@@ -144,7 +144,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
             <CWTextInput
               value={String(this.currentStake)}
               placeholder="Amount to lock"
-              oninput={(e) => {
+              onInput={(e) => {
                 this.phragmenStakeAmount = app.chain.chain.coins(
                   parseFloat(e.target.value),
                   true
@@ -173,7 +173,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                     <div className="candidate-row" onClick={onClick}>
                       <CWCheckbox
                         checked={this.votes.indexOf(address) !== -1}
-                        onchange={onClick}
+                        onChange={onClick}
                         label=""
                         value=""
                       />

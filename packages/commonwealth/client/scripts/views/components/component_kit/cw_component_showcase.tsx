@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
@@ -37,9 +47,9 @@ import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
 
 const displayIcons = (icons) => {
-  return Object.entries(icons).map(([k, _]) => {
+  return Object.entries(icons).map(([k], i) => {
     return (
-      <div className="icon-container">
+      <div className="icon-container" key={i}>
         <div className="icon-name">{k}</div>
         <CWIcon iconName={k as IconName} />
       </div>
@@ -87,7 +97,7 @@ export class ComponentShowcase extends ClassComponent {
   private toggleToggled: boolean;
   private voteCount: number;
 
-  oninit() {
+  oncreate() {
     this.radioGroupSelection = radioGroupOptions[2].value;
     this.selectedTab = 1;
     this.voteCount = 0;
@@ -104,7 +114,7 @@ export class ComponentShowcase extends ClassComponent {
             header="Stages"
             filterMenuItems={checkboxGroupOptions}
             selectedItems={this.checkboxGroupSelected}
-            onchange={(e) => {
+            onChange={(e) => {
               const itemValue = e.target.value;
               // console.log(itemValue);
               if (this.checkboxGroupSelected.indexOf(itemValue) === -1) {
@@ -124,7 +134,7 @@ export class ComponentShowcase extends ClassComponent {
           <CWContentPageCard
             header="Information"
             content={
-              <div style="padding: 16px;">
+              <div style={{ padding: '16px' }}>
                 <CWText>Content page card content</CWText>
               </div>
             }
@@ -302,20 +312,20 @@ export class ComponentShowcase extends ClassComponent {
           <CWText type="h3">Toggle</CWText>
           <CWToggle
             checked={this.toggleToggled}
-            onchange={() => {
+            onChange={() => {
               this.toggleToggled = !this.toggleToggled;
             }}
           />
           <CWToggle
             disabled
-            onchange={() => {
+            onChange={() => {
               this.toggleToggled = !this.toggleToggled;
             }}
           />
           <CWToggle
             checked
             disabled
-            onchange={() => {
+            onChange={() => {
               this.toggleToggled = !this.toggleToggled;
             }}
           />
@@ -458,17 +468,17 @@ export class ComponentShowcase extends ClassComponent {
             label="Text area"
             placeholder="Type here"
           />
-          <CWCoverImageUploader
+          {/* <CWCoverImageUploader
             uploadCompleteCallback={(url: string) => {
               notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
             }}
-          />
+          /> */}
         </div>
         <div className="button-gallery">
           <CWText type="h3">Buttons</CWText>
           <div className="button-row">
             <CWButton
-              iconName="person"
+              iconLeft="person"
               buttonType="primary-red"
               label="Primary red with icon"
               onClick={() => notifySuccess('Button clicked!')}
@@ -491,7 +501,7 @@ export class ComponentShowcase extends ClassComponent {
           </div>
           <div className="button-row">
             <CWButton
-              iconName="person"
+              iconLeft="person"
               label="Secondary red with icon"
               buttonType="secondary-red"
               onClick={() => notifySuccess('Button clicked!')}
@@ -515,7 +525,7 @@ export class ComponentShowcase extends ClassComponent {
           </div>
           <div className="button-row">
             <CWButton
-              iconName="person"
+              iconLeft="person"
               label="Tertiary blue with icon"
               buttonType="tertiary-blue"
               onClick={() => notifySuccess('Button clicked!')}
@@ -534,7 +544,7 @@ export class ComponentShowcase extends ClassComponent {
           </div>
           <div className="button-row">
             <CWButton
-              iconName="person"
+              iconLeft="person"
               label="Large primary red with icon"
               buttonType="lg-primary-red"
               onClick={() => notifySuccess('Button clicked!')}
@@ -553,7 +563,7 @@ export class ComponentShowcase extends ClassComponent {
           </div>
           <div className="button-row">
             <CWButton
-              iconName="person"
+              iconLeft="person"
               label="Large secondary red with icon"
               buttonType="lg-secondary-red"
               onClick={() => notifySuccess('Button clicked!')}
@@ -572,7 +582,7 @@ export class ComponentShowcase extends ClassComponent {
           </div>
           <div className="button-row">
             <CWButton
-              iconName="person"
+              iconLeft="person"
               label="Large tertiary red with icon"
               buttonType="lg-tertiary-red"
               onClick={() => notifySuccess('Button clicked!')}
@@ -605,7 +615,7 @@ export class ComponentShowcase extends ClassComponent {
           </div>
           <div className="button-row">
             <CWButton
-              iconName="person"
+              iconLeft="person"
               buttonType="mini-black"
               label="Mini with icon"
               onClick={() => notifySuccess('Button clicked!')}
@@ -818,7 +828,7 @@ export class ComponentShowcase extends ClassComponent {
             value="Radio Button"
             label="Radio Button"
             checked={this.radioButtonChecked === true}
-            onchange={() => {
+            onChange={() => {
               this.radioButtonChecked = true;
             }}
           />
@@ -840,7 +850,7 @@ export class ComponentShowcase extends ClassComponent {
             options={radioGroupOptions}
             name="RadioGroup"
             toggledOption={this.radioGroupSelection}
-            onchange={(e) => {
+            onChange={(e) => {
               this.radioGroupSelection = e.target.value;
               notifySuccess(`"${e.target.value}" selected`);
             }}
@@ -851,7 +861,7 @@ export class ComponentShowcase extends ClassComponent {
           <CWCheckbox
             checked={this.checkboxChecked}
             label="Click me"
-            onchange={() => {
+            onChange={() => {
               this.checkboxChecked = !this.checkboxChecked;
             }}
           />

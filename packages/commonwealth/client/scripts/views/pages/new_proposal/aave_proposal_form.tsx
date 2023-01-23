@@ -60,7 +60,7 @@ export class AaveProposalForm extends ClassComponent {
         <CWTextInput
           label="IPFS Hash"
           placeholder="Proposal IPFS Hash"
-          oninput={(e) => {
+          onInput={(e) => {
             this.ipfsHash = e.target.value;
           }}
         />
@@ -133,7 +133,7 @@ export class AaveProposalForm extends ClassComponent {
           label="Target Address"
           placeholder="Add Target"
           value={aaveProposalState[activeTabIndex].target}
-          oninput={(e) => {
+          onInput={(e) => {
             this.aaveProposalState[activeTabIndex].target = e.target.value;
           }}
         />
@@ -141,7 +141,7 @@ export class AaveProposalForm extends ClassComponent {
           label="Value"
           placeholder="Enter amount in wei"
           value={aaveProposalState[activeTabIndex].value}
-          oninput={(e) => {
+          onInput={(e) => {
             this.aaveProposalState[activeTabIndex].value = e.target.value;
           }}
         />
@@ -149,7 +149,7 @@ export class AaveProposalForm extends ClassComponent {
           label="Calldata"
           placeholder="Add Calldata"
           value={aaveProposalState[activeTabIndex].calldata}
-          oninput={(e) => {
+          onInput={(e) => {
             this.aaveProposalState[activeTabIndex].calldata = e.target.value;
           }}
         />
@@ -157,13 +157,13 @@ export class AaveProposalForm extends ClassComponent {
           label="Function Signature (Optional)"
           placeholder="Add a signature"
           value={aaveProposalState[activeTabIndex].signature}
-          oninput={(e) => {
+          onInput={(e) => {
             this.aaveProposalState[activeTabIndex].signature = e.target.value;
           }}
         />
         <CWCheckbox
           checked={this.aaveProposalState[activeTabIndex].withDelegateCall}
-          onchange={() => {
+          onChange={() => {
             this.aaveProposalState[activeTabIndex].withDelegateCall =
               !this.aaveProposalState[activeTabIndex].withDelegateCall;
           }}

@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_input.scss';
 
@@ -18,8 +27,8 @@ import { IconName } from './cw_icons/cw_icon_lookup';
 type TextInputSize = 'small' | 'large';
 
 export type BaseTextInputAttrs = {
-  autocomplete?: string;
-  autofocus?: boolean;
+  autoComplete?: string;
+  autoFocus?: boolean;
   containerClassName?: string;
   defaultValue?: string | number;
   value?: string | number;
@@ -27,13 +36,13 @@ export type BaseTextInputAttrs = {
   iconRightonClick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
-  maxlength?: number;
+  maxLength?: number;
   name?: string;
-  oninput?: (e) => void;
+  onInput?: (e) => void;
   onenterkey?: (e) => void;
   onClick?: (e) => void;
   placeholder?: string;
-  tabindex?: number;
+  tabIndex?: number;
 };
 
 type InputStyleAttrs = {
@@ -97,8 +106,8 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
 
   view(vnode: ResultNode<TextInputAttrs>) {
     const {
-      autocomplete = 'off',
-      autofocus,
+      autoComplete = 'off',
+      autoFocus,
       containerClassName,
       darkMode,
       defaultValue,
@@ -109,14 +118,14 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
       inputClassName,
       inputValidationFn,
       label,
-      maxlength,
+      maxLength,
       name,
-      oninput,
+      onInput,
       onenterkey,
       onClick,
       placeholder,
       size = 'large',
-      tabindex,
+      tabIndex,
       displayOnly,
     } = vnode.attrs;
 
@@ -144,8 +153,8 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
         )}
         <div className="input-and-icon-container">
           <input
-            autofocus={autofocus}
-            autocomplete={autocomplete}
+            autoFocus={autoFocus}
+            autoComplete={autoComplete}
             className={getClasses<InputStyleAttrs & InputInternalStyleAttrs>({
               size,
               validationStatus: this.validationStatus,
@@ -157,12 +166,12 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
               inputClassName,
             })}
             disabled={disabled || displayOnly}
-            tabindex={tabindex}
-            maxlength={maxlength}
+            tabIndex={tabIndex}
+            maxLength={maxLength}
             name={name}
             placeholder={placeholder}
-            oninput={(e) => {
-              if (oninput) oninput(e);
+            onInput={(e) => {
+              if (onInput) onInput(e);
 
               if (e.target.value?.length === 0) {
                 this.isTyping = false;
@@ -184,7 +193,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                 }, timeout);
               }
             }}
-            onfocusout={(e) => {
+            onBlur={(e) => {
               if (inputValidationFn) {
                 if (e.target.value?.length === 0) {
                   this.isTyping = false;
@@ -197,7 +206,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                 }
               }
             }}
-            onkeydown={(e) => {
+            onKeyDown={(e) => {
               if (onenterkey && (e.key === 'Enter' || e.keyCode === 13)) {
                 onenterkey(e);
               }

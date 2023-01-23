@@ -171,7 +171,7 @@ export class LoginSelectorMenuRight extends ClassComponent {
         <div className="login-menu-item">
           <CWToggle
             checked={isDarkModeOn}
-            onchange={(e) => {
+            onChange={(e) => {
               if (isDarkModeOn) {
                 localStorage.setItem('dark-mode-state', 'off');
                 document

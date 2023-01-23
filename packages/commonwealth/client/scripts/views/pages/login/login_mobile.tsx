@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/login/login_mobile.scss';
 
@@ -154,7 +163,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
                 <CWTextInput
                   label="email address"
                   placeholder="your-email@email.com"
-                  oninput={handleSetEmail}
+                  onInput={handleSetEmail}
                   onenterkey={handleEmailLoginCallback}
                 />
               ) : (

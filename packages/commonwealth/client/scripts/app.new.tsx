@@ -57,6 +57,7 @@ const ViewSnapshotProposalPage = lazy(
 
 const DiscussionsPage = lazy(() => import('views/pages/discussions'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
+const ComponentsPage = lazy(() => import('views/pages/components'));
 const PageNotFound = lazy(() => import('views/pages/404'));
 const MembersPage = lazy(() => import('views/pages/members'));
 const ViewThreadPage = lazy(() => import('views/pages/view_thread'));
@@ -120,6 +121,13 @@ const App = () => {
         <Route
           path="/whyCommonwealth"
           element={withLayout(WhyCommonwealthPage, {
+            scoped: false,
+            hideSidebar: true,
+          })}
+        />
+        <Route
+          path="/components"
+          element={withLayout(ComponentsPage, {
             scoped: false,
             hideSidebar: true,
           })}

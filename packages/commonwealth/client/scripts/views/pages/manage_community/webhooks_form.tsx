@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 import smartTruncate from 'smart-truncate';
 
@@ -195,7 +204,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
         <CWTextInput
           placeholder="https://hooks.slack.com/services/"
           value={this.webhookUrl}
-          oninput={(e) => {
+          onInput={(e) => {
             this.webhookUrl = e.target.value;
           }}
         />

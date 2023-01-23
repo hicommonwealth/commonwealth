@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_button.scss';
 
@@ -23,7 +32,7 @@ type RadioButtonStyleAttrs = {
 
 type RadioButtonAttrs = {
   groupName?: string;
-  onchange?: (e?: any) => void;
+  onChange?: (e?: any) => void;
 } & Omit<RadioButtonType, 'disabled'> &
   RadioButtonStyleAttrs;
 
@@ -33,7 +42,7 @@ export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
       disabled = false,
       groupName,
       label,
-      onchange,
+      onChange,
       checked,
       value,
     } = vnode.attrs;
@@ -41,7 +50,7 @@ export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
     const params = {
       disabled,
       name: groupName,
-      onchange,
+      onChange,
       checked,
       type: 'radio',
       value,

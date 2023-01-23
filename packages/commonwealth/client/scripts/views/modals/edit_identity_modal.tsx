@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/edit_identity_modal.scss';
@@ -146,42 +156,42 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
           <CWTextInput
             label="Display Name"
             placeholder="A reasonable display name for the controller of the account"
-            oninput={(e) => {
+            onInput={(e) => {
               this.display = e.target.value;
             }}
           />
           <CWTextInput
             label="Legal Name"
             placeholder="Full legal name in the local jurisdiction of the entity"
-            oninput={(e) => {
+            onInput={(e) => {
               this.legal = e.target.value;
             }}
           />
           <CWTextInput
             label="Website"
             placeholder="Website for the controller of the account, https:// automatically prepended"
-            oninput={(e) => {
+            onInput={(e) => {
               this.web = e.target.value;
             }}
           />
           <CWTextInput
             label="Riot/Matrix"
             placeholder="Riot/Matrix handle held by the controller of the account"
-            oninput={(e) => {
+            onInput={(e) => {
               this.riot = e.target.value;
             }}
           />
           <CWTextInput
             label="Email"
             placeholder="Email address of the controller of the account"
-            oninput={(e) => {
+            onInput={(e) => {
               this.email = e.target.value;
             }}
           />
           <CWTextInput
             label="Twitter"
             placeholder="Twitter identity of the controller of the account"
-            oninput={(e) => {
+            onInput={(e) => {
               this.twitter = e.target.value;
             }}
           />

@@ -3,7 +3,17 @@ import React from 'react';
 
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'modals/bounty_modals.scss';
 
@@ -41,7 +51,7 @@ export class ApproveBountyModal extends ClassComponent<BountyModalAttrs> {
             fail.
           </CWText>
           <CWTextInput
-            oninput={(e) => {
+            onInput={(e) => {
               const approvals = +(e.target as any).value;
               this.approvals = approvals;
             }}
@@ -105,12 +115,12 @@ export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
               fluid: true,
               placeholder: 'Curator address',
             }}
-            oninput={(result) => {
+            onInput={(result) => {
               this.curator = result.address;
             }}
           />
           <CWTextInput
-            oninput={(e) => {
+            onInput={(e) => {
               this.fee = +(e.target as any).value;
             }}
             placeholder={`Fee (${app.chain?.chain?.denom})`}
@@ -120,7 +130,7 @@ export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
             sufficient number of councillors as configured by the chain.
           </CWText>
           <CWTextInput
-            oninput={(e) => {
+            onInput={(e) => {
               this.approvals = +(e.target as any).value;
             }}
             placeholder="Approvals required"
@@ -180,7 +190,7 @@ export class AwardBountyModal extends ClassComponent<BountyModalAttrs> {
               fluid: true,
               placeholder: 'Recipient address',
             }}
-            oninput={(result) => {
+            onInput={(result) => {
               this.recipient = result.address;
             }}
           />
@@ -232,7 +242,7 @@ export class ExtendExpiryModal extends ClassComponent<BountyModalAttrs> {
             so far.
           </CWText>
           <CWTextInput
-            oninput={(e) => {
+            onInput={(e) => {
               this.remark = (e.target as any).value;
             }}
             placeholder="Remark"

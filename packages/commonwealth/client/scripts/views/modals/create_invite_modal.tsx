@@ -509,7 +509,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
               label="Address"
               placeholder="Type to search by name or address"
               value={this.searchAddressTerm}
-              oninput={(e) => {
+              onInput={(e) => {
                 e.stopPropagation();
                 this.isTyping = true;
                 this.searchAddressTerm = e.target.value?.toLowerCase();
@@ -585,7 +585,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
           <CWTextInput
             label="Email"
             placeholder="Enter email"
-            oninput={(e) => {
+            onInput={(e) => {
               this.invitedEmail = (e.target as any).value;
             }}
           />

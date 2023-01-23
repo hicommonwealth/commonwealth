@@ -52,14 +52,14 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
         <CWTextInput
           label="Beneficiary"
           placeholder="Beneficiary of treasury proposal"
-          oninput={(e) => {
+          onInput={(e) => {
             this.beneficiary = e.target.value;
           }}
         />
         <CWTextArea
           label="Reason"
           placeholder="What’s the reason you want to tip the beneficiary?"
-          oninput={(e) => {
+          onInput={(e) => {
             this.description = e.target.value;
           }}
         />

@@ -125,7 +125,7 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
                      p-2 flex flex-row justify-between mb-10 relative`}
                 >
                   <FindYourTokenInputComponent
-                    onchangeValue={(event: any) => {
+                    onChangeValue={(event: any) => {
                       this.inputTokenValue = event.target.value;
                       this.refilterResults = false;
                       clearTimeout(this.inputTimeout);

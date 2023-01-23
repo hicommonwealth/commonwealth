@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_area.scss';
 
@@ -26,17 +35,17 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
 
   view(vnode: ResultNode<TextAreaAttrs>) {
     const {
-      autocomplete,
-      autofocus,
+      autoComplete,
+      autoFocus,
       value,
       disabled,
       inputValidationFn,
       label,
-      maxlength,
+      maxLength,
       name,
-      oninput,
+      onInput,
       placeholder,
-      tabindex,
+      tabIndex,
     } = vnode.attrs;
 
     return (
@@ -50,20 +59,20 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
           />
         )}
         <textarea
-          autofocus={autofocus}
-          autocomplete={autocomplete}
+          autoFocus={autoFocus}
+          autoComplete={autoComplete}
           className={getClasses<TextAreaStyleAttrs & { isTyping: boolean }>({
             validationStatus: this.validationStatus,
             disabled,
             isTyping: this.isTyping,
           })}
           disabled={disabled}
-          tabindex={tabindex}
-          maxlength={maxlength}
+          tabIndex={tabIndex}
+          maxLength={maxLength}
           name={name}
           placeholder={placeholder}
-          oninput={(e) => {
-            if (oninput) oninput(e);
+          onInput={(e) => {
+            if (onInput) onInput(e);
 
             if (e.target.value?.length === 0) {
               this.isTyping = false;
@@ -85,7 +94,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
               }, timeout);
             }
           }}
-          onfocusout={(e) => {
+          onBlur={(e) => {
             if (inputValidationFn) {
               if (e.target.value?.length === 0) {
                 this.isTyping = false;

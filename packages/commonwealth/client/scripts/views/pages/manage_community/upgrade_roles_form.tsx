@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
@@ -60,7 +69,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
             name="members/mods"
             options={nonAdminNames.map((n) => ({ label: n, value: n }))}
             toggledOption={this.user}
-            onchange={(e) => {
+            onChange={(e) => {
               this.user = e.target.value;
             }}
           />
@@ -73,7 +82,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
               { label: 'Moderator', value: 'Moderator' },
             ]}
             toggledOption={this.role}
-            onchange={(e) => {
+            onChange={(e) => {
               this.role = e.target.value;
             }}
           />

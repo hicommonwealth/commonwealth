@@ -1,5 +1,14 @@
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
@@ -180,7 +189,7 @@ export const renderQuillDelta = (
               },
               [
                 render('a', {
-                  tabindex: -1,
+                  tabIndex: -1,
                   href: url,
                 }),
               ]
@@ -301,7 +310,9 @@ export const renderQuillDelta = (
             const tag = getParentTag(parent);
             const content = parent.children.map(renderChild);
             if (tag === 'li.checked') {
-              content.unshift(render(`input[type='checkbox'][disabled][checked]`));
+              content.unshift(
+                render(`input[type='checkbox'][disabled][checked]`)
+              );
             } else if (tag === 'li.unchecked') {
               content.unshift(render(`input[type='checkbox'][disabled]`));
             }

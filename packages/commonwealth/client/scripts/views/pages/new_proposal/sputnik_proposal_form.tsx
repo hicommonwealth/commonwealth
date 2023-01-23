@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
@@ -56,7 +66,7 @@ export class SputnikProposalForm extends ClassComponent {
           <CWTextInput
             label="Member"
             defaultValue="tokenfactory.testnet"
-            oninput={(e) => {
+            onInput={(e) => {
               this.member = e.target.value;
             }}
           />
@@ -64,7 +74,7 @@ export class SputnikProposalForm extends ClassComponent {
         <CWTextInput
           label="Description"
           defaultValue=""
-          oninput={(e) => {
+          onInput={(e) => {
             this.description = e.target.value;
           }}
         />
@@ -72,7 +82,7 @@ export class SputnikProposalForm extends ClassComponent {
           <CWTextInput
             label="Token ID (leave blank for Ⓝ)"
             defaultValue=""
-            oninput={(e) => {
+            onInput={(e) => {
               this.tokenId = e.target.value;
             }}
           />
@@ -81,7 +91,7 @@ export class SputnikProposalForm extends ClassComponent {
           <CWTextInput
             label="Amount"
             defaultValue=""
-            oninput={(e) => {
+            onInput={(e) => {
               this.payoutAmount = e.target.value;
             }}
           />

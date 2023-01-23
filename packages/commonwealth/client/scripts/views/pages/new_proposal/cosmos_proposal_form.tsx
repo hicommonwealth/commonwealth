@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
@@ -40,7 +50,7 @@ export class CosmosProposalForm extends ClassComponent {
         <CWLabel label="Proposal Type" />
         <CWRadioGroup
           name="cosmos-proposal-type"
-          onchange={(value) => {
+          onChange={(value) => {
             this.cosmosProposalType = value;
           }}
           toggledOption="textProposal"
@@ -52,14 +62,14 @@ export class CosmosProposalForm extends ClassComponent {
         <CWTextInput
           placeholder="Enter a title"
           label="Title"
-          oninput={(e) => {
+          onInput={(e) => {
             this.title = e.target.value;
           }}
         />
         <CWTextArea
           label="Description"
           placeholder="Enter a description"
-          oninput={(e) => {
+          onInput={(e) => {
             this.description = e.target.value;
           }}
         />
@@ -67,7 +77,7 @@ export class CosmosProposalForm extends ClassComponent {
           label={`Deposit (${cosmos.governance.minDeposit.denom})`}
           placeholder={`Min: ${+cosmos.governance.minDeposit}`}
           defaultValue={+cosmos.governance.minDeposit}
-          oninput={(e) => {
+          onInput={(e) => {
             this.deposit = +e.target.value;
           }}
         />
@@ -76,7 +86,7 @@ export class CosmosProposalForm extends ClassComponent {
             label="Recipient"
             placeholder={app.user.activeAccount.address}
             defaultValue=""
-            oninput={(e) => {
+            onInput={(e) => {
               this.recipient = e.target.value;
             }}
           />
@@ -86,7 +96,7 @@ export class CosmosProposalForm extends ClassComponent {
             label={`Amount (${cosmos.governance.minDeposit.denom})`}
             placeholder="12345"
             defaultValue=""
-            oninput={(e) => {
+            onInput={(e) => {
               this.payoutAmount = e.target.value;
             }}
           />

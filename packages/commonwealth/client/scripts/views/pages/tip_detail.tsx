@@ -91,7 +91,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                   <CWTextInput
                     name="amount"
                     placeholder="Enter tip amount"
-                    oninput={(e) => {
+                    onInput={(e) => {
                       const result = (e.target as any).value;
                       setTipAmount(
                         result.length > 0

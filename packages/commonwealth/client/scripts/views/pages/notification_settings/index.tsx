@@ -111,7 +111,7 @@ class NotificationSettingsPage extends ClassComponent {
                       <CWCheckbox
                         label="Receive Emails"
                         checked={hasSomeEmailSubs}
-                        onchange={() => {
+                        onChange={() => {
                           hasSomeEmailSubs
                             ? app.user.notifications
                                 .disableImmediateEmails(subs)
@@ -127,7 +127,7 @@ class NotificationSettingsPage extends ClassComponent {
                       />
                       <CWToggle
                         checked={subs.some((s) => s.isActive)}
-                        onchange={() => {
+                        onChange={() => {
                           hasSomeInAppSubs
                             ? app.user.notifications
                                 .disableSubscriptions(subs)

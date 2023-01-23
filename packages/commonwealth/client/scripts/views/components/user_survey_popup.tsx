@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import app from 'state';
 
 import 'components/user_survey_popup.scss';
@@ -55,7 +64,7 @@ class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
             value=""
             checked={checked}
             label="Please don't show this again"
-            onchange={onCheckboxClick}
+            onChange={onCheckboxClick}
             className="checkbox"
           />
         </div>

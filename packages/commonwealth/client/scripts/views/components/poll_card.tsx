@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/poll_card.scss';
 
@@ -53,7 +62,7 @@ export class PollOptions extends ClassComponent<PollOptionAttrs> {
                 checked={false}
                 value=""
                 label={option.label}
-                onchange={() => {
+                onChange={() => {
                   // TODO: Build this out when multiple vote options are introduced.
                   // Something like: this.selectedOptions.push(option.value);
                   console.log('A vote for multiple options');
@@ -67,7 +76,7 @@ export class PollOptions extends ClassComponent<PollOptionAttrs> {
                   option.value === selectedOptions[0]
                 }
                 groupName="votes"
-                onchange={() => {
+                onChange={() => {
                   selectedOptions[0] = option.value;
                 }}
                 label={option.label}

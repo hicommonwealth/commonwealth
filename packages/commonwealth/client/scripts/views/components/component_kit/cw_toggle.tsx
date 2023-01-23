@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_toggle.scss';
 
@@ -14,16 +23,16 @@ type ToggleStyleAttrs = {
 } & StyleAttrs;
 
 type ToggleAttrs = {
-  onchange: (e?: any) => void;
+  onChange: (e?: any) => void;
 } & ToggleStyleAttrs;
 
 export class CWToggle extends ClassComponent<ToggleAttrs> {
   view(vnode: ResultNode<ToggleAttrs>) {
-    const { className, disabled = false, onchange, checked } = vnode.attrs;
+    const { className, disabled = false, onChange, checked } = vnode.attrs;
 
     const params = {
       disabled,
-      onchange,
+      onChange,
       checked,
       type: 'checkbox',
     };

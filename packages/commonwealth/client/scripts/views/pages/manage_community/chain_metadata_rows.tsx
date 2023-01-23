@@ -311,13 +311,13 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           title="Banner"
           name="Banner Text"
           label="Banner"
-          maxlength={512}
+          maxLength={512}
           placeholder="Text for across the top of your community"
           value={this.communityBanner}
           onChangeHandler={(v) => {
             this.communityBanner = v;
           }}
-          tabindex={1}
+          tabIndex={1}
           editorNamespace="new-banner"
         />
         <div className="tag-row">
@@ -501,7 +501,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               <div className="snapshot-settings">
                 <CWText type="h4">Snapshot Notifications</CWText>
                 <CWToggle
-                  onchange={() => {
+                  onChange={() => {
                     this.snapshotNotificationsEnabled =
                       !this.snapshotNotificationsEnabled;
                     this.redraw();

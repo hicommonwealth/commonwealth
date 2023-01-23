@@ -2,8 +2,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -64,12 +73,12 @@ export class CreateCategory extends ClassComponent<ChannelAttrs> {
         <CWTextInput
           label="*Category Title"
           placeholder="Enter a category title"
-          oninput={handleCategoryChange}
+          onInput={handleCategoryChange}
         />
         <CWTextInput
           label="*Channel Title"
           placeholder="Enter a channel title"
-          oninput={handleChannelChange}
+          onInput={handleChannelChange}
         />
         <div className="button-bar">
           <CWButton
@@ -124,7 +133,7 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
         <CWTextInput
           label="*Channel Title"
           placeholder="Enter a channel title"
-          oninput={handleChannelChange}
+          onInput={handleChannelChange}
         />
         <div className="button-bar">
           <CWButton
@@ -176,7 +185,7 @@ export class RenameChannel extends ClassComponent<ChannelAttrs> {
         <CWTextInput
           label="*Channel Name"
           placeholder="Enter a new channel name"
-          oninput={handleChange}
+          onInput={handleChange}
         />
         <div className="button-bar">
           <CWButton
@@ -228,7 +237,7 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
         <CWTextInput
           label="*Category Name"
           placeholder="Enter a category name"
-          oninput={handleChange}
+          onInput={handleChange}
         />
         <div className="button-bar">
           <CWButton
