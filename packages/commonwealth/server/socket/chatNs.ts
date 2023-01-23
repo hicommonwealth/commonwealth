@@ -6,7 +6,7 @@ import {
 } from 'common-common/src/types';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import { Action } from '../util/permissions';
+import { Action } from 'commonwealth/shared/permissions';
 import emitNotifications from '../util/emitNotifications';
 import {
   WebsocketEngineEvents,
