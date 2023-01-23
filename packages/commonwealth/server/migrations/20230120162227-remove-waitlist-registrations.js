@@ -3,13 +3,13 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      queryInterface.dropTable('WaitlistRegistrations', { transaction });
+      await queryInterface.dropTable('WaitlistRegistrations', { transaction });
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      queryInterface.createTable('WaitlistRegistrations', {
+      await queryInterface.createTable('WaitlistRegistrations', {
         user_id: { type: Sequelize.INTEGER, allowNull: false },
         chain_id: { type: Sequelize.STRING, allowNull: false },
         address: { type: Sequelize.STRING, allowNull: true },
