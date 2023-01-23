@@ -340,14 +340,15 @@ export function isActiveAddressPermitted(
   else {
     // compute permissions with chain default permissions
 
-    const permission =
-      permissionsManager.computePermissions(
-        everyonePermissions, [
-      {
-        allow: chain_info.defaultAllowPermissions,
-        deny: chain_info.defaultDenyPermissions,
-      },
-    ]);
+    const permission = permissionsManager.computePermissions(
+      everyonePermissions,
+      [
+        {
+          allow: chain_info.defaultAllowPermissions,
+          deny: chain_info.defaultDenyPermissions,
+        },
+      ]
+    );
     if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
