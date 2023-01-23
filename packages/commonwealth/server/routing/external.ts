@@ -1,5 +1,5 @@
 import {
-  PostProfilesReq,
+  // PostProfilesReq,
   PostReactionsReq,
   PostRolesReq,
   PostRulesReq,
@@ -52,7 +52,7 @@ import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
 import { TypedRequest } from '../types';
 import {
   onlyIds,
-  postProfilesValidation,
+  // postProfilesValidation,
   postReactionsValidation,
   postRolesValidation,
   postRulesValidation,

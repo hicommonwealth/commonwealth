@@ -34,7 +34,6 @@ const editThread = async (
     kind,
     stage,
     thread_id,
-    version_history,
     url,
     canvas_action,
     canvas_session,
@@ -148,6 +147,9 @@ const editThread = async (
     }
     thread.body = body;
     thread.stage = stage;
+    thread.canvas_action = canvas_action;
+    thread.canvas_session = canvas_session;
+    thread.canvas_hash = canvas_hash;
     thread.plaintext = (() => {
       try {
         return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));

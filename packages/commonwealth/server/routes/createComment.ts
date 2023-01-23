@@ -60,7 +60,6 @@ const createComment = async (
   const {
     parent_id,
     root_id,
-    chain_entity_id,
     text,
     canvas_action,
     canvas_session,

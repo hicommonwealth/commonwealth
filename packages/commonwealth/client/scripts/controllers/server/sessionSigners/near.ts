@@ -1,8 +1,9 @@
 import bs58 from 'bs58';
-import { KeyPair } from 'near-api-js';
-import { PublicKey } from 'near-api-js/lib/utils';
 import { KeyPairEd25519 } from 'near-api-js/lib/utils';
-import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import {
+  actionToHash,
+  verify as verifyCanvasSessionSignature,
+} from 'helpers/canvas';
 import { serializeActionPayload } from '@canvas-js/interfaces';
 import {
   Action,
@@ -130,7 +131,7 @@ export class NEARSessionController implements ISessionController {
     };
 
     const message = getNearSignatureData(actionPayload);
-    const { signature: signatureBytes, publicKey } = signer.sign(message);
+    const { signature: signatureBytes } = signer.sign(message); // publicKey?
     const signature = bs58.encode(signatureBytes);
     if (!signer.verify(message, signatureBytes)) {
       throw new Error('Invalid signature!');

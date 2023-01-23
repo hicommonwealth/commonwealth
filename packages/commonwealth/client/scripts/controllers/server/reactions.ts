@@ -1,12 +1,5 @@
-/* eslint-disable dot-notation */
-import { notifyError } from 'controllers/app/notifications';
-import proposalIdToEntity from 'helpers/proposalIdToEntity';
-/* eslint-disable no-restricted-syntax */
-import $ from 'jquery';
 import type { AbridgedThread, AnyProposal } from 'models';
-import { Comment, Proposal, Reaction, Thread } from 'models';
-
-import app from 'state';
+import { Comment, Reaction, Thread } from 'models';
 
 import { ReactionStore } from 'stores';
 

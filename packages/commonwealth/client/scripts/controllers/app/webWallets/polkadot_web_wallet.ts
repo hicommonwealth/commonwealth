@@ -9,7 +9,6 @@ import {
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
-import { ApiPromise, WsProvider } from '@polkadot/api';
 
 import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 

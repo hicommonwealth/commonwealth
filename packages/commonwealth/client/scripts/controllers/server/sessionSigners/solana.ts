@@ -1,11 +1,11 @@
 import * as solw3 from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
-import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import {
-  serializeActionPayload,
-  serializeSessionPayload,
-} from '@canvas-js/interfaces';
+  actionToHash,
+  verify as verifyCanvasSessionSignature,
+} from 'helpers/canvas';
+import { serializeActionPayload } from '@canvas-js/interfaces';
 import type {
   Action,
   ActionArgument,

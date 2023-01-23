@@ -1,10 +1,8 @@
 declare let window: any;
 
 import bs58 from 'bs58';
-import * as solw3 from '@solana/web3.js';
 import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 
-import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 

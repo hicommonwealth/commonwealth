@@ -7,7 +7,7 @@ import {
 } from '@terra-money/wallet-controller';
 import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 
-import { Account, BlockInfo, IWebWallet } from 'models';
+import { Account, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
 
@@ -113,7 +113,7 @@ class TerraWalletConnectWebWalletController
       await this._controller.connect(ConnectType.WALLETCONNECT);
 
       let subscription;
-      this._wallet = await new Promise((resolve, reject) => {
+      this._wallet = await new Promise((resolve) => {
         subscription = this._controller
           .connectedWallet()
           .subscribe((connectedWallet) => {

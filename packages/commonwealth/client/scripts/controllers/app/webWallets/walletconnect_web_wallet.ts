@@ -1,7 +1,7 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
-import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
+import { SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
@@ -68,7 +68,6 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       account.address,
       JSON.stringify(typedCanvasMessage),
     ]);
-    const chainId = (app.chain?.meta.node.ethChainId || 1).toString();
     return signature;
   }
 

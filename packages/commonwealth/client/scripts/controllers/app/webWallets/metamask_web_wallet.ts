@@ -77,7 +77,6 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       method: 'eth_signTypedData_v4',
       params: [account.address, JSON.stringify(typedCanvasMessage)],
     });
-    const chainId = (app.chain?.meta.node.ethChainId || 1).toString();
     return signature;
   }
 

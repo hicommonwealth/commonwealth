@@ -28,8 +28,7 @@ const deleteThread = async (
   req: TypedRequestBody<DeleteThreadReq>,
   resp: TypedResponse<DeleteThreadResp>
 ) => {
-  const { thread_id, chain_id, canvas_action, canvas_session, canvas_hash } =
-    req.body;
+  const { thread_id } = req.body;
   if (!req.user) {
     throw new AppError(DeleteThreadErrors.NoUser);
   }

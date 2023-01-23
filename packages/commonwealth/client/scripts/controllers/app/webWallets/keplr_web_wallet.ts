@@ -8,15 +8,6 @@ import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 import { Account, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 
-interface Pubkey {
-  readonly type: string;
-  readonly value: any;
-}
-interface StdSignature {
-  readonly pub_key: Pubkey;
-  readonly signature: string;
-}
-
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}

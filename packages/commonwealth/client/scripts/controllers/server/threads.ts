@@ -385,14 +385,6 @@ class ThreadsController {
   }
 
   public async delete(proposal) {
-    const {
-      session = null,
-      action = null,
-      hash = 0,
-    } = await app.sessions.signDeleteThread({
-      thread_id: proposal.canvasHash,
-    });
-
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {

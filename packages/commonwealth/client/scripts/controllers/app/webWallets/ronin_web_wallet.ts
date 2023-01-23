@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
@@ -35,7 +37,7 @@ class RoninWebWalletController implements IWebWallet<any> {
     throw new Error('not implemented');
   }
 
-  public async getRecentBlock(chainIdentifier: string) {
+  public async getRecentBlock(_chainIdentifier: string) {
     return null;
   }
 

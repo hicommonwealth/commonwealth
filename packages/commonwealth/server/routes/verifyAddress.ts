@@ -48,11 +48,6 @@ import {
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-let serializeSessionPayload;
-import('@canvas-js/interfaces').then((interfaces) => {
-  serializeSessionPayload = interfaces.serializeSessionPayload;
-});
-
 const log = factory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -421,9 +416,6 @@ const processAddress = async (
     !!existingAddress.verified && user && existingAddress.user_id !== user.id;
   const oldId = existingAddress.user_id;
   try {
-    const node = await models.ChainNode.findOne({
-      where: { id: chain.chain_node_id },
-    });
     const valid = await verifySignature(
       models,
       chain,

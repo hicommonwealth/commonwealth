@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
 import { SessionPayload } from '@canvas-js/interfaces';

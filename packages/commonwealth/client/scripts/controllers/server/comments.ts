@@ -218,7 +218,6 @@ class CommentsController {
         body,
         parent_comment_id: comment.parentComment,
       });
-      const signedData = JSON.stringify({ session, action });
       const response = await $.post(`${app.serverUrl()}/editComment`, {
         address: app.user.activeAccount.address,
         author_chain: app.user.activeAccount.chain.id,
@@ -227,9 +226,9 @@ class CommentsController {
         body: encodeURIComponent(newBody),
         'attachments[]': attachments,
         jwt: app.user.jwt,
-        canvas_action: comment.canvasAction,
-        canvas_session: comment.canvasSession,
-        canvas_hash: comment.canvasHash,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {

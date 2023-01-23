@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 import m from 'mithril';
@@ -8,8 +10,6 @@ import { ApiStatus } from 'state';
 import type SolanaAccount from './account';
 
 import { SolanaToken } from './types';
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default class SolanaChain
   implements IChainModule<SolanaToken, SolanaAccount>
