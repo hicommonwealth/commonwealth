@@ -12,7 +12,6 @@ import setupPassport from './passport';
 import setupRouter from './router';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 const port = process.env.PORT || DEFAULT_PORT;
 
 export const app = express();
