@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/overview/index.scss';
 
@@ -17,9 +26,11 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
+import CWReactModal from '../../components/component_kit/cw_react_modal';
 
 class OverviewPage extends ClassComponent {
   private isWindowExtraSmall: boolean;
+  private modalOpen: boolean;
 
   onResize() {
     this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
@@ -28,6 +39,7 @@ class OverviewPage extends ClassComponent {
 
   oninit() {
     this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
+    this.modalOpen = false;
 
     window.addEventListener('resize', () => {
       this.onResize();
@@ -66,7 +78,7 @@ class OverviewPage extends ClassComponent {
       return { monthlyThreads, topic };
     });
 
-    return (!topicSummaryRows.length && !app.threads.initialized) ? (
+    return !topicSummaryRows.length && !app.threads.initialized ? (
       <PageLoading />
     ) : (
       <Sublayout>
@@ -76,6 +88,23 @@ class OverviewPage extends ClassComponent {
               <CWText type="h3" fontWeight="semiBold">
                 Overview
               </CWText>
+              <CWReactModal
+                open={this.modalOpen}
+                onClose={() => {
+                  this.modalOpen = false;
+                  this.redraw();
+                  console.log('lol');
+                }}
+              />
+              <CWButton
+                buttonType="mini-black"
+                label="Open"
+                iconName="plus"
+                onClick={() => {
+                  this.modalOpen = !this.modalOpen;
+                  this.redraw();
+                }}
+              />
               <CWButton
                 className="latest-button"
                 buttonType="mini-black"
