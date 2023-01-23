@@ -73,9 +73,8 @@ describe('PermissionManager', () => {
       );
 
       const expectedPermissions =
-        BigInt(1 << Action.EDIT_COMMENT) |
-        BigInt(1 << Action.DELETE_COMMENT);
-        
+        BigInt(1 << Action.EDIT_COMMENT) | BigInt(1 << Action.DELETE_COMMENT);
+
       assert.equal(result, expectedPermissions);
     });
   });
