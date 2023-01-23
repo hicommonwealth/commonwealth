@@ -41,7 +41,7 @@ export const constructTypedMessage = async (fromAddress: string, fromChainId: nu
   const validationBlockInfo = JSON.parse(validationBlockInfoString)
   const block: Block = {
     chain: 'eth',
-    chainId: fromChainId,
+    chainId: fromChainId.toString(),
     blocknum: validationBlockInfo.number,
     blockhash: validationBlockInfo.hash,
     timestamp: validationBlockInfo.timestamp,

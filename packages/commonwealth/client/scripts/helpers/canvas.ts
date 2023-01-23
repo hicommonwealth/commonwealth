@@ -38,7 +38,6 @@ import bs58 from 'bs58';
 export function actionToHash(action: Action): Buffer {
   const payload = serializeActionPayload(action.payload);
   return createHash('sha256').update({ ...action, payload }).digest();
-  return hash;
 }
 
 export function sessionToHash(session: Session): Buffer {

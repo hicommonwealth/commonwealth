@@ -10,9 +10,7 @@ import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
-import { constructCanvasMessage } from 'shared/adapters/shared';
 import { PermissionManager } from 'commonwealth/shared/permissions';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3';
 import app from '../../server-test';
 import models from '../../server/database';
@@ -91,14 +89,15 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
-    const data = constructCanvasMessage(
-      'ethereum',
+    const message = constructCanvasMessage(
+      'eth',
       chain_id,
       address,
       sessionWallet.address,
       timestamp,
       TEST_BLOCK_INFO_BLOCKHASH
     );
+    const data = constructTypedCanvasMessage(message);
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
