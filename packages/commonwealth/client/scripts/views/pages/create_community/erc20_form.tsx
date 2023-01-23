@@ -63,7 +63,13 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
   }
 
   view(vnode: m.Vnode<EthChainAttrs>) {
-    const validAddress = isAddress(this.state.form.address);
+    // TODO: Decide where this goes
+    const isXdcAddress = (address) => {
+      return isAddress(address.replace(/^(xdc|XDC)/i, '0x'));
+    };
+    const validAddress =
+      isAddress(this.state.form.address) ||
+      isXdcAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
     const updateTokenForum = async () => {
