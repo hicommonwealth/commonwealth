@@ -655,6 +655,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
               scoped: true,
             }),
+            // General Contracts
+            '/new/contract': importRoute('views/pages/new_contract', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/contract/:contractAddress': importRoute(
+              'views/pages/general_contract',
+              { scoped: true }
+            ),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/discussions': importRoute('views/pages/discussions', {
@@ -920,6 +929,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/:scope/new/contract': importRoute('views/pages/new_contract', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/contract/:contractAddress': importRoute(
+              'views/pages/general_contract',
+              { scoped: true }
+            ),
             '/:scope/discussions/:topic': importRoute(
               'views/pages/discussions',
               { scoped: true, deferChain: true }

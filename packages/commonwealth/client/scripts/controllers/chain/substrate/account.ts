@@ -169,7 +169,7 @@ export class SubstrateAccount extends Account {
     return this._Accounts.validators.then((validators: IValidators) =>
       Object.entries(validators)
         .filter(
-          ([stash, { exposure }]) =>
+          ([, { exposure }]) =>
             exposure.others.findIndex(
               ({ who }) => who.toString() === this.address
             ) !== -1
