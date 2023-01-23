@@ -46,6 +46,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from "v8";
+import {factory, formatFilename} from "common-common/src/logging";
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
