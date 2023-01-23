@@ -1,24 +1,27 @@
 /* eslint-disable no-unused-expressions */
-import chai from 'chai';
-import 'chai/register-should';
-import Web3 from 'web3';
-import { ethers } from 'ethers';
-import BN from 'bn.js';
-import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { createRole, findOneRole } from 'server/util/roles';
+import { stringToU8a } from '@polkadot/util';
+import type BN from 'bn.js';
+import chai from 'chai';
+import 'chai/register-should';
 import { BalanceType, ChainNetwork } from 'common-common/src/types';
+import wallet from 'ethereumjs-wallet';
+import { ethers } from 'ethers';
+import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
+import { constructCanvasMessage } from 'shared/adapters/shared';
+import { PermissionManager } from '../../server/util/permissions';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
+import Web3 from 'web3';
 import app from '../../server-test';
 import models from '../../server/database';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { Permission } from '../../server/models/role';
-import { constructTypedCanvasMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-import { constructCanvasMessage } from 'shared/adapters/shared';
-import { Action } from '../../../common-common/src/permissions';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
+import {
+  constructTypedMessage,
+  TEST_BLOCK_INFO_STRING,
+} from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -29,12 +32,15 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
-export async function addAllowDenyPermissions(
+export async function addAllowDenyPermissionsForCommunityRole(
   role_name: Permission,
   chain_id: string,
-  allow_permission: number,
-  deny_permission: number
+  allow_permission: number | undefined,
+  deny_permission: number | undefined
 ) {
+  try {
+    console.log('addAllowDenyPermissionsForCommunityRole');
+  const permissionsManager = new PermissionManager();
   // get community role object from the database
   const communityRole = await models.CommunityRole.findOne({
     where: {
@@ -42,14 +48,28 @@ export async function addAllowDenyPermissions(
       name: role_name,
     },
   });
-  // update allow permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.allow = BigInt(communityRole.allow) | BigInt(1) << BigInt(allow_permission);
-  // update deny permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.deny = BigInt(communityRole.deny) | BigInt(1) << BigInt(deny_permission);
+  let denyPermission;
+  let allowPermission;
+  if (deny_permission) {
+    denyPermission = permissionsManager.addDenyPermission(
+      BigInt(communityRole?.deny || 0),
+      deny_permission,
+    );
+    communityRole.deny = denyPermission;
+  }
+  if (allow_permission) {
+    allowPermission = permissionsManager.addAllowPermission(
+      BigInt(communityRole?.allow || 0),
+      allow_permission,
+    );
+    communityRole.allow = allowPermission;
+  }
   // save community role object to the database
-  await communityRole.save();
+  const updatedRole = await communityRole.save();
+  console.log('updatedRole', updatedRole);
+  } catch(err) {
+    throw new Error(err);
+  }
 }
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
@@ -61,12 +81,17 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+    console.log('createAndVerifyAddress res', res.body);
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
-    const sessionWallet = ethers.Wallet.createRandom()
-    const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
-    const data = constructTypedCanvasMessage(message);
+    const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
+    const sessionWallet = ethers.Wallet.createRandom();
+    const data = await constructTypedMessage(
+      address,
+      chain_id,
+      sessionWallet.address,
+      TEST_BLOCK_INFO_STRING
+    );
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -105,12 +130,21 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
 
     // generate session wallet
     const sessionKeyring = new Keyring();
-    const sessionWallet = sessionKeyring.addFromUri(mnemonicGenerate(), {}, 'ed25519');
-    const chain_id = ChainNetwork.Edgeware
-    const timestamp = 1665083987891
-    const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+    const sessionWallet = sessionKeyring.addFromUri(
+      mnemonicGenerate(),
+      {},
+      'ed25519'
+    );
+    const chain_id = ChainNetwork.Edgeware;
+    const message = constructCanvasMessage(
+      'eth',
+      chain_id,
+      address,
+      sessionWallet.address,
+      TEST_BLOCK_INFO_STRING
+    );
 
-    const signature = keyPair.sign(stringToU8a(JSON.stringify(message)))
+    const signature = keyPair.sign(stringToU8a(JSON.stringify(message)));
 
     const address_id = res.body.result.id;
     res = await chai.request
@@ -154,6 +188,7 @@ export interface ThreadArgs {
   attachments?: string[];
   readOnly?: boolean;
 }
+
 export const createThread = async (args: ThreadArgs) => {
   const {
     chainId,
@@ -165,9 +200,7 @@ export const createThread = async (args: ThreadArgs) => {
     topicId,
     readOnly,
     kind,
-    stage,
     url,
-    attachments,
   } = args;
   const res = await chai.request
     .agent(app)
@@ -198,6 +231,7 @@ export interface CommentArgs {
   parentCommentId?: any;
   root_id?: any;
 }
+
 export const createComment = async (args: CommentArgs) => {
   const { chain, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request
@@ -241,6 +275,32 @@ export const editComment = async (args: EditCommentArgs) => {
       jwt,
       chain: community ? undefined : chain,
       community,
+    });
+  return res.body;
+};
+
+export interface CreateReactionArgs {
+  author_chain: string;
+  chain: string;
+  address: string;
+  reaction: string;
+  jwt: string;
+  comment_id: number;
+}
+
+export const createReaction = async (args: CreateReactionArgs) => {
+  const { chain, address, jwt, author_chain, reaction, comment_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/createReaction')
+    .set('Accept', 'application/json')
+    .send({
+      chain,
+      address,
+      reaction,
+      comment_id,
+      author_chain,
+      jwt,
     });
   return res.body;
 };
@@ -364,6 +424,7 @@ export interface SubscriptionArgs {
   is_active: boolean;
   category: string;
 }
+
 export const createSubscription = async (args: SubscriptionArgs) => {
   const res = await chai
     .request(app)
@@ -417,7 +478,10 @@ export const createInvite = async (args: InviteArgs) => {
 };
 
 // always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
+export class MockTokenBalanceProvider extends BalanceProvider<{
+  tokenAddress: string;
+  contractType: string;
+}> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
@@ -429,7 +493,7 @@ export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: st
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: { tokenAddress: string, contractType: string }
+    opts: { tokenAddress: string; contractType: string }
   ): Promise<string> {
     if (this.balanceFn) {
       const bal = await this.balanceFn(opts.tokenAddress, address);

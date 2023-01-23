@@ -1,9 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -11,7 +8,12 @@ export const Errors = {
   ChainNF: 'Chain not found',
 };
 
-const selectChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const selectChain = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }

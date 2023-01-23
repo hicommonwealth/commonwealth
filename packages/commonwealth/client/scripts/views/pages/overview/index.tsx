@@ -1,21 +1,21 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
+import m from 'mithril';
+import type { Thread, Topic } from 'models';
 
 import 'pages/overview/index.scss';
 
 import app from 'state';
-import { Thread, Topic } from 'models';
-import { navigateToSubpage } from 'app';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { TopicSummaryRow } from './topic_summary_row';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWText } from '../../components/component_kit/cw_text';
+import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
+import { TopicSummaryRow } from './topic_summary_row';
 
 class OverviewPage extends ClassComponent {
   private isWindowExtraSmall: boolean;
@@ -65,7 +65,7 @@ class OverviewPage extends ClassComponent {
       return { monthlyThreads, topic };
     });
 
-    return (!topicSummaryRows.length && !app.threads.initialized) ? (
+    return !topicSummaryRows.length && !app.threads.initialized ? (
       <PageLoading />
     ) : (
       <Sublayout>

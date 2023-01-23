@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 
 export const Errors = {
   NoStarValue: 'Must pass isAlreadyStarred boolean to set starred status',
@@ -15,7 +15,7 @@ const starCommunity = async (
   const chain = req.chain;
 
   try {
-    const [star, created] = await models.StarredCommunity.findOrCreate({
+    const [star] = await models.StarredCommunity.findOrCreate({
       where: {
         chain: chain.id,
         user_id: req.user.id,

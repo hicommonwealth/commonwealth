@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import 'pages/why_commonwealth.scss';
+import { CWButton } from '../components/component_kit/cw_button';
 
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
-import { CWButton } from '../components/component_kit/cw_button';
 
 class WhyCommonwealthPage extends ClassComponent {
   view() {

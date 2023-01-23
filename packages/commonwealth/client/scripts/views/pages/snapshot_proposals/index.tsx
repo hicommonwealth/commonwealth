@@ -1,22 +1,22 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelSnapshotEvents } from 'analytics/types';
 import ClassComponent from 'class_component';
+
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import m from 'mithril';
 import moment from 'moment';
 
 import 'pages/snapshot_proposals.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { MixpanelSnapshotEvents } from 'analytics/types';
-
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
+import { CardsCollection } from '../../components/cards_collection';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
-import { CardsCollection } from '../../components/cards_collection';
-import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/cw_button';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 

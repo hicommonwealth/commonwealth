@@ -1,24 +1,31 @@
-import { IApp } from 'state';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IMolochMember } from 'adapters/chain/moloch/types';
-import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import EthereumChain from 'controllers/chain/ethereum/chain';
-import { IAccountsModule } from 'models';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
+import type { IMolochMember } from 'adapters/chain/moloch/types';
+import type EthereumAccounts from 'controllers/chain/ethereum/accounts';
+import type EthereumChain from 'controllers/chain/ethereum/chain';
+import type { IAccountsModule } from 'models';
+import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import type MolochAPI from './api';
 import MolochMember from './member';
-import MolochAPI from './api';
 
 // TODO: ideally we should store DAO accounts inside the EthereumAccount object, rather
 //   than extending it into a MolochMember. But this is our first-pass implementation,
 //   for now.
-export default class MolochMembers implements IAccountsModule<EthereumCoin, MolochMember> {
+export default class MolochMembers
+  implements IAccountsModule<EthereumCoin, MolochMember>
+{
   protected _store: AccountsStore<MolochMember> = new AccountsStore();
   private _api: MolochAPI;
   private _Chain: EthereumChain;
   private _Accounts: EthereumAccounts;
 
-  public get store() { return this._store; }
-  public get api() { return this._api; }
+  public get store() {
+    return this._store;
+  }
+
+  public get api() {
+    return this._api;
+  }
 
   public async init(api: MolochAPI) {
     this._api = api;
@@ -29,7 +36,9 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts) {
     this._app = app;
@@ -44,7 +53,13 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
       return this._store.getByAddress(address);
     } catch (e) {
       if (!this._Accounts) return null;
-      return new MolochMember(this.app, this._Chain, this._Accounts, this, address);
+      return new MolochMember(
+        this.app,
+        this._Chain,
+        this._Accounts,
+        this,
+        address
+      );
     }
   }
 
@@ -54,7 +69,14 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
       return this._store.getByAddress(member.id);
     } catch (e) {
       if (!this._Accounts) return null;
-      return new MolochMember(this.app, this._Chain, this._Accounts, this, member.id, member);
+      return new MolochMember(
+        this.app,
+        this._Chain,
+        this._Accounts,
+        this,
+        member.id,
+        member
+      );
     }
   }
 
@@ -64,7 +86,9 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
   }
 
   public async isDelegate(address: string): Promise<boolean> {
-    const delegator = await this._api.Contract.memberAddressByDelegateKey(address);
+    const delegator = await this._api.Contract.memberAddressByDelegateKey(
+      address
+    );
     if (parseInt(delegator, 16) === 0) {
       return false;
     }

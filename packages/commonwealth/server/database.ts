@@ -1,6 +1,4 @@
-import { Sequelize, DataTypes } from 'sequelize';
-
-import { factory, formatFilename } from 'common-common/src/logging';
+import { DataTypes, Sequelize } from 'sequelize';
 import { DATABASE_URI } from './config';
 
 import type { DB, Models } from './models';
@@ -21,24 +19,26 @@ import CommunityBannerFactory from './models/community_banner';
 import CommunityContractFactory from './models/community_contract';
 import CommunityRoleFactory from './models/community_role';
 import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
-import SnapshotSpaceFactory from './models/snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
+import DiscordBotConfigFactory from './models/discord_bot_config';
 import DiscussionDraftFactory from './models/discussion_draft';
 import IdentityCacheFactory from './models/identity_cache';
 import InviteCodeFactory from './models/invite_code';
 import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
-import NotificationsReadFactory from './models/notifications_read';
 import NotificationCategoryFactory from './models/notification_category';
+import NotificationsReadFactory from './models/notifications_read';
 import OffchainProfileFactory from './models/offchain_profile';
 import PollFactory from './models/poll';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
-import RoleAssignmentFactory from './models/role_assignment';
 import RoleFactory from './models/role';
+import RoleAssignmentFactory from './models/role_assignment';
 import RuleFactory from './models/rule';
+import SnapshotProposalFactory from './models/snapshot_proposal';
+import SnapshotSpaceFactory from './models/snapshot_spaces';
 import SocialAccountFactory from './models/social_account';
 import SsoTokenFactory from './models/sso_token';
 import StarredCommunityFactory from './models/starred_community';
@@ -52,8 +52,7 @@ import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
-import SnapshotProposalFactory from './models/snapshot_proposal';
-import DiscordBotConfigFactory from './models/discord_bot_config';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -67,10 +66,12 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           log.trace(msg);
         },
   dialectOptions:
-    process.env.NODE_ENV !== 'production' ? { requestTimeout: 40000 } :
-    DATABASE_URI === "postgresql://commonwealth:edgeware@localhost/commonwealth" ?
-    { requestTimeout: 40000, ssl: false } :
-    { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
+    process.env.NODE_ENV !== 'production'
+      ? { requestTimeout: 40000 }
+      : DATABASE_URI ===
+        'postgresql://commonwealth:edgeware@localhost/commonwealth'
+      ? { requestTimeout: 40000, ssl: false }
+      : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
   pool: {
     max: 10,
     min: 0,
@@ -79,7 +80,6 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   },
 });
 
-export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),

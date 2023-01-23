@@ -1,29 +1,24 @@
 /* @jsx m */
 
-import m from 'mithril';
+// TODO: remove formatCoin, only use coins.format()
+import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
 
 import 'components/proposals/vote_listing.scss';
-
-import app from 'state';
-// TODO: remove formatCoin, only use coins.format()
-import { formatCoin } from 'adapters/currency';
-import User from 'views/components/widgets/user';
-import {
-  IVote,
-  DepositVote,
-  BinaryVote,
-  AnyProposal,
-  VotingUnit,
-} from 'models';
 import { CosmosVote } from 'controllers/chain/cosmos/proposal';
-import { MolochProposalVote } from 'controllers/chain/ethereum/moloch/proposal';
-import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
-import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
-import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
+import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
+import { MolochProposalVote } from 'controllers/chain/ethereum/moloch/proposal';
+import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
+import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
+import m from 'mithril';
+import type { AnyProposal, IVote } from 'models';
+import { BinaryVote, DepositVote, VotingUnit } from 'models';
+
+import app from 'state';
+import User from 'views/components/widgets/user';
 import { CWText } from '../component_kit/cw_text';
 
 type VoteListingAttrs = {

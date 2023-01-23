@@ -1,4 +1,4 @@
-import { ChainInfo } from '.';
+import type { ChainInfo } from '.';
 
 class Webhook {
   public readonly id: number;
@@ -21,7 +21,7 @@ class Webhook {
       json.url,
       json.categories,
       json.chain_id,
-      json.Chain,
+      json.Chain
     );
   }
 }

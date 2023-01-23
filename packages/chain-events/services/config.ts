@@ -1,4 +1,5 @@
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export const DEFAULT_PORT = '8081';
 
@@ -50,4 +51,5 @@ export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
 export const CW_SERVER_URL = process.env.SERVER_URL || 'http://localhost:8080';
 
 // used to query CE only routes on CW
-export const CHAIN_EVENT_SERVICE_SECRET = process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
+export const CHAIN_EVENT_SERVICE_SECRET =
+  process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';

@@ -1,16 +1,19 @@
-import { bech32 } from 'bech32';
-
-declare let window: any;
-
-import Web3 from 'web3';
-import { provider } from 'web3-core';
 import { StargateClient } from '@cosmjs/stargate';
+import { bech32 } from 'bech32';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
+import type { Account, IWebWallet } from 'models';
 import { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
+import Web3 from 'web3';
+import type {
+  provider,
+  TransactionConfig,
+  RLPEncodedTransaction,
+} from 'web3-core';
+
+declare let window: any;
 
 function encodeEthAddress(bech32Prefix: string, address: string): string {
   return bech32.encode(
@@ -55,10 +58,12 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public get api(): any {
+    return this._web3;
+  }
+
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${
-      chainIdentifier
-    }`;
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
     const client = await StargateClient.connect(url);
     const height = await client.getHeight();
     const block = await client.getBlock(height);
@@ -67,7 +72,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       number: block.header.height,
       hash: block.id,
       // seconds since epoch
-      timestamp: Math.floor((new Date(block.header.time)).getTime() / 1000)
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
     };
   }
 
@@ -75,13 +80,23 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return this._chainId;
   }
 
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const signature = await this._web3.eth.personal.sign(
       JSON.stringify(canvasMessage),
       this._ethAccounts[0],
       ''
     );
     return signature;
+  }
+
+  public async signTransaction(
+    tx: TransactionConfig
+  ): Promise<RLPEncodedTransaction> {
+    const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
+    return rlpEncodedTx;
   }
 
   // ACTIONS
