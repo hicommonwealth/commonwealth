@@ -74,8 +74,8 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      console.log('YOOOOOOO')
-      console.log(res.body)
+      console.log('YOOOOOOO');
+      console.log(res.body);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
