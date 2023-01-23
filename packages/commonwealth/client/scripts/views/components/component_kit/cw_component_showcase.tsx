@@ -372,33 +372,28 @@ export class ComponentShowcase extends ClassComponent {
             progress={75}
             label="Progress Bar (Success)"
             progressStatus="passed"
-            count={50}
           />
           <CWProgressBar
             progress={75}
             label="Progress Bar (Success) with Check"
             progressStatus="passed"
-            count={50}
             iconName="check"
           />
           <CWProgressBar
             progress={100}
             label="Progress Bar (Selected)"
             progressStatus="selected"
-            count={50}
           />
           <CWProgressBar
             progress={150}
             label="Progress Bar (Neutral) With Token"
             progressStatus="neutral"
-            count={50}
             subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
           />
           <CWProgressBar
             progress={75}
             label="Progress Bar (Ongoing) With Token"
             progressStatus="ongoing"
-            count={50}
             subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
           />
         </div>

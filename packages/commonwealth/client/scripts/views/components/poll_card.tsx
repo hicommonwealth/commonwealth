@@ -293,7 +293,6 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
                   }
                   progressStatus={calculateProgressStatus(option, index)}
                   label={option.label}
-                  count={option.voteCount}
                   iconName={option.label === votedFor ? 'check' : undefined}
                 />
               );
