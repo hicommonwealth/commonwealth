@@ -19,6 +19,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { Permission } from '../../server/models/role';
 import {
   constructTypedMessage,
+  constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../shared/adapters/chain/ethereum/keys';
