@@ -32,7 +32,9 @@ module.exports = {
           {
             balance_type: 'ethereum',
             url: 'https://rpc.xinfin.network',
+            alt_wallet_url: 'https://rpc.xinfin.network',
             name: 'XDC Mainnet',
+            eth_chain_id: 50,
           },
         ],
         { transaction: t }
@@ -51,7 +53,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkDelete(
         'ChainNodes',
-        { chain: 'xdc' },
+        { url: 'https://rpc.xinfin.network' },
         { transaction: t }
       );
       await queryInterface.bulkDelete(
