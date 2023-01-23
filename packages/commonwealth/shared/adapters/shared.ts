@@ -92,8 +92,8 @@ export function chainBaseToCanvasChainId(
     // See also: client/scripts/controllers/app/webWallets/phantom_web_wallet.ts
     return 'mainnet';
   } else if (chainBase === ChainBase.Substrate) {
-    // Temporarily locked to edgeware, but eventually should support Substrate chains by ID
+    // Temporarily locked to generic Substrate chain id
     // See also: client/scripts/controllers/app/webWallets/polkadot_web_wallet.ts
-    return 'edgeware';
+    return '42';
   }
 }

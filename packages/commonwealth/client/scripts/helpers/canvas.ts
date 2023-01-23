@@ -8,8 +8,8 @@ import {
 import { getActionSignatureData } from '@canvas-js/verifiers';
 
 import { getCosmosSignatureData } from 'controllers/server/sessionSigners/cosmos';
-import { constructTypedCanvasMessage } from 'shared/adapters/chain/ethereum/keys';
-import { validationTokenToSignDoc } from 'shared/adapters/chain/cosmos/keys';
+import { constructTypedCanvasMessage } from '../../../shared/adapters/chain/ethereum/keys';
+import { validationTokenToSignDoc } from '../../../shared/adapters/chain/cosmos/keys';
 
 import { utils as ethersUtils } from 'ethers';
 import * as ethUtil from 'ethereumjs-util';
