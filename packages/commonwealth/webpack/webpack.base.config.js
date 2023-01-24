@@ -68,8 +68,13 @@ module.exports = {
           chunks: 'all',
         },
         cosmos: {
-          test: /[\\/]node_modules[\\/](cosmjs-types|@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
+          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
+          chunks: 'all',
+        },
+        cosmosTypes: {
+          test: /[\\/]node_modules[\\/](cosmjs-types)[\\/]/,
+          name: 'cosmosTypes',
           chunks: 'all',
         },
         polkadot: {
