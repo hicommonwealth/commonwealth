@@ -26,7 +26,7 @@ export const constructTypedCanvasMessage = (message) => {
       { name: 'from', type: 'string' },
       { name: 'sessionAddress', type: 'string' },
       { name: 'sessionDuration', type: 'uint256' },
-      { name: 'sessionTimestamp', type: 'uint256' },
+      { name: 'sessionIssued', type: 'uint256' },
     ],
   };
 
