@@ -1,13 +1,22 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/proposals/aave_proposal_card_detail.scss';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import User from '../widgets/user';
+import { User } from '../user/user';
 import { CWText } from '../component_kit/cw_text';
 import { CWLabel } from '../component_kit/cw_label';
 
@@ -59,11 +68,7 @@ export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetai
                 {proposal.ipfsData.author.split(' (')[0]}
               </CWText>
             ) : (
-              render(User, {
-                user: proposal.author,
-                hideAvatar: true,
-                linkify: true,
-              })
+              <User user={proposal.author} hideAvatar linkify />
             )}
           </div>
           <div className="aave-metadata-column">

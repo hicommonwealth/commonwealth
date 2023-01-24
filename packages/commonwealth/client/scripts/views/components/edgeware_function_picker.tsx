@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { blake2AsHex } from '@polkadot/util-crypto';
 
@@ -92,7 +102,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
               <CWTextInput
                 label={`${name} (${app.chain.currency})`}
                 placeholder={`${name} (${app.chain.currency})`}
-                oninput={(e) => {
+                onInput={(e) => {
                   const result = (e.target as any).value;
                   vnode.attrs.args[index] = app.chain.chain.coins(
                     parseFloat(result),
@@ -107,7 +117,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
               <CWTextInput
                 label={`${name} (${type})`}
                 placeholder={`${name} (${type})`}
-                oninput={(e) => {
+                onInput={(e) => {
                   const result = (e.target as any).value;
                   vnode.attrs.args[index] = result
                     .split(',')
@@ -121,7 +131,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
               <CWTextInput
                 label={name}
                 placeholder={`${name} (${type})`}
-                oninput={(e) => {
+                onInput={(e) => {
                   const result = (e.target as any).value;
                   vnode.attrs.args[index] = result;
                   redraw(); // TODO: why is this needed?
@@ -134,9 +144,13 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
         <CWTextInput
           label="Proposal Hash"
           disabled
-          value={EdgewareFunctionPicker.getMethod(vnode.attrs)
-            ? blake2AsHex(EdgewareFunctionPicker.getMethod(vnode.attrs).toHex())
-            : ''}
+          value={
+            EdgewareFunctionPicker.getMethod(vnode.attrs)
+              ? blake2AsHex(
+                  EdgewareFunctionPicker.getMethod(vnode.attrs).toHex()
+                )
+              : ''
+          }
         />
       </React.Fragment>
     );

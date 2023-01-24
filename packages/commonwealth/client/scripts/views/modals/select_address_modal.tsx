@@ -1,6 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/select_address_modal.scss';
@@ -8,7 +19,6 @@ import 'modals/select_address_modal.scss';
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, RoleInfo } from 'models';
-import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
@@ -19,6 +29,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { getClasses } from '../components/component_kit/helpers';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
+import { UserBlock } from '../components/user/user_block';
 
 export class SelectAddressModal extends ClassComponent {
   private loading: boolean;
@@ -138,7 +149,7 @@ export class SelectAddressModal extends ClassComponent {
                   role && (
                     <div className="select-address-option existing">
                       <div className="select-address-option-left">
-                        {render(UserBlock, { user: account })}
+                        <UserBlock user={account} />
                         {app.user.addresses.find(
                           (a) =>
                             a.address === account.address &&
@@ -177,11 +188,11 @@ export class SelectAddressModal extends ClassComponent {
                       }}
                     >
                       <div className="select-address-option-left">
-                        {render(UserBlock, {
-                          user: account,
-                          showRole: true,
-                          selected: this.selectedIndex === index,
-                        })}
+                        <UserBlock
+                          user={account}
+                          showRole
+                          selected={this.selectedIndex === index}
+                        />
                         {app.user.addresses.find(
                           (a) =>
                             a.address === account.address &&

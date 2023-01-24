@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -11,7 +20,7 @@ import 'pages/members.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { PageLoading } from 'views/pages/loading';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { Profile } from 'models';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
@@ -229,7 +238,7 @@ class MembersPage extends ClassComponent {
                       navigateToSubpage(`/account/${address}?base=${chain}`);
                     }}
                   >
-                    {render(User, { user: profileInfo.profile, showRole: true })}
+                    <User user={profileInfo.profile} showRole />
                   </a>
                   <CWText>{profileInfo.postCount}</CWText>
                 </div>

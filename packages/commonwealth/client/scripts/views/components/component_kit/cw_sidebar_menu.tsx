@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 // import { ListItem, Icon, Icons } from 'construct-ui';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 
@@ -15,7 +25,7 @@ import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { ComponentType, MenuItem } from './types';
 import { CommunityLabel } from '../community_label';
-import User from '../widgets/user';
+import { User } from '../user/user';
 
 class CWSidebarMenuItemComponent extends ClassComponent<MenuItem> {
   view(vnode: ResultNode<MenuItem>) {
@@ -67,20 +77,26 @@ class CWSidebarMenuItemComponent extends ClassComponent<MenuItem> {
           {app.isLoggedIn() && roles.length > 0 && (
             <div className="roles-and-star">
               {roles.map((role) => {
-                return render(User, {
-                  avatarSize: 18,
-                  avatarOnly: true,
-                  user: new AddressInfo(
-                    role.address_id,
-                    role.address,
-                    role.address_chain || role.chain_id,
-                    null
-                  ),
-                });
+                return (
+                  <User
+                    avatarSize={18}
+                    avatarOnly
+                    user={
+                      new AddressInfo(
+                        role.address_id,
+                        role.address,
+                        role.address_chain || role.chain_id,
+                        null
+                      )
+                    }
+                  />
+                );
               })}
               <div
                 className={
-                  app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
+                  app.communities.isStarred(item.id)
+                    ? 'star-filled'
+                    : 'star-empty'
                 }
                 onClick={async (e) => {
                   e.stopPropagation();

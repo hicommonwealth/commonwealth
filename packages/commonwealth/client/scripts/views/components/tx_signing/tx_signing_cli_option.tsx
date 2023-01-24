@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 
@@ -59,7 +68,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
               label="Enter the output here"
               placeholder="Signed TX"
               value={this.signedTx}
-              oninput={(e) => {
+              onInput={(e) => {
                 this.signedTx = e.target.value;
               }}
             />

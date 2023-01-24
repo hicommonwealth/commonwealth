@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -15,7 +24,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 
@@ -81,15 +90,17 @@ const getTextRows = (subscription: NotificationSubscription) => {
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             fontWeight="bold"
           >
-            {render(User, {
-              hideAvatar: true,
-              user: new AddressInfo(
-                null,
-                subscription.Comment.author,
-                subscription.Comment.chain,
-                null
-              ),
-            })}
+            <User
+              hideAvatar
+              user={
+                new AddressInfo(
+                  null,
+                  subscription.Comment.author,
+                  subscription.Comment.chain,
+                  null
+                )
+              }
+            />
             's
           </CWText>
           <CWText
@@ -154,7 +165,9 @@ export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRow
           }
           iconSize="small"
         />
-        <div className="title-and-body-container">{getTextRows(subscription)}</div>
+        <div className="title-and-body-container">
+          {getTextRows(subscription)}
+        </div>
       </div>
     );
   }

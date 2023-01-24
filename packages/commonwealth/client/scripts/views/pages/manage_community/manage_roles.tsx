@@ -1,14 +1,23 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/manage_roles.scss';
 
 import app from 'state';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { AddressInfo, RoleInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
@@ -44,19 +53,21 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
             ).length;
             return (
               <div className="role-row">
-                {render(User, {
-                  user: new AddressInfo(
-                    addr.id,
-                    addr.address,
-                    role.chain_id,
-                    null,
-                    addr.walletId
-                  ), // role.Address, // make AddressInfo?
-                  popover: true,
-                  linkify: false,
-                  hideAvatar: false,
-                  hideIdentityIcon: true,
-                })}
+                <User
+                  user={
+                    new AddressInfo(
+                      addr.id,
+                      addr.address,
+                      role.chain_id,
+                      null,
+                      addr.walletId
+                    )
+                  } // role.Address, // make AddressInfo?
+                  popover
+                  linkify
+                  hideAvatar
+                  hideIdentityIcon
+                />
                 <CWIcon
                   iconName="close"
                   iconSize="small"

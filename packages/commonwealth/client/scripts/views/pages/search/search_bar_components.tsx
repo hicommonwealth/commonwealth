@@ -16,7 +16,7 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CommunityLabel } from '../../components/community_label';
 
@@ -67,14 +67,16 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
         }
       >
         <div className="header-row">
-          {render(User, {
-            user: new AddressInfo(
-              searchResult.address_id,
-              searchResult.address,
-              searchResult.address_chain,
-              null
-            ),
-          })}
+          <User
+            user={
+              new AddressInfo(
+                searchResult.address_id,
+                searchResult.address,
+                searchResult.address_chain,
+                null
+              )
+            }
+          />
           <CWText className="last-updated-text">•</CWText>
           <CWText type="caption" className="last-updated-text">
             {moment(searchResult.created_at).format('l')}
@@ -159,13 +161,13 @@ export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRo
 
     return (
       <div className="SearchBarMemberPreviewRow">
-        {render(User, {
-          user: app.profiles.getProfile(
+        <User
+          user={app.profiles.getProfile(
             searchResult.chain,
             searchResult.address
-          ),
-          linkify: true,
-        })}
+          )}
+          linkify
+        />
       </div>
     );
   }

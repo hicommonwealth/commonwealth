@@ -2,7 +2,17 @@
 import React from 'react';
 
 import $ from 'jquery';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import 'pages/admin.scss';
@@ -14,7 +24,7 @@ import { formatCoin } from 'adapters/currency';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { PageLoading } from 'views/pages/loading';
 import PageNotFound from './404';
 import { CWText } from '../components/component_kit/cw_text';
@@ -38,9 +48,7 @@ class SudoForm extends ClassComponent {
       return (
         <div className="admin-column">
           <CWText>Must be logged into admin account to use Sudo: </CWText>
-          {render(User, {
-            user: app.chain.accounts.get(substrate.chain.sudoKey),
-          })}
+          <User user={app.chain.accounts.get(substrate.chain.sudoKey)} />
         </div>
       );
     }

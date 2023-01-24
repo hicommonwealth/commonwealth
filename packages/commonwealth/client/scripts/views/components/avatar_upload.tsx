@@ -3,7 +3,17 @@ import React from 'react';
 
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import Dropzone from 'dropzone';
 
 import 'components/avatar_upload.scss';
@@ -147,7 +157,10 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
             { hidden: !this.uploaded },
             'dropzone-preview-container'
           )}
-          style={`background-image: url(${localUploadURL}); background-size: ${avatarSize}px;`}
+          style={{
+            backgroundImage: `url(${localUploadURL})`,
+            backgroundSize: `${avatarSize}px;`,
+          }}
         />
       </div>
     );

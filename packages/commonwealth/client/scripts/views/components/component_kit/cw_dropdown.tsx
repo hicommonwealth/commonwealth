@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_dropdown.scss';
 
@@ -25,7 +34,7 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
   private showDropdown: boolean;
   private selectedValue: DropdownItemType;
 
-  oninit(vnode: ResultNode<DropdownAttrs>) {
+  oncreate(vnode: ResultNode<DropdownAttrs>) {
     this.showDropdown = false;
     this.selectedValue = vnode.attrs.initialValue ?? vnode.attrs.options[0];
   }
@@ -49,10 +58,11 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
         />
         {this.showDropdown && (
           <div className="dropdown-options-display">
-            {options.map((item) => {
+            {options.map((item, i) => {
               return (
                 <div
                   className="dropdown-item"
+                  key={i}
                   onClick={() => {
                     this.showDropdown = false;
                     this.selectedValue = item;

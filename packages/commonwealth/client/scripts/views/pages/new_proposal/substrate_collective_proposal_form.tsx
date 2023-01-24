@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -108,14 +118,14 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               <CWTextInput
                 label="Voting Period"
                 placeholder="Blocks (minimum enforced)"
-                oninput={(e) => {
+                onInput={(e) => {
                   this.votingPeriod = +e.target.value;
                 }}
               />
               <CWTextInput
                 label="Enactment Delay"
                 placeholder="Blocks (minimum enforced)"
-                oninput={(e) => {
+                onInput={(e) => {
                   this.enactmentDelay = +e.target.value;
                 }}
               />
@@ -152,7 +162,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
           <CWTextInput
             label="Threshold"
             placeholder="How many members must vote yes to execute?"
-            oninput={(e) => {
+            onInput={(e) => {
               this.threshold = +e.target.value;
             }}
           />

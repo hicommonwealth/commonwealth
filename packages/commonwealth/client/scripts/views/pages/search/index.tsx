@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
 
@@ -13,7 +22,6 @@ import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
-import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { SearchContentType } from 'types';
@@ -27,6 +35,7 @@ import PageNotFound from '../404';
 import ErrorPage from '../error';
 import { CommunityLabel } from '../../components/community_label';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { User } from '../../components/user/user';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -50,14 +59,16 @@ const getDiscussionResult = (thread, searchTerm) => {
         </CWText>
         <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
         <div className="search-results-thread-subtitle">
-          {render(User, {
-            user: new AddressInfo(
-              thread.address_id,
-              thread.address,
-              thread.address_chain,
-              null
-            ),
-          })}
+          <User
+            user={
+              new AddressInfo(
+                thread.address_id,
+                thread.address,
+                thread.address_chain,
+                null
+              )
+            }
+          />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
           </CWText>
@@ -100,14 +111,16 @@ const getCommentResult = (comment, searchTerm) => {
           {decodeURIComponent(comment.title)}
         </div> */}
         <div className="search-results-thread-subtitle">
-          {m(User, {
-            user: new AddressInfo(
-              comment.address_id,
-              comment.address,
-              comment.address_chain,
-              null
-            ),
-          })}
+          <User
+            user={
+              new AddressInfo(
+                comment.address_id,
+                comment.address,
+                comment.address_chain,
+                null
+              )
+            }
+          />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}
           </CWText>
@@ -155,13 +168,13 @@ const getMemberResult = (addr) => {
 
   return (
     <div className="member-result-row">
-      {m(User, {
-        user: profile,
-        showRole: true,
-        linkify: true,
-        avatarSize: 32,
-        showAddressWithDisplayName: true,
-      })}
+      <User
+        user={profile}
+        showRole
+        linkify
+        avatarSize={32}
+        showAddressWithDisplayName
+      />
     </div>
   );
 };

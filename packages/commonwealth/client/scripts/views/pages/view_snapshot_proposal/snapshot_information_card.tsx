@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -12,7 +21,7 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { CWText } from '../../components/component_kit/cw_text';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
@@ -80,17 +89,21 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
             <div className="info-rows-container">
               <SnapshotInfoRow
                 label="Author"
-                value={render(User, {
-                  user: new AddressInfo(
-                    null,
-                    proposal.author,
-                    app.activeChainId(),
-                    null
-                  ),
-                  hideAvatar: true,
-                  linkify: true,
-                  popover: true,
-                })}
+                value={
+                  <User
+                    user={
+                      new AddressInfo(
+                        null,
+                        proposal.author,
+                        app.activeChainId(),
+                        null
+                      )
+                    }
+                    hideAvatar
+                    linkify
+                    popover
+                  />
+                }
               />
               <SnapshotInfoLinkRow
                 label="IPFS"

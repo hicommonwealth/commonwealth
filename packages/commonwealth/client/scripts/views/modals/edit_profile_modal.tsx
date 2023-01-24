@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/edit_profile_modal.scss';
@@ -67,8 +76,8 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
             value={this.name}
             placeholder="Add your name"
             disabled={account.profile.isOnchain}
-            autocomplete="off"
-            oninput={(e) => {
+            autoComplete="off"
+            onInput={(e) => {
               if (account.profile) {
                 this.name = e.target.value;
               }
@@ -79,8 +88,8 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
             name="headline"
             value={this.headline}
             placeholder="Add a headline"
-            autocomplete="off"
-            oninput={(e) => {
+            autoComplete="off"
+            onInput={(e) => {
               if (account.profile) {
                 this.headline = e.target.value;
               }
@@ -91,7 +100,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
             label="Bio"
             value={this.bio}
             placeholder="Add a bio"
-            oninput={(e) => {
+            onInput={(e) => {
               if (account.profile) {
                 this.bio = e.target.value;
               }

@@ -22,7 +22,11 @@ import { createRoot } from 'react-dom/client';
 export type Children = ReactNode | ReactNode[];
 
 // corresponds to Mithril's `m()` call
-export const render = (tag: string | React.ComponentType, attrs: any = {}, ...children: any[]) => {
+export const render = (
+  tag: string | React.ComponentType,
+  attrs: any = {},
+  ...children: any[]
+) => {
   let className = attrs?.className;
 
   // check if selector uses classes (.) and convert to props, as
@@ -65,7 +69,9 @@ export const render = (tag: string | React.ComponentType, attrs: any = {}, ...ch
 // corresponds to Mithril's `m.trust()` call, which is used to render inner HTML directly
 render.trust = (html: string, wrapper?: string) => {
   if (wrapper) {
-    return createElement(wrapper, { dangerouslySetInnerHTML: { __html: html } });
+    return createElement(wrapper, {
+      dangerouslySetInnerHTML: { __html: html },
+    });
   } else {
     return createElement('div', { dangerouslySetInnerHTML: { __html: html } });
   }
@@ -78,20 +84,22 @@ export type Component<Props = unknown> = FunctionComponent<Props>;
 export const jsx = createElement;
 
 // corresponds to Mithril's Vnode type with attrs only (no state)
-export type ResultNode<A = unknown> = { attrs: A, children: Children };
+export type ResultNode<A = unknown> = { attrs: A; children: Children };
 
 // Additions to base React Component attrs
 type AdditionalAttrs = {
   // simulate mithril's vnode.children
-  children?: Children,
+  children?: Children;
 
   // optionally used navigation for NavigationWrapper, see `./helpers.tsx`
-  navigate?: NavigateFunction,
+  navigate?: NavigateFunction;
 };
 
 // Replicates Mithril's ClassComponent functionality with support for JSX syntax.
 // Expects state on `this`, with redraws on this variable assignments.
-export abstract class ClassComponent<A = unknown> extends ReactComponent<A & AdditionalAttrs> {
+export abstract class ClassComponent<A = unknown> extends ReactComponent<
+  A & AdditionalAttrs
+> {
   protected readonly __props: A;
   private _isMounted = false;
 
@@ -111,29 +119,25 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<A & Add
       set(obj, prop, value) {
         if (
           // do not update if not yet mounted
-          obj._isMounted
-
+          obj._isMounted &&
           // do not update on reserved keyword changes
-          && !ClassComponent.IGNORED_PROPS.includes(prop as string)
-
+          !ClassComponent.IGNORED_PROPS.includes(prop as string) &&
           // do not update if the prop is inherited = internal to React
-          && Object.keys(obj).includes(prop as string)
-
+          Object.keys(obj).includes(prop as string) &&
           // do not update if the value doesn't change
-          && obj[prop] !== value
-
+          obj[prop] !== value &&
           // do not update if the value is a function (not sure if necessary)
-          && typeof value !== 'function'
+          typeof value !== 'function'
         ) {
-          obj.setState({ ...obj.state, [prop]: value })
+          obj.setState({ ...obj.state, [prop]: value });
           // console.log(prop, value);
         }
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line prefer-rest-params
         return Reflect.set(...arguments);
-      }
-    })
+      },
+    });
   }
 
   // used for mithril's `oninit` lifecycle hook
@@ -160,10 +164,10 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<A & Add
   }
 
   /* eslint-disable @typescript-eslint/no-empty-function */
-  public oninit(v: ResultNode<A>) { }
-  public onupdate(v: ResultNode<A>) { }
-  public onremove(v: ResultNode<A>) { }
-  public oncreate(v: ResultNode<A>) { }
+  public oninit(v: ResultNode<A>) {}
+  public onupdate(v: ResultNode<A>) {}
+  public onremove(v: ResultNode<A>) {}
+  public oncreate(v: ResultNode<A>) {}
 
   abstract view(v: ResultNode<A>): Children | null;
 
@@ -199,7 +203,7 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<A & Add
 export function redraw(sync = false, component?: any) {
   // TODO
   if (component) {
-    console.log(component)
+    console.log(component);
     component.forceUpdate();
   }
 }
@@ -231,7 +235,11 @@ type RouteOptions = {
 };
 
 // attempt to replicate global m.route.set(), currently a no-op.
-export function setRoute(route: string, data?: Record<string, unknown>, options?: RouteOptions) {
+export function setRoute(
+  route: string,
+  data?: Record<string, unknown>,
+  options?: RouteOptions
+) {
   // app._lastNavigatedBack = false;
   // app._lastNavigatedFrom = getRoute();
   /*

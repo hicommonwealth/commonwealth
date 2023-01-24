@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/settings/email_section.scss';
@@ -60,7 +69,7 @@ export class EmailSection extends ClassComponent {
           <CWTextInput
             placeholder="name@example.com"
             value={this.email || null}
-            oninput={(e) => {
+            onInput={(e) => {
               this.emailInputUpdated = true;
               this.verificationSent = false;
               this.email = (e.target as any).value;

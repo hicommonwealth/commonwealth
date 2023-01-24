@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_thread_vote_button.scss';
 
@@ -22,7 +31,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
   private isHoveringDownvote: boolean;
   private initialVoteCount: number;
 
-  oninit(vnode: ResultNode<ThreadVoteButtonAttrs>) {
+  oncreate(vnode: ResultNode<ThreadVoteButtonAttrs>) {
     this.initialVoteCount = vnode.attrs.voteCount;
   }
 

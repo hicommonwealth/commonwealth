@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -10,7 +19,7 @@ import 'pages/user_dashboard/user_dashboard_row_top.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { formatTimestamp } from 'helpers/index';
 import { getCommentPreview } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -55,22 +64,21 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         ? `${decodedTitle.slice(0, 47)}...`
         : decodedTitle;
 
-    const actorName = render(User, {
-      user: new AddressInfo(
-        null,
-        author_address,
-        author_chain ?? chain_id,
-        null
-      ),
-      hideIdentityIcon: false,
-      linkify: true,
-      avatarSize: 16,
-      onClick: (e: any) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setRoute(`/${author_chain}/account/${author_address}`);
-      },
-    });
+    const actorName = (
+      <User
+        user={
+          new AddressInfo(null, author_address, author_chain ?? chain_id, null)
+        }
+        hideIdentityIcon={false}
+        linkify
+        avatarSize={16}
+        onclick={(e: any) => {
+          e.preventDefault();
+          e.stopPropagation();
+          m.route.set(`/${author_chain}/account/${author_address}`);
+        }}
+      />
+    );
 
     if (vnode.attrs.category === 'new-comment-creation') {
       return (

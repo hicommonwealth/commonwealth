@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import _ from 'lodash';
 
 import 'pages/settings/linked_addresses_section.scss';
@@ -11,7 +20,7 @@ import app from 'state';
 import { orderAccountsByAddress, link, formatAddressShort } from 'helpers';
 import { unlinkLogin } from 'controllers/app/login';
 import { AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { WalletId } from 'common-common/src/types';
@@ -43,20 +52,9 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
         key={`${account.chain.id}#${account.address}`}
         onClick={vnode.attrs.onClick}
       >
-        {render(User, {
-          user: account,
-          avatarOnly: true,
-          avatarSize: 32,
-          linkify: true,
-          popover: true,
-        })}
+        <User user={account} avatarOnly avatarSize={32} linkify popover />
         <div className="info-col">
-          {render(User, {
-            user: account,
-            hideAvatar: true,
-            linkify: true,
-            popover: true,
-          })}
+          <User user={account} hideAvatar linkify popover />
           <CWText className="address-text" type="caption">
             {formatAddressShort(account.address)} -{' '}
             {app.config.chains.getById(account.chain.id)?.name}

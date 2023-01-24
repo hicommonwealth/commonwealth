@@ -1,14 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
 import { ITXModalData, ProposalModule } from 'models';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { ProposalType } from '../../../../../../common-common/src/types';
@@ -38,23 +48,18 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
     return (
       <React.Fragment>
         <CWLabel label="Finder" />,
-        {render(User, {
-          user: author,
-          linkify: true,
-          popover: true,
-          showAddressWithDisplayName: true,
-        })}
+        <User user={author} linkify popover showAddressWithDisplayName />
         <CWTextInput
           label="Beneficiary"
           placeholder="Beneficiary of treasury proposal"
-          oninput={(e) => {
+          onInput={(e) => {
             this.beneficiary = e.target.value;
           }}
         />
         <CWTextArea
           label="Reason"
           placeholder="What’s the reason you want to tip the beneficiary?"
-          oninput={(e) => {
+          onInput={(e) => {
             this.description = e.target.value;
           }}
         />

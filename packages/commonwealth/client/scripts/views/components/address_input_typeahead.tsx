@@ -1,15 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 // import { InputSelect, ListItem } from 'construct-ui';
 
 import 'components/address_input_typeahead.scss';
 
 import app from 'state';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { AddressInfo } from 'models';
 import { CWText } from './component_kit/cw_text';
 
@@ -21,7 +30,7 @@ type AddressInputTypeaheadItem = {
 };
 
 type AddressInputTypeaheadAttrs = {
-  oninput: (item: AddressInputTypeaheadItem) => void;
+  onInput: (item: AddressInputTypeaheadItem) => void;
   options: { placeholder: string; fluid: boolean };
 };
 
@@ -36,12 +45,12 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
       $(vnode.dom)
         .find('input')
         .attr('placeholder', vnode.attrs.options.placeholder)
-        .attr('autocomplete', 'xyz123');
+        .attr('autoComplete', 'xyz123');
     }
   }
 
   view(vnode: ResultNode<AddressInputTypeaheadAttrs>) {
-    const { options, oninput } = vnode.attrs;
+    const { options, onInput } = vnode.attrs;
 
     if (!this.initialized) {
       this.initialized = true;
@@ -111,13 +120,13 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
     //   },
     //   onSelect: (item: AddressInputTypeaheadItem) => {
     //     this.selectedItem = item;
-    //     if (oninput) oninput(item);
+    //     if (onInput) onInput(item);
     //     redraw();
     //   },
     //   inputAttrs: {
     //     fluid: options.fluid,
     //     placeholder: options.placeholder,
-    //     autocomplete: 'xyz123',
+    //     autoComplete: 'xyz123',
     //   },
     //   popoverAttrs: {
     //     hasArrow: false,

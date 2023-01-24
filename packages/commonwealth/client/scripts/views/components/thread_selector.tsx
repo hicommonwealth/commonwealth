@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/thread_selector.scss';
 
@@ -23,7 +32,7 @@ const renderThreadPreview = (
   const selected = linkedThreads.some((lt) => +lt.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
-    return render('@TODO @REACT PLEASE REMOVE ME')
+  return render('@TODO @REACT PLEASE REMOVE ME');
   // return m(ListItem, {
   //   label: (
   //     <div className="thread-preview-row">
@@ -102,7 +111,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
               }}
               value={this.searchTerm}
               iconRight="close"
-              oninput={(e) => {
+              onInput={(e) => {
                 e.preventDefault();
 
                 e.stopPropagation();

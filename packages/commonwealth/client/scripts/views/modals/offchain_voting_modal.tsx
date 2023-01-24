@@ -1,13 +1,22 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'modals/offchain_voting_modal.scss';
 
 import { Vote, AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
 type OffchainVotingModalAttrs = {
@@ -48,19 +57,21 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
           {votes.map((vote) => (
             <div className="offchain-poll-voter">
               <div className="offchain-poll-voter-user">
-                {render(User, {
-                  avatarSize: 16,
-                  popover: true,
-                  linkify: true,
-                  user: new AddressInfo(
-                    null,
-                    vote.address,
-                    vote.authorChain,
-                    null,
-                    null
-                  ),
-                  hideIdentityIcon: true,
-                })}
+                <User
+                  avatarSize={16}
+                  popover
+                  linkify
+                  user={
+                    new AddressInfo(
+                      null,
+                      vote.address,
+                      vote.authorChain,
+                      null,
+                      null
+                    )
+                  }
+                  hideIdentityIcon
+                />
               </div>
               <div className="offchain-poll-voter-choice">{vote.option}</div>
             </div>

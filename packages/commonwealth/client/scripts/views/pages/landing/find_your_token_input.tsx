@@ -15,7 +15,7 @@ import {
 } from 'mithrilInterop';
 
 type FindYourTokenInputComponentAttrs = {
-  onchangeValue: (event: any) => void;
+  onChangeValue: (event: any) => void;
   onkeyupValue: (event: any) => void;
 };
 
@@ -28,7 +28,7 @@ export class FindYourTokenInputComponent extends ClassComponent<FindYourTokenInp
         id="token-input"
         type="text"
         placeholder="Find your favorite token"
-        onInput={vnode.attrs.onchangeValue}
+        onInput={vnode.attrs.onChangeValue}
         onKeyUp={vnode.attrs.onkeyupValue}
       />
     );

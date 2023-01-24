@@ -1,13 +1,22 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
 import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { NewLoginModal } from '../../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
@@ -34,10 +43,10 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       return (
         <div style="display: flex; width: 120px;">
           <CWText noWrap>
-            {render(User, {
-              user: new AddressInfo(null, address, chain?.id || chain, null),
-              linkify: true,
-            })}
+            <User
+              user={new AddressInfo(null, address, chain?.id || chain, null)}
+              linkify
+            />
           </CWText>
         </div>
       );

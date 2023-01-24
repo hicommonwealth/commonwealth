@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/bounties.scss';
 
@@ -14,7 +23,7 @@ import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInfo } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import {
   ApproveBountyModal,
   ProposeCuratorModal,
@@ -122,10 +131,10 @@ export const getActionSection = (
         )}
         <div className="action-info-row">
           <CWText>Proposed curator: </CWText>
-          {render(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
-            linkify: true,
-          })}
+          <User
+            user={new AddressInfo(null, bounty.curator, app.chain.id, null)}
+            linkify
+          />
         </div>
         {bounty.fee && <CWText>Curator fee: {formatCoin(bounty.fee)}</CWText>}
       </React.Fragment>
@@ -158,10 +167,10 @@ export const getActionSection = (
         )}
         <div className="action-info-row">
           <CWText>Curator: </CWText>
-          {render(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
-            linkify: true,
-          })}
+          <User
+            user={new AddressInfo(null, bounty.curator, app.chain.id, null)}
+            linkify
+          />
         </div>
         {bounty.fee && (
           <React.Fragment>
@@ -218,17 +227,17 @@ export const getActionSection = (
         />
         <div className="action-info-row">
           <CWText>Curator: </CWText>
-          {render(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
-            linkify: true,
-          })}
+          <User
+            user={new AddressInfo(null, bounty.curator, app.chain.id, null)}
+            linkify
+          />
         </div>
         <div className="action-info-row">
           <CWText>Recipient: </CWText>
-          {render(User, {
-            user: new AddressInfo(null, bounty.beneficiary, app.chain.id, null),
-            linkify: true,
-          })}
+          <User
+            user={new AddressInfo(null, bounty.beneficiary, app.chain.id, null)}
+            linkify
+          />
         </div>
         <div className="action-info-row">
           <CWText>Review period ends at: </CWText>

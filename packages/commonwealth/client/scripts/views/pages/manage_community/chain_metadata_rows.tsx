@@ -3,7 +3,17 @@ import React from 'react';
 
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
@@ -301,13 +311,13 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           title="Banner"
           name="Banner Text"
           label="Banner"
-          maxlength={512}
+          maxLength={512}
           placeholder="Text for across the top of your community"
           value={this.communityBanner}
           onChangeHandler={(v) => {
             this.communityBanner = v;
           }}
-          tabindex={1}
+          tabIndex={1}
           editorNamespace="new-banner"
         />
         <div className="tag-row">
@@ -451,7 +461,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="commonbot-section">
           <CWText type="h3">Commonbot Settings</CWText>
           {this.discordBotConnected ? (
-            <>
+            <React.Fragment>
               <div className="connected-line">
                 <CWText type="h4">Connection Status</CWText>
                 <div className="connect-group">
@@ -491,7 +501,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               <div className="snapshot-settings">
                 <CWText type="h4">Snapshot Notifications</CWText>
                 <CWToggle
-                  onchange={() => {
+                  onChange={() => {
                     this.snapshotNotificationsEnabled =
                       !this.snapshotNotificationsEnabled;
                     this.redraw();
@@ -550,9 +560,9 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   }
                 }}
               />
-            </>
+            </React.Fragment>
           ) : this.discordBotConnecting ? (
-            <>
+            <React.Fragment>
               <div className="settings-row">
                 <div className="spinner-group">
                   <CWSpinner />
@@ -560,7 +570,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 </div>
                 <CWText>Refresh to check if connection succeeded</CWText>
               </div>
-            </>
+            </React.Fragment>
           ) : (
             <div className="settings-row">
               <CWButton

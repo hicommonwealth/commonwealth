@@ -1,15 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/proposals/vote_listing.scss';
 
 import app from 'state';
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import {
   IVote,
   DepositVote,
@@ -100,11 +109,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof CosmosVote:
                 return (
                   <div className="vote">
-                    {render(User, {
-                      user: vote.account,
-                      linkify: true,
-                      popover: true,
-                    })}
+                    <User user={vote.account} linkify popover />
                     {/* {balanceWeighted && balance && <CWText>{balance}</CWText>} */}
                   </div>
                 );
@@ -112,7 +117,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof MolochProposalVote:
                 return (
                   <div className="vote">
-                    {render(User, { user: vote.account, linkify: true })}
+                    <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
                       <div className="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -126,7 +131,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof CompoundProposalVote:
                 return (
                   <div className="vote">
-                    {render(User, { user: vote.account, linkify: true })}
+                    <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
                       <div className="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -140,7 +145,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof AaveProposalVote:
                 return (
                   <div className="vote">
-                    {render(User, { user: vote.account, linkify: true })}
+                    <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
                       <div className="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -156,11 +161,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   case vote instanceof SubstrateDemocracyVote:
                     return (
                       <div className="vote">
-                        {render(User, {
-                          user: vote.account,
-                          linkify: true,
-                          popover: true,
-                        })}
+                        <User user={vote.account} linkify popover />
                         <div className="vote-right-container">
                           <CWText
                             noWrap
@@ -191,22 +192,14 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   case vote instanceof SubstrateCollectiveVote:
                     return (
                       <div className="vote">
-                        {render(User, {
-                          user: vote.account,
-                          linkify: true,
-                          popover: true,
-                        })}
+                        <User user={vote.account} linkify popover />
                       </div>
                     );
 
                   default:
                     return (
                       <div className="vote">
-                        {render(User, {
-                          user: vote.account,
-                          linkify: true,
-                          popover: true,
-                        })}
+                        <User user={vote.account} linkify popover />
                         <div className="vote-right-container">
                           <CWText
                             noWrap
@@ -230,11 +223,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof DepositVote:
                 return (
                   <div className="vote">
-                    {render(User, {
-                      user: vote.account,
-                      linkify: true,
-                      popover: true,
-                    })}
+                    <User user={vote.account} linkify popover />
                     <CWText>
                       {formatCoin((vote as DepositVote<any>).deposit, true)}
                     </CWText>
@@ -244,11 +233,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               default:
                 return (
                   <div className="vote">
-                    {render(User, {
-                      user: vote.account,
-                      linkify: true,
-                      popover: true,
-                    })}
+                    <User user={vote.account} linkify popover />
                   </div>
                 );
             }

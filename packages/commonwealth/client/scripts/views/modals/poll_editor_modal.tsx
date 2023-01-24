@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 import moment from 'moment';
 import _ from 'underscore';
@@ -70,7 +79,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
             label="Question"
             placeholder="Do you support this proposal?"
             defaultValue={this.prompt}
-            oninput={(e) => {
+            onInput={(e) => {
               this.prompt = (e.target as HTMLInputElement).value;
             }}
           />
@@ -81,7 +90,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                 <CWTextInput
                   placeholder={`${index + 1}.`}
                   defaultValue={this.options[index]}
-                  oninput={(e) => {
+                  onInput={(e) => {
                     this.options[index] = (e.target as HTMLInputElement).value;
                   }}
                 />
@@ -113,7 +122,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
               <CWCheckbox
                 label="Custom duration"
                 checked={this.customDurationEnabled}
-                onchange={() => {
+                onChange={() => {
                   this.customDurationEnabled = !this.customDurationEnabled;
                   this.customDuration = 'Infinite';
                 }}

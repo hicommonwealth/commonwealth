@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/notification_settings/index.scss';
@@ -17,7 +26,7 @@ import { CWCommunityAvatar } from '../../components/component_kit/cw_community_a
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import {
   SubscriptionRowTextContainer,
@@ -102,7 +111,7 @@ class NotificationSettingsPage extends ClassComponent {
                       <CWCheckbox
                         label="Receive Emails"
                         checked={hasSomeEmailSubs}
-                        onchange={() => {
+                        onChange={() => {
                           hasSomeEmailSubs
                             ? app.user.notifications
                                 .disableImmediateEmails(subs)
@@ -118,7 +127,7 @@ class NotificationSettingsPage extends ClassComponent {
                       />
                       <CWToggle
                         checked={subs.some((s) => s.isActive)}
-                        onchange={() => {
+                        onChange={() => {
                           hasSomeInAppSubs
                             ? app.user.notifications
                                 .disableSubscriptions(subs)
@@ -159,23 +168,31 @@ class NotificationSettingsPage extends ClassComponent {
                       {subs.map((sub) => {
                         const getUser = () => {
                           if (sub.Thread) {
-                            return render(User, {
-                              user: new AddressInfo(
-                                null,
-                                sub.Thread.author,
-                                sub.Thread.chain,
-                                null
-                              ),
-                            });
+                            return (
+                              <User
+                                user={
+                                  new AddressInfo(
+                                    null,
+                                    sub.Thread.author,
+                                    sub.Thread.chain,
+                                    null
+                                  )
+                                }
+                              />
+                            );
                           } else if (sub.Comment) {
-                            return render(User, {
-                              user: new AddressInfo(
-                                null,
-                                sub.Comment.author,
-                                sub.Comment.chain,
-                                null
-                              ),
-                            });
+                            return (
+                              <User
+                                user={
+                                  new AddressInfo(
+                                    null,
+                                    sub.Comment.author,
+                                    sub.Comment.chain,
+                                    null
+                                  )
+                                }
+                              />
+                            );
                           } else {
                             // return empty div to ensure that grid layout is correct
                             // even in the absence of a user

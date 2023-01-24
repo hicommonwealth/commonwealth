@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
@@ -53,7 +63,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
       <React.Fragment>
         <CWRadioGroup
           name="democracy-tx-switcher"
-          onchange={(value) => {
+          onChange={(value) => {
             this.toggleValue = value;
           }}
           toggledOption="proposal"
@@ -72,7 +82,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
             label={`Deposit (${app.chain.currency})`}
             placeholder={`Min: ${substrate.democracyProposals.minimumDeposit.inDollars}`}
             defaultValue={substrate.democracyProposals.minimumDeposit.inDollars}
-            oninput={(e) => {
+            onInput={(e) => {
               this.deposit = parseFloat(e.target.value);
             }}
           />

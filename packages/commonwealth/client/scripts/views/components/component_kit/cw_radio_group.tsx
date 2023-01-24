@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_group.scss';
 
@@ -11,24 +20,25 @@ import { ComponentType } from './types';
 
 type RadioGroupAttrs = {
   name: string;
-  onchange: (e?: any) => void;
+  onChange: (e?: any) => void;
   options: Array<RadioButtonType>;
   toggledOption?: string;
 };
 export class CWRadioGroup extends ClassComponent<RadioGroupAttrs> {
   view(vnode: ResultNode<RadioGroupAttrs>) {
-    const { options, onchange, name, toggledOption } = vnode.attrs;
+    const { options, onChange, name, toggledOption } = vnode.attrs;
 
     return (
       <div className={ComponentType.RadioGroup}>
-        {options.map((o) => {
+        {options.map((o, i) => {
           return (
             <CWRadioButton
+              key={i}
               value={o.value}
               label={o.label}
               checked={o.value === toggledOption}
               groupName={name}
-              onchange={onchange}
+              onChange={onChange}
               disabled={o.disabled}
             />
           );

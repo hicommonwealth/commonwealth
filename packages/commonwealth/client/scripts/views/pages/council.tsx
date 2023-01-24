@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/council.scss';
 
@@ -14,7 +23,7 @@ import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import Sublayout from 'views/sublayout';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { CouncilVotingModal } from 'views/modals/council_voting_modal';
 import { PageLoading } from 'views/pages/loading';
@@ -48,7 +57,7 @@ class Councillor extends ClassComponent<CouncillorAttrs> {
 
     return (
       <CWCard className="CouncillorCard">
-        {render(User, { user: account, popover: true, hideIdentityIcon: true })}
+        <User user={account} popover hideIdentityIcon />
         <CWText className="councillor-status-text">
           {election.isMember(account)
             ? `${election.backing(account).format(true)} from ${pluralize(

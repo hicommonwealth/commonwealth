@@ -2,8 +2,17 @@
 import React from 'react';
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 
@@ -158,14 +167,14 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
             },
             'attach-zone'
           )}
-          style={`background-image: url(${imageURL})`}
+          style={{ backgroundImage: `url(${imageURL})` }}
         >
           <input
             type="file"
             accept="image/jpeg, image/jpg, image/png"
             id="pseudo-input"
           />
-          {this.isUploading && <CWSpinner active="true" size="large" />}
+          {this.isUploading && <CWSpinner size="large" />}
           <div className="attach-btn">
             {!this.isUploading && (
               <CWIcon iconName="imageUpload" iconSize="medium" />

@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/settings/composer_section.scss';
 
@@ -34,7 +43,7 @@ export class ComposerSection extends ClassComponent {
           options={settingsRadioGroupOptions}
           name="composerSectionRadioGroup"
           toggledOption={this.selection}
-          onchange={async (e) => {
+          onChange={async (e) => {
             this.selection = e.target.value;
             await SettingsController.disableRichText(
               e.target.value !== 'richtext'

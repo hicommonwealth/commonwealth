@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/feedback_modal.scss';
@@ -31,7 +40,7 @@ export class FeedbackModal extends ClassComponent {
           <CWTextArea
             placeholder="Report a bug, or suggest an improvement"
             value={this.feedbackText}
-            oninput={(e) => {
+            onInput={(e) => {
               this.feedbackText = e.target.value;
             }}
           />

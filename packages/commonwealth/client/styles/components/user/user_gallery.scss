@@ -4,12 +4,14 @@
 .UserGallery {
   .overflow-users-wrap {
     @include circledAvatar();
+
     position: relative;
     display: inline-block;
     margin-right: -16px;
     margin-top: -3px;
     white-space: nowrap;
     background-color: $primary-100;
+
     .overflow-users {
       position: absolute;
       width: 100%;
