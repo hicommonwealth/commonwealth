@@ -17,30 +17,26 @@ export interface ICompletable extends IIdentifiable {
 export const constructCanvasMessage = (
   canvasChain: CanvasChain, // Canvas chain network, e.g. "ethereum"
   canvasChainId: string, // Canvas chain id, e.g. "1" or "osmo-1" (CW chainId is 1 or "osmo-1")
-  fromAddress: string,
-  sessionPublicAddress: string,
-  timestamp: number | null,
+  from: string,
+  sessionAddress: string,
+  sessionIssued: number | null,
   block: string | null
 ): SessionPayload => {
-  // This will be replaced with an IPFS hash after turning on peering
+  // This will be replaced with an IPFS hash
   const placeholderMultihash = '/commonwealth';
 
-  // Timestamp and blockhash are optional, but must be explicitly so.
-  if (timestamp === undefined)
-    throw new Error('Invalid Canvas signing message');
+  // The blockhash is optional, but must be explicitly so
   if (block === undefined) throw new Error('Invalid Canvas signing message');
 
-  // Not all data here is used. For chains without block data
-  // like Solana/Polkadot, timestamp is left blank in session login.
   const payload: SessionPayload = {
     app: placeholderMultihash,
     block: block === null ? null : block,
     chain: canvasChain,
     chainId: canvasChainId,
-    from: fromAddress,
-    sessionAddress: sessionPublicAddress,
+    from,
+    sessionAddress,
     sessionDuration: 86400 * 1000,
-    sessionTimestamp: timestamp === null ? null : timestamp,
+    sessionIssued,
   };
 
   return payload;

@@ -113,7 +113,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         chainId,
         acct.address,
         sessionPublicAddress,
-        null, // no timestamp
+        +new Date(),
         null // no blockhash
       );
       console.log(canvasMessage);

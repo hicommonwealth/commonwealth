@@ -15,10 +15,7 @@ import {
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  signSessionWithAccount,
-  getSessionSigningTimestamp,
-} from 'controllers/server/sessions';
+import { signSessionWithAccount } from 'controllers/server/sessions';
 import { Account, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
 import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
@@ -215,7 +212,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     ) => {
       // Handle Logged in and joining community of different chain base
       if (this.currentlyInCommunityPage && app.isLoggedIn()) {
-        const timestamp = getSessionSigningTimestamp();
+        const timestamp = +new Date();
         const { signature, chainId, sessionPayload } =
           await signSessionWithAccount(this.selectedWallet, account, timestamp);
         await account.validate(signature, timestamp, chainId);
@@ -250,7 +247,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       // Handle receiving and caching wallet signature strings
       if (!newlyCreated && !linking) {
         try {
-          const timestamp = getSessionSigningTimestamp();
+          const timestamp = +new Date();
           const { signature, sessionPayload, chainId } =
             await signSessionWithAccount(
               this.selectedWallet,
@@ -266,7 +263,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       } else {
         if (!linking) {
           try {
-            const timestamp = getSessionSigningTimestamp();
+            const timestamp = +new Date();
             const { signature, chainId } = await signSessionWithAccount(
               this.selectedWallet,
               account,
@@ -323,7 +320,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     // Validates both linking (secondary) and primary accounts
     const performLinkingCallback = async () => {
       try {
-        const secondaryTimestamp = getSessionSigningTimestamp();
+        const secondaryTimestamp = +new Date();
         const { signature: secondarySignature, chainId: secondaryChainId } =
           await signSessionWithAccount(
             this.selectedLinkingWallet,
