@@ -156,8 +156,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         <div class="UserDashboard">
           <div class="dashboard-column">
             <div class="dashboard-header">
-              <CWText type="h3" fontWeight="semiBold">
-                Activity
+              <CWText type="h3" fontWeight="medium">
+                Home
               </CWText>
               <CWTabBar>
                 <CWTab

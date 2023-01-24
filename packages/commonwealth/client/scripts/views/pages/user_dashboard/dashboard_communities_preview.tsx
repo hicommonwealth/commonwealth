@@ -47,11 +47,13 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
             {chain.name}
           </CWText>
         </div>
-        <CWText className="card-subtext">{chain.description}</CWText>
+        <CWText className="card-subtext" type="b2">
+          {chain.description}
+        </CWText>
         {/* if no recently active threads, hide this module altogether */}
         {!!monthlyThreadCount && (
           <>
-            <CWText className="card-subtext" type="b2" fontWeight="medium">
+            <CWText className="card-subtext" type="caption">
               {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
             </CWText>
             {isMember && (
@@ -88,17 +90,20 @@ export class DashboardCommunitiesPreview extends ClassComponent {
 
     return (
       <div class="DashboardCommunitiesPreview">
-        <CWText type="h3">Active Communities</CWText>
+        <CWText type="h4">Suggested Communities</CWText>
         <div class="community-preview-cards-collection">
           {sortedChains.length > 3 ? sortedChains.slice(0, 3) : sortedChains}
         </div>
-        <CWButton
-          onclick={() => {
-            m.route.set('/communities');
-            m.redraw();
-          }}
-          label="View more communities"
-        />
+        <div className="buttons">
+          <CWButton
+            onclick={() => {
+              m.route.set('/communities');
+              m.redraw();
+            }}
+            label="Explore communities"
+            buttonType="mini-black"
+          />
+        </div>
       </div>
     );
   }

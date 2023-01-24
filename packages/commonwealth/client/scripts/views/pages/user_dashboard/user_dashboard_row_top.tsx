@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import { formatTimestamp } from 'helpers/index';
+import { formatTimestamp, formatTimestampAsAlternateDate } from 'helpers/index';
 import { capitalize } from 'lodash';
 import m from 'mithril';
 import { AddressInfo } from 'models';
@@ -39,6 +39,8 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
     const communityName =
       app.config.chains.getById(chain_id)?.name || 'Unknown chain';
 
+    const communityIcon = app.config.chains.getById(chain_id)?.iconUrl;
+
     let decodedTitle;
 
     try {
@@ -63,7 +65,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
       ),
       hideIdentityIcon: false,
       linkify: true,
-      avatarSize: 16,
+      avatarSize: 24,
       onclick: (e: any) => {
         e.preventDefault();
         e.stopPropagation();
@@ -71,57 +73,42 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
       },
     });
 
-    if (vnode.attrs.category === 'new-comment-creation') {
-      return (
-        <div class="UserDashboardRowTop">
-          <CWText className="row-top-text">
-            {actorName}
-            <span>
-              {numericalCommentCount > 1 &&
-                `and ${numericalCommentCount - 1} others `}
-              commented on
-            </span>
-            <b>{titleText}</b>
-            <span>in</span>
-            <a
-              onclick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                m.route.set(`/${chain_id}`);
-              }}
-            >
-              {communityName}
-            </a>
-            <span>({formatTimestamp(moment(created_at))})</span>
-          </CWText>
-          <div class="comment-preview-container">
-            {getCommentPreview(comment_text)}
-          </div>
-        </div>
-      );
-    } else if (vnode.attrs.category === 'new-thread-creation') {
-      return (
-        <div class="UserDashboardRowTop">
-          <CWText className="row-top-text">
-            {actorName}
-            <span>created new thread</span>
-            <b>{titleText}</b>
-            <span>in</span>
-            <a
-              onclick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                m.route.set(`/${chain_id}`);
-              }}
-            >
-              {communityName}
-            </a>
-            <span>{formatTimestamp(moment(created_at))}</span>
-          </CWText>
-        </div>
-      );
-    }
+    const numericalCount =
+      numericalCommentCount > 1 && `and ${numericalCommentCount - 1} others `;
 
-    return <div class="UserDashboardRowTop">{actorName}</div>;
+    const isComment = vnode.attrs.category === 'new-comment-creation';
+
+    return (
+      <div class="UserDashboardRowTop">
+        <div className="community-info">
+          <img className="icon" src={communityIcon} />
+          <CWText type="caption" fontWeight="medium">
+            <a
+              onclick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                m.route.set(`/${chain_id}`);
+              }}
+            >
+              {communityName}
+            </a>
+          </CWText>
+          <div className="dot">.</div>
+          <CWText type="caption" fontWeight="medium" className="gray-text">
+            {moment(created_at).format('MM/DD/YY')}
+          </CWText>
+        </div>
+        <div className="comment-thread-info">
+          <CWText noWrap fontWeight="semiBold">
+            {actorName}&nbsp;
+            <span className="info-type">
+              {isComment ? 'commented on the thread' : 'created a thread'}&nbsp;
+            </span>
+            <span className="thread-title">{titleText}</span>
+          </CWText>
+        </div>
+        <div className="comment-preview">{getCommentPreview(comment_text)}</div>
+      </div>
+    );
   }
 }
