@@ -43,7 +43,7 @@ const CanvasVerifyDataModal = {
           .finally(() => m.redraw());
         verify({
           action: vnode.state.action,
-          actionSignerAddress: vnode.state.session.payload.address,
+          actionSignerAddress: vnode.state.session.payload.sessionAddress,
         })
           .then((result) => (vnode.state.verifiedAction = result))
           .catch((err) => console.error('Could not verify action:', err))

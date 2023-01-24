@@ -66,7 +66,7 @@ export const verify = async ({
   const payload = action?.payload ?? session?.payload;
   if (!payload || !signature) return false;
 
-  if (payload.chain === 'eth') {
+  if (payload.chain === 'ethereum') {
     // verify ethereum signature
     if (action) {
       const [domain, types, value] = getActionSignatureData(actionPayload);

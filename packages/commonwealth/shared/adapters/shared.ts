@@ -15,8 +15,8 @@ export interface ICompletable extends IIdentifiable {
 }
 
 export const constructCanvasMessage = (
-  chain: CanvasChain, // Canvas chain prefix, e.g. "eth"
-  canvasChainId: string, // Canvas chain id, e.g. "1" or "osmo" (Note: CW chain id is 1 or "osmo-1")
+  canvasChain: CanvasChain, // Canvas chain network, e.g. "ethereum"
+  canvasChainId: string, // Canvas chain id, e.g. "1" or "osmo-1" (CW chainId is 1 or "osmo-1")
   fromAddress: string,
   sessionPublicAddress: string,
   timestamp: number | null,
@@ -33,18 +33,15 @@ export const constructCanvasMessage = (
 
   // Not all data here is used. For chains without block data
   // like Solana/Polkadot, timestamp is left blank in session login.
-  //
-  // This in cleaned up in the next PR which reconciles
-  // Commonwealth to use the updated Canvas signing payload.
   const payload: SessionPayload = {
-    from: fromAddress,
-    spec: placeholderMultihash,
-    address: sessionPublicAddress,
-    duration: 86400 * 1000,
-    timestamp: timestamp === null ? null : timestamp,
+    app: placeholderMultihash,
     block: block === null ? null : block,
-    chain: chain,
+    chain: canvasChain,
     chainId: canvasChainId,
+    from: fromAddress,
+    sessionAddress: sessionPublicAddress,
+    sessionDuration: 86400 * 1000,
+    sessionTimestamp: timestamp === null ? null : timestamp,
   };
 
   return payload;

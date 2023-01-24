@@ -44,11 +44,11 @@ export class EthereumSessionController implements ISessionController {
       // throw new Error("Invalid signature");
     }
     if (
-      payload.address.toLowerCase() !==
+      payload.sessionAddress.toLowerCase() !==
       this.signers[chainId].address.toLowerCase()
     ) {
       throw new Error(
-        `Invalid auth: ${payload.address} vs. ${this.signers[chainId].address}`
+        `Invalid auth: ${payload.sessionAddress} vs. ${this.signers[chainId].address}`
       );
     }
 
@@ -83,7 +83,7 @@ export class EthereumSessionController implements ISessionController {
         if (!valid) throw new Error();
 
         if (
-          payload.address.toLowerCase() ===
+          payload.sessionAddress.toLowerCase() ===
           this.signers[chainId].address.toLowerCase()
         ) {
           console.log(
@@ -111,7 +111,7 @@ export class EthereumSessionController implements ISessionController {
   async sign(
     chainId: string,
     call: string,
-    args: Record<string, ActionArgument>
+    callArgs: Record<string, ActionArgument>
   ): Promise<{
     session: Session;
     action: Action;
@@ -130,7 +130,7 @@ export class EthereumSessionController implements ISessionController {
       chainId,
       block: sessionPayload.block,
       call,
-      args,
+      callArgs,
     };
 
     const [domain, types, value] = getActionSignatureData(actionPayload);

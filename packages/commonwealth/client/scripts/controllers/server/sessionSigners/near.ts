@@ -51,9 +51,9 @@ export class NEARSessionController implements ISessionController {
     if (!valid) {
       // throw new Error("Invalid signature");
     }
-    if (payload.address !== this.getAddress(chainId)) {
+    if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
-        `Invalid auth: ${payload.address} vs. ${this.getAddress(chainId)}`
+        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(chainId)}`
       );
     }
     this.auths[chainId] = { payload, signature };
@@ -85,7 +85,7 @@ export class NEARSessionController implements ISessionController {
         });
         if (!valid) throw new Error();
 
-        if (payload.address === this.getAddress(chainId)) {
+        if (payload.sessionAddress === this.getAddress(chainId)) {
           console.log(
             'Restored authenticated session:',
             this.getAddress(chainId)
