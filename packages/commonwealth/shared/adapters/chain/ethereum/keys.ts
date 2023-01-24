@@ -19,73 +19,15 @@ export const constructTypedCanvasMessage = (message) => {
   const types: Record<string, TypedDataField[]> = {
     EIP712Domain: [{ name: 'name', type: 'string' }],
     Message: [
-      { name: 'from', type: 'string' },
-      { name: 'spec', type: 'string' },
-      { name: 'timestamp', type: 'uint256' },
-      { name: 'address', type: 'string' },
-      { name: 'duration', type: 'uint256' },
-      { name: 'blockhash', type: 'string' },
+      { name: 'app', type: 'string' },
+      { name: 'block', type: 'string' },
       { name: 'chain', type: 'string' },
       { name: 'chainId', type: 'string' },
+      { name: 'from', type: 'string' },
+      { name: 'sessionAddress', type: 'string' },
+      { name: 'sessionDuration', type: 'uint256' },
+      { name: 'sessionTimestamp', type: 'uint256' },
     ],
-  };
-
-  // canvas uses ethers' signTypedData types while commonwealth uses eth-sig-util's
-  // so we have to coerce the types here
-  return { types, primaryType: 'Message', domain, message } as any;
-};
-
-export const constructTypedMessage = async (
-  fromAddress: string,
-  fromChainId: number,
-  sessionPublicAddress: string,
-  validationBlockInfoString: string
-) => {
-  const placeholderMultihash = '/commonwealth'; // TODO
-
-  const validationBlockInfo = JSON.parse(validationBlockInfoString);
-  const block: Block = {
-    chain: 'eth',
-    chainId: fromChainId.toString(),
-    blocknum: validationBlockInfo.number,
-    blockhash: validationBlockInfo.hash,
-    timestamp: validationBlockInfo.timestamp,
-  };
-
-  // use the block timestamp as the message timestamp, since the block should
-  // have been requested recently
-  const payload: SessionPayload = {
-    chain: block.chain,
-    chainId: block.chainId,
-    from: fromAddress,
-    spec: placeholderMultihash,
-    address: sessionPublicAddress,
-    duration: 86400 * 1000,
-    timestamp: block.timestamp,
-    blockhash: block.blockhash,
-  };
-
-  // construct the signature data from scratch, since canvas' implementation doesn't
-  // include an EIP712Domain
-  const domain: TypedDataDomain = {
-    name: 'Commonwealth',
-  };
-
-  const types: Record<string, TypedDataField[]> = {
-    EIP712Domain: [{ name: 'name', type: 'string' }],
-    Message: [
-      { name: 'loginTo', type: 'string' },
-      { name: 'registerSessionAddress', type: 'string' },
-      { name: 'registerSessionDuration', type: 'uint256' },
-      { name: 'timestamp', type: 'uint256' },
-    ],
-  };
-
-  const message = {
-    loginTo: payload.spec,
-    registerSessionAddress: payload.address,
-    registerSessionDuration: payload.duration.toString(),
-    timestamp: payload.timestamp.toString(),
   };
 
   // canvas uses ethers' signTypedData types while commonwealth uses eth-sig-util's

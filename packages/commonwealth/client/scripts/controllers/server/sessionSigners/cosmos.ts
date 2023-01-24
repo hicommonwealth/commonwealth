@@ -150,7 +150,7 @@ export class CosmosSDKSessionController implements ISessionController {
   async sign(
     chainId: string,
     call: string,
-    args: Record<string, ActionArgument>
+    callArgs: Record<string, ActionArgument>
   ): Promise<{ session: Session; action: Action; hash: string }> {
     const { signer, privkey, bech32Address: address } = this.signers[chainId];
     const sessionPayload: SessionPayload = this.auths[chainId]?.payload;
@@ -158,14 +158,14 @@ export class CosmosSDKSessionController implements ISessionController {
     // TODO: verify payload is not expired
 
     const actionPayload: ActionPayload = {
+      app: sessionPayload.app,
       from: sessionPayload.from,
-      spec: sessionPayload.spec,
       timestamp: +Date.now(),
       chain: 'cosmos',
       chainId,
-      blockhash: sessionPayload.blockhash,
+      block: sessionPayload.block,
       call,
-      args,
+      callArgs,
     };
 
     // don't use signAmino, use Secp256k1.createSignature to get an ExtendedSecp256k1Signature

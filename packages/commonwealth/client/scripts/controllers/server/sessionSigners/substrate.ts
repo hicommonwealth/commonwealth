@@ -120,7 +120,7 @@ export class SubstrateSessionController implements ISessionController {
   async sign(
     chainId: string,
     call: string,
-    args: Record<string, ActionArgument>
+    callArgs: Record<string, ActionArgument>
   ): Promise<{
     session: Session;
     action: Action;
@@ -132,14 +132,14 @@ export class SubstrateSessionController implements ISessionController {
     // TODO: verify payload is not expired
 
     const actionPayload: ActionPayload = {
+      app: sessionPayload.app,
       from: sessionPayload.from,
-      spec: sessionPayload.spec,
       timestamp: +Date.now(),
       chain: 'substrate',
       chainId,
-      blockhash: sessionPayload.blockhash, // will be null
+      block: sessionPayload.block, // will be null
       call,
-      args,
+      callArgs,
     };
 
     const message = getSubstrateSignatureData(actionPayload);

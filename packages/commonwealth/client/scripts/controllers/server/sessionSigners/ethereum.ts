@@ -123,12 +123,12 @@ export class EthereumSessionController implements ISessionController {
     // TODO: verify payload is not expired
 
     const actionPayload: ActionPayload = {
+      app: sessionPayload.app,
       from: sessionPayload.from,
-      spec: sessionPayload.spec,
       timestamp: +Date.now(),
-      chain: 'eth',
+      chain: 'ethereum',
       chainId,
-      blockhash: sessionPayload.blockhash,
+      block: sessionPayload.block,
       call,
       args,
     };

@@ -20,7 +20,7 @@ export const constructCanvasMessage = (
   fromAddress: string,
   sessionPublicAddress: string,
   timestamp: number | null,
-  blockhash: string | null
+  block: string | null
 ): SessionPayload => {
   // This will be replaced with an IPFS hash after turning on peering
   const placeholderMultihash = '/commonwealth';
@@ -28,7 +28,7 @@ export const constructCanvasMessage = (
   // Timestamp and blockhash are optional, but must be explicitly so.
   if (timestamp === undefined)
     throw new Error('Invalid Canvas signing message');
-  if (blockhash === undefined)
+  if (block === undefined)
     throw new Error('Invalid Canvas signing message');
 
   // Not all data here is used. For chains without block data
@@ -42,7 +42,7 @@ export const constructCanvasMessage = (
     address: sessionPublicAddress,
     duration: 86400 * 1000,
     timestamp: timestamp === null ? null : timestamp,
-    blockhash: blockhash === null ? null : blockhash,
+    block: block === null ? null : block,
     chain: chain,
     chainId: canvasChainId,
   };
@@ -55,7 +55,7 @@ export function chainBaseToCanvasChain(chainBase: ChainBase): CanvasChain {
   if (chainBase === ChainBase.CosmosSDK) {
     return 'cosmos';
   } else if (chainBase === ChainBase.Ethereum) {
-    return 'eth';
+    return 'ethereum';
   } else if (chainBase === ChainBase.NEAR) {
     return 'near';
   } else if (chainBase === ChainBase.Solana) {

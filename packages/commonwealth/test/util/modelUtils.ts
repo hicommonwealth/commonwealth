@@ -18,7 +18,6 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 import { Permission } from '../../server/models/role';
 import {
-  constructTypedMessage,
   constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
@@ -91,7 +90,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
     const message = constructCanvasMessage(
-      'eth',
+      'ethereum',
       chain_id,
       address,
       sessionWallet.address,
@@ -146,7 +145,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
     const message = constructCanvasMessage(
-      'eth',
+      'ethereum',
       chain_id,
       address,
       sessionWallet.address,
