@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
@@ -12,7 +22,7 @@ import { CWText } from './component_kit/cw_text';
 type InputRowAttrs = {
   value: string | number;
   disabled?: boolean;
-  maxlength?: number;
+  maxLength?: number;
   onChangeHandler: (e) => void;
   placeholder?: string;
   textarea?: boolean;
@@ -24,7 +34,7 @@ export class InputRow extends ClassComponent<InputRowAttrs> {
     const {
       value,
       disabled,
-      maxlength,
+      maxLength,
       onChangeHandler,
       placeholder,
       textarea,
@@ -39,8 +49,8 @@ export class InputRow extends ClassComponent<InputRowAttrs> {
             value={value}
             placeholder={placeholder}
             disabled={!!disabled}
-            maxlength={maxlength}
-            oninput={(e) => {
+            maxLength={maxLength}
+            onInput={(e) => {
               onChangeHandler((e.target as any).value);
             }}
           />
@@ -49,9 +59,9 @@ export class InputRow extends ClassComponent<InputRowAttrs> {
             label={title}
             value={value}
             placeholder={placeholder}
-            maxlength={maxlength}
+            maxLength={maxLength}
             disabled={!!disabled}
-            oninput={(e) => {
+            onInput={(e) => {
               onChangeHandler((e.target as any).value);
             }}
           />
@@ -86,7 +96,7 @@ export class ToggleRow extends ClassComponent<ToggleRowAttrs> {
           <CWToggle
             checked={this.checked}
             disabled={!!disabled}
-            onchange={() => {
+            onChange={() => {
               this.checked = !this.checked;
               onToggle(this.checked);
             }}

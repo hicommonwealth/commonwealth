@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/new_proposal/compound_proposal_form.scss';
 
@@ -9,7 +19,7 @@ import app from 'state';
 import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -41,24 +51,19 @@ export class CompoundProposalForm extends ClassComponent {
       <div className="CompoundProposalForm">
         <div className="row-with-label">
           <CWLabel label="Proposer (you)" />
-          {render(User, {
-            user: author,
-            linkify: true,
-            popover: true,
-            showAddressWithDisplayName: true,
-          })}
+          <User user={author} linkify popover showAddressWithDisplayName />
         </div>
         <CWTextInput
           label="Proposal Title (leave blank for no title)"
           placeholder="Proposal Title"
-          oninput={(e) => {
+          onInput={(e) => {
             this.title = e.target.value;
           }}
         />
         <CWTextArea
           label="Proposal Description"
           placeholder="Proposal Description"
-          oninput={(e) => {
+          onInput={(e) => {
             this.description = e.target.value;
           }}
         />
@@ -102,7 +107,7 @@ export class CompoundProposalForm extends ClassComponent {
           label="Target Address"
           placeholder="Add Target"
           value={aaveProposalState[activeTabIndex].target}
-          oninput={(e) => {
+          onInput={(e) => {
             this.aaveProposalState[activeTabIndex].target = e.target.value;
           }}
         />
@@ -110,7 +115,7 @@ export class CompoundProposalForm extends ClassComponent {
           label="Value"
           placeholder="Enter amount in wei"
           value={aaveProposalState[activeTabIndex].value}
-          oninput={(e) => {
+          onInput={(e) => {
             this.aaveProposalState[activeTabIndex].value = e.target.value;
           }}
         />
@@ -118,7 +123,7 @@ export class CompoundProposalForm extends ClassComponent {
           label="Calldata"
           placeholder="Add Calldata"
           value={aaveProposalState[activeTabIndex].calldata}
-          oninput={(e) => {
+          onInput={(e) => {
             this.aaveProposalState[activeTabIndex].calldata = e.target.value;
           }}
         />
@@ -126,7 +131,7 @@ export class CompoundProposalForm extends ClassComponent {
           label="Function Signature (Optional)"
           placeholder="Add a signature"
           value={aaveProposalState[activeTabIndex].signature}
-          oninput={(e) => {
+          onInput={(e) => {
             this.aaveProposalState[activeTabIndex].signature = e.target.value;
           }}
         />

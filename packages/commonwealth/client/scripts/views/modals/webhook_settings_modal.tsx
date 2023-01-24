@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/webhook_settings_modal.scss';
@@ -71,7 +80,7 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
           checked={allValuesPresent}
           label={label}
           indeterminate={someValuesPresent && !allValuesPresent}
-          onchange={() => {
+          onChange={() => {
             if (allValuesPresent) {
               this.selectedCategories = this.selectedCategories.filter(
                 (v) => !values.includes(v)

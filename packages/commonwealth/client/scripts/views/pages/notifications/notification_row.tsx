@@ -130,7 +130,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
             <div className="comment-body-bottom">
               Block {notification.chainEvent.blockNumber}
             </div>
-            {/* <div class="comment-body-excerpt">{label.label}</div> */}
+            {/* <div className="comment-body-excerpt">{label.label}</div> */}
           </div>
         </div>
       );
@@ -163,11 +163,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       const author = new AddressInfo(null, author_address, chain_id, null);
 
-      const authorName = render(User, {
-        user: author,
-        hideAvatar: true,
-        hideIdentityIcon: true,
-      });
+      const authorName = <User user={author} hideAvatar hideIdentityIcon />;
 
       // link(
       //   'a.NotificationRow',
@@ -175,11 +171,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       return (
         <div onClick={() => navigateToSubpage(route)}>
-          {render(User, {
-            user: author,
-            avatarOnly: true,
-            avatarSize: 26,
-          })}
+          <User user={author} avatarOnly avatarSize={26} />
           <div className="comment-body">
             <div className="comment-body-title">
               {authorName} mentioned you in {chain_id} chat
@@ -264,23 +256,27 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       return (
         <div onClick={() => navigateToSubpage(path.replace(/ /g, '%20'))}>
-          {authorInfo.length === 1
-            ? render(User, {
-                user: new AddressInfo(
+          {authorInfo.length === 1 ? (
+            <User
+              user={
+                new AddressInfo(
                   null,
                   (authorInfo[0] as [string, string])[1],
                   (authorInfo[0] as [string, string])[0],
                   null
-                ),
-                avatarOnly: true,
-                avatarSize: 26,
-              })
-            : render(UserGallery, {
-                users: authorInfo.map(
-                  (auth) => new AddressInfo(null, auth[1], auth[0], null)
-                ),
-                avatarSize: 26,
-              })}
+                )
+              }
+              avatarOnly
+              avatarSize={26}
+            />
+          ) : (
+            <UserGallery
+              users={authorInfo.map(
+                (auth) => new AddressInfo(null, auth[1], auth[0], null)
+              )}
+              avatarSize={26}
+            />
+          )}
           <div className="comment-body">
             <div className="comment-body-title">{notificationHeader}</div>
             {notificationBody &&

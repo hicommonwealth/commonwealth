@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/delegate.scss';
 
@@ -101,7 +110,7 @@ class DelegateForm extends ClassComponent {
         <CWTextInput
           label="Your delegate"
           placeholder="Paste address you want to delegate to"
-          oninput={(e) => {
+          onInput={(e) => {
             const result = (e.target as any).value;
             this.form.address = result;
             redraw();
@@ -112,7 +121,7 @@ class DelegateForm extends ClassComponent {
             label="Amount to delegate"
             placeholder="10000"
             value=""
-            oninput={(e) => {
+            onInput={(e) => {
               const result = (e.target as any).value;
               this.form.amount = result;
               redraw();

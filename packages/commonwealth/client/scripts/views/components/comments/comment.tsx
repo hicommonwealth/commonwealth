@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/comments/comment.scss';
@@ -19,9 +28,10 @@ import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
 import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
 import { SharePopover } from '../share_popover';
-import User, { AnonymousUser } from '../widgets/user';
+import { User } from '../user/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
+import { AnonymousUser } from '../user/anonymous_user';
 
 type CommentAuthorAttrs = {
   comment: CommentType<any>;
@@ -38,9 +48,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
         comment.authorChain !== app.chain.id &&
         comment.authorChain !== app.chain.base
       ) {
-        return render(AnonymousUser, {
-          distinguishingKey: comment.author,
-        });
+        return <AnonymousUser distinguishingKey={comment.author} />;
       }
     }
 
@@ -49,12 +57,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
     return comment.deleted ? (
       <span>[deleted]</span>
     ) : (
-      render(User, {
-        avatarSize: 24,
-        user: author,
-        popover: true,
-        linkify: true,
-      })
+      <User avatarSize={24} user={author} popover linkify />
     );
   }
 }
@@ -128,6 +131,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
               published on
             </CWText> */}
             <CWText
+              key={comment.id}
               type="caption"
               fontWeight="medium"
               className="published-text"

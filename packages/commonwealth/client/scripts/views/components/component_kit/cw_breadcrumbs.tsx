@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
 
@@ -28,7 +37,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
           const isCurrent = k === breadcrumbs.length - 1;
 
           return (
-            <React.Fragment>
+            <React.Fragment key={k}>
               <CWText
                 type="caption"
                 fontWeight="medium"

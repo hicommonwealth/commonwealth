@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/token_decimal_input.scss';
 
@@ -40,7 +49,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
         <CWTextInput
           value={this.displayValue}
           // type: 'number',
-          oninput={(v) => {
+          onInput={(v) => {
             v.preventDefault();
             // restrict it to numerical input
             const wholeNumberTest = /^[1-9]\d*$/;
@@ -71,7 +80,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
           <div className="token-settings">
             <CWToggle
               checked={!this.isInputInWei}
-              onchange={() => {
+              onChange={() => {
                 this.isInputInWei = !this.isInputInWei;
                 if (this.isInputInWei) {
                   this.switchCaption = 'Using base token value';

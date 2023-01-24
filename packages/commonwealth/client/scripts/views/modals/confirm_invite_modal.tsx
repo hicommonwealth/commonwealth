@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/confirm_invite_modal.scss';
@@ -9,7 +19,6 @@ import 'modals/confirm_invite_modal.scss';
 import app from 'state';
 import { orderAccountsByAddress } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { UserBlock } from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { navigateToSubpage } from 'app';
 import { InviteCodeAttributes } from 'types';
@@ -21,6 +30,7 @@ import {
 } from '../components/component_kit/helpers';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { UserBlock } from '../components/user/user_block';
 
 type SideMenuAttrs = {
   invites: Array<InviteCodeAttributes>;
@@ -61,7 +71,7 @@ export class ConfirmInviteModal extends ClassComponent {
   private isComplete: boolean;
   private location: number;
   private rejected: Array<number>;
-  private selectedAddress: string;
+  private selectedAddress: string | null;
 
   oninit() {
     this.invites = app.config.invites;
@@ -92,11 +102,11 @@ export class ConfirmInviteModal extends ClassComponent {
             this.selectedAddress = account.address;
           }}
         >
-          {render(UserBlock, {
-            user: account,
-            showChainName: true,
-            addressDisplayOptions: { showFullAddress: !isMobile },
-          })}
+          <UserBlock
+            user={account}
+            showChainName
+            addressDisplayOptions={{ showFullAddress: !isMobile }}
+          />
         </div>
       );
     };

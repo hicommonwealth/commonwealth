@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
@@ -17,7 +26,7 @@ import { slugify } from 'utils';
 import { isCommandClick, pluralize } from 'helpers';
 import { AddressInfo, Thread } from 'models';
 import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SharePopover } from '../../components/share_popover';
@@ -105,19 +114,15 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
         <div className="main-content">
           <div className="top-row">
             <div className="user-and-date">
-              {render(User, {
-                avatarSize: 24,
-                user: new AddressInfo(
-                  null,
-                  thread.author,
-                  thread.authorChain,
-                  null
-                ),
-                linkify: true,
-                popover: false,
-                showAddressWithDisplayName: true,
-                hideIdentityIcon: true,
-              })}
+              <User
+                avatarSize={24}
+                user={
+                  new AddressInfo(null, thread.author, thread.authorChain, null)
+                }
+                linkify
+                showAddressWithDisplayName
+                hideIdentityIcon
+              />
               {!this.isWindowSmallInclusive && (
                 <CWText className="last-updated-text">•</CWText>
               )}

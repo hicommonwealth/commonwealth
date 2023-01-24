@@ -1,8 +1,18 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, parsePathname } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+  parsePathname,
+} from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -174,7 +184,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
           <CWTextInput
             label="Question/Proposal"
             placeholder="Should 0xMaki be our new Mayor?"
-            oninput={(e) => {
+            onInput={(e) => {
               e.redraw = false; // do not redraw on input
 
               this.form.name = e.target as any;
@@ -193,7 +203,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
                 placeholder={
                   idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
                 }
-                oninput={(e) => {
+                onInput={(e) => {
                   this.form.choices[idx] = (e.target as any).value;
                   redraw();
                 }}
@@ -224,7 +234,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
               options={[{ value: '4d', label: '4-day' }]}
               value={this.form.range}
               toggledOption="4d"
-              onchange={(e: Event) => {
+              onChange={(e: Event) => {
                 this.form.range = (e.target as any).value;
                 this.form.start = new Date().getTime();
 

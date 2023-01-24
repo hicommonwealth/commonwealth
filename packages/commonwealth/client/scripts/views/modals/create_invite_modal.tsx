@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 // import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
@@ -15,7 +24,6 @@ import app from 'state';
 import { ChainBase } from 'common-common/src/types';
 import { ChainInfo, RoleInfo, Profile } from 'models';
 import { SearchScope } from 'models/SearchQuery';
-import { UserBlock } from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -23,6 +31,7 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { UserBlock } from '../components/user/user_block';
 
 type SearchParams = {
   chainScope?: string;
@@ -500,7 +509,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
               label="Address"
               placeholder="Type to search by name or address"
               value={this.searchAddressTerm}
-              oninput={(e) => {
+              onInput={(e) => {
                 e.stopPropagation();
                 this.isTyping = true;
                 this.searchAddressTerm = e.target.value?.toLowerCase();
@@ -530,9 +539,8 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
               }}
             />
           </div>
-          {searchAddressTerm?.length > 3 &&
-            !this.hideResults &&
-            null // @TODO @REACT FIX ME
+          {
+            searchAddressTerm?.length > 3 && !this.hideResults && null // @TODO @REACT FIX ME
             // m(List, [
             //   !results || results?.length === 0
             //     ? app.searchAddressCache[searchAddressTerm]?.loaded
@@ -556,7 +564,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
             //     ? m(ListItem, { label: <CWSpinner size="small" /> })
             //     : results,
             // ])
-            }
+          }
           <InviteButton
             selection="address"
             disabled={!this.isAddressValid}
@@ -577,7 +585,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
           <CWTextInput
             label="Email"
             placeholder="Enter email"
-            oninput={(e) => {
+            onInput={(e) => {
               this.invitedEmail = (e.target as any).value;
             }}
           />
@@ -601,123 +609,12 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
             <div className="success-message">Success! Your invite was sent</div>
           )}
           {this.failure && (
-            <div className="error-message">{this.error || 'An error occurred'}</div>
+            <div className="error-message">
+              {this.error || 'An error occurred'}
+            </div>
           )}
         </div>
       </div>
     );
   }
 }
-
-// Gabe 7/28/22 - Invite link generation doesn't work right now
-
-// const CreateInviteLink: Component<
-//   {
-//     chain?: ChainInfo;
-//     onChangeHandler?: Function;
-//   },
-//   {
-//     link: string;
-//     inviteUses: string;
-//     inviteTime: string;
-//   }
-// > = {
-//   oninit: (vnode) => {
-//     this.link = '';
-//     this.inviteUses = 'none';
-//     this.inviteTime = 'none';
-//   },
-//   view: (vnode) => {
-//     const { chain, onChangeHandler } = vnode.attrs;
-//     const chainOrCommunityObj = { chain: chain.id };
-//     return render(Form, { class: 'CreateInviteLink' }, [
-//       render(FormGroup, { span: 12 }, [
-//         render('h2.invite-link-title', 'Generate Invite Link'),
-//       ]),
-//       render(FormGroup, { span: 4 }, [
-//         render(FormLabel, { for: 'uses' }, 'Number of Uses'),
-//         render(RadioGroup, {
-//           name: 'uses',
-//           options: [
-//             { value: 'none', label: 'Unlimited uses' },
-//             { value: '1', label: 'One time use' },
-//           ],
-//           value: this.inviteUses,
-//           onchange: (e: Event) => {
-//             this.inviteUses = (e.target as any).value;
-//           },
-//         }),
-//       ]),
-//       render(FormGroup, { span: 4 }, [
-//         render(FormLabel, { for: 'time' }, 'Expires after'),
-//         render(RadioGroup, {
-//           name: 'time',
-//           options: [
-//             { value: 'none', label: 'Never expires' },
-//             { value: '24h', label: '24 hours' },
-//             { value: '48h', label: '48 hours' },
-//             { value: '1w', label: '1 week' },
-//             { value: '30d', label: '30 days' },
-//           ],
-//           value: this.inviteTime,
-//           onchange: (e: Event) => {
-//             this.inviteTime = (e.target as any).value;
-//           },
-//         }),
-//       ]),
-//       render(FormGroup, { span: 4 }),
-//       render(FormGroup, { span: 4 }, [
-//         render(Button, {
-//           type: 'submit',
-//           intent: 'primary',
-//           rounded: true,
-//           onClick: (e) => {
-//             e.preventDefault();
-//             // TODO: Change to POST /inviteLink
-//             $.post(`${app.serverUrl()}/createInviteLink`, {
-//               ...chainOrCommunityObj,
-//               time: this.inviteTime,
-//               uses: this.inviteUses,
-//               jwt: app.user.jwt,
-//             }).then((response) => {
-//               const linkInfo = response.result;
-//               const url = app.isProduction
-//                 ? 'commonwealth.im'
-//                 : 'localhost:8080';
-//               if (onChangeHandler) onChangeHandler(linkInfo);
-//               this.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${
-//                 linkInfo.id
-//               }`;
-//               redraw();
-//             });
-//           },
-//           label: 'Get invite link',
-//         }),
-//       ]),
-//       render(FormGroup, { span: 8, class: 'copy-link-line' }, [
-//         render(Input, {
-//           id: 'invite-link-pastebin',
-//           class: 'invite-link-pastebin',
-//           fluid: true,
-//           readonly: true,
-//           placeholder: 'Click to generate a link',
-//           value: `${this.link}`,
-//         }),
-//         render('img', {
-//           src: 'static/img/copy_default.svg',
-//           alt: '',
-//           class: 'mx-auto',
-//           onClick: (e) => {
-//             const copyText = document.getElementById(
-//               'invite-link-pastebin'
-//             ) as HTMLInputElement;
-//             copyText.select();
-//             copyText.setSelectionRange(0, 99999); /* For mobile devices */
-
-//             document.execCommand('copy');
-//           },
-//         }),
-//       ]),
-//     ]);
-//   },
-// };

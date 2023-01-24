@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -18,12 +27,14 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import { CWText } from './cw_text';
-import { CWWalletOptionRow, CWWalletMissingOptionRow } from './cw_wallet_option_row';
+import {
+  CWWalletOptionRow,
+  CWWalletMissingOptionRow,
+} from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
-import User from '../widgets/user';
+import { User } from '../user/user';
 import { CWIconButton } from './cw_icon_button';
-import KeplrWebWalletController from 'client/scripts/controllers/app/webWallets/keplr_web_wallet';
 import { CWSpinner } from './cw_spinner';
 
 // Copied over from the old wallet selector with modifications
@@ -71,15 +82,13 @@ const LinkAccountItem: Component<
         render('.account-item-avatar', [
           render(
             '.account-user',
-            render(User, {
-              user: new AddressInfo(
-                null,
-                address,
-                app.chain?.id || walletNetwork
-              ),
-              avatarOnly: true,
-              avatarSize: 40,
-            })
+            <User
+              user={
+                new AddressInfo(null, address, app.chain?.id || walletNetwork)
+              }
+              avatarOnly
+              avatarSize={40}
+            />
           ),
         ]),
         render('.account-item-left', [
@@ -87,18 +96,19 @@ const LinkAccountItem: Component<
           render('.account-item-address', [
             render(
               '.account-user',
-              render(User, {
-                user: new AddressInfo(
-                  null,
-                  address,
-                  app.chain?.id || walletNetwork
-                ),
-                hideAvatar: true,
-              })
+              <User
+                user={
+                  new AddressInfo(null, address, app.chain?.id || walletNetwork)
+                }
+                hideAvatar
+              />
             ),
           ]),
           vnode.state.linking &&
-            render('p.small-text', 'Check your wallet for a confirmation prompt.'),
+            render(
+              'p.small-text',
+              'Check your wallet for a confirmation prompt.'
+            ),
         ]),
         render('.account-item-right', [
           vnode.state.linking &&
@@ -209,9 +219,14 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       }
 
       try {
-        const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, wallet.getChainId());
+        const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+          wallet.chain,
+          wallet.getChainId()
+        );
         const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-        const validationBlockInfo = wallet.getRecentBlock && await wallet.getRecentBlock(chainIdentifier);
+        const validationBlockInfo =
+          wallet.getRecentBlock &&
+          (await wallet.getRecentBlock(chainIdentifier));
         const { account: signerAccount, newlyCreated } =
           await createUserWithAddress(
             address,
@@ -250,7 +265,10 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       <div className="WalletsList">
         <div className="wallets-and-link-container">
           <div
-            className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'wallets')}
+            className={getClasses<{ darkMode?: boolean }>(
+              { darkMode },
+              'wallets'
+            )}
           >
             {wallets.map((wallet: IWebWallet<any>) => (
               <CWWalletOptionRow
@@ -355,7 +373,9 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                 }}
               />
             ))}
-            {wallets.length === 0 && <CWWalletMissingOptionRow darkMode={darkMode} />}
+            {wallets.length === 0 && (
+              <CWWalletMissingOptionRow darkMode={darkMode} />
+            )}
           </div>
           <div className="wallet-list-links">
             {showResetWalletConnect && (

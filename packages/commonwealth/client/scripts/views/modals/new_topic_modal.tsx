@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 
@@ -75,7 +84,7 @@ export class NewTopicModal extends ClassComponent {
             label="Name"
             name="name"
             value={this.form.name}
-            oninput={(e) => {
+            onInput={(e) => {
               this.form.name = (e.target as HTMLInputElement).value;
             }}
             inputValidationFn={(text: string) => {
@@ -109,20 +118,20 @@ export class NewTopicModal extends ClassComponent {
 
               return ['success', 'Valid topic name'];
             }}
-            autofocus
-            autocomplete="off"
-            tabindex={1}
+            autoFocus
+            autoComplete="off"
+            tabIndex={1}
             oncreate={(vvnode) => {
-              // use oncreate to focus because autofocus: true fails when component is recycled in a modal
+              // use oncreate to focus because autoFocus: true fails when component is recycled in a modal
               setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
             }}
           />
           <CWTextInput
             label="Description"
             name="description"
-            tabindex={2}
+            tabIndex={2}
             value={this.form.description}
-            oninput={(e) => {
+            onInput={(e) => {
               this.form.description = (e.target as any).value;
             }}
           />
@@ -144,7 +153,7 @@ export class NewTopicModal extends ClassComponent {
             <CWCheckbox
               label="Featured in Sidebar"
               checked={this.form.featuredInSidebar}
-              onchange={() => {
+              onChange={() => {
                 this.form.featuredInSidebar = !this.form.featuredInSidebar;
               }}
               value=""
@@ -152,7 +161,7 @@ export class NewTopicModal extends ClassComponent {
             <CWCheckbox
               label="Featured in New Post"
               checked={this.form.featuredInNewPost}
-              onchange={() => {
+              onChange={() => {
                 this.form.featuredInNewPost = !this.form.featuredInNewPost;
               }}
               value=""
@@ -165,7 +174,7 @@ export class NewTopicModal extends ClassComponent {
                 this.quillEditorState = state;
               }}
               editorNamespace="new-discussion"
-              tabindex={3}
+              tabIndex={3}
             />
           )}
           <CWButton

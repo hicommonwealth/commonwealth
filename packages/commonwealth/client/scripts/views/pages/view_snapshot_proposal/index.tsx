@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 
@@ -29,7 +38,7 @@ import {
   ClosedProposalPill,
 } from '../../components/proposal_pills';
 import { CWText } from '../../components/component_kit/cw_text';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -131,17 +140,19 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={
             <CWText>
-              {render(User, {
-                user: new AddressInfo(
-                  null,
-                  this.proposal.author,
-                  app.activeChainId(),
-                  null
-                ),
-                showAddressWithDisplayName: true,
-                linkify: true,
-                popover: true,
-              })}
+              <User
+                user={
+                  new AddressInfo(
+                    null,
+                    this.proposal.author,
+                    app.activeChainId(),
+                    null
+                  )
+                }
+                showAddressWithDisplayName
+                linkify
+                popover
+              />
             </CWText>
           }
           createdAt={this.proposal.created}

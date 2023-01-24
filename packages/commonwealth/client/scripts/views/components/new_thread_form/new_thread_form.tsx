@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import $ from 'jquery';
 
@@ -291,7 +300,10 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
 
     return (
       <div
-        className={getClasses<{ isModal?: boolean }>({ isModal }, 'NewThreadForm')}
+        className={getClasses<{ isModal?: boolean }>(
+          { isModal },
+          'NewThreadForm'
+        )}
       >
         <div className="new-thread-header">
           <CWTabBar>
@@ -377,14 +389,14 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         })
                       }
                       updateFormData={this._updateTopicState.bind(this)}
-                      tabindex={1}
+                      tabIndex={1}
                     />
                   )}
                   <CWTextInput
-                    autofocus
+                    autoFocus
                     name="new-thread-title"
                     placeholder="Title"
-                    oninput={(e) => {
+                    onInput={(e) => {
                       e.redraw = false; // do not redraw on input
 
                       const { value } = (e as any).target;
@@ -404,7 +416,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                       );
                     }}
                     value={this.form.title}
-                    tabindex={2}
+                    tabIndex={2}
                   />
                 </div>
                 <QuillEditorComponent
@@ -417,7 +429,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                   }}
                   editorNamespace="new-discussion"
                   imageUploader
-                  tabindex={3}
+                  tabIndex={3}
                 />
                 <div className="buttons-row">
                   <CWButton
@@ -458,7 +470,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         : 'Create thread'
                     }
                     name="submission"
-                    tabindex={4}
+                    tabIndex={4}
                   />
                   <CWButton
                     disabled={disableSubmission}
@@ -490,7 +502,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                     }}
                     label={fromDraft ? 'Update saved draft' : 'Save draft'}
                     name="save"
-                    tabindex={5}
+                    tabIndex={5}
                   />
                 </div>
               </React.Fragment>
@@ -514,12 +526,12 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                       })
                     }
                     updateFormData={this._updateTopicState.bind(this)}
-                    tabindex={1}
+                    tabIndex={1}
                   />
                   <CWTextInput
                     placeholder="Title"
                     name="new-link-title"
-                    oninput={(e) => {
+                    onInput={(e) => {
                       e.redraw = false; // do not redraw on input
                       const { value } = e.target as any;
                       this.autoTitleOverride = true;
@@ -530,12 +542,12 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                       );
                     }}
                     value={this.form.title}
-                    tabindex={3}
+                    tabIndex={3}
                   />
                 </div>
                 <CWTextInput
                   placeholder="https://"
-                  oninput={(e) => {
+                  onInput={(e) => {
                     e.redraw = false; // do not redraw on input
                     const { value } = e.target as any;
                     this.form.url = value;
@@ -545,7 +557,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                     );
                   }}
                   value={this.form.url}
-                  tabindex={2}
+                  tabIndex={2}
                 />
                 <QuillEditorComponent
                   contentsDoc="" // Prevent the editor from being filled in with previous content
@@ -558,7 +570,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                   placeholder="Comment (optional)"
                   editorNamespace="new-link"
                   imageUploader
-                  tabindex={4}
+                  tabIndex={4}
                 />
                 <CWButton
                   label="Create thread"

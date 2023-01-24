@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/validators.scss';
 
@@ -13,7 +22,7 @@ import { ChainBase } from 'common-common/src/types';
 import { AddressInfo } from 'models';
 import Substrate from 'controllers/chain/substrate/adapter';
 import Sublayout from 'views/sublayout';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { CWCard } from '../components/component_kit/cw_card';
@@ -44,11 +53,11 @@ class Validator extends ClassComponent<ValidatorAttrs> {
     return (
       <CWCard className="ValidatorCard">
         <div className="user-and-nominator">
-          {render(User, {
-            user: new AddressInfo(null, info.stash, info.chain, null),
-            popover: true,
-            hideIdentityIcon: true,
-          })}
+          <User
+            user={new AddressInfo(null, info.stash, info.chain, null)}
+            popover
+            hideIdentityIcon
+          />
           <CWText type="caption" fontWeight="medium">
             {`${info.total?.format(true)} from ${pluralize(
               info.nominators,

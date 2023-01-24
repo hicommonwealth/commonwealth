@@ -1,15 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';
 import { formatNumberLong } from 'helpers';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type SnapshotVoteType = {
@@ -68,16 +77,13 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
           </div>
           {displayedVoters.map((vote) => (
             <div className="vote-row">
-              {render(User, {
-                user: new AddressInfo(
-                  null,
-                  vote.voter,
-                  app.activeChainId(),
-                  null
-                ),
-                linkify: true,
-                popover: true,
-              })}
+              <User
+                user={
+                  new AddressInfo(null, vote.voter, app.activeChainId(), null)
+                }
+                linkify
+                popover
+              />
               <CWText className="column-text" noWrap>
                 {choices[vote.choice - 1]}
               </CWText>

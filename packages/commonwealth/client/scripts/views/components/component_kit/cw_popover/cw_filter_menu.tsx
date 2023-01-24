@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
 
@@ -16,7 +25,7 @@ import { getClasses } from '../helpers';
 type FilterMenuAttrs = {
   filterMenuItems: Array<CheckboxType>;
   header: string;
-  onchange: (e?: any) => void;
+  onChange: (e?: any) => void;
   selectedItems: Array<string>;
 };
 
@@ -24,7 +33,7 @@ type FilterMenuAttrs = {
 
 export class CWFilterMenu extends ClassComponent<FilterMenuAttrs> {
   view(vnode: ResultNode<FilterMenuAttrs>) {
-    const { filterMenuItems, header, onchange, selectedItems } = vnode.attrs;
+    const { filterMenuItems, header, onChange, selectedItems } = vnode.attrs;
     // console.log({ selectedItems });
 
     return (
@@ -52,7 +61,7 @@ export class CWFilterMenu extends ClassComponent<FilterMenuAttrs> {
                   value={item.value}
                   label={item.label}
                   checked={isChecked}
-                  onchange={onchange}
+                  onChange={onChange}
                   // disabled={item.disabled}
                 />
               );

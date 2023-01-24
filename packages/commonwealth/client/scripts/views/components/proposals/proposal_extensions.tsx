@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/proposals/proposal_extensions.scss';
 
@@ -54,7 +63,7 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
             oncreate={() => {
               setDemocracyVoteAmount(0);
             }}
-            oninput={(e) => {
+            onInput={(e) => {
               setDemocracyVoteAmount(parseFloat(e.target.value));
             }}
           />
@@ -92,7 +101,7 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
             oncreate={() => {
               setCosmosDepositAmount(0);
             }}
-            oninput={(e) => {
+            onInput={(e) => {
               setCosmosDepositAmount(parseInt(e.target.value, 10));
             }}
           />

@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
@@ -14,7 +23,7 @@ import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { pluralize } from 'helpers';
 import { CWText } from '../../components/component_kit/cw_text';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 // import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -105,12 +114,12 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                 >
                   <div className="row-top">
                     <div className="user-and-date-row">
-                      {render(User, {
-                        user,
-                        showAddressWithDisplayName: true,
-                        avatarSize: 24,
-                        linkify: true,
-                      })}
+                      <User
+                        user={user}
+                        showAddressWithDisplayName
+                        avatarSize={24}
+                        linkify
+                      />
                       <CWText className="last-updated-text">•</CWText>
                       <CWText
                         type="caption"

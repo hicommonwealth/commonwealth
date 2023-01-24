@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
@@ -98,7 +107,7 @@ class SpecSettingsPage extends ClassComponent {
           <CWTextArea
             disabled={this.isLoading}
             value={JSON.stringify(this.spec, null, 2)}
-            oninput={(e) => {
+            onInput={(e) => {
               // TODO: support tabs / auto-alignment / syntax highlighting
               const result = (e.target as any).value;
               if (result !== this.spec) {

@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/tip_detail.scss';
 
@@ -12,7 +21,7 @@ import { IBalanceAccount } from 'models/interfaces';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import Sublayout from '../sublayout';
-import User from '../components/widgets/user';
+import { User } from '../components/user/user';
 import { MarkdownFormattedText } from '../components/quill/markdown_formatted_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -46,21 +55,16 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
             <div className="title">{title}</div>
             <div className="proposal-page-row">
               <div className="label">Finder</div>
-              {render(User, {
-                user: author,
-                linkify: true,
-                popover: true,
-                showAddressWithDisplayName: true,
-              })}
+              <User user={author} linkify popover showAddressWithDisplayName />
             </div>
             <div className="proposal-page-row">
               <div className="label">Beneficiary</div>
-              {render(User, {
-                user: app.profiles.getProfile(proposal.author.chain.id, who),
-                linkify: true,
-                popover: true,
-                showAddressWithDisplayName: true,
-              })}
+              <User
+                user={app.profiles.getProfile(proposal.author.chain.id, who)}
+                linkify
+                popover
+                showAddressWithDisplayName
+              />
             </div>
             <div className="proposal-page-row">
               <div className="label">Reason</div>
@@ -87,7 +91,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                   <CWTextInput
                     name="amount"
                     placeholder="Enter tip amount"
-                    oninput={(e) => {
+                    onInput={(e) => {
                       const result = (e.target as any).value;
                       setTipAmount(
                         result.length > 0
@@ -124,12 +128,12 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                       <div className="denominator">{deposit.denom}</div>
                       <div>{deposit.inDollars}</div>
                     </div>
-                    {render(User, {
-                      user: account,
-                      linkify: true,
-                      popover: true,
-                      showAddressWithDisplayName: true,
-                    })}
+                    <User
+                      user={account}
+                      linkify
+                      popover
+                      showAddressWithDisplayName
+                    />
                   </div>
                 ))}
               </React.Fragment>

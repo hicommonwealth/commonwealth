@@ -3,7 +3,17 @@ import React from 'react';
 
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/view_thread/index.scss';
 
@@ -274,9 +284,10 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     }
 
     const updatedCommentsCallback = () => {
-      this.comments = app.comments
-        .getByProposal(thread)
-        .filter((c) => c.parentComment === null) || [];
+      this.comments =
+        app.comments
+          .getByProposal(thread)
+          .filter((c) => c.parentComment === null) || [];
       this.redraw();
     };
     if (!this.initializedComments) {
@@ -573,7 +584,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           title={
             this.isEditingBody ? (
               <CWTextInput
-                oninput={(e) => {
+                onInput={(e) => {
                   this.title = e.target.value;
                 }}
                 defaultValue={thread.title}
@@ -617,7 +628,9 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
-                  ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
+                  ) : !this.isGloballyEditing &&
+                    canComment &&
+                    app.isLoggedIn() ? (
                     <React.Fragment>
                       {reactionsAndReplyButtons}
                       <CreateComment

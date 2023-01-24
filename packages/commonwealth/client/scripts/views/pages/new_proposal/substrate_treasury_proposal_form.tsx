@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -37,14 +47,14 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
           title="Beneficiary"
           placeholder="Beneficiary of proposal"
           defaultValue={author.address}
-          oninput={(e) => {
+          onInput={(e) => {
             this.beneficiary = e.target.value;
           }}
         />
         <CWTextInput
           label={`Amount (${app.chain.chain.denom})`}
           placeholder="Amount of proposal"
-          oninput={(e) => {
+          onInput={(e) => {
             this.amount = app.chain.chain.coins(
               parseFloat(e.target.value),
               true

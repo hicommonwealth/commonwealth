@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_avatar_username_input.scss';
 
@@ -67,7 +76,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
             size="small"
             iconRight="write"
             value={value}
-            oninput={(e) => {
+            onInput={(e) => {
               onUsernameChangeHandler((e.target as any).value);
             }}
           />

@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
@@ -13,7 +22,7 @@ import { formatCoin } from 'adapters/currency';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
@@ -135,7 +144,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
             <CWTextInput
               value={String(this.currentStake)}
               placeholder="Amount to lock"
-              oninput={(e) => {
+              onInput={(e) => {
                 this.phragmenStakeAmount = app.chain.chain.coins(
                   parseFloat(e.target.value),
                   true
@@ -164,11 +173,11 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                     <div className="candidate-row" onClick={onClick}>
                       <CWCheckbox
                         checked={this.votes.indexOf(address) !== -1}
-                        onchange={onClick}
+                        onChange={onClick}
                         label=""
                         value=""
                       />
-                      {render(User, { user: candidate })}
+                      <User user={candidate} />
                     </div>
                   );
                 })

@@ -1,5 +1,14 @@
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
@@ -145,7 +154,7 @@ export default class QuillEditorInternal {
       this._$editor
         .closest('.QuillEditor')
         .find('.ql-editor')
-        .attr('tabindex', tabIndex);
+        .attr('tabIndex', tabIndex);
     }
 
     this._unsavedChanges = new Delta();

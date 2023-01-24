@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/view_thread/thread_components.scss';
 import 'pages/view_proposal/proposal_header_links.scss';
@@ -21,7 +30,7 @@ import {
   ThreadStage as ThreadStageType,
   AddressInfo,
 } from 'models';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
 import { getClasses } from '../../components/component_kit/helpers';
@@ -39,13 +48,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
 
     return (
       <div className="ThreadAuthor">
-        {render(User, {
-          avatarSize: 24,
-          user: author,
-          // @TODO @REACT FIX ME change to true when popover will work
-          popover: false,
-          linkify: true,
-        })}
+        <User avatarSize={24} user={author} popover linkify />
         {thread.collaborators?.length > 0 && (
           <React.Fragment>
             <CWText type="caption">and</CWText>
@@ -55,9 +58,11 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
               content={
                 <div className="collaborators">
                   {thread.collaborators.map(({ address, chain }) => {
-                    return render(User, {
-                      user: new AddressInfo(null, address, chain, null),
-                    });
+                    return (
+                      <User
+                        user={new AddressInfo(null, address, chain, null)}
+                      />
+                    );
                   })}
                 </div>
               }

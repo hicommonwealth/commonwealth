@@ -3,7 +3,17 @@ import React from 'react';
 
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -11,7 +21,7 @@ import 'pages/chat.scss';
 import { Action } from 'common-common/src/permissions';
 import app from 'state';
 import { AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { WebsocketMessageNames } from 'types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
@@ -167,16 +177,18 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
               }
             >
               <div className="user-and-timestamp-container">
-                {render(User, {
-                  user: new AddressInfo(
-                    null,
-                    grp.address,
-                    app.activeChainId(),
-                    null
-                  ),
-                  linkify: true,
-                  avatarSize: 24,
-                })}
+                <User
+                  user={
+                    new AddressInfo(
+                      null,
+                      grp.address,
+                      app.activeChainId(),
+                      null
+                    )
+                  }
+                  linkify
+                  avatarSize={24}
+                />
                 <div className="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
@@ -222,7 +234,9 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
             Set up an account to join chat
           </div>
         ) : !app.socket.chatNs.isConnected ? (
-          <div className="chat-composer-unavailable">Waiting for connection</div>
+          <div className="chat-composer-unavailable">
+            Waiting for connection
+          </div>
         ) : (
           <div
             className={`chat-composer${

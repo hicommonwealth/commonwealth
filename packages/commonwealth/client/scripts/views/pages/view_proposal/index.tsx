@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -24,7 +33,7 @@ import PageNotFound from 'views/pages/404';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import User from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import {
   ProposalSubheader,
   SubheaderProposalType,
@@ -277,13 +286,14 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         <CWContentPage
           title={this.proposal.title}
           author={
-            !!this.proposal.author &&
-            render(User, {
-              avatarSize: 24,
-              user: this.proposal.author,
-              popover: true,
-              linkify: true,
-            })
+            !!this.proposal.author && (
+              <User
+                avatarSize={24}
+                user={this.proposal.author}
+                popover
+                linkify
+              />
+            )
           }
           createdAt={this.proposal.createdAt}
           subHeader={

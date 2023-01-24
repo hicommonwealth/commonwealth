@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/topic_selector.scss';
 
@@ -12,14 +21,14 @@ import { CWButton } from './component_kit/cw_button';
 
 type TopicSelectorAttrs = {
   defaultTopic?: Topic | string | boolean;
-  tabindex?: number;
+  tabIndex?: number;
   topics: Topic[];
   updateFormData: (topic: Topic) => void;
 };
 
 export class TopicSelector extends ClassComponent<TopicSelectorAttrs> {
   view(vnode: ResultNode<TopicSelectorAttrs>) {
-    const { defaultTopic, tabindex, topics, updateFormData } = vnode.attrs;
+    const { defaultTopic, tabIndex, topics, updateFormData } = vnode.attrs;
 
     let selectedTopic;
 
@@ -102,7 +111,7 @@ export class TopicSelector extends ClassComponent<TopicSelectorAttrs> {
     //           ? selectedTopic.name
     //           : 'Select a topic'
     //       }
-    //       tabindex={tabindex}
+    //       tabIndex={tabIndex}
     //     />
     //   ),
     // });

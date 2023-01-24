@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -35,14 +45,14 @@ export class SubstrateBountyProposalForm extends ClassComponent {
         <CWTextInput
           placeholder="Bounty title (stored on chain)"
           label="Title"
-          oninput={(e) => {
+          onInput={(e) => {
             this.title = e.target.value;
           }}
         />
         <CWTextInput
           label={`Value (${app.chain.chain.denom})`}
           placeholder="Amount allocated to bounty"
-          oninput={(e) => {
+          onInput={(e) => {
             this.value = app.chain.chain.coins(
               parseFloat(e.target.value),
               true

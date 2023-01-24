@@ -1,15 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { AnyProposal, Thread } from 'models';
 import { countLinesQuill, countLinesMarkdown } from './quill/helpers';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
-import User from './widgets/user';
+import { User } from './user/user';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
@@ -58,12 +67,7 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
 
       return author ? (
         <React.Fragment>
-          {render(User, {
-            user: author,
-            hideAvatar: true,
-            hideIdentityIcon: true,
-          })}{' '}
-          created this thread
+          <User user={author} hideAvatar hideIdentityIcon /> created this thread
         </React.Fragment>
       ) : (
         'Created this thread'
@@ -98,11 +102,13 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
           return getPlaceholder();
         }
 
-        return body && (
-          <MarkdownFormattedText
-            doc={body}
-            cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
-          />
+        return (
+          body && (
+            <MarkdownFormattedText
+              doc={body}
+              cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+            />
+          )
         );
       }
     };
@@ -164,11 +170,13 @@ export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalB
           />
         );
       } catch (e) {
-        return body && (
-          <MarkdownFormattedText
-            doc={body}
-            cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
-          />
+        return (
+          body && (
+            <MarkdownFormattedText
+              doc={body}
+              cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+            />
+          )
         );
       }
     };

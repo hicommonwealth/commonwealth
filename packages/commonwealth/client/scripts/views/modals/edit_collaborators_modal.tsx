@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 // import { QueryList, ListItem } from 'construct-ui';
 
@@ -10,7 +19,7 @@ import 'modals/edit_collaborators_modal.scss';
 
 import app from 'state';
 import { Thread, Profile } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import {
   notifyError,
   notifyInfo,
@@ -98,8 +107,8 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   this.addedEditors[role.Address.address]
                 );
 
-                return render(ListItem, {
-                  label: render(User, { user }),
+                return m(ListItem, {
+                  label: <User user={user} />,
                   selected: recentlyAdded,
                   key: role.Address.address,
                 });
@@ -150,7 +159,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
 
                   return (
                     <div className="collaborator-row">
-                      {render(User, { user })}
+                      <User user={user} />
                       <CWIconButton
                         iconName="close"
                         iconSize="small"

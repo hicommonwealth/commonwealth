@@ -2,7 +2,17 @@
 import React from 'react';
 
 import $ from 'jquery';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import _ from 'lodash';
 
 import 'components/header/login_selector.scss';
@@ -18,7 +28,7 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { addressSwapper } from 'commonwealth/shared/utils';
-import User, { UserBlock } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
@@ -29,6 +39,7 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWToggle } from '../component_kit/cw_toggle';
+import { UserBlock } from '../user/user_block';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWPopover } from '../component_kit/cw_popover/cw_popover';
 
@@ -61,16 +72,16 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             className="login-menu-item"
             onClick={async () => {
               await setActiveAccount(account);
-              this.redraw();
+              redraw();
             }}
           >
-            {render(UserBlock, {
-              user: account,
-              selected: isSameAccount(account, app.user.activeAccount),
-              showRole: false,
-              compact: true,
-              avatarSize: 16,
-            })}
+            <UserBlock
+              user={account}
+              selected={isSameAccount(account, app.user.activeAccount)}
+              showRole={false}
+              compact
+              avatarSize={16}
+            />
           </div>
         ))}
         {activeAddressesWithRole.length > 0 && <CWDivider />}
@@ -160,7 +171,7 @@ export class LoginSelectorMenuRight extends ClassComponent {
         <div className="login-menu-item">
           <CWToggle
             checked={isDarkModeOn}
-            onchange={(e) => {
+            onChange={(e) => {
               if (isDarkModeOn) {
                 localStorage.setItem('dark-mode-state', 'off');
                 document
@@ -173,7 +184,7 @@ export class LoginSelectorMenuRight extends ClassComponent {
                 localStorage.setItem('dark-mode-state', 'on');
               }
               e.stopPropagation();
-              this.redraw();
+              redraw();
             }}
           />
           <CWText type="caption">Dark mode</CWText>
@@ -502,10 +513,7 @@ export class LoginSelector extends ClassComponent {
             <CWPopover
               trigger={
                 <div className="left-button">
-                  {render(User, {
-                    user: app.user.activeAccount,
-                    hideIdentityIcon: true,
-                  })}
+                  <User user={app.user.activeAccount} hideIdentityIcon />
                 </div>
               }
               content={
