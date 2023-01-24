@@ -1,12 +1,31 @@
 import { Web3Provider } from '@ethersproject/providers';
-import snapshot from '@snapshot-labs/snapshot.js';
 import gql from 'graphql-tag';
 import { notifyError } from '../controllers/app/notifications';
 
-const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-const client = new snapshot.Client712(hub);
-
 let apolloClient = null;
+
+class SnapshotLazyLoader {
+  private static snapshot;
+  private static client;
+
+  private static async init() {
+    if(!this.snapshot) {
+      this.snapshot = await import('@snapshot-labs/snapshot.js');
+      const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+      this.client = new this.snapshot.Client712(hub);
+    }
+  }
+
+  public static async getSnapshot() {
+    await this.init();
+    return this.snapshot;
+  }
+
+  public static async getClient() {
+    await this.init();
+    return this.client;
+  }
+}
 
 async function getApolloClient() {
   if (apolloClient) return apolloClient;
@@ -214,21 +233,25 @@ export async function getVotes(
 
 export async function castVote(address: string, payload: any) {
   const web3 = new Web3Provider((window as any).ethereum);
+  const client = await SnapshotLazyLoader.getClient();
   await client.vote(web3 as any, address, payload);
 }
 
 export async function createProposal(address: string, payload: any) {
   const web3 = new Web3Provider((window as any).ethereum);
+  const client = await SnapshotLazyLoader.getClient();
 
   const receipt = await client.proposal(web3 as any, address, payload);
   return receipt;
 }
 
 export async function getSpaceBlockNumber(network: string): Promise<number> {
+  const snapshot = await SnapshotLazyLoader.getSnapshot();
   return snapshot.utils.getBlockNumber(snapshot.utils.getProvider(network));
 }
 
 export async function getScore(space: SnapshotSpace, address: string) {
+  const snapshot = await SnapshotLazyLoader.getSnapshot();
   return snapshot.utils.getScores(
     space.id,
     space.strategies,
@@ -252,6 +275,7 @@ export async function getResults(
       let attempts = 0;
       while (attempts <= 3) {
         try {
+          const snapshot = await SnapshotLazyLoader.getSnapshot();
           const scores = await snapshot.utils.getScores(
             space.id,
             strategies,
@@ -283,6 +307,7 @@ export async function getResults(
     }
 
     /* Get results */
+    const snapshot = await SnapshotLazyLoader.getSnapshot();
     const votingClass = new snapshot.utils.voting[proposal.type](
       proposal,
       votes,
@@ -306,6 +331,7 @@ export async function getPower(
   proposal: SnapshotProposal,
   address: string
 ) {
+  const snapshot = await SnapshotLazyLoader.getSnapshot();
   const blockNumber = await snapshot.utils.getBlockNumber(
     snapshot.utils.getProvider(space.network)
   );
