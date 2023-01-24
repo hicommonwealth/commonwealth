@@ -660,6 +660,13 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/new/contract_template': importRoute(
+              'views/pages/new_contract_template',
+              {
+                scoped: true,
+                deferChain: true,
+              }
+            ),
             '/contract/:contractAddress': importRoute(
               'views/pages/general_contract',
               { scoped: true }
@@ -933,6 +940,13 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/:scope/new/contract_template': importRoute(
+              'views/pages/new_contract_template',
+              {
+                scoped: true,
+                deferChain: true,
+              }
+            ),
             '/:scope/contract/:contractAddress': importRoute(
               'views/pages/general_contract',
               { scoped: true }
