@@ -1,7 +1,10 @@
 import { Keyring } from '@polkadot/api';
 import { IKeyringPair } from '@polkadot/types/types';
 import { mnemonicGenerate, signatureVerify } from '@polkadot/util-crypto';
-import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import {
+  actionToHash,
+  verify as verifyCanvasSessionSignature,
+} from 'helpers/canvas';
 import { addressSwapper } from '../../../../../shared/utils';
 import { serializeActionPayload } from '@canvas-js/interfaces';
 import type {
@@ -12,7 +15,6 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-
 
 const getSubstrateSignatureData = (payload: ActionPayload) => {
   return new TextEncoder().encode(serializeActionPayload(payload));

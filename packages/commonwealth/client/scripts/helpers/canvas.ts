@@ -37,12 +37,16 @@ import bs58 from 'bs58';
 
 export function actionToHash(action: Action): Buffer {
   const payload = serializeActionPayload(action.payload);
-  return createHash('sha256').update({ ...action, payload }).digest();
+  return createHash('sha256')
+    .update({ ...action, payload })
+    .digest();
 }
 
 export function sessionToHash(session: Session): Buffer {
   const payload = serializeSessionPayload(session.payload);
-  return createHash('sha256').update({ ...session, payload }).digest();
+  return createHash('sha256')
+    .update({ ...session, payload })
+    .digest();
 }
 
 // TODO: verify payload is not expired
@@ -117,7 +121,9 @@ export const verify = async ({
     }
     // verify cosmos-ethereum sessions (actions are verified like other cosmos chains)
     if (!action && signature.startsWith('0x')) {
-      const msgHash = ethUtil.hashPersonalMessage(Buffer.from(serializeSessionPayload(sessionPayload)));
+      const msgHash = ethUtil.hashPersonalMessage(
+        Buffer.from(serializeSessionPayload(sessionPayload))
+      );
       const ethSignatureParams = ethUtil.fromRpcSig(signature.trim());
       // recover the eth signature, then convert to cosmos address
       const publicKey = ethUtil.ecrecover(

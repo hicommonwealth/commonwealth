@@ -1,4 +1,7 @@
-import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import {
+  actionToHash,
+  verify as verifyCanvasSessionSignature,
+} from 'helpers/canvas';
 import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
 import { Secp256k1Wallet, serializeSignDoc } from '@cosmjs/amino';
 import { Random, Sha256, Secp256k1 } from '@cosmjs/crypto';

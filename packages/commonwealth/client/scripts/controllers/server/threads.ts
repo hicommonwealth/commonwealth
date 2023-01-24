@@ -138,9 +138,9 @@ class ThreadsController {
       last_commented_on,
       linked_threads,
       numberOfComments,
-    canvasAction,
-    canvasSession,
-    canvasHash,
+      canvasAction,
+      canvasSession,
+      canvasHash,
     } = thread;
 
     const attachments = Attachments
@@ -245,9 +245,9 @@ class ThreadsController {
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
       linkedThreads,
       numberOfComments,
-    canvasAction,
-    canvasSession,
-    canvasHash,
+      canvasAction,
+      canvasSession,
+      canvasHash,
     });
 
     ThreadsController.Instance.store.add(t);
