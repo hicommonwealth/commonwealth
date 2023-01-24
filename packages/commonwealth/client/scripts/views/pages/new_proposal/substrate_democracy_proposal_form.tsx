@@ -82,15 +82,14 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
           onclick={(e) => {
             e.preventDefault();
 
-            let createFunc: (
-              ...args
-            ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (
-                proposalSlugToClass().get(
-                  ProposalType.SubstrateDemocracyProposal
-                ) as ProposalModule<any, any, any>
-              ).createTx(...a);
-            };
+            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
+              (a) => {
+                return (
+                  proposalSlugToClass().get(
+                    ProposalType.SubstrateDemocracyProposal
+                  ) as ProposalModule<any, any, any>
+                ).createTx(...a);
+              };
 
             let args = [];
 

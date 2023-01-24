@@ -42,15 +42,14 @@ export class PhragmenCandidacyForm extends ClassComponent {
           onclick={(e) => {
             e.preventDefault();
 
-            let createFunc: (
-              ...args
-            ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (
-                proposalSlugToClass().get(
-                  ProposalType.PhragmenCandidacy
-                ) as ProposalModule<any, any, any>
-              ).createTx(...a);
-            };
+            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
+              (a) => {
+                return (
+                  proposalSlugToClass().get(
+                    ProposalType.PhragmenCandidacy
+                  ) as ProposalModule<any, any, any>
+                ).createTx(...a);
+              };
 
             createFunc = ([a]) =>
               substrate.phragmenElections.activeElection.submitCandidacyTx(a);

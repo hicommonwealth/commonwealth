@@ -78,22 +78,22 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
           <div className="SnapshotInformationCard">
             <div class="info-rows-container">
               <SnapshotInfoRow
-              label="Author"
-              value={
-                app.chain
-                  ? m(User, {
-                      user: new AddressInfo(
-                        null,
-                        proposal.author,
-                        app.activeChainId(),
-                        null
-                      ),
-                      hideAvatar: true,
-                      linkify: true,
-                      popover: true,
-                    })
-                  : proposal.author
-              }
+                label="Author"
+                value={
+                  app.chain
+                    ? m(User, {
+                        user: new AddressInfo(
+                          null,
+                          proposal.author,
+                          app.activeChainId(),
+                          null
+                        ),
+                        hideAvatar: true,
+                        linkify: true,
+                        popover: true,
+                      })
+                    : proposal.author
+                }
               />
               <SnapshotInfoLinkRow
                 label="IPFS"
@@ -110,7 +110,9 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
                 value={moment(+proposal.end * 1000).format('lll')}
               />
               <SnapshotInfoLinkRow
-                label={proposal.strategies.length > 1 ? 'Strategies' : 'Strategy'}
+                label={
+                  proposal.strategies.length > 1 ? 'Strategies' : 'Strategy'
+                }
                 value={
                   proposal.strategies.length > 1
                     ? `${proposal.strategies.length} Strategies`

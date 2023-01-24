@@ -84,11 +84,11 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       try {
         if (app.activeChainId()) {
           app.threads
-          .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
-          .then((res) => {
-            this.threads = res;
-            m.redraw();
-          });
+            .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
+            .then((res) => {
+              this.threads = res;
+              m.redraw();
+            });
         }
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);
