@@ -1,0 +1,140 @@
+@import '../../shared';
+
+.ContractsPage {
+  width: 864px;
+  margin: 16px auto;
+
+  @include mediumSmallInclusive {
+    width: calc(100% - 10%);
+  }
+
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 32px 0 8px;
+
+    @include extraSmall {
+      flex-direction: column;
+      align-items: start;
+    }
+  }
+
+  .contracts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 40px;
+  }
+
+  .no-contracts-container {
+    margin-top: 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .no-contracts-info {
+      text-align: center;
+      color: $neutral-500;
+    }
+  }
+}
+
+.ContractCard {
+  .label {
+    color: $neutral-500;
+    margin-bottom: 8px;
+  }
+
+  .header {
+    width: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+
+    .address {
+      word-break: break-word;
+    }
+
+    .delete-icon {
+      margin-left: 20px;
+    }
+  }
+
+  .templates {
+    width: 100%;
+    margin-top: 44px;
+
+    .no-templates-container {
+      min-height: 56px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .no-templates-info {
+        text-align: center;
+        color: $neutral-500;
+      }
+    }
+
+    .templates-container {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .add-template-btn {
+      padding-inline: 0;
+      margin: 16px 0;
+
+      .Text {
+        font-size: 12px;
+      }
+    }
+
+    .create-template-info {
+      color: $neutral-500;
+      display: inline-block;
+
+      .cta {
+        display: inline-block;
+        margin-left: 4px;
+        color: $primary-500;
+      }
+    }
+  }
+}
+
+.ContractTemplateCard {
+  background-color: $neutral-25;
+
+  .header {
+    margin-bottom: 24px;
+
+    svg {
+      padding-block: 2px;
+    }
+  }
+
+  .contract-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .info-row {
+      display: flex;
+
+      @include extraSmall {
+        flex-direction: column;
+      }
+
+      .row-label {
+        color: $neutral-500;
+        min-width: 120px;
+      }
+    }
+  }
+}

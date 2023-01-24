@@ -33,7 +33,7 @@ class NewContractTemplatePage extends ClassComponent {
         <div class="NewContractTemplatePage">
           <CWBreadcrumbs
             breadcrumbs={[
-              { label: 'Contracts', path: `${scope}/contracts` },
+              { label: 'Contracts', path: `/${scope}/contracts` },
               { label: 'Create a New Template', path: '' },
             ]}
           />
