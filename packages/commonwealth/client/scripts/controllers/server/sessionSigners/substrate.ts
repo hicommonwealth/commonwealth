@@ -1,7 +1,10 @@
 import { Keyring } from '@polkadot/api';
 import { IKeyringPair } from '@polkadot/types/types';
 import { mnemonicGenerate, signatureVerify } from '@polkadot/util-crypto';
-import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import {
+  actionToHash,
+  verify as verifyCanvasSessionSignature,
+} from 'helpers/canvas';
 import { addressSwapper } from '../../../../../shared/utils';
 import { serializeActionPayload } from '@canvas-js/interfaces';
 import type {
@@ -12,7 +15,6 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-
 
 const getSubstrateSignatureData = (payload: ActionPayload) => {
   return new TextEncoder().encode(serializeActionPayload(payload));
@@ -60,7 +62,9 @@ export class SubstrateSessionController implements ISessionController {
     }
     if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
-        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(chainId)}`
+        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
+          chainId
+        )}`
       );
     }
     this.auths[chainId] = { payload, signature };

@@ -7,7 +7,10 @@ import {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { getActionSignatureData } from '@canvas-js/verifiers';
-import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import {
+  actionToHash,
+  verify as verifyCanvasSessionSignature,
+} from 'helpers/canvas';
 import { ISessionController } from '.';
 
 export class EthereumSessionController implements ISessionController {

@@ -28,8 +28,7 @@ export const constructCanvasMessage = (
   // Timestamp and blockhash are optional, but must be explicitly so.
   if (timestamp === undefined)
     throw new Error('Invalid Canvas signing message');
-  if (block === undefined)
-    throw new Error('Invalid Canvas signing message');
+  if (block === undefined) throw new Error('Invalid Canvas signing message');
 
   // Not all data here is used. For chains without block data
   // like Solana/Polkadot, timestamp is left blank in session login.

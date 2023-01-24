@@ -1,4 +1,7 @@
-import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import {
+  actionToHash,
+  verify as verifyCanvasSessionSignature,
+} from 'helpers/canvas';
 import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
 import { Secp256k1Wallet, serializeSignDoc } from '@cosmjs/amino';
 import { Random, Sha256, Secp256k1 } from '@cosmjs/crypto';
@@ -82,7 +85,9 @@ export class CosmosSDKSessionController implements ISessionController {
     }
     if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
-        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(chainId)}`
+        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
+          chainId
+        )}`
       );
     }
     this.auths[chainId] = { payload, signature };

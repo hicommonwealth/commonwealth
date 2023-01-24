@@ -53,7 +53,9 @@ export class NEARSessionController implements ISessionController {
     }
     if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
-        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(chainId)}`
+        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
+          chainId
+        )}`
       );
     }
     this.auths[chainId] = { payload, signature };
