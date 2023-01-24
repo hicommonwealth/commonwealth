@@ -158,7 +158,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   );
 
                   return (
-                    <div class="collaborator-row">
+                    <div className="collaborator-row">
                       <User user={user} />
                       <CWIconButton
                         iconName="close"

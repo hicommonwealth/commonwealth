@@ -176,7 +176,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                   : ''
               }
             >
-              <div class="user-and-timestamp-container">
+              <div className="user-and-timestamp-container">
                 <User
                   user={
                     new AddressInfo(
@@ -189,7 +189,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                   linkify
                   avatarSize={24}
                 />
-                <div class="chat-message-group-timestamp">
+                <div className="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
                 <CWIconButton

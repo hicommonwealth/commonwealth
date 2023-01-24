@@ -130,7 +130,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
             <div className="comment-body-bottom">
               Block {notification.chainEvent.blockNumber}
             </div>
-            {/* <div class="comment-body-excerpt">{label.label}</div> */}
+            {/* <div className="comment-body-excerpt">{label.label}</div> */}
           </div>
         </div>
       );

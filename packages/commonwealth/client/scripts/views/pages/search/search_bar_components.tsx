@@ -66,7 +66,7 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
           )
         }
       >
-        <div class="header-row">
+        <div className="header-row">
           <User
             user={
               new AddressInfo(
@@ -160,7 +160,7 @@ export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRo
     const { searchResult } = vnode.attrs;
 
     return (
-      <div class="SearchBarMemberPreviewRow">
+      <div className="SearchBarMemberPreviewRow">
         <User
           user={app.profiles.getProfile(
             searchResult.chain,

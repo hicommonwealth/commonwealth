@@ -58,7 +58,7 @@ const getDiscussionResult = (thread, searchTerm) => {
           {`discussion - ${thread.chain}`}
         </CWText>
         <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
-        <div class="search-results-thread-subtitle">
+        <div className="search-results-thread-subtitle">
           <User
             user={
               new AddressInfo(
@@ -110,7 +110,7 @@ const getCommentResult = (comment, searchTerm) => {
         {/* <div className="search-results-thread-title">
           {decodeURIComponent(comment.title)}
         </div> */}
-        <div class="search-results-thread-subtitle">
+        <div className="search-results-thread-subtitle">
           <User
             user={
               new AddressInfo(
@@ -167,7 +167,7 @@ const getMemberResult = (addr) => {
   if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
 
   return (
-    <div class="member-result-row">
+    <div className="member-result-row">
       <User
         user={profile}
         showRole

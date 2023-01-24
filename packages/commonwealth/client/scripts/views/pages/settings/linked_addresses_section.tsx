@@ -53,7 +53,7 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
         onClick={vnode.attrs.onClick}
       >
         <User user={account} avatarOnly avatarSize={32} linkify popover />
-        <div class="info-col">
+        <div className="info-col">
           <User user={account} hideAvatar linkify popover />
           <CWText className="address-text" type="caption">
             {formatAddressShort(account.address)} -{' '}

@@ -55,8 +55,8 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
             </a>
           </div>
           {votes.map((vote) => (
-            <div class="offchain-poll-voter">
-              <div class="offchain-poll-voter-user">
+            <div className="offchain-poll-voter">
+              <div className="offchain-poll-voter-user">
                 <User
                   avatarSize={16}
                   popover

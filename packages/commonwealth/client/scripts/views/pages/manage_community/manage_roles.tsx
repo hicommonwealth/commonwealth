@@ -52,7 +52,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
               (addr_) => addr_.id === (role.address_id || role.Address.id)
             ).length;
             return (
-              <div class="role-row">
+              <div className="role-row">
                 <User
                   user={
                     new AddressInfo(

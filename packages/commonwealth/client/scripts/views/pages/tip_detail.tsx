@@ -50,15 +50,15 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
       <Sublayout
       // title={headerTitle}
       >
-        <div class="TipDetail">
-          <div class="tip-details">
-            <div class="title">{title}</div>
-            <div class="proposal-page-row">
-              <div class="label">Finder</div>
+        <div className="TipDetail">
+          <div className="tip-details">
+            <div className="title">{title}</div>
+            <div className="proposal-page-row">
+              <div className="label">Finder</div>
               <User user={author} linkify popover showAddressWithDisplayName />
             </div>
-            <div class="proposal-page-row">
-              <div class="label">Beneficiary</div>
+            <div className="proposal-page-row">
+              <div className="label">Beneficiary</div>
               <User
                 user={app.profiles.getProfile(proposal.author.chain.id, who)}
                 linkify

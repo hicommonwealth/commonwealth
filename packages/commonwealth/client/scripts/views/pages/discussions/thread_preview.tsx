@@ -111,9 +111,9 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
         {!this.isWindowSmallInclusive && (
           <ThreadPreviewReactionButton thread={thread} />
         )}
-        <div class="main-content">
-          <div class="top-row">
-            <div class="user-and-date">
+        <div className="main-content">
+          <div className="top-row">
+            <div className="user-and-date">
               <User
                 avatarSize={24}
                 user={

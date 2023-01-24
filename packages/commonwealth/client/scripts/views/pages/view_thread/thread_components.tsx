@@ -47,7 +47,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
     const author: Account = app.chain.accounts.get(thread.author);
 
     return (
-      <div class="ThreadAuthor">
+      <div className="ThreadAuthor">
         <User avatarSize={24} user={author} popover linkify />
         {thread.collaborators?.length > 0 && (
           <React.Fragment>

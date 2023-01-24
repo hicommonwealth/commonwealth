@@ -52,7 +52,7 @@ class Validator extends ClassComponent<ValidatorAttrs> {
 
     return (
       <CWCard className="ValidatorCard">
-        <div class="user-and-nominator">
+        <div className="user-and-nominator">
           <User
             user={new AddressInfo(null, info.stash, info.chain, null)}
             popover

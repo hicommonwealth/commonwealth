@@ -76,7 +76,7 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
             </CWText>
           </div>
           {displayedVoters.map((vote) => (
-            <div class="vote-row">
+            <div className="vote-row">
               <User
                 user={
                   new AddressInfo(null, vote.voter, app.activeChainId(), null)
