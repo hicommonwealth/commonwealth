@@ -3,7 +3,7 @@
 import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
-import { Action } from 'commonwealth/server/util/permissions';
+import { Action } from 'commonwealth/shared/permissions';
 
 import 'components/sidebar/index.scss';
 import { isActiveAddressPermitted } from 'controllers/server/roles';

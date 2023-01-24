@@ -11,7 +11,7 @@ import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 import { constructCanvasMessage } from 'shared/adapters/shared';
-import { PermissionManager } from '../../server/util/permissions';
+import { PermissionManager } from 'commonwealth/shared/permissions';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3';
 import app from '../../server-test';
@@ -40,34 +40,34 @@ export async function addAllowDenyPermissionsForCommunityRole(
 ) {
   try {
     console.log('addAllowDenyPermissionsForCommunityRole');
-  const permissionsManager = new PermissionManager();
-  // get community role object from the database
-  const communityRole = await models.CommunityRole.findOne({
-    where: {
-      chain_id,
-      name: role_name,
-    },
-  });
-  let denyPermission;
-  let allowPermission;
-  if (deny_permission) {
-    denyPermission = permissionsManager.addDenyPermission(
-      BigInt(communityRole?.deny || 0),
-      deny_permission,
-    );
-    communityRole.deny = denyPermission;
-  }
-  if (allow_permission) {
-    allowPermission = permissionsManager.addAllowPermission(
-      BigInt(communityRole?.allow || 0),
-      allow_permission,
-    );
-    communityRole.allow = allowPermission;
-  }
-  // save community role object to the database
-  const updatedRole = await communityRole.save();
-  console.log('updatedRole', updatedRole);
-  } catch(err) {
+    const permissionsManager = new PermissionManager();
+    // get community role object from the database
+    const communityRole = await models.CommunityRole.findOne({
+      where: {
+        chain_id,
+        name: role_name,
+      },
+    });
+    let denyPermission;
+    let allowPermission;
+    if (deny_permission) {
+      denyPermission = permissionsManager.addDenyPermission(
+        BigInt(communityRole?.deny || 0),
+        deny_permission
+      );
+      communityRole.deny = denyPermission;
+    }
+    if (allow_permission) {
+      allowPermission = permissionsManager.addAllowPermission(
+        BigInt(communityRole?.allow || 0),
+        allow_permission
+      );
+      communityRole.allow = allowPermission;
+    }
+    // save community role object to the database
+    const updatedRole = await communityRole.save();
+    console.log('updatedRole', updatedRole);
+  } catch (err) {
     throw new Error(err);
   }
 }
