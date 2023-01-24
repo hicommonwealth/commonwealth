@@ -30,7 +30,6 @@ const communityStats = async (
     return next(new AppError('Must be admin'));
   }
 
-  const shouldLog = process.env.NODE_ENV !== 'production' ? console.log : null;
   const numberOfPrevDays = 14;
 
   // get new objects created over the last ${numberOfPrevDays} days
@@ -43,7 +42,6 @@ WHERE ${table}.${chainName} = :chainOrCommunity
 GROUP BY seq.date
 ORDER BY seq.date DESC;`,
       {
-        logging: shouldLog,
         type: QueryTypes.SELECT,
         replacements: { chainOrCommunity: chain.id, chainName: chainName },
       }
@@ -58,7 +56,6 @@ ORDER BY seq.date DESC;`,
     return models.sequelize.query(
       `SELECT COUNT(id) AS new_items FROM ${table} WHERE ${chainName} = :chainOrCommunity;`,
       {
-        logging: shouldLog,
         type: QueryTypes.SELECT,
         replacements: { chainOrCommunity: chain.id },
       }
@@ -88,7 +85,6 @@ GROUP BY seq.date
 ORDER BY seq.date DESC;
 `,
     {
-      logging: shouldLog,
       type: QueryTypes.SELECT,
       replacements: { chainOrCommunity: chain.id },
     }
