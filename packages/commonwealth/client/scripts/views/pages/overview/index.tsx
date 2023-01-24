@@ -124,8 +124,8 @@ class OverviewPage extends ClassComponent {
             </div>
           </div>
           <CWDivider />
-          {topicSummaryRows.map((row) => (
-            <TopicSummaryRow {...row} />
+          {topicSummaryRows.map((row, i) => (
+            <TopicSummaryRow {...row} key={i} />
           ))}
         </div>
       </Sublayout>

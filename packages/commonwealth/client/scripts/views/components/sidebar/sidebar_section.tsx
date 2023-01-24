@@ -237,8 +237,8 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
         </div>
         {this.toggled && (
           <div className="sections-container">
-            {displayData.map((sectionGroup) => (
-              <SubSectionGroup {...sectionGroup} />
+            {displayData.map((sectionGroup, i) => (
+              <SubSectionGroup {...sectionGroup} key={i} />
             ))}
           </div>
         )}

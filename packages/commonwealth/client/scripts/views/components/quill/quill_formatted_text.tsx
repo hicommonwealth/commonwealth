@@ -140,12 +140,12 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
             { collapsed: collapse },
             'QuillFormattedText'
           )}
-          oncreate={() => {
+          // oncreate={() => {
             // if (!(<any>window).twttr) {
             //   loadScript('//platform.twitter.com/widgets.js').then(() => {
             //     console.log('Twitter Widgets loaded');
             //   })
-          }}
+          // }}
         >
           {this.truncatedDoc && renderQuillDelta(
             this.truncatedDoc,
