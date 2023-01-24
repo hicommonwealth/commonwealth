@@ -7,7 +7,6 @@ import type { Thread } from '../../models';
 import { SearchQuery } from '../../models';
 import type { SearchParams } from '../../models/SearchQuery';
 import { SearchScope } from '../../models/SearchQuery';
-import { modelFromServer } from './threads';
 
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
@@ -172,7 +171,7 @@ class SearchController {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
       return response.result.map((rawThread) => {
-        return modelFromServer(rawThread);
+        return app.threads.modelFromServer(rawThread);
       });
     } catch (e) {
       console.error(e);
