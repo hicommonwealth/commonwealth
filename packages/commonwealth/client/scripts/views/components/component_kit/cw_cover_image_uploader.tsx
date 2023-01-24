@@ -15,8 +15,7 @@ import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
 import { CWText } from './cw_text';
 
-type ICWCoverImageUploaderAttrs = {
-  defaultBackground?: string;
+type CoverImageUploaderAttrs = {
   headerText?: string;
   subheaderText?: string;
   enableGenerativeAI?: boolean;
@@ -25,7 +24,7 @@ type ICWCoverImageUploaderAttrs = {
 };
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
-export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUploaderAttrs> {
+export default class CWCoverImageUploader extends ClassComponent<CoverImageUploaderAttrs> {
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;
@@ -60,10 +59,8 @@ export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUp
       return [null, 'failure'];
     }
   }
-  async generateImage(
-    prompt: string,
-    vnode: m.Vnode<ICWCoverImageUploaderAttrs>
-  ) {
+
+  async generateImage(prompt: string, vnode: m.Vnode<CoverImageUploaderAttrs>) {
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
 
     try {
@@ -96,7 +93,7 @@ export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUp
     }
   }
 
-  oncreate(vnode: m.Vnode<ICWCoverImageUploaderAttrs>) {
+  oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
@@ -166,15 +163,9 @@ export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUp
 
     pseudoInput.addEventListener('change', pseudoInputHandler);
     attachZone.addEventListener('click', clickHandler);
-
-    if (vnode.attrs.defaultBackground) {
-      this.imageURL = vnode.attrs.defaultBackground;
-      this.uploadStatus = 'success';
-      m.redraw();
-    }
   }
 
-  view(vnode: m.Vnode<ICWCoverImageUploaderAttrs>) {
+  view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
     const {
       imageURL,
       isUploading,
