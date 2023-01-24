@@ -8,7 +8,7 @@ import 'pages/manage_community/index.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'router';
-import { RoleInfo, Webhook } from 'models';
+import { AccessLevel, RoleInfo, Webhook } from 'models';
 import { ChainMetadataRows } from './chain_metadata_rows';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
