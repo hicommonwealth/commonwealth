@@ -55,7 +55,7 @@ export class TokensChainsComponent extends ClassComponent<TokensChainsComponentA
   private index: number;
   private oncreateSlider: () => any;
 
-  oninit(vnode: ResultNode<TokensChainsComponentAttrs>) {
+  oncreate(vnode: ResultNode<TokensChainsComponentAttrs>) {
     this.index = 0;
 
     this.displayedChains = vnode.attrs.chains
@@ -63,9 +63,7 @@ export class TokensChainsComponent extends ClassComponent<TokensChainsComponentA
       .map(chainToTag);
 
     this.oncreateSlider = vnode.attrs.oncreateSlider;
-  }
 
-  oncreate(vnode: ResultNode<TokensChainsComponentAttrs>) {
     const glide = this.oncreateSlider();
 
     glide.on('run.before', () => {
@@ -80,6 +78,7 @@ export class TokensChainsComponent extends ClassComponent<TokensChainsComponentA
           this.index + initialSlides - 1
         )
       );
+
       glide.update();
     });
 

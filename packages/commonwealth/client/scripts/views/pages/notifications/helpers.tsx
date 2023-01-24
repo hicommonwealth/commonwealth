@@ -22,7 +22,7 @@ import { IPostNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { AddressInfo } from 'models';
 import { pluralize } from 'helpers';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { getProposalUrl, getCommunityUrl } from 'utils';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { QuillFormattedText } from '../../components/quill/quill_formatted_text';
