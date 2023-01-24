@@ -73,7 +73,7 @@ describe('API Tests', () => {
       const sessionWallet = ethers.Wallet.createRandom();
       const timestamp = 1665083987891;
       const message = constructCanvasMessage(
-        'eth',
+        'ethereum',
         chain_id,
         address,
         sessionWallet.address,

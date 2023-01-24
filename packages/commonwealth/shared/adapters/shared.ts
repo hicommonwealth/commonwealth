@@ -15,36 +15,28 @@ export interface ICompletable extends IIdentifiable {
 }
 
 export const constructCanvasMessage = (
-  chain: CanvasChain, // Canvas chain prefix, e.g. "eth"
-  canvasChainId: string, // Canvas chain id, e.g. "1" or "osmo" (Note: CW chain id is 1 or "osmo-1")
-  fromAddress: string,
-  sessionPublicAddress: string,
-  timestamp: number | null,
-  blockhash: string | null
+  canvasChain: CanvasChain, // Canvas chain network, e.g. "ethereum"
+  canvasChainId: string, // Canvas chain id, e.g. "1" or "osmo-1" (CW chainId is 1 or "osmo-1")
+  from: string,
+  sessionAddress: string,
+  sessionIssued: number | null,
+  block: string | null
 ): SessionPayload => {
-  // This will be replaced with an IPFS hash after turning on peering
+  // This will be replaced with an IPFS hash
   const placeholderMultihash = '/commonwealth';
 
-  // Timestamp and blockhash are optional, but must be explicitly so.
-  if (timestamp === undefined)
-    throw new Error('Invalid Canvas signing message');
-  if (blockhash === undefined)
-    throw new Error('Invalid Canvas signing message');
+  // The blockhash is optional, but must be explicitly so
+  if (block === undefined) throw new Error('Invalid Canvas signing message');
 
-  // Not all data here is used. For chains without block data
-  // like Solana/Polkadot, timestamp is left blank in session login.
-  //
-  // This in cleaned up in the next PR which reconciles
-  // Commonwealth to use the updated Canvas signing payload.
   const payload: SessionPayload = {
-    from: fromAddress,
-    spec: placeholderMultihash,
-    address: sessionPublicAddress,
-    duration: 86400 * 1000,
-    timestamp: timestamp === null ? null : timestamp,
-    blockhash: blockhash === null ? null : blockhash,
-    chain: chain,
+    app: placeholderMultihash,
+    block: block === null ? null : block,
+    chain: canvasChain,
     chainId: canvasChainId,
+    from,
+    sessionAddress,
+    sessionDuration: 86400 * 1000,
+    sessionIssued,
   };
 
   return payload;
@@ -55,7 +47,7 @@ export function chainBaseToCanvasChain(chainBase: ChainBase): CanvasChain {
   if (chainBase === ChainBase.CosmosSDK) {
     return 'cosmos';
   } else if (chainBase === ChainBase.Ethereum) {
-    return 'eth';
+    return 'ethereum';
   } else if (chainBase === ChainBase.NEAR) {
     return 'near';
   } else if (chainBase === ChainBase.Solana) {

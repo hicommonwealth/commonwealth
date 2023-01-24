@@ -8,10 +8,7 @@ import { addressSwapper } from 'commonwealth/shared/utils';
 import 'components/component_kit/cw_wallets_list.scss';
 
 import { Account, AddressInfo, IWebWallet } from 'models';
-import {
-  signSessionWithAccount,
-  getSessionSigningTimestamp,
-} from 'controllers/server/sessions';
+import { signSessionWithAccount } from 'controllers/server/sessions';
 import { createUserWithAddress } from 'controllers/app/login';
 import { notifyInfo } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
@@ -195,9 +192,8 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       wallet: IWebWallet<any>,
       address: string
     ) {
-      const timestamp = getSessionSigningTimestamp();
-
-      const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+      const timestamp = +new Date();
+      const sessionAddress = await app.sessions.getOrCreateAddress(
         wallet.chain,
         wallet.getChainId().toString()
       );
@@ -210,7 +206,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
         address,
         wallet.name,
         chainIdentifier,
-        sessionPublicAddress,
+        sessionAddress,
         validationBlockInfo
       );
       account.setValidationBlockInfo(
@@ -263,7 +259,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       }
 
       try {
-        const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+        const sessionAddress = await app.sessions.getOrCreateAddress(
           wallet.chain,
           wallet.getChainId().toString()
         );
@@ -276,7 +272,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
             address,
             wallet.name,
             chainIdentifier,
-            sessionPublicAddress,
+            sessionAddress,
             validationBlockInfo
           );
         accountVerifiedCallback(signerAccount, newlyCreated, linking);

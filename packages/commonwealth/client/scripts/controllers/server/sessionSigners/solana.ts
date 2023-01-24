@@ -52,9 +52,11 @@ export class SolanaSessionController implements ISessionController {
     if (!valid) {
       // throw new Error("Invalid signature");
     }
-    if (payload.address !== this.getAddress(chainId)) {
+    if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
-        `Invalid auth: ${payload.address} vs. ${this.getAddress(chainId)}`
+        `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
+          chainId
+        )}`
       );
     }
     this.auths[chainId] = { payload, signature };
@@ -87,7 +89,7 @@ export class SolanaSessionController implements ISessionController {
         });
         if (!valid) throw new Error();
 
-        if (payload.address === this.getAddress(chainId)) {
+        if (payload.sessionAddress === this.getAddress(chainId)) {
           console.log(
             'Restored authenticated session:',
             this.getAddress(chainId)
@@ -110,7 +112,7 @@ export class SolanaSessionController implements ISessionController {
   async sign(
     chainId: string,
     call: string,
-    args: Record<string, ActionArgument>
+    callArgs: Record<string, ActionArgument>
   ): Promise<{
     session: Session;
     action: Action;
@@ -123,13 +125,13 @@ export class SolanaSessionController implements ISessionController {
 
     const actionPayload: ActionPayload = {
       from: sessionPayload.from,
-      spec: sessionPayload.spec,
+      app: sessionPayload.app,
       timestamp: +Date.now(),
       chain: 'solana',
       chainId,
-      blockhash: sessionPayload.blockhash, // will be null
+      block: sessionPayload.block, // will be null
       call,
-      args,
+      callArgs,
     };
 
     const message = getSolanaSignatureData(actionPayload);

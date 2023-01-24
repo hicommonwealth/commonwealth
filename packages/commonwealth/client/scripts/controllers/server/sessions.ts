@@ -19,10 +19,6 @@ import {
   NEARSessionController,
 } from './sessionSigners';
 
-export function getSessionSigningTimestamp(): number {
-  return new Date().getTime();
-}
-
 export async function signSessionWithAccount<T extends { address: string }>(
   wallet: IWebWallet<T>,
   account: Account,

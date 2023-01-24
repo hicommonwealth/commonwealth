@@ -79,8 +79,8 @@ const verifySignature = async (
   addressModel: AddressInstance,
   user_id: number,
   signatureString: string,
-  sessionPublicAddress: string | null, // used when signing a block to login
-  sessionTimestamp: string | null, // used when signing a block to login
+  sessionAddress: string | null, // used when signing a block to login
+  sessionIssued: string | null, // used when signing a block to login
   sessionBlockInfo: string | null // used when signing a block to login
 ): Promise<boolean> => {
   if (!chain) {
@@ -100,8 +100,8 @@ const verifySignature = async (
           currentPrefix: 42,
         })
       : addressModel.address,
-    sessionPublicAddress,
-    parseInt(sessionTimestamp, 10),
+    sessionAddress,
+    parseInt(sessionIssued, 10),
     sessionBlockInfo
       ? addressModel.block_info
         ? JSON.parse(addressModel.block_info).hash
@@ -388,8 +388,8 @@ const processAddress = async (
   wallet_id: WalletId,
   signature: string,
   user: Express.User,
-  sessionPublicAddress: string | null,
-  sessionTimestamp: string | null,
+  sessionAddress: string | null,
+  sessionIssued: string | null,
   sessionBlockInfo: string | null
 ): Promise<void> => {
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
@@ -423,8 +423,8 @@ const processAddress = async (
       existingAddress,
       user ? user.id : null,
       signature,
-      sessionPublicAddress,
-      sessionTimestamp,
+      sessionAddress,
+      sessionIssued,
       sessionBlockInfo
     );
     if (!valid) {
