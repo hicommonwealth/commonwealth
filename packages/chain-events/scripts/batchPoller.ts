@@ -1,14 +1,9 @@
-import type { ApiPromise } from '@polkadot/api';
-import type { LogGroupControlSettings } from 'typescript-logging';
-import type {
-  IDisconnectedRange,
-  CWEvent,
-  SubstrateTypes} from '../dist/index';
-import {
-  SubstrateEvents,
-  IEventHandler
-} from '../dist/index';
-import { factoryControl } from '../dist/logging';
+import { ApiPromise } from '@polkadot/api';
+import { LogGroupControlSettings } from 'typescript-logging';
+import { factoryControl } from '../src/logging';
+import { CWEvent, IDisconnectedRange, IEventHandler } from '../src';
+import { createApi, Poller, Processor } from '../src/chains/substrate';
+import { Block } from '../src/chains/substrate/types';
 
 export async function batchQuery(
   api: ApiPromise,
@@ -33,9 +28,9 @@ export async function batchQuery(
     fullRange.endBlock = latestBlock;
   }
 
-  const processBlocksFn = async (blocks: SubstrateTypes.Block[]) => {
+  const processBlocksFn = async (blocks: Block[]) => {
     // process all blocks
-    const processor = new SubstrateEvents.Processor(api);
+    const processor = new Processor(api);
     for (const block of blocks) {
       // retrieve events from block
       const events = await processor.process(block);
@@ -61,7 +56,7 @@ export async function batchQuery(
   // TODO: configure chunk size
   const CHUNK_SIZE = 1000;
 
-  const poller = new SubstrateEvents.Poller(api);
+  const poller = new Poller(api);
   const results = [];
   // iterate over all blocks in chunks, from smallest to largest, and place in result array
   for (
@@ -127,7 +122,7 @@ function main() {
   const url = networks[chain];
 
   if (!url) throw new Error(`no url for chain ${chain}`);
-  SubstrateEvents.createApi(url, {}).then(async (api) => {
+  createApi(url, {}).then(async (api) => {
     await batchQuery(api, [new StandaloneEventHandler()]);
     process.exit(0);
   });

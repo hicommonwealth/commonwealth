@@ -1,19 +1,18 @@
-import { AppError } from 'common-common/src/errors';
-import type { Action } from 'common-common/src/permissions';
-import {
-  BASE_PERMISSIONS,
-  computePermissions,
-  isPermitted,
-  PermissionError,
-} from 'common-common/src/permissions';
+import { Transaction, Op, FindOptions } from 'sequelize';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
-import type { FindOptions, Transaction } from 'sequelize';
-import { Op } from 'sequelize';
-import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
-import type { CommunityRoleAttributes } from '../models/community_role';
-import type { Permission } from '../models/role';
-import type { RoleAssignmentAttributes } from '../models/role_assignment';
+import {
+  Action,
+  PermissionManager,
+  PermissionError,
+  ToCheck,
+  everyonePermissions,
+} from 'commonwealth/shared/permissions';
+import { DB } from '../models';
+import { CommunityRoleAttributes } from '../models/community_role';
+import { Permission } from '../models/role';
+import { RoleAssignmentAttributes } from '../models/role_assignment';
+import { AddressInstance } from '../models/address';
+import { RoleObject } from '../../shared/types';
 
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   chain_id: string;
@@ -108,6 +107,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
       ],
     };
   }
+
   const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
   return communityRoles.map((communityRole) => communityRole.toJSON());
 }
@@ -294,17 +294,17 @@ export async function createRole(
 }
 
 // Permissions Helpers for Roles
-/// ////////////////////////////////////////////////////////////////////////////////////////////
 
 export async function isAddressPermitted(
   models: DB,
   address_id: number,
   chain_id: string,
   action: Action
-): Promise<PermissionError | undefined> {
+): Promise<boolean> {
   const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
 
-  // fetch the default allow and deny permissions for the chain
+  const permissionsManager = new PermissionManager();
+
   const chain = await models.Chain.findOne({ where: { id: chain_id } });
   if (!chain) {
     throw new Error('Chain not found');
@@ -316,16 +316,23 @@ export async function isAddressPermitted(
         permission: role.permission,
         allow: role.allow,
         deny: role.deny,
-      };
+      } as RoleObject;
     });
+
     const permission = aggregatePermissions(rolesWithPermission, {
       allow: chain.default_allow_permissions,
       deny: chain.default_deny_permissions,
     });
 
-    // check if action is permitted
-    if (!isPermitted(permission, action)) {
-      return PermissionError.NOT_PERMITTED;
+    const permitted = permissionsManager.hasPermission(
+      permission,
+      action,
+      ToCheck.Deny
+    );
+    if (!permitted) {
+      throw new Error('Not permitted');
+    } else {
+      return true;
     }
   }
 }
@@ -365,21 +372,26 @@ export async function isAnyonePermitted(
   models: DB,
   chain_id: string,
   action: Action
-): Promise<PermissionError | undefined> {
+): Promise<PermissionError | boolean> {
   const chain = await models.Chain.findOne({ where: { id: chain_id } });
   if (!chain) {
     throw new Error('Chain not found');
   }
-  const permission = computePermissions(BASE_PERMISSIONS, [
-    {
-      allow: chain.default_allow_permissions,
-      deny: chain.default_deny_permissions,
-    },
-  ]);
-  // check if action is permitted
-  if (!isPermitted(permission, action)) {
+  const permissionsManager = new PermissionManager();
+  const permission = permissionsManager.computePermissions(
+    everyonePermissions,
+    [
+      {
+        allow: chain.default_allow_permissions,
+        deny: chain.default_deny_permissions,
+      },
+    ]
+  );
+
+  if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
     return PermissionError.NOT_PERMITTED;
   }
+  return true;
 }
 
 export async function checkReadPermitted(
@@ -387,7 +399,7 @@ export async function checkReadPermitted(
   chain_id: string,
   action: Action,
   user_id?: number
-) {
+): Promise<PermissionError | boolean> {
   if (user_id) {
     // get active address
     const activeAddressInstance = await getActiveAddress(
@@ -405,13 +417,15 @@ export async function checkReadPermitted(
         action
       );
       if (permission_error) {
-        throw new AppError(permission_error);
+        return PermissionError.NOT_PERMITTED;
       }
-      return;
+      return true;
     }
   }
+
   const permission_error = await isAnyonePermitted(models, chain_id, action);
   if (permission_error) {
-    throw new AppError(permission_error);
+    return PermissionError.NOT_PERMITTED;
   }
+  return true;
 }

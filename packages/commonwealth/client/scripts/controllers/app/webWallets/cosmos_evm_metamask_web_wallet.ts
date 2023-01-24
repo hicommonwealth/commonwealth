@@ -6,7 +6,11 @@ import type { Account, IWebWallet } from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';
-import type { provider } from 'web3-core';
+import type {
+  provider,
+  TransactionConfig,
+  RLPEncodedTransaction,
+} from 'web3-core';
 
 declare let window: any;
 
@@ -53,6 +57,10 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public get api(): any {
+    return this._web3;
+  }
+
   public async getRecentBlock(chainIdentifier: string) {
     const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
     const cosm = await import('@cosmjs/stargate');
@@ -82,6 +90,13 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       ''
     );
     return signature;
+  }
+
+  public async signTransaction(
+    tx: TransactionConfig
+  ): Promise<RLPEncodedTransaction> {
+    const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
+    return rlpEncodedTx;
   }
 
   // ACTIONS
