@@ -7,12 +7,11 @@ import 'pages/new_contract/add_contract_and_abi_form.scss';
 import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 
 class AddContractAndAbiForm extends ClassComponent {
-  private loading = false;
   private saving = false;
   private form = {
     address: '',
@@ -21,10 +20,12 @@ class AddContractAndAbiForm extends ClassComponent {
 
   addContract() {
     try {
-      console.log(this.form);
+      this.saving = true;
     } catch (err) {
       notifyError('Failed to add Contract and ABI');
       console.log(err);
+    } finally {
+      this.saving = false;
     }
   }
 
@@ -36,8 +37,7 @@ class AddContractAndAbiForm extends ClassComponent {
   view() {
     const isAddressValid = isAddress(this.form.address);
     const isAbiValid = !!this.form.abi;
-    const isAddingDisabled =
-      this.saving || this.loading || !isAddressValid || !isAbiValid;
+    const isAddingDisabled = this.saving || !isAddressValid || !isAbiValid;
 
     return (
       <div class="AddContractAndAbiForm">
