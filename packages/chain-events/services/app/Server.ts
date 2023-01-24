@@ -9,7 +9,9 @@ import { DEFAULT_PORT } from '../config';
 
 import setupPassport from './passport';
 import setupRouter from './router';
+import { factory, formatFilename } from 'common-common/src/logging';
 
+const log = factory.getLogger(formatFilename(__filename));
 const port = process.env.PORT || DEFAULT_PORT;
 
 export const app = express();

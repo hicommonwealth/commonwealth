@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import { ListItem, QueryList } from 'construct-ui';
 import {
   notifyError,
   notifyInfo,
@@ -18,6 +17,7 @@ import User from 'views/components/widgets/user';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 
@@ -30,33 +30,41 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
   private items: any[];
   private membersFetched: boolean;
   private removedEditors: any;
+  private searchTerm: string;
 
   view(vnode: m.Vnode<EditCollaboratorsModalAttrs>) {
     const { thread } = vnode.attrs;
 
-    // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state
-    if (!this.membersFetched) {
-      this.membersFetched = true;
-      const chainOrCommObj = { chain: app.activeChainId() };
+    const fetchMembers = async (searchTerm) => {
+      if (searchTerm.length < 3) {
+        return;
+      }
+      const chainOrCommObj = {
+        chain: app.activeChainId(),
+        searchTerm,
+      };
 
-      // TODO Graham 4/4/21: This needs pagination, search, or serializing.
-      // The fetch time for large communities is getting unwieldy.
-      $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
+      await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
         .then((response) => {
           if (response.status !== 'Success')
             throw new Error('Could not fetch members');
           this.items = response.result.filter((role) => {
             return role.Address.address !== app.user.activeAccount?.address;
           });
+
           m.redraw();
         })
         .catch((err) => {
           m.redraw();
           console.error(err);
         });
-    }
+    };
 
-    if (!this.items?.length) return;
+    if (!this.membersFetched) {
+      this.items = [];
+      fetchMembers('');
+      this.membersFetched = true;
+    }
 
     if (!this.addedEditors) {
       this.addedEditors = {};
@@ -80,62 +88,60 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
         </div>
         <div class="compact-modal-body">
           <div class="user-list-container">
-            <CWLabel label="Users" />
-            {m(QueryList, {
-              checkmark: true,
-              items,
-              inputAttrs: {
-                placeholder: 'Enter username or address...',
-              },
-              itemRender: (role: any) => {
-                const user: Profile = app.profiles.getProfile(
-                  role.Address.chain,
-                  role.Address.address
-                );
+            <div class="selected-collaborators-section">
+              <CWTextInput
+                label="Search Members"
+                value={this.searchTerm}
+                placeholder="type 3 or more characters to search"
+                oninput={async (e) => {
+                  this.searchTerm = e.target.value;
+                  await fetchMembers(this.searchTerm);
+                }}
+              />
+              <div class="collaborator-rows-container">
+                {items.map((c) => {
+                  const user: Profile = app.profiles.getProfile(
+                    c.chain_id,
+                    c.Address.address
+                  );
 
-                const recentlyAdded = !$.isEmptyObject(
-                  this.addedEditors[role.Address.address]
-                );
+                  return (
+                    <div
+                      class="collaborator-row"
+                      onclick={async () => {
+                        const addrItem = (c as any).Address;
 
-                return m(ListItem, {
-                  label: m(User, { user }),
-                  selected: recentlyAdded,
-                  key: role.Address.address,
-                });
-              },
-              itemPredicate: (query, item) => {
-                const address = (item as any).Address;
+                        // If already scheduled for removal, un-schedule
+                        if (this.removedEditors[addrItem.address]) {
+                          delete this.removedEditors[addrItem.address];
+                        }
 
-                return address.name
-                  ? address.name.toLowerCase().includes(query.toLowerCase())
-                  : address.address.toLowerCase().includes(query.toLowerCase());
-              },
-              onSelect: (item) => {
-                const addrItem = (item as any).Address;
-
-                // If already scheduled for removal, un-schedule
-                if (this.removedEditors[addrItem.address]) {
-                  delete this.removedEditors[addrItem.address];
-                }
-
-                // If already scheduled for addition, un-schedule
-                if (this.addedEditors[addrItem.address]) {
-                  delete this.addedEditors[addrItem.address];
-                } else if (
-                  thread.collaborators.filter((c) => {
-                    return (
-                      c.address === addrItem.address &&
-                      c.chain === addrItem.chain
-                    );
-                  }).length === 0
-                ) {
-                  // If unscheduled for addition, and not an existing editor, schedule
-                  this.addedEditors[addrItem.address] = addrItem;
-                } else {
-                  notifyInfo('Already an editor');
-                }
-              },
-            })}
+                        // If already scheduled for addition, un-schedule
+                        if (this.addedEditors[addrItem.address]) {
+                          delete this.addedEditors[addrItem.address];
+                        } else if (
+                          thread.collaborators.filter((collaborator) => {
+                            return (
+                              collaborator.address === addrItem.address &&
+                              collaborator.chain === addrItem.chain
+                            );
+                          }).length === 0
+                        ) {
+                          // If unscheduled for addition, and not an existing editor, schedule
+                          this.addedEditors[addrItem.address] = addrItem;
+                        } else {
+                          notifyInfo('Already an editor');
+                        }
+                      }}
+                    >
+                      {m(User, {
+                        user,
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
           {allCollaborators.length > 0 ? (
             <div class="selected-collaborators-section">

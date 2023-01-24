@@ -152,9 +152,6 @@ export default (
     models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);
     models.User.hasMany(models.StarredCommunity);
-    models.User.belongsToMany(models.Chain, {
-      through: models.WaitlistRegistration,
-    });
   };
 
   return User;
