@@ -120,7 +120,6 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
                   new AddressInfo(null, thread.author, thread.authorChain, null)
                 }
                 linkify
-                popover
                 showAddressWithDisplayName
                 hideIdentityIcon
               />
