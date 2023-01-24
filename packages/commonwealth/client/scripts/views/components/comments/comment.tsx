@@ -131,6 +131,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
               published on
             </CWText> */}
             <CWText
+              key={comment.id}
               type="caption"
               fontWeight="medium"
               className="published-text"

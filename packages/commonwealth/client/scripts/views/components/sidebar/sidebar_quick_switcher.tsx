@@ -60,6 +60,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
         <div className="scrollable-community-bar">
           {starredCommunities.map((item) => (
             <CWCommunityAvatar
+              key={item.id}
               size="large"
               community={item}
               onClick={link ? () => setRoute(`/${item.id}`) : undefined}
