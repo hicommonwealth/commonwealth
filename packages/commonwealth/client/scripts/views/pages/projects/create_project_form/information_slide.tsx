@@ -130,8 +130,10 @@ export class InformationSlide extends ClassComponent<{
           uploadCompleteCallback={(imageURL: string) => {
             vnode.attrs.form.coverImage = imageURL;
           }}
-          generatedImageCallback={(url: string) => {
-            notifySuccess(`Generated Image uploaded to ${url.slice(0, 18)}...`);
+          generatedImageCallback={(imageURL: string) => {
+            notifySuccess(
+              `Generated Image uploaded to ${imageURL.slice(0, 18)}...`
+            );
           }}
           enableGenerativeAI={true}
         />
