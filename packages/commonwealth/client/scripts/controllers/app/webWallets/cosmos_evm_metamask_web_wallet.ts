@@ -5,7 +5,7 @@ import { Address } from 'ethereumjs-util';
 import type { Account, IWebWallet } from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
-import Web3 from 'web3';
+import type Web3 from 'web3';
 import type {
   provider,
   TransactionConfig,
@@ -105,6 +105,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // (this needs to be called first, before other requests)
+      const Web3 = (await import('web3')).default;
       this._web3 = new Web3((window as any).ethereum);
       await this._web3.givenProvider.enable();
 

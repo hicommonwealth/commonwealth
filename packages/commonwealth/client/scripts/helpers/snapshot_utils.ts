@@ -1,5 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
-import gql from 'graphql-tag';
 import { notifyError } from '../controllers/app/notifications';
 
 let apolloClient = null;
@@ -27,37 +25,19 @@ class SnapshotLazyLoader {
   }
 }
 
-async function getApolloClient() {
-  if (apolloClient) return apolloClient;
-
-  const { ApolloClient, createHttpLink, InMemoryCache } = await import(
-    '@apollo/client/core'
-  );
-
-  // HTTP connection to the API
-  const httpLink = createHttpLink({
-    // You should use an absolute URL here
-    uri: `${
-      process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
-    }/graphql`,
-  });
-
-  // Create the apollo client
-  apolloClient = new ApolloClient({
-    link: httpLink,
-    cache: new InMemoryCache(),
-    defaultOptions: {
-      query: {
-        fetchPolicy: 'no-cache',
-      },
-    },
-  });
-  return apolloClient;
-}
-
 // Queries from: https://github.com/snapshot-labs/snapshot/blob/develop/src/helpers/queries.ts
+class GqlLazyLoader {
+  private static gql;
 
-export const SPACE_QUERY = gql`
+  private static async init() {
+    if(!this.gql) {
+      this.gql = await import('graphql-tag');
+    }
+  }
+
+  public static async SPACE_QUERY() {
+    await this.init();
+    return this.gql`
   query Space($space: String) {
     space(id: $space) {
       id
@@ -79,8 +59,11 @@ export const SPACE_QUERY = gql`
     }
   }
 `;
+  }
 
-export const PROPOSALS_QUERY = gql`
+  public static async PROPOSALS_QUERY() {
+    await this.init();
+    return this.gql`
   query Proposals(
     $first: Int!
     $skip: Int!
@@ -121,8 +104,11 @@ export const PROPOSALS_QUERY = gql`
     }
   }
 `;
+  }
 
-export const PROPOSAL_VOTES_QUERY = gql`
+  public static async PROPOSAL_VOTES_QUERY() {
+    await this.init();
+    return this.gql`
   query Votes($proposalHash: String!) {
     votes(
       first: 1000
@@ -138,6 +124,36 @@ export const PROPOSAL_VOTES_QUERY = gql`
     }
   }
 `;
+  }
+}
+
+async function getApolloClient() {
+  if (apolloClient) return apolloClient;
+
+  const { ApolloClient, createHttpLink, InMemoryCache } = await import(
+    '@apollo/client/core'
+  );
+
+  // HTTP connection to the API
+  const httpLink = createHttpLink({
+    // You should use an absolute URL here
+    uri: `${
+      process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
+    }/graphql`,
+  });
+
+  // Create the apollo client
+  apolloClient = new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache(),
+    defaultOptions: {
+      query: {
+        fetchPolicy: 'no-cache',
+      },
+    },
+  });
+  return apolloClient;
+}
 
 export interface SnapshotSpace {
   id: string;
@@ -195,7 +211,7 @@ export async function getVersion(): Promise<string> {
 export async function getSpace(space: string): Promise<SnapshotSpace> {
   await getApolloClient();
   const spaceObj = await apolloClient.query({
-    query: SPACE_QUERY,
+    query: await GqlLazyLoader.SPACE_QUERY(),
     variables: {
       space,
     },
@@ -206,7 +222,7 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {
   await getApolloClient();
   const proposalsObj = await apolloClient.query({
-    query: PROPOSALS_QUERY,
+    query: await GqlLazyLoader.PROPOSALS_QUERY(),
     variables: {
       space,
       state: 'all',
@@ -223,7 +239,7 @@ export async function getVotes(
 ): Promise<SnapshotProposalVote[]> {
   await getApolloClient();
   const response = await apolloClient.query({
-    query: PROPOSAL_VOTES_QUERY,
+    query: await GqlLazyLoader.PROPOSAL_VOTES_QUERY(),
     variables: {
       proposalHash,
     },
@@ -232,12 +248,14 @@ export async function getVotes(
 }
 
 export async function castVote(address: string, payload: any) {
+  const { Web3Provider } = await import('@ethersproject/providers');
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
   await client.vote(web3 as any, address, payload);
 }
 
 export async function createProposal(address: string, payload: any) {
+  const { Web3Provider } = await import('@ethersproject/providers');
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
 

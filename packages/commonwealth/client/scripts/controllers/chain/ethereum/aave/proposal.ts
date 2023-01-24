@@ -17,7 +17,7 @@ import type {
 } from 'models';
 import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import moment from 'moment';
-import Web3 from 'web3';
+import Web3 from 'web3-utils';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
@@ -39,7 +39,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
   }
 
   public format(): string {
-    return `${formatNumberLong(+Web3.utils.fromWei(this.power))} ${
+    return `${formatNumberLong(+Web3.fromWei(this.power))} ${
       this.account.chain.default_symbol
     }`;
   }
@@ -308,7 +308,7 @@ export default class AaveProposal extends Proposal<
       console.error(
         'Failed to fetch total voting supply at proposal start block, using hardcoded value.'
       );
-      this._votingSupplyAtStart = Web3.utils.toWei(
+      this._votingSupplyAtStart = Web3.toWei(
         new BN(1_000_000_000),
         'ether'
       );

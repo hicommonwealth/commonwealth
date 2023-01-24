@@ -11,7 +11,6 @@ import {
 import type { NextFunction } from 'express';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
-import Web3 from 'web3';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
@@ -165,6 +164,7 @@ const createChain = async (
     req.body.base === ChainBase.Ethereum &&
     req.body.type !== ChainType.Offchain
   ) {
+    const Web3 = (await import('web3')).default;
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new AppError(Errors.InvalidAddress));
     }

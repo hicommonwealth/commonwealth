@@ -20,7 +20,6 @@ import {
 import * as ethUtil from 'ethereumjs-util';
 import type { NextFunction, Request, Response } from 'express';
 
-import nacl from 'tweetnacl';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import {
@@ -287,6 +286,7 @@ const verifySignature = async (
     //
 
     // both in base64 encoding
+    const nacl = await import('tweetnacl');
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
     isValid = nacl.sign.detached.verify(
       Buffer.from(JSON.stringify(canvasMessage)),
@@ -302,6 +302,7 @@ const verifySignature = async (
     try {
       const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
+        const nacl = await import('tweetnacl');
         isValid = nacl.sign.detached.verify(
           Buffer.from(`${JSON.stringify(canvasMessage)}`),
           Buffer.from(signatureString, 'base64'),

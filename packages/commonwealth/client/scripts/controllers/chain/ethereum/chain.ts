@@ -5,7 +5,7 @@ import type { ChainInfo, IChainModule, ITXModalData, NodeInfo } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import Web3 from 'web3';
+import type Web3 from 'web3';
 import type EthereumAccount from './account';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -64,6 +64,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public async _initApi(node: NodeInfo): Promise<Web3> {
     try {
       // TODO: support http?
+      const Web3 = (await import('web3')).default;
       const provider = new Web3.providers.WebsocketProvider(node.url);
       this._api = new Web3(provider);
       return this._api;
