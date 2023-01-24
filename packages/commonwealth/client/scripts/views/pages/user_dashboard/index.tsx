@@ -11,6 +11,11 @@ import 'pages/user_dashboard/index.scss';
 
 import app, { LoginState } from 'state';
 import Sublayout from 'views/sublayout';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
+import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -193,6 +198,52 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
               </CWTabBar>
               {loadingData && <CWSpinner />}
             </div>
+            <CWPopover
+              trigger={
+                <CWButton
+                  buttonType="mini-white"
+                  label="Filter"
+                  iconRight="chevronDown"
+                />
+              }
+              content={
+                <CWCard className="dashboard-filter-items">
+                  <CWCheckbox
+                    checked={false}
+                    value=""
+                    label="Threads"
+                    onchange={() => {
+                      // TODO: add filter functionality
+                    }}
+                  />
+                  <CWCheckbox
+                    checked={false}
+                    value=""
+                    label="Polls"
+                    onchange={() => {
+                      // TODO: add filter functionality
+                    }}
+                  />
+                  <CWCheckbox
+                    checked={false}
+                    value=""
+                    label="Proposals"
+                    onchange={() => {
+                      // TODO: add filter functionality
+                    }}
+                  />
+                  <CWCheckbox
+                    checked={false}
+                    value=""
+                    label="Crowdfunds"
+                    onchange={() => {
+                      // TODO: add filter functionality
+                    }}
+                  />
+                </CWCard>
+              }
+            />
+            <CWDivider />
             {!loadingData && (
               <>
                 {activePage === DashboardViews.ForYou && (

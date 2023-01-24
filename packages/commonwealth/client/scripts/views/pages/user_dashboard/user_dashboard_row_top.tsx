@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import { formatTimestamp, formatTimestampAsAlternateDate } from 'helpers/index';
 import { capitalize } from 'lodash';
 import m from 'mithril';
 import { AddressInfo } from 'models';

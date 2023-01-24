@@ -20,4 +20,18 @@
       margin-bottom: 32px;
     }
   }
+
+  .Divider {
+    margin-top: 8px;
+    width: 768px;
+
+    @include mediumSmallInclusive {
+      width: 100%;
+    }
+  }
+}
+
+.dashboard-filter-items {
+  background: $white;
+  width: fit-content;
 }
