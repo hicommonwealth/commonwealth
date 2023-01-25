@@ -10,10 +10,9 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWText } from 'views/components/component_kit/cw_text';
+import app from 'state';
 
-type CreateContractTemplateFormAttrs = { scope: string };
-
-class CreateContractTemplateForm extends ClassComponent<CreateContractTemplateFormAttrs> {
+class CreateContractTemplateForm extends ClassComponent {
   private saving = false;
   private form = {
     displayName: '',
@@ -21,7 +20,8 @@ class CreateContractTemplateForm extends ClassComponent<CreateContractTemplateFo
     template: '',
   };
 
-  createContractTemplate(scope: string) {
+  createContractTemplate() {
+    const scope = app.customDomainId() || m.route.param('scope');
     try {
       this.saving = true;
       console.log(this.form);
@@ -34,18 +34,17 @@ class CreateContractTemplateForm extends ClassComponent<CreateContractTemplateFo
     }
   }
 
-  handleCancel(scope: string) {
+  handleCancel() {
+    const scope = app.customDomainId() || m.route.param('scope');
     m.route.set(`/${scope}/contracts`);
   }
 
-  view(vnode: m.Vnode<CreateContractTemplateFormAttrs>) {
+  view(vnode) {
     const isCreatingDisabled =
       this.saving ||
       !this.form.displayName ||
       !this.form.nickname ||
       !this.form.template;
-
-    const scope = vnode.attrs.scope;
 
     return (
       <div class="CreateContractTemplateForm">
@@ -90,13 +89,13 @@ class CreateContractTemplateForm extends ClassComponent<CreateContractTemplateFo
           <CWButton
             buttonType="mini-white"
             label="Cancel"
-            onclick={() => this.handleCancel(scope)}
+            onclick={this.handleCancel}
           />
           <CWButton
             buttonType="mini-black"
             label="Create"
             disabled={isCreatingDisabled}
-            onclick={() => this.createContractTemplate(scope)}
+            onclick={this.createContractTemplate}
           />
         </div>
       </div>

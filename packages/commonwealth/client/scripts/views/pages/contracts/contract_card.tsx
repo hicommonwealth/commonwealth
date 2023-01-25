@@ -7,15 +7,15 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-
 import { ContractTemplateCard } from './contract_template_card';
 import type { Contract } from 'views/pages/contracts';
 import { showConfirmationModal } from 'views/modals/confirmation_modal';
+import { showManageContractTemplateModal } from 'views/modals/manage_contract_template_modal';
+import app from 'state';
 
 type ContractCardAttrs = {
   address: string;
   templates: Contract['templates'];
-  scope: string;
 };
 
 export class ContractCard extends ClassComponent<ContractCardAttrs> {
@@ -38,18 +38,18 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
     });
   }
 
-  handleCreateNewTemplate(scope: string) {
+  handleCreateNewTemplate() {
     // TODO add some contract ID to know where should template be created
+    const scope = app.customDomainId() || m.route.param('scope');
     m.route.set(`/${scope}/new/contract_template`);
   }
 
   handleAddTemplate() {
-    // TODO open modal
-    console.log('click add new template!');
+    showManageContractTemplateModal();
   }
 
   view(vnode: m.Vnode<ContractCardAttrs>) {
-    const { address, templates, scope } = vnode.attrs;
+    const { address, templates } = vnode.attrs;
 
     return (
       <CWCard fullWidth className="ContractCard">
@@ -102,7 +102,7 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
               type="caption"
               fontWeight="medium"
               className="cta"
-              onclick={() => this.handleCreateNewTemplate(scope)}
+              onclick={this.handleCreateNewTemplate}
             >
               Create a New Template
             </CWText>

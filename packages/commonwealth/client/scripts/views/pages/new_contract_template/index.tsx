@@ -2,6 +2,7 @@
 
 import 'pages/new_contract_template/new_contract_template_page.scss';
 import app from 'state';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
@@ -44,7 +45,7 @@ class NewContractTemplatePage extends ClassComponent {
             Create a new template for your community to use.
           </CWText>
           <CWDivider className="divider" />
-          <CreateContractTemplateForm scope={scope} />
+          <CreateContractTemplateForm />
         </div>
       </Sublayout>
     );

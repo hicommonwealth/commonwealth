@@ -2,6 +2,7 @@
 
 import 'pages/new_contract/new_contract_page.scss';
 import app from 'state';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
@@ -45,7 +46,7 @@ class NewContractPage extends ClassComponent {
             Add contracts and their corresponding ABI files to your community.
           </CWText>
           <CWDivider className="divider" />
-          <AddContractAndAbiForm scope={scope} />
+          <AddContractAndAbiForm />
         </div>
       </Sublayout>
     );

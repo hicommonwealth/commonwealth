@@ -2,6 +2,7 @@
 
 import 'pages/contracts/contracts_page.scss';
 import app from 'state';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
@@ -64,7 +65,8 @@ export type Contract = {
 };
 
 class ContractsPage extends ClassComponent {
-  handleAddContract(scope: string) {
+  handleAddContract() {
+    const scope = app.customDomainId() || m.route.param('scope');
     m.route.set(`/${scope}/new/contract`);
   }
 
@@ -72,8 +74,6 @@ class ContractsPage extends ClassComponent {
     if (!app.contracts || !app.chain) {
       return <PageLoading title="Contracts Page" />;
     }
-
-    const scope = vnode.attrs.scope;
 
     return (
       <Sublayout>
@@ -85,7 +85,7 @@ class ContractsPage extends ClassComponent {
               buttonType="mini-white"
               label="Add Contract"
               iconLeft="plus"
-              onclick={() => this.handleAddContract(scope)}
+              onclick={this.handleAddContract}
             />
           </div>
 
@@ -99,7 +99,6 @@ class ContractsPage extends ClassComponent {
                 <ContractCard
                   address={contract.address}
                   templates={contract.templates}
-                  scope={scope}
                 />
               ))}
             </div>

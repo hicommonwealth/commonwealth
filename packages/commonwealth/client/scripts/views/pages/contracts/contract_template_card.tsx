@@ -9,6 +9,7 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import type { Contract } from 'views/pages/contracts/index';
 import { CWPopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { showConfirmationModal } from 'views/modals/confirmation_modal';
+import { showManageContractTemplateModal } from 'views/modals/manage_contract_template_modal';
 
 type ContractTemplateCardAttrs = Contract['templates'][0];
 
@@ -19,8 +20,7 @@ interface InfoOrder {
 
 export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAttrs> {
   handleEditTemplate() {
-    console.log('click edit template');
-    // TODO open edit modal
+    showManageContractTemplateModal();
   }
 
   handleDeleteTemplate(name: string) {
