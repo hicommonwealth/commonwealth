@@ -209,7 +209,6 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                       </>
                     ) : (
                       <CWText>Join some communities to see Activity!</CWText>
-
                     )}
                   </>
                 )}
