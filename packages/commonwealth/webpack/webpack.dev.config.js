@@ -22,8 +22,8 @@ module.exports = merge(common, {
   output: {
     publicPath: '/build',
     path: path.join(__dirname, '../build'),
-    filename: 'js/[name].js',
-    chunkFilename: 'js/[name].chunk.js',
+    filename: 'js/[name].[contenthash:8].js',
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   devServer: {
     inline: true,
