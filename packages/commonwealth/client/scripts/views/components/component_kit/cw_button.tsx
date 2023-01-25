@@ -30,7 +30,8 @@ export type ButtonType =
   | 'primary-blue-dark'
   | 'secondary-blue-dark'
   | 'mini-black'
-  | 'mini-white';
+  | 'mini-white'
+  | 'mini-red';
 
 export type ButtonStyleAttrs = {
   buttonType?: ButtonType;

@@ -10,6 +10,7 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 import { ContractTemplateCard } from './contract_template_card';
 import type { Contract } from 'views/pages/contracts';
+import { showConfirmationModal } from 'views/modals/confirmation_modal';
 
 type ContractCardAttrs = {
   address: string;
@@ -18,9 +19,24 @@ type ContractCardAttrs = {
 };
 
 export class ContractCard extends ClassComponent<ContractCardAttrs> {
-  handleDeleteContract() {
-    // TODO add confirmation popup
-    console.log('click delete!');
+  async handleDeleteContract(address: string) {
+    showConfirmationModal({
+      title: 'Delete Contract',
+      description: (
+        <>
+          Deleting contract <b>{address}</b> is permanent and deletes all
+          associated data. Are you sure you want to proceed?
+        </>
+      ),
+      confirmButton: {
+        label: 'Delete',
+        type: 'mini-red',
+
+        onConfirm: () => {
+          console.log('delete contract');
+        },
+      },
+    });
   }
 
   handleCreateNewTemplate(scope: string) {
@@ -48,7 +64,7 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
           <CWIconButton
             className="delete-icon"
             iconName="trash"
-            onclick={this.handleDeleteContract}
+            onclick={() => this.handleDeleteContract(address)}
           />
         </div>
         <div className="templates">
