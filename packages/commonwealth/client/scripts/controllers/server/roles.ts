@@ -331,7 +331,7 @@ export function isActiveAddressPermitted(
       deny: chain_info.defaultDenyPermissions,
     });
     if (
-      !this.permissionsManager.hasPermission(permission, action, ToCheck.Allow)
+      !permissionsManager.hasPermission(permission, action, ToCheck.Allow)
     ) {
       return false;
     }
@@ -350,7 +350,7 @@ export function isActiveAddressPermitted(
       ]
     );
     if (
-      !this.permissionsManager.hasPermission(permission, action, ToCheck.Allow)
+      !permissionsManager.hasPermission(permission, action, ToCheck.Allow)
     ) {
       return false;
     }
