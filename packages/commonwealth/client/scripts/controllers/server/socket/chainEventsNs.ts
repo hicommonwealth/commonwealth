@@ -24,6 +24,7 @@ export class ChainEventsNamespace {
   }
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
+    console.log("MYYYYY SUBBBBBIESSSS", subs);
     if (this._isConnected) {
       const roomsToJoin = [];
       for (const sub of subs) {
@@ -64,7 +65,7 @@ export class ChainEventsNamespace {
 
   private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
-      (sub) => sub.chainEntityId === notification.ChainEvent.entity_id
+      (sub) => sub.getChain === notification.ChainEvent.chain
     );
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally
@@ -77,6 +78,7 @@ export class ChainEventsNamespace {
 
   private onConnect() {
     this._isConnected = true;
+    console.log("CONNNNEEECCTED ->>>>>>>>>>>>>>>>", app.user.notifications.subscriptions);
     this.addChainEventSubscriptions(app.user.notifications.subscriptions);
     console.log('Chain events namespace connected!');
   }

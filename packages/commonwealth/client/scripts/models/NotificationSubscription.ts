@@ -35,6 +35,11 @@ class NotificationSubscription {
     return this._isActive;
   }
 
+  // TODO: should resolve Chain vs chain
+  public get getChain() {
+    return this.Chain.id || this.Chain
+  }
+
   public enable() {
     this._isActive = true;
   }
