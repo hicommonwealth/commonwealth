@@ -6,7 +6,7 @@ import {
   Permissions,
   impliedDenyPermissionsByAction,
   impliedAllowPermissionsByAction,
-} from 'commonwealth/server/util/permissions';
+} from 'commonwealth/shared/permissions';
 
 describe('PermissionManager', () => {
   let permissionManager: PermissionManager;

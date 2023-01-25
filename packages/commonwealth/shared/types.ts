@@ -1,7 +1,7 @@
 import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import type { ChainAttributes } from '../server/models/chain';
 import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
-import { AccessLevel } from '../server/util/permissions';
+import { AccessLevel } from 'commonwealth/shared/permissions';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
