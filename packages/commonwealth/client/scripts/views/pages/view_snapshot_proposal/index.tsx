@@ -130,7 +130,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={
             <CWText>
-              {m(User, {
+              {!!app.activeChainId() && m(User, {
                 user: new AddressInfo(
                   null,
                   this.proposal.author,
