@@ -53,12 +53,12 @@ module.exports = {
           chunks: 'all',
         },
         ethereum: { // this is made into an inital chunk
-          test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
+          test: /[\\/]node_modules[\\/](@ethersproject|ethereumjs-abi)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
         ethereumAsync: { // this is made into an async chunk (lazy loaded)
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
+          test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect)[\\/]/,
           name: 'ethereumAsync',
           chunks: 'all',
         },
