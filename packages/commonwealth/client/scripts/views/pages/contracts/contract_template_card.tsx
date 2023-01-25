@@ -8,6 +8,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import type { Contract } from 'views/pages/contracts/index';
 import { CWPopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import { showConfirmationModal } from 'views/modals/confirmation_modal';
 
 type ContractTemplateCardAttrs = Contract['templates'][0];
 
@@ -22,9 +23,23 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
     // TODO open edit modal
   }
 
-  handleDeleteTemplate() {
-    // TODO open confirmation popup
-    console.log('click delete template');
+  handleDeleteTemplate(name: string) {
+    showConfirmationModal({
+      title: 'Delete Template',
+      description: (
+        <>
+          Deleting this template <b>{name}</b> is permanent and deletes all
+          associated data. Are you sure you want to proceed?
+        </>
+      ),
+      confirmButton: {
+        label: 'Delete',
+        type: 'mini-red',
+        onConfirm: () => {
+          console.log('delete template');
+        },
+      },
+    });
   }
 
   view(vnode: m.Vnode<ContractTemplateCardAttrs>) {
@@ -54,7 +69,8 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
               {
                 label: 'Delete',
                 iconLeft: 'trash',
-                onclick: this.handleDeleteTemplate,
+                onclick: () =>
+                  this.handleDeleteTemplate(templateInfo.displayName),
               },
             ]}
           />

@@ -19,7 +19,7 @@ type ContractCardAttrs = {
 };
 
 export class ContractCard extends ClassComponent<ContractCardAttrs> {
-  async handleDeleteContract(address: string) {
+  handleDeleteContract(address: string) {
     showConfirmationModal({
       title: 'Delete Contract',
       description: (
@@ -31,7 +31,6 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
       confirmButton: {
         label: 'Delete',
         type: 'mini-red',
-
         onConfirm: () => {
           console.log('delete contract');
         },
