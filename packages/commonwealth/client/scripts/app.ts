@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
+import '../../static/fonts/fonts.css'
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import 'construct.scss';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
