@@ -13,7 +13,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 
-import styles from 'components/component_kit/cw_component_showcase.scss';
+import 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
@@ -116,7 +116,7 @@ export const ComponentShowcase = () => {
         />
         <CWReactPopover
           anchorEl={basicPopoverEl}
-          content={<div className={styles.Tooltip}>poop</div>}
+          content={<div className={'Tooltip'}>poop</div>}
         />
       </div>
     </div>
