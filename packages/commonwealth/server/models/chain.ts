@@ -1,17 +1,20 @@
-import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-
-import { RegisteredTypes } from '@polkadot/types/types';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { DataTypes } from 'sequelize';
-import { AddressAttributes, AddressInstance } from './address';
-import { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
-import { CommentAttributes } from './comment';
-import { ContractInstance } from './contract';
-import { StarredCommunityAttributes } from './starred_community';
-import { ThreadAttributes } from './thread';
-import { TopicAttributes, TopicInstance } from './topic';
-import { ModelInstance, ModelStatic } from './types';
-import { UserAttributes } from './user';
+import type { RegisteredTypes } from '@polkadot/types/types';
+import type {
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+} from 'common-common/src/types';
+import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import type { DataTypes } from 'sequelize';
+import type { AddressAttributes, AddressInstance } from './address';
+import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
+import type { CommentAttributes } from './comment';
+import type { ContractInstance } from './contract';
+import type { StarredCommunityAttributes } from './starred_community';
+import type { ThreadAttributes } from './thread';
+import type { TopicAttributes, TopicInstance } from './topic';
+import type { ModelInstance, ModelStatic } from './types';
+import type { UserAttributes } from './user';
 
 export type ChainAttributes = {
   name: string;
@@ -165,9 +168,6 @@ export default (
     models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
     models.Chain.hasMany(models.ChatChannel);
-    models.Chain.belongsToMany(models.User, {
-      through: models.WaitlistRegistration,
-    });
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });

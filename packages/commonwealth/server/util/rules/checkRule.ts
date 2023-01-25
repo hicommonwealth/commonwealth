@@ -1,9 +1,9 @@
-import { Transaction } from 'sequelize';
-
-import type { RuleType, DefaultSchemaT } from './ruleTypes';
+import type { Transaction } from 'sequelize';
+import type { DB } from '../../models';
 import RuleTypes from '../../ruleTypes';
-import RuleCache from './ruleCache';
-import { DB } from '../../models';
+import type RuleCache from './ruleCache';
+
+import type { DefaultSchemaT, RuleType } from './ruleTypes';
 
 export default async function checkRule(
   ruleCache: RuleCache,

@@ -1,20 +1,20 @@
 import sleep from 'sleep-promise';
 
 import { createProvider } from '../../eth';
-import {
+import type {
   IDisconnectedRange,
   CWEvent,
   SubscribeFunc,
   ISubscribeOptions,
-  SupportedNetwork,
 } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 import { IProjectBaseFactory__factory as IProjectBaseFactoryFactory } from '../../contractTypes';
 
 import { Subscriber, constructProjectApi } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
-import { IEventData, RawEvent, Api } from './types';
+import type { IEventData, RawEvent, Api } from './types';
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
@@ -100,14 +100,8 @@ export const subscribeEvents: SubscribeFunc<
   RawEvent,
   ISubscribeOptions<Api>
 > = async (options) => {
-  const {
-    chain,
-    api,
-    handlers,
-    skipCatchup,
-    discoverReconnectRange,
-    verbose,
-  } = options;
+  const { chain, api, handlers, skipCatchup, discoverReconnectRange, verbose } =
+    options;
   const log = factory.getLogger(
     addPrefix(__filename, [SupportedNetwork.Commonwealth, chain])
   );

@@ -1,14 +1,14 @@
 import JobRunner from 'common-common/src/cacheJobRunner';
-
-import { default as queryGlobalActivity, GlobalActivity } from './queryGlobalActivity';
-import { DB } from '../models';
+import type { DB } from '../models';
+import type { GlobalActivity } from './queryGlobalActivity';
+import { default as queryGlobalActivity } from './queryGlobalActivity';
 
 type CacheT = { activity: GlobalActivity };
 
 export default class GlobalActivityCache extends JobRunner<CacheT> {
   constructor(
     private _models: DB,
-    _time: number = 60 * 5,   // 5 minutes
+    _time: number = 60 * 5 // 5 minutes
   ) {
     super({ activity: [] }, _time, false);
   }

@@ -1,8 +1,8 @@
-import { RuleType } from '../util/rules/ruleTypes';
+import type { RuleType } from '../util/rules/ruleTypes';
 import AdminOnlyRule from './adminOnly';
+import AllRule from './all';
 import AllowListRule from './allowList';
 import AnyRule from './any';
-import AllRule from './all';
 import TokenBalanceRule from './tokenBalanceRule';
 
 export default {

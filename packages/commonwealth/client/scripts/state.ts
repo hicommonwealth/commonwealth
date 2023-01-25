@@ -1,33 +1,36 @@
-import { ChainStore, NodeStore } from 'stores';
-import { IChainAdapter, NotificationCategory } from 'models';
-import { EventEmitter } from 'events';
-import { getToastStore, ToastStore } from 'controllers/app/toasts';
-import { getModalStore, ModalStore } from 'controllers/app/modals';
-import { InviteCodeAttributes } from 'types';
+import type { ModalStore } from 'controllers/app/modals';
+import { getModalStore } from 'controllers/app/modals';
+import type { ToastStore } from 'controllers/app/toasts';
+import { getToastStore } from 'controllers/app/toasts';
+import ChainEntityController from 'controllers/server/chain_entities';
+import DiscordController from 'controllers/server/discord';
 import { WebSocketController } from 'controllers/server/socket';
-import { ChainCategoryAttributes } from 'server/models/chain_category';
-import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
+import { EventEmitter } from 'events';
+import type { IChainAdapter, NotificationCategory } from 'models';
+import type { ChainCategoryAttributes } from 'server/models/chain_category';
+import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
+import { ChainStore, NodeStore } from 'stores';
+import type { InviteCodeAttributes } from 'types';
 import RecentActivityController from './controllers/app/recent_activity';
-import ProfilesController from './controllers/server/profiles';
-import CommentsController from './controllers/server/comments';
-import ThreadsController from './controllers/server/threads';
+import WebWalletController from './controllers/app/web_wallets';
 import SnapshotController from './controllers/chain/snapshot';
-import SearchController from './controllers/server/search';
-import ReactionsController from './controllers/server/reactions';
-import ReactionCountsController from './controllers/server/reactionCounts';
-import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
-import TopicsController from './controllers/server/topics';
+import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
-import SessionsController from './controllers/server/sessions';
-import { UserController } from './controllers/server/user';
-import { RolesController } from './controllers/server/roles';
-import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import RulesController from './controllers/server/rules';
-import { MobileMenuName } from './views/app_mobile_menus';
-import ChainEntityController from 'controllers/server/chain_entities';
-import { SidebarMenuName } from './views/components/sidebar';
+import ProfilesController from './controllers/server/profiles';
+import ReactionCountsController from './controllers/server/reactionCounts';
+import ReactionsController from './controllers/server/reactions';
+import { RolesController } from './controllers/server/roles';
+import SearchController from './controllers/server/search';
+import SessionsController from './controllers/server/sessions';
+import ThreadsController from './controllers/server/threads';
+import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
+import TopicsController from './controllers/server/topics';
+import { UserController } from './controllers/server/user';
+import type { MobileMenuName } from './views/app_mobile_menus';
+import type { SidebarMenuName } from './views/components/sidebar';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -45,6 +48,7 @@ export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
   chainEntities: ChainEntityController;
+
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
 
@@ -77,6 +81,9 @@ export interface IApp {
   // Contracts
   contracts: ContractsController;
 
+  // Discord
+  discord: DiscordController;
+
   // User
   user: UserController;
   roles: RolesController;
@@ -106,20 +113,30 @@ export interface IApp {
     chainCategories?: ChainCategoryAttributes[];
     chainCategoryTypes?: ChainCategoryTypeAttributes[];
   };
+
   loginStatusLoaded(): boolean;
+
   isLoggedIn(): boolean;
+
   isProduction(): boolean;
+
   serverUrl(): string;
+
   loadingError: string;
 
   _customDomainId: string;
+
   isCustomDomain(): boolean;
+
   customDomainId(): string;
+
   setCustomDomain(d: string): void;
 
   _lastNavigatedBack: boolean;
   _lastNavigatedFrom: string;
+
   lastNavigatedBack(): boolean;
+
   lastNavigatedFrom(): string;
 
   cachedIdentityWidget: any; // lazy loaded substrate identity widget
@@ -151,7 +168,7 @@ const app: IApp = {
   rules: new RulesController(),
 
   // Thread
-  threads: new ThreadsController(),
+  threads: ThreadsController.Instance,
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   comments: new CommentsController(),
   reactions: new ReactionsController(),
@@ -164,6 +181,9 @@ const app: IApp = {
 
   // Contracts
   contracts: new ContractsController(),
+
+  // Discord
+  discord: new DiscordController(),
 
   // Search
   search: new SearchController(),

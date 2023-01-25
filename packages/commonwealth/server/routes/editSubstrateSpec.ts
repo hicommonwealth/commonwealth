@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
-import validateChain from '../middleware/validateChain';
-import { DB } from '../models';
+import { AppError } from 'common-common/src/errors';
 import { ChainBase } from 'common-common/src/types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
+import { findAllRoles } from '../util/roles';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
-import { findAllRoles } from '../util/roles';
 
 const editSubstrateSpec = async (
   models: DB,
@@ -13,8 +12,7 @@ const editSubstrateSpec = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   if (!chain) return next(new AppError('Unknown chain.'));
   if (chain.base !== ChainBase.Substrate)
     return next(new AppError('Chain must be substrate'));

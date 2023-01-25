@@ -1,9 +1,8 @@
 /* eslint-disable no-restricted-syntax */
-import { Response, NextFunction } from 'express';
-import { QueryTypes } from 'sequelize';
-import validateChain from '../middleware/validateChain';
-import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction, Response } from 'express';
+import { QueryTypes } from 'sequelize';
+import type { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -19,8 +18,7 @@ const deleteTopic = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
@@ -49,7 +47,7 @@ const deleteTopic = async (
     .then(() => {
       res.json({ status: 'Success' });
     })
-    .catch((e) => {
+    .catch(() => {
       next(new ServerError(Errors.DeleteFail));
     });
 };

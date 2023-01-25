@@ -1,9 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 
 const VALID_DIGEST_INTERVALS = ['daily', 'never'];
 
@@ -13,7 +10,12 @@ export const Errors = {
   InvalidSetting: 'Invalid setting',
 };
 
-const writeUserSetting = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const writeUserSetting = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { key, value } = req.body;
 
   if (!req.user) {
@@ -37,7 +39,10 @@ const writeUserSetting = async (models: DB, req: Request, res: Response, next: N
   } else if (key === 'disableRichText' && value === 'false') {
     req.user.disableRichText = false;
     await req.user.save();
-  } else if (key === 'updateEmailInterval' && VALID_DIGEST_INTERVALS.indexOf(value) !== -1) {
+  } else if (
+    key === 'updateEmailInterval' &&
+    VALID_DIGEST_INTERVALS.indexOf(value) !== -1
+  ) {
     req.user.emailNotificationInterval = value;
     await req.user.save();
   } else {

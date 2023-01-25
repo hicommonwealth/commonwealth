@@ -4,15 +4,12 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import { Errors as DeleteDraftErrors } from 'server/routes/drafts/deleteDraft';
-import { Errors as CreateDraftErrors } from 'server/routes/drafts/createDraft';
-import { Errors as EditDraftErrors } from 'server/routes/drafts/editDraft';
 import MockExpressRequest from 'mock-express-request';
-import app, { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
+import { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import models from '../../../server/database';
 import DatabaseValidationService from '../../../server/middleware/databaseValidationService';
+import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -30,7 +27,7 @@ describe('DatabaseValidationService Tests', () => {
   let user2Address;
   let user2JWT;
   let user2Id;
-  let databaseValidationService
+  let databaseValidationService;
 
   before(async function () {
     this.timeout(300000);
@@ -110,6 +107,48 @@ describe('DatabaseValidationService Tests', () => {
         return null;
       });
       expect(request.address).to.be.undefined;
+    });
+  });
+
+  describe('validateChain', () => {
+    it('should successfully validate chain id if chain exists', async () => {
+      const request = new MockExpressRequest();
+
+      const resBody = {
+        address: userAddress,
+        author_chain: chain,
+        chain,
+        title,
+        topic,
+        body,
+        jwt: userJWT,
+      };
+      request.body = resBody;
+      request.user = { id: userId };
+      expect(
+        databaseValidationService.validateChain(models, request, null, () => {
+          return null;
+        })
+      ).to.not.throw;
+    });
+
+    it('should fail if no chain is given', async () => {
+      const request = new MockExpressRequest();
+
+      const resBody = {
+        address: userAddress,
+        author_chain: null,
+        title,
+        topic,
+        body,
+        jwt: userJWT,
+      };
+      request.body = resBody;
+      request.user = { id: userId };
+      databaseValidationService.validateChain(models, request, resBody, () => {
+        return null;
+      });
+      expect(request.chain).to.be.undefined;
     });
   });
 });

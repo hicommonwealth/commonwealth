@@ -1,32 +1,43 @@
-import { Transaction } from 'sequelize/types';
-import { DB } from '../../models';
+import type { Transaction } from 'sequelize/types';
+import type { DB } from '../../models';
 
 // acceptable types for rule arguments, verified in parser
-export type RuleArgumentType = 'balance' | 'balance[]' | 'address' | 'address[]' | 'rule[]';
+export type RuleArgumentType =
+  | 'balance'
+  | 'balance[]'
+  | 'address'
+  | 'address[]'
+  | 'rule[]';
 
 // provided typescript definitions for use in the rules folder
 export type RuleMetadata = {
   name: string;
   description: string;
-  arguments: Array<{ name: string, description: string, type: RuleArgumentType }>;
+  arguments: Array<{
+    name: string;
+    description: string;
+    type: RuleArgumentType;
+  }>;
 };
 
 export type DefaultSchemaT = Record<string, Array<unknown>>;
 
 // the type that must be implemented by a RuleType
 export type IRuleType<SchemaT extends DefaultSchemaT> = {
-  identifier: string,
-  metadata: RuleMetadata,
+  identifier: string;
+  metadata: RuleMetadata;
   check: (
     ruleSchema: SchemaT,
     address: string,
     chain: string,
     models?: DB,
-    transaction?: Transaction,
-  ) => Promise<boolean>,
+    transaction?: Transaction
+  ) => Promise<boolean>;
 };
 
-export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT> implements IRuleType<SchemaT> {
+export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT>
+  implements IRuleType<SchemaT>
+{
   // parser-used identifier for a rule, e.g. "ThresholdRule"
   abstract get identifier(): string;
 
@@ -39,6 +50,6 @@ export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT> 
     address: string,
     chain: string,
     models?: DB,
-    transaction?: Transaction,
+    transaction?: Transaction
   ): Promise<boolean>;
 }

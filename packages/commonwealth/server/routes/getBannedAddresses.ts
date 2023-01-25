@@ -1,9 +1,9 @@
 import { AppError } from 'common-common/src/errors';
-import { success, TypedRequestQuery, TypedResponse } from '../types';
-import { DB } from '../models';
-import validateChain from '../middleware/validateChain';
+import type { DB } from '../models';
+import type { BanAttributes } from '../models/ban';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { success } from '../types';
 import validateRoles from '../util/validateRoles';
-import { BanAttributes } from '../models/ban';
 
 enum GetBannedAddressesErrors {
   NoChain = 'Must supply a chain ID',
@@ -21,8 +21,7 @@ const getBannedAddresses = async (
   req: TypedRequestQuery<GetBannedAddressesReq>,
   res: TypedResponse<GetBannedAddressesResp>
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) throw new AppError(GetBannedAddressesErrors.NoChain);
+  const chain = req.chain;
   const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) throw new AppError(GetBannedAddressesErrors.NoPermission);
 

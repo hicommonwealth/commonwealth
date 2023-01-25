@@ -1,21 +1,21 @@
-import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
-import moment from 'moment';
-import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from 'common-common/src/errors';
-import validateChain from '../middleware/validateChain';
+import { NotificationCategories } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import { Op } from 'sequelize';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
-import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../models';
-import BanCache from '../util/banCheckCache';
+import type { DB } from '../models';
+import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
+import { parseUserMentions } from '../util/parseUserMentions';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
+
 export const Errors = {
   NoId: 'Must provide id',
   NotAddrOwner: 'Address not owned by this user',
@@ -29,8 +29,7 @@ const editComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));

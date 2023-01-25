@@ -1,19 +1,22 @@
 import _ from 'underscore';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import type Rollbar from 'rollbar';
+
+import type { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
+import type { SubstrateEvents } from '../../src';
 import {
   createListener,
   ErcLoggingHandler,
   LoggingHandler,
-  SubstrateEvents,
-  SubstrateTypes,
   SupportedNetwork,
 } from '../../src';
-import {ChainBase, ChainNetwork} from 'common-common/src/types';
-import {ChainAttributes, IListenerInstances} from './types';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers';
-import Rollbar from 'rollbar';
-import models, {DB} from '../database/database';
-import {handleFatalListenerError} from "./chainSubscriber";
+import { SubstrateTypes } from '../../src/types';
+import type { DB } from '../database/database';
+import models from '../database/database';
+
+import type { ChainAttributes, IListenerInstances } from './types';
+import { handleFatalListenerError } from './chainSubscriber';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -25,7 +28,7 @@ export async function manageErcListeners(
   listenerInstances: IListenerInstances,
   producer: RabbitMqHandler,
   rollbar?: Rollbar
-) {
+): Promise<void> {
   // delete any listeners that have no more tokens to listen to
   const currentChainUrls = Object.keys(groupedTokens);
   for (const listenerName of Object.keys(listenerInstances)) {
@@ -83,8 +86,8 @@ export async function manageErcListeners(
           supportedNetwork,
           {
             url,
-            tokenAddresses: tokenAddresses,
-            tokenNames: tokenNames,
+            tokenAddresses,
+            tokenNames,
             verbose: false,
           }
         );
@@ -110,7 +113,7 @@ export async function manageErcListeners(
       .map((token) => token.id);
 
     let logger = <ErcLoggingHandler>(
-      (<unknown>listenerInstances[listenerName].eventHandlers['logger'])
+      (<unknown>listenerInstances[listenerName].eventHandlers.logger)
     );
     // create the logger if this is a brand-new listener
     if (!logger && tokenLog.length > 0) {
@@ -120,21 +123,21 @@ export async function manageErcListeners(
       else if (network === ChainNetwork.ERC721)
         logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
 
-      listenerInstances[listenerName].eventHandlers['logger'] = {
+      listenerInstances[listenerName].eventHandlers.logger = {
         handler: logger,
         excludedEvents: [],
       };
     } else if (logger && tokenLog.length === 0) {
       log.info(`Deleting logger on listener: ${listenerName}`);
-      delete listenerInstances[listenerName].eventHandlers['logger'];
+      delete listenerInstances[listenerName].eventHandlers.logger;
     } else if (logger && tokenLog.length > 0) {
       // update the tokens to log events for
       logger.tokenNames = tokenLog;
     }
 
-    if (!listenerInstances[listenerName].eventHandlers['rabbitmq']) {
+    if (!listenerInstances[listenerName].eventHandlers.rabbitmq) {
       log.info(`Adding RabbitMQ event handler to listener: ${listenerName}`);
-      listenerInstances[listenerName].eventHandlers['rabbitmq'] = {
+      listenerInstances[listenerName].eventHandlers.rabbitmq = {
         handler: producer,
         excludedEvents: [],
       };
@@ -161,7 +164,7 @@ export async function manageRegularListeners(
   listenerInstances: IListenerInstances,
   producer: RabbitMqHandler,
   rollbar?: Rollbar
-) {
+): Promise<void> {
   // for ease of use create a new object containing all listener instances that are not ERC20 or ERC721
   const regListenerInstances: IListenerInstances = {};
   const activeListenerNames: string[] = [];
@@ -260,14 +263,14 @@ async function setupNewListeners(
       ];
 
     // add the rabbitmq handler and the events it should ignore
-    listenerInstances[chain.id].eventHandlers['rabbitmq'] = {
+    listenerInstances[chain.id].eventHandlers.rabbitmq = {
       handler: producer,
       excludedEvents,
     };
 
     // add the logger and the events it should ignore if required
     if (chain.verbose_logging) {
-      listenerInstances[chain.id].eventHandlers['logger'] = {
+      listenerInstances[chain.id].eventHandlers.logger = {
         handler: generalLogger,
         excludedEvents,
       };
@@ -325,10 +328,10 @@ async function updateExistingListeners(
     }
 
     if (
-      listenerInstances[chain.id].eventHandlers['logger'] &&
+      listenerInstances[chain.id].eventHandlers.logger &&
       !chain.verbose_logging
     ) {
-      delete listenerInstances[chain.id].eventHandlers['logger'];
+      delete listenerInstances[chain.id].eventHandlers.logger;
     }
   }
 }
@@ -371,9 +374,7 @@ async function discoverReconnectRange(this: DB, chain: string) {
     ).map((x) => x.id);
 
     if (eventTypes.length === 0) {
-      log.info(
-        `[${chain}]: No event types exist in the database`
-      );
+      log.info(`[${chain}]: No event types exist in the database`);
       return { startBlock: null };
     }
 
@@ -388,10 +389,9 @@ async function discoverReconnectRange(this: DB, chain: string) {
         `[${chain}]: Discovered chain event in db at block ${latestBlock}.`
       );
       return { startBlock: latestBlock + 1 };
-    } else {
-      log.info(`[${chain}]: No chain-events found in the database`);
-      return { startBlock: null };
     }
+    log.info(`[${chain}]: No chain-events found in the database`);
+    return { startBlock: null };
   } catch (error) {
     log.warn(
       `[${chain}]: An error occurred while discovering offline time range`,

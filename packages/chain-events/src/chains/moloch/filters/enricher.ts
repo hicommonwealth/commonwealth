@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Contract } from 'ethers';
+import type { Contract } from 'ethers';
 import { hexToNumberString, hexToNumber as web3HexToNumber } from 'web3-utils';
 
-import { TypedEventFilter } from '../../../contractTypes/commons';
-import { Moloch1 } from '../../../contractTypes';
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { EventKind, RawEvent, IEventData, Api } from '../types';
+import type { TypedEventFilter } from '../../../contractTypes/commons';
+import type { Moloch1 } from '../../../contractTypes';
+import type { CWEvent } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { RawEvent, IEventData, Api } from '../types';
+import { EventKind } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
 type GetArgType<
@@ -72,12 +74,8 @@ export async function Enrich(
       };
     }
     case EventKind.SubmitVote: {
-      const {
-        proposalIndex,
-        delegateKey,
-        memberAddress,
-        uintVote,
-      } = rawData.args as GetArgType<Moloch1, 'SubmitVote'>;
+      const { proposalIndex, delegateKey, memberAddress, uintVote } =
+        rawData.args as GetArgType<Moloch1, 'SubmitVote'>;
       const member = await (api as Moloch1).members(memberAddress);
       return {
         blockNumber,

@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
 import { formatAddressShort } from 'helpers';
-import { RolePermission, RoleInfo } from 'models';
+import { AccessLevel, RoleInfo } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
@@ -27,8 +27,8 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
 
     const nonAdmins: RoleInfo[] = roleData.filter((role) => {
       return (
-        role.permission === RolePermission.member ||
-        role.permission === RolePermission.moderator
+        role.permission === AccessLevel.Member ||
+        role.permission === AccessLevel.Moderator
       );
     });
 

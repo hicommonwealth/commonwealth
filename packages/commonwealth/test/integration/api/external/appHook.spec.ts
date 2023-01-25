@@ -10,6 +10,7 @@ import { addExternalRoutes } from 'server/routing/external';
 import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
+import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);
 
@@ -37,6 +38,7 @@ before(async () => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cookieParser());
   app.use(sessionParser);
+  setupPassport(models);
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -45,15 +47,90 @@ before(async () => {
   app.use('/api', router);
 });
 
-export async function get(path: string, val: Record<string, unknown> = null, expectError = false) {
-  const res = <any>await chai
-    .request(app)
-    .get(path)
-    .set('Accept', 'application/json')
-    .query(val);
+export async function get(
+  path: string,
+  val: Record<string, unknown> = null,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .get(path)
+      .set('Accept', 'application/json')
+      .query(val)
+  );
 
-  if (!expectError) assert.equal(res.statusCode, 200);
+  if (!expectError) {
+    assert.equal(res.statusCode, 200);
+  } else if (res.text === 'Unauthorized') {
+    return res;
+  }
 
-  if (res.statusCode === 404) throw Error(`Cannot find api for ${path}`);
+  return JSON.parse(res.text);
+}
+
+export async function put(
+  path: string,
+  val: Record<string, unknown>,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .put(path)
+      .set('Accept', 'application/json')
+      .send(val)
+  );
+
+  if (!expectError) {
+    assert.equal(res.statusCode, 200);
+  } else if (res.text === 'Unauthorized') {
+    return res;
+  }
+
+  return JSON.parse(res.text);
+}
+
+export async function post(
+  path: string,
+  val: Record<string, unknown>,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .post(path)
+      .set('Accept', 'application/json')
+      .send(val)
+  );
+
+  if (!expectError) {
+    assert.equal(res.statusCode, 200);
+  } else if (res.text === 'Unauthorized') {
+    return res;
+  }
+
+  return JSON.parse(res.text);
+}
+
+export async function del(
+  path: string,
+  val: Record<string, unknown>,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .delete(path)
+      .set('Accept', 'application/json')
+      .send(val)
+  );
+
+  if (!expectError) {
+    assert.equal(res.statusCode, 200);
+  } else if (res.text === 'Unauthorized') {
+    return res;
+  }
+
   return JSON.parse(res.text);
 }

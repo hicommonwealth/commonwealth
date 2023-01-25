@@ -1,7 +1,7 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
-import { ModelStatic, ModelInstance } from './types';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ChainAttributes } from './chain';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type RuleAttributes = {
   id?: number;

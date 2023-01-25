@@ -1,7 +1,7 @@
-import { Action } from 'common-common/src/permissions';
+import { AppError } from 'common-common/src/errors';
+import { Action } from 'commonwealth/shared/permissions';
 import { checkReadPermitted } from '../../util/roles';
 import { DB } from '../../models';
-import { AppError } from 'common-common/src/errors';
 import { success, TypedRequestQuery, TypedResponse } from '../../types';
 import { ChatChannelAttributes } from '../../models/chat_channel';
 
@@ -21,7 +21,7 @@ type GetChatChannelResp = ChatChannelAttributes;
 export default async (
   models: DB,
   req: TypedRequestQuery<GetChatChannelReq>,
-  res: TypedResponse<GetChatChannelResp>,
+  res: TypedResponse<GetChatChannelResp>
 ) => {
   if (!req.query.channel_id) {
     throw new AppError(Errors.NoChannelId);
@@ -34,7 +34,7 @@ export default async (
     models,
     req.query.chain_id,
     Action.VIEW_CHAT_CHANNELS,
-    req.user?.id,
+    req.user?.id
   );
 
   const channel = await models.ChatChannel.findOne({

@@ -1,17 +1,16 @@
-import m from 'mithril';
 import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
+import m from 'mithril';
 import app from 'state';
-import { RoleInfo, RolePermission } from 'models';
+import { RoleInfo, AccessLevel } from 'models';
 import { ChainNetwork, ChainBase } from 'common-common/src/types';
-import { ChainInstance } from 'server/models/chain';
 import NodeInfo from './NodeInfo';
 
 import {
   CWAvatar,
   CWJdenticon,
 } from '../views/components/component_kit/cw_avatar';
-import CommunityRole from './CommunityRole';
+import type CommunityRole from './CommunityRole';
 
 class ChainInfo {
   public readonly id: string;
@@ -222,8 +221,8 @@ class ChainInfo {
       this.setMembers(res.result);
       const roles = res.result.filter((r) => {
         return (
-          r.permission === RolePermission.admin ||
-          r.permission === RolePermission.moderator
+          r.permission === AccessLevel.Admin ||
+          r.permission === AccessLevel.Moderator
         );
       });
       this.setAdmins(roles);

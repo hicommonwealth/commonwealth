@@ -1,12 +1,12 @@
 import { AppError, ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../../middleware/validateChain';
-import { DB } from '../../models';
-import { TypedResponse, success, TypedRequestBody } from '../../types';
-import { RuleAttributes } from '../../models/rule';
-import validateRoles from '../../util/validateRoles';
 
+import type { DB } from '../../models';
+import type { RuleAttributes } from '../../models/rule';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
 import { validateRule } from '../../util/rules/ruleParser';
+import { factory, formatFilename } from 'common-common/src/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -23,25 +23,6 @@ const createRule = async (
   req: TypedRequestBody<CreateRuleReq>,
   res: TypedResponse<CreateRuleResp>
 ) => {
-  const isAdmin = await validateRoles(
-    models,
-    req.user,
-    'admin',
-    req.body.chain_id
-  );
-  if (!isAdmin) {
-    throw new AppError(Errors.AdminOnly);
-  }
-
-  try {
-    const [, error] = await validateChain(models, req.body);
-    if (error) {
-      throw new AppError(error);
-    }
-  } catch (err) {
-    throw new AppError(err);
-  }
-
   // validate rule
   if (!req.body.rule) {
     throw new AppError(Errors.NoRuleSpecified);

@@ -1,19 +1,19 @@
-@import 'shared';
+@import '../../shared';
 
 .Spinner {
-  animation: loading-spinner 2.75s ease-in-out infinite;
+  animation: loading-spinner 0.9s ease-in-out infinite;
   height: fit-content;
   width: fit-content;
 
   @keyframes loading-spinner {
     0% {
-      transform: rotate(0deg);
+      transform: translate(-6px, 0);
     }
     50% {
-      transform: rotate(540deg);
+      transform: translate(6px, 0);
     }
     100% {
-      transform: rotate(1080deg);
+      transform: translate(-6px, 0);
     }
   }
 }

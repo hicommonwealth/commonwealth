@@ -1,10 +1,10 @@
+import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import moment from 'moment';
 
-import { SubscriptionInstance } from 'server/models/subscription';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
-import { IUniqueId } from './interfaces';
+import type { SubscriptionInstance } from 'server/models/subscription';
+import type { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
+import app from '../state';
+import type { IUniqueId } from './interfaces';
 
 class NotificationSubscription {
   public readonly category: string;
@@ -21,9 +21,11 @@ class NotificationSubscription {
   public get immediateEmail() {
     return this._immediateEmail;
   }
+
   public enableImmediateEmail() {
     this._immediateEmail = true;
   }
+
   public disableImmediateEmail() {
     this._immediateEmail = false;
   }
@@ -32,9 +34,11 @@ class NotificationSubscription {
   public get isActive() {
     return this._isActive;
   }
+
   public enable() {
     this._isActive = true;
   }
+
   public disable() {
     this._isActive = false;
   }
@@ -97,7 +101,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
 
   if (Thread) {
     try {
-      modeledThread = modelThreadFromServer(Thread);
+      modeledThread = app.threads.modelFromServer(Thread);
     } catch (e) {
       console.log('error', e);
     }

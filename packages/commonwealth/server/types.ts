@@ -1,13 +1,15 @@
-import { Request, Response } from 'express';
-import { ValidationError } from 'express-validator';
-import { AddressInstance } from './models/address';
-import { UserInstance } from './models/user';
+import type { Response } from 'express';
+import type { ValidationError } from 'express-validator';
+import type { AddressInstance } from './models/address';
+import type { ChainInstance } from './models/chain';
+import type { UserInstance } from './models/user';
 
 export type TypedRequestQuery<
   Q extends Record<string, unknown> = Record<string, unknown>
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
+  chain?: ChainInstance;
   query: Q;
 };
 
@@ -16,6 +18,7 @@ export type TypedRequestBody<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
+  chain?: ChainInstance;
   body: B;
 };
 
@@ -25,6 +28,7 @@ export type TypedRequest<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
+  chain?: ChainInstance;
   body?: B;
   query?: Q;
 };
@@ -58,6 +62,7 @@ declare global {
     interface Request {
       user?: User;
       address?: AddressInstance;
+      chain?: ChainInstance;
       // TODO: session is used in logout.ts -> remove?
       session: any;
       sessionID: any;

@@ -1,11 +1,11 @@
-import m from 'mithril';
+import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
 import _ from 'lodash';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import m from 'mithril';
+import { Profile } from 'models';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
-import { Profile } from 'models';
 import { ChainBase } from '../../../../../common-common/src/types';
 
 class ProfilesController {
@@ -34,7 +34,14 @@ class ProfilesController {
 
   public getProfile(chain: string, address: string) {
     const existingProfile = this._store.getByAddress(address);
-    if (existingProfile !== undefined) return existingProfile;
+    if (existingProfile !== undefined) {
+      if (existingProfile.chain === chain) {
+        return existingProfile;
+      } else {
+        // Remove profile associated with same address on a different chain
+        this._store.remove(existingProfile);
+      }
+    }
     const profile = new Profile(chain, address);
     this._store.add(profile);
     this._unfetched.push(profile);

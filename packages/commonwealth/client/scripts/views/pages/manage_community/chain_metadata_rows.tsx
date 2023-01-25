@@ -1,14 +1,11 @@
 /* @jsx m */
 
-import $ from 'jquery';
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
 import 'pages/manage_community/chain_metadata_rows.scss';
 
+import m from 'mithril';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
-
 import {
   ChainBase,
   ChainCategoryType,
@@ -20,23 +17,23 @@ import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
-  addPermission,
-  isPermitted,
-  removePermission,
-} from 'common-common/src/permissions';
+  PermissionManager,
+  ToCheck,
+} from 'commonwealth/shared/permissions';
+
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ManageRoles } from './manage_roles';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
 import {
-  setSelectedTags,
   buildCategoryMap,
   setChainCategories,
+  setSelectedTags,
 } from './helpers';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { ManageRoles } from './manage_roles';
 
 type ChainMetadataRowsAttrs = {
   admins: Array<RoleInfo>;
@@ -83,6 +80,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   snapshotChannels: { id: string; name: string }[];
   selectedSnapshotChannel: { id: string; name: string } | null;
   snapshotNotificationsEnabled: boolean;
+  permissionsManager = new PermissionManager();
 
   oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -96,9 +94,10 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.stagesEnabled = chain.stagesEnabled;
     this.rulesEnabled = chain.rulesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !isPermitted(
+    this.chatEnabled = !this.permissionsManager.hasPermission(
       chain.defaultDenyPermissions,
-      Action.VIEW_CHAT_CHANNELS
+      Action.VIEW_CHAT_CHANNELS,
+      ToCheck.Allow
     );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
@@ -124,12 +123,9 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
 
     const getChannels = async () => {
       try {
-        const discordBotConfig = await $.post(
-          `${app.serverUrl()}/getDiscordChannels`,
-          { chain_id: chain.id, jwt: app.user.jwt }
-        );
-        this.snapshotChannels = discordBotConfig.result.channels;
-        this.selectedSnapshotChannel = discordBotConfig.result.selected_channel;
+        const res = await app.discord.getChannels(chain.id);
+        this.snapshotChannels = res.channels;
+        this.selectedSnapshotChannel = res.selectedChannel;
         if (this.selectedSnapshotChannel.id) {
           this.snapshotNotificationsEnabled = true;
         }
@@ -423,18 +419,19 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               console.log(err);
             }
-
             try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = removePermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.removeDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               } else {
-                this.default_deny_permissions = addPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.addDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               }
               await chain.updateChainData({
                 name,
@@ -460,7 +457,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               notifyError(err || 'Chain update failed');
             }
-
             m.redraw();
           }}
         />
@@ -482,12 +478,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 onclick={async () => {
                   try {
                     const verification_token = uuidv4();
-
-                    await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
-                      chain_id: app.activeChainId(),
-                      verification_token,
-                      jwt: app.user.jwt,
-                    });
+                    await app.discord.createConfig(verification_token);
 
                     window.open(
                       `https://discord.com/oauth2/authorize?client_id=${
@@ -560,16 +551,11 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                     return;
                   }
                   try {
-                    const res = await $.post(
-                      `${app.serverUrl()}/setDiscordBotConfig`,
-                      {
-                        snapshot_channel_id: this.snapshotNotificationsEnabled
-                          ? this.selectedSnapshotChannel?.id
-                          : 'disabled',
-                        chain_id: app.activeChainId(),
-                        jwt: app.user.jwt,
-                      }
-                    );
+                    const channelId = this.snapshotNotificationsEnabled
+                      ? this.selectedSnapshotChannel?.id
+                      : 'disabled';
+
+                    await app.discord.setConfig(channelId);
                     notifySuccess('Snapshot Notifications Settings Saved');
                   } catch (e) {
                     console.log(e);
@@ -596,11 +582,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   try {
                     const verification_token = uuidv4();
 
-                    await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
-                      chain_id: app.activeChainId(),
-                      verification_token,
-                      jwt: app.user.jwt,
-                    });
+                    await app.discord.createConfig(verification_token);
 
                     window.open(
                       `https://discord.com/oauth2/authorize?client_id=${

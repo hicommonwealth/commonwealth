@@ -1,8 +1,7 @@
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Response } from 'express';
 import Sequelize, { Op } from 'sequelize';
-import { Response, NextFunction } from 'express';
-import validateChain from '../middleware/validateChain';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { DB } from '../models';
 import { findOneRole } from '../util/roles';
 
 export const Errors = {
@@ -17,8 +16,7 @@ const setDefaultRole = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.address || !req.body.author_chain)
     return next(new AppError(Errors.InvalidAddress));

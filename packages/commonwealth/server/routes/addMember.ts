@@ -1,11 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../middleware/validateChain';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 import { createRole, findAllRoles, findOneRole } from '../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -22,9 +18,7 @@ const addMember = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-  if (!chain) return next(new AppError(Errors.InvalidCommunity));
+  const chain = req.chain;
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new AppError(Errors.NeedAddress));
 

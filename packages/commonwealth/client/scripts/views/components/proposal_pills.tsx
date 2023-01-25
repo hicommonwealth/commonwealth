@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import moment from 'moment';
 
 import 'components/proposal_pills.scss';
 
 import { formatTimestamp } from 'helpers';
+import m from 'mithril';
+import moment from 'moment';
 import { CWText } from './component_kit/cw_text';
 
 type ActiveProposalPillAttrs = { proposalEnd: number };
