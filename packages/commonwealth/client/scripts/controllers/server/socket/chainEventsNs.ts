@@ -24,7 +24,7 @@ export class ChainEventsNamespace {
   }
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
-    console.log("MYYYYY SUBBBBBIESSSS", subs);
+    console.log('MYYYYY SUBBBBBIESSSS', subs);
     if (this._isConnected) {
       const roomsToJoin = [];
       for (const sub of subs) {
@@ -78,7 +78,10 @@ export class ChainEventsNamespace {
 
   private onConnect() {
     this._isConnected = true;
-    console.log("CONNNNEEECCTED ->>>>>>>>>>>>>>>>", app.user.notifications.subscriptions);
+    console.log(
+      'CONNNNEEECCTED ->>>>>>>>>>>>>>>>',
+      app.user.notifications.subscriptions
+    );
     this.addChainEventSubscriptions(app.user.notifications.subscriptions);
     console.log('Chain events namespace connected!');
   }

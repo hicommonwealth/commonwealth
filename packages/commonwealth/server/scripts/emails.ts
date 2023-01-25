@@ -15,7 +15,7 @@ import {
   DynamicTemplate,
   IChainEventNotificationData,
   IChatNotification,
-  ICommunityNotificationData
+  ICommunityNotificationData,
 } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import type { UserAttributes } from '../models/user';
@@ -27,12 +27,19 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const createImmediateNotificationEmailObject = async (
-  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
+  notification_data:
+    | IPostNotificationData
+    | ICommunityNotificationData
+    | IChainEventNotificationData
+    | IChatNotification,
   category_id,
   models
 ) => {
-  if ((<IChainEventNotificationData>notification_data).block_number && (<IChainEventNotificationData>notification_data).event_data) {
-    const ceInstance = <IChainEventNotificationData>notification_data
+  if (
+    (<IChainEventNotificationData>notification_data).block_number &&
+    (<IChainEventNotificationData>notification_data).event_data
+  ) {
+    const ceInstance = <IChainEventNotificationData>notification_data;
     // construct compatible CW event from DB by inserting network from type
     const evt: CWEvent = {
       blockNumber: ceInstance.block_number,
@@ -41,17 +48,12 @@ export const createImmediateNotificationEmailObject = async (
     };
 
     try {
-      const chainEventLabel = ChainEventLabel(
-        ceInstance.chain,
-        evt
-      );
+      const chainEventLabel = ChainEventLabel(ceInstance.chain, evt);
       if (!chainEventLabel) return;
 
       const subject = `${
         process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-      }${chainEventLabel.heading} event on ${capitalize(
-        ceInstance.chain
-      )}`;
+      }${chainEventLabel.heading} event on ${capitalize(ceInstance.chain)}`;
 
       return {
         from: 'Commonwealth <no-reply@commonwealth.im>',

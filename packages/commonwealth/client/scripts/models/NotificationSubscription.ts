@@ -37,7 +37,7 @@ class NotificationSubscription {
 
   // TODO: should resolve Chain vs chain
   public get getChain() {
-    return this.Chain.id || this.Chain
+    return this.Chain.id || this.Chain;
   }
 
   public enable() {
