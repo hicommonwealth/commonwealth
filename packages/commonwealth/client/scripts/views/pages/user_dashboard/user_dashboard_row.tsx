@@ -21,8 +21,6 @@ type UserDashboardRowAttrs = {
 export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
   view(vnode: m.Vnode<UserDashboardRowAttrs>) {
     const {
-      likeCount,
-      viewCount,
       commentCount,
       categoryId,
       threadId,
