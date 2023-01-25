@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
@@ -61,7 +70,11 @@ export class CWPopoverMenu extends ClassComponent<PopoverMenuAttrs> {
         content={
           <div className={ComponentType.PopoverMenu}>
             {menuItems.map((item, i) => (
-              <CWPopoverMenuItem key={`${i}`} type={item.type || 'default'} {...item} />
+              <CWPopoverMenuItem
+                key={`${i}`}
+                type={item.type || 'default'}
+                {...item}
+              />
             ))}
           </div>
         }

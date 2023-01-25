@@ -2,6 +2,16 @@
 
 $width: 360px;
 
+.Tooltip {
+  @include baseTooltipStyles;
+
+  border: 2px solid $neutral-400;
+
+  .Text {
+    color: $neutral-500;
+  }
+}
+
 .ComponentShowcase {
   display: flex;
   flex-direction: column;
@@ -9,18 +19,28 @@ $width: 360px;
   padding: 24px;
   width: 100%;
 
-  .progress-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 400px;
-  }
-
   .basic-gallery {
     display: flex;
     flex-direction: column;
     gap: 8px;
     width: $width;
+
+    .Tooltip {
+      @include baseTooltipStyles;
+
+      border: 2px solid $neutral-400;
+
+      .Text {
+        color: $neutral-500;
+      }
+    }
+  }
+
+  .progress-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 400px;
   }
 
   .tooltip-gallery {

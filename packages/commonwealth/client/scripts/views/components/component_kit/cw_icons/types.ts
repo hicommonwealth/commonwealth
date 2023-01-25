@@ -15,7 +15,7 @@ export type IconStyleAttrs = {
 
 export type IconAttrs = IconStyleAttrs & {
   componentType?: ComponentType;
-  onClick?: (e?: MouseEvent) => void; // should be used by icon button, not by plain icons
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void; // should be used by icon button, not by plain icons
 };
 
 export type IconComponentAttrs = IconAttrs & { iconName: IconName };

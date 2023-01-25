@@ -13,7 +13,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 
-import 'components/component_kit/cw_component_showcase.scss';
+import styles from 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
@@ -39,12 +39,13 @@ import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
-import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
-import CWCoverImageUploader from './cw_cover_image_uploader';
 import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
+import { CWReactPopover } from './cw_popover/cw_popover';
+import CWCoverImageUploader from './cw_cover_image_uploader';
+import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -87,7 +88,42 @@ const checkboxGroupOptions: Array<CheckboxType> = [
     value: 'failed',
   },
 ];
-export class ComponentShowcase extends ClassComponent {
+
+const useComponentShowcase = () => {
+  const [basicPopoverEl, setBasicPopoverEl] =
+    React.useState<null | HTMLElement>(null);
+
+  const handleBasicPopoverClick = (e?: React.MouseEvent<HTMLElement>) => {
+    setBasicPopoverEl(basicPopoverEl ? null : e.currentTarget);
+  };
+
+  return {
+    basicPopoverEl,
+    handleBasicPopoverClick,
+  };
+};
+
+export const ComponentShowcase = () => {
+  const { basicPopoverEl, handleBasicPopoverClick } = useComponentShowcase();
+
+  return (
+    <div className="ComponentShowcase">
+      <div className="basic-gallery">
+        <CWText type="h4">Popover</CWText>
+        <CWIconButton
+          iconName="dotsVertical"
+          onClick={handleBasicPopoverClick}
+        />
+        <CWReactPopover
+          anchorEl={basicPopoverEl}
+          content={<div className={styles.Tooltip}>poop</div>}
+        />
+      </div>
+    </div>
+  );
+};
+
+export class _ComponentShowcase extends ClassComponent {
   private checkboxChecked: boolean;
   private checkboxGroupSelected: Array<string>;
   private radioButtonChecked: boolean;
@@ -106,6 +142,7 @@ export class ComponentShowcase extends ClassComponent {
 
   view() {
     // console.log(this.checkboxGroupSelected);
+
     return (
       <div className="ComponentShowcase">
         {/* <div className="basic-gallery">
