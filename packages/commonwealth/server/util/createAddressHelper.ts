@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { bech32 } from 'bech32';
-import { PublicKey } from '@solana/web3.js';
 import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
@@ -73,6 +72,7 @@ export async function createAddressHelper(
         throw new AppError('NEAR address is not valid');
       }
     } else if (chain.base === ChainBase.Solana) {
+      const { PublicKey } = await import('@solana/web3.js');
       const key = new PublicKey(encodedAddress);
       if (key.toBase58() !== encodedAddress) {
         throw new AppError(`Solana address is not valid: ${key.toBase58()}`);

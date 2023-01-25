@@ -1,7 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { Keyring } from '@polkadot/api';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
-import * as solw3 from '@solana/web3.js';
 import { ethers } from 'ethers';
 import { KeyPair } from 'near-api-js';
 import { PublicKey } from 'near-api-js/lib/utils';
@@ -65,6 +64,7 @@ class CosmosSDKSessionController extends ISessionController<string> {
 
 class SolanaSessionController extends ISessionController<string> {
   async generateAddress(): Promise<string> {
+    const solw3 = await import('@solana/web3.js');
     return solw3.Keypair.generate().publicKey.toString();
   }
 }

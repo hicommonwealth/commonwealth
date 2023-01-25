@@ -1,4 +1,3 @@
-import * as solw3 from '@solana/web3.js';
 import _ from 'lodash';
 import { Account } from 'models';
 import type { IApp } from 'state';
@@ -16,13 +15,14 @@ export default class SolanaAccount extends Account {
     return this.updateBalance().then(() => this._balance);
   }
 
-  public get publicKey() {
+  public async publicKey() {
+    const solw3 = await import('@solana/web3.js');
     return new solw3.PublicKey(this.address);
   }
 
   private updateBalance = _.throttle(async () => {
     try {
-      const bal = await this._Chain.connection.getBalance(this.publicKey);
+      const bal = await this._Chain.connection.getBalance(await this.publicKey());
       console.log(`Fetched balance: ${bal}`);
       this._balance = this._Chain.coins(bal);
     } catch (e) {

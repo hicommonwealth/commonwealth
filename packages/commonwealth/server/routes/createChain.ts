@@ -1,5 +1,4 @@
 import type { Cluster } from '@solana/web3.js';
-import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 import { AppError, ServerError } from 'common-common/src/errors';
 import {
@@ -202,7 +201,8 @@ const createChain = async (
     req.body.base === ChainBase.Solana &&
     req.body.type !== ChainType.Offchain
   ) {
-    let pubKey: solw3.PublicKey;
+    const solw3 = await import('@solana/web3.js');
+    let pubKey;
     try {
       pubKey = new solw3.PublicKey(req.body.address);
     } catch (e) {
