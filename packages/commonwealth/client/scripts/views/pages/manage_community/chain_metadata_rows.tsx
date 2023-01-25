@@ -4,6 +4,7 @@ import ClassComponent from 'class_component';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
 import {
