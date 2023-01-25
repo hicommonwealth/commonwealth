@@ -1,9 +1,10 @@
-import { ContractType } from 'common-common/src/types';
+import type { ContractType } from 'common-common/src/types';
 import { AppError } from 'common-common/src/errors';
-import { DB } from '../../models';
-import { ContractAttributes, ContractInstance } from '../../models/contract';
-import { ChainNodeAttributes } from '../../models/chain_node';
-import { TypedRequestBody, TypedResponse, success } from '../../types';
+import type { DB } from '../../models';
+import type { ContractAttributes, ContractInstance } from '../../models/contract';
+import type { ChainNodeAttributes } from '../../models/chain_node';
+import type { TypedRequestBody, TypedResponse} from '../../types';
+import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
 
 export const Errors = {

@@ -7,7 +7,7 @@ import _ from 'lodash';
 import m from 'mithril';
 import { Profile } from 'models';
 import moment from 'moment';
-import type Quill from 'quill';
+import Quill from 'quill';
 import type QuillMention from 'quill-mention';
 
 import app from 'state';

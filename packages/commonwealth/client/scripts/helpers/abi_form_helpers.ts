@@ -1,7 +1,7 @@
 import Web3 from 'ethereumjs-abi';
-import { AbiInput } from 'web3-utils';
+import type { AbiInput } from 'web3-utils';
 import { BigNumber, ethers } from 'ethers';
-import { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
+import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
 const Bytes32 = ethers.utils.formatBytes32String;
 

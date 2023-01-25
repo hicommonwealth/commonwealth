@@ -1,17 +1,19 @@
 import $ from 'jquery';
 import app from 'state';
 
-import { AddressInfo, RoleInfo, Account, ChainInfo } from 'models';
+import type { AddressInfo, RoleInfo, ChainInfo } from 'models';
+import { Account } from 'models';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
+import type {
+  Action} from 'commonwealth/shared/permissions';
 import {
-  Action,
   AccessLevel,
   PermissionManager,
   ToCheck,
   everyonePermissions,
 } from 'commonwealth/shared/permissions';
-import { RoleObject } from 'commonwealth/shared/types';
-import { UserController } from './user';
+import type { RoleObject } from 'commonwealth/shared/types';
+import type { UserController } from './user';
 
 const getPermissionLevel = (permission: AccessLevel | undefined) => {
   if (permission === undefined) {

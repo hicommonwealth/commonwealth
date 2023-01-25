@@ -14,7 +14,7 @@ import {
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo, RoleInfo } from 'models';
+import type { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
   PermissionManager,
