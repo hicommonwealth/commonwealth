@@ -13,7 +13,7 @@ export const Errors = {
     'The Action number provided does not match the Action enum',
 };
 
-export const getHasPermissions = async (
+export const getPermissions = async (
   models: DB,
   req: Request,
   res: Response,

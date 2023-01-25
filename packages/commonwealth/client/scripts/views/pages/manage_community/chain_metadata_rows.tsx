@@ -20,6 +20,7 @@ import {
   PermissionManager,
   ToCheck,
 } from 'commonwealth/shared/permissions';
+import { axios } from 'axios';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -43,6 +44,17 @@ type ChainMetadataRowsAttrs = {
   onSave: () => void;
 };
 
+//use axios to call getPermissions
+const getPermissions = async (chainId: string) => {
+  //use server url env
+  const url = `${app.serverUrl()}/getPermissions`;
+  //use axios here
+  const response = await axios.post(url, {
+    chainId,
+    action: Action.VIEW_CHAT_CHANNELS,
+  });
+
+  //
 export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   name: string;
   description: string;
@@ -92,11 +104,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !this.permissionsManager.hasPermission(
-      chain.defaultDenyPermissions,
-      Action.VIEW_CHAT_CHANNELS,
-      ToCheck.Allow
-    );
+
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;

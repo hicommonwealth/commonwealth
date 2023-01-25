@@ -166,6 +166,7 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { addSwagger } from './addSwagger';
+import { getPermissions } from '../routes/getPermissions';
 import * as controllers from '../controller';
 
 function setupRouter(
