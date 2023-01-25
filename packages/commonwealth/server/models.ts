@@ -48,7 +48,6 @@ import type { TopicModelStatic } from './models/topic';
 import type { UserModelStatic } from './models/user';
 import type { ViewCountModelStatic } from './models/viewcount';
 import type { VoteModelStatic } from './models/vote';
-import type { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
 import type { WebhookModelStatic } from './models/webhook';
 import type { CommunityContractTemplateStatic } from './models/community_contract_template';
 import type { CommunityContractMetadataStatic } from './models/community_contract_metadata';
@@ -104,7 +103,6 @@ export type Models = {
   Token: TokenModelStatic;
   TaggedThread: TaggedThreadModelStatic;
   User: UserModelStatic;
-  WaitlistRegistration: WaitlistRegistrationModelStatic;
   Webhook: WebhookModelStatic;
 };
 

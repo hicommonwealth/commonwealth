@@ -107,6 +107,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
       ],
     };
   }
+
   const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
   return communityRoles.map((communityRole) => communityRole.toJSON());
 }
@@ -302,7 +303,7 @@ export async function isAddressPermitted(
 ): Promise<boolean> {
   const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
 
-  const permissionsManager = new PermissionManager()
+  const permissionsManager = new PermissionManager();
 
   const chain = await models.Chain.findOne({ where: { id: chain_id } });
   if (!chain) {
@@ -376,13 +377,16 @@ export async function isAnyonePermitted(
   if (!chain) {
     throw new Error('Chain not found');
   }
-  const permissionsManager = new PermissionManager()
-  const permission = permissionsManager.computePermissions(everyonePermissions, [
-    {
-      allow: chain.default_allow_permissions,
-      deny: chain.default_deny_permissions,
-    },
-  ]);
+  const permissionsManager = new PermissionManager();
+  const permission = permissionsManager.computePermissions(
+    everyonePermissions,
+    [
+      {
+        allow: chain.default_allow_permissions,
+        deny: chain.default_deny_permissions,
+      },
+    ]
+  );
 
   if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
     return PermissionError.NOT_PERMITTED;
@@ -394,8 +398,8 @@ export async function checkReadPermitted(
   models: DB,
   chain_id: string,
   action: Action,
-  user_id?: number,
-): Promise<PermissionError | boolean > {
+  user_id?: number
+): Promise<PermissionError | boolean> {
   if (user_id) {
     // get active address
     const activeAddressInstance = await getActiveAddress(

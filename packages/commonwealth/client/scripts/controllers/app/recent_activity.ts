@@ -1,4 +1,3 @@
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import $ from 'jquery';
 import type { Thread, Topic } from 'models';
 import { AbridgedThread, Profile } from 'models';
@@ -87,7 +86,7 @@ class RecentActivityController {
 
     const threads = response.result;
     return threads.map((thread) => {
-      const modeledThread = modelThreadFromServer(thread);
+      const modeledThread = app.threads.modelFromServer(thread);
       if (!thread.Address) {
         console.error('Thread missing address');
       }
