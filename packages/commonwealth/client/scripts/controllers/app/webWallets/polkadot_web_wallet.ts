@@ -24,7 +24,7 @@ class PolkadotWebWalletController
   public readonly chain = ChainBase.Substrate;
 
   public get available() {
-    return this.polkadot.isWeb3Injected;
+    return this.polkadot && this.polkadot.isWeb3Injected;
   }
 
   public get enabled() {

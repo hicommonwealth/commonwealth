@@ -77,7 +77,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   public async initApi(node?: NodeInfo): Promise<Web3> {
     this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
-    this._initApi(node);
+    await this._initApi(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
     const blockNumber = await this._api.eth.getBlockNumber();
