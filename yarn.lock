@@ -1451,17 +1451,17 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@canvas-js/interfaces@0.0.48-pre", "@canvas-js/interfaces@^0.0.48-pre":
-  version "0.0.48-pre"
-  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.0.48-pre.tgz#62752298c85ddc6b48f9432541577873e87a35df"
-  integrity sha512-aWrNBjfuuPj574LIb3amU24eFnOCX+aTLC2ldD+H86rZPmSIhsUR72habJz6eB6b1RyFK4OUWm5BsOKulTp2nA==
+"@canvas-js/interfaces@0.0.49", "@canvas-js/interfaces@^0.0.49":
+  version "0.0.49"
+  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.0.49.tgz#f089089b57b3ed6a1c5aaaceebf7a3196e223cfc"
+  integrity sha512-YtOHsXFPxrcMFHJ52JbQIHOFjW/Z23itQYIskfynqYi2YV4rWJcCPVAxK1Yb/HLjgk1tpzFD0kOeOKAIv4TJvQ==
 
-"@canvas-js/verifiers@^0.0.48-pre":
-  version "0.0.48-pre"
-  resolved "https://registry.yarnpkg.com/@canvas-js/verifiers/-/verifiers-0.0.48-pre.tgz#5429e7b4f6d40071a6452d020930cb45b78dff50"
-  integrity sha512-OO5RU5ZSty3OCNp+uolNm25Etag0Hdc2c0AYS4FBjj4nqnQi4OuVJvJiOU/p7wikUnOkhoK5IXTgteIFddHYGg==
+"@canvas-js/verifiers@^0.0.49":
+  version "0.0.49"
+  resolved "https://registry.yarnpkg.com/@canvas-js/verifiers/-/verifiers-0.0.49.tgz#761cd721e75c3d921fc19dd54bff934951f164f0"
+  integrity sha512-2rp7BJJ1nt5UVVmoQ7bUl1zs0Ci6tf+zrqOL7yZJLXV03UilkzvnQky0ZjErNPZa1wd4wt+vPw0zcZEeUXxJPA==
   dependencies:
-    "@canvas-js/interfaces" "0.0.48-pre"
+    "@canvas-js/interfaces" "0.0.49"
     "@ethersproject/wallet" "^5.7.0"
     bs58 "^5.0.0"
     ethers "^5.7.2"
