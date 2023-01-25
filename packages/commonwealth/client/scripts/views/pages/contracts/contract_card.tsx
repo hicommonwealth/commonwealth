@@ -14,23 +14,27 @@ import type { Contract } from 'views/pages/contracts';
 type ContractCardAttrs = {
   address: string;
   templates: Contract['templates'];
+  scope: string;
 };
 
 export class ContractCard extends ClassComponent<ContractCardAttrs> {
   handleDeleteContract() {
+    // TODO add confirmation popup
     console.log('click delete!');
   }
 
-  handleCreateNewTemplate() {
-    console.log('click create new template!');
+  handleCreateNewTemplate(scope: string) {
+    // TODO add some contract ID to know where should template be created
+    m.route.set(`/${scope}/new/contract_template`);
   }
 
   handleAddTemplate() {
+    // TODO open modal
     console.log('click add new template!');
   }
 
   view(vnode: m.Vnode<ContractCardAttrs>) {
-    const { address, templates } = vnode.attrs;
+    const { address, templates, scope } = vnode.attrs;
 
     return (
       <CWCard fullWidth className="ContractCard">
@@ -83,7 +87,7 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
               type="caption"
               fontWeight="medium"
               className="cta"
-              onclick={this.handleCreateNewTemplate}
+              onclick={() => this.handleCreateNewTemplate(scope)}
             >
               Create a New Template
             </CWText>

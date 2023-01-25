@@ -11,7 +11,9 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-class CreateContractTemplateForm extends ClassComponent {
+type CreateContractTemplateFormAttrs = { scope: string };
+
+class CreateContractTemplateForm extends ClassComponent<CreateContractTemplateFormAttrs> {
   private saving = false;
   private form = {
     displayName: '',
@@ -19,10 +21,11 @@ class CreateContractTemplateForm extends ClassComponent {
     template: '',
   };
 
-  createContractTemplate() {
+  createContractTemplate(scope: string) {
     try {
       this.saving = true;
       console.log(this.form);
+      m.route.set(`/${scope}/contracts`);
     } catch (err) {
       notifyError('Failed to create new contract template');
       console.log(err);
@@ -31,18 +34,18 @@ class CreateContractTemplateForm extends ClassComponent {
     }
   }
 
-  resetForm() {
-    this.form.displayName = '';
-    this.form.nickname = '';
-    this.form.template = '';
+  handleCancel(scope: string) {
+    m.route.set(`/${scope}/contracts`);
   }
 
-  view() {
+  view(vnode: m.Vnode<CreateContractTemplateFormAttrs>) {
     const isCreatingDisabled =
       this.saving ||
       !this.form.displayName ||
       !this.form.nickname ||
       !this.form.template;
+
+    const scope = vnode.attrs.scope;
 
     return (
       <div class="CreateContractTemplateForm">
@@ -87,13 +90,13 @@ class CreateContractTemplateForm extends ClassComponent {
           <CWButton
             buttonType="mini-white"
             label="Cancel"
-            onclick={() => this.resetForm()}
+            onclick={() => this.handleCancel(scope)}
           />
           <CWButton
             buttonType="mini-black"
             label="Create"
             disabled={isCreatingDisabled}
-            onclick={() => this.createContractTemplate()}
+            onclick={() => this.createContractTemplate(scope)}
           />
         </div>
       </div>

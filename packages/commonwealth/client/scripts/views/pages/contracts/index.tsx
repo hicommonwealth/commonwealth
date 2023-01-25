@@ -64,14 +64,16 @@ export type Contract = {
 };
 
 class ContractsPage extends ClassComponent {
-  handleAddContract() {
-    console.log('click add contract!');
+  handleAddContract(scope: string) {
+    m.route.set(`/${scope}/new/contract`);
   }
 
-  view() {
+  view(vnode) {
     if (!app.contracts || !app.chain) {
       return <PageLoading title="Contracts Page" />;
     }
+
+    const scope = vnode.attrs.scope;
 
     return (
       <Sublayout>
@@ -83,7 +85,7 @@ class ContractsPage extends ClassComponent {
               buttonType="mini-white"
               label="Add Contract"
               iconLeft="plus"
-              onclick={this.handleAddContract}
+              onclick={() => this.handleAddContract(scope)}
             />
           </div>
 
@@ -97,6 +99,7 @@ class ContractsPage extends ClassComponent {
                 <ContractCard
                   address={contract.address}
                   templates={contract.templates}
+                  scope={scope}
                 />
               ))}
             </div>

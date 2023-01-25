@@ -44,7 +44,7 @@ class NewContractTemplatePage extends ClassComponent {
             Create a new template for your community to use.
           </CWText>
           <CWDivider className="divider" />
-          <CreateContractTemplateForm />
+          <CreateContractTemplateForm scope={scope} />
         </div>
       </Sublayout>
     );

@@ -45,7 +45,7 @@ class NewContractPage extends ClassComponent {
             Add contracts and their corresponding ABI files to your community.
           </CWText>
           <CWDivider className="divider" />
-          <AddContractAndAbiForm />
+          <AddContractAndAbiForm scope={scope} />
         </div>
       </Sublayout>
     );

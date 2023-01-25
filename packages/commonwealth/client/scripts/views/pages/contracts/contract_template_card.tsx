@@ -7,6 +7,7 @@ import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import type { Contract } from 'views/pages/contracts/index';
+import { CWPopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 
 type ContractTemplateCardAttrs = Contract['templates'][0];
 
@@ -16,8 +17,14 @@ interface InfoOrder {
 }
 
 export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAttrs> {
-  handleMenuClick() {
-    console.log('click open contract template menu');
+  handleEditTemplate() {
+    console.log('click edit template');
+    // TODO open edit modal
+  }
+
+  handleDeleteTemplate() {
+    // TODO open confirmation popup
+    console.log('click delete template');
   }
 
   view(vnode: m.Vnode<ContractTemplateCardAttrs>) {
@@ -36,9 +43,20 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
           <CWText type="h5" className="title">
             {title}
           </CWText>
-          <CWIconButton
-            iconName="dotsVertical"
-            onclick={this.handleMenuClick}
+          <CWPopoverMenu
+            trigger={<CWIconButton iconName="dotsVertical" />}
+            menuItems={[
+              {
+                label: 'Edit Template',
+                iconLeft: 'write',
+                onclick: this.handleEditTemplate,
+              },
+              {
+                label: 'Delete',
+                iconLeft: 'trash',
+                onclick: this.handleDeleteTemplate,
+              },
+            ]}
           />
         </div>
         <div className="contract-info-container">
