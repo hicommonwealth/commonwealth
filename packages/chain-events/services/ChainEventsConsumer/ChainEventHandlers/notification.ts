@@ -2,12 +2,16 @@ import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQCont
 import type { RmqCENotificationCUD } from 'common-common/src/rabbitmq/types';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
 
-import {addPrefix, factory} from '../../../src/logging';
-import type {ChainEventInstance} from '../../database/models/chain_event';
-import type {DB} from '../../database/database';
+import { addPrefix, factory } from '../../../src/logging';
+import type { ChainEventInstance } from '../../database/models/chain_event';
+import type { DB } from '../../database/database';
 
 import type { CWEvent, IChainEventKind } from 'chain-events/src';
-import {EntityEventKind, eventToEntity, IEventHandler} from 'chain-events/src';
+import {
+  EntityEventKind,
+  eventToEntity,
+  IEventHandler,
+} from 'chain-events/src';
 
 export default class extends IEventHandler {
   public readonly name = 'Notification Producer';
@@ -42,8 +46,13 @@ export default class extends IEventHandler {
     }
 
     const [, eventEntityKind] = eventToEntity(event.network, event.data.kind);
-    if (eventEntityKind != EntityEventKind.Create && eventEntityKind != EntityEventKind.Complete) {
-      log.trace(`Event does not mark the creation or completion of an entity. Skipping event!`);
+    if (
+      eventEntityKind != EntityEventKind.Create &&
+      eventEntityKind != EntityEventKind.Complete
+    ) {
+      log.trace(
+        `Event does not mark the creation or completion of an entity. Skipping event!`
+      );
       return dbEvent;
     }
 

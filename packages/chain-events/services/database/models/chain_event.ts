@@ -2,8 +2,11 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 
 import type { ModelStatic, ModelInstance } from './types';
-import type { ChainEntityAttributes } from './chain_entity';
-import {SupportedNetwork} from "../../../src";
+import type {
+  ChainEntityAttributes,
+  ChainEntityInstance,
+} from './chain_entity';
+import { SupportedNetwork } from '../../../src';
 
 export type ChainEventAttributes = {
   id: number;
@@ -19,7 +22,9 @@ export type ChainEventAttributes = {
   ChainEntity?: ChainEntityAttributes;
 };
 
-export type ChainEventInstance = ModelInstance<ChainEventAttributes>;
+export type ChainEventInstance = ModelInstance<ChainEventAttributes> & {
+  getChainEntity: Sequelize.HasOneGetAssociationMixin<ChainEntityInstance>;
+};
 
 export type ChainEventModelStatic = ModelStatic<ChainEventInstance>;
 
@@ -38,7 +43,7 @@ export default (
       updated_at: { type: dataTypes.DATE, allowNull: false },
       queued: { type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0 },
       chain: { type: dataTypes.STRING, allowNull: false },
-      network: { type: dataTypes.STRING, allowNull: false }
+      network: { type: dataTypes.STRING, allowNull: false },
     },
     {
       tableName: 'ChainEvents',

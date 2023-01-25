@@ -15,7 +15,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export type SafeRmqPublishSupported =
   | ChainEntityModelStatic
-  | ChainEventModelStatic
+  | ChainEventModelStatic;
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {

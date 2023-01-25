@@ -2,7 +2,8 @@ import chai from 'chai';
 import {
   RascalExchanges,
   RascalQueues,
-  RascalRoutingKeys, RmqCENotificationCUD,
+  RascalRoutingKeys,
+  RmqCENotificationCUD,
   RmqEntityCUD,
 } from 'common-common/src/rabbitmq';
 import type { ServiceConsumer } from 'common-common/src/serviceConsumer';

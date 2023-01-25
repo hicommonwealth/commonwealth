@@ -19,7 +19,7 @@ const eventActivity: any = async (
 
   const events = await models.ChainEvent.findAll({
     order: [['created_at', 'DESC']],
-    limit: req.query.limit
+    limit: req.query.limit,
   });
 
   return res.json({ status: 'Success', result: events });

@@ -21,7 +21,7 @@ import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as CommonwealthApi } from './chains/commonwealth/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
-import {ChainBase, ChainNetwork} from "common-common/src/types";
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -223,19 +223,17 @@ export type TitlerFilter = (kind: IChainEventKind) => IEventTitle;
  * @param chainNetwork The network attribute of the Commonwealth chain model
  * @param chainBase The base attribute of the Commonwealth chain model
  */
-export function getChainEventNetwork(chainNetwork: string, chainBase: string): SupportedNetwork {
-  if (chainBase === ChainBase.Substrate)
-    return SupportedNetwork.Substrate;
-  else if (chainBase === ChainBase.CosmosSDK)
-    return SupportedNetwork.Cosmos;
+export function getChainEventNetwork(
+  chainNetwork: string,
+  chainBase: string
+): SupportedNetwork {
+  if (chainBase === ChainBase.Substrate) return SupportedNetwork.Substrate;
+  else if (chainBase === ChainBase.CosmosSDK) return SupportedNetwork.Cosmos;
   else if (chainNetwork === ChainNetwork.Compound)
     return SupportedNetwork.Compound;
-  else if (chainNetwork === ChainNetwork.Aave)
-    return SupportedNetwork.Aave;
-  else if (chainNetwork === ChainNetwork.Moloch)
-    return SupportedNetwork.Moloch;
-  else
-    throw new Error('No matching SupportedNetwork');
+  else if (chainNetwork === ChainNetwork.Aave) return SupportedNetwork.Aave;
+  else if (chainNetwork === ChainNetwork.Moloch) return SupportedNetwork.Moloch;
+  else throw new Error('No matching SupportedNetwork');
 }
 
 /**

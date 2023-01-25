@@ -93,7 +93,8 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
-    }, {
+    },
+    {
       tableName: 'Subscriptions',
       underscored: true,
       createdAt: 'created_at',

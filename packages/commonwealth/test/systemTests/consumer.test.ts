@@ -48,7 +48,7 @@ describe('Tests for the commonwealth-app consumer', () => {
     await new Promise((resolve) => setTimeout(resolve, 10000));
   });
 
-  it("Should process chain-event-notification messages from the CENotificationsCUD queue", async () => {
+  it('Should process chain-event-notification messages from the CENotificationsCUD queue', async () => {
     const ceData: ITransfer = {
       kind: EventKind.Transfer,
       tokenAddress: uuidv4(),
@@ -82,8 +82,8 @@ describe('Tests for the commonwealth-app consumer', () => {
       event_data: ceData,
       queued: -1,
       network: cwEvent.network,
-      chain: cwEvent.chain
-    }
+      chain: cwEvent.chain,
+    };
 
     const ceNotifCUD: RmqCENotificationCUD.RmqMsgType = {
       ChainEvent: chainEvent,

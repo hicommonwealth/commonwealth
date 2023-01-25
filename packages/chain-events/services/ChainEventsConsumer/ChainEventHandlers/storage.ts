@@ -2,9 +2,7 @@
  * Generic handler that stores the event in the database.
  */
 import { addPrefix, factory } from 'common-common/src/logging';
-import type {
-  RabbitMQController,
-} from 'common-common/src/rabbitmq';
+import type { RabbitMQController } from 'common-common/src/rabbitmq';
 import { RascalPublications } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
@@ -85,7 +83,7 @@ export default class extends IEventHandler {
       block_number: event.blockNumber,
       event_data: event.data,
       network: event.network,
-      chain
+      chain,
     };
 
     // duplicate event check

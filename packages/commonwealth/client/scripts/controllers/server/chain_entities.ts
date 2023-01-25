@@ -15,7 +15,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { getBaseUrl, getFetch } from 'helpers/getUrl';
 import $ from 'jquery';
 import type { ChainInfo } from 'models';
-import { ChainEntity, ChainEvent, ChainEventType } from 'models';
+import { ChainEntity, ChainEvent } from 'models';
 import app from 'state';
 
 import { ChainEntityStore } from 'stores';
@@ -161,12 +161,8 @@ class ChainEntityController {
       if (!eventEntity) continue;
       const [entityKind] = eventEntity;
 
-
       // create event
-      const event = new ChainEvent(
-        cwEvent.blockNumber,
-        cwEvent.data,
-      );
+      const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data);
 
       // create entity
       const fieldName = getUniqueEntityKey(network, entityKind);

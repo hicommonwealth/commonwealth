@@ -1,11 +1,10 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import m from 'mithril';
-import { ChainEventType, Notification, NotificationSubscription } from 'models';
+import { Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
 
 import app from 'state';
-import {NotificationCategories} from "../../../../server/routes/viewNotifications";
 
 import { NotificationStore } from 'stores';
 
@@ -341,10 +340,7 @@ class NotificationsController {
           is_read: notificationsReadJSON.is_read,
           ...notificationsReadJSON.Notification,
         };
-        const notification = Notification.fromJSON(
-          data,
-          subscription,
-        );
+        const notification = Notification.fromJSON(data, subscription);
 
         if (subscription.category === 'chain-event') {
           if (!this._chainEventStore.getById(notification.id))

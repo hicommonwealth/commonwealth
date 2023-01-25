@@ -54,11 +54,11 @@ export default class extends IEventHandler<ChainEventInstance> {
               [queryFieldName]: fieldValue,
               // votes will be unique by data rather than by type
               event_data: event.data as any,
-              chain
+              chain,
             }
           : {
               [queryFieldName]: fieldValue,
-              chain
+              chain,
             };
       const existingEvent = await this._models.ChainEvent.findOne({
         where: queryArgs,
@@ -75,7 +75,7 @@ export default class extends IEventHandler<ChainEventInstance> {
         block_number: event.blockNumber,
         event_data: event.data,
         network: event.network,
-        chain
+        chain,
       });
 
       const formattedEvent: ChainEventAttributes = dbEvent.toJSON();

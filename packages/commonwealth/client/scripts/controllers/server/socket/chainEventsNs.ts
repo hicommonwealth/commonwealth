@@ -25,12 +25,12 @@ export class ChainEventsNamespace {
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const filteredSubs = subs.filter((x) => !!x.chainEntityId);
       const roomsToJoin = [];
-      for (const sub of filteredSubs) {
-        if (!this.subscriptionRoomsJoined.has(sub.chainEntityId)) {
-          roomsToJoin.push(sub.chainEntityId);
-          this.subscriptionRoomsJoined.add(sub.chainEntityId);
+      for (const sub of subs) {
+        const chain = sub?.Chain?.id || sub.Chain;
+        if (!this.subscriptionRoomsJoined.has(chain)) {
+          roomsToJoin.push(chain);
+          this.subscriptionRoomsJoined.add(chain);
         }
       }
       if (roomsToJoin.length > 0) {
@@ -44,12 +44,12 @@ export class ChainEventsNamespace {
 
   public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const filteredSubs = subs.filter((x) => !!x.chainEntityId);
       const roomsToLeave = [];
-      for (const sub of filteredSubs) {
-        if (this.subscriptionRoomsJoined.has(sub.chainEntityId)) {
-          roomsToLeave.push(sub.chainEntityId);
-          this.subscriptionRoomsJoined.delete(sub.chainEntityId);
+      for (const sub of subs) {
+        const chain = sub?.Chain?.id || sub.Chain;
+        if (this.subscriptionRoomsJoined.has(chain)) {
+          roomsToLeave.push(chain);
+          this.subscriptionRoomsJoined.delete(chain);
         }
       }
 
@@ -64,8 +64,7 @@ export class ChainEventsNamespace {
 
   private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
-      (sub) =>
-        sub.chainEntityId === notification.ChainEvent.entity_id
+      (sub) => sub.chainEntityId === notification.ChainEvent.entity_id
     );
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally

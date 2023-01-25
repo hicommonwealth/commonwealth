@@ -3,24 +3,38 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.addColumn('ChainEvents', 'chain', {
-        type: Sequelize.STRING, allowNull: true
-      }, {transaction: t});
-      await queryInterface.sequelize.query(`
+      await queryInterface.addColumn(
+        'ChainEvents',
+        'chain',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        `
           UPDATE "ChainEvents" CE
           SET chain = (SELECT CET.chain
                        FROM "ChainEventTypes" CET
                        WHERE CE.chain_event_type_id = CET.id);
-    `, {transaction: t});
+    `,
+        { transaction: t }
+      );
 
-      await queryInterface.changeColumn('ChainEvents', 'chain', {
-        type: Sequelize.STRING,
-        allowNull: false
-      }, {transaction: t});
+      await queryInterface.changeColumn(
+        'ChainEvents',
+        'chain',
+        {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        { transaction: t }
+      );
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn('ChainEvents', 'chain');
-  }
+  },
 };

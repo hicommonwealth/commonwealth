@@ -16,8 +16,8 @@ import {
 } from '../scripts/emails';
 import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
-import {SupportedNetwork} from "chain-events";
 import { factory, formatFilename } from 'common-common/src/logging';
+import { SupportedNetwork } from 'chain-events/src';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -50,12 +50,15 @@ export default async function emitNotifications(
   // typeguard function to differentiate between chain event notifications as needed
   let chainEvent: IChainEventNotificationData;
   const isChainEventData = !!(
-    typeof (<any>notification_data).id === 'number'
-    && typeof (<any>notification_data).block_number === 'number'
-    && (<any>notification_data).event_data
-    && Object.values(SupportedNetwork).includes((<any>notification_data).network)
-    && (<any>notification_data).chain && typeof (<any>notification_data).chain === 'string'
-    && typeof (<any>notification_data).entity_id === 'number'
+    typeof (<any>notification_data).id === 'number' &&
+    typeof (<any>notification_data).block_number === 'number' &&
+    (<any>notification_data).event_data &&
+    Object.values(SupportedNetwork).includes(
+      (<any>notification_data).network
+    ) &&
+    (<any>notification_data).chain &&
+    typeof (<any>notification_data).chain === 'string' &&
+    typeof (<any>notification_data).entity_id === 'number'
   );
 
   if (isChainEventData) {
@@ -128,7 +131,7 @@ export default async function emitNotifications(
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
         chain_id: chainEvent.chain,
-        entity_id: chainEvent.entity_id
+        entity_id: chainEvent.entity_id,
       });
     } else {
       notification = await models.Notification.create({
@@ -166,7 +169,7 @@ export default async function emitNotifications(
           (notification_data as any).chain_id,
         subscriber: `${subscription.subscriber_id}`,
       });
-      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `
+      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `;
       replacements.push(
         notification.id,
         subscription.id,
@@ -193,14 +196,8 @@ export default async function emitNotifications(
 
   // send emails
   for (const subscription of subscriptions) {
-    if (
-      msg &&
-      isChainEventData &&
-      chainEvent.chain
-    ) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${
-        chainEvent.chain
-      }/notifications?id=${notification.id}`;
+    if (msg && isChainEventData && chainEvent.chain) {
+      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
     }
     if (msg && subscription?.immediate_email && subscription?.User) {
       // kick off async call and immediately return
@@ -226,10 +223,9 @@ export default async function emitNotifications(
   ) {
     await send(models, {
       notificationCategory: category_id,
-      ...webhook_data as Required<WebhookContent>
+      ...(webhook_data as Required<WebhookContent>),
     });
   }
 
   return notification;
 }
-;

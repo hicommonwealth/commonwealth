@@ -48,8 +48,11 @@ export async function initAppState(
       .then(async (data) => {
         app.subscribedChains = data.result || [];
         resolve();
-      }).catch((e) => {
-        console.log(`Subscribed chains failed to load. You will be unable to edit chain-event subscriptions`);
+      })
+      .catch((e) => {
+        console.log(
+          `Subscribed chains failed to load. You will be unable to edit chain-event subscriptions`
+        );
         console.error(e);
       });
   });

@@ -7,7 +7,8 @@ import type { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers'
 import type { SubstrateEvents } from '../../src';
 import {
   createListener,
-  ErcLoggingHandler, getChainEventNetwork,
+  ErcLoggingHandler,
+  getChainEventNetwork,
   LoggingHandler,
   SupportedNetwork,
 } from '../../src';
@@ -222,7 +223,10 @@ async function setupNewListeners(
     try {
       network = getChainEventNetwork(chain.network, chain.base);
     } catch (e) {
-      log.error(`Unknown chain base: ${chain.base} \tand network: ${chain.network}`, e);
+      log.error(
+        `Unknown chain base: ${chain.base} \tand network: ${chain.network}`,
+        e
+      );
       continue;
     }
 
