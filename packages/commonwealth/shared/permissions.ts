@@ -207,10 +207,10 @@ export class PermissionManager {
     if (Array.isArray(impliedAllowPermissions)) {
       impliedAllowPermissions.forEach((impliedAllowPermission) => {
         allowPermission =
-          allowPermission & ~BigInt(1 << impliedAllowPermission);
+          (allowPermission) & ~BigInt(1 << impliedAllowPermission);
       });
     } else {
-      allowPermission = allowPermission & ~BigInt(1 << impliedAllowPermissions);
+      allowPermission = BigInt(allowPermission) & ~BigInt(1 << impliedAllowPermissions);
     }
     return allowPermission;
   }
@@ -224,10 +224,10 @@ export class PermissionManager {
     );
     if (Array.isArray(impliedDenyPermissions)) {
       impliedDenyPermissions.forEach((impliedDenyPermission) => {
-        denyPermission = denyPermission & ~BigInt(1 << impliedDenyPermission);
+        denyPermission = BigInt(denyPermission) & ~BigInt(1 << impliedDenyPermission);
       });
     } else {
-      denyPermission = denyPermission & ~BigInt(1 << impliedDenyPermissions);
+      denyPermission = BigInt(denyPermission) & ~BigInt(1 << impliedDenyPermissions);
     }
     return denyPermission;
   }
