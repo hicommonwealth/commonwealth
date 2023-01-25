@@ -6,8 +6,7 @@ import { RascalExchanges, RascalRoutingKeys } from 'common-common/src/rabbitmq';
 import models from 'chain-events/services/database/database';
 
 async function main() {
-  // @ts-ignore
-  const ceData: IEventData = {
+  const ceData = {
     id: 10,
     kind: 'proposal-created',
     values: ['0'],
@@ -26,7 +25,7 @@ async function main() {
   };
   const chainEvent: CWEvent<IEventData> = {
     blockNumber: 16170754,
-    data: ceData,
+    data: <any>ceData,
     network: SupportedNetwork.Aave,
     chain: 'dydx',
   };
