@@ -324,6 +324,7 @@ export function isActiveAddressPermitted(
     };
   });
 
+  const permissionsManager = new PermissionManager();
   if (chainRoles.length > 0) {
     const permission = aggregatePermissions(roles, {
       allow: chain_info.defaultAllowPermissions,
