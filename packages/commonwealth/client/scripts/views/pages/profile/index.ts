@@ -3,7 +3,7 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { ChainBase } from 'common-common/src/types';

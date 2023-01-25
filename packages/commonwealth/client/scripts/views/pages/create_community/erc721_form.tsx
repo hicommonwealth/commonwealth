@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { IERC721Metadata__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';

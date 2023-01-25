@@ -1,6 +1,7 @@
 /* @jsx m */
 
-import { initAppState, navigateToSubpage } from 'app';
+import { initAppState } from 'state';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';

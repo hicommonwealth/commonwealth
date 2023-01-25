@@ -1,7 +1,7 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import type { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
