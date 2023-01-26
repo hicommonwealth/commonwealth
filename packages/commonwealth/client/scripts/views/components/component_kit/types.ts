@@ -64,7 +64,7 @@ export type DefaultMenuItem = {
   iconRight?: IconName;
   isSecondary?: boolean;
   label?: string;
-  onClick?: (e?: Event) => void;
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'default';
 };
 
@@ -73,7 +73,7 @@ type NotificationMenuItem = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label?: string;
-  onClick?: (e?: MouseEvent) => void;
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'notification';
 };
 

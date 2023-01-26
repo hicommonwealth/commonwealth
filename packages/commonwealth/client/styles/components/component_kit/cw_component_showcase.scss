@@ -6,6 +6,8 @@ $width: 360px;
   @include baseTooltipStyles;
 
   border: 2px solid $neutral-400;
+  box-shadow: $elevation-2;
+  padding: 8px;
 
   .Text {
     color: $neutral-500;
