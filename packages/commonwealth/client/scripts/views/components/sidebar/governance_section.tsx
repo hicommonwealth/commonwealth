@@ -278,21 +278,21 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       displayData: null,
     };
 
-    const rulesData: SectionGroupAttrs = {
-      title: 'Rules',
-      containsChildren: false,
-      displayData: null,
-      hasDefaultToggle: false,
-      isActive: onRulesPage(m.route.get()),
-      isVisible: showRules,
-      isUpdated: false,
-      onclick: (e, toggle: boolean) => {
-        e.preventDefault();
-        handleRedirectClicks(e, `/rules`, app.activeChainId(), () => {
-          setGovernanceToggleTree(`children.Rules.toggledState`, toggle);
-        });
-      },
-    };
+    // const rulesData: SectionGroupAttrs = {
+    //   title: 'Rules',
+    //   containsChildren: false,
+    //   displayData: null,
+    //   hasDefaultToggle: false,
+    //   isActive: onRulesPage(m.route.get()),
+    //   isVisible: showRules,
+    //   isUpdated: false,
+    //   onclick: (e, toggle: boolean) => {
+    //     e.preventDefault();
+    //     handleRedirectClicks(e, `/rules`, app.activeChainId(), () => {
+    //       setGovernanceToggleTree(`children.Rules.toggledState`, toggle);
+    //     });
+    //   },
+    // };
 
     // Snapshots
     const snapshotData: SectionGroupAttrs = {
@@ -488,7 +488,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
 
     let governanceGroupData: SectionGroupAttrs[] = [
       membersData,
-      rulesData,
+      // rulesData,
       snapshotData,
       delegateData,
       treasuryData,
@@ -500,7 +500,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       validatorsData,
     ];
 
-    if (!hasProposals) governanceGroupData = [membersData, rulesData];
+    if (!hasProposals) governanceGroupData = [membersData];
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Governance',

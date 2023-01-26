@@ -648,11 +648,11 @@ const getCommonDomainRoutes = (importRoute) => ({
     deferChain: true,
   }),
 
-  // Rules
-  '/:scope/rules': importRoute('views/pages/rules', {
-    scoped: true,
-    deferChain: true,
-  }),
+  // Rules: Uncomment when rules/roles are ready
+  // '/:scope/rules': importRoute('views/pages/rules', {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
 
   // Admin
   '/:scope/admin': importRoute('views/pages/admin', { scoped: true }),
