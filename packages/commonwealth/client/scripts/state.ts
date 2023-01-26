@@ -271,11 +271,9 @@ export async function initAppState(
           });
 
         app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories =
-          data.result.notificationCategories.map((json) =>
-            NotificationCategory.fromJSON(json)
-          );
-        app.config.invites = data.result.invites;
+        app.config.notificationCategories = data.result.notificationCategories.map(
+          (json) => NotificationCategory.fromJSON(json)
+        );
         app.config.chainCategories = data.result.chainCategories;
         app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 
