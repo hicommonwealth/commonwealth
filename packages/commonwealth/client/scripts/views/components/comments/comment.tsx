@@ -71,16 +71,14 @@ type CommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-type CommentState = {
-  verificationChecked: boolean;
-  verifiedSession: boolean;
-  verifiedAction: boolean;
-};
-
-export class Comment extends ClassComponent<CommentAttrs, CommentState> {
+export class Comment extends ClassComponent<CommentAttrs> {
   private isEditingComment: boolean;
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
+
+  private verificationChecked: boolean;
+  private verifiedSession: boolean;
+  private verifiedAction: boolean;
 
   view(vnode: m.Vnode<CommentAttrs>) {
     const {
@@ -116,8 +114,8 @@ export class Comment extends ClassComponent<CommentAttrs, CommentState> {
       !isLocked &&
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
-    if (!vnode.state.verificationChecked) {
-      vnode.state.verificationChecked = true;
+    if (!this.verificationChecked) {
+      this.verificationChecked = true;
       try {
         const session = JSON.parse(comment.canvasSession);
         const action = JSON.parse(comment.canvasAction);
@@ -129,11 +127,11 @@ export class Comment extends ClassComponent<CommentAttrs, CommentState> {
         )
           return;
         verify({ session })
-          .then((result) => (vnode.state.verifiedSession = true))
+          .then((result) => (this.verifiedSession = true))
           .catch((err) => console.log('Could not verify session'))
           .finally(() => m.redraw());
         verify({ action, actionSignerAddress })
-          .then((result) => (vnode.state.verifiedAction = true))
+          .then((result) => (this.verifiedAction = true))
           .catch((err) => console.log('Could not verify action'))
           .finally(() => m.redraw());
       } catch (err) {
@@ -167,7 +165,7 @@ export class Comment extends ClassComponent<CommentAttrs, CommentState> {
             >
               {moment(comment.createdAt).format('l')}
             </CWText>
-            {vnode.state.verifiedAction && vnode.state.verifiedSession && (
+            {this.verifiedAction && this.verifiedSession && (
               <CWText
                 type="caption"
                 fontWeight="medium"
