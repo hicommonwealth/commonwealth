@@ -82,12 +82,14 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       });
 
       try {
-        app.threads
-          .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
-          .then((res) => {
-            this.threads = res;
-            m.redraw();
-          });
+        if (app.activeChainId()) {
+          app.threads
+            .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
+            .then((res) => {
+              this.threads = res;
+              m.redraw();
+            });
+        }
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);
       }
@@ -128,17 +130,18 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={
             <CWText>
-              {m(User, {
-                user: new AddressInfo(
-                  null,
-                  this.proposal.author,
-                  app.activeChainId(),
-                  null
-                ),
-                showAddressWithDisplayName: true,
-                linkify: true,
-                popover: true,
-              })}
+              {!!app.activeChainId() &&
+                m(User, {
+                  user: new AddressInfo(
+                    null,
+                    this.proposal.author,
+                    app.activeChainId(),
+                    null
+                  ),
+                  showAddressWithDisplayName: true,
+                  linkify: true,
+                  popover: true,
+                })}
             </CWText>
           }
           createdAt={this.proposal.created}

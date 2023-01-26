@@ -1,12 +1,15 @@
 /* @jsx m */
 
 import m from 'mithril';
+import {
+  chainBasetoCanvasChain,
+  constructCanvasMessage,
+} from 'adapters/shared';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
-import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
 
-import { initAppState } from 'app';
 import {
   completeClientLogin,
   loginWithMagicLink,
