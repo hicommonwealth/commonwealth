@@ -1,10 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import {
-  chainBasetoCanvasChain,
-  constructCanvasMessage,
-} from 'adapters/shared';
+import { constructCanvasMessage } from 'adapters/shared';
 import app, { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
