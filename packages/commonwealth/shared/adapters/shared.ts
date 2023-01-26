@@ -30,6 +30,7 @@ export const constructCanvasMessage = (
 
   const payload: SessionPayload = {
     app: placeholderMultihash,
+    appName: "Commonwealth",
     block: block === null ? null : block,
     chain: canvasChain,
     chainId: canvasChainId,

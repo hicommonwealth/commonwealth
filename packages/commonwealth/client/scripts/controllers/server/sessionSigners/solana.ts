@@ -124,14 +124,15 @@ export class SolanaSessionController implements ISessionController {
     // TODO: verify payload is not expired
 
     const actionPayload: ActionPayload = {
-      from: sessionPayload.from,
       app: sessionPayload.app,
+      appName: "Commonwealth",
       timestamp: +Date.now(),
       chain: 'solana',
       chainId,
       block: sessionPayload.block, // will be null
       call,
       callArgs,
+      from: sessionPayload.from,
     };
 
     const message = getSolanaSignatureData(actionPayload);

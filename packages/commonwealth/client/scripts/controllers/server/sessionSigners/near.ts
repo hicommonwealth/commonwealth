@@ -123,6 +123,7 @@ export class NEARSessionController implements ISessionController {
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,
+      appName: "Commonwealth",
       from: sessionPayload.from,
       timestamp: +Date.now(),
       chain: 'near',
