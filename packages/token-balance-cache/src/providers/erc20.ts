@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { BigNumber, providers } from 'ethers';
-import type { ERC721 } from 'common-common/src/eth/types';
-import { ERC721__factory } from 'common-common/src/eth/types';
+import type { ERC20 } from 'common-common/src/eth/types';
+import { ERC20__factory } from 'common-common/src/eth/types';
 
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
@@ -12,12 +12,13 @@ type EthBPOpts = {
   contractType?: string;
 };
 
-export default class Erc721BalanceProvider extends BalanceProvider<EthBPOpts> {
-  public name = 'erc721';
+export default class Erc20BalanceProvider extends BalanceProvider<EthBPOpts> {
+  public name = 'erc20';
   // Added Token Id as String because it can be a BigNumber (uint256 on solidity)
   public opts = {
     contractType: 'string?',
     tokenAddress: 'string?',
+    tokenId: 'string?',
   };
   public validBases = [BalanceType.Ethereum];
 
@@ -47,17 +48,16 @@ export default class Erc721BalanceProvider extends BalanceProvider<EthBPOpts> {
     }
 
     const provider = new Web3.providers.WebsocketProvider(url);
-
-    const erc721Api: ERC721 = ERC721__factory.connect(
+    const erc20Api: ERC20 = ERC20__factory.connect(
       tokenAddress,
       new providers.Web3Provider(provider as any)
     );
-    await erc721Api.deployed();
-    return await this.fetchBalance(erc721Api, provider, address);
+    await erc20Api.deployed();
+    return await this.fetchBalance(erc20Api, provider, address);
   }
 
   private async fetchBalance(
-    api: ERC721,
+    api: ERC20,
     provider: any,
     address: string
   ): Promise<string> {
