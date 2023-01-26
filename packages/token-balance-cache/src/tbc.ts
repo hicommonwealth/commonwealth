@@ -224,7 +224,11 @@ export class TokenBalanceCache
     // grab contract if provided, otherwise query native token
     let opts = {};
     if (contractAddress) {
-      if (network !== ChainNetwork.ERC20 && network !== ChainNetwork.ERC721 && network !== ChainNetwork.ERC1155) {
+      if (
+        network !== ChainNetwork.ERC20 &&
+        network !== ChainNetwork.ERC721 &&
+        network !== ChainNetwork.ERC1155
+      ) {
         throw new Error(FetchTokenBalanceErrors.UnsupportedContractType);
       }
       opts = {
