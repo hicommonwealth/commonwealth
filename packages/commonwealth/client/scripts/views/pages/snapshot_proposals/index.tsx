@@ -118,28 +118,26 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
       <Sublayout
       // title="Proposals"
       >
-        {app.chain && (
-          <div class="SnapshotProposalsPage">
-            <SnapshotProposalStagesBar
-              selected={selectedFilter}
-              onChangeFilter={onChangeFilter}
+        <div class="SnapshotProposalsPage">
+          <SnapshotProposalStagesBar
+            selected={selectedFilter}
+            onChangeFilter={onChangeFilter}
+          />
+          {proposals.length > 0 ? (
+            <CardsCollection
+              content={proposals.map((proposal) => (
+                <SnapshotProposalCard
+                  snapshotId={snapshotId}
+                  proposal={proposal}
+                />
+              ))}
             />
-            {proposals.length > 0 ? (
-              <CardsCollection
-                content={proposals.map((proposal) => (
-                  <SnapshotProposalCard
-                    snapshotId={snapshotId}
-                    proposal={proposal}
-                  />
-                ))}
-              />
-            ) : (
-              <CWText className="no-proposals-text">
-                No {this.selectedFilter.toLowerCase()} proposals found.
-              </CWText>
-            )}
-          </div>
-        )}
+          ) : (
+            <CWText className="no-proposals-text">
+              No {this.selectedFilter.toLowerCase()} proposals found.
+            </CWText>
+          )}
+        </div>
       </Sublayout>
     );
   }
