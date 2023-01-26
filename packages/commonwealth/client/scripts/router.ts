@@ -269,10 +269,13 @@ const getCustomDomainRoutes = (importRoute) => ({
   }),
 
   // Notifications
-  '/notification-settings': importRoute(import('views/pages/notification_settings'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  '/notification-settings': importRoute(
+    import('views/pages/notification_settings'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
   '/notifications': importRoute(import('views/pages/notifications_page'), {
     scoped: true,
     deferChain: true,
@@ -291,9 +294,12 @@ const getCustomDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/contract/:contractAddress': importRoute(import('views/pages/general_contract'), {
-    scoped: true,
-  }),
+  '/contract/:contractAddress': importRoute(
+    import('views/pages/general_contract'),
+    {
+      scoped: true,
+    }
+  ),
 
   // Discussions
   '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
@@ -345,18 +351,24 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/council': importRoute(import('views/pages/council'), { scoped: true }),
   '/delegate': importRoute(import('views/pages/delegate'), { scoped: true }),
   '/proposal/:type/:identifier': importRoute(
-  import('views/pages/view_proposal/index'),
+    import('views/pages/view_proposal/index'),
     { scoped: true }
   ),
   '/:scope/proposal/discussion/:identifier': redirectRoute(
     (attrs) => `/discussion/${attrs.identifier}`
   ),
-  '/proposal/:identifier': importRoute(import('views/pages/view_proposal/index'), {
-    scoped: true,
-  }),
-  '/discussion/:identifier': importRoute(import('views/pages/view_thread/index'), {
-    scoped: true,
-  }),
+  '/proposal/:identifier': importRoute(
+    import('views/pages/view_proposal/index'),
+    {
+      scoped: true,
+    }
+  ),
+  '/discussion/:identifier': importRoute(
+    import('views/pages/view_thread/index'),
+    {
+      scoped: true,
+    }
+  ),
   '/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), {
     scoped: true,
   }),
@@ -387,20 +399,23 @@ const getCustomDomainRoutes = (importRoute) => ({
     deferChain: true,
   }),
 
-  '/snapshot/:snapshotId': importRoute(import('views/pages/snapshot_proposals'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  '/snapshot/:snapshotId': importRoute(
+    import('views/pages/snapshot_proposals'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
   '/multiple-snapshots': importRoute(
-  import('views/pages/view_multiple_snapshot_spaces'),
+    import('views/pages/view_multiple_snapshot_spaces'),
     { scoped: true, deferChain: true }
   ),
   '/snapshot/:snapshotId/:identifier': importRoute(
-  import('views/pages/view_snapshot_proposal'),
+    import('views/pages/view_snapshot_proposal'),
     { scoped: true, deferChain: true }
   ),
   '/new/snapshot/:snapshotId': importRoute(
-  import('views/pages/new_snapshot_proposal'),
+    import('views/pages/new_snapshot_proposal'),
     { scoped: true, deferChain: true }
   ),
 
@@ -507,20 +522,29 @@ const getCommonDomainRoutes = (importRoute) => ({
   ),
 
   // Notifications
-  '/:scope/notifications': importRoute(import('views/pages/notifications_page'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  '/:scope/notifications': importRoute(
+    import('views/pages/notifications_page'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
   '/notifications': redirectRoute(() => '/edgeware/notifications'),
-  '/notification-settings': importRoute(import('views/pages/notification_settings'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  '/notification-settings': importRoute(
+    import('views/pages/notification_settings'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
 
   // NEAR
-  '/:scope/finishNearLogin': importRoute(import('views/pages/finish_near_login'), {
-    scoped: true,
-  }),
+  '/:scope/finishNearLogin': importRoute(
+    import('views/pages/finish_near_login'),
+    {
+      scoped: true,
+    }
+  ),
   '/finishaxielogin': importRoute(import('views/pages/finish_axie_login')),
 
   // Settings
@@ -613,12 +637,18 @@ const getCommonDomainRoutes = (importRoute) => ({
     'views/pages/view_thread/index',
     { scoped: true }
   ),
-  '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), {
-    scoped: true,
-  }),
-  '/:scope/new/proposal': importRoute(import('views/pages/new_proposal/index'), {
-    scoped: true,
-  }),
+  '/:scope/new/proposal/:type': importRoute(
+    import('views/pages/new_proposal/index'),
+    {
+      scoped: true,
+    }
+  ),
+  '/:scope/new/proposal': importRoute(
+    import('views/pages/new_proposal/index'),
+    {
+      scoped: true,
+    }
+  ),
 
   // Treasury
   '/:scope/treasury': importRoute(import('views/pages/treasury'), {
