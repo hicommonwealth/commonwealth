@@ -17,10 +17,10 @@ import moment from 'moment';
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
-import { ComponentType, PopoverMenuItem } from './types';
+import { ComponentType } from './types';
 import { CWTabBar, CWTab } from './cw_tabs';
 import { CWText } from './cw_text';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
+import { PopoverMenu, PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
 import { isWindowMediumSmallInclusive } from './helpers';
 import { CWIcon } from './cw_icons/cw_icon';

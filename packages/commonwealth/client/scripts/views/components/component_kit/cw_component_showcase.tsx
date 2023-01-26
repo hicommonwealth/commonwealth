@@ -35,7 +35,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
+import { PopoverMenu, PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
@@ -46,7 +46,6 @@ import { CWContentPageCard } from './cw_content_page';
 import { ReactPopover } from './cw_popover/cw_popover';
 import CWCoverImageUploader from './cw_cover_image_uploader';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import { PopoverMenuItem } from './types';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {

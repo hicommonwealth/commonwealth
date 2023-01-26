@@ -21,8 +21,10 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { PopoverMenuItem } from '../components/component_kit/types';
+import {
+  PopoverMenu,
+  PopoverMenuItem,
+} from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 
 const getCreateContentMenuItems = (): PopoverMenuItem[] => {

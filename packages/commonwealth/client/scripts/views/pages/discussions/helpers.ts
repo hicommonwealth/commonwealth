@@ -15,7 +15,7 @@ import app from 'state';
 import { NotificationSubscription, Thread } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
-import { PopoverMenuItem } from '../../components/component_kit/types';
+import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {
   const { lastCommentedOn } = thread;
