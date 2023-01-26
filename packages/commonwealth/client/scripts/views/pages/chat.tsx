@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import { MixpanelChatEvents } from 'analytics/types';
-import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import m from 'mithril';
@@ -9,6 +8,7 @@ import m from 'mithril';
 import 'pages/chat.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'router';
 import { ChatWindow } from 'views/components/chat/chat_window';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';

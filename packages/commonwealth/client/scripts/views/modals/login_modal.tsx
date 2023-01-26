@@ -1,12 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
+import { constructCanvasMessage } from 'adapters/shared';
+import app, { initAppState } from 'state';
 import ClassComponent from 'class_component';
-import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
 
-import { initAppState } from 'app';
 import {
   completeClientLogin,
   loginWithMagicLink,

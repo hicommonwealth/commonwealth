@@ -1,8 +1,10 @@
 /* @jsx m */
 
-import { constructCanvasMessage } from 'adapters/shared';
 import { Chain, serializeSessionPayload } from '@canvas-js/interfaces';
-import { initAppState, navigateToSubpage } from 'app';
+
+import { constructCanvasMessage } from 'adapters/shared';
+import { initAppState } from 'state';
+import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
 import ClassComponent from 'class_component';
 import { ChainBase, WalletId } from 'common-common/src/types';

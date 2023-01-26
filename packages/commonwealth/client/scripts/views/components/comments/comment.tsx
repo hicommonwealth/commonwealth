@@ -22,6 +22,7 @@ import User, { AnonymousUser } from '../widgets/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 import { showCanvasVerifyDataModal } from '../../modals/canvas_verify_data_modal';
+import { verify } from '../../../helpers/canvas';
 
 type CommentAuthorAttrs = {
   comment: CommentType<any>;
@@ -70,7 +71,13 @@ type CommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-export class Comment extends ClassComponent<CommentAttrs> {
+type CommentState = {
+  verificationChecked: boolean;
+  verifiedSession: boolean;
+  verifiedAction: boolean;
+};
+
+export class Comment extends ClassComponent<CommentAttrs, CommentState> {
   private isEditingComment: boolean;
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
@@ -109,6 +116,32 @@ export class Comment extends ClassComponent<CommentAttrs> {
       !isLocked &&
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
+    if (!vnode.state.verificationChecked) {
+      vnode.state.verificationChecked = true;
+      try {
+        const session = JSON.parse(comment.canvasSession);
+        const action = JSON.parse(comment.canvasAction);
+        const actionSignerAddress = session?.payload?.sessionAddress;
+        if (
+          !comment.canvasSession ||
+          !comment.canvasAction ||
+          !actionSignerAddress
+        )
+          return;
+        verify({ session })
+          .then((result) => (vnode.state.verifiedSession = true))
+          .catch((err) => console.log('Could not verify session'))
+          .finally(() => m.redraw());
+        verify({ action, actionSignerAddress })
+          .then((result) => (vnode.state.verifiedAction = true))
+          .catch((err) => console.log('Could not verify action'))
+          .finally(() => m.redraw());
+      } catch (err) {
+        console.log('Unexpected error while verifying action/session');
+        return;
+      }
+    }
+
     return (
       <div class={`Comment comment-${comment.id}`}>
         {threadLevel > 0 && (
@@ -131,10 +164,19 @@ export class Comment extends ClassComponent<CommentAttrs> {
               type="caption"
               fontWeight="medium"
               className="published-text"
-              onclick={() => showCanvasVerifyDataModal(comment)}
             >
               {moment(comment.createdAt).format('l')}
             </CWText>
+            {vnode.state.verifiedAction && vnode.state.verifiedSession && (
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="verification-icon"
+                onclick={() => showCanvasVerifyDataModal(comment)}
+              >
+                <CWIcon iconName="checkCircle" iconSize="xs" />
+              </CWText>
+            )}
           </div>
           {this.isEditingComment ? (
             <EditComment

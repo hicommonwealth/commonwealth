@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 
 import 'components/new_thread_form.scss';
