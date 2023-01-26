@@ -71,7 +71,13 @@ type CommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-export class Comment extends ClassComponent<CommentAttrs> {
+type CommentState = {
+  verificationChecked: boolean;
+  verifiedSession: boolean;
+  verifiedAction: boolean;
+};
+
+export class Comment extends ClassComponent<CommentAttrs, CommentState> {
   private isEditingComment: boolean;
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
@@ -116,13 +122,18 @@ export class Comment extends ClassComponent<CommentAttrs> {
         const session = JSON.parse(comment.canvasSession);
         const action = JSON.parse(comment.canvasAction);
         const actionSignerAddress = session?.payload?.sessionAddress;
-        if (!comment.canvasSession || !comment.canvasAction || !actionSignerAddress) return;
+        if (
+          !comment.canvasSession ||
+          !comment.canvasAction ||
+          !actionSignerAddress
+        )
+          return;
         verify({ session })
-          .then((result) => vnode.state.verifiedSession = true)
+          .then((result) => (vnode.state.verifiedSession = true))
           .catch((err) => console.log('Could not verify session'))
           .finally(() => m.redraw());
         verify({ action, actionSignerAddress })
-          .then((result) => vnode.state.verifiedAction = true)
+          .then((result) => (vnode.state.verifiedAction = true))
           .catch((err) => console.log('Could not verify action'))
           .finally(() => m.redraw());
       } catch (err) {
@@ -156,9 +167,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
             >
               {moment(comment.createdAt).format('l')}
             </CWText>
-        {vnode.state.verifiedAction}
-      {vnode.state.verifiedSession}
-            {vnode.state.verifiedAction && vnode.state.verifiedSession &&
+            {vnode.state.verifiedAction && vnode.state.verifiedSession && (
               <CWText
                 type="caption"
                 fontWeight="medium"
@@ -166,7 +175,8 @@ export class Comment extends ClassComponent<CommentAttrs> {
                 onclick={() => showCanvasVerifyDataModal(comment)}
               >
                 <CWIcon iconName="checkCircle" iconSize="xs" />
-              </CWText>}
+              </CWText>
+            )}
           </div>
           {this.isEditingComment ? (
             <EditComment
