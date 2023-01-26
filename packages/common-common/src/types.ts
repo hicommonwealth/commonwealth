@@ -1,3 +1,4 @@
+import { ERC1155 } from './eth/types/ERC1155.d';
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
@@ -115,6 +116,7 @@ export enum ChainNetwork {
   ALEX = 'alex',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',
