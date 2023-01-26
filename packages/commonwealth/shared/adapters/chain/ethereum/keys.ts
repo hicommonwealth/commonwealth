@@ -1,3 +1,4 @@
+import { utils } from "ethers"
 import type {
   TypedDataDomain,
   TypedDataField,
@@ -14,6 +15,7 @@ export const constructTypedCanvasMessage = (message) => {
   // include an EIP712Domain
   const domain: TypedDataDomain = {
     name: 'Commonwealth',
+    salt: utils.hexlify(0),
   };
 
   const types: Record<string, TypedDataField[]> = {
