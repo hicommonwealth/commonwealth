@@ -502,7 +502,14 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/web3login': importRoute('views/pages/web3login', {
     deferChain: true,
   }),
-
+  '/snapshot/:snapshotId': importRoute('views/pages/snapshot_proposals', {
+    scoped: true,
+    deferChain: true,
+  }),
+  '/snapshot/:snapshotId/:identifier': importRoute(
+    'views/pages/view_snapshot_proposal',
+    { scoped: true, deferChain: true }
+  ),
   // Scoped routes
   '/:scope/proposal/discussion/:identifier': redirectRoute(
     (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
