@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
@@ -72,13 +81,14 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
             }}
           >
             <SharePopover
-              trigger={
+              renderTrigger={(onclick) => (
                 <CWButton
                   label="Share"
                   iconLeft="share"
                   buttonType="secondary-blue"
+                  onClick={onclick}
                 />
-              }
+              )}
             />
           </div>
         </div>

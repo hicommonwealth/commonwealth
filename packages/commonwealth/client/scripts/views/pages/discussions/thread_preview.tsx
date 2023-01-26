@@ -31,7 +31,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SharePopover } from '../../components/share_popover';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -44,7 +44,6 @@ import {
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-// import { ThreadPreviewMenu } from './thread_preview_menu';
 import { ThreadPreviewMenu } from './thread_preview_menu';
 
 type ThreadPreviewAttrs = {
@@ -210,14 +209,15 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
                   e.stopPropagation();
                 }}
               >
-                <CWPopoverMenu
+                <PopoverMenu
                   menuItems={[getThreadSubScriptionMenuItem(thread)]}
-                  trigger={
+                  renderTrigger={(onclick) => (
                     <CWIconButton
                       iconName={isSubscribed ? 'unsubscribe' : 'bell'}
                       iconSize="small"
+                      onClick={onclick}
                     />
-                  }
+                  )}
                 />
               </div>
               {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}

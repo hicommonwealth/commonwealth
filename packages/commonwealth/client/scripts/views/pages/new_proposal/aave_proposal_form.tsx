@@ -25,7 +25,7 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
@@ -104,7 +104,7 @@ export class AaveProposalForm extends ClassComponent {
               />
             ))}
           </CWTabBar>
-          <CWPopoverMenu
+          <PopoverMenu
             menuItems={[
               {
                 iconLeft: 'write',
@@ -126,7 +126,9 @@ export class AaveProposalForm extends ClassComponent {
                 },
               },
             ]}
-            trigger={<CWIconButton iconName="plus" />}
+            renderTrigger={(onclick) => (
+              <CWIconButton iconName="plus" onClick={onclick} />
+            )}
           />
         </div>
         <CWTextInput

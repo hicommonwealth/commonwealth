@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_button.scss';
 
@@ -40,7 +49,7 @@ export type ButtonAttrs = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string | ResultNode;
-  onClick?: (e?: MouseEvent) => void;
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
 } & ButtonStyleAttrs;
 
 const getTextType = (buttonType: ButtonType) => {

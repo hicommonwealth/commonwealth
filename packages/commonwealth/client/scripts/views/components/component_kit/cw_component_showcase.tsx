@@ -35,16 +35,17 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
-import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
+import { PopoverMenu, PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
-import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
-import CWCoverImageUploader from './cw_cover_image_uploader';
 import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
+import { ReactPopover } from './cw_popover/cw_popover';
+import CWCoverImageUploader from './cw_cover_image_uploader';
+import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -87,7 +88,105 @@ const checkboxGroupOptions: Array<CheckboxType> = [
     value: 'failed',
   },
 ];
-export class ComponentShowcase extends ClassComponent {
+
+const popoverMenuOptions = (): Array<PopoverMenuItem> => {
+  return [
+    { type: 'header', label: 'Community' },
+    {
+      type: 'default',
+      label: 'Create Thread',
+      iconLeft: 'write',
+      onClick: () => console.log('Create thread clicked'),
+    },
+    {
+      label: 'Create Proposal',
+      iconLeft: 'write',
+      onClick: () => console.log('Create proposal clicked'),
+    },
+    {
+      label: 'Create Poll',
+      iconLeft: 'write',
+      onClick: () => console.log('Create poll clicked'),
+    },
+    {
+      label: 'Create Snapshot',
+      iconLeft: 'write',
+      disabled: true,
+      onClick: () => console.log('Create snapshot clicked'),
+    },
+    { type: 'divider' },
+    { type: 'header', label: 'Universal' },
+    {
+      label: 'Create Community',
+      iconLeft: 'people',
+      onClick: () => console.log('Create community clicked'),
+    },
+    {
+      label: 'Create Crowdfund',
+      iconLeft: 'wallet',
+      onClick: () => console.log('Create crowdfund clicked'),
+    },
+    { type: 'divider' },
+    {
+      label: 'Report',
+      iconLeft: 'cautionCircle',
+      isSecondary: true,
+      onClick: () => console.log('Report clicked'),
+    },
+  ];
+};
+
+const useComponentShowcase = () => {
+  const [basicPopoverEl, setBasicPopoverEl] =
+    React.useState<null | HTMLElement>(null);
+
+  const handleBasicPopoverClick = (e?: React.MouseEvent<HTMLElement>) => {
+    setBasicPopoverEl(basicPopoverEl ? null : e.currentTarget);
+  };
+
+  return {
+    basicPopoverEl,
+    handleBasicPopoverClick,
+  };
+};
+
+export const ComponentShowcase = () => {
+  const { basicPopoverEl, handleBasicPopoverClick } = useComponentShowcase();
+
+  return (
+    <div className="ComponentShowcase">
+      <div className="basic-gallery">
+        <CWText type="h4">Popover</CWText>
+        <CWIconButton
+          iconName="dotsVertical"
+          onClick={handleBasicPopoverClick}
+        />
+        <ReactPopover
+          anchorEl={basicPopoverEl}
+          content={
+            <div className="Tooltip">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </div>
+          }
+        />
+        <PopoverMenu
+          menuItems={popoverMenuOptions()}
+          renderTrigger={(onclick) => (
+            <CWIconButton iconName="dotsVertical" onClick={onclick} />
+          )}
+        />
+      </div>
+    </div>
+  );
+};
+
+export class _ComponentShowcase extends ClassComponent {
   private checkboxChecked: boolean;
   private checkboxGroupSelected: Array<string>;
   private radioButtonChecked: boolean;
@@ -106,6 +205,7 @@ export class ComponentShowcase extends ClassComponent {
 
   view() {
     // console.log(this.checkboxGroupSelected);
+
     return (
       <div className="ComponentShowcase">
         {/* <div className="basic-gallery">
@@ -177,30 +277,6 @@ export class ComponentShowcase extends ClassComponent {
           <CWTag label="Prop #52" type="proposal" />
           <CWTag label="Ref #90" type="referendum" />
           <CWTag label="12 days" iconName="clock" />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Popover Menu</CWText>
-          <CWPopoverMenu
-            trigger={<CWIconButton iconName="dotsVertical" />}
-            menuItems={[
-              { type: 'header', label: 'Community' },
-              { label: 'Create Thread', iconLeft: 'write' },
-              { label: 'Create Proposal', iconLeft: 'write' },
-              { label: 'Create Poll', iconLeft: 'write' },
-              { label: 'Create Snapshot', iconLeft: 'write', disabled: true },
-              { type: 'divider' },
-              { type: 'header', label: 'Universal' },
-              { label: 'Create Community', iconLeft: 'people' },
-              { label: 'Create Crowdfund', iconLeft: 'wallet' },
-              { type: 'divider' },
-              {
-                label: 'Report',
-                iconLeft: 'cautionCircle',
-                isSecondary: true,
-                onClick: () => console.log('clicked'),
-              },
-            ]}
-          />
         </div>
         <div className="tooltip-gallery">
           <CWText type="h3">Tooltip</CWText>
