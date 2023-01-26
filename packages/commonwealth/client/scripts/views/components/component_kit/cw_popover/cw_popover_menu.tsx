@@ -17,14 +17,24 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
 import { ReactPopover } from './cw_popover';
-import { ComponentType, ReactMenuItem } from '../types';
+import {
+  ComponentType,
+  DefaultMenuItem,
+  DividerMenuItem,
+  HeaderMenuItem,
+} from '../types';
 import { getClasses } from '../helpers';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 
-export const ReactPopoverMenu = (props: {
+export type PopoverMenuItem =
+  | DividerMenuItem
+  | HeaderMenuItem
+  | DefaultMenuItem;
+
+export const PopoverMenu = (props: {
   renderTrigger: (onClick: () => void) => React.ReactNode;
-  menuItems: Array<ReactMenuItem>;
+  menuItems: Array<PopoverMenuItem>;
 }) => {
   const [triggerEl, setTriggerEl] = React.useState<null | HTMLElement>(null);
 

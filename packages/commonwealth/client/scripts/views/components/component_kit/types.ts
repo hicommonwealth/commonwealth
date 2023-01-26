@@ -54,7 +54,7 @@ export type StyleAttrs = {
 
 export type DividerMenuItem = { type: 'divider' };
 
-type HeaderMenuItem = { type: 'header'; label?: string };
+export type HeaderMenuItem = { type: 'header'; label?: string };
 
 export type DefaultMenuItem = {
   disabled?: boolean;
@@ -87,5 +87,3 @@ export type MenuItem =
   | DefaultMenuItem
   | NotificationMenuItem
   | CommunityMenuItem;
-
-export type ReactMenuItem = DividerMenuItem | HeaderMenuItem | DefaultMenuItem;

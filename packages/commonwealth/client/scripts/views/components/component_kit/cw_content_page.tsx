@@ -17,10 +17,10 @@ import moment from 'moment';
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
-import { ComponentType, ReactMenuItem } from './types';
+import { ComponentType, PopoverMenuItem } from './types';
 import { CWTabBar, CWTab } from './cw_tabs';
 import { CWText } from './cw_text';
-import { ReactPopoverMenu } from './cw_popover/cw_popover_menu';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
 import { isWindowMediumSmallInclusive } from './helpers';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -45,7 +45,7 @@ type ContentPageAttrs = {
 
   // optional
   author?: ResultNode;
-  actions?: Array<ReactMenuItem>;
+  actions?: Array<PopoverMenuItem>;
   body?: ResultNode;
   comments?: ResultNode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
@@ -136,7 +136,7 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
             {headerComponents}
             {readOnly && <CWIcon iconName="lock" iconSize="small" />}
             {actions && (
-              <ReactPopoverMenu
+              <PopoverMenu
                 renderTrigger={(onclick) => (
                   <CWIconButton
                     iconName="dotsVertical"

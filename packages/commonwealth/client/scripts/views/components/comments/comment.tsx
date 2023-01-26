@@ -23,7 +23,7 @@ import { ChainType } from '../../../../../../common-common/src/types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { ReactPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
 import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
@@ -173,7 +173,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                   <div className="menu-buttons-right">
                     <SharePopover commentId={comment.id} />
                     {canEditAndDelete && (
-                      <ReactPopoverMenu
+                      <PopoverMenu
                         renderTrigger={(onclick) => (
                           <CWIconButton
                             iconName="dotsVertical"

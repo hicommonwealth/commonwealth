@@ -14,7 +14,7 @@ import {
 } from 'mithrilInterop';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
-import { ReactPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
 type SharePopoverAttrs = {
   commentId?: number;
@@ -32,7 +32,7 @@ export class SharePopover extends ClassComponent<SharePopoverAttrs> {
     const domain = document.location.origin;
 
     return (
-      <ReactPopoverMenu
+      <PopoverMenu
         menuItems={[
           {
             iconLeft: 'copy',

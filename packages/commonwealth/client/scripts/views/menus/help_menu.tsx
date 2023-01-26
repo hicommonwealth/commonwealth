@@ -16,11 +16,11 @@ import {
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { ReactPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { ReactMenuItem } from '../components/component_kit/types';
+import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenuItem } from '../components/component_kit/types';
 import { FeedbackModal } from '../modals/feedback_modal';
 
-const gethelpMenuItems = (): Array<ReactMenuItem> => {
+const gethelpMenuItems = (): Array<PopoverMenuItem> => {
   return [
     {
       label: 'Send Feedback',
@@ -53,7 +53,7 @@ export class HelpMenu extends ClassComponent {
 export class HelpMenuPopover extends ClassComponent {
   view() {
     return (
-      <ReactPopoverMenu
+      <PopoverMenu
         renderTrigger={(onclick) => (
           <CWIconButton
             iconButtonTheme="black"

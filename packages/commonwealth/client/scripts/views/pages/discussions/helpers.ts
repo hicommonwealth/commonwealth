@@ -15,7 +15,7 @@ import app from 'state';
 import { NotificationSubscription, Thread } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
-import { ReactMenuItem } from '../../components/component_kit/types';
+import { PopoverMenuItem } from '../../components/component_kit/types';
 
 export const getLastUpdated = (thread: Thread) => {
   const { lastCommentedOn } = thread;
@@ -101,7 +101,7 @@ export const getReactionSubscription = (thread: Thread) => {
 
 export const getThreadSubScriptionMenuItem = (
   thread: Thread
-): ReactMenuItem => {
+): PopoverMenuItem => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
 

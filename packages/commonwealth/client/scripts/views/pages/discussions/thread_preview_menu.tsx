@@ -19,7 +19,7 @@ import { Thread, ThreadStage, Topic } from 'models';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { ReactPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 type ThreadPreviewMenuAttrs = {
@@ -58,7 +58,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
           e.stopPropagation();
         }}
       >
-        <ReactPopoverMenu
+        <PopoverMenu
           menuItems={[
             ...(hasAdminPermissions
               ? [
