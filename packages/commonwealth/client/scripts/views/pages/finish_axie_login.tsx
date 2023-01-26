@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
