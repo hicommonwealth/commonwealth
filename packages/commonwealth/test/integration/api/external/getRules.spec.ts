@@ -1,6 +1,6 @@
 import 'chai/register-should';
 import chai from 'chai';
-import type { GetRulesReq} from 'common-common/src/api/extApiTypes';
+import type { GetRulesReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import { testRules } from 'test/integration/api/external/dbEntityHooks.spec';
 import type { RuleAttributes } from 'server/models/rule';

@@ -5,7 +5,10 @@ import type { CommentAttributes } from 'commonwealth/server/models/comment';
 import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import type { ChainAttributes } from 'commonwealth/server/models/chain';
 import type { ProfileAttributes } from 'commonwealth/server/models/profile';
-import type { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
+import type {
+  BalanceProviderResp,
+  ChainNodeResp,
+} from 'token-balance-cache/src';
 import type { TopicAttributes } from 'commonwealth/server/models/topic';
 import type { RoleAttributes } from 'commonwealth/server/models/role';
 import type { RuleAttributes } from 'commonwealth/server/models/rule';

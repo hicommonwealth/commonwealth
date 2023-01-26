@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AppError } from 'common-common/src/errors';
 import type { DB } from '../models';
-import type { TypedRequestBody, TypedResponse} from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { ETHERSCAN_JS_API_KEY } from '../config';
 import type { ContractAttributes } from '../models/contract';

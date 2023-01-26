@@ -111,7 +111,9 @@ class CosmosGovernance extends ProposalModule<
     const { votingParams } = await this._Chain.api.gov.params('voting');
     this._votingPeriodS = votingParams.votingPeriod.seconds.toNumber();
     this._yesThreshold = await asciiLiteralToDecimal(tallyParams.threshold);
-    this._vetoThreshold = await asciiLiteralToDecimal(tallyParams.vetoThreshold);
+    this._vetoThreshold = await asciiLiteralToDecimal(
+      tallyParams.vetoThreshold
+    );
     this._maxDepositPeriodS = depositParams.maxDepositPeriod.seconds.toNumber();
 
     // TODO: support off-denom deposits

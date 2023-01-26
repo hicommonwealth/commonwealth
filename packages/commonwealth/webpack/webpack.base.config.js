@@ -52,12 +52,14 @@ module.exports = {
           name: 'bitcoin',
           chunks: 'all',
         },
-        ethereum: { // this is made into an inital chunk
+        ethereum: {
+          // this is made into an inital chunk
           test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
-        ethereumAsync: { // this is made into an async chunk (lazy loaded)
+        ethereumAsync: {
+          // this is made into an async chunk (lazy loaded)
           test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
           name: 'ethereumAsync',
           chunks: 'all',

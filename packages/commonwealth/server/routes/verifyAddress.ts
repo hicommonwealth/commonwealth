@@ -178,7 +178,8 @@ const verifySignature = async (
         try {
           // directly verify the generated signature, generated via SignBytes
           const { pubkey, signature } = cosm.decodeSignature(stdSignature);
-          const secpSignature = cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
+          const secpSignature =
+            cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new cosmCrypto.Sha256(
             Buffer.from(JSON.stringify(canvasMessage))
           ).digest();
@@ -228,7 +229,8 @@ const verifySignature = async (
 
           const { pubkey, signature } = cosm.decodeSignature(stdSignature);
           const cosmCrypto = await import('@cosmjs/crypto');
-          const secpSignature = cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
+          const secpSignature =
+            cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new cosmCrypto.Sha256(
             cosm.serializeSignDoc(generatedSignDoc)
           ).digest();

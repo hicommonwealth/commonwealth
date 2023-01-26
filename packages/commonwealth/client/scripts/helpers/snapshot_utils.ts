@@ -7,7 +7,7 @@ class SnapshotLazyLoader {
   private static client;
 
   private static async init() {
-    if(!this.snapshot) {
+    if (!this.snapshot) {
       this.snapshot = await import('@snapshot-labs/snapshot.js');
       const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
       this.client = new this.snapshot.Client712(hub);
@@ -30,7 +30,7 @@ class GqlLazyLoader {
   private static gql;
 
   private static async init() {
-    if(!this.gql) {
+    if (!this.gql) {
       this.gql = await import('graphql-tag');
     }
   }

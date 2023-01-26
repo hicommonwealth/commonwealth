@@ -12,10 +12,9 @@ import type {
   ICache,
   IChainNode,
   ITokenBalanceCache,
-  TokenBalanceResp} from './types';
-import {
-  FetchTokenBalanceErrors
+  TokenBalanceResp,
 } from './types';
+import { FetchTokenBalanceErrors } from './types';
 import { TbcStatsDSender } from './tbcStatsDSender';
 
 const log = factory.getLogger(formatFilename(__filename));

@@ -4,8 +4,7 @@ import app from 'state';
 import type { AddressInfo, RoleInfo, ChainInfo } from 'models';
 import { Account } from 'models';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
-import type {
-  Action} from 'commonwealth/shared/permissions';
+import type { Action } from 'commonwealth/shared/permissions';
 import {
   AccessLevel,
   PermissionManager,

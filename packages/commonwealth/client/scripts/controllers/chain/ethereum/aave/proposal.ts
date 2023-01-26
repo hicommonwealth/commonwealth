@@ -308,10 +308,7 @@ export default class AaveProposal extends Proposal<
       console.error(
         'Failed to fetch total voting supply at proposal start block, using hardcoded value.'
       );
-      this._votingSupplyAtStart = Web3.toWei(
-        new BN(1_000_000_000),
-        'ether'
-      );
+      this._votingSupplyAtStart = Web3.toWei(new BN(1_000_000_000), 'ether');
     }
 
     this._minVotingPowerNeeded = this._votingSupplyAtStart

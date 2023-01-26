@@ -1,8 +1,7 @@
 import type { Transaction, FindOptions } from 'sequelize';
 import { Op } from 'sequelize';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
-import type {
-  Action} from 'commonwealth/shared/permissions';
+import type { Action } from 'commonwealth/shared/permissions';
 import {
   PermissionManager,
   PermissionError,

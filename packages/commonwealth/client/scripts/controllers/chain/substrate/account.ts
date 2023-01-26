@@ -361,13 +361,13 @@ class SubstrateAccounts
   }
 
   public isZero(address: string) {
-    const decoded = this.polk.decodeAddress(address);
+    const decoded = this.polkadot.decodeAddress(address);
     return decoded.every((v) => v === 0);
   }
 
   public fromAddress(address: string, isEd25519 = false): SubstrateAccount {
     try {
-      this.polk.decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
+      this.polkadot.decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
     } catch (e) {
       console.error(`Decoded invalid address: ${address}`);
       return;

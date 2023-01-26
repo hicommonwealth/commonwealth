@@ -1,10 +1,7 @@
 import 'chai/register-should';
 import chai from 'chai';
-import type {
-  GetTopicsReq} from 'common-common/src/api/extApiTypes';
-import {
-  OrderByOptions,
-} from 'common-common/src/api/extApiTypes';
+import type { GetTopicsReq } from 'common-common/src/api/extApiTypes';
+import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import { testTopics } from 'test/integration/api/external/dbEntityHooks.spec';
 import type { TopicAttributes } from 'server/models/topic';
 import { get } from 'test/integration/api/external/appHook.spec';

@@ -1,13 +1,11 @@
 import Sequelize from 'sequelize';
-import type { GetRulesReq, GetRulesResp } from 'common-common/src/api/extApiTypes';
-import { oneOf, query, validationResult } from 'express-validator';
 import type {
-  TypedRequestQuery,
-  TypedResponse} from '../../types';
-import {
-  success,
-  failure,
-} from '../../types';
+  GetRulesReq,
+  GetRulesResp,
+} from 'common-common/src/api/extApiTypes';
+import { oneOf, query, validationResult } from 'express-validator';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { success, failure } from '../../types';
 import type { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 

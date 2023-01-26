@@ -98,7 +98,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
     const rpc = chainUrl ? { [chainId]: chainUrl } : {};
 
-    const WalletConnectProvider = (await import('@walletconnect/web3-provider')).default;
+    const WalletConnectProvider = (await import('@walletconnect/web3-provider'))
+      .default;
     this._provider = new WalletConnectProvider({ rpc, chainId });
 
     // destroy pre-existing session if exists

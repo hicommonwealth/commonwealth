@@ -1,5 +1,8 @@
 import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
-import type { TokenBalanceCache, TokenBalanceResp } from 'token-balance-cache/src';
+import type {
+  TokenBalanceCache,
+  TokenBalanceResp,
+} from 'token-balance-cache/src';
 import { query, validationResult } from 'express-validator';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';

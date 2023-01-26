@@ -3,10 +3,9 @@ import type {
   PostRolesReq,
   PostRulesReq,
   PostTopicsReq,
-  PutCommentsReq} from 'common-common/src/api/extApiTypes';
-import {
-  PostProfilesReq
+  PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
+import { PostProfilesReq } from 'common-common/src/api/extApiTypes';
 import type { DB } from 'commonwealth/server/models';
 import {
   getComments,
