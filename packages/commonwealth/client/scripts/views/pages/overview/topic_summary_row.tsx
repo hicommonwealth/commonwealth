@@ -4,7 +4,7 @@ import ClassComponent from 'class_component';
 import { pluralize } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import m from 'mithril';
-// import { navigateToSubpage } from 'app';
+// import { navigateToSubpage } from 'router';
 import type { Thread, Topic } from 'models';
 import moment from 'moment';
 
