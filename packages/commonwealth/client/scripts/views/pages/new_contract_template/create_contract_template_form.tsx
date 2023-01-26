@@ -10,6 +10,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWText } from 'views/components/component_kit/cw_text';
+import app from 'state';
 
 class CreateContractTemplateForm extends ClassComponent {
   private saving = false;
@@ -20,9 +21,11 @@ class CreateContractTemplateForm extends ClassComponent {
   };
 
   createContractTemplate() {
+    const scope = app.customDomainId() || m.route.param('scope');
     try {
       this.saving = true;
       console.log(this.form);
+      m.route.set(`/${scope}/contracts`);
     } catch (err) {
       notifyError('Failed to create new contract template');
       console.log(err);
@@ -31,13 +34,12 @@ class CreateContractTemplateForm extends ClassComponent {
     }
   }
 
-  resetForm() {
-    this.form.displayName = '';
-    this.form.nickname = '';
-    this.form.template = '';
+  handleCancel() {
+    const scope = app.customDomainId() || m.route.param('scope');
+    m.route.set(`/${scope}/contracts`);
   }
 
-  view() {
+  view(vnode) {
     const isCreatingDisabled =
       this.saving ||
       !this.form.displayName ||
@@ -87,13 +89,13 @@ class CreateContractTemplateForm extends ClassComponent {
           <CWButton
             buttonType="mini-white"
             label="Cancel"
-            onclick={() => this.resetForm()}
+            onclick={this.handleCancel}
           />
           <CWButton
             buttonType="mini-black"
             label="Create"
             disabled={isCreatingDisabled}
-            onclick={() => this.createContractTemplate()}
+            onclick={this.createContractTemplate}
           />
         </div>
       </div>

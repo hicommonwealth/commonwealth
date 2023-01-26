@@ -10,6 +10,7 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import app from 'state';
 
 class AddContractAndAbiForm extends ClassComponent {
   private saving = false;
@@ -18,9 +19,11 @@ class AddContractAndAbiForm extends ClassComponent {
     abi: '',
   };
 
-  addContract() {
+  handleAddContract() {
+    const scope = app.customDomainId() || m.route.param('scope');
     try {
       this.saving = true;
+      m.route.set(`/${scope}/contracts`);
     } catch (err) {
       notifyError('Failed to add Contract and ABI');
       console.log(err);
@@ -29,12 +32,12 @@ class AddContractAndAbiForm extends ClassComponent {
     }
   }
 
-  resetForm() {
-    this.form.address = '';
-    this.form.abi = '';
+  handleCancel() {
+    const scope = app.customDomainId() || m.route.param('scope');
+    m.route.set(`/${scope}/contracts`);
   }
 
-  view() {
+  view(vnode) {
     const isAddressValid = isAddress(this.form.address);
     const isAbiValid = !!this.form.abi;
     const isAddingDisabled = this.saving || !isAddressValid || !isAbiValid;
@@ -73,13 +76,13 @@ class AddContractAndAbiForm extends ClassComponent {
           <CWButton
             buttonType="mini-white"
             label="Cancel"
-            onclick={() => this.resetForm()}
+            onclick={this.handleCancel}
           />
           <CWButton
             buttonType="mini-black"
             label="Add"
             disabled={isAddingDisabled}
-            onclick={() => this.addContract()}
+            onclick={this.handleAddContract}
           />
         </div>
       </div>

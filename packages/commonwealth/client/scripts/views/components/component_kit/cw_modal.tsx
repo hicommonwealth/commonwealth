@@ -27,6 +27,7 @@ type ModalAttrs = {
   modalType: 'centered' | 'fullScreen';
   spec: any; // TODO Gabe 2/2/22 - What is a spec?
   breakpointFn?: (width: number) => boolean;
+  className?: string;
 };
 
 export class CWModal extends ClassComponent<ModalAttrs> {
@@ -76,7 +77,7 @@ export class CWModal extends ClassComponent<ModalAttrs> {
   }
 
   view(vnode: m.Vnode<ModalAttrs>) {
-    const { onclick, spec } = vnode.attrs;
+    const { onclick, spec, className } = vnode.attrs;
 
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
@@ -88,8 +89,14 @@ export class CWModal extends ClassComponent<ModalAttrs> {
           onclick={() => onclick(spec, confirmExit, exitCallback)}
         >
           <div
-            class={getClasses<{ isFullScreen: boolean }>(
-              { isFullScreen: this.modalTypeState === 'fullScreen' },
+            class={getClasses<{
+              isFullScreen: boolean;
+              [key: string]: boolean;
+            }>(
+              {
+                isFullScreen: this.modalTypeState === 'fullScreen',
+                [className]: !!className,
+              },
               'modal-container'
             )}
             onclick={(e) => {

@@ -2,6 +2,7 @@
 
 import 'pages/new_contract/new_contract_page.scss';
 import app from 'state';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
@@ -34,7 +35,7 @@ class NewContractPage extends ClassComponent {
         <div class="NewContractPage">
           <CWBreadcrumbs
             breadcrumbs={[
-              { label: 'Contracts', path: `${scope}/contracts` },
+              { label: 'Contracts', path: `/${scope}/contracts` },
               { label: 'Add Contract and ABI', path: '' },
             ]}
           />

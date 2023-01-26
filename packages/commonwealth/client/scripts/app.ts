@@ -655,7 +655,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
               scoped: true,
             }),
-            // General Contracts
+            '/contracts': importRoute('views/pages/contracts', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/new/contract': importRoute('views/pages/new_contract', {
               scoped: true,
               deferChain: true,
@@ -933,6 +936,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/:scope/overview': importRoute('views/pages/overview', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/contracts': importRoute('views/pages/contracts', {
               scoped: true,
               deferChain: true,
             }),

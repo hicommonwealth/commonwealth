@@ -1,0 +1,32 @@
+@import '../../shared';
+
+.ContractTemplateCard {
+  background-color: $neutral-25;
+
+  .header {
+    margin-bottom: 24px;
+
+    svg {
+      padding-block: 2px;
+    }
+  }
+
+  .contract-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .info-row {
+      display: flex;
+
+      @include extraSmall {
+        flex-direction: column;
+      }
+
+      .row-label {
+        color: $neutral-500;
+        min-width: 120px;
+      }
+    }
+  }
+}
