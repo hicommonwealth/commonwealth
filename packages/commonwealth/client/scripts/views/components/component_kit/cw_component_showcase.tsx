@@ -46,7 +46,7 @@ import { CWContentPageCard } from './cw_content_page';
 import { ReactPopover } from './cw_popover/cw_popover';
 import CWCoverImageUploader from './cw_cover_image_uploader';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import { DividerMenuItem, MenuItem } from './types';
+import { DividerMenuItem, MenuItem, ReactMenuItem } from './types';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -90,52 +90,50 @@ const checkboxGroupOptions: Array<CheckboxType> = [
   },
 ];
 
-const popoverMenuOptions = (): Array<MenuItem> => {
+const popoverMenuOptions = (): Array<ReactMenuItem> => {
   return [
     { type: 'header', label: 'Community' },
     {
       type: 'default',
       label: 'Create Thread',
       iconLeft: 'write',
-      onClick: () => {
-        return console.log('inside item onclick');
-      },
+      onClick: () => console.log('Create thread clicked'),
     },
-    // {
-    //   label: 'Create Proposal',
-    //   iconLeft: 'write',
-    //   onClick: () => console.log('Create proposal clicked'),
-    // },
-    // {
-    //   label: 'Create Poll',
-    //   iconLeft: 'write',
-    //   onClick: () => console.log('Create poll clicked'),
-    // },
-    // {
-    //   label: 'Create Snapshot',
-    //   iconLeft: 'write',
-    //   disabled: true,
-    //   onClick: () => console.log('Create snapshot clicked'),
-    // },
-    // { type: 'divider' },
-    // { type: 'header', label: 'Universal' },
-    // {
-    //   label: 'Create Community',
-    //   iconLeft: 'people',
-    //   onClick: () => console.log('Create community clicked'),
-    // },
-    // {
-    //   label: 'Create Crowdfund',
-    //   iconLeft: 'wallet',
-    //   onClick: () => console.log('Create crowdfund clicked'),
-    // },
-    // { type: 'divider' },
-    // {
-    //   label: 'Report',
-    //   iconLeft: 'cautionCircle',
-    //   isSecondary: true,
-    //   onClick: () => console.log('Report clicked'),
-    // },
+    {
+      label: 'Create Proposal',
+      iconLeft: 'write',
+      onClick: () => console.log('Create proposal clicked'),
+    },
+    {
+      label: 'Create Poll',
+      iconLeft: 'write',
+      onClick: () => console.log('Create poll clicked'),
+    },
+    {
+      label: 'Create Snapshot',
+      iconLeft: 'write',
+      disabled: true,
+      onClick: () => console.log('Create snapshot clicked'),
+    },
+    { type: 'divider' },
+    { type: 'header', label: 'Universal' },
+    {
+      label: 'Create Community',
+      iconLeft: 'people',
+      onClick: () => console.log('Create community clicked'),
+    },
+    {
+      label: 'Create Crowdfund',
+      iconLeft: 'wallet',
+      onClick: () => console.log('Create crowdfund clicked'),
+    },
+    { type: 'divider' },
+    {
+      label: 'Report',
+      iconLeft: 'cautionCircle',
+      isSecondary: true,
+      onClick: () => console.log('Report clicked'),
+    },
   ];
 };
 

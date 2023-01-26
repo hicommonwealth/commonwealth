@@ -17,8 +17,6 @@ export enum ComponentType {
   ContentPage = 'ContentPage',
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
-  EngagementButton = 'EngagementButton',
-  ExternalLink = 'ExternalLink',
   Form = 'Form',
   FormSection = 'FormSection',
   FilterMenu = 'FilterMenu',
@@ -54,9 +52,9 @@ export type StyleAttrs = {
   className?: string;
 };
 
-export type DividerMenuItem = { type?: 'divider' };
+export type DividerMenuItem = { type: 'divider' };
 
-type HeaderMenuItem = { type?: 'header'; label?: string };
+type HeaderMenuItem = { type: 'header'; label?: string };
 
 export type DefaultMenuItem = {
   disabled?: boolean;
@@ -89,3 +87,5 @@ export type MenuItem =
   | DefaultMenuItem
   | NotificationMenuItem
   | CommunityMenuItem;
+
+export type ReactMenuItem = DividerMenuItem | HeaderMenuItem | DefaultMenuItem;
