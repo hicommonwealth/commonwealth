@@ -82,14 +82,13 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
           onclick={(e) => {
             e.preventDefault();
 
-            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-              (a) => {
-                return (
-                  proposalSlugToClass().get(
-                    ProposalType.SubstrateDemocracyProposal
-                  ) as ProposalModule<any, any, any>
-                ).createTx(...a);
-              };
+            let createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (proposalSlugToClass().get(
+                ProposalType.SubstrateDemocracyProposal
+              ) as ProposalModule<any, any, any>).createTx(...a);
+            };
 
             let args = [];
 
@@ -114,8 +113,9 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
               createFunc = ([au, mt, pr, dep]) =>
                 substrate.democracyProposals.createTx(au, mt, pr, dep);
             } else if (this.toggleValue === 'preimage') {
-              const encodedProposal =
-                EdgewareFunctionPicker.getMethod(formState).toHex();
+              const encodedProposal = EdgewareFunctionPicker.getMethod(
+                formState
+              ).toHex();
 
               args = [
                 author,
@@ -126,8 +126,9 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
               createFunc = ([au, mt, pr]) =>
                 substrate.democracyProposals.notePreimage(au, mt, pr);
             } else if (this.toggleValue === 'imminent') {
-              const encodedProposal =
-                EdgewareFunctionPicker.getMethod(formState).toHex();
+              const encodedProposal = EdgewareFunctionPicker.getMethod(
+                formState
+              ).toHex();
 
               args = [
                 author,
