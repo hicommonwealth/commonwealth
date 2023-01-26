@@ -7,7 +7,7 @@ import { ThreadStage } from 'models';
 import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
-import { navigateToSubpage } from '../app';
+import { navigateToSubpage } from 'router';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
