@@ -238,6 +238,23 @@ const app: IApp = {
   cachedIdentityWidget: null,
 };
 
+function handleLoginSockets(data: any) {
+  app.loginState = data.result.user
+    ? LoginState.LoggedIn
+    : LoginState.LoggedOut;
+
+  if (app.loginState === LoginState.LoggedIn) {
+    console.log('Initializing socket connection with JTW:', app.user.jwt);
+    // init the websocket connection and the chain-events namespace
+    app.socket.init(app.user.jwt);
+    app.user.notifications.refresh().then(() => m.redraw());
+  } else if (app.loginState === LoginState.LoggedOut &&
+    app.socket.isConnected) {
+    // TODO: create global deinit function
+    app.socket.disconnect();
+  }
+}
+
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
@@ -290,22 +307,8 @@ export async function initAppState(
 
         // update the login status
         updateActiveUser(data.result.user);
-        app.loginState = data.result.user
-          ? LoginState.LoggedIn
-          : LoginState.LoggedOut;
 
-        if (app.loginState === LoginState.LoggedIn) {
-          console.log('Initializing socket connection with JTW:', app.user.jwt);
-          // init the websocket connection and the chain-events namespace
-          app.socket.init(app.user.jwt);
-          app.user.notifications.refresh().then(() => m.redraw());
-        } else if (
-          app.loginState === LoginState.LoggedOut &&
-          app.socket.isConnected
-        ) {
-          // TODO: create global deinit function
-          app.socket.disconnect();
-        }
+        handleLoginSockets(data);
 
         app.user.setStarredCommunities(
           data.result.user ? data.result.user.starredCommunities : []

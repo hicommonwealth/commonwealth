@@ -12,19 +12,18 @@ const handleWindowError = () => {
   const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token/;
 
   window.onerror = (errorMsg) => {
-    if (
-      typeof errorMsg === 'string' &&
-      resizeObserverLoopErrRe.test(errorMsg)
-    ) {
-      return false;
-    }
+    if (typeof errorMsg === 'string') {
+      if (resizeObserverLoopErrRe.test(errorMsg)) {
+        return false;
+      }
 
-    if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
-      alertModalWithText(
-        APPLICATION_UPDATE_MESSAGE,
-        APPLICATION_UPDATE_ACTION
-      )();
-      return false;
+      if (chunkLoadingErrRe.test(errorMsg)) {
+        alertModalWithText(
+          APPLICATION_UPDATE_MESSAGE,
+          APPLICATION_UPDATE_ACTION
+        )();
+        return false;
+      }
     }
 
     notifyError(`${errorMsg}`);

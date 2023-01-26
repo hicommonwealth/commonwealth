@@ -190,22 +190,7 @@ export const selectChain = async (
     throw new Error('Invalid chain');
   }
 
-  // Load server data without initializing modules/chain connection.
-  const finalizeInitialization = await newChain.initServer();
-
-  // If the user is still on the initializing node, finalize the
-  // initialization; otherwise, abort, deinit, and return false.
-  //
-  // Also make sure the state is sufficiently reset so that the
-  // next redraw cycle will reinitialize any needed chain.
-  if (!finalizeInitialization) {
-    console.log('Chain loading aborted');
-    app.chainPreloading = false;
-    app.chain = null;
-    return false;
-  } else {
-    app.chain = newChain;
-  }
+  await initNewChain(newChain);
 
   if (initApi) {
     await app.chain.initApi(); // required for loading NearAccounts
@@ -231,6 +216,25 @@ export const selectChain = async (
   // initialization has finalized.
   m.redraw();
   return true;
+};
+
+export const initNewChain = async (newChain: any): Promise<boolean> => {
+  // Load server data without initializing modules/chain connection.
+  const finalizeInitialization = await newChain.initServer();
+
+  // If the user is still on the initializing node, finalize the
+  // initialization; otherwise, abort, deinit, and return false.
+  //
+  // Also make sure the state is sufficiently reset so that the
+  // next redraw cycle will reinitialize any needed chain.
+  if (!finalizeInitialization) {
+    console.log('Chain loading aborted');
+    app.chainPreloading = false;
+    app.chain = null;
+    return false;
+  } else {
+    app.chain = newChain;
+  }
 };
 
 // Initializes a selected chain. Requires `app.chain` to be defined and valid

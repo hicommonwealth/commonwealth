@@ -9,7 +9,7 @@ const showLoginNotification = () => {
     notifySuccess('Logged in!');
   } else if (loginError) {
     notifyError('Could not log in');
-    console.error(m.route.param('loginerror'));
+    console.error(loginError);
   }
 };
 
