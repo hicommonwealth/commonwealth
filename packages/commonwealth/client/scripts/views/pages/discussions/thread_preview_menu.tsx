@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -10,7 +19,7 @@ import { Thread, ThreadStage, Topic } from 'models';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { ReactPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 type ThreadPreviewMenuAttrs = {
@@ -49,7 +58,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
           e.stopPropagation();
         }}
       >
-        <CWPopoverMenu
+        <ReactPopoverMenu
           menuItems={[
             ...(hasAdminPermissions
               ? [
@@ -149,7 +158,13 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                 ]
               : []),
           ]}
-          trigger={<CWIconButton iconName="dotsVertical" iconSize="small" />}
+          renderTrigger={(onclick) => (
+            <CWIconButton
+              iconName="dotsVertical"
+              iconSize="small"
+              onClick={onclick}
+            />
+          )}
         />
       </div>
     );

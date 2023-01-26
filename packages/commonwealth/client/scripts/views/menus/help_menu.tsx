@@ -1,17 +1,26 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { MenuItem } from '../components/component_kit/types';
+import { ReactPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { ReactMenuItem } from '../components/component_kit/types';
 import { FeedbackModal } from '../modals/feedback_modal';
 
-const gethelpMenuItems = (): Array<MenuItem> => {
+const gethelpMenuItems = (): Array<ReactMenuItem> => {
   return [
     {
       label: 'Send Feedback',
@@ -44,8 +53,14 @@ export class HelpMenu extends ClassComponent {
 export class HelpMenuPopover extends ClassComponent {
   view() {
     return (
-      <CWPopoverMenu
-        trigger={<CWIconButton iconButtonTheme="black" iconName="help" />}
+      <ReactPopoverMenu
+        renderTrigger={(onclick) => (
+          <CWIconButton
+            iconButtonTheme="black"
+            iconName="help"
+            onClick={onclick}
+          />
+        )}
         menuItems={gethelpMenuItems()}
       />
     );

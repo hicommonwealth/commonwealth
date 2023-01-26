@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -12,11 +21,11 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { MenuItem } from '../components/component_kit/types';
+import { ReactPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { ReactMenuItem } from '../components/component_kit/types';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 
-const getCreateContentMenuItems = (): MenuItem[] => {
+const getCreateContentMenuItems = (): ReactMenuItem[] => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =
@@ -44,7 +53,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
     app.chain?.base === ChainBase.Substrate &&
     app.chain?.network !== ChainNetwork.Plasm;
 
-  const getTopicTemplateItems = (): MenuItem[] =>
+  const getTopicTemplateItems = (): ReactMenuItem[] =>
     topics.map((t) => ({
       label: `New ${t.name} Thread`,
       iconLeft: 'write',
@@ -65,7 +74,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
       },
     }));
 
-  const getOnChainProposalItem = (): MenuItem[] =>
+  const getOnChainProposalItem = (): ReactMenuItem[] =>
     showOnChainProposalItem
       ? [
           {
@@ -76,7 +85,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         ]
       : [];
 
-  const getSputnikProposalItem = (): MenuItem[] =>
+  const getSputnikProposalItem = (): ReactMenuItem[] =>
     showSputnikProposalItem
       ? [
           {
@@ -87,7 +96,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         ]
       : [];
 
-  const getSubstrateProposalItems = (): MenuItem[] =>
+  const getSubstrateProposalItems = (): ReactMenuItem[] =>
     showSubstrateProposalItems
       ? [
           {
@@ -117,7 +126,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
                   iconLeft: 'councilProposal',
                 },
               ]
-            : []) as MenuItem[]),
+            : []) as ReactMenuItem[]),
           {
             label: 'New bounty proposal',
             onClick: () =>
@@ -137,7 +146,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         ]
       : [];
 
-  const getSnapshotProposalItem = (): MenuItem[] =>
+  const getSnapshotProposalItem = (): ReactMenuItem[] =>
     showSnapshotOptions
       ? [
           {
@@ -157,7 +166,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         ]
       : [];
 
-  const getUniversalCreateItems = (): MenuItem[] => [
+  const getUniversalCreateItems = (): ReactMenuItem[] => [
     // {
     //   label: 'New Crowdfund',
     //   iconLeft: 'wallet',
@@ -212,14 +221,14 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           {
             type: 'header',
             label: 'Create Within Community',
-          } as MenuItem,
+          } as ReactMenuItem,
           {
             label: 'New Thread',
             onClick: () => {
               navigateToSubpage('/new/discussion');
             },
             iconLeft: 'write',
-          } as MenuItem,
+          } as ReactMenuItem,
           ...getTopicTemplateItems(),
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),
@@ -289,9 +298,15 @@ export class CreateContentPopover extends ClassComponent {
     }
 
     return (
-      <CWPopoverMenu
-        trigger={<CWIconButton iconButtonTheme="black" iconName="plusCircle" />}
+      <ReactPopoverMenu
         menuItems={getCreateContentMenuItems()}
+        renderTrigger={(onclick) => (
+          <CWIconButton
+            iconButtonTheme="black"
+            iconName="plusCircle"
+            onClick={onclick}
+          />
+        )}
       />
     );
   }

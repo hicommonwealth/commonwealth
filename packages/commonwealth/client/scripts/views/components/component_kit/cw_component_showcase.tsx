@@ -35,7 +35,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
-import { CWPopoverMenu, ReactPopoverMenu } from './cw_popover/cw_popover_menu';
+import { ReactPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
@@ -46,7 +46,7 @@ import { CWContentPageCard } from './cw_content_page';
 import { ReactPopover } from './cw_popover/cw_popover';
 import CWCoverImageUploader from './cw_cover_image_uploader';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import { DividerMenuItem, MenuItem, ReactMenuItem } from './types';
+import { ReactMenuItem } from './types';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -278,13 +278,6 @@ export class _ComponentShowcase extends ClassComponent {
           <CWTag label="Prop #52" type="proposal" />
           <CWTag label="Ref #90" type="referendum" />
           <CWTag label="12 days" iconName="clock" />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Popover Menu</CWText>
-          <CWPopoverMenu
-            trigger={<CWIconButton iconName="dotsVertical" />}
-            menuItems={popoverMenuOptions()}
-          />
         </div>
         <div className="tooltip-gallery">
           <CWText type="h3">Tooltip</CWText>

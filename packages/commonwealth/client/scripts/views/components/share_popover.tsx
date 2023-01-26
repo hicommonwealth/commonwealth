@@ -1,27 +1,45 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
-import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
+import { ReactPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
-type SharePopoverAttrs = { commentId?: number; trigger?: ResultNode };
+type SharePopoverAttrs = {
+  commentId?: number;
+  renderTrigger?: (onClick: () => void) => React.ReactNode;
+};
 
 export class SharePopover extends ClassComponent<SharePopoverAttrs> {
   view(vnode: ResultNode<SharePopoverAttrs>) {
-    const { commentId, trigger } = vnode.attrs;
+    const {
+      commentId,
+      renderTrigger = (onclick) => (
+        <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
+      ),
+    } = vnode.attrs;
     const domain = document.location.origin;
 
     return (
-      <CWPopoverMenu
+      <ReactPopoverMenu
         menuItems={[
           {
             iconLeft: 'copy',
             label: 'Copy URL',
             onClick: async () => {
-              const currentRouteSansCommentParam = getRoute()
-                .split('?comment=')[0];
+              const currentRouteSansCommentParam =
+                getRoute().split('?comment=')[0];
               if (!commentId) {
                 await navigator.clipboard.writeText(
                   `${domain}${currentRouteSansCommentParam}`
@@ -51,7 +69,7 @@ export class SharePopover extends ClassComponent<SharePopoverAttrs> {
             },
           },
         ]}
-        trigger={trigger || <CWIconButton iconName="share" iconSize="small" />}
+        renderTrigger={renderTrigger}
       />
     );
   }

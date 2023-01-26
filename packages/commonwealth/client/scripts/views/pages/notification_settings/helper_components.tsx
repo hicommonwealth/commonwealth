@@ -21,7 +21,7 @@ import { AddressInfo, NotificationSubscription } from 'models';
 import { slugify } from '../../../../../shared/utils';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { ReactPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { User } from '../../components/user/user';
@@ -177,8 +177,10 @@ export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
   view(vnode: ResultNode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
     return (
-      <CWPopoverMenu
-        trigger={<CWIconButton iconName="dotsVertical" />}
+      <ReactPopoverMenu
+        renderTrigger={(onclick) => (
+          <CWIconButton iconName="dotsVertical" onClick={onclick} />
+        )}
         menuItems={[
           {
             label: 'Unsubscribe',

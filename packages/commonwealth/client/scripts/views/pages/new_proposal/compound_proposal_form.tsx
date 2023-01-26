@@ -23,7 +23,7 @@ import { User } from 'views/components/user/user';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { ReactPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { AaveProposalState, defaultStateItem } from './types';
@@ -79,7 +79,7 @@ export class CompoundProposalForm extends ClassComponent {
               />
             ))}
           </CWTabBar>
-          <CWPopoverMenu
+          <ReactPopoverMenu
             menuItems={[
               {
                 iconLeft: 'write',
@@ -100,7 +100,9 @@ export class CompoundProposalForm extends ClassComponent {
                 },
               },
             ]}
-            trigger={<CWIconButton iconName="plus" />}
+            renderTrigger={(onclick) => (
+              <CWIconButton iconName="plus" onClick={onclick} />
+            )}
           />
         </div>
         <CWTextInput
