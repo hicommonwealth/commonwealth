@@ -131,9 +131,16 @@ export class Comment extends ClassComponent<CommentAttrs> {
               type="caption"
               fontWeight="medium"
               className="published-text"
-              onclick={() => showCanvasVerifyDataModal(comment)}
             >
               {moment(comment.createdAt).format('l')}
+            </CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="verification-icon"
+              onclick={() => showCanvasVerifyDataModal(comment)}
+            >
+              <CWIcon iconName="checkCircle" iconSize="xs" />
             </CWText>
           </div>
           {this.isEditingComment ? (
