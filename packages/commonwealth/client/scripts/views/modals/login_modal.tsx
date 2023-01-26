@@ -5,7 +5,7 @@ import {
   chainBasetoCanvasChain,
   constructCanvasMessage,
 } from 'adapters/shared';
-import { initAppState } from 'state';
+import app, { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 import _ from 'underscore';
