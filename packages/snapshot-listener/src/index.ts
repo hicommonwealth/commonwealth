@@ -7,14 +7,18 @@ import {
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
-import { factory, formatFilename } from "common-common/src/logging";
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_PORT, RABBITMQ_URI } from './config';
 import { StatsDController } from 'common-common/src/statsd';
-import v8 from "v8";
+import v8 from 'v8';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-log.info(`Node Option max-old-space-size set to: ${JSON.stringify(v8.getHeapStatistics().heap_size_limit / 1000000000 )} GB`);
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
