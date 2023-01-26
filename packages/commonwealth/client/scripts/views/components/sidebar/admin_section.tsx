@@ -84,6 +84,21 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         },
       },
       {
+        title: 'Contracts',
+        containsChildren: false,
+        displayData: null,
+        hasDefaultToggle: false,
+        isActive: m.route.get().includes('/contracts'),
+        isVisible: true,
+        isUpdated: false,
+        onclick: (e, toggle: boolean) => {
+          e.preventDefault();
+          handleRedirectClicks(e, `/contracts`, app.activeChainId(), () => {
+            setAdminToggleTree(`children.contracts.toggledState`, toggle);
+          });
+        },
+      },
+      {
         title: 'New topic',
         isActive: this.newTopicModalActive,
         isVisible: true,
