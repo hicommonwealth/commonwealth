@@ -137,7 +137,7 @@ export class SubstrateSessionController implements ISessionController {
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,
-      appName: "Commonwealth",
+      appName: 'Commonwealth',
       from: sessionPayload.from,
       timestamp: +Date.now(),
       chain: 'substrate',
