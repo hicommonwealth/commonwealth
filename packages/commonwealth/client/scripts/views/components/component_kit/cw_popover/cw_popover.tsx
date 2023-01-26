@@ -16,12 +16,7 @@ import {
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
-import { CWPortal } from '../cw_portal';
-import { applyArrowStyles, cursorInBounds, getPosition } from './helpers';
-import { ComponentType } from '../types';
-import { getClasses } from '../helpers';
 import { TooltipType } from './cw_tooltip';
-import { CWButton } from '../cw_button';
 
 export type PopoverInteractionType = 'click' | 'hover';
 
