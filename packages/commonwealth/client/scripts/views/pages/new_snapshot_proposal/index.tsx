@@ -177,7 +177,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
             oninput={(e) => {
               e.redraw = false; // do not redraw on input
 
-              this.form.name = e.target as any;
+              this.form.name = e.target.value as any;
 
               localStorage.setItem(
                 `${app.activeChainId()}-new-snapshot-proposal-name`,
@@ -245,6 +245,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
             }}
             placeholder="What is your proposal?"
             editorNamespace="new-proposal"
+            mode="markdown"
           />
           <CWButton
             label="Publish"
