@@ -2,7 +2,7 @@
 
 import * as solw3 from '@solana/web3.js';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';

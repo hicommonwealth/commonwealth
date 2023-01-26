@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
 import ClassComponent from 'class_component';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';

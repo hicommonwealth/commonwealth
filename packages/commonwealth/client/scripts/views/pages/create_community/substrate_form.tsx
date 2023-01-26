@@ -2,7 +2,7 @@
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
