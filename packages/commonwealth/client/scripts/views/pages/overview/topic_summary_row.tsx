@@ -25,20 +25,21 @@ import { getLastUpdated, isHot } from '../discussions/helpers';
 
 type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
+  pinnedThreads: Array<Thread>;
   topic: Topic;
 };
 
 export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
   view(vnode: m.Vnode<TopicSummaryRowAttrs>) {
-    const { monthlyThreads, topic } = vnode.attrs;
+    const { monthlyThreads, pinnedThreads, topic } = vnode.attrs;
 
-    const topFiveSortedThreads = monthlyThreads
+    const topSortedThreads = monthlyThreads
       .sort((a, b) => {
         const aLastUpdated = a.lastCommentedOn || a.createdAt;
         const bLastUpdated = b.lastCommentedOn || b.createdAt;
         return bLastUpdated.valueOf() - aLastUpdated.valueOf();
       })
-      .slice(0, 5);
+      .slice(0, 5 - monthlyThreads.length);
 
     // const isAdmin =
     //   app.roles.isRoleOfCommunity({
@@ -52,6 +53,8 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
     //     role: 'moderator',
     //     chain: app.activeChainId(),
     //   });
+
+    const threadsToDisplay = pinnedThreads.concat(topSortedThreads);
 
     return (
       <div class="TopicSummaryRow">
@@ -81,7 +84,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
           {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
         <div class="recent-threads-column">
-          {topFiveSortedThreads.map((thread, idx) => {
+          {threadsToDisplay.map((thread, idx) => {
             const discussionLink = getProposalUrlPath(
               thread.slug,
               `${thread.identifier}-${slugify(thread.title)}`
@@ -221,7 +224,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                     </div>
                   </div>
                 </div>
-                {idx !== topFiveSortedThreads.length - 1 && <CWDivider />}
+                {idx !== threadsToDisplay.length - 1 && <CWDivider />}
               </>
             );
           })}
