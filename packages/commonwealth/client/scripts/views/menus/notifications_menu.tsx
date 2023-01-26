@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 
 import 'components/header/notifications_menu.scss';
