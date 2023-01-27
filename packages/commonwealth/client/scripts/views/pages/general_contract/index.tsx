@@ -2,12 +2,12 @@
 
 import 'pages/general_contract/index.scss';
 import app from 'state';
-import { Contract } from 'models';
+import type { Contract } from 'models';
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
+import type { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';

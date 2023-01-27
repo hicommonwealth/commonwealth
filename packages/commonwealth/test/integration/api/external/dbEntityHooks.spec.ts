@@ -1,18 +1,18 @@
 import moment from 'moment';
 import models from 'server/database';
 import Sequelize from 'sequelize';
-import { ThreadInstance } from 'server/models/thread';
-import { CommentInstance } from 'server/models/comment';
-import { UserInstance } from 'server/models/user';
-import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
-import { CollaborationAttributes } from 'server/models/collaboration';
-import { ReactionAttributes } from 'server/models/reaction';
-import { ChainNodeAttributes } from 'server/models/chain_node';
-import { TopicAttributes } from 'server/models/topic';
-import { ProfileAttributes } from '../../../../server/models/profile';
-import { RoleAttributes } from '../../../../server/models/role';
-import { RuleAttributes } from '../../../../server/models/rule';
+import type { ThreadInstance } from 'server/models/thread';
+import type { CommentInstance } from 'server/models/comment';
+import type { UserInstance } from 'server/models/user';
+import type { AddressInstance } from 'server/models/address';
+import type { ChainInstance } from 'server/models/chain';
+import type { CollaborationAttributes } from 'server/models/collaboration';
+import type { ReactionAttributes } from 'server/models/reaction';
+import type { ChainNodeAttributes } from 'server/models/chain_node';
+import type { TopicAttributes } from 'server/models/topic';
+import type { ProfileAttributes } from '../../../../server/models/profile';
+import type { RoleAttributes } from '../../../../server/models/role';
+import type { RuleAttributes } from '../../../../server/models/rule';
 
 const Op = Sequelize.Op;
 

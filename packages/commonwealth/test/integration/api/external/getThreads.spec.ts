@@ -3,22 +3,20 @@ import models from 'server/database';
 import chai from 'chai';
 import 'chai/register-should';
 import { req, res } from 'test/unit/unitHelpers';
-import {
-  GetThreadsReq,
-  OrderByOptions,
-} from 'common-common/src/api/extApiTypes';
+import type { GetThreadsReq } from 'common-common/src/api/extApiTypes';
+import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import 'test/integration/api/external/dbEntityHooks.spec';
 import {
   testComments,
   testThreads,
 } from 'test/integration/api/external/dbEntityHooks.spec';
-import { ThreadAttributes } from 'server/models/thread';
+import type { ThreadAttributes } from 'server/models/thread';
 import { get } from 'test/integration/api/external/appHook.spec';
 
 describe('getThreads Tests', () => {
   it('should return threads with specified community_id correctly', async () => {
     const r: GetThreadsReq = { community_id: testThreads[0].chain };
-    let resp = await get('/api/threads', r);
+    const resp = await get('/api/threads', r);
 
     chai.assert.lengthOf(resp.result.threads, 5);
   });

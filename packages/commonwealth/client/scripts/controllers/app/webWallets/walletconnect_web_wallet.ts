@@ -1,11 +1,11 @@
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import type WalletConnectProvider from '@walletconnect/web3-provider';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import type { Account, BlockInfo, ChainInfo, IWebWallet } from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
-import Web3 from 'web3';
+import type Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
@@ -98,6 +98,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
     const rpc = chainUrl ? { [chainId]: chainUrl } : {};
 
+    const WalletConnectProvider = (await import('@walletconnect/web3-provider'))
+      .default;
     this._provider = new WalletConnectProvider({ rpc, chainId });
 
     // destroy pre-existing session if exists
@@ -107,6 +109,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
     //  Enable session (triggers QR Code modal)
     await this._provider.enable();
+    const Web3 = (await import('web3')).default;
     this._web3 = new Web3(this._provider as any);
     this._accounts = await this._web3.eth.getAccounts();
     if (this._accounts.length === 0) {

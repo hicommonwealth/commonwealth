@@ -1,4 +1,4 @@
-import { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
+import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
 import BN from 'bn.js';
 import {
   tokenBalanceCache,

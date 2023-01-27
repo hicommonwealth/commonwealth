@@ -1,5 +1,5 @@
 import type { ExternalProvider } from '@ethersproject/providers';
-import { Web3Provider } from '@ethersproject/providers';
+import type { Web3Provider } from '@ethersproject/providers';
 import type {
   ERC20VotesComp,
   GovernorAlpha,
@@ -35,11 +35,12 @@ export default class CompoundAPI
 
   public readonly contractAddress: string;
   private _Contract: GovernorAlpha | GovernorCompatibilityBravo;
+  private web3Provider: ExternalProvider;
   public get Contract() {
     return this._Contract;
   }
 
-  public readonly Provider: Web3Provider;
+  public Provider: Web3Provider;
 
   private _tokenType: GovernorTokenType;
   public get tokenType() {
@@ -72,12 +73,14 @@ export default class CompoundAPI
     web3Provider: ExternalProvider
   ) {
     this.contractAddress = contractAddress;
-    this.Provider = new Web3Provider(web3Provider);
-    // 12s minute polling interval (default is 4s)
-    this.Provider.pollingInterval = 12000;
+    this.web3Provider = web3Provider;
   }
 
   public async init(tokenName: string): Promise<void> {
+    const { Web3Provider } = await import('@ethersproject/providers');
+    this.Provider = new Web3Provider(this.web3Provider);
+    // 12s minute polling interval (default is 4s)
+    this.Provider.pollingInterval = 12000;
     // only Alpha has a guardian -- use to distinguish between types of governance contract
     try {
       this._Contract = GovernorAlpha__factory.connect(
