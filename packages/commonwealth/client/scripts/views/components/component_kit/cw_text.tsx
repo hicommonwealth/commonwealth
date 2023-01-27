@@ -1,8 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text.scss';
 
@@ -35,7 +34,7 @@ type FontType =
   | 'buttonLg'
   | 'buttonMini';
 
-type TextStyleAttrs = {
+type TextStyleProps = {
   className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;
@@ -45,10 +44,9 @@ type TextStyleAttrs = {
   type?: FontType;
 };
 
-type TextAttrs = {
-  onClick?: (e?: MouseEvent) => void;
-  title?: string | number;
-} & TextStyleAttrs;
+type TextProps = TextStyleProps &
+  React.PropsWithChildren &
+  React.HTMLAttributes<HTMLDivElement>;
 
 const getFontWeight = (type: FontType) => {
   if (type === 'buttonSm' || type === 'buttonLg') {
@@ -60,40 +58,40 @@ const getFontWeight = (type: FontType) => {
   }
 };
 
-export class CWText extends ClassComponent<TextAttrs> {
-  view(vnode: ResultNode<TextAttrs>) {
-    const {
-      className,
-      disabled = false,
-      isCentered,
-      fontStyle,
-      onClick,
-      noWrap = false,
-      title,
-      type = 'b1',
-      fontWeight = getFontWeight(type),
-    } = vnode.attrs;
+export const CWText = (props: TextProps) => {
+  const {
+    className,
+    disabled = false,
+    isCentered,
+    fontStyle,
+    onClick,
+    noWrap = false,
+    title,
+    type = 'b1',
+    fontWeight = getFontWeight(type),
+    ...otherProps
+  } = props;
 
-    return (
-      <div
-        className={getClasses<TextStyleAttrs & { onClick?: boolean }>(
-          {
-            type,
-            fontWeight,
-            disabled,
-            fontStyle,
-            noWrap,
-            onClick: !!onClick,
-            isCentered,
-            className,
-          },
-          ComponentType.Text
-        )}
-        title={title}
-        onClick={onClick}
-      >
-        {vnode.children}
-      </div>
-    );
-  }
-}
+  return (
+    <div
+      className={getClasses<TextStyleProps & { onClick?: boolean }>(
+        {
+          type,
+          fontWeight,
+          disabled,
+          fontStyle,
+          noWrap,
+          onClick: !!onClick,
+          isCentered,
+          className,
+        },
+        ComponentType.Text
+      )}
+      title={title ? title.toString() : undefined}
+      onClick={onClick}
+      {...otherProps}
+    >
+      {props.children}
+    </div>
+  );
+};

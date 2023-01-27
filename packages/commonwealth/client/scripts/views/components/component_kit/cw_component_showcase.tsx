@@ -19,11 +19,9 @@ import 'components/component_kit/cw_component_showcase.scss';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
-import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput } from './cw_text_input';
 import { iconLookup, IconName } from './cw_icons/cw_icon_lookup';
-import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
@@ -45,6 +43,8 @@ import { CWDropdown } from './cw_dropdown';
 import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
 import { Popover, usePopover } from './cw_popover/cw_popover';
+import { CWText } from './cw_text';
+import { CWIcon } from './cw_icons/cw_icon';
 import CWCoverImageUploader from './cw_cover_image_uploader';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 
@@ -262,6 +262,110 @@ export const ComponentShowcase = () => {
             )}
           />
           <CWText>Popover Menu (click)</CWText>
+        </div>
+      </div>
+      <div className="text-gallery">
+        <CWText type="h3">Text</CWText>
+        <CWText fontWeight="semiBold" type="d1">
+          Display1 semi bold
+        </CWText>
+        <CWText type="d1" fontWeight="bold">
+          Display1 bold
+        </CWText>
+        <CWText type="d1" fontWeight="black">
+          Display1 black
+        </CWText>
+        <CWText fontWeight="semiBold" type="d2">
+          Display2 semi bold
+        </CWText>
+        <CWText type="d2" fontWeight="bold">
+          Display2 bold
+        </CWText>
+        <CWText type="d2" fontWeight="black">
+          Display2 black
+        </CWText>
+        <CWText fontWeight="medium" type="h1">
+          Heading1 medium
+        </CWText>
+        <CWText type="h1" fontWeight="semiBold">
+          Heading1 semi bold
+        </CWText>
+        <CWText type="h1" fontWeight="bold">
+          Heading1 bold
+        </CWText>
+        <CWText fontWeight="medium" type="h2">
+          Heading2 medium
+        </CWText>
+        <CWText type="h2" fontWeight="semiBold">
+          Heading2 semi bold
+        </CWText>
+        <CWText type="h2" fontWeight="bold">
+          Heading2 bold
+        </CWText>
+        <CWText fontWeight="medium" type="h3">
+          Heading3 medium
+        </CWText>
+        <CWText type="h3" fontWeight="semiBold">
+          Heading3 semi bold
+        </CWText>
+        <CWText type="h3" fontWeight="bold">
+          Heading3 bold
+        </CWText>
+        <CWText fontWeight="medium" type="h4">
+          Heading4 medium
+        </CWText>
+        <CWText type="h4" fontWeight="semiBold">
+          Heading4 semi bold
+        </CWText>
+        <CWText type="h4" fontWeight="bold">
+          Heading4 bold
+        </CWText>
+        <CWText fontWeight="medium" type="h5">
+          Heading5 medium
+        </CWText>
+        <CWText type="h5" fontWeight="semiBold">
+          Heading5 semi bold
+        </CWText>
+        <CWText type="h5" fontWeight="bold">
+          Heading5 bold
+        </CWText>
+        <CWText type="b1">Body1 regular</CWText>
+        <CWText type="b1" fontWeight="bold">
+          Body1 bold
+        </CWText>
+        <CWText type="b1" fontWeight="italic">
+          Body1 italic
+        </CWText>
+        <CWText type="b2">Body2 regular</CWText>
+        <CWText type="b2" fontWeight="bold">
+          Body2 bold
+        </CWText>
+        <CWText type="b2" fontWeight="italic">
+          Body2 italic
+        </CWText>
+        <CWText type="caption">Caption regular</CWText>
+        <CWText type="caption" fontWeight="medium">
+          Caption medium
+        </CWText>
+        <CWText type="caption" fontWeight="uppercase">
+          Caption uppercase
+        </CWText>
+        <CWText type="buttonMini">Button mini</CWText>
+        <CWText type="buttonSm">Button small</CWText>
+        <CWText type="buttonLg">Button large</CWText>
+        <div className="text-row">
+          <CWText type="h3">Disabled</CWText>
+          <CWText type="h3" disabled={true}>
+            Body1 disabled
+          </CWText>
+        </div>
+        <div className="text-row">
+          <CWText type="h3">Overflow</CWText>
+          <div className="ellipsis-row">
+            <CWText type="h3" noWrap>
+              Body1 noWrap
+            </CWText>
+          </div>
         </div>
       </div>
     </div>
@@ -803,110 +907,6 @@ export class _ComponentShowcase extends ClassComponent {
               disabled
               onClick={() => notifySuccess('Button clicked!')}
             />
-          </div>
-        </div>
-        <div className="text-gallery">
-          <CWText type="h3">Text</CWText>
-          <CWText fontWeight="semiBold" type="d1">
-            Display1 semi bold
-          </CWText>
-          <CWText type="d1" fontWeight="bold">
-            Display1 bold
-          </CWText>
-          <CWText type="d1" fontWeight="black">
-            Display1 black
-          </CWText>
-          <CWText fontWeight="semiBold" type="d2">
-            Display2 semi bold
-          </CWText>
-          <CWText type="d2" fontWeight="bold">
-            Display2 bold
-          </CWText>
-          <CWText type="d2" fontWeight="black">
-            Display2 black
-          </CWText>
-          <CWText fontWeight="medium" type="h1">
-            Heading1 medium
-          </CWText>
-          <CWText type="h1" fontWeight="semiBold">
-            Heading1 semi bold
-          </CWText>
-          <CWText type="h1" fontWeight="bold">
-            Heading1 bold
-          </CWText>
-          <CWText fontWeight="medium" type="h2">
-            Heading2 medium
-          </CWText>
-          <CWText type="h2" fontWeight="semiBold">
-            Heading2 semi bold
-          </CWText>
-          <CWText type="h2" fontWeight="bold">
-            Heading2 bold
-          </CWText>
-          <CWText fontWeight="medium" type="h3">
-            Heading3 medium
-          </CWText>
-          <CWText type="h3" fontWeight="semiBold">
-            Heading3 semi bold
-          </CWText>
-          <CWText type="h3" fontWeight="bold">
-            Heading3 bold
-          </CWText>
-          <CWText fontWeight="medium" type="h4">
-            Heading4 medium
-          </CWText>
-          <CWText type="h4" fontWeight="semiBold">
-            Heading4 semi bold
-          </CWText>
-          <CWText type="h4" fontWeight="bold">
-            Heading4 bold
-          </CWText>
-          <CWText fontWeight="medium" type="h5">
-            Heading5 medium
-          </CWText>
-          <CWText type="h5" fontWeight="semiBold">
-            Heading5 semi bold
-          </CWText>
-          <CWText type="h5" fontWeight="bold">
-            Heading5 bold
-          </CWText>
-          <CWText type="b1">Body1 regular</CWText>
-          <CWText type="b1" fontWeight="bold">
-            Body1 bold
-          </CWText>
-          <CWText type="b1" fontWeight="italic">
-            Body1 italic
-          </CWText>
-          <CWText type="b2">Body2 regular</CWText>
-          <CWText type="b2" fontWeight="bold">
-            Body2 bold
-          </CWText>
-          <CWText type="b2" fontWeight="italic">
-            Body2 italic
-          </CWText>
-          <CWText type="caption">Caption regular</CWText>
-          <CWText type="caption" fontWeight="medium">
-            Caption medium
-          </CWText>
-          <CWText type="caption" fontWeight="uppercase">
-            Caption uppercase
-          </CWText>
-          <CWText type="buttonMini">Button mini</CWText>
-          <CWText type="buttonSm">Button small</CWText>
-          <CWText type="buttonLg">Button large</CWText>
-          <div className="text-row">
-            <CWText type="h3">Disabled</CWText>
-            <CWText type="h3" disabled={true}>
-              Body1 disabled
-            </CWText>
-          </div>
-          <div className="text-row">
-            <CWText type="h3">Overflow</CWText>
-            <div className="ellipsis-row">
-              <CWText type="h3" noWrap>
-                Body1 noWrap
-              </CWText>
-            </div>
           </div>
         </div>
         <div className="choice-gallery">
