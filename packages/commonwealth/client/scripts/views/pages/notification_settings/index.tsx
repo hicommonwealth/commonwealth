@@ -143,9 +143,6 @@ class NotificationSettingsPage extends ClassComponent {
                         {chainInfo?.name}
                       </CWText>
                     </div>
-                    <CWText type="b2" className="subscriptions-count-text">
-                      {subs.length} subscriptions
-                    </CWText>
                   </div>
                   <CWCheckbox
                     label="Receive Emails"
