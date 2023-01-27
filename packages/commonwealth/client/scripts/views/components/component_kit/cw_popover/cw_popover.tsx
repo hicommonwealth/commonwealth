@@ -7,7 +7,7 @@ import 'components/component_kit/cw_popover/cw_popover.scss';
 
 import { uuidv4 } from 'lib/util';
 
-type AnchorType = HTMLElement | SVGSVGElement;
+export type AnchorType = HTMLElement | SVGSVGElement;
 
 type UsePopoverProps = {
   anchorEl: AnchorType;

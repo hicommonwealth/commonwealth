@@ -3,7 +3,7 @@ import React from 'react';
 
 import { jsx } from 'mithrilInterop';
 
-import { Popover, usePopover } from './cw_popover';
+import { AnchorType, Popover, usePopover } from './cw_popover';
 import { CWText } from '../cw_text';
 
 export type TooltipType =
@@ -14,34 +14,30 @@ export type TooltipType =
 
 type TooltipProps = {
   content: string | React.ReactNode;
+  renderTrigger: (
+    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
+  ) => React.ReactNode;
   tooltipType?: TooltipType;
-  trigger: React.ReactNode;
 };
 
 export const CWTooltip = (props: TooltipProps) => {
-  const { content, tooltipType, trigger } = props;
+  const { content, tooltipType, renderTrigger } = props;
 
   const popoverProps = usePopover();
 
   return (
-    <div>
-      {/* <CWIconButton
-            iconName="infoEmpty"
-            onMouseEnter={hoverPopoverProps.handleInteraction}
-            onMouseLeave={hoverPopoverProps.handleInteraction}
-          /> */}
+    <React.Fragment>
+      {renderTrigger(popoverProps.handleInteraction)}
       <Popover
         content={
           typeof content === 'string' ? (
             <CWText type="caption">{content}</CWText>
           ) : (
-            content
+            <div>{content}</div>
           )
         }
-        // tooltipType={tooltipType}
-        // trigger={trigger}
         {...popoverProps}
       />
-    </div>
+    </React.Fragment>
   );
 };

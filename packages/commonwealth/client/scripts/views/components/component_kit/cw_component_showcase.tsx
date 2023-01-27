@@ -155,14 +155,20 @@ export const ComponentShowcase = () => {
       <div className="tooltip-gallery">
         <CWText type="h3">Tooltips</CWText>
         <div className="tooltip-row">
-          <CWText>Hover</CWText>
+          <CWText>Default</CWText>
           <CWTooltip
             content={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
             tooltipType="bordered"
-            trigger={<CWIcon iconName="infoEmpty" />}
+            renderTrigger={(handleInteraction) => (
+              <CWIcon
+                iconName="infoEmpty"
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+              />
+            )}
           />
         </div>
         <div className="tooltip-row">
@@ -173,7 +179,13 @@ export const ComponentShowcase = () => {
                 extra details on things people may need more help on.
               `}
             tooltipType="solidArrow"
-            trigger={<CWIcon iconName="infoEmpty" />}
+            renderTrigger={(handleInteraction) => (
+              <CWIcon
+                iconName="infoEmpty"
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+              />
+            )}
           />
         </div>
         <div className="tooltip-row">
@@ -184,16 +196,22 @@ export const ComponentShowcase = () => {
                 extra details on things people may need more help on.
               `}
             tooltipType="solidNoArrow"
-            trigger={<CWIcon iconName="infoEmpty" />}
+            renderTrigger={(handleInteraction) => (
+              <CWIcon
+                iconName="infoEmpty"
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+              />
+            )}
           />
         </div>
-        <div className="tooltip-row">
+        {/* <div className="tooltip-row">
           <CWText>Address tooltip</CWText>
           <CWAddressTooltip
             address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
             trigger={<CWIcon iconName="infoEmpty" />}
           />
-        </div>
+        </div> */}
       </div>
       <div className="icon-gallery">
         <CWText type="h3">Icons</CWText>
