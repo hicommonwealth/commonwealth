@@ -39,7 +39,6 @@ type ButtonProps = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string | React.ReactNode;
-  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
 } & ButtonStyleProps &
   React.HTMLAttributes<HTMLButtonElement>;
 
