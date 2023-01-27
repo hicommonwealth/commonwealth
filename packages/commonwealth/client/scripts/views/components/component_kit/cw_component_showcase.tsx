@@ -909,52 +909,6 @@ export class _ComponentShowcase extends ClassComponent {
             </div>
           </div>
         </div>
-        <div className="icon-button-gallery">
-          <CWText type="h3">Icon Buttons</CWText>
-          <CWText>Click to see selected state</CWText>
-          <div className="icon-button-row">
-            <CWIconButton
-              iconName="views"
-              iconSize="large"
-              iconButtonTheme="primary"
-              selected={this.selectedIconButton === 1}
-              onClick={() => {
-                this.selectedIconButton = 1;
-              }}
-            />
-            {this.selectedIconButton === 1 && (
-              <div className="icon-button-selected">is selected</div>
-            )}
-          </div>
-          <div className="icon-button-row">
-            <CWIconButton
-              iconName="views"
-              iconSize="large"
-              iconButtonTheme="neutral"
-              selected={this.selectedIconButton === 2}
-              onClick={() => {
-                this.selectedIconButton = 2;
-              }}
-            />
-            {this.selectedIconButton === 2 && (
-              <div className="icon-button-selected">is selected</div>
-            )}
-          </div>
-          <div className="icon-button-row">
-            <CWIconButton
-              iconName="views"
-              iconSize="large"
-              iconButtonTheme="black"
-              selected={this.selectedIconButton === 3}
-              onClick={() => {
-                this.selectedIconButton = 3;
-              }}
-            />
-            {this.selectedIconButton === 3 && (
-              <div className="icon-button-selected">is selected</div>
-            )}
-          </div>
-        </div>
         <div className="choice-gallery">
           <CWText type="h3">Radio Button</CWText>
           <CWRadioButton
