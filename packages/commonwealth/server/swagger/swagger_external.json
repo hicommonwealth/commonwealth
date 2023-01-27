@@ -8,6 +8,11 @@
   "host": "localhost:3000",
   "basePath": "/api",
   "schemes": ["http"],
+  "security": [
+    {
+      "apiKey": []
+    }
+  ],
   "paths": {
     "/threads": {
       "get": {
@@ -947,6 +952,14 @@
           }
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "apiKey": {
+      "type": "apiKey",
+      "name": "apikey",
+      "in": "header",
+      "description": "You can request an API key from: https://commonwealthlabsinc8d1edcd2.us.portal.konghq.com/"
     }
   }
 }
