@@ -3,8 +3,6 @@ import React from 'react';
 import { PopperUnstyled } from '@mui/base';
 import { ClassComponent, jsx } from 'mithrilInterop';
 
-import 'components/component_kit/cw_popover/cw_popover.scss';
-
 import { uuidv4 } from 'lib/util';
 
 export type AnchorType = HTMLElement | SVGSVGElement;

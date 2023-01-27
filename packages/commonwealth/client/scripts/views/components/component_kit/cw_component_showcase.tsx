@@ -161,7 +161,6 @@ export const ComponentShowcase = () => {
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
-            tooltipType="bordered"
             renderTrigger={(handleInteraction) => (
               <CWIcon
                 iconName="infoEmpty"
@@ -178,24 +177,7 @@ export const ComponentShowcase = () => {
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
-            tooltipType="solidArrow"
-            renderTrigger={(handleInteraction) => (
-              <CWIcon
-                iconName="infoEmpty"
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              />
-            )}
-          />
-        </div>
-        <div className="tooltip-row">
-          <CWText>Solid background, no arrow</CWText>
-          <CWTooltip
-            content={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-            tooltipType="solidNoArrow"
+            tooltipType="solidBackground"
             renderTrigger={(handleInteraction) => (
               <CWIcon
                 iconName="infoEmpty"
