@@ -18,17 +18,17 @@ import 'components/component_kit/cw_popover/cw_popover.scss';
 import { uuidv4 } from 'lib/util';
 import { TooltipType } from './cw_tooltip';
 
-// export type PopoverInteractionType = 'click' | 'hover';
+export type PopoverInteractionType = 'click' | 'hover';
 
-// export type SharedPopoverAttrs = {
-//   hoverCloseDelay?: number;
-//   hoverOpenDelay?: number;
-//   interactionType?: PopoverInteractionType;
-//   persistOnHover?: boolean;
-//   tooltipType?: TooltipType;
-//   toSide?: boolean;
-//   trigger: Children;
-// };
+export type SharedPopoverAttrs = {
+  hoverCloseDelay?: number;
+  hoverOpenDelay?: number;
+  interactionType?: PopoverInteractionType;
+  persistOnHover?: boolean;
+  tooltipType?: TooltipType;
+  toSide?: boolean;
+  trigger: Children;
+};
 
 type AnchorType = HTMLElement | SVGSVGElement;
 
