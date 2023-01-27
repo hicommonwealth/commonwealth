@@ -1,7 +1,6 @@
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
-import Web3 from 'web3';
 import type { DB } from '../models';
 import { createDefaultCommunityRoles } from '../util/roles';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -45,6 +44,7 @@ const getTokenForum = async (models: DB, req: Request, res: Response) => {
   }
 
   try {
+    const Web3 = (await import('web3')).default;
     const provider = new Web3.providers.WebsocketProvider(
       node?.private_url || url
     );
