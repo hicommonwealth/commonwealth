@@ -23,7 +23,6 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput } from './cw_text_input';
 import { iconLookup, IconName } from './cw_icons/cw_icon_lookup';
-import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
@@ -45,6 +44,7 @@ import { CWDropdown } from './cw_dropdown';
 import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
 import { Popover, usePopover } from './cw_popover/cw_popover';
+import { CWText } from './cw_text';
 import CWCoverImageUploader from './cw_cover_image_uploader';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 

@@ -34,7 +34,7 @@ type FontType =
   | 'buttonLg'
   | 'buttonMini';
 
-type TextStyleAttrs = {
+type TextStyleProps = {
   className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;
@@ -44,11 +44,9 @@ type TextStyleAttrs = {
   type?: FontType;
 };
 
-type TextAttrs = {
-  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  title?: string | number;
-} & TextStyleAttrs &
-  React.PropsWithChildren;
+type TextProps = TextStyleProps &
+  React.PropsWithChildren &
+  React.HTMLAttributes<HTMLDivElement>;
 
 const getFontWeight = (type: FontType) => {
   if (type === 'buttonSm' || type === 'buttonLg') {
@@ -60,7 +58,7 @@ const getFontWeight = (type: FontType) => {
   }
 };
 
-export const CWText = (props: TextAttrs) => {
+export const CWText = (props: TextProps) => {
   const {
     className,
     disabled = false,
@@ -71,11 +69,12 @@ export const CWText = (props: TextAttrs) => {
     title,
     type = 'b1',
     fontWeight = getFontWeight(type),
+    ...otherProps
   } = props;
 
   return (
     <div
-      className={getClasses<TextStyleAttrs & { onClick?: boolean }>(
+      className={getClasses<TextStyleProps & { onClick?: boolean }>(
         {
           type,
           fontWeight,
@@ -90,6 +89,7 @@ export const CWText = (props: TextAttrs) => {
       )}
       title={title ? title.toString() : undefined}
       onClick={onClick}
+      {...otherProps}
     >
       {props.children}
     </div>
