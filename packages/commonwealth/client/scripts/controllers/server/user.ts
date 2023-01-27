@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 import $ from 'jquery';
 
 import type {
@@ -12,6 +13,7 @@ import type {
 import app from 'state';
 import DraftsController from './drafts';
 
+// eslint-disable-next-line
 import NotificationsController from './notifications';
 
 export class UserController {

@@ -1,4 +1,4 @@
-import { TypedRequestQuery, TypedResponse } from 'server/types';
+import type { TypedRequestQuery, TypedResponse } from 'server/types';
 
 const expressRequest = {} as any as Express.Request;
 

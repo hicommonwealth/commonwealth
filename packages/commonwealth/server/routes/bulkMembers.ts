@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 const { Op } = Sequelize;
-import { DB } from '../models';
+import type { DB } from '../models';
 import type { Request, Response } from 'express';
 import { findAllRoles } from '../util/roles';
 

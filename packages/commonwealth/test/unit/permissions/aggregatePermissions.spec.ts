@@ -6,7 +6,7 @@ import {
   ToCheck,
 } from 'commonwealth/shared/permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
-import { RoleObject } from 'commonwealth/shared/types';
+import type { RoleObject } from 'commonwealth/shared/types';
 
 describe('aggregatePermissions() unit tests', () => {
   let base_permission;

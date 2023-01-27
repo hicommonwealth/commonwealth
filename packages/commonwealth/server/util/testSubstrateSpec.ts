@@ -1,4 +1,3 @@
-import { ApiPromise, WsProvider } from '@polkadot/api';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { AppError, ServerError } from 'common-common/src/errors';
 
@@ -26,7 +25,11 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   };
 
   log.info('Connecting to node...');
-  const provider = new WsProvider(constructSubstrateUrl(nodeUrl), false);
+  const polkadot = await import('@polkadot/api');
+  const provider = new polkadot.WsProvider(
+    constructSubstrateUrl(nodeUrl),
+    false
+  );
   try {
     await provider.connect();
   } catch (err) {
@@ -34,7 +37,10 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   }
   try {
     log.info('Fetching chain properties...');
-    const api = await ApiPromise.create({ provider, ...sanitizedSpec });
+    const api = await polkadot.ApiPromise.create({
+      provider,
+      ...sanitizedSpec,
+    });
     const version = api.runtimeVersion;
     const props = await api.rpc.system.properties();
     log.info(
