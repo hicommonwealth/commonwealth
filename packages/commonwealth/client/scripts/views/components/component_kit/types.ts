@@ -47,7 +47,7 @@ export enum ComponentType {
   WalletOptionRow = 'WalletOptionRow',
 }
 
-export type StyleAttrs = {
+export type BaseStyleProps = {
   disabled?: boolean;
   className?: string;
 };
