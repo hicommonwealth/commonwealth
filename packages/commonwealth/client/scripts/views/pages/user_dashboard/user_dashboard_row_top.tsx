@@ -72,9 +72,6 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
       },
     });
 
-    const numericalCount =
-      numericalCommentCount > 1 && `and ${numericalCommentCount - 1} others `;
-
     const isComment = vnode.attrs.category === 'new-comment-creation';
 
     return (

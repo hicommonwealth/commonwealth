@@ -7,9 +7,15 @@
   justify-content: space-between;
   width: 100%;
 
-  .comment-count {
+  .comments {
     display: flex;
     align-items: center;
+
+    .count {
+      display: flex;
+      align-items: center;
+      width: 120px;
+    }
 
     .icon,
     .text {

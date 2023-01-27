@@ -7,6 +7,10 @@ import m from 'mithril';
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
 import app from 'state';
+import {
+  CWAvatarGroup,
+  ProfileWithAddress,
+} from '../../components/component_kit/cw_avatar_group';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
@@ -18,11 +22,13 @@ type UserDashboardRowBottomAttrs = {
   threadId: string;
   chainId: string;
   commentId?: string;
+  commenters: ProfileWithAddress[];
 };
 
 export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBottomAttrs> {
   view(vnode: m.Vnode<UserDashboardRowBottomAttrs>) {
-    const { threadId, commentCount, commentId, chainId } = vnode.attrs;
+    const { threadId, commentCount, commentId, chainId, commenters } =
+      vnode.attrs;
 
     const adjustedId = `discussion_${threadId}`;
 
@@ -45,11 +51,16 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
 
     return (
       <div class="UserDashboardRowBottom">
-        <div class="comment-count">
-          <CWIcon iconName="feedback" iconSize="small" className="icon" />
-          <CWText type="caption" className="text">
-            {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
-          </CWText>
+        <div class="comments">
+          <div class="count">
+            <CWIcon iconName="feedback" iconSize="small" className="icon" />
+            <CWText type="caption" className="text">
+              {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
+            </CWText>
+          </div>
+          <div>
+            <CWAvatarGroup profiles={commenters} chainId={chainId} />
+          </div>
         </div>
         <div className="actions" onclick={(e) => e.stopPropagation()}>
           <CWPopoverMenu

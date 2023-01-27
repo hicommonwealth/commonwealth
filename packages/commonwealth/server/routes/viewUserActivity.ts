@@ -64,17 +64,24 @@ export default async (
   const addresses = await models.Address.findAll({
     where: {
       id: comments.map((c) => c.address_id),
-    }
+    },
   });
 
   const profiles = await models.Profile.findAll({
     where: {
       id: addresses.map((a) => a.profile_id),
-    }
-  })
+    },
+    include: [
+      {
+        model: models.Address,
+      },
+    ],
+  });
 
   const notificationsWithProfiles = notifications.map((notification) => {
-    const filteredComments = comments.filter((c) => c.root_id === `discussion_${notification.thread_id}`);
+    const filteredComments = comments.filter(
+      (c) => c.root_id === `discussion_${notification.thread_id}`
+    );
     const notificationProfiles = filteredComments.map((c) => {
       const filteredAddress = addresses.find((a) => a.id === c.address_id);
 

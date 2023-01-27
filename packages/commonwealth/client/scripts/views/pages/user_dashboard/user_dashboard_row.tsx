@@ -27,6 +27,7 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
       blockNumber,
       eventNetwork,
       chain,
+      commenters,
     } = vnode.attrs.notification;
 
     if (categoryId === 'chain-event') {
@@ -75,6 +76,7 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
           commentId={comment_id}
           chainId={chain_id}
           commentCount={commentCount}
+          commenters={commenters}
         />
       </div>
     );
