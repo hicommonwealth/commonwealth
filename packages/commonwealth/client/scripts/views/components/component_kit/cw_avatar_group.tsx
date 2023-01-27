@@ -20,6 +20,8 @@ type AvatarGroupAttrs = {
 export class CWAvatarGroup extends ClassComponent<AvatarGroupAttrs> {
   view(vnode: m.Vnode<AvatarGroupAttrs>) {
     const { profiles, chainId } = vnode.attrs;
+    if (!profiles || profiles?.length === 0) return;
+
     const truncatedProfiles = profiles.slice(0, 4).reverse();
 
     const count = profiles.length - 4;

@@ -196,8 +196,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   }}
                 />
               </CWTabBar>
-              {loadingData && <CWSpinner />}
             </div>
+            {loadingData && <CWSpinner />}
             {!loadingData && (
               <>
                 <CWPopover
