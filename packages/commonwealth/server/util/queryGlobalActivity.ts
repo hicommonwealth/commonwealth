@@ -89,7 +89,6 @@ export default async function queryGlobalActivity(
     };
   });
 
-
   // TODO: verify output type
   return notificationsWithProfiles as GlobalActivity;
 }
