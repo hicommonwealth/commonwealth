@@ -43,11 +43,8 @@
 .UserDashboardRow {
   @include userDashboardRowStyles;
   flex-direction: column;
-
-  @include mediumInclusive {
-    min-width: 100%;
-    max-width: 0;
-  }
+  min-width: 100%;
+  max-width: 0;
 
   &.isLink {
     cursor: pointer;
