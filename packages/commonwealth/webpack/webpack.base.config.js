@@ -46,6 +46,7 @@ module.exports = {
   optimization: {
     splitChunks: {
       chunks: 'all',
+      // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
         bitcoin: {
           test: /[\\/]node_modules[\\/](bip39)[\\/]/,
@@ -64,11 +65,6 @@ module.exports = {
           name: 'ethereumAsync',
           chunks: 'all',
         },
-        near: {
-          test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
-          name: 'near',
-          chunks: 'all',
-        },
         terra: {
           test: /[\\/]node_modules[\\/](@terra-money|terra-proto|legacy-proto)[\\/]/,
           name: 'terra',
@@ -77,16 +73,6 @@ module.exports = {
         cosmos: {
           test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
-          chunks: 'all',
-        },
-        cosmosTypes: {
-          test: /[\\/]node_modules[\\/](cosmjs-types)[\\/]/,
-          name: 'cosmosTypes',
-          chunks: 'all',
-        },
-        polkadot: {
-          test: /[\\/]node_modules[\\/](@polkadot)[\\/]/,
-          name: 'polkadot',
           chunks: 'all',
         },
         solana: {
@@ -99,6 +85,21 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
+        // near: {
+        //   test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
+        //   name: 'near',
+        //   chunks: 'all',
+        // },
+        // cosmosTypes: {
+        //   test: /[\\/]node_modules[\\/](cosmjs-types)[\\/]/,
+        //   name: 'cosmosTypes',
+        //   chunks: 'all',
+        // },
+        // polkadot: {
+        //   test: /[\\/]node_modules[\\/](@polkadot)[\\/]/,
+        //   name: 'polkadot',
+        //   chunks: 'all',
+        // },
       },
     },
   },
