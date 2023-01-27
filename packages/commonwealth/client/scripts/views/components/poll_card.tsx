@@ -113,10 +113,8 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
       <div className="CastVoteSection">
         {disableVoteButton ? (
           <CWTooltip
-            interactionType="hover"
-            tooltipContent={tooltipErrorMessage ?? 'Select an option to vote.'}
+            content={tooltipErrorMessage ?? 'Select an option to vote.'}
             tooltipType="solidNoArrow"
-            hoverCloseDelay={300}
             trigger={
               <CWButton
                 label="Vote"

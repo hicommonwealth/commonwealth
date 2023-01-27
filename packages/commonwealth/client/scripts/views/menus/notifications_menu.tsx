@@ -238,7 +238,6 @@ export class NotificationsMenuPopover extends ClassComponent {
     return null;
     // <CWPopover
     //   content={<NotificationsMenu />}
-    //   interactionType="click"
     //   trigger={
     //     app.user.notifications.numUnread > 0 ? (
     //       <div className="unreads-icon">

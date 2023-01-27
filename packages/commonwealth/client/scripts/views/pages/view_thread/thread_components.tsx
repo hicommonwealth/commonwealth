@@ -53,8 +53,6 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
           <React.Fragment>
             <CWText type="caption">and</CWText>
             <CWPopover
-              interactionType="hover"
-              hoverCloseDelay={500}
               content={
                 <div className="collaborators">
                   {thread.collaborators.map(({ address, chain }) => {

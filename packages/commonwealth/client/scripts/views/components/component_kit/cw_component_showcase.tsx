@@ -42,7 +42,6 @@ import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
-import { Popover, usePopover } from './cw_popover/cw_popover';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import CWCoverImageUploader from './cw_cover_image_uploader';
