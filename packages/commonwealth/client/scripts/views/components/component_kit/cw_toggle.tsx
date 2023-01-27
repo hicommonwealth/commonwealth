@@ -15,12 +15,12 @@ import {
 
 import 'components/component_kit/cw_toggle.scss';
 
-import { ComponentType, StyleAttrs } from './types';
+import { ComponentType, BaseStyleProps } from './types';
 import { getClasses } from './helpers';
 
 type ToggleStyleAttrs = {
   checked?: boolean;
-} & StyleAttrs;
+} & BaseStyleProps;
 
 type ToggleAttrs = {
   onChange: (e?: any) => void;
