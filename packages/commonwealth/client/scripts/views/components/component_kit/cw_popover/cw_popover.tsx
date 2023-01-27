@@ -45,7 +45,7 @@ type PopoverProps = {
 export const usePopover = (): UsePopoverProps => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const handleInteraction = (e?: React.MouseEvent<HTMLElement>) => {
+  const handleInteraction = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(anchorEl ? null : e.currentTarget);
   };
 
