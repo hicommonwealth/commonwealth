@@ -1,20 +1,10 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
+import { Popover, usePopover } from './cw_popover';
 import { CWText } from '../cw_text';
-import { SharedPopoverAttrs, CWPopover } from './cw_popover';
 
 export type TooltipType =
   | 'bordered'
@@ -22,40 +12,36 @@ export type TooltipType =
   | 'solidArrow'
   | 'solidNoArrow';
 
-type TooltipAttrs = {
-  tooltipContent: string | ResultNode;
-} & SharedPopoverAttrs;
+type TooltipProps = {
+  content: string | React.ReactNode;
+  tooltipType?: TooltipType;
+  trigger: React.ReactNode;
+};
 
-export class CWTooltip extends ClassComponent<TooltipAttrs> {
-  view(vnode: ResultNode<TooltipAttrs>) {
-    const {
-      hoverCloseDelay = 1500,
-      hoverOpenDelay,
-      interactionType,
-      persistOnHover,
-      tooltipContent,
-      tooltipType,
-      toSide,
-      trigger,
-    } = vnode.attrs;
+export const CWTooltip = (props: TooltipProps) => {
+  const { content, tooltipType, trigger } = props;
 
-    return (
-      <CWPopover
+  const popoverProps = usePopover();
+
+  return (
+    <div>
+      {/* <CWIconButton
+            iconName="infoEmpty"
+            onMouseEnter={hoverPopoverProps.handleInteraction}
+            onMouseLeave={hoverPopoverProps.handleInteraction}
+          /> */}
+      <Popover
         content={
-          typeof tooltipContent === 'string' ? (
-            <CWText type="caption">{tooltipContent}</CWText>
+          typeof content === 'string' ? (
+            <CWText type="caption">{content}</CWText>
           ) : (
-            tooltipContent
+            content
           )
         }
-        hoverCloseDelay={hoverCloseDelay}
-        hoverOpenDelay={hoverOpenDelay}
-        interactionType={interactionType}
-        persistOnHover={persistOnHover}
-        tooltipType={tooltipType}
-        toSide={toSide}
-        trigger={trigger}
+        // tooltipType={tooltipType}
+        // trigger={trigger}
+        {...popoverProps}
       />
-    );
-  }
-}
+    </div>
+  );
+};
