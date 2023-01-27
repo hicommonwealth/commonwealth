@@ -4,6 +4,9 @@ import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
 import { BalanceType, ContractType } from 'common-common/src/types';
+// TODO can we import it from the /server being now in /client ?
+import type { CommunityContractMetadataAttributes } from 'server/models/community_contract_metadata';
+import type { CommunityContractTemplateAttributes } from 'server/models/community_contract_template';
 
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
@@ -169,6 +172,35 @@ class ContractsController {
   }
   public addToStore(contract: Contract) {
     return this._store.add(contract);
+  }
+
+  public async addCommunityContractTemplate({
+    communityTemplate,
+    communityTemplateMetadata,
+  }: {
+    communityTemplate: CommunityContractTemplateAttributes;
+    communityTemplateMetadata: CommunityContractMetadataAttributes;
+  }) {
+    // TODO these two API calls should be eventually wrapped in single one
+    try {
+      await $.post(
+        `${app.serverUrl()}/contract/community_template`,
+        communityTemplate
+      );
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to add community template');
+    }
+
+    try {
+      await $.post(
+        `${app.serverUrl()}/contract/community_template/metadata`,
+        communityTemplateMetadata
+      );
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to add community template metadata');
+    }
   }
 
   public initialize(contracts = [], reset = true) {
