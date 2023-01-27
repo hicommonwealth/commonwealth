@@ -24,12 +24,10 @@ type DropdownAttrs = {
 export class CWDropdown extends ClassComponent<DropdownAttrs> {
   private showDropdown: boolean;
   private selectedValue: DropdownItemType;
-  private placeholder: string;
 
   oninit(vnode: m.Vnode<DropdownAttrs>) {
     this.showDropdown = false;
     this.selectedValue = vnode.attrs.initialValue ?? vnode.attrs.options[0];
-    this.placeholder = vnode.attrs.placeholder;
   }
 
   view(vnode: m.Vnode<DropdownAttrs>) {

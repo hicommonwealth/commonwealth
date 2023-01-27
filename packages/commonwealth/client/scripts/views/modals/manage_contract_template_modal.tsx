@@ -12,6 +12,7 @@ import {
   CWDropdown,
   DropdownItemType,
 } from 'views/components/component_kit/cw_dropdown';
+import { notifyError } from 'controllers/app/notifications';
 
 // TODO this should be aligned with display_options
 const displayOptions = [
@@ -58,12 +59,42 @@ export class ManageContractTemplateModal extends ClassComponent {
     m.route.set(`/${scope}/new/contract_template`);
   }
 
-  handleConfirm(e) {
+  async handleConfirm(e) {
     e.preventDefault();
-    $(e.target).trigger('modalcomplete');
-    setTimeout(() => {
-      $(e.target).trigger('modalexit');
-    }, 0);
+
+    const communityId = app.activeChainId();
+    const { slug, displayOption, nickname, displayName } = this.form;
+
+    const communityTemplate = {
+      community_id: communityId,
+      // TODO do we know template id if we are about to create it
+      contract_id: 0,
+      // TODO get template id from parent
+      template_id: 0,
+    };
+
+    const communityTemplateMetadata = {
+      // TODO is cct_id the same as template_id ?
+      cct_id: '',
+      slug,
+      nickname,
+      display_name: displayName,
+      display_options: displayOption,
+    };
+
+    try {
+      await app.contracts.addCommunityContractTemplate({
+        communityTemplate,
+        communityTemplateMetadata,
+      });
+
+      $(e.target).trigger('modalcomplete');
+      setTimeout(() => {
+        $(e.target).trigger('modalexit');
+      }, 0);
+    } catch (err) {
+      notifyError(err.message);
+    }
   }
 
   handleCancel(e) {
@@ -148,6 +179,7 @@ export class ManageContractTemplateModal extends ClassComponent {
               this.form.nickname = e.target.value;
             }}
           />
+          {/*// TODO add validation for slash '/' at the beginning of the string?*/}
           <CWText type="caption" fontWeight="medium" className="input-label">
             Slug
           </CWText>
