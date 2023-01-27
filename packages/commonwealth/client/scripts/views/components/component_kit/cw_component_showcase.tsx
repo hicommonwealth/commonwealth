@@ -140,21 +140,91 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
 export const ComponentShowcase = () => {
   const clickPopoverProps = usePopover();
   const hoverPopoverProps = usePopover();
+  const [selectedIconButton, setSelectedIconButton] = React.useState<
+    number | undefined
+  >(undefined);
 
   return (
     <div className="ComponentShowcase">
+      <div className="icon-gallery">
+        <CWText type="h3">Icons</CWText>
+        <div className="all-icons-container">{displayIcons(iconLookup)}</div>
+        <div className="icon-row">
+          Small
+          <CWIcon iconName="views" iconSize="small" />
+        </div>
+        <div className="icon-row">
+          Medium
+          <CWIcon iconName="views" />
+        </div>
+        <div className="icon-row">
+          Large
+          <CWIcon iconName="views" iconSize="large" />
+        </div>
+        <div className="icon-row">
+          Disabled Large
+          <CWIcon iconName="views" iconSize="large" disabled />
+        </div>
+      </div>
+      <div className="icon-button-gallery">
+        <CWText type="h3">Icon Buttons</CWText>
+        <CWText>Click to see selected state</CWText>
+        <div className="icon-button-row">
+          <CWIconButton
+            iconName="views"
+            iconSize="large"
+            iconButtonTheme="primary"
+            selected={selectedIconButton === 1}
+            onClick={() => {
+              setSelectedIconButton(1);
+            }}
+          />
+          {selectedIconButton === 1 && (
+            <div className="icon-button-selected">is selected</div>
+          )}
+        </div>
+        <div className="icon-button-row">
+          <CWIconButton
+            iconName="views"
+            iconSize="large"
+            iconButtonTheme="neutral"
+            selected={selectedIconButton === 2}
+            onClick={() => {
+              setSelectedIconButton(2);
+            }}
+          />
+          {selectedIconButton === 2 && (
+            <div className="icon-button-selected">is selected</div>
+          )}
+        </div>
+        <div className="icon-button-row">
+          <CWIconButton
+            iconName="views"
+            iconSize="large"
+            iconButtonTheme="black"
+            selected={selectedIconButton === 3}
+            onClick={() => {
+              setSelectedIconButton(3);
+            }}
+          />
+          {selectedIconButton === 3 && (
+            <div className="icon-button-selected">is selected</div>
+          )}
+        </div>
+      </div>
       <div className="basic-gallery">
-        <CWText type="h4">Popover</CWText>
+        <CWText type="h3">Popover</CWText>
         <ClickAwayListener
           onClickAway={() => clickPopoverProps.setAnchorEl(null)}
         >
           {/* needs to be div instead of fragment so listener can work */}
           <div>
-            <div
-              onClick={clickPopoverProps.handleInteraction}
-              style={{ width: 'fit-content', cursor: 'pointer' }}
-            >
-              click
+            <div className="item-row">
+              <CWIconButton
+                iconName="infoEmpty"
+                onClick={clickPopoverProps.handleInteraction}
+              />
+              <CWText>Click</CWText>
             </div>
             <Popover
               content={
@@ -167,30 +237,32 @@ export const ComponentShowcase = () => {
             />
           </div>
         </ClickAwayListener>
-        <div
-          onMouseEnter={hoverPopoverProps.handleInteraction}
-          style={{ width: 'fit-content', cursor: 'pointer' }}
-        >
-          hover
+        <div className="item-row">
+          <CWIconButton
+            iconName="infoEmpty"
+            onMouseEnter={hoverPopoverProps.handleInteraction}
+            onMouseLeave={hoverPopoverProps.handleInteraction}
+          />
+          <CWText>Hover</CWText>
         </div>
         <Popover
           content={
-            <div
-              className="Tooltip"
-              onMouseLeave={hoverPopoverProps.handleInteraction}
-            >
+            <div className="Tooltip">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </div>
           }
           {...hoverPopoverProps}
         />
-        <PopoverMenu
-          menuItems={popoverMenuOptions()}
-          renderTrigger={(onclick) => (
-            <CWIconButton iconName="dotsVertical" onClick={onclick} />
-          )}
-        />
+        <div className="item-row">
+          <PopoverMenu
+            menuItems={popoverMenuOptions()}
+            renderTrigger={(onclick) => (
+              <CWIconButton iconName="infoEmpty" onClick={onclick} />
+            )}
+          />
+          <CWText>Popover Menu (click)</CWText>
+        </div>
       </div>
     </div>
   );
@@ -835,26 +907,6 @@ export class _ComponentShowcase extends ClassComponent {
                 Body1 noWrap
               </CWText>
             </div>
-          </div>
-        </div>
-        <div className="icon-gallery">
-          <CWText type="h3">Icons</CWText>
-          <div className="all-icons-container">{displayIcons(iconLookup)}</div>
-          <div className="icon-row">
-            Small
-            <CWIcon iconName="views" iconSize="small" />
-          </div>
-          <div className="icon-row">
-            Medium
-            <CWIcon iconName="views" />
-          </div>
-          <div className="icon-row">
-            Large
-            <CWIcon iconName="views" iconSize="large" />
-          </div>
-          <div className="icon-row">
-            Disabled Large
-            <CWIcon iconName="views" iconSize="large" disabled={true} />
           </div>
         </div>
         <div className="icon-button-gallery">
