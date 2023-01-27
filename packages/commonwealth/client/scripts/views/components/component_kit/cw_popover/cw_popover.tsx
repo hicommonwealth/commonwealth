@@ -1,7 +1,6 @@
 /* @jsx jsx */
 import React from 'react';
-import PopperUnstyled from '@mui/base/PopperUnstyled';
-
+import { PopperUnstyled } from '@mui/base';
 import {
   ClassComponent,
   ResultNode,
@@ -16,6 +15,7 @@ import {
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
+import { uuidv4 } from 'lib/util';
 import { TooltipType } from './cw_tooltip';
 
 export type PopoverInteractionType = 'click' | 'hover';
@@ -30,25 +30,45 @@ export type SharedPopoverAttrs = {
   trigger: Children;
 };
 
-type PopoverAttrs = {
-  content: Children;
-  onToggle?: (isOpen: boolean) => void;
-} & SharedPopoverAttrs;
-
-// const defaultHoverCloseDelay = 100;
-
-export const ReactPopover = (props: {
+type UsePopoverProps = {
   anchorEl: HTMLElement;
+  id: string;
+  open: boolean;
+  setAnchorEl: React.Dispatch<React.SetStateAction<HTMLElement>>;
+  handleInteraction: (e: React.MouseEvent<HTMLElement>) => void;
+};
+
+type PopoverProps = {
   content: Children;
-}) => {
-  const open = Boolean(props.anchorEl);
-  const id = open ? 'simple-popper' : undefined;
+} & UsePopoverProps;
+
+export const usePopover = (): UsePopoverProps => {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleInteraction = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(anchorEl ? null : e.currentTarget);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? `popover-${uuidv4()}` : undefined;
+
+  return {
+    anchorEl,
+    id,
+    open,
+    setAnchorEl,
+    handleInteraction,
+  };
+};
+
+export const Popover = (props: PopoverProps) => {
+  const { anchorEl, content, id, open } = props;
 
   return (
     <PopperUnstyled
       id={id}
       open={open}
-      anchorEl={props.anchorEl}
+      anchorEl={anchorEl}
       modifiers={[
         {
           name: 'preventOverflow',
@@ -58,12 +78,12 @@ export const ReactPopover = (props: {
         },
       ]}
     >
-      {props.content}
+      {content}
     </PopperUnstyled>
   );
 };
 
-export class CWPopover extends ClassComponent<PopoverAttrs> {
+export class CWPopover extends ClassComponent {
   view() {
     return <div />;
   }

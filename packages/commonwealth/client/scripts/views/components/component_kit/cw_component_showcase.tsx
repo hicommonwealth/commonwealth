@@ -1,5 +1,6 @@
 /* @jsx jsx */
 import React from 'react';
+import { ClickAwayListener } from '@mui/base';
 
 import {
   ClassComponent,
@@ -43,7 +44,7 @@ import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
-import { ReactPopover } from './cw_popover/cw_popover';
+import { Popover, usePopover } from './cw_popover/cw_popover';
 import CWCoverImageUploader from './cw_cover_image_uploader';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 
@@ -136,44 +137,53 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
   ];
 };
 
-const useComponentShowcase = () => {
-  const [basicPopoverEl, setBasicPopoverEl] =
-    React.useState<null | HTMLElement>(null);
-
-  const handleBasicPopoverClick = (e?: React.MouseEvent<HTMLElement>) => {
-    setBasicPopoverEl(basicPopoverEl ? null : e.currentTarget);
-  };
-
-  return {
-    basicPopoverEl,
-    handleBasicPopoverClick,
-  };
-};
-
 export const ComponentShowcase = () => {
-  const { basicPopoverEl, handleBasicPopoverClick } = useComponentShowcase();
+  const clickPopoverProps = usePopover();
+  const hoverPopoverProps = usePopover();
 
   return (
     <div className="ComponentShowcase">
       <div className="basic-gallery">
         <CWText type="h4">Popover</CWText>
-        <CWIconButton
-          iconName="dotsVertical"
-          onClick={handleBasicPopoverClick}
-        />
-        <ReactPopover
-          anchorEl={basicPopoverEl}
+        <ClickAwayListener
+          onClickAway={() => clickPopoverProps.setAnchorEl(null)}
+        >
+          {/* needs to be div instead of fragment so listener can work */}
+          <div>
+            <div
+              onClick={clickPopoverProps.handleInteraction}
+              style={{ width: 'fit-content', cursor: 'pointer' }}
+            >
+              click
+            </div>
+            <Popover
+              content={
+                <div className="Tooltip">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </div>
+              }
+              {...clickPopoverProps}
+            />
+          </div>
+        </ClickAwayListener>
+        <div
+          onMouseEnter={hoverPopoverProps.handleInteraction}
+          style={{ width: 'fit-content', cursor: 'pointer' }}
+        >
+          hover
+        </div>
+        <Popover
           content={
-            <div className="Tooltip">
+            <div
+              className="Tooltip"
+              onMouseLeave={hoverPopoverProps.handleInteraction}
+            >
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </div>
           }
+          {...hoverPopoverProps}
         />
         <PopoverMenu
           menuItems={popoverMenuOptions()}

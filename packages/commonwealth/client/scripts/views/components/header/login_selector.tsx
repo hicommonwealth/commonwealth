@@ -506,7 +506,7 @@ export class LoginSelector extends ClassComponent {
               />
             </div>
           )}
-        {app.chain &&
+{app.chain &&
           !app.chainPreloading &&
           this.profileLoadComplete &&
           app.user.activeAccount && (
