@@ -41,7 +41,7 @@ import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWToggle } from '../component_kit/cw_toggle';
 import { UserBlock } from '../user/user_block';
 import { CWDivider } from '../component_kit/cw_divider';
-import { CWPopover } from '../component_kit/cw_popover/cw_popover';
+import { Popover } from '../component_kit/cw_popover/cw_popover';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -510,12 +510,12 @@ export class LoginSelector extends ClassComponent {
           !app.chainPreloading &&
           this.profileLoadComplete &&
           app.user.activeAccount && (
-            <CWPopover
-              trigger={
-                <div className="left-button">
+            <Popover
+              renderTrigger={(onclick) => (
+                <div className="left-button" onClick={onclick}>
                   <User user={app.user.activeAccount} hideIdentityIcon />
                 </div>
-              }
+              )}
               content={
                 <LoginSelectorMenuLeft
                   activeAddressesWithRole={activeAddressesWithRole}
@@ -524,12 +524,12 @@ export class LoginSelector extends ClassComponent {
               }
             />
           )}
-        <CWPopover
-          trigger={
-            <div className="right-button">
+        <Popover
+          renderTrigger={(onclick) => (
+            <div className="right-button" onClick={onclick}>
               <CWIconButton iconName="person" iconButtonTheme="black" />
             </div>
-          }
+          )}
           content={<LoginSelectorMenuRight />}
         />
       </div>
