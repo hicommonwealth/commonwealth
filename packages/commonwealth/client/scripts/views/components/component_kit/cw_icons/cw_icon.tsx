@@ -1,40 +1,47 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
 
 import { iconLookup } from './cw_icon_lookup';
-import { IconComponentAttrs } from './types';
+import { IconComponentProps } from './types';
 import { ComponentType } from '../types';
 
-export class CWIcon extends ClassComponent<IconComponentAttrs> {
-  view(vnode: ResultNode<IconComponentAttrs>) {
-    const {
-      className,
-      componentType = ComponentType.Icon,
-      disabled = false,
-      iconName,
-      iconSize = 'medium',
-      onClick,
-      selected,
-      ...otherAttrs
-    } = vnode.attrs;
+export const CWIcon = (props: IconComponentProps) => {
+  const {
+    className,
+    componentType = ComponentType.Icon,
+    disabled = false,
+    iconName,
+    iconSize = 'medium',
+    onClick,
+    selected,
+    ...otherProps
+  } = props;
 
-    const Icon = iconLookup[iconName];
+  const Icon = iconLookup[iconName];
 
-    return (
-      <Icon
-        className={className}
-        componentType={componentType}
-        disabled={disabled}
-        iconSize={iconSize}
-        onClick={onClick}
-        selected={selected}
-        {...otherAttrs}
-      />
-    );
-  }
-}
+  return (
+    <Icon
+      className={className}
+      componentType={componentType}
+      disabled={disabled}
+      iconSize={iconSize}
+      onClick={onClick}
+      selected={selected}
+      {...otherProps}
+    />
+  );
+};

@@ -18,24 +18,26 @@ import 'components/component_kit/cw_popover/cw_popover.scss';
 import { uuidv4 } from 'lib/util';
 import { TooltipType } from './cw_tooltip';
 
-export type PopoverInteractionType = 'click' | 'hover';
+// export type PopoverInteractionType = 'click' | 'hover';
 
-export type SharedPopoverAttrs = {
-  hoverCloseDelay?: number;
-  hoverOpenDelay?: number;
-  interactionType?: PopoverInteractionType;
-  persistOnHover?: boolean;
-  tooltipType?: TooltipType;
-  toSide?: boolean;
-  trigger: Children;
-};
+// export type SharedPopoverAttrs = {
+//   hoverCloseDelay?: number;
+//   hoverOpenDelay?: number;
+//   interactionType?: PopoverInteractionType;
+//   persistOnHover?: boolean;
+//   tooltipType?: TooltipType;
+//   toSide?: boolean;
+//   trigger: Children;
+// };
+
+type AnchorType = HTMLElement | SVGSVGElement;
 
 type UsePopoverProps = {
-  anchorEl: HTMLElement;
+  anchorEl: AnchorType;
   id: string;
   open: boolean;
-  setAnchorEl: React.Dispatch<React.SetStateAction<HTMLElement>>;
-  handleInteraction: (e: React.MouseEvent<HTMLElement>) => void;
+  setAnchorEl: React.Dispatch<React.SetStateAction<AnchorType>>;
+  handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
 };
 
 type PopoverProps = {
@@ -43,9 +45,9 @@ type PopoverProps = {
 } & UsePopoverProps;
 
 export const usePopover = (): UsePopoverProps => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | AnchorType>(null);
 
-  const handleInteraction = (e: React.MouseEvent<HTMLElement>) => {
+  const handleInteraction = (e: React.MouseEvent<AnchorType>) => {
     setAnchorEl(anchorEl ? null : e.currentTarget);
   };
 

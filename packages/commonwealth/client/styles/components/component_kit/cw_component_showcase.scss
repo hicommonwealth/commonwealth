@@ -27,6 +27,16 @@ $width: 360px;
     gap: 8px;
     width: $width;
 
+    .item-row {
+      align-items: center;
+      display: flex;
+      gap: 16px;
+
+      .Icon {
+        color: $neutral-400;
+      }
+    }
+
     .Tooltip {
       @include baseTooltipStyles;
 
