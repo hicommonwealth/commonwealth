@@ -115,11 +115,10 @@ import startEmailLogin from '../routes/startEmailLogin';
 import startOAuthLogin from '../routes/startOAuthLogin';
 
 import {
-  createCommunityContractTemplate,
+  createCommunityContractTemplateAndMetadata,
   getCommunityContractTemplate,
   updateCommunityContractTemplate,
   deleteCommunityContractTemplate,
-  createCommunityContractTemplateMetadata,
   getCommunityContractTemplateMetadata,
   updateCommunityContractTemplateMetadata,
   deleteCommunityContractTemplateMetadata,
@@ -266,9 +265,9 @@ function setupRouter(
 
   // community contract
   router.post(
-    '/contract/community_template',
+    '/contract/community_template_and_metadata',
     passport.authenticate('jwt', { session: false }),
-    createCommunityContractTemplate.bind(this, models)
+    createCommunityContractTemplateAndMetadata.bind(this, models)
   );
   router.get(
     '/contract/community_template',
@@ -286,11 +285,6 @@ function setupRouter(
   );
 
   // community contract metadata
-  router.post(
-    '/contract/community_template/metadata',
-    passport.authenticate('jwt', { session: false }),
-    createCommunityContractTemplateMetadata.bind(this, models)
-  );
   router.get(
     '/contract/community_template/metadata',
     getCommunityContractTemplateMetadata.bind(this, models)
