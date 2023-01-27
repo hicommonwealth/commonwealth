@@ -131,6 +131,8 @@ class TermsPage extends ClassComponent {
       <Sublayout>
         <div class="TermsPage">
           <div class="forum-container">
+            <CWText>Posted on 1/26/2023</CWText>
+
             <CWText type="h3">Notice</CWText>
             {renderMultilineText(notice)}
             <CWText type="h3">Terms of Service</CWText>
