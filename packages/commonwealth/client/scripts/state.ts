@@ -295,7 +295,7 @@ export async function initAppState(
           app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
-        await app.rules.getRuleTypes();
+        // await app.rules.getRuleTypes(); // @TODO Remove comment when ready to use
 
         // update the login status
         updateActiveUser(data.result.user);
