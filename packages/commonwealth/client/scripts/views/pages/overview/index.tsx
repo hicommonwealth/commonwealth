@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import m from 'mithril';
 import type { Thread, Topic } from 'models';
@@ -41,6 +41,9 @@ class OverviewPage extends ClassComponent {
 
   view() {
     const allMonthlyThreads = app.threads.overviewStore.getAll();
+    const allPinnedThreads = app.threads.listingStore.getThreads({
+      pinned: true,
+    });
 
     const topics = app.topics.getByCommunity(app.activeChainId());
 
@@ -56,13 +59,17 @@ class OverviewPage extends ClassComponent {
 
     const topicSummaryRows: Array<{
       monthlyThreads: Array<Thread>;
+      pinnedThreads: Array<Thread>;
       topic: Topic;
     }> = topicsSorted.map((topic) => {
       const monthlyThreads = allMonthlyThreads.filter(
         (thread) => topic.id === thread.topic.id
       );
+      const pinnedThreads = allPinnedThreads.filter(
+        (thread) => topic.id === thread.topic.id
+      );
 
-      return { monthlyThreads, topic };
+      return { monthlyThreads, pinnedThreads, topic };
     });
 
     return !topicSummaryRows.length && !app.threads.initialized ? (
