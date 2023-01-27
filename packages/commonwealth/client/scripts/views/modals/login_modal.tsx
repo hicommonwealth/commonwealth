@@ -4,7 +4,7 @@ import {
   chainBasetoCanvasChain,
   constructCanvasMessage,
 } from 'adapters/shared';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { ChainBase } from 'common-common/src/types';
 import {

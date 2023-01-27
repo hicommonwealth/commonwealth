@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

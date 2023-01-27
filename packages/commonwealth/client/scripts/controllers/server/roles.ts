@@ -21,8 +21,6 @@ const getPermissionLevel = (permission: AccessLevel | undefined) => {
 };
 
 export class RolesController {
-  private permissionManager = new PermissionManager();
-
   constructor(public readonly User: UserController) {}
 
   private _roles: RoleInfo[] = [];
@@ -338,7 +336,6 @@ export function isActiveAddressPermitted(
   // If no roles are given for the chain, compute permissions with chain default permissions
   else {
     // compute permissions with chain default permissions
-
     const permission = permissionsManager.computePermissions(
       everyonePermissions,
       [
