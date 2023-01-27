@@ -23,7 +23,7 @@ import {
   getThreads,
   getThreadsValidation,
 } from 'commonwealth/server/routes/threads/getThreads';
-import { Express } from 'express';
+import express, { Express } from 'express';
 import Router from 'express/lib/router/index';
 import passport from 'passport';
 import { TokenBalanceCache } from 'token-balance-cache/src';
@@ -51,7 +51,6 @@ import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
 import { TypedRequest } from '../types';
 import {
   onlyIds,
-  postProfilesValidation,
   postReactionsValidation,
   postRolesValidation,
   postRulesValidation,
@@ -61,11 +60,13 @@ import {
 
 // contains external routes
 export function addExternalRoutes(
-  router: Router,
+  endpoint: string,
   app: Express,
   models: DB,
   tokenBalanceCache: TokenBalanceCache
 ): Router {
+  const router = express.Router();
+
   router.get('/threads', getThreadsValidation, getThreads.bind(this, models));
 
   router.get(
@@ -199,6 +200,8 @@ export function addExternalRoutes(
     getTokenBalanceValidation,
     getTokenBalance.bind(this, models, tokenBalanceCache)
   );
+
+  app.use(endpoint, router);
 
   return router;
 }
