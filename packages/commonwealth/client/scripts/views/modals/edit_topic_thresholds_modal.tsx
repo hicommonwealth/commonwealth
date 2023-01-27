@@ -28,13 +28,21 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
       this.newTokenThresholdInWei = topic.tokenThreshold?.toString() || '0';
     }
 
-    const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+    const decimals =
+      app.chain?.meta?.decimals && app.chain.meta.id !== 'evmos'
+        ? app.chain.meta.decimals
+        : app.chain.network === ChainNetwork.ERC721
+        ? 0
+        : app.chain.base === ChainBase.CosmosSDK &&
+          app.chain.meta.id !== 'evmos'
+        ? 6
+        : 18;
+
+    console.log(app.chain.meta);
+    console.log(
+      app.chain.base === ChainBase.CosmosSDK && app.chain.meta.id !== 'evmos'
+    );
+    console.log('decimals', decimals);
 
     return (
       <div class="EditTopicThresholdsRow">

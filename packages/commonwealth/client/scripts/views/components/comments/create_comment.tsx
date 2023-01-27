@@ -134,13 +134,15 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       uploadsInProgress ||
       userFailsThreshold;
 
-    const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+    const decimals =
+      app.chain?.meta?.decimals && app.chain.meta.id !== 'evmos'
+        ? app.chain.meta.decimals
+        : app.chain.network === ChainNetwork.ERC721
+        ? 0
+        : app.chain.base === ChainBase.CosmosSDK &&
+          app.chain.meta.id !== 'evmos'
+        ? 6
+        : 18;
 
     return (
       <div class="CreateComment">
