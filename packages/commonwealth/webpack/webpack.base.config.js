@@ -85,6 +85,21 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
+        quill: { // large non-es module (cant be tree-shaken)
+          test: /[\\/]node_modules[\\/](quill)[\\/]/,
+          name: 'quill',
+          chunks: 'all',
+        },
+        vendorSplit2: { // remaining non-es modules
+          test: /[\\/]node_modules[\\/](lodash|moment|mixpanel)[\\/]/,
+          name: 'vendorSplit2',
+          chunks: 'all',
+        },
+        vendorSplit3: {
+          test: /[\\/]node_modules[\\/](jquery|underscore|bignumber|construct-ui|dropzone)[\\/]/,
+          name: 'vendorSplit3',
+          chunks: 'all',
+        },
         // near: {
         //   test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
         //   name: 'near',
