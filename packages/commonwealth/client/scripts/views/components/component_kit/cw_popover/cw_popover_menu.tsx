@@ -17,6 +17,7 @@ import PopperUnstyled from '@mui/base/PopperUnstyled';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
+import { uuidv4 } from 'lib/util';
 import {
   ComponentType,
   DefaultMenuItem,
@@ -39,7 +40,7 @@ export const PopoverMenu = (props: {
   const [triggerEl, setTriggerEl] = React.useState<null | HTMLElement>(null);
 
   const open = Boolean(triggerEl);
-  const id = open ? 'simple-popper' : undefined;
+  const id = open ? `popover-${uuidv4()}` : undefined;
 
   const handleToggle = (e?: React.MouseEvent<HTMLElement>) => {
     setTriggerEl(triggerEl ? null : e.currentTarget);
