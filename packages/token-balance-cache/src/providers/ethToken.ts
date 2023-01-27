@@ -22,7 +22,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
     address: string,
     opts: EthBPOpts
   ): string {
-    return `${node.id}-${address}-${opts.tokenAddress || 'native'}`;
+    return `${node.id}-${address}-${'native'}`;
   }
 
   public async getBalance(
@@ -45,7 +45,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
     provider: any,
     address: string
   ): Promise<string> {
-    const balance = await (api as Web3).eth.getBalance(address);
+    const balance = await api.eth.getBalance(address);
     provider.disconnect(1000, 'finished');
     return balance;
   }

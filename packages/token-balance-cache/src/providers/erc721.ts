@@ -26,7 +26,7 @@ export default class Erc721BalanceProvider extends BalanceProvider<EthBPOpts> {
     address: string,
     opts: EthBPOpts
   ): string {
-    return `${node.id}-${address}-${opts.tokenAddress || 'native'}`;
+    return `${node.id}-${address}-${opts.tokenAddress}`;
   }
 
   public async getBalance(
