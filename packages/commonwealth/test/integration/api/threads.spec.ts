@@ -4,10 +4,6 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import app, { resetDatabase } from 'commonwealth/server-test';
-import { JWT_SECRET } from 'commonwealth/server/config';
-import * as modelUtils from 'commonwealth/test/util/modelUtils';
-import { addAllowDenyPermissions } from 'commonwealth/test/util/modelUtils';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import { Errors as CreateCommentErrors } from 'server/routes/createComment';
@@ -17,7 +13,11 @@ import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPi
 import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
-import { Action } from '../../../../common-common/src/permissions';
+import app, { resetDatabase } from 'commonwealth/server-test';
+import { JWT_SECRET } from 'commonwealth/server/config';
+import * as modelUtils from 'commonwealth/test/util/modelUtils';
+import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
+import { Action } from 'commonwealth/shared/permissions';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
@@ -83,7 +83,12 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    addAllowDenyPermissions('member', chain2, 0, Action.CREATE_THREAD);
+    addAllowDenyPermissionsForCommunityRole(
+      'member',
+      chain2,
+      0,
+      Action.CREATE_THREAD
+    );
   });
 
   describe('/createThread', () => {
@@ -172,6 +177,7 @@ describe('Thread Tests', () => {
         readOnly,
         jwt: userJWT,
       });
+      console.log({ tRes });
       expect(tRes).not.to.be.null;
       expect(tRes.status).to.be.equal('Success');
       expect(tRes.result.read_only).to.be.equal(true);

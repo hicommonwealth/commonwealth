@@ -10,9 +10,9 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
+import fs from 'fs';
 import logger from 'morgan';
 import passport from 'passport';
-import * as path from 'path';
 import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
@@ -45,11 +45,20 @@ import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
+import * as v8 from 'v8';
+import { factory, formatFilename } from 'common-common/src/logging';
 
+const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
 require('express-async-errors');
 
 const app = express();
+
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
@@ -83,7 +92,16 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
+  const compiler = DEV
+    ? webpack(devWebpackConfig as any)
+    : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
+  const devMiddleware =
+    DEV && !NO_CLIENT_SERVER
+      ? webpackDevMiddleware(compiler as any, {
+          publicPath: '/build',
+        })
+      : null;
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
@@ -121,6 +139,32 @@ async function main() {
     // dynamic compression settings used
     app.use(compression());
 
+    // static compression settings unused
+    // app.get('*.js', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
+    //   next();
+    // });
+
+    // // static compression settings unused
+    // app.get('bundle.**.css', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'text/css');
+    //   next();
+    // });
+
+    // serve the compiled app
+    if (!NO_CLIENT_SERVER) {
+      if (DEV) {
+        app.use(devMiddleware);
+        app.use(webpackHotMiddleware(compiler));
+      } else {
+        app.use('/build', express.static('build'));
+      }
+    }
+
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
@@ -143,6 +187,16 @@ async function main() {
     app.use(passport.session());
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
   };
+
+  const templateFile = (() => {
+    try {
+      return fs.readFileSync('./build/index.html');
+    } catch (e) {
+      console.error(`Failed to read template file: ${e.message}`);
+    }
+  })();
+
+  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.
@@ -196,34 +250,6 @@ async function main() {
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
 
-  let compiler;
-  try {
-    compiler = DEV
-      ? webpack(devWebpackConfig as any)
-      : webpack(prodWebpackConfig as any);
-  } catch (e) {
-    console.log(e);
-  }
-  const devMiddleware = webpackDevMiddleware(compiler as any, {
-    publicPath: '/build',
-  });
-
-  // serve the compiled app
-  if (!NO_CLIENT_SERVER) {
-    if (DEV && !process.env.EXTERNAL_WEBPACK) {
-      app.use(devMiddleware);
-      app.use(webpackHotMiddleware(compiler));
-    } else if (process.env.EXTERNAL_WEBPACK) {
-      app.use('/build', express.static(path.join(__dirname, 'build')));
-
-      app.get('/', function (req, res) {
-        res.sendFile(path.join(__dirname, 'build', 'index.html'));
-      });
-    } else {
-      app.use('/', express.static('build'));
-    }
-  }
-
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
@@ -242,8 +268,7 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
-
-  setupAppRoutes(app, models, devMiddleware);
+  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 
   setupErrorHandlers(app, rollbar);
 

@@ -3,13 +3,12 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { ChainBase } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -211,7 +210,7 @@ const loadProfile = async (
       ghost_address: a.ghost_address,
     };
     state.account = account;
-    state.threads = result.threads.map((t) => modelThreadFromServer(t));
+    state.threads = result.threads.map((t) => app.threads.modelFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
     m.redraw();
   } catch (err) {
@@ -418,6 +417,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     const proposals = vnode.state.threads.sort(
       (a, b) => +b.createdAt - +a.createdAt
     );
+
     const allContent = []
       .concat(proposals || [])
       .concat(comments || [])

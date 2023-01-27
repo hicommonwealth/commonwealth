@@ -2,9 +2,12 @@ const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
-const { DuplicatesPlugin } = require('inspectpack/plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = merge(common, {
+  entry: {
+    app: ['webpack-hot-middleware/client?path=/__webpack_hmr&reload=true'],
+  },
   mode: 'development',
   devtool: 'eval-cheap-source-map',
   stats: {
@@ -15,10 +18,12 @@ module.exports = merge(common, {
     { module: /client\/styles\/construct.scss/ },
     { module: /node_modules\/magic-sdk\/dist\/es\/index.mjs/ },
   ],
+  target: 'web',
   output: {
+    publicPath: '/build',
     path: path.join(__dirname, '../build'),
-    filename: 'js/[name].js',
-    chunkFilename: 'js/[name].chunk.js',
+    filename: 'js/[name].[contenthash:8].js',
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   devServer: {
     inline: true,
@@ -29,30 +34,11 @@ module.exports = merge(common, {
       'process.env.NODE_ENV': JSON.stringify('development'),
       CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001'),
     }),
+    new webpack.HotModuleReplacementPlugin(), // used for hot reloading
   ],
+  optimization: {
+    minimizer: [
+      new CssMinimizerPlugin({ minimizerOptions: { preset: ['default'] } }),
+    ],
+  },
 });
-
-// if we are building locally in server.ts, add hot-middleware as entrypoint
-if (!process.env.EXTERNAL_WEBPACK) {
-  module.exports = merge(module.exports, {
-    entry: {
-      app: ['webpack-hot-middleware/client?path=/__webpack_hmr&reload=true'],
-    },
-    plugins: [
-      new webpack.HotModuleReplacementPlugin(), // used for hot reloading
-    ],
-  });
-}
-
-if (process.env.SHOW_DUPLICATE_DEPS) {
-  module.exports = merge(module.exports, {
-    plugins: [
-      new DuplicatesPlugin({
-        // Emit compilation warning or error? (Default: `false`)
-        emitErrors: false,
-        // Display full duplicates information? (Default: `false`)
-        verbose: false,
-      }),
-    ],
-  });
-}
