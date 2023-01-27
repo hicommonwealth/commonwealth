@@ -134,7 +134,7 @@ class NotificationSettingsPage extends ClassComponent {
             const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
             return (
-              <div class="notification-row">
+              <div class="notification-row chain-events-subscriptions-padding">
                 <div class="notification-row-header">
                   <div className="left-content-container">
                     <div class="avatar-and-name">
