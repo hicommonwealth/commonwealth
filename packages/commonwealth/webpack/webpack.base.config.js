@@ -85,12 +85,14 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
-        quill: { // large non-es module (cant be tree-shaken)
+        quill: {
+          // large non-es module (cant be tree-shaken)
           test: /[\\/]node_modules[\\/](quill)[\\/]/,
           name: 'quill',
           chunks: 'all',
         },
-        vendorSplit2: { // remaining non-es modules
+        vendorSplit2: {
+          // remaining non-es modules
           test: /[\\/]node_modules[\\/](lodash|moment|mixpanel)[\\/]/,
           name: 'vendorSplit2',
           chunks: 'all',
@@ -138,6 +140,7 @@ module.exports = {
     fallback: {
       fs: false,
       net: false,
+      zlib: false,
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),
       https: require.resolve('https-browserify'),
