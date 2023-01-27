@@ -1,11 +1,12 @@
-import {
+import type {
   PostReactionsReq,
   PostRolesReq,
   PostRulesReq,
   PostTopicsReq,
   PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
-import { DB } from 'commonwealth/server/models';
+import { PostProfilesReq } from 'common-common/src/api/extApiTypes';
+import type { DB } from 'commonwealth/server/models';
 import {
   getComments,
   getCommentsValidation,
@@ -23,10 +24,10 @@ import {
   getThreads,
   getThreadsValidation,
 } from 'commonwealth/server/routes/threads/getThreads';
-import { Express } from 'express';
-import Router from 'express/lib/router/index';
+import type { Express } from 'express';
+import type Router from 'express/lib/router/index';
 import passport from 'passport';
-import { TokenBalanceCache } from 'token-balance-cache/src';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import { addEntities } from '../routes/addEntities';
 import {
   putCommunities,
@@ -48,7 +49,7 @@ import {
 import { getRoles, getRolesValidation } from '../routes/roles/getRoles';
 import { getRules, getRulesValidation } from '../routes/rulesext/getRules';
 import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
-import { TypedRequest } from '../types';
+import type { TypedRequest } from '../types';
 import {
   onlyIds,
   postProfilesValidation,

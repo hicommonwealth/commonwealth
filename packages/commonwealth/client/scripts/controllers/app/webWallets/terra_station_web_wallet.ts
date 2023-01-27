@@ -1,4 +1,3 @@
-import { Extension, LCDClient, TendermintAPI } from '@terra-money/terra.js';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
@@ -12,7 +11,8 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
   private _accounts: TerraAddress[] = [];
   private _enabling = false;
-  private _extension = new Extension();
+  private _terra;
+  private _extension;
 
   public readonly name = WalletId.TerraStation;
   public readonly label = 'Terra Station';
@@ -21,7 +21,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   public readonly specificChains = ['terra'];
 
   public get available() {
-    return this._extension.isAvailable;
+    return this._extension && this._extension.isAvailable;
   }
 
   public get enabled() {
@@ -41,6 +41,8 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   // }
 
   public async enable() {
+    this._terra = await import('@terra-money/terra.js');
+    this._extension = new this._terra.Extension();
     console.log('Attempting to enable Terra Station');
     this._enabling = true;
 
@@ -66,11 +68,11 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const client = new LCDClient({
+    const client = new this._terra.LCDClient({
       URL: app.chain.meta.ChainNode.url,
       chainID: chainIdentifier,
     });
-    const tmClient = new TendermintAPI(client);
+    const tmClient = new this._terra.TendermintAPI(client);
     const blockInfo = await tmClient.blockInfo();
 
     return {
