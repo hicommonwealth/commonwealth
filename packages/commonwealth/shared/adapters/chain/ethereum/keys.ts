@@ -3,7 +3,6 @@ import type {
   TypedDataDomain,
   TypedDataField,
 } from '@ethersproject/abstract-signer';
-import type { Block, SessionPayload } from '@canvas-js/interfaces';
 
 export const TEST_BLOCK_INFO_STRING =
   '{"number":1,"hash":"0x0f927bde6fb00940895178da0d32948714ea6e76f6374f03ffbbd7e0787e15bf","timestamp":1665083987891}';
@@ -11,14 +10,14 @@ export const TEST_BLOCK_INFO_BLOCKHASH =
   '0x0f927bde6fb00940895178da0d32948714ea6e76f6374f03ffbbd7e0787e15bf';
 
 export const constructTypedCanvasMessage = (message) => {
-  // construct the signature data from scratch, since canvas' implementation doesn't
-  // include an EIP712Domain
-  const domain: TypedDataDomain = {
-    name: 'Commonwealth',
-    salt: utils.hexlify(0),
-  };
+  // canvas implements ethers.js eip712 types, but
+  // commonwealth uses web3.js which expects the
+  // user to provide a valid EIP712Domain
+  //
+  // see: https://github.com/ethers-io/ethers.js/issues/687#issuecomment-714069471
+  const domain = { name: 'Commonwealth' };
 
-  const types: Record<string, TypedDataField[]> = {
+  const types = {
     EIP712Domain: [{ name: 'name', type: 'string' }],
     Message: [
       { name: 'app', type: 'string' },
@@ -32,7 +31,6 @@ export const constructTypedCanvasMessage = (message) => {
     ],
   };
 
-  // canvas uses ethers' signTypedData types while commonwealth uses eth-sig-util's
-  // so we have to coerce the types here
-  return { types, primaryType: 'Message', domain, message } as any;
+  // these return types match what's expected by `eth-sig-util`
+  return { types, primaryType: 'Message', domain, message };
 };
