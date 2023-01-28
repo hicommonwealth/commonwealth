@@ -20,6 +20,7 @@ export const constructTypedCanvasMessage = (
     EIP712Domain: [{ name: 'name', type: 'string' }],
     Message: [
       { name: 'app', type: 'string' },
+      { name: 'appName', type: 'string' },
       { name: 'block', type: 'string' },
       { name: 'chain', type: 'string' },
       { name: 'chainId', type: 'string' },
