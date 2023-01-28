@@ -6,7 +6,9 @@ export const TEST_BLOCK_INFO_STRING =
 export const TEST_BLOCK_INFO_BLOCKHASH =
   '0x0f927bde6fb00940895178da0d32948714ea6e76f6374f03ffbbd7e0787e15bf';
 
-export const constructTypedCanvasMessage = (message: SessionPayload): TypedMessage<MessageTypes> => {
+export const constructTypedCanvasMessage = (
+  message: SessionPayload
+): TypedMessage<MessageTypes> => {
   // canvas implements ethers.js eip712 types, but
   // commonwealth uses web3.js which expects the
   // user to provide a valid EIP712Domain
