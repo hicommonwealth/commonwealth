@@ -1,4 +1,4 @@
-import * as solw3 from '@solana/web3.js';
+import type * as solw3 from '@solana/web3.js';
 import { BalanceType } from 'common-common/src/types';
 
 import type { IChainNode } from '../types';
@@ -28,6 +28,7 @@ export default class SplTokenBalanceProvider extends BalanceProvider<SplTokenBPO
     address: string,
     opts: SplTokenBPOpts
   ): Promise<string> {
+    const solw3 = await import('@solana/web3.js');
     const mintKey = new solw3.PublicKey(opts.tokenAddress);
     if (mintKey.toBase58() !== opts.tokenAddress) {
       throw new Error('Invalid token address');

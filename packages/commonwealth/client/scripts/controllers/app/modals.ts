@@ -14,17 +14,6 @@ export class ModalStore {
     m.redraw();
   }
 
-  // name must be filename in the modals folder
-  public async lazyCreate(name: string, data = {}) {
-    const modalImport = await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "modal-[request]" */
-      `../../views/modals/${name}`
-    );
-    const modal = modalImport.default;
-    this.create({ modal, data });
-  }
-
   public remove(modalspec) {
     const index = this._modals.findIndex((ms) => ms.id === modalspec.id);
     if (index === -1) {

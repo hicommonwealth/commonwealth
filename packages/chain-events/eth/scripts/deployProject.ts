@@ -1,9 +1,8 @@
 import { providers } from 'ethers';
-import Web3 from 'web3';
-
 import { CuratedProjectFactory__factory } from '../../src/contractTypes/factories/CuratedProjectFactory__factory';
 
 async function main() {
+  const Web3 = (await import('web3')).default;
   // TODO: configure URL based on chain
   const web3Provider = new Web3.providers.WebsocketProvider(
     'http://localhost:8545',
