@@ -52,7 +52,8 @@
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "sync-entities": "ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)",
     "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
-    "compress-images": "npx ts-node -T ./scripts/compressImages.ts"
+    "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
+    "test-e2e": "npx playwright test ./test/e2e/*"
   },
   "engines": {
     "node": "14.x"
@@ -93,6 +94,7 @@
     "@mui/base": "^5.0.0-alpha.114",
     "@openzeppelin/contracts": "^2.4.0",
     "@openzeppelin/contracts-governance": "npm:@openzeppelin/contracts@^4.3.2",
+    "@playwright/test": "^1.29.2",
     "@polkadot/api": "6.0.5",
     "@polkadot/api-derive": "6.0.5",
     "@polkadot/extension-dapp": "0.40.3",
@@ -204,6 +206,7 @@
     "passport-local": "^1.0.0",
     "passport-magic": "^1.0.0",
     "path-browserify": "^1.0.1",
+    "playwright-test": "^8.1.2",
     "prerender": "^5.6.0",
     "prerender-node": "^3.2.5",
     "prettier": "2.4.1",
