@@ -1,61 +1,57 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
+import 'components/component_kit/cw_popover/cw_tooltip.scss';
+
+import { AnchorType, Popover, usePopover } from './cw_popover';
 import { CWText } from '../cw_text';
-import { SharedPopoverAttrs, CWPopover } from './cw_popover';
+import { ComponentType } from '../types';
+import { getClasses } from '../helpers';
 
-export type TooltipType =
-  | 'bordered'
-  | 'singleLine'
-  | 'solidArrow'
-  | 'solidNoArrow';
+export type TooltipType = 'solidBackground' | 'singleLine';
 
-type TooltipAttrs = {
-  tooltipContent: string | ResultNode;
-} & SharedPopoverAttrs;
+type TooltipProps = {
+  content: string | React.ReactNode;
+  renderTrigger: (
+    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
+  ) => React.ReactNode;
+  tooltipType?: TooltipType;
+};
 
-export class CWTooltip extends ClassComponent<TooltipAttrs> {
-  view(vnode: ResultNode<TooltipAttrs>) {
-    const {
-      hoverCloseDelay = 1500,
-      hoverOpenDelay,
-      interactionType,
-      persistOnHover,
-      tooltipContent,
-      tooltipType,
-      toSide,
-      trigger,
-    } = vnode.attrs;
+export const CWTooltip = (props: TooltipProps) => {
+  const { content, tooltipType, renderTrigger } = props;
 
-    return (
-      <CWPopover
+  const popoverProps = usePopover();
+
+  return (
+    <React.Fragment>
+      {renderTrigger(popoverProps.handleInteraction)}
+      <Popover
         content={
-          typeof tooltipContent === 'string' ? (
-            <CWText type="caption">{tooltipContent}</CWText>
+          typeof content === 'string' ? (
+            <div
+              className={getClasses<{ tooltipType?: TooltipType }>(
+                { tooltipType },
+                ComponentType.Tooltip
+              )}
+            >
+              <CWText type="caption">{content}</CWText>
+            </div>
           ) : (
-            tooltipContent
+            <div
+              className={getClasses<{ tooltipType?: TooltipType }>(
+                { tooltipType },
+                ComponentType.Tooltip
+              )}
+            >
+              {content}
+            </div>
           )
         }
-        hoverCloseDelay={hoverCloseDelay}
-        hoverOpenDelay={hoverOpenDelay}
-        interactionType={interactionType}
-        persistOnHover={persistOnHover}
-        tooltipType={tooltipType}
-        toSide={toSide}
-        trigger={trigger}
+        {...popoverProps}
       />
-    );
-  }
-}
+    </React.Fragment>
+  );
+};

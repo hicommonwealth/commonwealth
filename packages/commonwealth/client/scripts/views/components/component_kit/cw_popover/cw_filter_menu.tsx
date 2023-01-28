@@ -68,7 +68,6 @@ export class CWFilterMenu extends ClassComponent<FilterMenuAttrs> {
             })}
           </div>
         }
-        interactionType="click"
         trigger={
           <CWButton
             label="Filter"

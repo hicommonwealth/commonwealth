@@ -32,8 +32,6 @@ export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
 
     return (
       <CWTooltip
-        persistOnHover
-        interactionType="hover"
         tooltipContent={
           <div className={ComponentType.AddressTooltip}>
             <CWText type="caption">{address}</CWText>

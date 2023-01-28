@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
 
@@ -91,9 +100,9 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
           this.reactors = await fetchReactionsByPost(thread);
         }}
         onClick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
-        className={`ThreadPreviewReactionButton${this.loading ? ' disabled' : ''}${
-          hasReacted ? ' has-reacted' : ''
-        }`}
+        className={`ThreadPreviewReactionButton${
+          this.loading ? ' disabled' : ''
+        }${hasReacted ? ' has-reacted' : ''}`}
       >
         <CWIcon
           iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
@@ -103,22 +112,21 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
       </div>
     );
 
-    return reactionButtonComponent
+    return reactionButtonComponent;
     // return likes > 0
     //   ? null // @TODO @REACT FIX ME
-      // m(Popover, {
-      //     interactionType: 'hover',
-      //     content: (
-      //       <div className="reaction-button-tooltip-contents">
-      //         {getDisplayedReactorsForPopup({
-      //           likes,
-      //           reactors: this.reactors,
-      //         })}
-      //       </div>
-      //     ),
-      //     trigger: reactionButtonComponent,
-      //     hoverOpenDelay: 100,
-      //   })
-      // : reactionButtonComponent;
+    // m(Popover, {
+    //     content: (
+    //       <div className="reaction-button-tooltip-contents">
+    //         {getDisplayedReactorsForPopup({
+    //           likes,
+    //           reactors: this.reactors,
+    //         })}
+    //       </div>
+    //     ),
+    //     trigger: reactionButtonComponent,
+    //     hoverOpenDelay: 100,
+    //   })
+    // : reactionButtonComponent;
   }
 }

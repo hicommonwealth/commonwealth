@@ -396,8 +396,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
             )}
             {hasNoWalletsLink && (
               <CWTooltip
-                interactionType="click"
-                tooltipContent={
+                content={
                   <React.Fragment>
                     <CWText type="caption">
                       If you don’t see your wallet then make sure:

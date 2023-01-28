@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 
@@ -113,8 +122,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
         />
         {likes > 0 ? (
           <CWTooltip
-            interactionType="hover"
-            tooltipContent={
+            content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
                   likes,
@@ -123,7 +131,6 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
               </div>
             }
             trigger={countsComponent}
-            hoverOpenDelay={100}
             tooltipType="bordered"
           />
         ) : (
