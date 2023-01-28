@@ -1,44 +1,43 @@
-import { Web3Provider } from '@ethersproject/providers';
-import snapshot from '@snapshot-labs/snapshot.js';
-import gql from 'graphql-tag';
 import { notifyError } from '../controllers/app/notifications';
-
-const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-const client = new snapshot.Client712(hub);
 
 let apolloClient = null;
 
-async function getApolloClient() {
-  if (apolloClient) return apolloClient;
+class SnapshotLazyLoader {
+  private static snapshot;
+  private static client;
 
-  const { ApolloClient, createHttpLink, InMemoryCache } = await import(
-    '@apollo/client/core'
-  );
+  private static async init() {
+    if (!this.snapshot) {
+      this.snapshot = await import('@snapshot-labs/snapshot.js');
+      const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+      this.client = new this.snapshot.Client712(hub);
+    }
+  }
 
-  // HTTP connection to the API
-  const httpLink = createHttpLink({
-    // You should use an absolute URL here
-    uri: `${
-      process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
-    }/graphql`,
-  });
+  public static async getSnapshot() {
+    await this.init();
+    return this.snapshot;
+  }
 
-  // Create the apollo client
-  apolloClient = new ApolloClient({
-    link: httpLink,
-    cache: new InMemoryCache(),
-    defaultOptions: {
-      query: {
-        fetchPolicy: 'no-cache',
-      },
-    },
-  });
-  return apolloClient;
+  public static async getClient() {
+    await this.init();
+    return this.client;
+  }
 }
 
 // Queries from: https://github.com/snapshot-labs/snapshot/blob/develop/src/helpers/queries.ts
+class GqlLazyLoader {
+  private static gql;
 
-export const SPACE_QUERY = gql`
+  private static async init() {
+    if (!this.gql) {
+      this.gql = await import('graphql-tag');
+    }
+  }
+
+  public static async SPACE_QUERY() {
+    await this.init();
+    return this.gql`
   query Space($space: String) {
     space(id: $space) {
       id
@@ -60,8 +59,11 @@ export const SPACE_QUERY = gql`
     }
   }
 `;
+  }
 
-export const PROPOSALS_QUERY = gql`
+  public static async PROPOSALS_QUERY() {
+    await this.init();
+    return this.gql`
   query Proposals(
     $first: Int!
     $skip: Int!
@@ -102,8 +104,11 @@ export const PROPOSALS_QUERY = gql`
     }
   }
 `;
+  }
 
-export const PROPOSAL_VOTES_QUERY = gql`
+  public static async PROPOSAL_VOTES_QUERY() {
+    await this.init();
+    return this.gql`
   query Votes($proposalHash: String!) {
     votes(
       first: 1000
@@ -119,6 +124,36 @@ export const PROPOSAL_VOTES_QUERY = gql`
     }
   }
 `;
+  }
+}
+
+async function getApolloClient() {
+  if (apolloClient) return apolloClient;
+
+  const { ApolloClient, createHttpLink, InMemoryCache } = await import(
+    '@apollo/client/core'
+  );
+
+  // HTTP connection to the API
+  const httpLink = createHttpLink({
+    // You should use an absolute URL here
+    uri: `${
+      process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
+    }/graphql`,
+  });
+
+  // Create the apollo client
+  apolloClient = new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache(),
+    defaultOptions: {
+      query: {
+        fetchPolicy: 'no-cache',
+      },
+    },
+  });
+  return apolloClient;
+}
 
 export interface SnapshotSpace {
   id: string;
@@ -176,7 +211,7 @@ export async function getVersion(): Promise<string> {
 export async function getSpace(space: string): Promise<SnapshotSpace> {
   await getApolloClient();
   const spaceObj = await apolloClient.query({
-    query: SPACE_QUERY,
+    query: await GqlLazyLoader.SPACE_QUERY(),
     variables: {
       space,
     },
@@ -187,7 +222,7 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {
   await getApolloClient();
   const proposalsObj = await apolloClient.query({
-    query: PROPOSALS_QUERY,
+    query: await GqlLazyLoader.PROPOSALS_QUERY(),
     variables: {
       space,
       state: 'all',
@@ -204,7 +239,7 @@ export async function getVotes(
 ): Promise<SnapshotProposalVote[]> {
   await getApolloClient();
   const response = await apolloClient.query({
-    query: PROPOSAL_VOTES_QUERY,
+    query: await GqlLazyLoader.PROPOSAL_VOTES_QUERY(),
     variables: {
       proposalHash,
     },
@@ -213,22 +248,28 @@ export async function getVotes(
 }
 
 export async function castVote(address: string, payload: any) {
+  const { Web3Provider } = await import('@ethersproject/providers');
   const web3 = new Web3Provider((window as any).ethereum);
+  const client = await SnapshotLazyLoader.getClient();
   await client.vote(web3 as any, address, payload);
 }
 
 export async function createProposal(address: string, payload: any) {
+  const { Web3Provider } = await import('@ethersproject/providers');
   const web3 = new Web3Provider((window as any).ethereum);
+  const client = await SnapshotLazyLoader.getClient();
 
   const receipt = await client.proposal(web3 as any, address, payload);
   return receipt;
 }
 
 export async function getSpaceBlockNumber(network: string): Promise<number> {
+  const snapshot = await SnapshotLazyLoader.getSnapshot();
   return snapshot.utils.getBlockNumber(snapshot.utils.getProvider(network));
 }
 
 export async function getScore(space: SnapshotSpace, address: string) {
+  const snapshot = await SnapshotLazyLoader.getSnapshot();
   return snapshot.utils.getScores(
     space.id,
     space.strategies,
@@ -252,6 +293,7 @@ export async function getResults(
       let attempts = 0;
       while (attempts <= 3) {
         try {
+          const snapshot = await SnapshotLazyLoader.getSnapshot();
           const scores = await snapshot.utils.getScores(
             space.id,
             strategies,
@@ -283,6 +325,7 @@ export async function getResults(
     }
 
     /* Get results */
+    const snapshot = await SnapshotLazyLoader.getSnapshot();
     const votingClass = new snapshot.utils.voting[proposal.type](
       proposal,
       votes,
@@ -306,6 +349,7 @@ export async function getPower(
   proposal: SnapshotProposal,
   address: string
 ) {
+  const snapshot = await SnapshotLazyLoader.getSnapshot();
   const blockNumber = await snapshot.utils.getBlockNumber(
     snapshot.utils.getProvider(space.network)
   );

@@ -1,4 +1,3 @@
-import { fromAscii } from '@cosmjs/encoding';
 import type { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
 import type {
@@ -47,10 +46,11 @@ const isCompleted = (status: string): boolean => {
   return status === 'Passed' || status === 'Rejected' || status === 'Failed';
 };
 
-const asciiLiteralToDecimal = (n: Uint8Array) => {
+const asciiLiteralToDecimal = async (n: Uint8Array) => {
   // 500000000000000000 = 0.5
   // dividing by 1000000000000000 gives 3 decimal digits of precision
-  const nStr = fromAscii(n);
+  const cosm = await import('@cosmjs/encoding');
+  const nStr = cosm.fromAscii(n);
   return +new BN(nStr).div(new BN('1000000000000000')) / 1000;
 };
 
@@ -110,8 +110,10 @@ class CosmosGovernance extends ProposalModule<
     const { tallyParams } = await this._Chain.api.gov.params('tallying');
     const { votingParams } = await this._Chain.api.gov.params('voting');
     this._votingPeriodS = votingParams.votingPeriod.seconds.toNumber();
-    this._yesThreshold = asciiLiteralToDecimal(tallyParams.threshold);
-    this._vetoThreshold = asciiLiteralToDecimal(tallyParams.vetoThreshold);
+    this._yesThreshold = await asciiLiteralToDecimal(tallyParams.threshold);
+    this._vetoThreshold = await asciiLiteralToDecimal(
+      tallyParams.vetoThreshold
+    );
     this._maxDepositPeriodS = depositParams.maxDepositPeriod.seconds.toNumber();
 
     // TODO: support off-denom deposits
@@ -264,10 +266,11 @@ class CosmosGovernance extends ProposalModule<
     const events = await this._Chain.sendTx(sender, msg);
     console.log(events);
     const submitEvent = events.find((e) => e.type === 'submit_proposal');
+    const cosm = await import('@cosmjs/encoding');
     const idAttribute = submitEvent.attributes.find(
-      ({ key }) => fromAscii(key) === 'proposal_id'
+      ({ key }) => cosm.fromAscii(key) === 'proposal_id'
     );
-    const id = +fromAscii(idAttribute.value);
+    const id = +cosm.fromAscii(idAttribute.value);
     await this._initProposals(id);
     return id;
   }

@@ -9,7 +9,7 @@ import {
   PermissionManager,
   everyonePermissions,
 } from 'commonwealth/shared/permissions';
-import { RoleObject } from './types';
+import type { RoleObject } from './types';
 import { ProposalType } from 'common-common/src/types';
 
 export const getNextPollEndingTime = (now) => {

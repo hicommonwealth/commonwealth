@@ -1,7 +1,6 @@
 import type { Signer } from 'ethers';
 import { providers } from 'ethers';
 import type { BigNumberish } from '@ethersproject/bignumber';
-import Web3 from 'web3';
 
 import type { ERC20VotesMock, TimelockController } from '../types';
 import {
@@ -33,6 +32,7 @@ async function deployTimelock(
 
 async function main() {
   // TODO: configure URL based on chain
+  const Web3 = (await import('web3')).default;
   const web3Provider = new Web3.providers.WebsocketProvider(
     'http://localhost:8545',
     {
