@@ -1,7 +1,6 @@
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
-import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
-import { Secp256k1Wallet, serializeSignDoc } from '@cosmjs/amino';
-import { Random, Sha256, Secp256k1 } from '@cosmjs/crypto';
+import type { AminoMsg, StdSignDoc, StdFee, Secp256k1Wallet } from '@cosmjs/amino';
+import type { Secp256k1 } from '@cosmjs/crypto';
 
 import {
   Action,
@@ -33,7 +32,8 @@ export const getCosmosSignatureData = (
       data: JSON.stringify(actionPayload),
     },
   };
-  const signDoc = makeSignDoc(
+  const cosm = await import('@cosmjs/amino');
+  const signDoc = cosm.makeSignDoc(
     [jsonTx],
     fee,
     chainId,
@@ -102,12 +102,15 @@ export class CosmosSDKSessionController implements ISessionController {
     if (this.signers[chainId] !== undefined) {
       return this.signers[chainId];
     }
+    const cosm = await import('@cosmjs/amino');
+    const cosmCrypto = await import('@cosmjs/crypto');
+
     const storageKey = `CW_SESSIONS-cosmos-${chainId}`;
     const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-auth`;
     try {
       const storage = localStorage.getItem(storageKey);
       const { privkey } = JSON.parse(storage);
-      const signer = await Secp256k1Wallet.fromKey(Buffer.from(privkey, 'hex'));
+      const signer = await cosm.Secp256k1Wallet.fromKey(Buffer.from(privkey, 'hex'));
       const accounts = await signer.getAccounts();
       const address = accounts[0].address;
       this.signers[chainId] = { signer, privkey, bech32Address: address };
@@ -137,7 +140,7 @@ export class CosmosSDKSessionController implements ISessionController {
       console.log('Could not restore previous session', err);
       // Use same configuration for generating private keys as @cosmjs/amino Secp256k1HdWallet
       const entropyLength = 4 * Math.floor((11 * 24) / 33);
-      const privkeyBytes = Random.getBytes(entropyLength);
+      const privkeyBytes = cosmCrypto.Random.getBytes(entropyLength);
       const privkey = Buffer.from(privkeyBytes).toString('hex');
 
       const signer = await Secp256k1Wallet.fromKey(privkeyBytes);
@@ -172,9 +175,12 @@ export class CosmosSDKSessionController implements ISessionController {
       callArgs,
     };
 
+    const cosm = await import('@cosmjs/amino');
+    const cosmCrypto = await import('@cosmjs/crypto');
+
     // don't use signAmino, use Secp256k1.createSignature to get an ExtendedSecp256k1Signature
     const signDoc = getCosmosSignatureData(actionPayload, address);
-    const signDocDigest = new Sha256(serializeSignDoc(signDoc)).digest();
+    const signDocDigest = new cosmCrypto.Sha256(cosm.serializeSignDoc(signDoc)).digest();
     const extendedSignature = await Secp256k1.createSignature(
       signDocDigest,
       Buffer.from(privkey, 'hex')

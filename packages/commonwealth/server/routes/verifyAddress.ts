@@ -4,22 +4,15 @@ import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 
-import Keyring, { decodeAddress } from '@polkadot/keyring';
-import { KeyringOptions } from '@polkadot/keyring/types';
+import type { KeyringOptions } from '@polkadot/keyring/types';
 import { hexToU8a, stringToHex } from '@polkadot/util';
-import { KeypairType } from '@polkadot/util-crypto/types';
+import type { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
+
 import {
   recoverTypedSignature,
   SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
-
-import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import {
-  pubkeyToAddress,
-  serializeSignDoc,
-  decodeSignature,
-} from '@cosmjs/amino';
 
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -29,7 +22,8 @@ import {
   NotificationCategories,
   WalletId,
 } from 'common-common/src/types';
-import nacl from 'tweetnacl';
+
+import type { NextFunction, Request, Response } from 'express';
 
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
@@ -118,7 +112,8 @@ const verifySignature = async (
     //
     // substrate address handling
     //
-    const address = decodeAddress(addressModel.address);
+    const polkadot = await import('@polkadot/keyring');
+    const address = polkadot.decodeAddress(addressModel.address);
     const keyringOptions: KeyringOptions = { type: 'sr25519' };
     if (
       !addressModel.keytype ||
@@ -129,7 +124,9 @@ const verifySignature = async (
         keyringOptions.type = addressModel.keytype as KeypairType;
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
-      const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
+      const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(
+        address
+      );
       const message = stringToHex(sortedStringify(canvasMessage));
 
       const signatureU8a =
@@ -192,11 +189,14 @@ const verifySignature = async (
     // the account they registered with.
     // TODO: ensure ion works
     const bech32Prefix = chain.bech32_prefix;
+
+    const cosmCrypto = await import('@cosmjs/crypto');
     if (!bech32Prefix) {
       log.error('No bech32 prefix found.');
       isValid = false;
     } else {
-      const generatedAddress = pubkeyToAddress(
+      const cosm = await import('@cosmjs/amino');
+      const generatedAddress = cosm.pubkeyToAddress(
         stdSignature.pub_key,
         bech32Prefix
       );
@@ -204,13 +204,14 @@ const verifySignature = async (
       if (generatedAddress === addressModel.address) {
         try {
           // directly verify the generated signature, generated via SignBytes
-          const { pubkey, signature } = decodeSignature(stdSignature);
-          const secpSignature = Secp256k1Signature.fromFixedLength(signature);
-          const messageHash = new Sha256(
+          const { pubkey, signature } = cosm.decodeSignature(stdSignature);
+          const secpSignature =
+            cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
+          const messageHash = new cosmCrypto.Sha256(
             Buffer.from(sortedStringify(canvasMessage))
           ).digest();
 
-          isValid = await Secp256k1.verifySignature(
+          isValid = await cosmCrypto.Secp256k1.verifySignature(
             secpSignature,
             messageHash,
             pubkey
@@ -231,11 +232,12 @@ const verifySignature = async (
       log.error('No bech32 prefix found.');
       isValid = false;
     } else {
-      const generatedAddress = pubkeyToAddress(
+      const cosm = await import('@cosmjs/amino');
+      const generatedAddress = cosm.pubkeyToAddress(
         stdSignature.pub_key,
         bech32Prefix
       );
-      const generatedAddressWithCosmosPrefix = pubkeyToAddress(
+      const generatedAddressWithCosmosPrefix = cosm.pubkeyToAddress(
         stdSignature.pub_key,
         'cosmos'
       );
@@ -246,17 +248,19 @@ const verifySignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const generatedSignDoc = validationTokenToSignDoc(
+          const generatedSignDoc = await validationTokenToSignDoc(
             Buffer.from(sortedStringify(canvasMessage)),
             generatedAddress
           );
 
-          const { pubkey, signature } = decodeSignature(stdSignature);
-          const secpSignature = Secp256k1Signature.fromFixedLength(signature);
-          const messageHash = new Sha256(
-            serializeSignDoc(generatedSignDoc)
+          const { pubkey, signature } = cosm.decodeSignature(stdSignature);
+          const cosmCrypto = await import('@cosmjs/crypto');
+          const secpSignature =
+            cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
+          const messageHash = new cosmCrypto.Sha256(
+            cosm.serializeSignDoc(generatedSignDoc)
           ).digest();
-          isValid = await Secp256k1.verifySignature(
+          isValid = await cosmCrypto.Secp256k1.verifySignature(
             secpSignature,
             messageHash,
             pubkey
@@ -310,6 +314,7 @@ const verifySignature = async (
     //
 
     // both in base64 encoding
+    const nacl = await import('tweetnacl');
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
 
     isValid = nacl.sign.detached.verify(
@@ -326,6 +331,7 @@ const verifySignature = async (
     try {
       const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
+        const nacl = await import('tweetnacl');
         isValid = nacl.sign.detached.verify(
           Buffer.from(sortedStringify(canvasMessage)),
           bs58.decode(signatureString),

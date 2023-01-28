@@ -1,7 +1,10 @@
 declare let window: any;
 
 import $ from 'jquery';
-import Web3 from 'web3';
+
+import type { Account, BlockInfo, IWebWallet } from 'models';
+import type Web3 from 'web3';
+
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 
@@ -9,7 +12,6 @@ import { SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, BlockInfo, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 
@@ -95,6 +97,8 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       const chainId = this.getChainId();
 
       // ensure we're on the correct chain
+
+      const Web3 = (await import('web3')).default;
       this._web3 = new Web3((window as any).ethereum);
       // TODO: does this come after?
       await this._web3.givenProvider.request({

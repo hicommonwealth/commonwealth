@@ -1,10 +1,4 @@
-import { LCDClient, TendermintAPI } from '@terra-money/terra.js';
-import type { ConnectedWallet } from '@terra-money/wallet-controller';
-import {
-  ConnectType,
-  getChainOptions,
-  WalletController,
-} from '@terra-money/wallet-controller';
+import type { ConnectedWallet, WalletController } from '@terra-money/wallet-controller';
 import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 
 import { Account, IWebWallet } from 'models';
@@ -25,6 +19,7 @@ class TerraWalletConnectWebWalletController
   private _accounts: TerraAddress[];
   private _controller: WalletController;
   private _wallet: ConnectedWallet;
+  private _terra;
 
   public readonly name = WalletId.TerraWalletConnect;
   public readonly label = 'WalletConnect';
@@ -51,11 +46,11 @@ class TerraWalletConnectWebWalletController
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const client = new LCDClient({
+    const client = new this._terra.LCDClient({
       URL: app.chain.meta.ChainNode.url,
       chainID: chainIdentifier,
     });
-    const tmClient = new TendermintAPI(client);
+    const tmClient = new this._terra.TendermintAPI(client);
     const blockInfo = await tmClient.blockInfo();
 
     return {
@@ -101,16 +96,17 @@ class TerraWalletConnectWebWalletController
 
   public async enable() {
     console.log('Attempting to enable WalletConnect');
+    this._terra = import('@terra-money/terra.js');
     this._enabling = true;
     try {
-      // Create WalletConnect Provider
-      const chainOptions = await getChainOptions();
-      this._controller = new WalletController({
+      const terra = await import('@terra-money/wallet-controller');
+      const chainOptions = await terra.getChainOptions();
+      this._controller = new terra.WalletController({
         ...chainOptions,
       });
 
       //  Enable session (triggers QR Code modal)
-      await this._controller.connect(ConnectType.WALLETCONNECT);
+      await this._controller.connect(terra.ConnectType.WALLETCONNECT);
 
       let subscription;
       this._wallet = await new Promise((resolve) => {

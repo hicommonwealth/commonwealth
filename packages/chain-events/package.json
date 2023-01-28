@@ -11,7 +11,7 @@
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.src.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
     "build-services": "tsc --project tsconfig.services.json && tsc-alias --project tsconfig.services.json",
-    "compile-contracts": "cd eth && npx hardhat compile",
+    "compile-contracts": "cd eth && npx hardhat compile && npx eslint --no-ignore --no-inline-config --fix \"./src/contractTypes/**/*.ts\"",
     "check-services-types": "tsc --noEmit --project tsconfig.services.json",
     "check-src-types": "tsc --noEmit --project tsconfig.src.json",
     "check-types": "tsc --noEmit --project tsconfig.json",

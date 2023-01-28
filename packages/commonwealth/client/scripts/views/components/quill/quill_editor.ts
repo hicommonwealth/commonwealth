@@ -12,6 +12,12 @@ import type { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 //    4. Re-enable the editor if it will be reused on the page.
 
 export class QuillEditor extends QuillEditorInternal {
+  private theme;
+  private imageUploader;
+  private placeholder;
+  private defaultContents;
+  private tabIndex;
+
   public get activeMode(): QuillActiveMode {
     return this._activeMode;
   }
@@ -79,12 +85,20 @@ export class QuillEditor extends QuillEditorInternal {
     tabIndex?: number
   ) {
     super($editor, defaultMode, editorNamespace, onkeyboardSubmit);
-    this._initializeEditor(
-      theme,
-      imageUploader,
-      placeholder,
-      defaultContents,
-      tabIndex
+    this.theme = theme;
+    this.imageUploader = imageUploader;
+    this.placeholder = placeholder;
+    this.defaultContents = defaultContents;
+    this.tabIndex = tabIndex;
+  }
+
+  public async initialize() {
+    await this._initializeEditor(
+      this.theme,
+      this.imageUploader,
+      this.placeholder,
+      this.defaultContents,
+      this.tabIndex
     );
   }
 

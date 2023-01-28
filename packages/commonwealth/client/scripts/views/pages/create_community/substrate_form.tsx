@@ -1,6 +1,5 @@
 /* @jsx m */
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
 import ClassComponent from 'class_component';
@@ -88,14 +87,15 @@ export class SubstrateForm extends ClassComponent {
               await app.chain.deinit();
             }
 
+            const polkadot = await import('@polkadot/api');
             // create new API
-            const provider = new WsProvider(
+            const provider = new polkadot.WsProvider(
               constructSubstrateUrl(this.state.form.nodeUrl),
               false
             );
             try {
               await provider.connect();
-              const api = await ApiPromise.create({
+              const api = await polkadot.ApiPromise.create({
                 throwOnConnect: true,
                 provider,
                 ...JSON.parse(this.state.form.substrateSpec),

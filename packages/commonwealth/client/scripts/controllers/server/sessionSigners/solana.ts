@@ -1,4 +1,4 @@
-import * as solw3 from '@solana/web3.js';
+import type * as solw3 from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
@@ -63,6 +63,7 @@ export class SolanaSessionController implements ISessionController {
   }
 
   private async getOrCreateSigner(chainId: string): Promise<solw3.Keypair> {
+    const solw3 = await import('@solana/web3.js');
     if (this.signers[chainId] !== undefined) {
       return this.signers[chainId];
     }

@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import { Chain, serializeSessionPayload } from '@canvas-js/interfaces';
-
 import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
