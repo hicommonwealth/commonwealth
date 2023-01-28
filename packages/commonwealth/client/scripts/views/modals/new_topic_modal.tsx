@@ -1,6 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
+import ClassComponent from 'class_component';
 import {
   ClassComponent,
   ResultNode,
@@ -12,22 +13,22 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
-import app from 'state';
+
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+
+import { pluralizeWithoutNumberPrefix } from 'helpers';
 import $ from 'jquery';
 
 import 'modals/new_topic_modal.scss';
-
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { QuillEditor } from 'views/components/quill/quill_editor';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-
-import { pluralizeWithoutNumberPrefix } from 'helpers';
+import app from 'state';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWLabel } from '../components/component_kit/cw_label';
-import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
+import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 type NewTopicModalForm = {

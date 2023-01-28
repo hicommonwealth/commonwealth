@@ -1,17 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_mobile_menu.scss';
 
 import app from 'state';
-import { getClasses } from './helpers';
-import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
-import { ComponentType, MenuItem } from './types';
+import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+import type { MenuItem } from './types';
+import { ComponentType } from './types';
 
 class CWMobileMenuItem extends ClassComponent<MenuItem> {
   view(vnode: ResultNode<MenuItem>) {

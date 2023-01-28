@@ -4,8 +4,8 @@ import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
+import { blocknumToTime, formatDuration } from 'helpers';
 
-import { formatDuration, blocknumToTime } from 'helpers';
 
 type CountdownAttrs = {
   duration?: moment.Duration;

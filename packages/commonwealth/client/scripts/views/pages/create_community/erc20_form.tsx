@@ -1,38 +1,37 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { initAppState } from 'state';
+import { IERC20Metadata__factory } from 'common-common/src/eth/types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import { providers } from 'ethers';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import Web3 from 'web3';
-import { providers } from 'ethers';
-import { isAddress } from 'web3-utils';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
 import { slugify, slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
-import { IERC20Metadata__factory } from 'common-common/src/eth/types';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
+import { isAddress } from 'web3-utils';
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
-  initChainForm,
   defaultChainRows,
   ethChainRows,
+  initChainForm,
 } from './chain_input_rows';
-import {
+import type {
   ChainFormFields,
   ChainFormState,
   EthChainAttrs,
   EthFormFields,
 } from './types';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
 type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
 
@@ -103,6 +102,7 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
           } else {
             // attempt to query ERC20Detailed token info from chain
             console.log('Querying chain for ERC info');
+            const Web3 = (await import('web3')).default;
             const provider = new Web3.providers.WebsocketProvider(args.url);
             try {
               const ethersProvider = new providers.Web3Provider(provider);
@@ -197,8 +197,14 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onClick={async () => {
-            const { altWalletUrl, chainString, ethChainId, nodeUrl, symbol } =
-              this.state.form;
+            const {
+              altWalletUrl,
+              chainString,
+              ethChainId,
+              nodeUrl,
+              symbol,
+              iconUrl,
+            } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
@@ -212,6 +218,7 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
                 base: ChainBase.Ethereum,
                 chain_string: chainString,
                 eth_chain_id: ethChainId,
+                icon_url: iconUrl,
                 jwt: app.user.jwt,
                 network: ChainNetwork.ERC20,
                 node_url: nodeUrl,

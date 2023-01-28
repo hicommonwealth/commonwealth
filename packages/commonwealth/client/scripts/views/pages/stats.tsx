@@ -1,7 +1,6 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'lodash';
@@ -10,14 +9,15 @@ import moment from 'moment';
 import 'pages/stats.scss';
 
 import app from 'state';
-import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
+import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 
 class StatsPage extends ClassComponent {
   private data: any;
+  private totalData: any;
   private error: string;
   private requested: boolean;
 
@@ -33,43 +33,35 @@ class StatsPage extends ClassComponent {
           if (status !== 'Success') {
             this.error = 'Error loading stats';
           } else {
+            this.totalData = {
+              totalComments: +result.totalComments[0].new_items,
+              totalRoles: +result.totalRoles[0].new_items,
+              totalThreads: +result.totalThreads[0].new_items,
+            };
+
             const data = {};
-            const totalComments = +result.totalComments[0].new_items;
-            const totalRoles = +result.totalRoles[0].new_items;
-            const totalThreads = +result.totalThreads[0].new_items;
-
-            let acc1 = totalComments,
-              acc2 = totalRoles,
-              acc3 = totalThreads;
-
             result.comments.forEach(({ date, new_items }) => {
               if (data[date]) {
                 data[date].comments = new_items;
-                data[date].totalComments = acc1;
               } else {
-                data[date] = { comments: new_items, totalComments: acc1 };
+                data[date] = { comments: new_items };
               }
-              acc1 -= new_items;
             });
 
             result.roles.forEach(({ date, new_items }) => {
               if (data[date]) {
                 data[date].roles = new_items;
-                data[date].totalRoles = acc2;
               } else {
-                data[date] = { roles: new_items, totalRoles: acc2 };
+                data[date] = { roles: new_items };
               }
-              acc2 -= new_items;
             });
 
             result.threads.forEach(({ date, new_items }) => {
               if (data[date]) {
                 data[date].threads = new_items;
-                data[date].totalThreads = acc3;
               } else {
-                data[date] = { threads: new_items, totalThreads: acc3 };
+                data[date] = { threads: new_items };
               }
-              acc3 -= new_items;
             });
 
             (result.activeAccounts || []).forEach(({ date, new_items }) => {
@@ -129,12 +121,23 @@ class StatsPage extends ClassComponent {
             .map(([date, row]: [any, any]) => (
               <div className="stat-row">
                 <CWText>{moment(date).format('l')}</CWText>
-                <CWText>{row.comments || 0}</CWText>
                 <CWText>{row.roles || 0}</CWText>
+                <CWText>{row.comments || 0}</CWText>
                 <CWText>{row.threads || 0}</CWText>
                 <CWText>{row.activeAccounts}</CWText>
               </div>
             ))}
+
+          <div class="stat-row">
+            <CWText fontWeight="medium">Total Addresses</CWText>
+            <CWText fontWeight="medium">Total Comments</CWText>
+            <CWText fontWeight="medium">Total Threads</CWText>
+          </div>
+          <div class="stat-row">
+            <CWText>{this.totalData.totalRoles}</CWText>
+            <CWText>{this.totalData.totalComments}</CWText>
+            <CWText>{this.totalData.totalThreads}</CWText>
+          </div>
         </div>
       </Sublayout>
     );

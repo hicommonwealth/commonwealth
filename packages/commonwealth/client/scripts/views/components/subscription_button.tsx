@@ -1,12 +1,11 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { NotificationCategories } from 'common-common/src/types';
+import { isNotUndefined } from 'helpers/typeGuards';
 
 import app from 'state';
-import { isNotUndefined } from 'helpers/typeGuards';
-import { NotificationCategories } from 'common-common/src/types';
 import { CWButton } from './component_kit/cw_button';
 
 export class SubscriptionButton extends ClassComponent {

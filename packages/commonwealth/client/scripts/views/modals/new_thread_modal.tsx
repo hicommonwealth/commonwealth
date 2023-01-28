@@ -1,14 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'modals/new_thread_modal.scss';
 
 import app from 'state';
-import { NewThreadForm } from 'views/components/new_thread_form/new_thread_form';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { NewThreadForm } from 'views/components/new_thread_form/new_thread_form';
 
 class NewThreadModal extends ClassComponent {
   view() {

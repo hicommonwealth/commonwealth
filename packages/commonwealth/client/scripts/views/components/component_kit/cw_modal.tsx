@@ -3,14 +3,14 @@ import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import $ from 'jquery';
 
 import 'components/component_kit/cw_modal.scss';
+import $ from 'jquery';
+import { CWIconButton } from './cw_icon_button';
+import type { IconButtonTheme } from './cw_icons/types';
+import { breakpointFnValidator, getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { CWIconButton } from './cw_icon_button';
-import { breakpointFnValidator, getClasses } from './helpers';
-import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
   onClick: (

@@ -1,12 +1,10 @@
 import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import BanCache from '../util/banCheckCache';
-import { TypedRequestBody, TypedResponse, success } from '../types';
-import validateRoles from '../util/validateRoles';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import type BanCache from '../util/banCheckCache';
 import deleteThreadFromDb from '../util/deleteThread';
-
-const log = factory.getLogger(formatFilename(__filename));
+import validateRoles from '../util/validateRoles';
 
 enum DeleteThreadErrors {
   NoUser = 'Not logged in',
@@ -20,11 +18,11 @@ type DeleteThreadReq = {
 
 type DeleteThreadResp = Record<string, never>;
 
-const deleteThread = async(
+const deleteThread = async (
   models: DB,
   banCache: BanCache,
   req: TypedRequestBody<DeleteThreadReq>,
-  resp: TypedResponse<DeleteThreadResp>,
+  resp: TypedResponse<DeleteThreadResp>
 ) => {
   const { thread_id } = req.body;
   if (!req.user) {
@@ -37,9 +35,7 @@ const deleteThread = async(
     where: {
       id: thread_id,
     },
-    include: [
-      { model: models.Address, as: 'Address' },
-    ]
+    include: [{ model: models.Address, as: 'Address' }],
   });
   if (!thread) {
     throw new AppError(DeleteThreadErrors.NoThread);
@@ -59,7 +55,12 @@ const deleteThread = async(
   }
 
   // permit community mod or admin to delete
-  const isAdminOrMod = await validateRoles(models, req.user, 'moderator', thread.chain);
+  const isAdminOrMod = await validateRoles(
+    models,
+    req.user,
+    'moderator',
+    thread.chain
+  );
   if (!isAdminOrMod) {
     throw new AppError(DeleteThreadErrors.NoPermission);
   }

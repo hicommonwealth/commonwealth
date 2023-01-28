@@ -1,7 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
+import ClassComponent from 'class_component';
 import 'components/sidebar/sidebar_section.scss';
+import { isNotUndefined } from 'helpers/typeGuards';
 
 import {
   ClassComponent,
@@ -15,14 +17,13 @@ import {
   jsx,
 } from 'mithrilInterop';
 import app from 'state';
-import { isNotUndefined } from 'helpers/typeGuards';
-import {
-  SubSectionAttrs,
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-} from './types';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
+import type {
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+  SubSectionAttrs,
+} from './types';
 
 class SubSection extends ClassComponent<SubSectionAttrs> {
   view(vnode: ResultNode<SubSectionAttrs>) {
@@ -68,6 +69,7 @@ class SubSection extends ClassComponent<SubSectionAttrs> {
     );
   }
 }
+
 class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;

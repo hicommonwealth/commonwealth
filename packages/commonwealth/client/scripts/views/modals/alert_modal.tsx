@@ -5,6 +5,7 @@ import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/alert_modal.scss';
 

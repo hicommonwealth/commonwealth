@@ -2,6 +2,9 @@
 import React from 'react';
 import PopperUnstyled from '@mui/base/PopperUnstyled';
 
+import 'components/component_kit/cw_popover/cw_popover.scss';
+
+
 import {
   ClassComponent,
   ResultNode,
@@ -16,7 +19,16 @@ import {
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
-import { TooltipType } from './cw_tooltip';
+import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
+import type { TooltipType } from './cw_tooltip';
+import {
+  applyArrowStyles,
+  cursorInBounds,
+  findRef,
+  getPosition,
+} from './helpers';
+import { CWPortal } from '../cw_portal';
 
 export type PopoverInteractionType = 'click' | 'hover';
 

@@ -1,14 +1,14 @@
-
+import { pluralize } from 'helpers';
+import type { Account } from 'models';
+import { Thread } from 'models';
 
 import app from 'state';
-import { pluralize } from 'helpers';
-import { Thread, Account } from 'models';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
-import { UserContent } from './index';
+import type { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
 import ProfileProposal from './profile_proposal';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 const postsRemaining = (contentLength, count) => {
   return contentLength > 10 && count < contentLength;

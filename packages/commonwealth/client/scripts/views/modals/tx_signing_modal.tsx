@@ -1,26 +1,26 @@
 /* @jsx jsx */
 import React from 'react';
 
+import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'modals/tx_signing_modal.scss';
+import type { ITXModalData } from 'models/interfaces';
 
 import app from 'state';
-import { ITXModalData } from 'models/interfaces';
-import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import {
   getModalTitle,
   getTransactionLabel,
 } from '../components/tx_signing/helpers';
-import { StageName, TxDataState } from '../components/tx_signing/types';
 import {
   TxSigningModalIntroStage,
   TxSigningModalRejectedStage,
   TxSigningModalSuccessStage,
   TxSigningModalWaitingStage,
 } from '../components/tx_signing/tx_signing_modal_stages';
+import type { StageName, TxDataState } from '../components/tx_signing/types';
 
 class TXSigningModal extends ClassComponent<ITXModalData> {
   private data: TxDataState;

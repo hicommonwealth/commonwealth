@@ -1,6 +1,14 @@
 /* @jsx jsx */
 import React from 'react';
 
+import ClassComponent from 'class_component';
+
+import 'components/thread_selector.scss';
+import { ListItem, QueryList } from 'construct-ui';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import m from 'mithril';
+import type { Thread } from 'models';
+import type { SearchParams } from 'models/SearchQuery';
 import {
   ClassComponent,
   ResultNode,
@@ -12,17 +20,11 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
-
-import 'components/thread_selector.scss';
-
 import app from 'state';
-import { Thread } from 'models';
-import { SearchParams } from 'models/SearchQuery';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from '../../../../shared/utils';
-import { CWTextInput } from './component_kit/cw_text_input';
-import { CWText } from './component_kit/cw_text';
 import { CWSpinner } from './component_kit/cw_spinner';
+import { CWText } from './component_kit/cw_text';
+import { CWTextInput } from './component_kit/cw_text_input';
 
 const renderThreadPreview = (
   linkedThreads: Array<Thread>,

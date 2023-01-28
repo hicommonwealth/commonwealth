@@ -14,10 +14,11 @@ import {
 } from 'mithrilInterop';
 
 import 'components/component_kit/cw_checkbox.scss';
-
-import { ComponentType, StyleAttrs } from './types';
-import { getClasses } from './helpers';
 import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+
+import type { StyleAttrs } from './types';
+import { ComponentType } from './types';
 
 export type CheckboxType = { label?: string; value?: string };
 

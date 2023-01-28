@@ -1,20 +1,19 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
+import $ from 'jquery';
 
 import app from 'state';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { PreviewModal } from 'views/modals/preview_modal';
-import { QuillEditor } from './quill_editor';
-import { getClasses } from '../component_kit/helpers';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
-import { QuillTextContents, QuillActiveMode, QuillMode } from './types';
+import { getClasses } from '../component_kit/helpers';
+import { QuillEditor } from './quill_editor';
+import type { QuillActiveMode, QuillMode, QuillTextContents } from './types';
 
 // Rich text and Markdown editor.
 //
@@ -92,6 +91,10 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
         // Otherwise, set this.activeMode based on the app setting
         this.activeMode = app.user?.disableRichText ? 'markdown' : 'richText';
       }
+    } else if (mode === 'markdown') {
+      this.activeMode = 'markdown';
+    } else {
+      this.activeMode = 'richText';
     }
   }
 
@@ -164,7 +167,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
     return (
       <div
         className={editorClass}
-        oncreate={(childVnode) => {
+        oncreate={async (childVnode) => {
           this.$editor = $(childVnode.dom).find('.quill-editor');
           this.editor = new QuillEditor(
             this.$editor,
@@ -177,6 +180,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
             this.defaultContents,
             tabIndex
           );
+          await this.editor.initialize();
           if (oncreateBind) oncreateBind(this.editor);
         }}
       >

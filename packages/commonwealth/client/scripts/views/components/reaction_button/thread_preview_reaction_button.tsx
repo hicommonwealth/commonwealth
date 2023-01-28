@@ -1,14 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import type { ChainInfo, Thread } from 'models';
 
 import app from 'state';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { Thread, ChainInfo } from 'models';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import {
   fetchReactionsByPost,

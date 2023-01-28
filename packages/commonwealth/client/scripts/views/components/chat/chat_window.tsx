@@ -1,6 +1,11 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { MixpanelChatEvents } from 'analytics/types';
+
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { isActiveAddressPermitted } from 'controllers/server/roles';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import $ from 'jquery';
 
 import {
@@ -18,21 +23,18 @@ import moment from 'moment';
 
 import 'pages/chat.scss';
 
-import { Action } from 'common-common/src/permissions';
+import { Action } from 'commonwealth/shared/permissions';
 import app from 'state';
 import { AddressInfo } from 'models';
 import { User } from 'views/components/user/user';
 import { WebsocketMessageNames } from 'types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { MixpanelChatEvents } from 'analytics/types';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import { isActiveAddressPermitted } from 'controllers/server/roles';
-
-import { QuillEditorComponent } from '../quill/quill_editor_component';
+import User from 'views/components/widgets/user';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { renderQuillTextBody } from '../quill/helpers';
-import { QuillEditor } from '../quill/quill_editor';
-import { CWIconButton } from '../component_kit/cw_icon_button';
+import type { QuillEditor } from '../quill/quill_editor';
+
+import { QuillEditorComponent } from '../quill/quill_editor_component';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;

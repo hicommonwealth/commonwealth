@@ -1,10 +1,10 @@
-import { Web3Provider } from '@ethersproject/providers';
-import BN from 'bn.js';
+import type { Web3Provider } from '@ethersproject/providers';
+import type BN from 'bn.js';
 
-import { TypedEvent } from '../../contractTypes/commons';
-import { ERC20 } from '../../contractTypes';
+import type { TypedEvent } from '../../contractTypes/commons';
+import type { ERC20 } from '../../contractTypes';
 
-import { EnricherConfig } from './filters/enricher';
+import type { EnricherConfig } from './filters/enricher';
 
 interface IErc20Contract {
   contract: ERC20;

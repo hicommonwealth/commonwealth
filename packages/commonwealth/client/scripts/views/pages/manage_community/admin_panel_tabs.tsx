@@ -5,11 +5,9 @@ import React from 'react';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
-
-import { Webhook, RoleInfo } from 'models';
-import { WebhooksForm } from './webhooks_form';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { UpgradeRolesForm } from './upgrade_roles_form';
-import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
+import { WebhooksForm } from './webhooks_form';
 
 type AdminPanelTabsAttrs = {
   defaultTab: number;

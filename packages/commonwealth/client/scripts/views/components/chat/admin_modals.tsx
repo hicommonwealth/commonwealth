@@ -16,13 +16,14 @@ import {
 
 import app from 'state';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { MixpanelChatEvents } from 'analytics/types';
-import { IChannel } from 'controllers/server/socket/chatNs';
-import { CWCard } from '../component_kit/cw_card';
+import m from 'mithril';
+
+import app from 'state';
 import { CWButton } from '../component_kit/cw_button';
-import { CWTextInput } from '../component_kit/cw_text_input';
+import { CWCard } from '../component_kit/cw_card';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
+import { CWTextInput } from '../component_kit/cw_text_input';
 
 type ChannelAttrs = {
   category?: string;

@@ -1,35 +1,33 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import _ from 'lodash';
-// import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
 import 'components/sidebar/index.scss';
+// import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
+import type { IChannel } from 'controllers/server/socket/chatNs';
+import { handleRedirectClicks } from 'helpers';
 
 import app from 'state';
-import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
-import { handleRedirectClicks } from 'helpers';
+import { CWSpinner } from '../component_kit/cw_spinner';
+import { verifyCachedToggleTree } from '../sidebar/helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
+import type {
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+  SubSectionAttrs,
+  ToggleTree,
+} from '../sidebar/types';
 import {
   CreateCategory,
   CreateChannel,
-  RenameCategory,
-  RenameChannel,
   DeleteCategory,
   DeleteChannel,
+  RenameCategory,
+  RenameChannel,
 } from './admin_modals';
-import {
-  ToggleTree,
-  SubSectionAttrs,
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-} from '../sidebar/types';
-import { verifyCachedToggleTree } from '../sidebar/helpers';
-import { CWSpinner } from '../component_kit/cw_spinner';
 
 enum Errors {
   None = '',

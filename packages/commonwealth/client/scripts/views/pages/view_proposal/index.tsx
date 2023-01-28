@@ -1,6 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { navigateToSubpage } from 'router';
 import {
   ClassComponent,
   ResultNode,
@@ -14,42 +15,38 @@ import {
 } from 'mithrilInterop';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
   idToProposal,
   proposalSlugToClass,
 } from 'identifiers';
+import type { AnyProposal, Comment, ProposalModule } from 'models';
+import { Account } from 'models';
+
+import app from 'state';
 import { slugify } from 'utils';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { notifyError } from 'controllers/app/notifications';
-import { Comment, Account, ProposalModule, AnyProposal } from 'models';
+import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import PageNotFound from 'views/pages/404';
-import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import { TipDetail } from '../tip_detail';
+import Sublayout from 'views/sublayout';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
+import { CommentsTree } from '../../components/comments/comments_tree';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import { User } from '../../components/user/user';
-import {
-  ProposalSubheader,
-  SubheaderProposalType,
-} from './proposal_components';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
+import User from '../../components/widgets/user';
+import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
-import {
-  LinkedProposalsEmbed,
-  LinkedSubstrateProposal,
-} from './linked_proposals_embed';
-import { CommentsTree } from '../../components/comments/comments_tree';
-import {
-  CollapsibleProposalBody,
-  CollapsibleThreadBody,
-} from '../../components/collapsible_body_text';
+import type { LinkedSubstrateProposal } from './linked_proposals_embed';
+import { LinkedProposalsEmbed } from './linked_proposals_embed';
+import type { SubheaderProposalType } from './proposal_components';
+import { ProposalSubheader } from './proposal_components';
 
 type ProposalPrefetch = {
   [identifier: string]: {

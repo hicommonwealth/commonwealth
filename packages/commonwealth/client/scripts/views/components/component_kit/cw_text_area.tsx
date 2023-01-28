@@ -14,11 +14,12 @@ import {
 } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_area.scss';
+import type { BaseTextInputAttrs } from './cw_text_input';
+import { MessageRow } from './cw_text_input';
+import type { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import { ValidationStatus } from './cw_validation_text';
-import { MessageRow, BaseTextInputAttrs } from './cw_text_input';
 
 type TextAreaStyleAttrs = {
   disabled?: boolean;

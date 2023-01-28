@@ -1,18 +1,28 @@
-import { ITXModalData, IChainModule, ITXData, ChainInfo } from 'models';
+import type { EncodeObject } from '@cosmjs/proto-signing';
+
+import type {
+  BankExtension,
+  GovExtension,
+  StakingExtension,
+  StdFee,
+} from '@cosmjs/stargate';
+import type { QueryClient } from '@cosmjs/stargate';
+import type { Event } from '@cosmjs/tendermint-rpc';
+import type { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import BN from 'bn.js';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 
+import { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import _ from 'lodash';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
-import BN from 'bn.js';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
+import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
+import type CosmosAccount from './account';
 
-import { Event } from '@cosmjs/tendermint-rpc/build/tendermint34';
-import { EncodeObject } from '@cosmjs/proto-signing';
-import { StdFee } from '@cosmjs/amino';
-import CosmosAccount from './account';
-import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export interface ICosmosTXData extends ITXData {
   chainId: string;
@@ -23,11 +33,16 @@ export interface ICosmosTXData extends ITXData {
   gas: number;
 }
 
-export type CosmosApiType = any;
+export type CosmosApiType = QueryClient &
+  StakingExtension &
+  GovExtension &
+  BankExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _api: CosmosApiType;
-  public get api() { return this._api; }
+  public get api() {
+    return this._api;
+  }
 
   // TODO: rename this something like "bankDenom" or "gasDenom" or "masterDenom"
   private _denom: string;
@@ -41,7 +56,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -52,7 +69,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return new CosmosToken(this.denom, n);
   }
 
-  private _tmClient: any;
+  private _tmClient: Tendermint34Client;
+
   public async init(chain: ChainInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
     console.log(`Starting Tendermint RPC API at ${url}...`);
@@ -65,7 +83,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       this._tmClient,
       cosm.setupGovExtension,
       cosm.setupStakingExtension,
-      cosm.setupBankExtension,
+      cosm.setupBankExtension
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
@@ -77,14 +95,19 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const { block: prevBlock } = await this._tmClient.block(height - 1);
     const time = moment.unix(block.header.time.valueOf() / 1000);
     // TODO: check if this is correctly seconds or milliseconds
-    this.app.chain.block.duration = block.header.time.valueOf() - prevBlock.header.time.valueOf();
+    this.app.chain.block.duration =
+      block.header.time.valueOf() - prevBlock.header.time.valueOf();
     this.app.chain.block.lastTime = time;
     this.app.chain.block.height = height;
 
-    const { pool: { bondedTokens } } = await this._api.staking.pool();
+    const {
+      pool: { bondedTokens },
+    } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bondedTokens));
 
-    const { params: { bondDenom } } = await this._api.staking.params();
+    const {
+      params: { bondDenom },
+    } = await this._api.staking.params();
     this._denom = bondDenom;
     this.app.chain.networkStatus = ApiStatus.Connected;
     redraw();
@@ -94,37 +117,52 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
   }
 
-  public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<readonly Event[]> {
+  public async sendTx(
+    account: CosmosAccount,
+    tx: EncodeObject
+  ): Promise<readonly Event[]> {
     // TODO: error handling
     // TODO: support multiple wallets
     if (this._app.chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
-    const wallet = this.app.wallets.getByName(WalletId.Keplr) as KeplrWebWalletController;
+    const wallet = this.app.wallets.getByName(
+      WalletId.Keplr
+    ) as KeplrWebWalletController;
     if (!wallet) throw new Error('Keplr wallet not found');
     if (!wallet.enabled) {
       await wallet.enable();
     }
-    const cosm   = await import('@cosmjs/stargate');
-    const client = await cosm.SigningStargateClient.connectWithSigner(this._app.chain.meta.node.url, wallet.offlineSigner);
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.SigningStargateClient.connectWithSigner(
+      this._app.chain.meta.node.url,
+      wallet.offlineSigner
+    );
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
     const DEFAULT_FEE: StdFee = {
       gas: '180000',
-      amount: [{ amount: (2.5e-8).toFixed(9), denom: this.denom }]
+      amount: [{ amount: (2.5e-8).toFixed(9), denom: this.denom }],
     };
     const DEFAULT_MEMO = '';
 
     // send the transaction using keplr-supported signing client
     try {
-      const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
+      const result = await client.signAndBroadcast(
+        account.address,
+        [tx],
+        DEFAULT_FEE,
+        DEFAULT_MEMO
+      );
       console.log(result);
       if (cosm.isBroadcastTxFailure(result)) {
         throw new Error('TX execution failed.');
       } else if (cosm.isBroadcastTxSuccess(result)) {
         const txHash = result.transactionHash;
-        const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
+        const txResult = await this._tmClient.tx({
+          hash: Buffer.from(txHash, 'hex'),
+        });
         return txResult.result.events;
       } else {
         throw new Error('Unknown broadcast result');
@@ -140,7 +178,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void,
+    cb?: (success: boolean) => void
   ): ITXModalData {
     throw new Error('unsupported');
   }

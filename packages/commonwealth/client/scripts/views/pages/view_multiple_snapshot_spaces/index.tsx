@@ -1,6 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
+import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
+import type { Thread } from 'models';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -8,16 +11,10 @@ import 'pages/snapshot/multiple_snapshots_page.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import {
-  loadMultipleSpacesData,
-  SnapshotProposal,
-  SnapshotSpace,
-} from 'helpers/snapshot_utils';
-import { Thread } from 'models';
-import { SnapshotSpaceCard } from './snapshot_space_card';
-import { PageLoading } from '../loading';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';
+import { PageLoading } from '../loading';
+import { SnapshotSpaceCard } from './snapshot_space_card';
 
 enum SPACES_HEADER_MESSAGES {
   NEW_PROPOSAL = 'Select a Snapshot Space to Create a Proposal:',

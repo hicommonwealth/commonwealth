@@ -1,17 +1,16 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/snapshot_proposal_selector.scss';
+import { ListItem, QueryList } from 'construct-ui';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
+import m from 'mithril';
+import type { Thread } from 'models';
 
 import app from 'state';
-import { Thread } from 'models';
-import {
-  loadMultipleSpacesData,
-  SnapshotProposal,
-} from 'helpers/snapshot_utils';
 
 type SnapshotProposalSelectorAttrs = {
   onSelect: (sn: SnapshotProposal) => void;

@@ -1,23 +1,26 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-
-import 'components/sidebar/index.scss';
-
-import app from 'state';
 import {
-  ProposalType,
   ChainBase,
   ChainNetwork,
   ChainType,
+  ProposalType,
 } from 'common-common/src/types';
+
+import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
-import { SidebarSectionGroup } from './sidebar_section';
-import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
+
+import app from 'state';
 import { verifyCachedToggleTree } from './helpers';
+import { SidebarSectionGroup } from './sidebar_section';
+import type {
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+  ToggleTree,
+} from './types';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(

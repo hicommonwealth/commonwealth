@@ -1,13 +1,12 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import {
-  convictionToWeight,
-  convictionToLocktime,
   convictions,
+  convictionToLocktime,
+  convictionToWeight,
 } from 'controllers/chain/substrate/democracy_referendum';
 import { CWDropdown } from '../component_kit/cw_dropdown';
 

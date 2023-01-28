@@ -5,9 +5,9 @@ import React from 'react';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_collapsible.scss';
+import { CWIconButton } from './cw_icon_button';
 
 import { ComponentType } from './types';
-import { CWIconButton } from './cw_icon_button';
 
 type CollapsibleAttrs = {
   collapsibleContent: ResultNode;

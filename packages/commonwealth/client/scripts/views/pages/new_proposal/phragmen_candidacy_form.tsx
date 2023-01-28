@@ -3,17 +3,18 @@ import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
-import app from 'state';
-import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
 import { formatCoin } from 'adapters/currency';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { CWText } from '../../components/component_kit/cw_text';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { proposalSlugToClass } from 'identifiers';
+import type { ITXModalData, ProposalModule } from 'models';
+
+import app from 'state';
 import { ProposalType } from '../../../../../../common-common/src/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
+import ErrorPage from '../error';
 
 export class PhragmenCandidacyForm extends ClassComponent {
   view() {
@@ -42,14 +43,15 @@ export class PhragmenCandidacyForm extends ClassComponent {
           onClick={(e) => {
             e.preventDefault();
 
-            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-              (a) => {
-                return (
-                  proposalSlugToClass().get(
-                    ProposalType.PhragmenCandidacy
-                  ) as ProposalModule<any, any, any>
-                ).createTx(...a);
-              };
+            let createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.PhragmenCandidacy
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
 
             createFunc = ([a]) =>
               substrate.phragmenElections.activeElection.submitCandidacyTx(a);

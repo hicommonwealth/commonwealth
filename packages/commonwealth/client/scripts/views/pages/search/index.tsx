@@ -13,19 +13,24 @@ import {
   jsx,
 } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
+import { notifyError } from 'controllers/app/notifications';
+
+import { pluralize } from 'helpers';
+import type { Profile } from 'models';
+import { AddressInfo, SearchQuery } from 'models';
+import { SearchScope, SearchSort } from 'models/SearchQuery';
 import moment from 'moment';
 
 import 'pages/search/index.scss';
-
-import { pluralize } from 'helpers';
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import { AddressInfo, Profile, SearchQuery } from 'models';
-import { SearchScope, SearchSort } from 'models/SearchQuery';
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
 import { SearchContentType } from 'types';
+import { SearchScope, SearchSort } from 'models/SearchQuery';
+import { AddressInfo, Profile, SearchQuery } from 'models';
+import User from 'views/components/widgets/user';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
+import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
@@ -33,7 +38,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import PageNotFound from '../404';
 import ErrorPage from '../error';
-import { CommunityLabel } from '../../components/community_label';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { User } from '../../components/user/user';
 

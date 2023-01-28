@@ -13,11 +13,12 @@ import {
   jsx,
 } from 'mithrilInterop';
 
-import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
-import { CWTextArea } from './component_kit/cw_text_area';
-import { CWToggle } from './component_kit/cw_toggle';
 import { CWText } from './component_kit/cw_text';
+import { CWTextArea } from './component_kit/cw_text_area';
+
+import { CWTextInput } from './component_kit/cw_text_input';
+import { CWToggle } from './component_kit/cw_toggle';
 
 type InputRowAttrs = {
   value: string | number;

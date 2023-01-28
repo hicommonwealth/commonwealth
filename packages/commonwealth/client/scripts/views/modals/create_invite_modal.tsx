@@ -13,24 +13,27 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
-// import { ListItem, List, SelectList } from 'construct-ui';
-import { checkAddressChecksum } from 'web3-utils';
 import { decodeAddress } from '@polkadot/util-crypto';
-import moment from 'moment';
+import { ChainBase } from 'common-common/src/types';
+import { List, ListItem, SelectList } from 'construct-ui';
+import { notifyError } from 'controllers/app/notifications';
 
 import 'modals/create_invite_modal.scss';
+import type { ChainInfo, Profile } from 'models';
+import { RoleInfo } from 'models';
+import { SearchScope } from 'models/SearchQuery';
+import moment from 'moment';
 
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, RoleInfo, Profile } from 'models';
-import { SearchScope } from 'models/SearchQuery';
 import { notifyError } from 'controllers/app/notifications';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { UserBlock } from 'views/components/widgets/user';
+import { checkAddressChecksum } from 'web3-utils';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { UserBlock } from '../components/user/user_block';
 
 type SearchParams = {

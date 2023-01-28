@@ -1,6 +1,10 @@
 /* @jsx jsx */
 import React from 'react';
 
+import BN from 'bn.js';
+import type Near from 'controllers/chain/near/adapter';
+import type { IDaoInfo } from 'controllers/chain/near/chain';
+import { formatDuration } from 'helpers';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import BN from 'bn.js';
@@ -9,11 +13,8 @@ import moment from 'moment';
 import 'pages/sputnikdaos.scss';
 
 import app from 'state';
-import { formatDuration } from 'helpers';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import Near from 'controllers/chain/near/adapter';
-import { IDaoInfo } from 'controllers/chain/near/chain';
 // import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';

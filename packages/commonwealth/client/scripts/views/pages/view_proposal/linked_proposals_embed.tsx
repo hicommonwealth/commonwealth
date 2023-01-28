@@ -1,20 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { navigateToSubpage } from 'router';
+import ClassComponent from 'class_component';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/view_proposal/linked_proposals_embed.scss';
 
-import app from 'state';
-import { navigateToSubpage } from 'app';
 import { ProposalType } from 'common-common/src/types';
-import { idToProposal } from 'identifiers';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import Substrate from 'controllers/chain/substrate/adapter';
+import { idToProposal } from 'identifiers';
+
+import 'pages/view_proposal/linked_proposals_embed.scss';
+
+import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 

@@ -26,6 +26,12 @@ import {
 import { getClasses } from '../helpers';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
+import { getClasses } from '../helpers';
+import type { MenuItem } from '../types';
+import { ComponentType } from '../types';
+
+import type { SharedPopoverAttrs } from './cw_popover';
+import { CWPopover } from './cw_popover';
 
 export type PopoverMenuItem =
   | DividerMenuItem

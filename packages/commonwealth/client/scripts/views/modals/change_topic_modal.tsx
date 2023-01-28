@@ -4,14 +4,15 @@ import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/change_topic_modal.scss';
+import type { Thread, Topic } from 'models';
 
 import app from 'state';
-import { Thread, Topic } from 'models';
 import { CWButton } from '../components/component_kit/cw_button';
-import { TopicSelector } from '../components/topic_selector';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
+import { TopicSelector } from '../components/topic_selector';
 
 type ChangeTopicModalAttrs = {
   onChangeHandler: (topic: Topic) => void;

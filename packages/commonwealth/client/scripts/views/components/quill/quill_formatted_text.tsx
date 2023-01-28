@@ -1,18 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, jsx, Component, rootRender } from 'mithrilInterop';
-import { findAll } from 'highlight-words-core';
-import smartTruncate from 'smart-truncate';
 
 import 'components/quill/quill_formatted_text.scss';
+import { findAll } from 'highlight-words-core';
+import smartTruncate from 'smart-truncate';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { getClasses } from '../component_kit/helpers';
+import { countLinesQuill } from './helpers';
 
 // import { loadScript } from 'helpers';
 import { renderQuillDelta } from './render_quill_delta';
-import { getClasses } from '../component_kit/helpers';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { countLinesQuill } from './helpers';
 
 export type QuillTextParams = {
   collapse?: boolean;

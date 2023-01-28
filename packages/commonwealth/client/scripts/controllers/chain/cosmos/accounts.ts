@@ -1,18 +1,23 @@
-import _ from 'lodash';
-import { IApp } from 'state';
-import CosmosChain from 'controllers/chain/cosmos/chain';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { IAccountsModule } from 'models';
+import type CosmosChain from 'controllers/chain/cosmos/chain';
+import type { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { IAccountsModule } from 'models';
+import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import CosmosAccount from './account';
 
-export default class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccount> {
-  private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
+export default class CosmosAccounts
+  implements IAccountsModule<CosmosToken, CosmosAccount>
+{
+  private _initialized = false;
+  public get initialized() {
+    return this._initialized;
+  }
 
   // STORAGE
   private _store: AccountsStore<CosmosAccount> = new AccountsStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _Chain: CosmosChain;
 
@@ -21,7 +26,9 @@ export default class CosmosAccounts implements IAccountsModule<CosmosToken, Cosm
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;

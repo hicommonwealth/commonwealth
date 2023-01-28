@@ -2,18 +2,17 @@ import $ from 'jquery';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
-
-import { RolePermission } from 'models';
+import { AccessLevel } from 'models';
 import { ChainCategoryType } from 'common-common/src/types';
 import { buildChainToCategoriesMap } from '../communities';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
     return a.Address.address.localeCompare(b.Address.address);
-  if (a.permission === RolePermission.admin) return -1;
-  if (b.permission === RolePermission.admin) return 1;
-  if (a.permission === RolePermission.moderator) return -1;
-  if (b.permission === RolePermission.moderator) return 1;
+  if (a.permission === AccessLevel.Admin) return -1;
+  if (b.permission === AccessLevel.Admin) return 1;
+  if (a.permission === AccessLevel.Moderator) return -1;
+  if (b.permission === AccessLevel.Moderator) return 1;
   return a.Address.address.localeCompare(b.Address.address);
 };
 
@@ -61,8 +60,9 @@ export const setChainCategories = async (
 export const setSelectedTags = (chain: string) => {
   const categoryTypes = app.config.chainCategoryTypes;
   const chainsAndCategories = app.config.chainCategories;
-  const chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } =
-    buildChainToCategoriesMap(categoryTypes, chainsAndCategories);
+  const chainToCategoriesMap: {
+    [chain: string]: ChainCategoryType[];
+  } = buildChainToCategoriesMap(categoryTypes, chainsAndCategories);
 
   const types = Object.keys(ChainCategoryType);
   const selectedTags = {};

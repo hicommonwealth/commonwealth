@@ -5,21 +5,25 @@ import React from 'react';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_divider.scss';
+import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { getClasses } from './helpers';
 
 type DividerAttrs = {
   isVertical?: boolean;
+  className?: string;
 };
 
 export class CWDivider extends ClassComponent<DividerAttrs> {
   view(vnode: ResultNode<DividerAttrs>) {
-    const { isVertical } = vnode.attrs;
+    const { isVertical, className } = vnode.attrs;
 
     return (
       <div
-        className={getClasses<DividerAttrs>({ isVertical }, ComponentType.Divider)}
+        className={getClasses<DividerAttrs>(
+          { isVertical, className },
+          ComponentType.Divider
+        )}
       />
     );
   }

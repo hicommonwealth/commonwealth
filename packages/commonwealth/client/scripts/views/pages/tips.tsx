@@ -1,6 +1,11 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { formatCoin } from 'adapters/currency';
+import { navigateToSubpage } from 'router';
+import { ChainBase, ProposalType } from 'common-common/src/types';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import {
   ClassComponent,
   ResultNode,
@@ -16,22 +21,18 @@ import {
 import 'pages/tips.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { formatCoin } from 'adapters/currency';
-import { ProposalType, ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
-import { ProposalCard } from 'views/components/proposal_card';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import ErrorPage from './error';
+import { ProposalCard } from 'views/components/proposal_card';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { User } from '../components/user/user';
 import { CardsCollection } from '../components/cards_collection';
 import { CWButton } from '../components/component_kit/cw_button';
-import { GovExplainer } from '../components/gov_explainer';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
+import { GovExplainer } from '../components/gov_explainer';
+import User from '../components/widgets/user';
+import ErrorPage from './error';
 
 type TipAttrs = {
   proposal: SubstrateTreasuryTip;

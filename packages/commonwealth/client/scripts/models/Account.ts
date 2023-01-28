@@ -1,9 +1,10 @@
+import type { WalletId } from 'common-common/src/types';
+import { ChainType } from 'common-common/src/types';
 import $ from 'jquery';
 import app from 'state';
-import { ChainType, WalletId } from 'common-common/src/types';
 
-import ChainInfo from './ChainInfo';
-import Profile from './Profile';
+import type ChainInfo from './ChainInfo';
+import type Profile from './Profile';
 
 class Account {
   public readonly address: string;
@@ -72,6 +73,7 @@ class Account {
   get addressId() {
     return this._addressId;
   }
+
   public setAddressId(id: number) {
     this._addressId = id;
   }
@@ -79,6 +81,7 @@ class Account {
   get walletId() {
     return this._walletId;
   }
+
   public setWalletId(walletId: WalletId) {
     this._walletId = walletId;
   }
@@ -86,6 +89,7 @@ class Account {
   get validationToken() {
     return this._validationToken;
   }
+
   public setValidationToken(token: string) {
     this._validationToken = token;
   }
@@ -93,6 +97,7 @@ class Account {
   get validationBlockInfo() {
     return this._validationBlockInfo;
   }
+
   public setValidationBlockInfo(token: string) {
     this._validationBlockInfo = token;
   }
@@ -100,6 +105,7 @@ class Account {
   get sessionPublicAddress() {
     return this._sessionPublicAddress;
   }
+
   public setSessionPublicAddress(sessionPublicAddress: string) {
     this._sessionPublicAddress = sessionPublicAddress;
   }
@@ -119,7 +125,10 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
-      session_public_address: await app.sessions.getOrCreateAddress(this.chain.base, chainId),
+      session_public_address: await app.sessions.getOrCreateAddress(
+        this.chain.base,
+        chainId
+      ),
       session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);

@@ -1,12 +1,11 @@
 /* @jsx jsx */
 import React from 'react';
 
-
+import { ChainBase } from 'common-common/src/types';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import type { ProposalModule } from 'models';
 
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import { ProposalModule } from 'models';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import { BreadcrumbsTitleTag } from './breadcrumbs_title_tag';

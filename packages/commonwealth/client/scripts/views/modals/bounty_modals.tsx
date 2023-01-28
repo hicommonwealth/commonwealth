@@ -1,6 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
+import ClassComponent from 'class_component';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import $ from 'jquery';
 
 import {
@@ -18,15 +21,13 @@ import {
 import 'modals/bounty_modals.scss';
 
 import app from 'state';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInputTypeahead } from 'views/components/address_input_typeahead';
-import { createTXModal } from 'views/modals/tx_signing_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { createTXModal } from 'views/modals/tx_signing_modal';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 
 type BountyModalAttrs = {
   bountyId: number;

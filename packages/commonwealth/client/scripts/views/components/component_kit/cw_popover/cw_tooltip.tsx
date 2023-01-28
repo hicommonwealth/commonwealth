@@ -14,7 +14,8 @@ import {
 } from 'mithrilInterop';
 
 import { CWText } from '../cw_text';
-import { SharedPopoverAttrs, CWPopover } from './cw_popover';
+import type { SharedPopoverAttrs } from './cw_popover';
+import { CWPopover } from './cw_popover';
 
 export type TooltipType =
   | 'bordered'

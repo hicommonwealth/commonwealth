@@ -1,35 +1,31 @@
 import { ApiStatus, IApp } from 'state';
 import Web3 from 'web3';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import type { ChainInfo, IChainModule, ITXModalData, NodeInfo } from 'models';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
+import type Web3 from 'web3';
+import type EthereumAccount from './account';
 
-import {
-  NodeInfo,
-  ITXModalData,
-  ITXData,
-  IChainModule,
-  ChainInfo
-} from 'models';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import EthereumAccount from './account';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 const ETHEREUM_BLOCK_TIME = 13;
-export interface IEthereumTXData extends ITXData {
-  chainId: string;
-  accountNumber: number;
-  sequence: number;
-
-  // skip simulating the tx twice by saving the original estimated gas
-  gas: number;
-}
 
 class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
-  public createTXModalData(author: EthereumAccount, txFunc: any, txName: string, objName: string): ITXModalData {
+  public createTXModalData(
+    author: EthereumAccount,
+    txFunc: any,
+    txName: string,
+    objName: string
+  ): ITXModalData {
     throw new Error('Method not implemented.');
   }
 
   private static _instance;
+
   public static get(): EthereumChain {
     if (!this._instance) {
       // TODO: Figure out how to inject the app since this method is static
@@ -43,7 +39,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -56,27 +54,42 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   private _api: Web3;
   private _metadataInitialized = false;
   private _totalbalance: EthereumCoin;
-  public get metadataInitialized() { return this._metadataInitialized; }
-  public get totalbalance() { return this._totalbalance; }
 
-  public async initApi(node?: NodeInfo): Promise<Web3> {
-    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+  public get metadataInitialized() {
+    return this._metadataInitialized;
+  }
+
+  public get totalbalance() {
+    return this._totalbalance;
+  }
+
+  public async _initApi(node: NodeInfo): Promise<Web3> {
     try {
       // TODO: support http?
+      const Web3 = (await import('web3')).default;
       const provider = new Web3.providers.WebsocketProvider(node.url);
       this._api = new Web3(provider);
+      return this._api;
     } catch (error) {
       console.log(`Could not connect to Ethereum on ${node.url}`);
       this.app.chain.networkStatus = ApiStatus.Disconnected;
       throw error;
     }
+  }
 
+  public async initApi(node?: NodeInfo): Promise<Web3> {
+    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+    await this._initApi(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
     const blockNumber = await this._api.eth.getBlockNumber();
     console.log(blockNumber);
     const headers = await this._api.eth.getBlock(`${blockNumber}`);
-    if (this.app.chain && this.app.chain.meta.node && this.app.chain.meta.node.ethChainId !== 1) {
+    if (
+      this.app.chain &&
+      this.app.chain.meta.node &&
+      this.app.chain.meta.node.ethChainId !== 1
+    ) {
       this.app.chain.block.height = headers.number;
       this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
 
@@ -88,8 +101,10 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       for (let n = 0; n < nHeadersForBlocktime; n++) {
         const prevBlockNumber = blockNumber - 1 - n;
         if (prevBlockNumber > 0) {
-          const prevHeader = await this._api.eth.getBlock(`${blockNumber - 1 - n}`);
-          const duration = lastBlockTime -+prevHeader.timestamp;
+          const prevHeader = await this._api.eth.getBlock(
+            `${blockNumber - 1 - n}`
+          );
+          const duration = lastBlockTime - +prevHeader.timestamp;
           lastBlockTime = +prevHeader.timestamp;
           totalDuration += duration;
         } else {

@@ -7,24 +7,28 @@ import { ethers } from 'hardhat';
 import { BigNumber } from 'ethers';
 import type { Signer, providers, BigNumberish } from 'ethers';
 
-import {
+import type {
   GovernorBravoImmutable,
-  GovernorBravoImmutable__factory as GovernorBravoImmutableFactory,
   MPond,
-  MPond__factory as MPondFactory,
   TimelockMock as Timelock,
-  TimelockMock__factory as TimelockFactory,
 } from '../../src/contractTypes';
 import {
+  GovernorBravoImmutable__factory as GovernorBravoImmutableFactory,
+  MPond__factory as MPondFactory,
+  TimelockMock__factory as TimelockFactory,
+} from '../../src/contractTypes';
+import type {
   Api,
-  BravoSupport,
-  EventKind,
   IEventData,
   IProposalCanceled,
   IProposalCreated,
   IProposalExecuted,
   IProposalQueued,
   IVoteCast,
+} from '../../src/chains/compound/types';
+import {
+  BravoSupport,
+  EventKind,
   ProposalState,
 } from '../../src/chains/compound/types';
 import {
@@ -32,12 +36,8 @@ import {
   StorageFetcher,
   subscribeEvents,
 } from '../../src/chains/compound';
-import {
-  CWEvent,
-  IChainEventData,
-  IEventHandler,
-  SupportedNetwork,
-} from '../../src';
+import type { CWEvent, IChainEventData } from '../../src';
+import { IEventHandler, SupportedNetwork } from '../../src';
 
 const { assert } = chai;
 
@@ -267,23 +267,14 @@ describe('Governor Bravo Event Integration Tests', () => {
 
   describe('GovernorBravo contract function events', () => {
     it('should create a proposal', async () => {
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler } =
+        await setupSubscription();
       await createProposal(handler, GovernorBravo, comp, addresses[0]);
     });
 
     it('proposal castvote against with reason', async () => {
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-        provider,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler, provider } =
+        await setupSubscription();
 
       const from = addresses[0];
 
@@ -322,13 +313,8 @@ describe('Governor Bravo Event Integration Tests', () => {
     });
 
     it('proposal castvote for', async () => {
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-        provider,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler, provider } =
+        await setupSubscription();
 
       const from = addresses[0];
 
@@ -363,13 +349,8 @@ describe('Governor Bravo Event Integration Tests', () => {
     });
 
     it('proposal cancel', async () => {
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-        provider,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler, provider } =
+        await setupSubscription();
 
       const from = addresses[0];
 
@@ -397,13 +378,8 @@ describe('Governor Bravo Event Integration Tests', () => {
     });
 
     it('proposal castvote abstain', async () => {
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-        provider,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler, provider } =
+        await setupSubscription();
 
       const from = addresses[0];
 
@@ -438,13 +414,8 @@ describe('Governor Bravo Event Integration Tests', () => {
     });
 
     it('proposal should succeed once voting period has expired', async () => {
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-        provider,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler, provider } =
+        await setupSubscription();
 
       const from = addresses[0];
 
@@ -473,13 +444,8 @@ describe('Governor Bravo Event Integration Tests', () => {
     });
 
     it('proposal should be defeated once voting period has expired', async () => {
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-        provider,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler, provider } =
+        await setupSubscription();
 
       const from = addresses[0];
 
@@ -509,13 +475,8 @@ describe('Governor Bravo Event Integration Tests', () => {
 
     it('should be queued and executed', async function () {
       this.timeout(0);
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-        provider,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler, provider } =
+        await setupSubscription();
 
       const from = addresses[0];
 
@@ -603,14 +564,8 @@ describe('Governor Bravo Event Integration Tests', () => {
 
     it('should expire in queue', async function () {
       this.timeout(0);
-      const {
-        GovernorBravo,
-        comp,
-        timelock,
-        addresses,
-        handler,
-        provider,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, timelock, addresses, handler, provider } =
+        await setupSubscription();
 
       const from = addresses[0];
 
@@ -696,14 +651,8 @@ describe('Governor Bravo Event Integration Tests', () => {
 
     it('should fetch proposals from storage', async function () {
       this.timeout(0);
-      const {
-        GovernorBravo,
-        comp,
-        addresses,
-        handler,
-        provider,
-        api,
-      } = await setupSubscription();
+      const { GovernorBravo, comp, addresses, handler, provider, api } =
+        await setupSubscription();
 
       const from = addresses[0];
       const beginBlock = await provider.getBlockNumber();

@@ -15,6 +15,7 @@ import {
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import 'footer.scss';
+import m from 'mithril';
 
 import { isNotUndefined } from '../helpers/typeGuards';
 

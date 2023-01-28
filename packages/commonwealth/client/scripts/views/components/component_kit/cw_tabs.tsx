@@ -5,10 +5,10 @@ import React from 'react';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_tabs.scss';
+import { CWText } from './cw_text';
 
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
-import { CWText } from './cw_text';
 
 type TabStyleAttrs = {
   disabled?: boolean;

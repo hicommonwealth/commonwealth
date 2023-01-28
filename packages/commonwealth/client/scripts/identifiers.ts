@@ -1,20 +1,11 @@
-import { ProposalModule, ChainInfo } from 'models';
-import { IChainEntityKind } from 'chain-events/src';
+import type { IChainEntityKind } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
-import { ProposalStore } from 'stores';
-import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import type { ChainInfo, ProposalModule } from 'models';
+import type { ProposalStore } from 'stores';
 import { requiresTypeSlug } from 'utils';
+import type ThreadsController from './controllers/server/threads';
 import app from './state';
-import ThreadsController from './controllers/server/threads';
-
-export const pathIsDiscussion = (
-  scope: string | null,
-  path: string
-): boolean => {
-  return (
-    path.startsWith(`/${scope}/discussion`) || path.startsWith('/discussion')
-  );
-};
 
 // returns a URL path to a proposal based on its type and id, taking into account
 // custom domain prefixes as well.
@@ -54,6 +45,9 @@ export const proposalSlugToClass = () => {
     string,
     ProposalModule<any, any, any> | ThreadsController
   >([[ProposalType.Thread, app.threads]]);
+  if (!app.chain) {
+    return mmap;
+  }
   if (app.chain.base === ChainBase.Substrate) {
     mmap.set(
       ProposalType.SubstrateDemocracyReferendum,

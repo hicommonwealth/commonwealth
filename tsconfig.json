@@ -18,5 +18,5 @@
       "token-balance-cache/*": ["./packages/token-balance-cache/*"],
       "react": ["node_modules/@types/react"]
     }
-  },
+  }
 }

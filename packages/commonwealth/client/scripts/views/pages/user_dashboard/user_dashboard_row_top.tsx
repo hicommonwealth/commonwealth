@@ -1,6 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { formatTimestamp } from 'helpers/index';
 import {
   ClassComponent,
   ResultNode,
@@ -14,15 +15,15 @@ import {
 } from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
+import { AddressInfo } from 'models';
+import moment from 'moment';
 
 import 'pages/user_dashboard/user_dashboard_row_top.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
 import { User } from 'views/components/user/user';
-import { formatTimestamp } from 'helpers/index';
-import { getCommentPreview } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
+import { getCommentPreview } from './helpers';
 
 type UserDashboardRowTopAttrs = {
   activityData: any;

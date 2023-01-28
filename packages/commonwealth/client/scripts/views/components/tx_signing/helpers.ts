@@ -1,8 +1,9 @@
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
-import { ITXModalData, TransactionStatus } from 'models';
-import { NextFn, StageName } from './types';
+import type { ITXModalData } from 'models';
+import { TransactionStatus } from 'models';
+import type { NextFn, StageName } from './types';
 
 const createProposalTransactionLabels = {
   // substrate: accounts

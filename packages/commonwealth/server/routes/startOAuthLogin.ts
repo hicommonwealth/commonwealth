@@ -1,21 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
-
-interface AuthInfoExtended extends Express.AuthInfo {
-  state?: {
-    hostname: string
-  }
-}
+import type { Request, Response } from 'express';
+import type { DB } from '../models';
 
 const startOAuthLogin = async (
   models: DB,
   provider: string,
   req: Request,
-  res: Response,
-  next: NextFunction,
+  res: Response
 ) => {
-  console.log("Auth info startOAuthLogin:", req.authInfo);
-  let successRedirect = '/';
+  console.log('Auth info startOAuthLogin:', req.authInfo);
+  const successRedirect = '/';
 
   // custom domain OAuth2.0 login logic. OAuth2.0 login is currently disabled for custom domains.
   // const hostname = (<AuthInfoExtended>req.authInfo)?.state?.hostname

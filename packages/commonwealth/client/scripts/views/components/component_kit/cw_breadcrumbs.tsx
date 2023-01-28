@@ -14,9 +14,9 @@ import {
 } from 'mithrilInterop';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
+import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
-import { CWText } from './cw_text';
 
 type BreadcrumbsType = {
   label: string;

@@ -13,20 +13,20 @@ import {
   jsx,
 } from 'mithrilInterop';
 import moment from 'moment';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import { MixpanelSnapshotEvents } from 'analytics/types';
+
 
 import 'pages/snapshot_proposals.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { MixpanelSnapshotEvents } from 'analytics/types';
-
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
+import { CardsCollection } from '../../components/cards_collection';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
-import { CardsCollection } from '../../components/cards_collection';
-import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/cw_button';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -126,29 +126,27 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
       <Sublayout
       // title="Proposals"
       >
-        {app.chain && (
-          <div className="SnapshotProposalsPage">
-            <SnapshotProposalStagesBar
-              selected={selectedFilter}
-              onChangeFilter={onChangeFilter}
-            />
-            {proposals.length > 0 ? (
-              <CardsCollection
-                content={proposals.map((proposal, i) => (
-                  <SnapshotProposalCard
+        <div className="SnapshotProposalsPage">
+          <SnapshotProposalStagesBar
+            selected={selectedFilter}
+            onChangeFilter={onChangeFilter}
+          />
+          {proposals.length > 0 ? (
+            <CardsCollection
+              content={proposals.map((proposal, i) => (
+                <SnapshotProposalCard
                     key={i}
-                    snapshotId={snapshotId}
-                    proposal={proposal}
-                  />
-                ))}
-              />
-            ) : (
-              <CWText className="no-proposals-text">
-                No {this.selectedFilter.toLowerCase()} proposals found.
-              </CWText>
-            )}
-          </div>
-        )}
+                  snapshotId={snapshotId}
+                  proposal={proposal}
+                />
+              ))}
+            />
+          ) : (
+            <CWText className="no-proposals-text">
+              No {this.selectedFilter.toLowerCase()} proposals found.
+            </CWText>
+          )}
+        </div>
       </Sublayout>
     );
   }

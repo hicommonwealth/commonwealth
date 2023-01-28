@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import _ from 'lodash';
-import { Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import _ from 'lodash';
+import type{ Account } from 'models';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { initChain } from 'helpers/chain';
+import { setActiveAccount } from '../../../controllers/app/login';
+import type SubstrateIdentity from '../../../controllers/chain/substrate/identity';
+import app from '../../../state';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { User } from '../../components/user/user';
-import { initChain } from '../../../app';
-import SubstrateIdentity from '../../../controllers/chain/substrate/identity';
-import app from '../../../state';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditIdentityModal } from '../../modals/edit_identity_modal';
-import { setActiveAccount } from '../../../controllers/app/login';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
-import { CWButton } from '../../components/component_kit/cw_button';
 
 const editIdentityAction = (
   account: Account,
@@ -50,7 +50,7 @@ const editIdentityAction = (
                 data: { account, currentIdentity },
               });
             })
-            .catch((err) => {
+            .catch(() => {
               vnode.state.chainLoading = false;
             });
         } else {
@@ -64,6 +64,7 @@ const editIdentityAction = (
     })
   );
 };
+
 export interface IProfileHeaderAttrs {
   account: Account;
   setIdentity: boolean;
@@ -87,7 +88,6 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } =
       vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
-    const isClaimable = !account || !account.profile || account.profile.isEmpty;
 
     window.addEventListener(
       'scroll',
@@ -168,7 +168,7 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   width: '20px',
 
                   class: !account.ghostAddress ? 'cursor-pointer' : '',
-                  onClick: (e) => {
+                  onClick: () => {
                     if (!account.ghostAddress) {
                       window.navigator.clipboard
                         .writeText(account.address)
@@ -243,7 +243,7 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             alt: '',
             width: '20px',
             class: !account.ghostAddress ? 'cursor-pointer' : '',
-            onClick: (e) => {
+            onClick: () => {
               if (!account.ghostAddress) {
                 window.navigator.clipboard
                   .writeText(account.address)

@@ -49,6 +49,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import app from 'state';
 import { CWModal } from './components/component_kit/cw_modal';

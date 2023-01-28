@@ -4,21 +4,21 @@ import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/create_community.scss';
-
-import app from 'state';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
-import { slugifyPreserveDashes } from 'utils';
+import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState, EthFormFields } from './types';
-import { IdRow, InputRow } from '../../components/metadata_rows';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import app from 'state';
+import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { IdRow, InputRow } from '../../components/metadata_rows';
+import { defaultChainRows, initChainForm } from './chain_input_rows';
+import type { ChainFormFields, ChainFormState, EthFormFields } from './types';
 
 // TODO: populate additional fields
 
@@ -104,6 +104,7 @@ export class CosmosForm extends ClassComponent {
               ethChainId,
               nodeUrl,
               symbol,
+              iconUrl,
             } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
@@ -122,6 +123,7 @@ export class CosmosForm extends ClassComponent {
                 jwt: app.user.jwt,
                 network: this.state.form.id,
                 node_url: nodeUrl,
+                icon_url: iconUrl,
                 type: ChainType.Chain,
                 default_symbol: symbol,
                 ...this.state.form,

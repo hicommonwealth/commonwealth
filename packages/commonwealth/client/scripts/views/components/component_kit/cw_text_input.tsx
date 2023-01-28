@@ -14,15 +14,15 @@ import {
 } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_input.scss';
+import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
+import { CWLabel } from './cw_label';
+import { CWText } from './cw_text';
+import type { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import { CWLabel } from './cw_label';
-import { ValidationStatus } from './cw_validation_text';
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWText } from './cw_text';
-import { CWIconButton } from './cw_icon_button';
-import { IconName } from './cw_icons/cw_icon_lookup';
 
 type TextInputSize = 'small' | 'large';
 
@@ -34,7 +34,7 @@ export type BaseTextInputAttrs = {
   value?: string | number;
   iconRight?: IconName;
   iconRightonClick?: () => void;
-  inputValidationFn?: (value: string) => [ValidationStatus, string];
+  inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
   label?: string;
   maxLength?: number;
   name?: string;

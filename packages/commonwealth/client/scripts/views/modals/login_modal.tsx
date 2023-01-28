@@ -2,6 +2,12 @@
 import React from 'react';
 
 import {
+  chainBasetoCanvasChain,
+  constructCanvasMessage,
+} from 'adapters/shared';
+import { initAppState } from 'state';
+import { ChainBase } from 'common-common/src/types';
+import {
   ClassComponent,
   ResultNode,
   render,
@@ -15,30 +21,26 @@ import {
 import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
-
-import {
-  constructCanvasMessage,
-  chainBasetoCanvasChain,
-} from 'adapters/shared';
-import { initAppState } from 'app';
 import {
   completeClientLogin,
   loginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { notifyError } from 'controllers/app/notifications';
-import { Account, IWebWallet } from 'models';
-import { ChainBase } from 'common-common/src/types';
+import $ from 'jquery';
+import type { Account, IWebWallet } from 'models';
+import app from 'state';
+import _ from 'underscore';
+import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../components/component_kit/helpers';
-import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
-import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
+import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;

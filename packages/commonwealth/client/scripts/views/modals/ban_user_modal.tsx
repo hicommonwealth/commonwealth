@@ -3,10 +3,10 @@ import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';
 
-import { Profile } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import type { Profile } from 'models';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 

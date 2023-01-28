@@ -15,13 +15,21 @@ import {
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
-
+import { isCommandClick, pluralize } from 'helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
 import {
   chainEntityTypeToProposalShortName,
   getProposalUrlPath,
 } from 'identifiers';
+import m from 'mithril';
+import type { Thread } from 'models';
+import { AddressInfo } from 'models';
+import moment from 'moment';
+
+import 'pages/discussions/thread_preview.scss';
+
+import app from 'state';
 import { slugify } from 'utils';
 import { isCommandClick, pluralize } from 'helpers';
 import { AddressInfo, Thread } from 'models';
@@ -31,19 +39,24 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SharePopover } from '../../components/share_popover';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWTag } from '../../components/component_kit/cw_tag';
+import { CWText } from '../../components/component_kit/cw_text';
+import {
+  getClasses,
+  isWindowSmallInclusive,
+} from '../../components/component_kit/helpers';
+import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { SharePopover } from '../../components/share_popover';
+import User from '../../components/widgets/user';
 import {
   getCommentSubscription,
   getReactionSubscription,
   getThreadSubScriptionMenuItem,
   isHot,
 } from './helpers';
-import { CWTag } from '../../components/component_kit/cw_tag';
-import {
-  getClasses,
-  isWindowSmallInclusive,
-} from '../../components/component_kit/helpers';
-import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ThreadPreviewMenu } from './thread_preview_menu';
 
 type ThreadPreviewAttrs = {

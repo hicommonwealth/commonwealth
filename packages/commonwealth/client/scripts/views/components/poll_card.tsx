@@ -14,15 +14,16 @@ import {
 } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
+import m from 'mithril';
+import { CWButton } from './component_kit/cw_button';
 
 import { CWCard } from './component_kit/cw_card';
-import { CWButton } from './component_kit/cw_button';
-import { CWProgressBar } from './component_kit/cw_progress_bar';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWCheckbox } from './component_kit/cw_checkbox';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
+import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
-import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import { getClasses } from './component_kit/helpers';
 
 const LIVE_PREVIEW_MAX = 3;

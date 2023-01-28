@@ -1,22 +1,22 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { navigateToSubpage } from 'router';
+import { parseCustomStages } from 'helpers';
+import { isUndefined } from 'helpers/typeGuards';
+import m from 'mithril';
+import { ThreadStage } from 'models';
 
 import 'pages/discussions/recent_threads_header.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { parseCustomStages } from 'helpers';
-import { isUndefined } from 'helpers/typeGuards';
-import { ThreadStage } from 'models';
-import { TopicsMenu } from './topics_menu';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { StagesMenu } from './stages_menu';
+import { TopicsMenu } from './topics_menu';
 
 type RecentThreadsHeaderAttrs = {
   stage: string;

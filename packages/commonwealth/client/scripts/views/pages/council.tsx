@@ -12,29 +12,29 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
+import { navigateToSubpage } from 'router';
+import { ChainBase, ProposalType } from 'common-common/src/types';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
+import { pluralize } from 'helpers';
 
 import 'pages/council.scss';
 
 import app, { ApiStatus } from 'state';
-import { navigateToSubpage } from 'app';
-import { ProposalType, ChainBase } from 'common-common/src/types';
-import { pluralize } from 'helpers';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
-import Sublayout from 'views/sublayout';
-import { User } from 'views/components/user/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import { CouncilVotingModal } from 'views/modals/council_voting_modal';
-import { PageLoading } from 'views/pages/loading';
-import ErrorPage from 'views/pages/error';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
+import { User } from 'views/components/user/user';
+import { CouncilVotingModal } from 'views/modals/council_voting_modal';
+import ErrorPage from 'views/pages/error';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { CardsCollection } from '../components/cards_collection';
+import { CWButton } from '../components/component_kit/cw_button';
 import { CWCard } from '../components/component_kit/cw_card';
 import { CWText } from '../components/component_kit/cw_text';
-import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
-import { CWButton } from '../components/component_kit/cw_button';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 type CouncillorAttrs = {
   account: SubstrateAccount;

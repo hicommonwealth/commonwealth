@@ -1,13 +1,12 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import moment from 'moment';
 
 import 'components/proposal_pills.scss';
 
 import { formatTimestamp } from 'helpers';
+import moment from 'moment';
 import { CWText } from './component_kit/cw_text';
 
 type ActiveProposalPillAttrs = { proposalEnd: number };

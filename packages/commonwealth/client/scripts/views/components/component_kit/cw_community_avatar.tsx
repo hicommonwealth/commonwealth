@@ -6,11 +6,11 @@ import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, 
 
 import 'components/component_kit/cw_community_avatar.scss';
 
-import { ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
+import type { IconSize } from './cw_icons/types';
+import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
-import { IconSize } from './cw_icons/types';
-import { CWText } from './cw_text';
 
 type CommunityAvatarAttrs = {
   community: ChainInfo;

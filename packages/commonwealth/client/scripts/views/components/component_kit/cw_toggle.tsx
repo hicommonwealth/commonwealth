@@ -14,9 +14,9 @@ import {
 } from 'mithrilInterop';
 
 import 'components/component_kit/cw_toggle.scss';
-
-import { ComponentType, StyleAttrs } from './types';
 import { getClasses } from './helpers';
+import type { StyleAttrs } from './types';
+import { ComponentType } from './types';
 
 type ToggleStyleAttrs = {
   checked?: boolean;

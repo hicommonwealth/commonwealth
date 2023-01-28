@@ -1,19 +1,18 @@
 /* @jsx jsx */
 import React from 'react';
 
-
+import { navigateToSubpage } from 'router';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { ThreadsFilterMenuItem } from './stages_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
+import { ThreadsFilterMenuItem } from './stages_menu';
 
 type Topic = {
   defaultOffchainTemplate?: string;

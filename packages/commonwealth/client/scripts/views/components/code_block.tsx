@@ -4,9 +4,9 @@ import React from 'react';
 import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'components/code_block.scss';
+import { CWLabel } from './component_kit/cw_label';
 
 import { getClasses } from './component_kit/helpers';
-import { CWLabel } from './component_kit/cw_label';
 
 type CodeBlockAttrs = {
   clickToSelect: boolean;

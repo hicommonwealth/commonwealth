@@ -2,23 +2,22 @@
 import React from 'react';
 /* eslint-disable max-classes-per-file */
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/proposals/voting_result_components.scss';
+import type {
+  CosmosProposal,
+  CosmosVote,
+} from 'controllers/chain/cosmos/proposal';
+import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
+import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
+import type { NearSputnikVote } from 'controllers/chain/near/sputnik/types';
+import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
 
-import { AnyProposal, IVote } from 'models';
-import {
-  NearSputnikVote,
-  NearSputnikVoteString,
-} from 'controllers/chain/near/sputnik/types';
-import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
-import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import AaveProposal, {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
-import { VoteListing } from './vote_listing';
+import type { AnyProposal, IVote } from 'models';
 import { CWText } from '../component_kit/cw_text';
+import { VoteListing } from './vote_listing';
 
 type BaseVotingResultAttrs = {
   proposal: AnyProposal;

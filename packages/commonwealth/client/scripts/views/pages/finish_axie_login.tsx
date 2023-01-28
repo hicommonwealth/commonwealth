@@ -1,13 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { initAppState } from 'state';
+import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
 import app from 'state';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
-import { initAppState } from 'app';
 import { PageLoading } from 'views/pages/loading';
-import { updateActiveAddresses } from 'controllers/app/login';
 import ErrorPage from './error';
 
 interface IState {

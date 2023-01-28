@@ -45,7 +45,7 @@ class CommunitiesController {
           resolve();
           redraw();
         })
-        .catch((err) => {
+        .catch(() => {
           reject();
         });
     });

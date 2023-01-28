@@ -9,35 +9,37 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
-import _ from 'lodash';
-import $ from 'jquery';
-import moment from 'moment';
-import Quill from 'quill';
-import ImageUploader from 'quill-image-uploader';
-import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
-import { MarkdownShortcuts } from 'lib/markdownShortcuts';
-import QuillMention from 'quill-mention';
-
-import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { loadScript } from 'helpers';
 import { detectURL } from 'helpers/threads';
-import { notifyError } from 'controllers/app/notifications';
+import $ from 'jquery';
+import { MarkdownShortcuts } from 'lib/markdownShortcuts';
+import _ from 'lodash';
 import { Profile } from 'models';
+import moment from 'moment';
+import Quill from 'quill';
+import type QuillMention from 'quill-mention';
+
+import app from 'state';
 import { PreviewModal } from 'views/modals/preview_modal';
-import {
+import type {
   DeltaOps,
   QuillActiveMode,
   QuillDelta,
   QuillTextContents,
 } from './types';
 
-const Delta = Quill.import('delta');
-const Clipboard = Quill.import('modules/clipboard') as any;
+/* eslint-disable */
 
 const REGEXP_GLOBAL = /https?:\/\/[^\s]+/g;
 const REGEXP_WITH_PRECEDING_WS = /(?:\s|^)(https?:\/\/[^\s]+)/;
 
 export default class QuillEditorInternal {
+  private Delta;
+  private Clipboard;
+  private QuillImageDropAndPaste;
+  private ImageUploader;
+  private QuillMention;
   protected _activeMode: QuillActiveMode;
   protected _alteredText: boolean;
   protected _quill: Quill;
@@ -59,13 +61,20 @@ export default class QuillEditorInternal {
     this._onkeyboardSubmit = onkeyboardSubmit;
   }
 
-  protected _initializeEditor(
+  protected async _initializeEditor(
     theme: string,
     imageUploader: boolean,
     placeholder: string,
     defaultContents: QuillTextContents,
     tabIndex?: number
   ) {
+    const Quill = await import('quill');
+
+    this.QuillImageDropAndPaste = await import('quill-image-drop-and-paste');
+    this.ImageUploader = await import('quill-image-uploader');
+    this.QuillMention = await import('quill-mention');
+    this.Delta = Quill.import('delta');
+    this.Clipboard = Quill.import('modules/clipboard') as any;
     // Remove existing editor, if there is one
     this._$editor.empty();
     this._$editor.siblings('.ql-toolbar').remove();
@@ -112,7 +121,7 @@ export default class QuillEditorInternal {
               Node.ELEMENT_NODE,
               (node, delta) => {
                 return delta.compose(
-                  new Delta().retain(delta.length(), {
+                  new this.Delta().retain(delta.length(), {
                     header: false,
                     align: false,
                     color: false,
@@ -157,7 +166,7 @@ export default class QuillEditorInternal {
         .attr('tabIndex', tabIndex);
     }
 
-    this._unsavedChanges = new Delta();
+    this._unsavedChanges = new this.Delta();
     this._addChangesListener();
 
     // Restore defaultContent
@@ -172,7 +181,7 @@ export default class QuillEditorInternal {
             `${app.activeChainId()}-${this._editorNamespace}-storedText`,
             data
           );
-          this._unsavedChanges = new Delta();
+          this._unsavedChanges = new this.Delta();
         }
         redraw();
       }
@@ -720,19 +729,19 @@ export default class QuillEditorInternal {
 
   private _registerModules() {
     // Register image uploader extension
-    Quill.register('modules/imageUploader', ImageUploader);
+    Quill.register('modules/imageUploader', this.ImageUploader);
 
     // Register drag'n'paste module
-    Quill.register('modules/imageDropAndPaste', QuillImageDropAndPaste);
+    Quill.register('modules/imageDropAndPaste', this.QuillImageDropAndPaste);
 
     // Register markdown shortcuts
     Quill.register('modules/markdownShortcuts', MarkdownShortcuts);
 
     // Register mentions module
-    Quill.register({ 'modules/mention': QuillMention });
+    Quill.register({ 'modules/mention': this.QuillMention });
 
     // Register a patch to prevent pasting into long documents causing the editor to jump
-    class CustomClipboard extends Clipboard {
+    class CustomClipboard extends this.Clipboard {
       onCapturePaste(e) {
         if (e.defaultPrevented || !this.quill.isEnabled()) return;
         e.preventDefault();
@@ -760,6 +769,7 @@ export default class QuillEditorInternal {
       );
 
     const BlockEmbed = Quill.import('blots/block/embed');
+
     class TwitterBlot extends BlockEmbed {
       public static blotName = 'twitter';
       public static className = 'ql-twitter';
@@ -862,7 +872,7 @@ export default class QuillEditorInternal {
         fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0)
       );
     } else {
-      const delta = new Delta()
+      const delta = new this.Delta()
         .retain(beforeText.length)
         .delete(mentionLength)
         .insert(`@${item.name}`, { link: item.link });
@@ -952,7 +962,7 @@ export default class QuillEditorInternal {
     }
     this._quill.insertText(range.index, ' ', 'user');
     this._quill.history.cutoff();
-    const delta = new Delta()
+    const delta = new this.Delta()
       .retain(range.index - offset)
       .delete(length + 1)
       .retain(line.length() - 2 - offset)

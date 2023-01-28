@@ -1,16 +1,4 @@
-
-import $ from 'jquery';
-import { RegisteredTypes } from '@polkadot/types/types';
-import app from 'state';
-import { RoleInfo, RolePermission } from 'models';
-import { ChainNetwork, ChainBase } from 'common-common/src/types';
 import { Permission } from 'server/models/role';
-import NodeInfo from './NodeInfo';
-
-import {
-  CWAvatar,
-  CWJdenticon,
-} from '../views/components/component_kit/cw_avatar';
 
 class CommunityRole {
   public readonly id: number;

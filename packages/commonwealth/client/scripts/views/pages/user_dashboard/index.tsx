@@ -1,23 +1,22 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
+import { notifyInfo } from 'controllers/app/notifications';
 import $ from 'jquery';
+import { DashboardActivityNotification } from 'models';
 
 import 'pages/user_dashboard/index.scss';
 
 import app, { LoginState } from 'state';
-import { DashboardActivityNotification } from 'models';
 import Sublayout from 'views/sublayout';
-import { notifyInfo } from 'controllers/app/notifications';
-import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
-import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
-import { UserDashboardRow } from './user_dashboard_row';
-import { fetchActivity, notificationsRemaining } from './helpers';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
+import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
+import { fetchActivity, notificationsRemaining } from './helpers';
+import { UserDashboardRow } from './user_dashboard_row';
 
 export enum DashboardViews {
   ForYou = 'For You',

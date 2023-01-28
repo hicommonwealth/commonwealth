@@ -13,24 +13,22 @@ import {
   jsx,
 } from 'mithrilInterop';
 import { utils } from 'ethers';
+import m from 'mithril';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
 
 import app from 'state';
-import { Executor } from 'common-common/src/eth/types';
 import { User } from 'views/components/user/user';
-import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
-import { notifyError } from 'controllers/app/notifications';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
-import { AaveProposalState, defaultStateItem } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import type { AaveProposalState } from './types';
+import { defaultStateItem } from './types';
 
 export class AaveProposalForm extends ClassComponent {
   private aaveProposalState: Array<AaveProposalState>;

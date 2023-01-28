@@ -1,18 +1,19 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelPageViewEvent } from 'analytics/types';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import 'components/sidebar/sidebar_quick_switcher.scss';
+import { link } from 'helpers';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import m from 'mithril';
+import { ChainInfo } from 'models';
 
 import app from 'state';
-import { link } from 'helpers';
-import { ChainInfo } from 'models';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
-import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWDivider } from '../component_kit/cw_divider';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 
 export class SidebarQuickSwitcher extends ClassComponent {
   view() {

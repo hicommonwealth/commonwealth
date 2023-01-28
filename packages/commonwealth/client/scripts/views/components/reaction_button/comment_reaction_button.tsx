@@ -5,19 +5,19 @@ import React from 'react';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import type { ChainInfo, Comment } from 'models';
 
 import app from 'state';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { Comment, ChainInfo } from 'models';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import { CWText } from '../component_kit/cw_text';
+import { getClasses } from '../component_kit/helpers';
 import {
   fetchReactionsByPost,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
-import { getClasses } from '../component_kit/helpers';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWText } from '../component_kit/cw_text';
 
 type CommentReactionButtonAttrs = {
   comment: Comment<any>;

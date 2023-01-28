@@ -1,20 +1,20 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import type { Poll, Thread } from 'models';
+
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
 
 import app from 'state';
-import { Poll, Thread } from 'models';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { PollEditorModal } from '../../modals/poll_editor_modal';
-import { PollCard } from '../../components/poll_card';
-import { getPollTimestamp, handlePollVote } from './helpers';
-import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { PollCard } from '../../components/poll_card';
+import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
+import { PollEditorModal } from '../../modals/poll_editor_modal';
+import { getPollTimestamp, handlePollVote } from './helpers';
 
 type ThreadPollEditorCardAttrs = {
   thread: Thread;

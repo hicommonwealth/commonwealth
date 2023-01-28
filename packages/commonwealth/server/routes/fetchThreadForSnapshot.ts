@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -8,7 +8,12 @@ export const Errors = {
   InvalidChain: 'No chain',
 };
 
-const fetchThreadForSnapshot = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const fetchThreadForSnapshot = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { snapshot, chain } = req.query;
   if (!snapshot) return next(new AppError(Errors.InvalidSnapshot));
   if (!chain) return next(new AppError(Errors.InvalidChain));
@@ -17,11 +22,16 @@ const fetchThreadForSnapshot = async (models: DB, req: Request, res: Response, n
     where: {
       chain: chain,
       snapshot_proposal: snapshot,
-    }
+    },
   });
   if (threads.length < 1) return res.json({ status: 'Failure' });
 
-  return res.json({ status: 'Success', result: threads.map((thread) => { return { id: thread.id, title: thread.title } }) });
+  return res.json({
+    status: 'Success',
+    result: threads.map((thread) => {
+      return { id: thread.id, title: thread.title };
+    }),
+  });
 };
 
 export default fetchThreadForSnapshot;

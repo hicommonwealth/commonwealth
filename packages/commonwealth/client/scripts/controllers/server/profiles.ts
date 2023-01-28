@@ -1,13 +1,12 @@
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
 import _ from 'lodash';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import { Profile } from 'models';
 import { EventEmitter } from 'events';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
-import { Profile } from 'models';
 import { ChainBase } from '../../../../../common-common/src/types';
 
 class ProfilesController {

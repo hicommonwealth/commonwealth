@@ -1,6 +1,10 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { WalletId } from 'common-common/src/types';
+import { unlinkLogin } from 'controllers/app/login';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import { formatAddressShort, link, orderAccountsByAddress } from 'helpers';
 import {
   ClassComponent,
   ResultNode,
@@ -13,17 +17,13 @@ import {
   jsx,
 } from 'mithrilInterop';
 import _ from 'lodash';
+import type { AddressInfo } from 'models';
 
 import 'pages/settings/linked_addresses_section.scss';
 
 import app from 'state';
-import { orderAccountsByAddress, link, formatAddressShort } from 'helpers';
-import { unlinkLogin } from 'controllers/app/login';
-import { AddressInfo } from 'models';
 import { User } from 'views/components/user/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import MolochMember from 'controllers/chain/ethereum/moloch/member';
-import { WalletId } from 'common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';

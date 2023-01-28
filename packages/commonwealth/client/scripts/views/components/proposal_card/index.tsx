@@ -1,30 +1,31 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { navigateToSubpage } from 'router';
+import { ProposalType } from 'common-common/src/types';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import { isNotNil } from 'helpers/typeGuards';
+import { getProposalUrlPath } from 'identifiers';
+import m from 'mithril';
+import type { AnyProposal } from 'models';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
-import { isNotNil } from 'helpers/typeGuards';
-import { AnyProposal } from 'models';
-import { ProposalType } from 'common-common/src/types';
-import { getProposalUrlPath } from 'identifiers';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CWCard } from '../component_kit/cw_card';
+import { CWDivider } from '../component_kit/cw_divider';
+import { CWText } from '../component_kit/cw_text';
 import {
+  getPrimaryTagText,
   getSecondaryTagText,
   getStatusClass,
   getStatusText,
-  getPrimaryTagText,
 } from './helpers';
-import { CWText } from '../component_kit/cw_text';
-import { CWDivider } from '../component_kit/cw_divider';
 import { ProposalTag } from './proposal_tag';
 
 type ProposalCardAttrs = {

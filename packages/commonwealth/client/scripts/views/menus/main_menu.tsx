@@ -6,7 +6,7 @@ import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, 
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { MenuItem } from '../components/component_kit/types';
+import type { MenuItem } from '../components/component_kit/types';
 
 export const getMainMenuItems = (): Array<MenuItem> => {
   return [

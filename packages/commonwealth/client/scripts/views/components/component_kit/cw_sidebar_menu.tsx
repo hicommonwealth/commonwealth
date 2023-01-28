@@ -14,18 +14,22 @@ import {
 } from 'mithrilInterop';
 // import { ListItem, Icon, Icons } from 'construct-ui';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
+import { navigateToSubpage } from 'router';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
+import { Icon, Icons, ListItem } from 'construct-ui';
+import m from 'mithril';
+import type { ChainInfo, RoleInfo } from 'models';
+import { AddressInfo } from 'models';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { AddressInfo, ChainInfo } from 'models';
-import { getClasses } from './helpers';
-import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
-import { ComponentType, MenuItem } from './types';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
+import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+import type { MenuItem } from './types';
+import { ComponentType } from './types';
 
 class CWSidebarMenuItemComponent extends ClassComponent<MenuItem> {
   view(vnode: ResultNode<MenuItem>) {
