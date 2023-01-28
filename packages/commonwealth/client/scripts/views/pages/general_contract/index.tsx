@@ -1,10 +1,13 @@
-/* @jsx m */
+/* @jsx jsx */
 
 import 'pages/general_contract/index.scss';
 import app from 'state';
 import type { Contract } from 'models';
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  jsx,
+  redraw, ResultNode
+} from 'mithrilInterop';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
@@ -20,7 +23,7 @@ import {
 } from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { Result } from 'ethers/lib/utils';
-import { PageNotFound } from '../404';
+import PageNotFound from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 
@@ -33,7 +36,7 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
     functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
   };
 
-  view(vnode: m.Vnode<{ contractAddress?: string }>) {
+  view(vnode: ResultNode<{ contractAddress?: string }>) {
     const fetchContractAbi = async (contract: Contract) => {
       if (contract.abi === undefined) {
         try {
@@ -41,7 +44,7 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
           await app.contracts.checkFetchEtherscanForAbi(contract.address);
           // TODO The UI Should In One Go show the abi form after successfully fetching the abi
           // from etherscan, which it does not do rn
-          m.redraw();
+          redraw();
         } catch (err) {
           notifyError(
             err.message || `Fetching ABI for ${contract.address} failed: ${err}`
@@ -106,11 +109,11 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
 
     return (
       <Sublayout>
-        <div class="GeneralContractPage">
+        <div className="GeneralContractPage">
           <CWText type="h4">General Contract</CWText>
           <CWText>Contract Address: {contractAddress}</CWText>
-          <div class="functions-container">
-            <div class="header-row">
+          <div className="functions-container">
+            <div className="header-row">
               <CWText>Name</CWText>
               <CWText>State Mutability</CWText>
               <CWText>Inputs</CWText>
@@ -119,14 +122,14 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
             </div>
             {loadContractAbi().map((fn: AbiItem) => {
               return (
-                <div class="function-row">
+                <div className="function-row">
                   <CWText>{fn.name}</CWText>
                   <CWText>{fn.stateMutability}</CWText>
-                  <div class="functions-input-container">
+                  <div className="functions-input-container">
                     {fn.inputs.map((input: AbiInput, inputIdx: number) => {
                       return (
                         <div>
-                          <div class="function-inputs">
+                          <div className="function-inputs">
                             <CWText>[{inputIdx}]</CWText>
                             <CWText>{input.type}</CWText>
                             <CWText>{input.name}</CWText>
@@ -135,7 +138,7 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
                             <CWTextInput
                               name="Contract Input Field"
                               placeholder="Insert Input Here"
-                              oninput={(e) => {
+                              onInput={(e) => {
                                 handleMappingAbiInputs(
                                   inputIdx,
                                   e.target.value,
@@ -153,13 +156,13 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
                       );
                     })}
                   </div>
-                  <div class="functions-output-container">
+                  <div className="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
                       const fnOutputArray =
                         this.functionNameToFunctionOutput.get(fn.name);
                       return (
                         <div>
-                          <div class="function-outputs">
+                          <div className="function-outputs">
                             <CWText>[{i}]</CWText>
                             <CWText>{output.type}</CWText>
                             <CWText>{output.name}</CWText>
@@ -176,11 +179,11 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
                       );
                     })}
                   </div>
-                  <div class="function-call">
+                  <div className="function-call">
                     <CWButton
                       label="Submit"
                       disabled={this.saving || !this.loaded}
-                      onclick={() => {
+                      onClick={() => {
                         notifySuccess('Submit Call button clicked!');
                         this.saving = true;
                         try {

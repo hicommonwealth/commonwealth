@@ -4,16 +4,10 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import BN from 'bn.js';
-import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/comments/create_comment.scss';

@@ -4,27 +4,16 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
-import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
-import { isCommandClick, pluralize } from 'helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
-import app from 'state';
 import {
   chainEntityTypeToProposalShortName,
   getProposalUrlPath,
 } from 'identifiers';
-import m from 'mithril';
-import type { Thread } from 'models';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
@@ -33,16 +22,8 @@ import app from 'state';
 import { slugify } from 'utils';
 import { isCommandClick, pluralize } from 'helpers';
 import { AddressInfo, Thread } from 'models';
-import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
-import { User } from '../../components/user/user';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { SharePopover } from '../../components/share_popover';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   getClasses,
   isWindowSmallInclusive,
@@ -50,7 +31,7 @@ import {
 import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { SharePopover } from '../../components/share_popover';
-import User from '../../components/widgets/user';
+import { User } from "../../components/user/user";
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -58,6 +39,8 @@ import {
   isHot,
 } from './helpers';
 import { ThreadPreviewMenu } from './thread_preview_menu';
+import { CWText } from '../../components/component_kit/cw_text';
+import {CWIcon} from "views/components/component_kit/cw_icons/cw_icon";
 
 type ThreadPreviewAttrs = {
   thread: Thread;

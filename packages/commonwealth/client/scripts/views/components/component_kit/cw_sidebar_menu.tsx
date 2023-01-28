@@ -4,22 +4,14 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
   setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
+  jsx
 } from 'mithrilInterop';
 // import { ListItem, Icon, Icons } from 'construct-ui';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { navigateToSubpage } from 'router';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
-import { Icon, Icons, ListItem } from 'construct-ui';
-import m from 'mithril';
-import type { ChainInfo, RoleInfo } from 'models';
 import { AddressInfo } from 'models';
 
 import app from 'state';

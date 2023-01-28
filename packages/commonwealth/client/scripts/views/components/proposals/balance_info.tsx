@@ -1,13 +1,10 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import { formatCoin } from 'adapters/currency';
-import ClassComponent from 'class_component';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import m from 'mithril';
 import app from 'state';
 import { CWText } from '../component_kit/cw_text';
 

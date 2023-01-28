@@ -1,13 +1,11 @@
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { render, setRoute } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
-import type { RouteOptions } from 'mithril';
 import { ThreadStage } from 'models';
 import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
-import { navigateToSubpage } from 'router';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));

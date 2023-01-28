@@ -33,7 +33,9 @@ import type { MobileMenuName } from './views/app_mobile_menus';
 import type { SidebarMenuName } from './views/components/sidebar';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
-import m from 'mithril';
+import {
+  redraw,
+} from 'mithrilInterop';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -298,7 +300,7 @@ export async function initAppState(
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
-          app.user.notifications.refresh().then(() => m.redraw());
+          app.user.notifications.refresh().then(() => redraw());
         } else if (
           app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected

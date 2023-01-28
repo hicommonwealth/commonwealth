@@ -1,13 +1,14 @@
-/* @jsx m */
+/* @jsx jsx */
 
 import 'pages/new_contract/new_contract_page.scss';
 import app from 'state';
-import m from 'mithril';
-import ClassComponent from 'class_component';
-
+import {
+  ClassComponent,
+  jsx,
+} from 'mithrilInterop';
 import { ChainBase } from 'common-common/src/types';
 import AddContractAndAbiForm from './add_contract_and_abi_form';
-import { PageNotFound } from '../404';
+import PageNotFound from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -31,7 +32,7 @@ class NewContractPage extends ClassComponent {
 
     return (
       <Sublayout>
-        <div class="NewContractPage">
+        <div className="NewContractPage">
           <CWBreadcrumbs
             breadcrumbs={[
               { label: 'Contracts', path: `${scope}/contracts` },

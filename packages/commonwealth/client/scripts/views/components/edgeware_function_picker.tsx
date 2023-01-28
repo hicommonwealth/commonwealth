@@ -1,27 +1,15 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import {ClassComponent, jsx, redraw, ResultNode,} from 'mithrilInterop';
 
-import { blake2AsHex } from '@polkadot/util-crypto';
-import ClassComponent from 'class_component';
+import {blake2AsHex} from '@polkadot/util-crypto';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import m from 'mithril';
 
 import app from 'state';
-import { CWDropdown } from './component_kit/cw_dropdown';
-import { CWText } from './component_kit/cw_text';
-import { CWTextInput } from './component_kit/cw_text_input';
+import {CWDropdown} from './component_kit/cw_dropdown';
+import {CWText} from './component_kit/cw_text';
+import {CWTextInput} from './component_kit/cw_text_input';
 
 type EdgewareFunctionPickerProps = {
   module: string;
@@ -134,8 +122,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
                 label={name}
                 placeholder={`${name} (${type})`}
                 onInput={(e) => {
-                  const result = (e.target as any).value;
-                  vnode.attrs.args[index] = result;
+                  vnode.attrs.args[index] = (e.target as any).value;
                   redraw(); // TODO: why is this needed?
                 }}
               />

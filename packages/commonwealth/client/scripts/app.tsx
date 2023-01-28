@@ -9,7 +9,6 @@ import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
 import 'construct.scss';
 import 'lity/dist/lity.min.css';
-import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
 import $ from 'jquery';

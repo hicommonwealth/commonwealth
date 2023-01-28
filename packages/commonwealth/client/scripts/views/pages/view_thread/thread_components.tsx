@@ -2,7 +2,6 @@
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
 import {
   externalLink,
   extractDomain,
@@ -15,12 +14,6 @@ import 'pages/view_proposal/proposal_header_links.scss';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import 'pages/view_thread/thread_components.scss';
@@ -30,7 +23,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import User from '../../components/widgets/user';
+import { User } from "../../components/user/user";
 
 type ThreadComponentAttrs = {
   thread: Thread;

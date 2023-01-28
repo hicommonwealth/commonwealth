@@ -5,12 +5,8 @@ import { navigateToSubpage } from 'router';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
+
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -30,17 +26,15 @@ import {
 import type { AnyProposal, Comment, ProposalModule } from 'models';
 import { Account } from 'models';
 
-import app from 'state';
 import { slugify } from 'utils';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/sublayout';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CommentsTree } from '../../components/comments/comments_tree';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import User from '../../components/widgets/user';
+import { User } from "../../components/user/user";
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';

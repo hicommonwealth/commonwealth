@@ -9,12 +9,6 @@ import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -26,12 +20,11 @@ import { ProposalCard } from 'views/components/proposal_card';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
-import { User } from '../components/user/user';
 import { CardsCollection } from '../components/cards_collection';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { GovExplainer } from '../components/gov_explainer';
-import User from '../components/widgets/user';
+import { User } from "../components/user/user";
 import ErrorPage from './error';
 
 type TipAttrs = {

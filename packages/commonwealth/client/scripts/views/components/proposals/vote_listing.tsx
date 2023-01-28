@@ -6,12 +6,7 @@ import { formatCoin } from 'adapters/currency';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -28,7 +23,7 @@ import type { AnyProposal, IVote } from 'models';
 import { BinaryVote, DepositVote, VotingUnit } from 'models';
 
 import app from 'state';
-import User from 'views/components/widgets/user';
+import { User } from "../../components/user/user";
 import { CWText } from '../component_kit/cw_text';
 
 type VoteListingAttrs = {

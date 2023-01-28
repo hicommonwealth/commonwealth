@@ -1,7 +1,6 @@
 import { alertModalWithText } from 'views/modals/alert_modal';
 import app from 'state';
 import { ChainType } from 'common-common/src/types';
-import m from 'mithril';
 import { Layout } from 'views/layout';
 import {
   APPLICATION_UPDATE_ACTION,
@@ -11,6 +10,7 @@ import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
+import { getRoute, getRouteParam, setRoute, render } from "mithrilInterop";
 
 export const pathIsDiscussion = (
   scope: string | null,
@@ -34,40 +34,10 @@ interface ShouldDeferChainAttrs {
   path: string;
 }
 
-// set up route navigation
-m.route.prefix = '';
-const _updateRoute = m.route.set;
-
-m.route.set = (...args) => {
-  // set app params that maintain global state for:
-  // - whether the user last clicked the back button
-  // - the last page the user was on
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
-
-  // update route
-  if (args[0] !== m.route.get()) {
-    _updateRoute.apply(this, args);
-  }
-
-  // reset scroll position
-  const html = document.getElementsByTagName('html')[0];
-
-  if (html) {
-    html.scrollTo(0, 0);
-  }
-
-  const body = document.getElementsByTagName('body')[0];
-
-  if (body) {
-    body.scrollTo(0, 0);
-  }
-};
-
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
-  app._lastNavigatedFrom = m.route.get();
+  app._lastNavigatedFrom =getRoute();
 
   if (_onpopstate) {
     _onpopstate.apply(this, args);
@@ -80,7 +50,7 @@ const navigateToSubpage = (...args) => {
     args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   app.sidebarMenu = 'default';
-  m.route.set.apply(this, args);
+  setRoute.apply(this, args);
 };
 
 const shouldDeferChain = ({
@@ -112,25 +82,25 @@ const redirectRoute = (
   path: string | ((attrs: Record<string, unknown>) => string)
 ) => ({
   render: (vnode) => {
-    m.route.set(
+    setRoute(
       typeof path === 'string' ? path : path(vnode.attrs),
       {},
       { replace: true }
     );
 
-    return m(Layout);
+    return render(Layout);
   },
 });
 
 const handleInviteLinkRedirect = () => {
-  const inviteMessage = m.route.param('invitemessage');
+  const inviteMessage = getRouteParam()['invitemessage'];
 
   if (!inviteMessage) {
     return;
   }
 
   const isAcceptInviteMessage =
-    m.route.param('message') === 'Must be logged in to accept invites';
+    getRouteParam['message'] === 'Must be logged in to accept invites';
 
   if (inviteMessage === 'failure' && isAcceptInviteMessage) {
     notifyInfo('Log in to join a community with an invite link');
@@ -145,7 +115,7 @@ const handleInviteLinkRedirect = () => {
       },
     });
   } else if (inviteMessage === 'failure') {
-    const message = m.route.param('message');
+    const message = getRouteParam()['message'];
     notifyError(message);
   } else if (inviteMessage === 'success') {
     if (app.config.invites.length === 0) {
@@ -159,11 +129,12 @@ const handleInviteLinkRedirect = () => {
 };
 
 const handleLoginRedirects = () => {
+  const routeParam = getRouteParam();
   if (
-    m.route.param('loggedin') &&
-    m.route.param('loggedin').toString() === 'true' &&
-    m.route.param('path') &&
-    !m.route.param('path').startsWith('/login')
+    routeParam['loggedin'] &&
+    routeParam['loggedin'].toString() === 'true' &&
+    routeParam['path'] &&
+    !(routeParam['path'].startsWith('/login'))
   ) {
     // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
     // handle param-based redirect after email login
@@ -171,11 +142,11 @@ const handleLoginRedirects = () => {
     /* If we are creating a new account, then we alias to create a new mixpanel user
      else we identify to associate mixpanel events
     */
-    if (m.route.param('new') && m.route.param('new').toString() === 'true') {
+    if (getRouteParam()['new'] && getRouteParam()['new'].toString() === 'true') {
       console.log('creating account');
     }
 
-    m.route.set(m.route.param('path'), {}, { replace: true });
+    setRoute(getRouteParam['path'], {}, { replace: true });
   } else if (
     localStorage &&
     localStorage.getItem &&
@@ -187,7 +158,7 @@ const handleLoginRedirects = () => {
         localStorage.getItem('githubPostAuthRedirect')
       );
       if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-        m.route.set(postAuth.path, {}, { replace: true });
+        setRoute(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('githubPostAuthRedirect');
     } catch (e) {
@@ -203,7 +174,7 @@ const handleLoginRedirects = () => {
         localStorage.getItem('discordPostAuthRedirect')
       );
       if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-        m.route.set(postAuth.path, {}, { replace: true });
+        setRoute(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('discordPostAuthRedirect');
     } catch (e) {
@@ -254,7 +225,7 @@ const renderRoute = (
       path: importPromise.moduleName,
     });
 
-    return m(Layout, { scope, deferChain, hideSidebar }, [vnode]);
+    return render(Layout, { scope, deferChain, hideSidebar }, [vnode]);
   },
 });
 
@@ -276,7 +247,7 @@ const getCustomDomainRoutes = (importRoute) => ({
       deferChain: true,
     }
   ),
-  '/notifications': importRoute(import('views/pages/notifications_page'), {
+  '/notifications': importRoute(import('views/pages/notifications_settings/index'), {
     scoped: true,
     deferChain: true,
   }),
@@ -523,7 +494,7 @@ const getCommonDomainRoutes = (importRoute) => ({
 
   // Notifications
   '/:scope/notifications': importRoute(
-    import('views/pages/notifications_page'),
+    import(t'views/pages/notifications_page'),
     {
       scoped: true,
       deferChain: true,

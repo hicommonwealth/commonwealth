@@ -2,7 +2,6 @@
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -14,12 +13,6 @@ import $ from 'jquery';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
@@ -30,7 +23,7 @@ import 'pages/view_thread/index.scss';
 import app from 'state';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CollapsibleThreadBody } from '../../components/collapsible_body_text';

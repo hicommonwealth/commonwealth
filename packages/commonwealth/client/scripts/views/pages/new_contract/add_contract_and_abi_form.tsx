@@ -1,6 +1,9 @@
-/* @jsx m */
-import m from 'mithril';
-import ClassComponent from 'class_component';
+/* @jsx jsx */
+
+import {
+  ClassComponent,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/new_contract/add_contract_and_abi_form.scss';
 
@@ -40,8 +43,8 @@ class AddContractAndAbiForm extends ClassComponent {
       this.saving || this.loading || !isAddressValid || !isAbiValid;
 
     return (
-      <div class="AddContractAndAbiForm">
-        <div class="form">
+      <div className="AddContractAndAbiForm">
+        <div className="form">
           <CWTextInput
             inputValidationFn={() => {
               if (isAddressValid) {
@@ -52,7 +55,7 @@ class AddContractAndAbiForm extends ClassComponent {
             label="Contract Address"
             value={this.form.address}
             placeholder="Enter contract address"
-            oninput={(e) => {
+            onInput={(e) => {
               this.form.address = e.target.value;
             }}
           />
@@ -61,7 +64,7 @@ class AddContractAndAbiForm extends ClassComponent {
             label="Contract ABI File"
             value={this.form.abi}
             placeholder="Enter contract's ABI file"
-            oninput={(e) => {
+            onInput={(e) => {
               this.form.abi = e.target.value;
             }}
           />
@@ -69,17 +72,17 @@ class AddContractAndAbiForm extends ClassComponent {
 
         <CWDivider className="divider" />
 
-        <div class="buttons">
+        <div className="buttons">
           <CWButton
             buttonType="mini-white"
             label="Cancel"
-            onclick={() => this.resetForm()}
+            onClick={() => this.resetForm()}
           />
           <CWButton
             buttonType="mini-black"
             label="Add"
             disabled={isAddingDisabled}
-            onclick={() => this.addContract()}
+            onClick={() => this.addContract()}
           />
         </div>
       </div>

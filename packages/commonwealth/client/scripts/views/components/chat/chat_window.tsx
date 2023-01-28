@@ -6,17 +6,12 @@ import { MixpanelChatEvents } from 'analytics/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import $ from 'jquery';
 
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
   getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import moment from 'moment';
@@ -26,9 +21,8 @@ import 'pages/chat.scss';
 import { Action } from 'commonwealth/shared/permissions';
 import app from 'state';
 import { AddressInfo } from 'models';
-import { User } from 'views/components/user/user';
+import { User } from '../../components/user/user';
 import { WebsocketMessageNames } from 'types';
-import User from 'views/components/widgets/user';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { renderQuillTextBody } from '../quill/helpers';
@@ -113,8 +107,9 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     this.shouldScrollToHighlight = Boolean(getRouteParam('message'));
 
     this.scrollToBottom = () => {
-      const scroller = $(vnode.dom).find('.chat-messages')[0];
-      scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
+      // TODO: @ZAK @REACT - fix vnode.dom type to uncomment
+      // const scroller = $(vnode.dom).find('.chat-messages')[0];
+      // scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
       const { chat_channel_id } = msg;

@@ -46,7 +46,8 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
                 });
               }}
             />
-          </div>
+          </div> as any
+          // @ZAK @REACT ^ (fix to remove 'as any')
         }
       />
     );

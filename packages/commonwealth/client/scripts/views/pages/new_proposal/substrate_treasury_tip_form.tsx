@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
-
-import ClassComponent from 'class_component';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -25,7 +16,7 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import User from '../../components/widgets/user';
+import { User } from "../../components/user/user";
 import { createTXModal } from '../../modals/tx_signing_modal';
 import ErrorPage from '../error';
 

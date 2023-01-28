@@ -4,12 +4,6 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -17,9 +11,8 @@ import 'modals/offchain_voting_modal.scss';
 
 import type { Vote } from 'models';
 import { AddressInfo } from 'models';
-import { User } from 'views/components/user/user';
-import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import User from 'views/components/widgets/user';
+import { User } from "../components/user/user";
+import { ModalExitButton } from '../components/component_kit/cw_modal';
 
 type OffchainVotingModalAttrs = {
   votes: Array<Vote>;

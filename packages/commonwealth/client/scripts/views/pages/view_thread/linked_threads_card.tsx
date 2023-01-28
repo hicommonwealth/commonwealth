@@ -5,7 +5,7 @@ import { getProposalUrlPath } from 'identifiers';
 import type { Thread } from 'models';
 import type { LinkedThreadRelation } from 'models/Thread';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -86,7 +86,8 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
                 }}
               />
             )}
-          </div>
+          </div> as any
+          // @ZAK @REACT ^ (fix to remove 'as any')
         }
       />
     );

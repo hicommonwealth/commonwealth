@@ -1,11 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import Web3 from 'web3';
+import { ClassComponent, ResultNode, setRoute, redraw, jsx } from 'mithrilInterop';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
-import ClassComponent from 'class_component';
 
 import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';

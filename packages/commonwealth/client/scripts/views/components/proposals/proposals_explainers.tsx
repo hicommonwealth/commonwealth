@@ -1,10 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import ClassComponent from 'class_component';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { CWButton } from '../component_kit/cw_button';
