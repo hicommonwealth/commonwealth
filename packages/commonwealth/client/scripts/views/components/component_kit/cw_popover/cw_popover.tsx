@@ -6,7 +6,7 @@ import { ClassComponent, jsx } from 'mithrilInterop';
 
 import { uuidv4 } from 'lib/util';
 
-export type AnchorType = HTMLElement | SVGSVGElement;
+type AnchorType = HTMLElement | SVGSVGElement;
 
 type UsePopoverProps = {
   anchorEl: AnchorType;
@@ -20,6 +20,12 @@ type PopoverProps = {
   content: React.ReactNode;
   placement?: Placement;
 } & UsePopoverProps;
+
+export type PopoverTriggerProps = {
+  renderTrigger: (
+    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
+  ) => React.ReactNode;
+};
 
 export const usePopover = (): UsePopoverProps => {
   const [anchorEl, setAnchorEl] = React.useState<null | AnchorType>(null);

@@ -9,14 +9,11 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWIconButton } from '../cw_icon_button';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
-import { AnchorType, Popover, usePopover } from './cw_popover';
+import { Popover, PopoverTriggerProps, usePopover } from './cw_popover';
 
 type AddressTooltipProps = {
   address: string;
-  renderTrigger: (
-    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
-  ) => React.ReactNode;
-};
+} & PopoverTriggerProps;
 
 export const CWAddressTooltip = (props: AddressTooltipProps) => {
   const { address, renderTrigger } = props;

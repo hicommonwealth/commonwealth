@@ -15,7 +15,7 @@ import {
 import { getClasses } from '../helpers';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
-import { AnchorType, Popover, usePopover } from './cw_popover';
+import { PopoverTriggerProps, Popover, usePopover } from './cw_popover';
 
 export type PopoverMenuItem =
   | DividerMenuItem
@@ -24,10 +24,7 @@ export type PopoverMenuItem =
 
 type PopoverMenuProps = {
   menuItems: Array<PopoverMenuItem>;
-  renderTrigger: (
-    onClick: (e: React.MouseEvent<AnchorType>) => void
-  ) => React.ReactNode;
-};
+} & PopoverTriggerProps;
 
 export const PopoverMenu = (props: PopoverMenuProps) => {
   const { menuItems, renderTrigger } = props;
