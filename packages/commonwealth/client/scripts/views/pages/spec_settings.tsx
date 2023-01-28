@@ -3,16 +3,9 @@ import React from 'react';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import ClassComponent from 'class_component';
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
@@ -29,7 +22,7 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import Sublayout from '../sublayout';
-import { PageNotFound } from './404';
+import PageNotFound from './404';
 import { PageLoading } from './loading';
 import { initChain, selectChain } from 'helpers/chain';
 

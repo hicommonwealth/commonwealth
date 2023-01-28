@@ -37,7 +37,7 @@ interface ShouldDeferChainAttrs {
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
-  app._lastNavigatedFrom =getRoute();
+  app._lastNavigatedFrom = getRoute();
 
   if (_onpopstate) {
     _onpopstate.apply(this, args);
@@ -247,7 +247,7 @@ const getCustomDomainRoutes = (importRoute) => ({
       deferChain: true,
     }
   ),
-  '/notifications': importRoute(import('views/pages/notifications_settings/index'), {
+  '/notifications': importRoute(import('views/pages/notifications'), {
     scoped: true,
     deferChain: true,
   }),
@@ -494,7 +494,7 @@ const getCommonDomainRoutes = (importRoute) => ({
 
   // Notifications
   '/:scope/notifications': importRoute(
-    import(t'views/pages/notifications_page'),
+    import('views/pages/notifications'),
     {
       scoped: true,
       deferChain: true,

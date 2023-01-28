@@ -4,12 +4,6 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import moment from 'moment';
@@ -17,22 +11,14 @@ import moment from 'moment';
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
-import { ComponentType } from './types';
-import { CWTabBar, CWTab } from './cw_tabs';
-import { CWText } from './cw_text';
 import { PopoverMenu, PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { CWIconButton } from './cw_icon_button';
-import { isWindowMediumSmallInclusive } from './helpers';
-import { CWIcon } from './cw_icons/cw_icon';
 import { SharePopover } from '../share_popover';
 import { CWCard } from './cw_card';
 import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
-import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { isWindowMediumSmallInclusive } from './helpers';
-import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
 export type ContentPageSidebarItem = {

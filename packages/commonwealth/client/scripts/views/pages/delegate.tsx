@@ -3,19 +3,10 @@ import React from 'react';
 
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import { ChainNetwork } from 'common-common/src/types';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import type Aave from 'controllers/chain/ethereum/aave/adapter';
-import type Compound from 'controllers/chain/ethereum/compound/adapter';
 
 import 'pages/delegate.scss';
 
@@ -30,7 +21,6 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { GovExplainer } from '../components/gov_explainer';
-import { PageNotFound } from './404';
 
 type DelegateFormType = {
   address: string;

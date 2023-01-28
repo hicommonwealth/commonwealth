@@ -1,4 +1,4 @@
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import {
   checkAddress,
@@ -14,14 +14,13 @@ import { modelFromServer as modelCommentFromServer } from 'controllers/server/co
 import $ from 'jquery';
 import _ from 'lodash';
 
-import m from 'mithril';
 import type { Comment, Thread } from 'models';
 import { Profile } from 'models';
 import 'pages/profile.scss';
 
 import app from 'state';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 
 import Sublayout from 'views/sublayout';

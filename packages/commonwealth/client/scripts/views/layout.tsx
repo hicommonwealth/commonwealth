@@ -4,12 +4,7 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -25,17 +20,13 @@ import {
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
-import m from 'mithril';
 import app from 'state';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { AppToasts } from 'views/toast';
-import { AppModals } from './app_modals';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import { useParams } from 'react-router-dom';
-import { UserSurveyPopup } from './components/user_survey_popup';
-
 
 export const withRouter = (WrappedComponent) => (props) => {
   const params = useParams();

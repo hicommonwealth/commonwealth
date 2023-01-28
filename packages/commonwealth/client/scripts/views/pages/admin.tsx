@@ -3,23 +3,17 @@ import React from 'react';
 
 import type { ISubmittableResult } from '@polkadot/types/types';
 import { formatCoin } from 'adapters/currency';
-import ClassComponent from 'class_component';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import $ from 'jquery';
 import {
   ClassComponent,
-  ResultNode,
   render,
   setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
-import { ISubmittableResult } from '@polkadot/types/types';
 
 import 'pages/admin.scss';
 
@@ -33,8 +27,6 @@ import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
 import { CWLabel } from '../components/component_kit/cw_label';
-import { CWText } from '../components/component_kit/cw_text';
-import { PageNotFound } from './404';
 
 class SudoForm extends ClassComponent {
   private resultText: string;
