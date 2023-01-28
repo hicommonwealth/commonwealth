@@ -1,4 +1,7 @@
-import type { ConnectedWallet, WalletController } from '@terra-money/wallet-controller';
+import type {
+  ConnectedWallet,
+  WalletController,
+} from '@terra-money/wallet-controller';
 import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 
 import { Account, IWebWallet } from 'models';
