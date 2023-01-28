@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
+import { configure as configureStableStringify } from "safe-stable-stringify"
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -50,6 +51,14 @@ import type { SessionPayload } from '@canvas-js/interfaces';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+// can't import from canvas es module, so we reimplement stringify here
+const sortedStringify = configureStableStringify({
+  bigint: false,
+  circularValue: Error,
+  strict: true,
+  deterministic: true,
+})
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 export const Errors = {
@@ -65,11 +74,6 @@ export const Errors = {
   BadToken: 'Invalid login token',
   WrongWallet: 'Verified with different wallet than created',
 };
-
-// We can't import getSessionPayloadData from Canvas since it's
-// an ES module, so this performs the same serialization.
-const sortedStringify = (message: SessionPayload) =>
-  JSON.stringify(message, Object.keys(message).sort());
 
 // Address.verifySignature
 const verifySignature = async (
