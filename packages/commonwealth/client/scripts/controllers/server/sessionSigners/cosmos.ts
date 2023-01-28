@@ -17,7 +17,7 @@ import {
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
 
-export const getCosmosSignatureData = (
+export const getCosmosSignatureData = async (
   actionPayload: ActionPayload,
   address: string
 ): StdSignDoc => {
@@ -150,7 +150,7 @@ export class CosmosSDKSessionController implements ISessionController {
       const privkeyBytes = cosmCrypto.Random.getBytes(entropyLength);
       const privkey = Buffer.from(privkeyBytes).toString('hex');
 
-      const signer = await Secp256k1Wallet.fromKey(privkeyBytes);
+      const signer = await cosm.Secp256k1Wallet.fromKey(privkeyBytes);
       const accounts = await signer.getAccounts();
       const address = accounts[0].address;
       this.signers[chainId] = { signer, privkey, bech32Address: address };
@@ -186,11 +186,11 @@ export class CosmosSDKSessionController implements ISessionController {
     const cosmCrypto = await import('@cosmjs/crypto');
 
     // don't use signAmino, use Secp256k1.createSignature to get an ExtendedSecp256k1Signature
-    const signDoc = getCosmosSignatureData(actionPayload, address);
+    const signDoc = await getCosmosSignatureData(actionPayload, address);
     const signDocDigest = new cosmCrypto.Sha256(
       cosm.serializeSignDoc(signDoc)
     ).digest();
-    const extendedSignature = await Secp256k1.createSignature(
+    const extendedSignature = await cosmCrypto.Secp256k1.createSignature(
       signDocDigest,
       Buffer.from(privkey, 'hex')
     );
@@ -199,7 +199,7 @@ export class CosmosSDKSessionController implements ISessionController {
     );
 
     const pubkey = (await signer.getAccounts())[0].pubkey;
-    const valid = await Secp256k1.verifySignature(
+    const valid = await cosmCrypto.Secp256k1.verifySignature(
       extendedSignature,
       signDocDigest,
       pubkey

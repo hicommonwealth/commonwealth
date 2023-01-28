@@ -135,7 +135,7 @@ export const verify = async ({
     }
     // verify cosmos signature (base64)
     if (action) {
-      const signDocPayload = getCosmosSignatureData(
+      const signDocPayload = await getCosmosSignatureData(
         actionPayload,
         actionSignerAddress
       );
@@ -155,7 +155,7 @@ export const verify = async ({
         Bech32.encode(prefix, rawSecp256k1PubkeyToRawAddress(pubkey))
       );
     } else {
-      const signDocPayload = validationTokenToSignDoc(
+      const signDocPayload = await validationTokenToSignDoc(
         Buffer.from(serializeSessionPayload(sessionPayload)),
         payload.from
       );
