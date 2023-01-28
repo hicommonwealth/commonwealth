@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-import { configure as configureStableStringify } from "safe-stable-stringify"
+import { configure as configureStableStringify } from 'safe-stable-stringify';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -57,7 +57,7 @@ const sortedStringify = configureStableStringify({
   circularValue: Error,
   strict: true,
   deterministic: true,
-})
+});
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
