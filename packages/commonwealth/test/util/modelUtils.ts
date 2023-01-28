@@ -26,8 +26,6 @@ import {
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../shared/adapters/chain/ethereum/keys';
-import { constructCanvasMessage } from '../../shared/adapters/shared';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
 
 const log = factory.getLogger(formatFilename(__filename));
 
