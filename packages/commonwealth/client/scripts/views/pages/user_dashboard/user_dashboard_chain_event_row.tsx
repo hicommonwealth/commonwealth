@@ -37,21 +37,23 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
         }}
       >
         <div className="chain-event-icon-container">
-          {label.icon && <CWIcon
-            iconName={label.icon as IconName}
-            className={label.icon === 'delegate' ? 'delegate' : ''}
-          />}
+          {label.icon && (
+            <CWIcon
+              iconName={label.icon as IconName}
+              className={label.icon === 'delegate' ? 'delegate' : ''}
+            />
+          )}
         </div>
         <div class="chain-event-text-container">
           <div className="community-title">
             <CWCommunityAvatar community={chain} size="small" />
-              <a
-                onclick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  m.route.set(`/${chain}`);
-                }}
-              >
+            <a
+              onclick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                m.route.set(`/${chain}`);
+              }}
+            >
               <CWText type="caption" fontWeight="medium">
                 {chain?.name || 'Unknown chain'}
               </CWText>
@@ -64,7 +66,9 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
           <CWText className="row-top-text" fontWeight="bold">
             {label.heading}
           </CWText>
-          <CWText type="caption" className="label">{label.label}</CWText>
+          <CWText type="caption" className="label">
+            {label.label}
+          </CWText>
         </div>
       </div>
     );

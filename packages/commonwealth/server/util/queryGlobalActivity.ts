@@ -46,7 +46,7 @@ export default async function queryGlobalActivity(
     ORDER BY nts.created_at DESC;
   `;
 
-  const notifications = await models.sequelize.query(query, {
+  const notifications: any = await models.sequelize.query(query, {
     type: 'SELECT',
     raw: true,
   });
