@@ -27,6 +27,7 @@ export const CWAddressTooltip = (props: AddressTooltipProps) => {
     <React.Fragment>
       {renderTrigger(popoverProps.handleInteraction)}
       <Popover
+        placement="top-start"
         content={
           <div className={ComponentType.AddressTooltip}>
             <CWText type="caption">{address}</CWText>
