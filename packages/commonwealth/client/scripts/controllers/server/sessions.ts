@@ -1,5 +1,6 @@
 import { IWebWallet, Account } from 'models';
 import { sessionSigninModal } from 'views/modals/session_signin_modal';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
 import {
   constructCanvasMessage,
@@ -43,7 +44,12 @@ export async function signSessionWithAccount<T extends { address: string }>(
   const canvasMessage = constructCanvasMessage(
     canvasChain,
     canvasChainId,
-    account.address,
+    wallet.chain === ChainBase.Substrate
+      ? addressSwapper({
+          address: account.address,
+          currentPrefix: 42,
+        })
+      : account.address,
     sessionPublicAddress,
     timestamp,
     account.validationBlockInfo

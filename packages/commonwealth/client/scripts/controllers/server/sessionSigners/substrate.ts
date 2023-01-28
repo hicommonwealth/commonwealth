@@ -18,7 +18,7 @@ const getSubstrateSignatureData = (payload: ActionPayload) => {
 };
 
 export class SubstrateSessionController implements ISessionController {
-  keyring: Keyring = new Keyring();
+  keyring: Keyring = new Keyring({ ss58Format: 42 });
   signers: Record<string, { pair: IKeyringPair; privateKey: string }> = {};
   private auths: Record<
     number,
