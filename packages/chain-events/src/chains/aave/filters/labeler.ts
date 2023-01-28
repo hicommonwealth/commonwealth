@@ -29,6 +29,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
+        icon: 'councilProposal',
       };
     }
     case EventKind.ProposalCreated: {
@@ -38,6 +39,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
+        icon: 'councilProposal',
       };
     }
     case EventKind.ProposalExecuted: {
@@ -47,6 +49,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
+        icon: 'councilProposal',
       };
     }
     case EventKind.ProposalQueued: {
@@ -58,6 +61,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
+        icon: 'councilProposal',
       };
     }
     case EventKind.VoteEmitted: {
@@ -69,6 +73,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
+        icon: 'vote',
       };
     }
     case EventKind.DelegateChanged: {
@@ -78,6 +83,7 @@ export const Label: LabelerFilter = (
           data.delegatee
         )}.`,
         linkUrl: chainId ? `/${chainId}/account/${data.delegator}` : null,
+        icon: 'delegate',
       };
     }
     case EventKind.DelegatedPowerChanged: {
@@ -85,18 +91,21 @@ export const Label: LabelerFilter = (
         heading: 'Delegated Power Changed',
         label: `User ${fmtAddr(data.who)} updated their delegation power.`,
         linkUrl: chainId ? `/${chainId}/account/${data.who}` : null,
+        icon: 'delegate',
       };
     }
     case EventKind.Transfer: {
       return {
         heading: 'Token Transfer',
         label: `Transfer of ${data.amount} tokens from ${data.from} to ${data.to}.`,
+        icon: 'transfer',
       };
     }
     case EventKind.Approval: {
       return {
         heading: 'Approval',
         label: `${data.spender} approved ${data.amount} to ${data.owner}.`,
+        icon: 'check',
       };
     }
     default: {
