@@ -20,7 +20,7 @@ import { ISessionController } from '.';
 export const getCosmosSignatureData = async (
   actionPayload: ActionPayload,
   address: string
-): StdSignDoc => {
+): Promise<StdSignDoc> => {
   const accountNumber = 0;
   const sequence = 0;
   const chainId = '';
