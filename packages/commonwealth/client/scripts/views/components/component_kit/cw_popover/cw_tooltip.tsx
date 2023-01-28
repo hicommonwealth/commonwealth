@@ -10,18 +10,16 @@ import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
 
-export type TooltipType = 'solidBackground' | 'singleLine';
-
 type TooltipProps = {
   content: string | React.ReactNode;
   renderTrigger: (
     handleInteraction: (e: React.MouseEvent<AnchorType>) => void
   ) => React.ReactNode;
-  tooltipType?: TooltipType;
+  hasBackground?: boolean;
 };
 
 export const CWTooltip = (props: TooltipProps) => {
-  const { content, tooltipType, renderTrigger } = props;
+  const { content, hasBackground, renderTrigger } = props;
 
   const popoverProps = usePopover();
 
@@ -32,8 +30,8 @@ export const CWTooltip = (props: TooltipProps) => {
         content={
           typeof content === 'string' ? (
             <div
-              className={getClasses<{ tooltipType?: TooltipType }>(
-                { tooltipType },
+              className={getClasses<{ hasBackground?: boolean }>(
+                { hasBackground },
                 ComponentType.Tooltip
               )}
             >
@@ -41,8 +39,8 @@ export const CWTooltip = (props: TooltipProps) => {
             </div>
           ) : (
             <div
-              className={getClasses<{ tooltipType?: TooltipType }>(
-                { tooltipType },
+              className={getClasses<{ hasBackground?: boolean }>(
+                { hasBackground },
                 ComponentType.Tooltip
               )}
             >

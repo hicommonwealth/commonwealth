@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_address_tooltip.scss';
 
@@ -19,21 +9,29 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWIconButton } from '../cw_icon_button';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
-import { CWTooltip } from './cw_tooltip';
+import { AnchorType, Popover, usePopover } from './cw_popover';
 
-type AddressTooltipAttrs = {
+type AddressTooltipProps = {
   address: string;
-  trigger: ResultNode;
+  renderTrigger: (
+    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
+  ) => React.ReactNode;
 };
 
-export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
-  view(vnode: ResultNode<AddressTooltipAttrs>) {
-    const { address, trigger } = vnode.attrs;
+export const CWAddressTooltip = (props: AddressTooltipProps) => {
+  const { address, renderTrigger } = props;
 
-    return (
-      <CWTooltip
-        tooltipContent={
-          <div className={ComponentType.AddressTooltip}>
+  const popoverProps = usePopover();
+
+  return (
+    <React.Fragment>
+      {renderTrigger(popoverProps.handleInteraction)}
+      <Popover
+        content={
+          <div
+            className={ComponentType.AddressTooltip}
+            onMouseLeave={popoverProps.handleInteraction}
+          >
             <CWText type="caption">{address}</CWText>
             <CWIconButton
               iconName="copy"
@@ -50,9 +48,8 @@ export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
             />
           </div>
         }
-        tooltipType="singleLine"
-        trigger={trigger}
+        {...popoverProps}
       />
-    );
-  }
-}
+    </React.Fragment>
+  );
+};
