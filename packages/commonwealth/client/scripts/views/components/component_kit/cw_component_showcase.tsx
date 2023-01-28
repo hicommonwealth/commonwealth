@@ -192,7 +192,7 @@ export const ComponentShowcase = () => {
           <CWAddressTooltip
             address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
             renderTrigger={(handleInteraction) => (
-              <CWIcon iconName="infoEmpty" onMouseEnter={handleInteraction} />
+              <CWIcon iconName="infoEmpty" onClick={handleInteraction} />
             )}
           />
         </div>

@@ -28,10 +28,7 @@ export const CWAddressTooltip = (props: AddressTooltipProps) => {
       {renderTrigger(popoverProps.handleInteraction)}
       <Popover
         content={
-          <div
-            className={ComponentType.AddressTooltip}
-            onMouseLeave={popoverProps.handleInteraction}
-          >
+          <div className={ComponentType.AddressTooltip}>
             <CWText type="caption">{address}</CWText>
             <CWIconButton
               iconName="copy"
@@ -42,6 +39,7 @@ export const CWAddressTooltip = (props: AddressTooltipProps) => {
                   .writeText(address)
                   .then(() => {
                     notifySuccess('Address copied to clipboard');
+                    popoverProps.setAnchorEl(null);
                   })
                   .catch(() => notifyError('Failed to copy address'));
               }}
