@@ -1,11 +1,8 @@
 import * as solw3 from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
-import {
-  actionToHash,
-  verify as verifyCanvasSessionSignature,
-} from 'helpers/canvas';
-import { serializeActionPayload } from '@canvas-js/interfaces';
+import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import { serializeActionPayload, getActionHash } from '@canvas-js/interfaces';
 import type {
   Action,
   ActionArgument,
@@ -159,7 +156,7 @@ export class SolanaSessionController implements ISessionController {
       session: sessionPayload.from,
       signature,
     };
-    const hash = Buffer.from(actionToHash(action)).toString('hex');
+    const hash = getActionHash(action);
 
     return { session, action, hash };
   }

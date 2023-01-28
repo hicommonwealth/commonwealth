@@ -1,9 +1,6 @@
 import bs58 from 'bs58';
 import { KeyPairEd25519 } from 'near-api-js/lib/utils';
-import {
-  actionToHash,
-  verify as verifyCanvasSessionSignature,
-} from 'helpers/canvas';
+import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { serializeActionPayload } from '@canvas-js/interfaces';
 import {
   Action,
@@ -11,6 +8,7 @@ import {
   Session,
   ActionArgument,
   SessionPayload,
+  getActionHash,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
 
@@ -151,7 +149,7 @@ export class NEARSessionController implements ISessionController {
       session: sessionPayload.from,
       signature,
     };
-    const hash = Buffer.from(actionToHash(action)).toString('hex');
+    const hash = getActionHash(action);
 
     return { session, action, hash };
   }

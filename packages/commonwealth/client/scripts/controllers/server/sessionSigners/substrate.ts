@@ -1,12 +1,9 @@
 import { Keyring } from '@polkadot/api';
 import { IKeyringPair } from '@polkadot/types/types';
 import { mnemonicGenerate, signatureVerify } from '@polkadot/util-crypto';
-import {
-  actionToHash,
-  verify as verifyCanvasSessionSignature,
-} from 'helpers/canvas';
+import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { addressSwapper } from '../../../../../shared/utils';
-import { serializeActionPayload } from '@canvas-js/interfaces';
+import { serializeActionPayload, getActionHash } from '@canvas-js/interfaces';
 import type {
   Action,
   ActionPayload,
@@ -167,7 +164,7 @@ export class SubstrateSessionController implements ISessionController {
       session: sessionPayload.from,
       signature,
     };
-    const hash = Buffer.from(actionToHash(action)).toString('hex');
+    const hash = getActionHash(action);
 
     return { session, action, hash };
   }

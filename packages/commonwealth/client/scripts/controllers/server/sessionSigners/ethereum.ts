@@ -5,12 +5,10 @@ import {
   ActionPayload,
   Session,
   SessionPayload,
+  getActionHash,
 } from '@canvas-js/interfaces';
-import { getActionSignatureData } from '@canvas-js/verifiers';
-import {
-  actionToHash,
-  verify as verifyCanvasSessionSignature,
-} from 'helpers/canvas';
+import { getActionSignatureData as getActionSignatureDataEIP712 } from '@canvas-js/chain-ethereum';
+import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { ISessionController } from '.';
 
 export class EthereumSessionController implements ISessionController {
@@ -137,7 +135,7 @@ export class EthereumSessionController implements ISessionController {
       callArgs,
     };
 
-    const [domain, types, value] = getActionSignatureData(actionPayload);
+    const [domain, types, value] = getActionSignatureDataEIP712(actionPayload);
     const signature = await actionSigner._signTypedData(domain, types, value);
     const recoveredAddr = utils.verifyTypedData(
       domain,
@@ -159,7 +157,7 @@ export class EthereumSessionController implements ISessionController {
       session: sessionPayload.from,
       signature,
     };
-    const hash = Buffer.from(actionToHash(action)).toString('hex');
+    const hash = getActionHash(action);
 
     return { session, action, hash };
   }

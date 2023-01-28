@@ -5,7 +5,7 @@ import {
   serializeActionPayload,
   serializeSessionPayload,
 } from '@canvas-js/interfaces';
-import { getActionSignatureData } from '@canvas-js/verifiers';
+import { getActionSignatureData as getActionSignatureDataEIP712 } from '@canvas-js/chain-ethereum';
 
 import { getCosmosSignatureData } from 'controllers/server/sessionSigners/cosmos';
 import { constructTypedCanvasMessage } from '../../../shared/adapters/chain/ethereum/keys';
@@ -35,20 +35,6 @@ import { signatureVerify } from '@polkadot/util-crypto';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 
-export function actionToHash(action: Action): Buffer {
-  const payload = serializeActionPayload(action.payload);
-  return createHash('sha256')
-    .update({ ...action, payload })
-    .digest();
-}
-
-export function sessionToHash(session: Session): Buffer {
-  const payload = serializeSessionPayload(session.payload);
-  return createHash('sha256')
-    .update({ ...session, payload })
-    .digest();
-}
-
 // TODO: verify payload is not expired
 export const verify = async ({
   action,
@@ -73,7 +59,8 @@ export const verify = async ({
   if (payload.chain === 'ethereum') {
     // verify ethereum signature
     if (action) {
-      const [domain, types, value] = getActionSignatureData(actionPayload);
+      const [domain, types, value] =
+        getActionSignatureDataEIP712(actionPayload);
       const recoveredAddr = ethersUtils.verifyTypedData(
         domain,
         types,
@@ -85,7 +72,7 @@ export const verify = async ({
       const { types, domain, message } =
         constructTypedCanvasMessage(sessionPayload);
       const recoveredAddr = recoverTypedSignature({
-        data: { types, domain, message, primaryType: 'Message' },
+        data: { types, domain, message, primaryType: 'Message' as const },
         signature,
         version: SignTypedDataVersion.V4,
       });
