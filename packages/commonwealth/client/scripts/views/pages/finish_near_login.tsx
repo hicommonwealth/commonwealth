@@ -118,7 +118,6 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         +new Date(),
         null // no blockhash
       );
-      console.log(canvasMessage);
 
       this.state.isNewAccount = newAcct.newlyCreated;
       // this.state.account = newAcct.account;
@@ -132,7 +131,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         serializeSessionPayload(canvasMessage)
       );
 
-      await acct.validate(signature, null, chainId);
+      await acct.validate(signature, canvasMessage.sessionIssued, chainId);
 
       app.sessions
         .getSessionController(ChainBase.NEAR)

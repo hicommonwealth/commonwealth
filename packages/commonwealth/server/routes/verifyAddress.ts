@@ -311,6 +311,7 @@ const verifySignature = async (
 
     // both in base64 encoding
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
+
     isValid = nacl.sign.detached.verify(
       Buffer.from(sortedStringify(canvasMessage)),
       Buffer.from(sigObj, 'base64'),
