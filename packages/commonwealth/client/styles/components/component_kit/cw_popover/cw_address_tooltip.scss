@@ -2,9 +2,17 @@
 
 .AddressTooltip {
   align-items: center;
+  background-color: $neutral-800;
+  border-color: $neutral-800;
   color: $white;
   display: flex;
-  flex-direction: row;
+  height: 24px;
+  max-width: 400px;
+  padding: 4px 8px;
+
+  .Text {
+    color: $white;
+  }
 
   .IconButton {
     margin-left: 4px;

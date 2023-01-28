@@ -1,11 +1,12 @@
 /* @jsx jsx */
 import React from 'react';
 import { PopperUnstyled } from '@mui/base';
+import { Placement } from '@popperjs/core/lib';
 import { ClassComponent, jsx } from 'mithrilInterop';
 
 import { uuidv4 } from 'lib/util';
 
-export type AnchorType = HTMLElement | SVGSVGElement;
+type AnchorType = HTMLElement | SVGSVGElement;
 
 type UsePopoverProps = {
   anchorEl: AnchorType;
@@ -17,7 +18,14 @@ type UsePopoverProps = {
 
 type PopoverProps = {
   content: React.ReactNode;
+  placement?: Placement;
 } & UsePopoverProps;
+
+export type PopoverTriggerProps = {
+  renderTrigger: (
+    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
+  ) => React.ReactNode;
+};
 
 export const usePopover = (): UsePopoverProps => {
   const [anchorEl, setAnchorEl] = React.useState<null | AnchorType>(null);
@@ -39,13 +47,14 @@ export const usePopover = (): UsePopoverProps => {
 };
 
 export const Popover = (props: PopoverProps) => {
-  const { anchorEl, content, id, open } = props;
+  const { anchorEl, content, id, open, placement } = props;
 
   return (
     <PopperUnstyled
       id={id}
       open={open}
       anchorEl={anchorEl}
+      placement={placement}
       modifiers={[
         {
           name: 'preventOverflow',

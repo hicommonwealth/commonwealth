@@ -177,7 +177,7 @@ export const ComponentShowcase = () => {
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
-            tooltipType="solidBackground"
+            hasBackground
             renderTrigger={(handleInteraction) => (
               <CWIcon
                 iconName="infoEmpty"
@@ -187,13 +187,15 @@ export const ComponentShowcase = () => {
             )}
           />
         </div>
-        {/* <div className="tooltip-row">
+        <div className="tooltip-row">
           <CWText>Address tooltip</CWText>
           <CWAddressTooltip
             address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
-            trigger={<CWIcon iconName="infoEmpty" />}
+            renderTrigger={(handleInteraction) => (
+              <CWIconButton iconName="infoEmpty" onClick={handleInteraction} />
+            )}
           />
-        </div> */}
+        </div>
       </div>
       <div className="icon-gallery">
         <CWText type="h3">Icons</CWText>
