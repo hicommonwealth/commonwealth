@@ -53,7 +53,8 @@
     "sync-entities": "ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)",
     "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
     "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
-    "test-e2e": "npx playwright test ./test/e2e/*"
+    "test-e2e": "npx playwright test ./test/e2e/*",
+    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "engines": {
     "node": "14.x"

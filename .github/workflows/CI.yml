@@ -62,6 +62,12 @@ jobs:
         env:
           NO_CLIENT: true
 
+      - name: Start server
+        run: yarn start && yarn wait-server
+
+      - name: Run e2e tests
+        run: npx playwright install --with-deps && yarn test-e2e
+
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
