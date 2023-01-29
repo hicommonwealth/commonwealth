@@ -49,6 +49,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn --ignore-engines
 
       - name: Install playwright
@@ -115,6 +116,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn --ignore-engines
 
       - name: Run unit tests
@@ -149,6 +151,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn --ignore-engines
 
       - name: Run unit tests
