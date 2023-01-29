@@ -13,6 +13,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 // import Infinite from 'mithril-infinite';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/header/notifications_menu.scss';
 
@@ -22,7 +23,10 @@ import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_ico
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { NotificationRow } from '../pages/notifications/notification_row';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
+import {
+  Popover,
+  usePopover,
+} from '../components/component_kit/cw_popover/cw_popover';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWText } from '../components/component_kit/cw_text';
 
@@ -233,20 +237,28 @@ export class NotificationsMenu extends ClassComponent {
   }
 }
 
-export class NotificationsMenuPopover extends ClassComponent {
-  view() {
-    return null;
-    // <CWPopover
-    //   content={<NotificationsMenu />}
-    //   trigger={
-    //     app.user.notifications.numUnread > 0 ? (
-    //       <div className="unreads-icon">
-    //         <CWCustomIcon iconName="unreads" />
-    //       </div>
-    //     ) : (
-    //       <CWIconButton iconButtonTheme="black" iconName="bell" />
-    //     )
-    //   }
-    // />
-  }
-}
+export const NotificationsMenuPopover = () => {
+  const popoverProps = usePopover();
+
+  return (
+    <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
+      <div>
+        {app.user.notifications.numUnread > 0 ? (
+          <div className="unreads-icon">
+            <CWCustomIcon
+              iconName="unreads"
+              onClick={popoverProps.handleInteraction}
+            />
+          </div>
+        ) : (
+          <CWIconButton
+            iconButtonTheme="black"
+            iconName="bell"
+            onClick={popoverProps.handleInteraction}
+          />
+        )}
+        <Popover content={<NotificationsMenu />} {...popoverProps} />
+      </div>
+    </ClickAwayListener>
+  );
+};

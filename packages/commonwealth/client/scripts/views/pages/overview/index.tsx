@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/overview/index.scss';
 
@@ -66,7 +75,7 @@ class OverviewPage extends ClassComponent {
       return { monthlyThreads, topic };
     });
 
-    return (!topicSummaryRows.length && !app.threads.initialized) ? (
+    return !topicSummaryRows.length && !app.threads.initialized ? (
       <PageLoading />
     ) : (
       <Sublayout>
@@ -80,7 +89,7 @@ class OverviewPage extends ClassComponent {
                 className="latest-button"
                 buttonType="mini-black"
                 label="Latest Threads"
-                iconName="home"
+                iconLeft="home"
                 onClick={() => {
                   navigateToSubpage('/discussions');
                 }}
@@ -98,7 +107,7 @@ class OverviewPage extends ClassComponent {
               <CWButton
                 buttonType="mini-black"
                 label="Create Thread"
-                iconName="plus"
+                iconLeft="plus"
                 onClick={() => {
                   navigateToSubpage('/new/discussion');
                 }}
