@@ -1,7 +1,7 @@
 #!/bin/bash
 
 attempt_counter=0
-max_attempts=20
+max_attempts=30
 
 until $(curl --output /dev/null --silent --head --fail http://localhost:${PORT}); do
     if [ ${attempt_counter} -eq ${max_attempts} ];then
