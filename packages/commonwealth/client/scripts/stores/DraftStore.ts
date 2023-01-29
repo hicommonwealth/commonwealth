@@ -3,8 +3,9 @@ import type { DiscussionDraft } from '../models';
 import IdStore from './IdStore';
 
 class DraftStore extends IdStore<DiscussionDraft> {
-  private _draftsByCommunity: { [identifier: string]: Array<DiscussionDraft> } =
-    {};
+  private _draftsByCommunity: {
+    [identifier: string]: Array<DiscussionDraft>;
+  } = {};
 
   public add(draft: DiscussionDraft) {
     super.add(draft);

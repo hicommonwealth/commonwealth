@@ -2,8 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import type { Signer, Overrides } from "ethers";
+import { Contract, ContractFactory } from "ethers";
+import type { Provider, TransactionRequest } from "@ethersproject/providers";
 
 import type { BaseUpgradeabilityProxy } from "../BaseUpgradeabilityProxy";
 

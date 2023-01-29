@@ -60,8 +60,9 @@ export const setChainCategories = async (
 export const setSelectedTags = (chain: string) => {
   const categoryTypes = app.config.chainCategoryTypes;
   const chainsAndCategories = app.config.chainCategories;
-  const chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } =
-    buildChainToCategoriesMap(categoryTypes, chainsAndCategories);
+  const chainToCategoriesMap: {
+    [chain: string]: ChainCategoryType[];
+  } = buildChainToCategoriesMap(categoryTypes, chainsAndCategories);
 
   const types = Object.keys(ChainCategoryType);
   const selectedTags = {};

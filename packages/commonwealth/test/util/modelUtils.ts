@@ -9,15 +9,16 @@ import { BalanceType, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
-import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
+import type { IChainNode } from 'token-balance-cache/src/index';
+import { BalanceProvider } from 'token-balance-cache/src/index';
 import { constructCanvasMessage } from 'shared/adapters/shared';
 import { PermissionManager } from 'commonwealth/shared/permissions';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
-import Web3 from 'web3';
+import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { Permission } from '../../server/models/role';
+import type { Permission } from '../../server/models/role';
 import {
   constructTypedMessage,
   TEST_BLOCK_INFO_STRING,
@@ -28,7 +29,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const generateEthAddress = () => {
   const keypair = wallet.generate();
   const lowercaseAddress = `0x${keypair.getAddress().toString('hex')}`;
-  const address = Web3.utils.toChecksumAddress(lowercaseAddress);
+  const address = Web3.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
 };
 

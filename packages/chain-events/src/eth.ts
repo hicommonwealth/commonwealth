@@ -1,5 +1,4 @@
 import { providers } from 'ethers';
-import Web3 from 'web3';
 
 import { addPrefix, factory } from './logging';
 
@@ -10,6 +9,7 @@ export async function createProvider(
 ): Promise<providers.Web3Provider> {
   const log = factory.getLogger(addPrefix(__filename, [network, chain]));
   try {
+    const Web3 = (await import('web3')).default;
     const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl, {
       clientConfig: {
         maxReceivedFrameSize: 2000000, // bytes - default: 1MiB, current: 2MiB

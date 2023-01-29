@@ -1,10 +1,3 @@
-import {
-  QueryClient,
-  setupBankExtension,
-  setupStakingExtension,
-} from '@cosmjs/stargate';
-import { Bech32 } from '@cosmjs/encoding';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { BalanceType } from 'common-common/src/types';
 
 import type { IChainNode } from '../types';
@@ -20,18 +13,21 @@ export default class CosmosBalanceProvider extends BalanceProvider {
     if (!node.bech32) {
       throw new Error('No cosmos prefix found!');
     }
-    const { data } = Bech32.decode(address);
-    const encodedAddress = Bech32.encode(node.bech32, data);
+    const cosmEnc = await import('@cosmjs/encoding');
+    const { data } = cosmEnc.Bech32.decode(address);
+    const encodedAddress = cosmEnc.Bech32.encode(node.bech32, data);
 
+    const cosmRpc = await import('@cosmjs/tendermint-rpc');
     /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */
-    const tmClient = await Tendermint34Client.connect(
+    const tmClient = await cosmRpc.Tendermint34Client.connect(
       node.private_url || node.url
     );
 
-    const api = QueryClient.withExtensions(
+    const cosm = await import('@cosmjs/stargate');
+    const api = cosm.QueryClient.withExtensions(
       tmClient,
-      setupBankExtension,
-      setupStakingExtension
+      cosm.setupBankExtension,
+      cosm.setupStakingExtension
     );
 
     try {
