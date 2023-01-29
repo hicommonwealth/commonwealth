@@ -3,7 +3,7 @@ import { ChainBase } from 'common-common/src/types';
 /* eslint-disable indent,prefer-template,operator-linebreak */
 require('dotenv').config();
 
-export const DEFAULT_PORT = '8080';
+export const PORT = process.env.PORT || '8080';
 
 export const NODE_URL =
   process.env.NODE_URL ||

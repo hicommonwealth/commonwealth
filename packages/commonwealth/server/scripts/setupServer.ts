@@ -3,7 +3,7 @@ import { Express } from 'express-serve-static-core';
 import http from 'http';
 import Rollbar from 'rollbar';
 
-import { DEFAULT_PORT } from '../config';
+import { PORT } from '../config';
 import { DB } from '../models';
 import { setupWebSocketServer } from '../socket';
 import {RabbitMQController} from "common-common/src/rabbitmq";
@@ -11,8 +11,7 @@ import {RabbitMQController} from "common-common/src/rabbitmq";
 const log = factory.getLogger(formatFilename(__filename));
 
 const setupServer = (app: Express, rollbar: Rollbar, models: DB, rabbitMQController: RabbitMQController) => {
-  const port = process.env.PORT || DEFAULT_PORT;
-  app.set('port', port);
+  app.set('port', PORT);
   const server = http.createServer(app);
   setupWebSocketServer(server, rollbar, models, rabbitMQController);
 
@@ -26,7 +25,7 @@ const setupServer = (app: Express, rollbar: Rollbar, models: DB, rabbitMQControl
         process.exit(1);
         break;
       case 'EADDRINUSE':
-        log.error(`Port ${port} is already in use`);
+        log.error(`Port ${PORT} is already in use`);
         process.exit(1);
         break;
       default:
@@ -43,7 +42,7 @@ const setupServer = (app: Express, rollbar: Rollbar, models: DB, rabbitMQControl
     }
   };
 
-  server.listen(port);
+  server.listen(PORT);
   server.on('error', onError);
   server.on('listening', onListen);
 };

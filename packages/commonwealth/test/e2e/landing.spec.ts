@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { DEFAULT_PORT } from '../../server/config';
+import { PORT } from '../../server/config';
 
 test('landing page works', async ({ page }) => {
-  await page.goto(`http://localhost:${DEFAULT_PORT}`);
+  await page.goto(`http://localhost:${PORT}`);
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/Commonwealth/);
@@ -35,7 +35,7 @@ test('landing page works', async ({ page }) => {
 });
 
 test('About link works', async ({ page }) => {
-  await page.goto(`http://localhost:${DEFAULT_PORT}/`);
+  await page.goto(`http://localhost:${PORT}/`);
   await page.getByText('About', { exact: true }).click();
   await page.locator('.WhyCommonwealthPage').click();
   await page.locator('div').filter({ hasText: 'AboutBlogJobsTermsPrivacyDocsDiscordTelegram' }).first().click();
@@ -44,7 +44,7 @@ test('About link works', async ({ page }) => {
 });
 
 test('blog link works', async ({ page }) => {
-  await page.goto(`http://localhost:${DEFAULT_PORT}/`);
+  await page.goto(`http://localhost:${PORT}/`);
   const page2Promise = page.waitForEvent('popup');
   await page.getByRole('link', { name: 'Blog' }).click();
   const page2 = await page2Promise;
@@ -61,7 +61,7 @@ test('privacy link works', async ({ page }) => {
 });
 
 test('docs link works', async ({ page }) => {
-  await page.goto(`http://localhost:${DEFAULT_PORT}/`);
+  await page.goto(`http://localhost:${PORT}/`);
   const page4Promise = page.waitForEvent('popup');
   await page.getByRole('link', { name: 'Docs' }).click();
   const page4 = await page4Promise;

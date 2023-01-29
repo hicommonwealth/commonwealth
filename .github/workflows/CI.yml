@@ -51,6 +51,24 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Install playwright
+        run: npx playwright install --with-deps
+
+      - name: Start server
+        run: yarn start &
+        env:
+          PORT: 8090
+
+      - name: Wait for server
+        run: yarn wait-server
+        env:
+          PORT: 8090
+
+      - name: Run e2e tests
+        run: yarn test-e2e
+        env:
+          PORT: 8090
+
       - name: Typecheck
         run: yarn check-types
 
@@ -61,12 +79,6 @@ jobs:
         run: yarn test-api
         env:
           NO_CLIENT: true
-
-      - name: Start server
-        run: yarn start && yarn wait-server
-
-      - name: Run e2e tests
-        run: npx playwright install --with-deps && yarn test-e2e
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
