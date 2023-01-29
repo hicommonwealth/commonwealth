@@ -1,6 +1,5 @@
 /* @jsx jsx */
 import React from 'react';
-import { ClickAwayListener } from '@mui/base';
 
 import {
   ClassComponent,
@@ -44,8 +43,8 @@ import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
-import CWCoverImageUploader from './cw_cover_image_uploader';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
+import CWCoverImageUploader from './cw_cover_image_uploader';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -140,6 +139,9 @@ export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = React.useState<
     number | undefined
   >(undefined);
+  const [checkboxGroupSelected, setCheckboxGroupSelected] = React.useState<
+    Array<string>
+  >([]);
 
   return (
     <div className="ComponentShowcase">
@@ -150,6 +152,24 @@ export const ComponentShowcase = () => {
           renderTrigger={(onclick) => (
             <CWIconButton iconName="plusCircle" onClick={onclick} />
           )}
+        />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Filter Menu</CWText>
+        <CWFilterMenu
+          header="Stages"
+          filterMenuItems={checkboxGroupOptions}
+          selectedItems={checkboxGroupSelected}
+          onChange={(e) => {
+            const itemValue = e.target.value;
+            if (checkboxGroupSelected.indexOf(itemValue) === -1) {
+              checkboxGroupSelected.push(itemValue);
+            } else {
+              setCheckboxGroupSelected(
+                checkboxGroupSelected.filter((item) => item !== itemValue)
+              );
+            }
+          }}
         />
       </div>
       <div className="tooltip-gallery">
@@ -551,7 +571,6 @@ export const ComponentShowcase = () => {
 
 export class _ComponentShowcase extends ClassComponent {
   private checkboxChecked: boolean;
-  private checkboxGroupSelected: Array<string>;
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;
   private selectedIconButton: number;
@@ -563,7 +582,6 @@ export class _ComponentShowcase extends ClassComponent {
     this.radioGroupSelection = radioGroupOptions[2].value;
     this.selectedTab = 1;
     this.voteCount = 0;
-    this.checkboxGroupSelected = [];
   }
 
   view() {
@@ -571,27 +589,6 @@ export class _ComponentShowcase extends ClassComponent {
 
     return (
       <div className="ComponentShowcase">
-        {/* <div className="basic-gallery">
-          <CWText type="h4">Filter Menu</CWText>
-          <CWFilterMenu
-            header="Stages"
-            filterMenuItems={checkboxGroupOptions}
-            selectedItems={this.checkboxGroupSelected}
-            onChange={(e) => {
-              const itemValue = e.target.value;
-              // console.log(itemValue);
-              if (this.checkboxGroupSelected.indexOf(itemValue) === -1) {
-                this.checkboxGroupSelected.push(itemValue);
-                // redraw();
-              } else {
-                this.checkboxGroupSelected = this.checkboxGroupSelected.filter(
-                  (item) => item !== itemValue
-                );
-                // redraw();
-              }
-            }}
-          />
-        </div> */}
         <div className="basic-gallery">
           <CWText type="h4">Content Page Card</CWText>
           <CWContentPageCard

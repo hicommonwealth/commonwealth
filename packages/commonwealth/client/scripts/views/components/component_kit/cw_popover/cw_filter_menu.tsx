@@ -1,84 +1,69 @@
 /* @jsx jsx */
 import React from 'react';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
 
-import { CWPopover } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
 import { ComponentType } from '../types';
 import { CheckboxType, CWCheckbox } from '../cw_checkbox';
 import { CWText } from '../cw_text';
 import { CWButton } from '../cw_button';
 import { getClasses } from '../helpers';
 
-type FilterMenuAttrs = {
+type FilterMenuProps = {
   filterMenuItems: Array<CheckboxType>;
   header: string;
   onChange: (e?: any) => void;
   selectedItems: Array<string>;
 };
 
-// DO NOT USE! DOESN'T WORK YET
+export const CWFilterMenu = (props: FilterMenuProps) => {
+  const { filterMenuItems, header, onChange, selectedItems } = props;
 
-export class CWFilterMenu extends ClassComponent<FilterMenuAttrs> {
-  view(vnode: ResultNode<FilterMenuAttrs>) {
-    const { filterMenuItems, header, onChange, selectedItems } = vnode.attrs;
-    // console.log({ selectedItems });
+  const popoverProps = usePopover();
 
-    return (
-      <CWPopover
-        content={
-          <div className={ComponentType.FilterMenu}>
-            <CWText type="b2" fontWeight="bold">
-              {header}
-            </CWText>
-            {filterMenuItems.map((item) => {
-              // console.log(
-              //   selectedItems,
-              //   selectedItems.some((i) => i === item.value)
-              // );
+  return (
+    <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
+      {/* needs to be div instead of fragment so listener can work */}
+      <div>
+        <CWButton
+          label="Filter"
+          buttonType="mini-white"
+          iconRight="chevronDown"
+          className={getClasses<{ someChecked: boolean }>({
+            someChecked: selectedItems.length > 0,
+          })}
+          onClick={popoverProps.handleInteraction}
+        />
+        <Popover
+          content={
+            <div className={ComponentType.FilterMenu}>
+              <CWText type="b2" fontWeight="bold">
+                {header}
+              </CWText>
+              {filterMenuItems.map((item) => {
+                const isChecked =
+                  selectedItems.find((i) => {
+                    return i === item.value;
+                  }) !== undefined;
 
-              const isChecked =
-                selectedItems.find((i) => {
-                  return i === item.value;
-                }) !== undefined;
-
-              console.log({ isChecked });
-
-              return (
-                <CWCheckbox
-                  value={item.value}
-                  label={item.label}
-                  checked={isChecked}
-                  onChange={onChange}
-                  // disabled={item.disabled}
-                />
-              );
-            })}
-          </div>
-        }
-        trigger={
-          <CWButton
-            label="Filter"
-            buttonType="mini-white"
-            iconRight="chevronDown"
-            className={getClasses<{ someChecked: boolean }>({
-              someChecked: selectedItems.length > 0,
-            })}
-          />
-        }
-      />
-    );
-  }
-}
+                return (
+                  <CWCheckbox
+                    value={item.value}
+                    label={item.label}
+                    checked={isChecked}
+                    onChange={onChange}
+                  />
+                );
+              })}
+            </div>
+          }
+          {...popoverProps}
+        />
+      </div>
+    </ClickAwayListener>
+  );
+};

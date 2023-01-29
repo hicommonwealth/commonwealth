@@ -32,7 +32,10 @@ import {
 } from 'models';
 import { User } from '../../components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
+import {
+  Popover,
+  usePopover,
+} from '../../components/component_kit/cw_popover/cw_popover';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
@@ -40,42 +43,44 @@ type ThreadComponentAttrs = {
   thread: Thread;
 };
 
-export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: ResultNode<ThreadComponentAttrs>) {
-    const { thread } = vnode.attrs;
+export const ThreadAuthor = (props: ThreadComponentAttrs) => {
+  const { thread } = props;
 
-    const author: Account = app.chain.accounts.get(thread.author);
+  const popoverProps = usePopover();
 
-    return (
-      <div className="ThreadAuthor">
-        <User avatarSize={24} user={author} popover linkify />
-        {thread.collaborators?.length > 0 && (
-          <React.Fragment>
-            <CWText type="caption">and</CWText>
-            <CWPopover
-              content={
-                <div className="collaborators">
-                  {thread.collaborators.map(({ address, chain }) => {
-                    return (
-                      <User
-                        user={new AddressInfo(null, address, chain, null)}
-                      />
-                    );
-                  })}
-                </div>
-              }
-              trigger={
-                <CWText type="caption" className="trigger-text">
-                  {pluralize(thread.collaborators?.length, 'other')}
-                </CWText>
-              }
-            />
-          </React.Fragment>
-        )}
-      </div>
-    );
-  }
-}
+  const author: Account = app.chain.accounts.get(thread.author);
+
+  return (
+    <div className="ThreadAuthor">
+      <User avatarSize={24} user={author} popover linkify />
+      {thread.collaborators?.length > 0 && (
+        <React.Fragment>
+          <CWText type="caption">and</CWText>
+          <Popover
+            content={
+              <div className="collaborators">
+                {thread.collaborators.map(({ address, chain }) => {
+                  return (
+                    <User user={new AddressInfo(null, address, chain, null)} />
+                  );
+                })}
+              </div>
+            }
+            {...popoverProps}
+          />
+          <CWText
+            type="caption"
+            className="trigger-text"
+            onMouseEnter={popoverProps.handleInteraction}
+            onMouseLeave={popoverProps.handleInteraction}
+          >
+            {pluralize(thread.collaborators?.length, 'other')}
+          </CWText>
+        </React.Fragment>
+      )}
+    </div>
+  );
+};
 
 export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
   view(vnode: ResultNode<ThreadComponentAttrs>) {
