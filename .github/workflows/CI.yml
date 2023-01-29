@@ -52,7 +52,16 @@ jobs:
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn --ignore-engines
 
+      - uses: actions/cache@v2
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+            **/node_modules/playwright
+          key: cache-playwright
+
       - name: Install playwright
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
       - name: Start server
