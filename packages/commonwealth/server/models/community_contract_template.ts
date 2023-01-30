@@ -3,6 +3,7 @@ import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityContractTemplateAttributes = {
+  id: number;
   community_id: string;
   contract_id: number;
   template_id: number;
@@ -22,6 +23,7 @@ export default (
     sequelize.define(
       'CommunityContractTemplate',
       {
+        id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
         community_id: { type: dataTypes.STRING, allowNull: false },
         contract_id: { type: dataTypes.INTEGER, allowNull: false },
         template_id: {

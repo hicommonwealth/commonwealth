@@ -2,41 +2,51 @@ import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope e
 import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type CommunityContractMetadataAttributes = {
-  cct_id: string;
+export type CommunityContractTemplateMetadataAttributes = {
+  cct_id: number;
   slug: string;
   nickname: string;
   display_name: string;
   display_options: string;
 };
 
-export type CommunityContractTemplateInstance =
-  ModelInstance<CommunityContractMetadataAttributes>;
+export type CommunityContractTemplateMetadataInstance =
+  ModelInstance<CommunityContractTemplateMetadataAttributes>;
 
-export type CommunityContractMetadataStatic =
-  ModelStatic<CommunityContractTemplateInstance>;
+export type CommunityContractTemplateMetadataStatic =
+  ModelStatic<CommunityContractTemplateMetadataInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): CommunityContractMetadataStatic => {
-  const CommunityContractMetadata = <CommunityContractMetadataStatic>(
-    sequelize.define(
-      'CommunityContractMetadata',
-      {
-        cct_id: { type: dataTypes.STRING, allowNull: false, primaryKey: true },
-        slug: { type: dataTypes.STRING, allowNull: false },
-        nickname: { type: dataTypes.STRING, allowNull: false },
-        display_name: { type: dataTypes.STRING, allowNull: false },
-        display_options: { type: dataTypes.STRING, allowNull: false },
-      },
-      {
-        tableName: 'CommunityContractMetadat',
-        underscored: true,
-        timestamps: false,
-      }
-    )
+): CommunityContractTemplateMetadataStatic => {
+  const CommunityContractTemplateMetadata = <
+    CommunityContractTemplateMetadataStatic
+  >sequelize.define(
+    'CommunityContractTemplateMetadata',
+    {
+      cct_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+      slug: { type: dataTypes.STRING, allowNull: false },
+      nickname: { type: dataTypes.STRING, allowNull: false },
+      display_name: { type: dataTypes.STRING, allowNull: false },
+      display_options: { type: dataTypes.STRING, allowNull: false },
+    },
+    {
+      tableName: 'CommunityContractTemplateMetadata',
+      underscored: true,
+      timestamps: false,
+    }
   );
 
-  return CommunityContractMetadata;
+  CommunityContractTemplateMetadata.associate = (models) => {
+    CommunityContractTemplateMetadata.belongsTo(
+      models.CommunityContractTemplate,
+      {
+        foreignKey: 'cct_id',
+        targetKey: 'id',
+      }
+    );
+  };
+
+  return CommunityContractTemplateMetadata;
 };

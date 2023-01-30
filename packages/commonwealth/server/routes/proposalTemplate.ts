@@ -2,35 +2,67 @@ import { AppError } from 'common-common/src/errors';
 import { Request, Response } from 'express';
 import { DB } from '../models';
 import { CommunityContractTemplateAttributes } from '../models/community_contract_template';
-import { CommunityContractMetadataAttributes } from '../models/community_contract_metadata';
+import { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
+import { TypedRequestBody, TypedResponse, success, failure } from '../types';
 
-export async function createCommunityContractTemplate(
+type CreateCommunityContractTemplateAndMetadataReq = {
+  slug: string;
+  nickname: string;
+  display_name: string;
+  display_options: string;
+  community_id: string;
+  contract_id: number;
+  template_id: number;
+};
+
+type CreateCommunityContractTemplateAndMetadataResp = {
+  metadata: CommunityContractTemplateMetadataAttributes;
+  cct: CommunityContractTemplateAttributes;
+};
+
+export async function createCommunityContractTemplateAndMetadata(
   models: DB,
-  req: Request,
-  res: Response
+  req: TypedRequestBody<CreateCommunityContractTemplateAndMetadataReq>,
+  res: TypedResponse<CreateCommunityContractTemplateAndMetadataResp>
 ) {
-  try {
-    if (!req.body) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide request body as json',
-      });
-    }
+  const {
+    slug,
+    nickname,
+    display_name,
+    display_options,
+    community_id,
+    contract_id,
+    template_id,
+  } = req.body;
 
-    const contractTemplate: CommunityContractTemplateAttributes =
-      req.body.contract;
-    if (!contractTemplate) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide community_id, contract_id, and template_id',
-      });
-    }
-
-    const created = await models.CommunityContractTemplate.create(
-      contractTemplate
+  if (!community_id || !contract_id || !template_id) {
+    throw new AppError(
+      'Must provide community_id, contract_id, and template_id'
     );
+  }
 
-    return res.status(201).json({ status: 'Success', data: created });
+  if (!slug || !nickname || !display_name || !display_options) {
+    throw new AppError(
+      'Must provide slug, nickname, display_name, and display_options'
+    );
+  }
+
+  try {
+    const newCCT = await models.CommunityContractTemplate.create({
+      community_id,
+      contract_id,
+      template_id,
+    });
+
+    const newMetadata = await models.CommunityContractTemplateMetadata.create({
+      slug,
+      nickname,
+      display_name,
+      display_options,
+      cct_id: newCCT.id,
+    });
+
+    return success(res, { metadata: newMetadata, cct: newCCT });
   } catch (err) {
     throw new AppError(
       'Unkown Server error creating community contract template'
@@ -167,42 +199,6 @@ export async function deleteCommunityContractTemplate(
   }
 }
 
-export async function createCommunityContractTemplateMetadata(
-  models: DB,
-  req: Request,
-  res: Response
-) {
-  try {
-    console.log('createCommunityContractTemplateMetadata');
-    if (!req.body) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide contract template metadata',
-      });
-    }
-
-    const contractTemplateMetadata: CommunityContractMetadataAttributes =
-      req.body.contractMetadata;
-
-    console.log('contractTemplateMetadata', contractTemplateMetadata);
-
-    if (!contractTemplateMetadata) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide community_id, contract_id, and template_id',
-      });
-    }
-
-    const created = await models.CommunityContractMetadata.create(
-      contractTemplateMetadata
-    );
-
-    return res.status(201).json({ status: 'Success', data: created });
-  } catch (err) {
-    throw new AppError('Error creating community contract template metadata');
-  }
-}
-
 export async function getCommunityContractTemplateMetadata(
   models: DB,
   req: Request,
@@ -217,7 +213,7 @@ export async function getCommunityContractTemplateMetadata(
       });
     }
 
-    const contract = await models.CommunityContractMetadata.findOne({
+    const contract = await models.CommunityContractTemplateMetadata.findOne({
       where: {
         cct_id,
       },
@@ -242,7 +238,7 @@ export async function updateCommunityContractTemplateMetadata(
       });
     }
 
-    const contractTemplateMetadata: CommunityContractMetadataAttributes =
+    const contractTemplateMetadata: CommunityContractTemplateMetadataAttributes =
       req.body.contractMetadata;
 
     if (!contractTemplateMetadata) {
@@ -252,7 +248,7 @@ export async function updateCommunityContractTemplateMetadata(
       });
     }
 
-    const contract = await models.CommunityContractMetadata.findOne({
+    const contract = await models.CommunityContractTemplateMetadata.findOne({
       where: {
         cct_id: contractTemplateMetadata.cct_id,
       },
@@ -284,7 +280,7 @@ export async function deleteCommunityContractTemplateMetadata(
       });
     }
 
-    const contractTemplateMetadata: CommunityContractMetadataAttributes =
+    const contractTemplateMetadata: CommunityContractTemplateMetadataAttributes =
       req.body.contractMetadata;
 
     if (!contractTemplateMetadata) {
@@ -294,7 +290,7 @@ export async function deleteCommunityContractTemplateMetadata(
       });
     }
 
-    const contract = await models.CommunityContractMetadata.findOne({
+    const contract = await models.CommunityContractTemplateMetadata.findOne({
       where: {
         cct_id: contractTemplateMetadata.cct_id,
       },

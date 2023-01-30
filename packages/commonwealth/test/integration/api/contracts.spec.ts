@@ -9,7 +9,6 @@ let adminJWT;
 let adminAddress;
 let userJWT;
 let userAddress;
-let contract;
 
 type Contract = {
   community_id: string;
@@ -60,11 +59,15 @@ describe('Contract route tests', () => {
   });
 
   describe(' /api/contract/community_template', () => {
-    it('should create a contract template', async () => {
-      const contract: Contract = {
+    it('should create a contract template and metadata', async () => {
+      const body = {
         community_id: generateRandomString(),
         contract_id: generateRandomNumber(),
         template_id: generateRandomNumber(),
+        slug: generateRandomString(),
+        nickname: generateRandomString(),
+        display_name: generateRandomString(),
+        display_options: generateRandomString(),
       };
       const res = await chai.request
         .agent(app)
@@ -74,9 +77,9 @@ describe('Contract route tests', () => {
           chain,
           jwt: adminJWT,
         })
-        .send({ contract });
+        .send({ body });
 
-      expect(res.status).to.equal(201);
+      expect(res.status).to.equal(200);
     });
 
     it('should get a contract template by template id', async () => {
@@ -187,21 +190,6 @@ describe('Contract route tests', () => {
         display_name: generateRandomString(),
         display_options: generateRandomString(),
       };
-
-      it('should create a contract with metadata', async () => {
-        const res = await chai.request
-          .agent(app)
-          .post('/api/contract/community_template/metadata')
-          .set('Accept', 'application/json')
-          .query({
-            chain,
-            jwt: adminJWT,
-          })
-          .send({ contractMetadata });
-
-        expect(res.status).to.equal(201);
-        expect(res.body.status).to.equal('Success');
-      });
 
       it('should get a contract with metadata', async () => {
         const res = await chai.request
