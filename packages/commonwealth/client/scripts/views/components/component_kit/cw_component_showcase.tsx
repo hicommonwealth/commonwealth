@@ -766,11 +766,11 @@ export const ComponentShowcase = () => {
           placeholder="Type here"
         />
         <CWTextArea name="Textarea" label="Text area" placeholder="Type here" />
-        {/* <CWCoverImageUploader
-            uploadCompleteCallback={(url: string) => {
-              notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
-            }}
-          /> */}
+        <CWCoverImageUploader
+          uploadCompleteCallback={(url: string) => {
+            notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
+          }}
+        />
       </div>
       <div className="choice-gallery">
         <CWText type="h3">Radio Button</CWText>
