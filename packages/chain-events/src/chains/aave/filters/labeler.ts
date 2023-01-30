@@ -29,7 +29,6 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
-        icon: 'councilProposal',
       };
     }
     case EventKind.ProposalCreated: {
@@ -39,7 +38,6 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
-        icon: 'councilProposal',
       };
     }
     case EventKind.ProposalExecuted: {
@@ -49,7 +47,6 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
-        icon: 'councilProposal',
       };
     }
     case EventKind.ProposalQueued: {
@@ -61,7 +58,6 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/onchainproposal/${data.id}`
           : null,
-        icon: 'councilProposal',
       };
     }
     case EventKind.VoteEmitted: {
@@ -105,7 +101,6 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Approval',
         label: `${data.spender} approved ${data.amount} to ${data.owner}.`,
-        icon: 'check',
       };
     }
     default: {

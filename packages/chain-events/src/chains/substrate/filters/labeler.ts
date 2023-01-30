@@ -115,6 +115,7 @@ export const Label: LabelerFilter = (
         label: `${fmtAddr(sender)} transferred ${balanceFormatter(
           value
         )} to ${fmtAddr(dest)}.`,
+        icon: 'transfer',
       };
     }
     /**
@@ -238,6 +239,7 @@ export const Label: LabelerFilter = (
           who
         )}.`,
         linkUrl: chainId ? `/${chainId}/account/${who}` : null,
+        icon: 'delegate',
       };
     }
     case EventKind.DemocracyProposed: {
@@ -591,6 +593,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/councilmotion/${proposalHash}`
           : null,
+        icon: 'vote',
       };
     }
     case EventKind.CollectiveApproved: {
@@ -722,6 +725,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/tip/${data.proposalHash}`
           : null,
+        icon: 'vote',
       };
     }
     case EventKind.TipClosing: {

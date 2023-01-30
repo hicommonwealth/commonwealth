@@ -37,12 +37,10 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
         }}
       >
         <div className="chain-event-icon-container">
-          {label.icon && (
-            <CWIcon
-              iconName={label.icon as IconName}
-              className={label.icon === 'delegate' ? 'delegate' : ''}
-            />
-          )}
+          <CWIcon
+            iconName={label.icon ? label.icon as IconName : 'element'}
+            className={label.icon === 'delegate' ? 'delegate' : ''}
+          />
         </div>
         <div class="chain-event-text-container">
           <div className="community-title">

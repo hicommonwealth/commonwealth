@@ -200,7 +200,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
             {loadingData && <CWSpinner />}
             {!loadingData && (
               <>
-                <CWPopover
+                {/* TODO: add filter functionality */}
+                {/* <CWPopover
                   trigger={
                     <CWButton
                       buttonType="mini-white"
@@ -245,7 +246,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                     </CWCard>
                   }
                 />
-                <CWDivider />
+                <CWDivider /> */}
                 {activePage === DashboardViews.ForYou && (
                   <>
                     {fyNotifications && fyNotifications.length > 0 ? (

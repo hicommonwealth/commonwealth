@@ -36,6 +36,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/molochproposal/${data.proposalIndex}`
           : null,
+        icon: 'vote',
       };
     case EventKind.ProcessProposal:
       return {
@@ -70,6 +71,7 @@ export const Label: LabelerFilter = (
           data.member
         )} updated their delegate to ${fmtAddr(data.newDelegateKey)}.`,
         linkUrl: chainId ? `/${chainId}/account/${data.member}` : null,
+        icon: 'delegate',
       };
     // this event should never appear
     case EventKind.SummonComplete:
