@@ -120,7 +120,7 @@ export class ComponentShowcase extends ClassComponent {
               });
             }}
           />
-          <CWRuleCard
+          {/* <CWRuleCard
             isNested={false}
             rule={{
               AnyRule: [
@@ -143,7 +143,7 @@ export class ComponentShowcase extends ClassComponent {
             ruleUpdatedAt={new Date()}
             ruleTypeIdentifier="AnyRule"
             adminView={true}
-          />
+          /> */}
         </div>
 
         <h1>Dropdown</h1>
