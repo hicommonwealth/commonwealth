@@ -36,7 +36,7 @@ import {
 import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import {CWIconButton} from "views/components/component_kit/cw_icon_button";
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 type ThreadPreviewAttrs = {
   thread: Thread;
