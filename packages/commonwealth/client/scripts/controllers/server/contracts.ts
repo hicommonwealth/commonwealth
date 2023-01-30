@@ -5,6 +5,16 @@ import { Contract } from 'models';
 import app from 'state';
 import { BalanceType, ContractType } from 'common-common/src/types';
 
+type AddCommunityContractTemplateAttributes = {
+  slug: string;
+  nickname: string;
+  display_name: string;
+  display_options: string;
+  community_id: string;
+  contract_id: number;
+  template_id: number;
+};
+
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
   private _initialized = false;
@@ -167,8 +177,25 @@ class ContractsController {
     this._store.add(result);
     return result;
   }
+
   public addToStore(contract: Contract) {
     return this._store.add(contract);
+  }
+
+  public async addCommunityContractTemplate(
+    communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes
+  ) {
+    try {
+      const newContract = await $.post(
+        `${app.serverUrl()}/contract/community_template_and_metadata`,
+        communityContractTemplateAndMetadata
+      );
+
+      // TODO add newContract to the store when the types will be aligned
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to add community contract template');
+    }
   }
 
   public initialize(contracts = [], reset = true) {

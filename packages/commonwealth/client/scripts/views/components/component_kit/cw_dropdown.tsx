@@ -16,6 +16,7 @@ export type DropdownItemType = {
 type DropdownAttrs = {
   initialValue?: DropdownItemType;
   label: string;
+  placeholder?: string;
   onSelect?: (item: DropdownItemType) => void;
   options: Array<DropdownItemType>;
 };

@@ -8,11 +8,49 @@ import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
+import {
+  CWDropdown,
+  DropdownItemType,
+} from 'views/components/component_kit/cw_dropdown';
+import { notifyError } from 'controllers/app/notifications';
 
-export class ManageContractTemplateModal extends ClassComponent {
+// TODO this should be aligned with display_options
+const displayOptions = [
+  { value: '2', label: 'In Create Dropdown' },
+  { value: '1', label: 'In Create Sidebar' },
+  { value: '3', label: 'In Create Dropdown and in Create Sidebar' },
+  { value: '0', label: 'Hidden' },
+];
+
+// TODO: In the final app, this will come from the /status route
+// and be accessible via app.templates or something to that effect
+const templates = [
+  {
+    id: 1,
+    title: 'Treasury Spend',
+    displayName: 'New Treasury Proposal 1',
+    nickname: 'Little Treasures',
+    slug: '/whatever-was-here-for-add-template',
+    display: 'In Create Dropdown and in Create Sidebar',
+  },
+  {
+    id: 2,
+    title: 'Parameter Change',
+    displayName: 'New Treasury Proposal 2',
+    nickname: 'Little Treasures 2',
+    slug: '/whatever-was-here-for-add-template-2',
+    display: 'In Create Dropdown',
+  },
+];
+
+type ManageContractTemplateModalAttrs = {
+  contractId: number;
+  templateId?: number;
+};
+
+export class ManageContractTemplateModal extends ClassComponent<ManageContractTemplateModalAttrs> {
   private form = {
-    template: '',
+    templateId: null,
     displayName: '',
     nickname: '',
     slug: '',
@@ -26,12 +64,35 @@ export class ManageContractTemplateModal extends ClassComponent {
     m.route.set(`/${scope}/new/contract_template`);
   }
 
-  handleConfirm(e) {
+  async handleConfirm(e, contractId: number) {
     e.preventDefault();
-    $(e.target).trigger('modalcomplete');
-    setTimeout(() => {
-      $(e.target).trigger('modalexit');
-    }, 0);
+
+    const communityId = app.activeChainId();
+    const { slug, displayOption, nickname, displayName, templateId } =
+      this.form;
+
+    const communityContractTemplateAndMetadata = {
+      slug,
+      nickname,
+      display_name: displayName,
+      display_options: displayOption,
+      community_id: communityId,
+      template_id: templateId,
+      contract_id: contractId,
+    };
+
+    try {
+      await app.contracts.addCommunityContractTemplate(
+        communityContractTemplateAndMetadata
+      );
+
+      $(e.target).trigger('modalcomplete');
+      setTimeout(() => {
+        $(e.target).trigger('modalexit');
+      }, 0);
+    } catch (err) {
+      notifyError(err.message);
+    }
   }
 
   handleCancel(e) {
@@ -39,23 +100,32 @@ export class ManageContractTemplateModal extends ClassComponent {
     $(e.target).trigger('modalexit');
   }
 
-  view(vnode) {
-    const isEditMode = true;
+  handleSelectTemplate(item: DropdownItemType) {
+    const templateId = +item.value;
+    const template = templates.find((t) => t.id === templateId);
+
+    this.form.templateId = item.value;
+    this.form.nickname = template.nickname;
+    this.form.displayName = template.displayName;
+  }
+
+  view(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
+    const { contractId, templateId } = vnode.attrs;
+
+    const isEditMode = templateId;
     const modalTitle = isEditMode ? 'Edit Template' : 'Add Template';
     const modalSubtitle = isEditMode
       ? 'Change the metadata associated with your template.'
       : 'Add a template to contract for your community to use.';
     const confirmButtonLabel = isEditMode ? 'Save' : 'Add';
-    const templateOptions = [
-      { value: '1', label: 'template1' },
-      { value: '2', label: 'template2' },
-      { value: '3', label: 'template3' },
-    ];
-    const displayOptions = [
-      { value: '1', label: 'display1' },
-      { value: '2', label: 'display2' },
-      { value: '3', label: 'display3' },
-    ];
+
+    // disable if at least one input is not filled
+    const addingDisabled = !Object.values(this.form).every(Boolean);
+
+    const templateOptions = templates.map((template) => ({
+      value: String(template.id),
+      label: template.title,
+    }));
 
     return (
       <div class="ManageContractTemplateModal">
@@ -69,11 +139,10 @@ export class ManageContractTemplateModal extends ClassComponent {
             Template
           </CWText>
           <CWDropdown
-            label="Choose a template for your contract"
+            initialValue={{ label: 'Select template type ', value: '' }}
+            label="Choose a template for your proposal"
             options={templateOptions}
-            onSelect={(result) => {
-              this.form.displayName = result.value;
-            }}
+            onSelect={(item) => this.handleSelectTemplate(item)}
           />
           {isEditMode && (
             <CWText className="create-template-info" type="caption">
@@ -125,6 +194,7 @@ export class ManageContractTemplateModal extends ClassComponent {
           </CWText>
           <CWDropdown
             label="Choose where to display template"
+            initialValue={{ label: 'Select display option', value: '' }}
             options={displayOptions}
             onSelect={(result) => {
               this.form.displayOption = result.value;
@@ -141,7 +211,8 @@ export class ManageContractTemplateModal extends ClassComponent {
           <CWButton
             buttonType="mini-black"
             label={confirmButtonLabel}
-            onclick={this.handleConfirm}
+            disabled={addingDisabled}
+            onclick={(e) => this.handleConfirm(e, contractId)}
           />
         </div>
       </div>
@@ -149,9 +220,21 @@ export class ManageContractTemplateModal extends ClassComponent {
   }
 }
 
-export const showManageContractTemplateModal = () => {
+type ShowManageContractTemplateModalAttrs = {
+  contractId: number;
+  templateId?: number;
+};
+
+export const showManageContractTemplateModal = ({
+  contractId,
+  templateId,
+}: ShowManageContractTemplateModalAttrs) => {
   app.modals.create({
     modal: ManageContractTemplateModal,
-    data: { className: 'ManageContractTemplateOuterModal' },
+    data: {
+      className: 'ManageContractTemplateOuterModal',
+      contractId,
+      templateId,
+    },
   });
 };
