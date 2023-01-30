@@ -262,16 +262,6 @@ export class ConfirmInviteModal extends ClassComponent {
                           web3loginParams
                         );
                       }
-
-                      // show web3 login modal
-                      app.modals.lazyCreate('link_new_address_modal', {
-                        joiningCommunity,
-                        targetCommunity,
-                        successCallback: () => {
-                          m.route.set(next);
-                          $(e.target).trigger('modalexit');
-                        },
-                      });
                     }}
                   >
                     Connect a new address
