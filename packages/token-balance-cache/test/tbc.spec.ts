@@ -6,7 +6,7 @@ import { TokenBalanceCache } from '../src/tbc';
 import type { IChainNode } from '../src/types';
 import { BalanceProvider } from '../src/types';
 
-class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
+class MockErc1155BalanceProvider extends BalanceProvider<{ testBalance: string }> {
   public readonly name = 'test-provider';
   public readonly opts = { testBalance: 'string', testTokenId: 'string?' };
   public readonly validBases = [BalanceType.Ethereum];
@@ -14,6 +14,23 @@ class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
     _node: IChainNode,
     address: string,
     opts: { testBalance: string; testTokenId?: string }
+  ): Promise<string> {
+    if (Web3.utils.isAddress(address)) {
+      return opts.testBalance;
+    } else {
+      throw new Error('Invalid address!');
+    }
+  }
+}
+
+class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
+  public readonly name = 'test-provider';
+  public readonly opts = { testBalance: 'string' };
+  public readonly validBases = [BalanceType.Ethereum];
+  public async getBalance(
+    _node: IChainNode,
+    address: string,
+    opts: { testBalance: string; }
   ): Promise<string> {
     if (Web3.utils.isAddress(address)) {
       return opts.testBalance;
@@ -62,6 +79,24 @@ describe('TBC unit tests', () => {
       0,
       0,
       [new MockBalanceProvider()],
+      mockNodesProvider
+    );
+    await tbc.start();
+    const bps = await tbc.getBalanceProviders(1);
+    assert.sameDeepMembers(bps, [
+      {
+        bp: 'test-provider',
+        opts: { testBalance: 'string' },
+      },
+    ]);
+    tbc.close();
+  });
+
+  it('should return erc1155 balance providers', async () => {
+    const tbc = new TokenBalanceCache(
+      0,
+      0,
+      [new MockErc1155BalanceProvider()],
       mockNodesProvider
     );
     await tbc.start();
@@ -125,7 +160,7 @@ describe('TBC unit tests', () => {
     const tbc = new TokenBalanceCache(
       0,
       0,
-      [new MockBalanceProvider()],
+      [new MockErc1155BalanceProvider()],
       mockNodesProvider
     );
     await tbc.start();
