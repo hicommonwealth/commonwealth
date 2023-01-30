@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
@@ -128,12 +128,12 @@ class StatsPage extends ClassComponent {
               </div>
             ))}
 
-          <div class="stat-row">
+          <div className="stat-row">
             <CWText fontWeight="medium">Total Addresses</CWText>
             <CWText fontWeight="medium">Total Comments</CWText>
             <CWText fontWeight="medium">Total Threads</CWText>
           </div>
-          <div class="stat-row">
+          <div className="stat-row">
             <CWText>{this.totalData.totalRoles}</CWText>
             <CWText>{this.totalData.totalComments}</CWText>
             <CWText>{this.totalData.totalThreads}</CWText>

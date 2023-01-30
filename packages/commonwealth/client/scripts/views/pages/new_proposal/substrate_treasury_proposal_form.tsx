@@ -3,19 +3,11 @@ import React from 'react';
 
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import type Substrate from 'controllers/chain/substrate/adapter';
 
 import { proposalSlugToClass } from 'identifiers';
-import m from 'mithril';
 import type { ITXModalData, ProposalModule } from 'models';
 
 import app from 'state';

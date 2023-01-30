@@ -5,7 +5,7 @@ import { updateActiveAddresses } from 'controllers/app/login';
 import { handleInviteLinkRedirect } from 'router';
 import $ from 'jquery';
 import {
-  redraw,
+  redraw, setRoute,
 } from 'mithrilInterop';
 
 export const deinitChainOrCommunity = async () => {
@@ -272,7 +272,7 @@ export const initNewTokenChain = async (address: string) => {
 
   if (response.status !== 'Success') {
     // TODO: better custom 404
-    m.route.set('/404');
+    setRoute('/404');
   }
 
   // TODO: check if this is valid

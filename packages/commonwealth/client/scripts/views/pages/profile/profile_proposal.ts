@@ -5,13 +5,17 @@ import app from 'state';
 import type { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
-const ProfileProposal: Component<
-  { proposal: Thread },
-  { revealThread: boolean }
-> = {
-  view: (vnode) => {
+type ProfileProposalAttr = {
+  proposal: Thread
+}
+
+export class ProfileProposal extends ClassComponent<ProfileProposalAttr> {
+  constructor(props) {
+    super(props);
+  }
+  view (vnode: ResultNode<ProfileProposalAttr>) {
     const proposal = vnode.attrs.proposal;
     const { slug, identifier } = proposal;
     const { attachments, author, title, createdAt, chain } = proposal;
@@ -82,7 +86,7 @@ const ProfileProposal: Component<
           ])
       ),
     ]);
-  },
+  }
 };
 
 export default ProfileProposal;

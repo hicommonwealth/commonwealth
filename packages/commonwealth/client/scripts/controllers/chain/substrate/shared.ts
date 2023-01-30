@@ -33,7 +33,6 @@ import {
   notifySuccess,
 } from 'controllers/app/notifications';
 import { EventEmitter } from 'events';
-import m from 'mithril';
 import type {
   ChainInfo,
   IChainModule,

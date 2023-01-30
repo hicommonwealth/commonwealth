@@ -1,16 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
-import ClassComponent from 'class_component';
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -181,7 +174,7 @@ export class NewTopicModal extends ClassComponent {
           <CWButton
             label="Create topic"
             disabled={this.saving || !!this.error || disabled}
-            onClick={async (e: Event) => {
+            onClick={async (e: MouseEvent) => {
               e.preventDefault();
               const { form } = this;
               try {

@@ -10,17 +10,9 @@ import { ChainBase } from 'common-common/src/types';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
-import app from 'state';
-import $ from 'jquery';
-import _ from 'underscore';
 import {
   completeClientLogin,
   loginWithMagicLink,

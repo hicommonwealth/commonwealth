@@ -2,12 +2,9 @@
 import React from 'react';
 
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, redraw, jsx } from 'mithrilInterop';
 
 import 'components/chain_entities_selector.scss';
-import { ListItem, QueryList } from 'construct-ui';
-import { chainEntityTypeToProposalName } from 'identifiers';
-import { uuidv4 } from 'lib/util';
 import type { ChainEntity, Thread } from 'models';
 
 import app from 'state';

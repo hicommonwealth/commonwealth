@@ -70,7 +70,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     }
   }
 
-  async generateImage(prompt: string, vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  async generateImage(prompt: string, vnode: ResultNode<CoverImageUploaderAttrs>) {
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
 
     try {
@@ -91,7 +91,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
       this.isUploading = false;
       this.isPrompting = false;
       this.isGenerating = false;
-      m.redraw();
+      redraw();
 
       return res.result.imageUrl;
     } catch (e) {
@@ -228,7 +228,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
               label="retry"
               buttonType="mini-black"
               className="retry-button"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.stopPropagation();
                 this.prompt = '';
                 this.isPrompting = true;
@@ -238,12 +238,12 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
 
           {isPrompting && (
             <div
-              class="cover-image-overlay"
-              onclick={(e) => e.stopPropagation()}
+              className="cover-image-overlay"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div class="icon-button-wrapper">
+              <div className="icon-button-wrapper">
                 <CWIconButton
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     this.isPrompting = false;
                     this.isGenerating = false;
@@ -261,11 +261,11 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
                     size="small"
                     value={this.prompt}
                     placeholder="type a description here"
-                    oninput={(e) => {
+                    onInput={(e) => {
                       this.prompt = e.target.value;
                     }}
                     iconRight="trash"
-                    iconRightonclick={() => {
+                    iconRightonClick={() => {
                       this.prompt = '';
                     }}
                     containerClassName="prompt-input"
@@ -274,7 +274,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
                     label="Generate"
                     buttonType="mini-black"
                     className="generate-btn"
-                    onclick={async () => {
+                    onClick={async () => {
                       if (this.prompt.length < 1) return;
                       this.isGenerating = true;
                       try {
@@ -293,7 +293,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
               type="file"
               accept="image/jpeg, image/jpg, image/png"
               id="pseudo-input"
-              class="pseudo-input"
+              className="pseudo-input"
             />
           )}
           {this.isUploading && <CWSpinner size="large" />}
@@ -309,7 +309,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
                 buttonType="mini-white"
                 label="Generate Image"
                 className="generate-btn"
-                onclick={(e) => {
+                onClick={(e) => {
                   this.prompt = '';
                   e.stopPropagation();
                   this.isPrompting = true;

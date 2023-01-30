@@ -1,19 +1,12 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { blake2AsHex } from '@polkadot/util-crypto';
 import { notifyError } from 'controllers/app/notifications';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   ClassComponent,
-  ResultNode,
   render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import { blake2AsHex } from '@polkadot/util-crypto';
@@ -22,7 +15,7 @@ import { proposalSlugToClass } from 'identifiers';
 import type { ITXModalData, ProposalModule } from 'models';
 
 import app from 'state';
-import { ProposalType } from '../../../../../../common-common/src/types';
+import { ProposalType } from 'common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';

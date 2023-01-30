@@ -3,26 +3,15 @@ import React from 'react';
 
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
-import app from 'state';
 import { navigateToSubpage } from 'router';
-import CosmosAccount from 'controllers/chain/cosmos/account';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
-import m from 'mithril';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';

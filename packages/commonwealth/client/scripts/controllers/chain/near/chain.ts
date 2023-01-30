@@ -1,7 +1,6 @@
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { uuidv4 } from 'lib/util';
-import * as m from 'mithril';
 import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import moment from 'moment';
 import type { ConnectConfig, Near as NearApi } from 'near-api-js';

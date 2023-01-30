@@ -1,5 +1,5 @@
 /* @jsx jsx */
-import React from 'react';
+import React, {MouseEvent} from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -17,11 +17,14 @@ type CardStyleAttrs = {
   interactive?: boolean;
 };
 
+// TODO: @ZAK @REACT is this type assumption ok?
+type ReactMouseEvent = MouseEvent<HTMLDivElement>;
+
 type CardAttrs = {
-  onClick?: (e?: MouseEvent) => void;
-  onmouseover?: (e?: MouseEvent) => void;
-  onMouseEnter?: (e?: MouseEvent) => void;
-  onMouseLeave?: (e?: MouseEvent) => void;
+  onClick?: (e?: ReactMouseEvent) => void;
+  onmouseover?: (e?: ReactMouseEvent) => void;
+  onMouseEnter?: (e?: ReactMouseEvent) => void;
+  onMouseLeave?: (e?: ReactMouseEvent) => void;
 } & CardStyleAttrs;
 
 export class CWCard extends ClassComponent<CardAttrs> {

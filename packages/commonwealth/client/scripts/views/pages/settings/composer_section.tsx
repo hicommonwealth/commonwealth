@@ -3,19 +3,11 @@ import React from 'react';
 
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
 import 'pages/settings/composer_section.scss';
 
-import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
 

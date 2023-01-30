@@ -4,22 +4,12 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
-import $ from 'jquery';
-// import { InputSelect, ListItem } from 'construct-ui';
 
 import 'components/address_input_typeahead.scss';
-import { InputSelect, ListItem } from 'construct-ui';
 import $ from 'jquery';
-import m from 'mithril';
-import { AddressInfo } from 'models';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
@@ -45,6 +35,7 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
 
   oncreate(vnode: ResultNode<AddressInputTypeaheadAttrs>) {
     if (vnode.attrs.options.placeholder) {
+      // TODO: @REACT @ZAK check this vnode.dom
       $(vnode.dom)
         .find('input')
         .attr('placeholder', vnode.attrs.options.placeholder)

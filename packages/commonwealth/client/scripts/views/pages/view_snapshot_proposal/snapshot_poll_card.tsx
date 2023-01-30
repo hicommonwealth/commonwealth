@@ -1,10 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
-import m from 'mithril';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 

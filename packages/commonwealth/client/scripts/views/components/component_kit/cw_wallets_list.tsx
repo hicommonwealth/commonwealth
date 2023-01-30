@@ -12,22 +12,13 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
-import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { addressSwapper } from 'commonwealth/shared/utils';
 
 import 'components/component_kit/cw_wallets_list.scss';
 import { createUserWithAddress } from 'controllers/app/login';
 import { notifyInfo } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
-import { addressSwapper } from 'commonwealth/shared/utils';
-import { CWText } from './cw_text';
-import {
-  CWWalletOptionRow,
-  CWWalletMissingOptionRow,
-} from './cw_wallet_option_row';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import { User } from '../user/user';
 import { CWIconButton } from './cw_icon_button';
 import { CWTooltip } from './cw_popover/cw_tooltip';
@@ -44,6 +35,7 @@ import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
+import {addressSwapper} from "utils";
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow

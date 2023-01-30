@@ -26,6 +26,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { getClasses } from '../../components/component_kit/helpers';
+import {WalletId} from "common-common/src/types";
 
 export class EmailSection extends ClassComponent {
   private discordAccount: SocialAccount;

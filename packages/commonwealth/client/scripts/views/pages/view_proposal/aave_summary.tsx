@@ -2,10 +2,9 @@
 import React from 'react';
 
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import m from 'mithril';
 
 import 'pages/view_proposal/aave_summary.scss';
 import { CWText } from '../../components/component_kit/cw_text';

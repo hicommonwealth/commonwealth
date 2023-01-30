@@ -75,6 +75,8 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
   private threadFetchFailed: boolean;
   private title: string;
   private viewCount: number;
+  private initializedComments = false;
+  private initializedPolls = false;
 
   editorListener(e) {
     if (this.isGloballyEditing || activeQuillEditorHasText()) {

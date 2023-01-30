@@ -1,5 +1,3 @@
-import { ApiStatus, IApp } from 'state';
-import Web3 from 'web3';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import type { ChainInfo, IChainModule, ITXModalData, NodeInfo } from 'models';
 

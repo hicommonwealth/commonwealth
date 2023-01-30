@@ -14,8 +14,7 @@ import { ChainNetwork, WalletId } from 'common-common/src/types';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import { ApiStatus, IApp } from 'state';
+import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';

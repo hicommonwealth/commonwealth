@@ -393,25 +393,26 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
       redraw();
     };
 
-    const overlayContent: ResultNode = this.adminModals['CreateCategory'] ? (
-      <CreateCategory handleClose={closeOverlay} />
-    ) : this.adminModals['CreateChannel'] ? (
-      <CreateChannel handleClose={closeOverlay} category={this.adminCategory} />
-    ) : this.adminModals['RenameCategory'] ? (
-      <RenameCategory
-        handleClose={closeOverlay}
-        category={this.adminCategory}
-      />
-    ) : this.adminModals['RenameChannel'] ? (
-      <RenameChannel handleClose={closeOverlay} channel={this.adminChannel} />
-    ) : this.adminModals['DeleteCategory'] ? (
-      <DeleteCategory
-        handleClose={closeOverlay}
-        category={this.adminCategory}
-      />
-    ) : this.adminModals['DeleteChannel'] ? (
-      <DeleteChannel handleClose={closeOverlay} channel={this.adminChannel} />
-    ) : null;
+    // TODO: @ZAK @REACT
+    // const overlayContent: ResultNode = this.adminModals['CreateCategory'] ? (
+    //   <CreateCategory handleClose={closeOverlay} />
+    // ) : this.adminModals['CreateChannel'] ? (
+    //   <CreateChannel handleClose={closeOverlay} category={this.adminCategory} />
+    // ) : this.adminModals['RenameCategory'] ? (
+    //   <RenameCategory
+    //     handleClose={closeOverlay}
+    //     category={this.adminCategory}
+    //   />
+    // ) : this.adminModals['RenameChannel'] ? (
+    //   <RenameChannel handleClose={closeOverlay} channel={this.adminChannel} />
+    // ) : this.adminModals['DeleteCategory'] ? (
+    //   <DeleteCategory
+    //     handleClose={closeOverlay}
+    //     category={this.adminCategory}
+    //   />
+    // ) : this.adminModals['DeleteChannel'] ? (
+    //   <DeleteChannel handleClose={closeOverlay} channel={this.adminChannel} />
+    // ) : null;
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Chat',

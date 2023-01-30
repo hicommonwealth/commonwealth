@@ -6,7 +6,7 @@ import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute, getRouteParam, redraw, jsx } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -25,7 +25,6 @@ import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
-import { NewLoginModal } from '../modals/login_modal';
 import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';

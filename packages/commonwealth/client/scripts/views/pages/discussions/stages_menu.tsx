@@ -2,11 +2,10 @@
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
-import ClassComponent from 'class_component';
 import { threadStageToLabel } from 'helpers';
 import { ThreadStage } from 'models';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 

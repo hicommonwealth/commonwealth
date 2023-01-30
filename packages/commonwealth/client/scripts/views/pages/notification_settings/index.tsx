@@ -3,10 +3,7 @@ import React from 'react';
 
 import {
   ClassComponent,
-  ResultNode,
-  render,
   setRoute,
-
   redraw,
   jsx,
 } from 'mithrilInterop';

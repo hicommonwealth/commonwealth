@@ -1,23 +1,15 @@
 /* @jsx jsx */
 import React from 'react';
 
-import $ from 'jquery';
-
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
-import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import { uuidv4 } from 'lib/util';

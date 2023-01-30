@@ -93,7 +93,7 @@ const redirectRoute = (
 });
 
 const handleInviteLinkRedirect = () => {
-  const inviteMessage = getRouteParam()['invitemessage'];
+  const inviteMessage = getRouteParam('invitemessage');
 
   if (!inviteMessage) {
     return;

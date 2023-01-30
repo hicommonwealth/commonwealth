@@ -1,9 +1,9 @@
-import m from 'mithril';
 import { notifySuccess } from 'controllers/app/notifications';
+import {getRouteParam} from "mithrilInterop";
 
 const handleUpdateEmailConfirmation = () => {
-  if (m.route.param('confirmation')) {
-    if (m.route.param('confirmation') === 'success') {
+  if (getRouteParam('confirmation')) {
+    if (getRouteParam('confirmation') === 'success') {
       notifySuccess('Email confirmed!');
     }
   }

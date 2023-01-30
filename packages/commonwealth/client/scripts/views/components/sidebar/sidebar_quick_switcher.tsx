@@ -1,13 +1,11 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { MixpanelPageViewEvent } from 'analytics/types';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
 import 'components/sidebar/sidebar_quick_switcher.scss';
 import { link } from 'helpers';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import m from 'mithril';
 import { ChainInfo } from 'models';
 
 import app from 'state';
@@ -26,9 +24,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
 
     const starredCommunities = allCommunities.filter((item) => {
       // filter out non-starred communities
-      if (item instanceof ChainInfo && !app.communities.isStarred(item.id))
-        return false;
-      return true;
+      return !(item instanceof ChainInfo && !app.communities.isStarred(item.id));
     });
 
     return (

@@ -13,6 +13,7 @@ type CodeBlockAttrs = {
 };
 
 export class CodeBlock extends ClassComponent<CodeBlockAttrs> {
+  private readonly codeBlockRef: React.RefObject<HTMLDivElement>;
   constructor(props) {
     super(props);
     this.codeBlockRef = React.createRef();

@@ -5,8 +5,6 @@ import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import Jdenticon from 'react-jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';
-import jdenticon from 'jdenticon';
-import m from 'mithril';
 
 import { ComponentType } from './types';
 

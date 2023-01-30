@@ -1,25 +1,14 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { formatAsTitleCase, isSameAccount } from 'helpers';
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/select_address_modal.scss';
-import type { Account, RoleInfo } from 'models';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
