@@ -1,11 +1,10 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
-import m from 'mithril';
 import { ThreadStage } from 'models';
 
 import 'pages/discussions/recent_threads_header.scss';

@@ -4,7 +4,7 @@ import React from 'react';
 import { navigateToSubpage } from 'router';
 import { ProposalType } from 'common-common/src/types';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
@@ -12,7 +12,6 @@ import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democr
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { isNotNil } from 'helpers/typeGuards';
 import { getProposalUrlPath } from 'identifiers';
-import m from 'mithril';
 import type { AnyProposal } from 'models';
 
 import app from 'state';

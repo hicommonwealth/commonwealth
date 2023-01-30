@@ -3,9 +3,8 @@ import React from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ResultNode, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import m from 'mithril';
 
 import 'modals/alert_modal.scss';
 

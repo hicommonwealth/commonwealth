@@ -4,12 +4,6 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -21,7 +15,6 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import m from 'mithril';
 import type { AnyProposal } from 'models';
 
 import app from 'state';

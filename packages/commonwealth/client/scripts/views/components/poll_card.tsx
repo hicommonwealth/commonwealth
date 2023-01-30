@@ -4,17 +4,11 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
-import m from 'mithril';
 import { CWButton } from './component_kit/cw_button';
 
 import { CWCard } from './component_kit/cw_card';

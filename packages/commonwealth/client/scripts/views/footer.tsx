@@ -3,19 +3,11 @@ import React from 'react';
 
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import 'footer.scss';
-import m from 'mithril';
 
 import { isNotUndefined } from '../helpers/typeGuards';
 

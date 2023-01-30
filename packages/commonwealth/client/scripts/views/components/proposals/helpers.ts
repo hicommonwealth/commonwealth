@@ -1,4 +1,4 @@
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import { formatCoin } from 'adapters/currency';
 import { CompoundTypes } from 'chain-events/src/types';
@@ -23,7 +23,6 @@ import {
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import m from 'mithril';
 import type { AnyProposal, IVote } from 'models';
 import { ProposalStatus, VotingUnit } from 'models';
 
