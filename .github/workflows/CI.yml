@@ -2,7 +2,32 @@ name: CI
 on: [push]
 
 jobs:
+  setup: # We do this at the beginning and cache it, so that subsequent jobs don't all download on cache miss
+    name: Install Yarn Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14.x
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn --ignore-engines --prefer-offline
+
   commonwealth:
+    needs: setup
     name: Commonwealth Tests
     runs-on: ubuntu-latest
 
@@ -29,38 +54,23 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: cache dependencies
-        uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn --ignore-engines
-
-      - name: cache playwright browser drivers
-        uses: actions/cache@v2
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-            **/node_modules/playwright
-          key: cache-playwright
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn --ignore-engines --prefer-offline
 
       - name: Install playwright browser drivers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
@@ -99,6 +109,7 @@ jobs:
           path: coverage
 
   token-balance-cache:
+    needs: setup
     name: Token Balance Cache Tests
     runs-on: ubuntu-latest
     defaults:
@@ -106,35 +117,27 @@ jobs:
         working-directory: packages/token-balance-cache
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: cache dependencies
-        uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn --ignore-engines
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn --ignore-engines --prefer-offline
 
       - name: Run unit tests
         run: yarn test
 
   chain-events:
+    needs: setup
     name: Chain Events Tests
     runs-on: ubuntu-latest
     defaults:
@@ -142,30 +145,21 @@ jobs:
         working-directory: packages/chain-events
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: cache dependencies
-        uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn --ignore-engines
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn --ignore-engines --prefer-offline
 
       - name: Run unit tests
         run: yarn unit-test
