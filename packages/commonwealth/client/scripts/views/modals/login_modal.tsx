@@ -7,7 +7,8 @@ import {
 } from 'adapters/shared';
 import { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import {
   completeClientLogin,
   loginWithMagicLink,
@@ -20,11 +21,11 @@ import $ from 'jquery';
 import type { Account, IWebWallet } from 'models';
 import app from 'state';
 import _ from 'underscore';
-import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../components/component_kit/helpers';
+import type { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
@@ -62,7 +63,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
   private bodyType: LoginBodyType;
-  private profiles: Array<ProfileRowAttrs>;
+  private profiles: Array<ProfileRowProps>;
   private sidebarType: LoginSidebarType;
   private username: string;
   private email: string;
@@ -395,7 +396,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         handleSetEmail={(e) => {
           this.email = e.target.value;
         }}
-        setProfiles={(profiles: Array<ProfileRowAttrs>) => {
+        setProfiles={(profiles: Array<ProfileRowProps>) => {
           this.profiles = profiles;
         }}
         setSidebarType={(sidebarType: LoginSidebarType) => {
@@ -440,7 +441,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         handleSetEmail={(e) => {
           this.email = e.target.value;
         }}
-        setProfiles={(profiles: Array<ProfileRowAttrs>) => {
+        setProfiles={(profiles: Array<ProfileRowProps>) => {
           this.profiles = profiles;
         }}
         setSidebarType={(sidebarType: LoginSidebarType) => {

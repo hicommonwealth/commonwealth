@@ -37,8 +37,8 @@ import { CWContentPageCard } from './cw_content_page';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
+import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import type { ValidationStatus } from './cw_validation_text';
-import CWCoverImageUploader from './cw_cover_image_uploader';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -760,18 +760,11 @@ export const ComponentShowcase = () => {
           placeholder="Type here"
         />
         <CWTextArea name="Textarea" label="Text area" placeholder="Type here" />
-        {/* <CWCoverImageUploader
-            uploadCompleteCallback={(url: string) => {
-              console.log(url);
-            }}
-            generatedImageCallback={(url: string) => {
-              notifySuccess(
-                `Generated Image uploaded to ${url.slice(0, 18)}...`
-              );
-            }}
-            subheaderText="Upload or Generate"
-            enableGenerativeAI={true}
-          /> */}
+        <CWCoverImageUploader
+          uploadCompleteCallback={(url: string) => {
+            notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
+          }}
+        />
       </div>
       <div className="choice-gallery">
         <CWText type="h3">Radio Button</CWText>

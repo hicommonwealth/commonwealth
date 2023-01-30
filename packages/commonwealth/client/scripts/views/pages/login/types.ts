@@ -1,5 +1,5 @@
 import type { Account, IWebWallet } from 'models';
-import type { ProfileRowAttrs } from '../../components/component_kit/cw_profiles_list';
+import type { ProfileRowProps } from '../../components/component_kit/cw_profiles_list';
 
 export type LoginSidebarType =
   | 'connectWallet'
@@ -21,7 +21,7 @@ export type LoginAttrs = {
   address: string;
   currentlyInCommunityPage: boolean;
   bodyType: LoginBodyType;
-  profiles: Array<ProfileRowAttrs>;
+  profiles: Array<ProfileRowProps>;
   sidebarType: LoginSidebarType;
   username: string;
   wallets: Array<IWebWallet<any>>;
@@ -32,7 +32,7 @@ export type LoginAttrs = {
   handleSetAvatar: (url: string) => void;
   handleSetUsername: (username: string) => void;
   handleSetEmail: (e: any) => void;
-  setProfiles: (profiles: Array<ProfileRowAttrs>) => void;
+  setProfiles: (profiles: Array<ProfileRowProps>) => void;
   setSidebarType: (sidebarType: string) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   setSelectedLinkingWallet: (wallet: IWebWallet<any>) => void;

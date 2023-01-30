@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_profiles_list.scss';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -19,78 +9,69 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
-type ProfileRowStyleAttrs = {
+type ProfileRowStyleProps = {
   darkMode?: boolean;
   isSelected?: boolean;
 };
 
-export type ProfileRowAttrs = {
+export type ProfileRowProps = {
   name: string;
   onClick?: () => void;
-} & ProfileRowStyleAttrs;
+} & ProfileRowStyleProps;
 
-export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
-  view(vnode: ResultNode<ProfileRowAttrs>) {
-    const { darkMode, isSelected, onClick, name } = vnode.attrs;
+export const CWProfileRow = (props: ProfileRowProps) => {
+  const { darkMode, isSelected, onClick, name } = props;
 
-    return (
-      <div
-        className={getClasses<ProfileRowStyleAttrs>(
-          { darkMode, isSelected },
-          'ProfileRow'
-        )}
-        onClick={onClick}
-      >
-        <div className="avatar-and-name">
-          <div className="avatar" />
-          <CWText
-            type="b1"
-            fontWeight="bold"
-            className="profile-row-text"
-            noWrap
-          >
-            {name ?? 'Your Profile'}
-          </CWText>
-        </div>
-        {isSelected && <CWIcon iconName="check" />}
+  return (
+    <div
+      className={getClasses<ProfileRowStyleProps>(
+        { darkMode, isSelected },
+        'ProfileRow'
+      )}
+      onClick={onClick}
+    >
+      <div className="avatar-and-name">
+        <div className="avatar" />
+        <CWText type="b1" fontWeight="bold" className="profile-row-text" noWrap>
+          {name ?? 'Your Profile'}
+        </CWText>
       </div>
-    );
-  }
-}
-
-type ProfilesListAttrs = {
-  darkMode?: boolean;
-  onClick?: () => void;
-  profiles: Array<ProfileRowAttrs>;
+      {isSelected && <CWIcon iconName="check" />}
+    </div>
+  );
 };
 
-export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
-  view(vnode: ResultNode<ProfilesListAttrs>) {
-    const { darkMode, onClick, profiles } = vnode.attrs;
+type ProfilesListProps = {
+  darkMode?: boolean;
+  onClick?: () => void;
+  profiles: Array<ProfileRowProps>;
+};
 
-    return (
+export const CWProfilesList = (props: ProfilesListProps) => {
+  const { darkMode, onClick, profiles } = props;
+
+  return (
+    <div
+      className={getClasses<{ darkMode?: boolean }>(
+        { darkMode },
+        'ProfilesList'
+      )}
+    >
       <div
         className={getClasses<{ darkMode?: boolean }>(
           { darkMode },
           'ProfilesList'
         )}
       >
-        <div
-          className={getClasses<{ darkMode?: boolean }>(
-            { darkMode },
-            'profile-rows-container'
-          )}
-        >
-          {profiles.map((profile) => (
-            <CWProfileRow
-              darkMode={darkMode}
-              isSelected={profile.isSelected}
-              name={profile.name}
-              onClick={onClick}
-            />
-          ))}
-        </div>
+        {profiles.map((profile) => (
+          <CWProfileRow
+            darkMode={darkMode}
+            isSelected={profile.isSelected}
+            name={profile.name}
+            onClick={onClick}
+          />
+        ))}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
