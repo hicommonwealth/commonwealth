@@ -6,17 +6,27 @@ import { TokenBalanceCache } from '../src/tbc';
 import type { IChainNode } from '../src/types';
 import { BalanceProvider } from '../src/types';
 
-class MockErc1155BalanceProvider extends BalanceProvider<{ testBalance: string }> {
+class MockErc1155BalanceProvider extends BalanceProvider<{
+  testBalance: string;
+}> {
   public readonly name = 'test-provider';
-  public readonly opts = { testBalance: 'string', testTokenId: 'string?' };
+  public readonly opts = {
+    testBalance: 'string',
+    testTokenId: 'string?',
+    contractType: 'string?',
+  };
   public readonly validBases = [BalanceType.Ethereum];
   public async getBalance(
     _node: IChainNode,
     address: string,
-    opts: { testBalance: string; testTokenId?: string }
+    opts: { testBalance: string; testTokenId?: string; contractType?: string }
   ): Promise<string> {
+    const { testBalance, testTokenId, contractType } = opts;
     if (Web3.utils.isAddress(address)) {
-      return opts.testBalance;
+      if (contractType === 'erc1155' && !testTokenId) {
+        throw new Error('Token Id Required For ERC-1155');
+      }
+      return testBalance;
     } else {
       throw new Error('Invalid address!');
     }
@@ -30,7 +40,7 @@ class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
   public async getBalance(
     _node: IChainNode,
     address: string,
-    opts: { testBalance: string; }
+    opts: { testBalance: string }
   ): Promise<string> {
     if (Web3.utils.isAddress(address)) {
       return opts.testBalance;
@@ -104,10 +114,30 @@ describe('TBC unit tests', () => {
     assert.sameDeepMembers(bps, [
       {
         bp: 'test-provider',
-        opts: { testBalance: 'string', testTokenId: 'string?' },
+        opts: {
+          testBalance: 'string',
+          testTokenId: 'string?',
+          contractType: 'string?',
+        },
       },
     ]);
     tbc.close();
+  });
+
+  it('erc1155 balance provider should return balance', async () => {
+    const erc1155Bp: MockErc1155BalanceProvider =
+      new MockErc1155BalanceProvider();
+    const balance = await erc1155Bp.getBalance(
+      await mockNodesProvider()[0],
+      '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      {
+        testBalance: '12345678912345678910',
+        testTokenId: '123',
+        contractType: 'erc1155',
+      }
+    );
+
+    assert.equal(balance, '12345678912345678910');
   });
 
   it('should throw error when no node exists for id', async () => {
