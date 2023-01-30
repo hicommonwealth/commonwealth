@@ -7,7 +7,7 @@ import ClassComponent from 'class_component';
 
 import 'components/rules/cw_rule_card.scss';
 
-import { RuleMetadata } from 'server/util/rules/ruleTypes';
+import { type RuleMetadata } from 'server/util/rules/ruleTypes';
 import app from 'state';
 import { CWCard } from '../component_kit/cw_card';
 import { ComponentType } from '../component_kit/types';
