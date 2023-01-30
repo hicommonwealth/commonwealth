@@ -30,7 +30,6 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
 
   oncreate(vnode: ResultNode<AddressInputTypeaheadAttrs>) {
     if (vnode.attrs.options.placeholder) {
-      // TODO: @REACT @ZAK check this vnode.dom
       $(vnode.dom)
         .find('input')
         .attr('placeholder', vnode.attrs.options.placeholder)

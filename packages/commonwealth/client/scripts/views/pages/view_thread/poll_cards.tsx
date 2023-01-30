@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import type { Poll, Thread } from 'models';
 
 import moment from 'moment';
@@ -42,24 +32,21 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
         } offchain poll to this
         thread?`}
         content={
-          (
-            <div className="PollEditorCard">
-              <CWButton
-                buttonType="mini-black"
-                label="Create poll"
-                onClick={(e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: PollEditorModal,
-                    data: {
-                      thread,
-                    },
-                  });
-                }}
-              />
-            </div>
-          ) as any
-          // @ZAK @REACT ^ (fix to remove 'as any')
+          <div className="PollEditorCard">
+            <CWButton
+              buttonType="mini-black"
+              label="Create poll"
+              onClick={(e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: PollEditorModal,
+                  data: {
+                    thread,
+                  },
+                });
+              }}
+            />
+          </div>
         }
       />
     );

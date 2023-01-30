@@ -107,9 +107,8 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     this.shouldScrollToHighlight = Boolean(getRouteParam('message'));
 
     this.scrollToBottom = () => {
-      // TODO: @ZAK @REACT - fix vnode.dom type to uncomment
-      // const scroller = $(vnode.dom).find('.chat-messages')[0];
-      // scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
+      const scroller = $(vnode.dom).find('.chat-messages')[0];
+      scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
       const { chat_channel_id } = msg;

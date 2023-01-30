@@ -1,20 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-
-// @ZAK @REACT
-// import Infinite from 'mithril-infinite';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
 
 import 'components/header/notifications_menu.scss';
 
@@ -22,7 +9,6 @@ import app from 'state';
 import { navigateToSubpage } from 'router';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import NotificationRow from '../components/notification_row';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
 import { CWDivider } from '../components/component_kit/cw_divider';
