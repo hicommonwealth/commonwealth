@@ -95,7 +95,7 @@ class OverviewPage extends ClassComponent {
                 className="latest-button"
                 buttonType="mini-black"
                 label="Latest Threads"
-                iconName="home"
+                iconLeft="home"
                 onClick={() => {
                   navigateToSubpage('/discussions');
                 }}
@@ -113,7 +113,7 @@ class OverviewPage extends ClassComponent {
               <CWButton
                 buttonType="mini-black"
                 label="Create Thread"
-                iconName="plus"
+                iconLeft="plus"
                 onClick={() => {
                   navigateToSubpage('/new/discussion');
                 }}
