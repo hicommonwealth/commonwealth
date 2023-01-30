@@ -25,7 +25,7 @@ export default (
   >sequelize.define(
     'CommunityContractTemplateMetadata',
     {
-      cct_id: { type: dataTypes.NUMBER, allowNull: false, primaryKey: true },
+      cct_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
       slug: { type: dataTypes.STRING, allowNull: false },
       nickname: { type: dataTypes.STRING, allowNull: false },
       display_name: { type: dataTypes.STRING, allowNull: false },
