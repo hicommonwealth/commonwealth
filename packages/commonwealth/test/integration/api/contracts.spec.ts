@@ -79,7 +79,7 @@ describe('Contract route tests', () => {
         })
         .send({ body });
 
-      expect(res.status).to.equal(20);
+      expect(res.status).to.equal(200);
     });
 
     it('should get a contract template by template id', async () => {
