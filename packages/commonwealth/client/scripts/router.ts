@@ -568,6 +568,10 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
+  '/:scope/feed': importRoute(import('views/pages/feed'), {
+    scoped: true,
+    deferChain: true,
+  }),
   '/:scope/new/contract': importRoute(import('views/pages/new_contract'), {
     scoped: true,
     deferChain: true,

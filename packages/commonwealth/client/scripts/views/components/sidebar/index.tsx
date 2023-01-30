@@ -10,6 +10,7 @@ import { isActiveAddressPermitted } from 'controllers/server/roles';
 import m from 'mithril';
 
 import app from 'state';
+import { navigateToSubpage } from 'router';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { ChatSection } from '../chat/chat_section';
@@ -19,6 +20,8 @@ import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { ExternalLinksModule } from './external_links_module';
 import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
 
 export type SidebarMenuName =
   | 'default'
@@ -32,6 +35,8 @@ export class Sidebar extends ClassComponent {
     });
 
     const currentChainInfo = app.chain?.meta;
+
+    const onHomeRoute = m.route.get() === `/${app.activeChainId()}/feed`;
 
     const hideChat =
       !currentChainInfo ||
@@ -50,6 +55,13 @@ export class Sidebar extends ClassComponent {
             {app.chain && (
               <div class="community-menu">
                 <AdminSection />
+                <div
+                  class={onHomeRoute ? 'home-button active' : 'home-button'}
+                  onclick={() => navigateToSubpage('/feed')}
+                >
+                  <CWIcon iconName="home" iconSize="small" />
+                  <CWText>Home</CWText>
+                </div>
                 <DiscussionSection />
                 <GovernanceSection />
                 {app.socket && !hideChat && <ChatSection />}
