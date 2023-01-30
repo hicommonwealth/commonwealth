@@ -44,7 +44,7 @@ import { CWContentPageCard } from './cw_content_page';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import CWCoverImageUploader from './cw_cover_image_uploader';
+import { CWCoverImageUploader } from './cw_cover_image_uploader';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {

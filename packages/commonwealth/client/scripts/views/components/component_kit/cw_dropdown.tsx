@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_dropdown.scss';
 
@@ -23,61 +13,57 @@ export type DropdownItemType = {
   value: string;
 };
 
-type DropdownAttrs = {
+type DropdownProps = {
   initialValue?: DropdownItemType;
   label: string;
   onSelect?: (item: DropdownItemType) => void;
   options: Array<DropdownItemType>;
 };
 
-export class CWDropdown extends ClassComponent<DropdownAttrs> {
-  private showDropdown: boolean;
-  private selectedValue: DropdownItemType;
+export const CWDropdown = (props: DropdownProps) => {
+  const [showDropdown, setShowDropdown] = React.useState<boolean>(false);
+  const [selectedValue, setSelectedValue] = React.useState<DropdownItemType>(
+    props.initialValue ?? props.options[0]
+  );
 
-  oncreate(vnode: ResultNode<DropdownAttrs>) {
-    this.showDropdown = false;
-    this.selectedValue = vnode.attrs.initialValue ?? vnode.attrs.options[0];
-  }
+  const { label, options, onSelect } = props;
 
-  view(vnode: ResultNode<DropdownAttrs>) {
-    const { label, options, onSelect } = vnode.attrs;
+  return (
+    <div className="dropdown-wrapper">
+      <CWTextInput
+        iconRight="chevronDown"
+        placeholder={selectedValue.label}
+        displayOnly
+        iconRightonClick={() => {
+          // Only here because it makes TextInput display correctly
+        }}
+        label={label}
+        onClick={() => {
+          setShowDropdown(!showDropdown);
+        }}
+      />
+      {showDropdown && (
+        <div className="dropdown-options-display">
+          {options.map((item, i) => {
+            return (
+              <div
+                className="dropdown-item"
+                key={i}
+                onClick={() => {
+                  setShowDropdown(false);
+                  setSelectedValue(item);
 
-    return (
-      <div className="dropdown-wrapper">
-        <CWTextInput
-          iconRight="chevronDown"
-          placeholder={this.selectedValue.label}
-          displayOnly
-          iconRightonClick={() => {
-            // Only here because it makes TextInput display correctly
-          }}
-          label={label}
-          onClick={() => {
-            this.showDropdown = !this.showDropdown;
-          }}
-        />
-        {this.showDropdown && (
-          <div className="dropdown-options-display">
-            {options.map((item, i) => {
-              return (
-                <div
-                  className="dropdown-item"
-                  key={i}
-                  onClick={() => {
-                    this.showDropdown = false;
-                    this.selectedValue = item;
-                    if (onSelect) {
-                      onSelect(item);
-                    }
-                  }}
-                >
-                  <CWText className="dropdown-item-text">{item.label}</CWText>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  }
-}
+                  if (onSelect) {
+                    onSelect(item);
+                  }
+                }}
+              >
+                <CWText className="dropdown-item-text">{item.label}</CWText>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
