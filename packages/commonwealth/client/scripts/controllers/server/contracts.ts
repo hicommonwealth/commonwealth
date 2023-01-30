@@ -4,9 +4,16 @@ import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
 import { BalanceType, ContractType } from 'common-common/src/types';
-// TODO can we import it from the /server being now in /client ?
-import type { CommunityContractMetadataAttributes } from 'server/models/community_contract_metadata';
-import type { CommunityContractTemplateAttributes } from 'server/models/community_contract_template';
+
+type AddCommunityContractTemplateAttributes = {
+  slug: string;
+  nickname: string;
+  display_name: string;
+  display_options: string;
+  community_id: string;
+  contract_id: number;
+  template_id: number;
+};
 
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
@@ -170,36 +177,24 @@ class ContractsController {
     this._store.add(result);
     return result;
   }
+
   public addToStore(contract: Contract) {
     return this._store.add(contract);
   }
 
-  public async addCommunityContractTemplate({
-    communityTemplate,
-    communityTemplateMetadata,
-  }: {
-    communityTemplate: CommunityContractTemplateAttributes;
-    communityTemplateMetadata: CommunityContractMetadataAttributes;
-  }) {
-    // TODO these two API calls should be eventually wrapped in single one
+  public async addCommunityContractTemplate(
+    communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes
+  ) {
     try {
-      await $.post(
-        `${app.serverUrl()}/contract/community_template`,
-        communityTemplate
+      const newContract = await $.post(
+        `${app.serverUrl()}/contract/community_template_and_metadata`,
+        communityContractTemplateAndMetadata
       );
-    } catch (err) {
-      console.log(err);
-      throw new Error('Failed to add community template');
-    }
 
-    try {
-      await $.post(
-        `${app.serverUrl()}/contract/community_template/metadata`,
-        communityTemplateMetadata
-      );
+      // TODO add newContract to the store when the types will be aligned
     } catch (err) {
       console.log(err);
-      throw new Error('Failed to add community template metadata');
+      throw new Error('Failed to add community contract template');
     }
   }
 

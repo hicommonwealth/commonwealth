@@ -11,7 +11,9 @@ import { CWPopoverMenu } from 'views/components/component_kit/cw_popover/cw_popo
 import { showConfirmationModal } from 'views/modals/confirmation_modal';
 import { showManageContractTemplateModal } from 'views/modals/manage_contract_template_modal';
 
-type ContractTemplateCardAttrs = Contract['templates'][0];
+type ContractTemplateCardAttrs = Contract['templates'][0] & {
+  contractId: number;
+};
 
 interface InfoOrder {
   key: keyof ContractTemplateCardAttrs;
@@ -19,8 +21,8 @@ interface InfoOrder {
 }
 
 export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAttrs> {
-  handleEditTemplate() {
-    showManageContractTemplateModal();
+  handleEditTemplate(contractId, templateId) {
+    showManageContractTemplateModal({ contractId, templateId });
   }
 
   handleDeleteTemplate(name: string) {
@@ -43,7 +45,7 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
   }
 
   view(vnode: m.Vnode<ContractTemplateCardAttrs>) {
-    const { title, ...templateInfo } = vnode.attrs;
+    const { title, contractId, id: templateId, ...templateInfo } = vnode.attrs;
 
     const infosOrder: InfoOrder[] = [
       { key: 'displayName', label: 'Display Name' },
@@ -64,7 +66,7 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
               {
                 label: 'Edit Template',
                 iconLeft: 'write',
-                onclick: this.handleEditTemplate,
+                onclick: () => this.handleEditTemplate(contractId, templateId),
               },
               {
                 label: 'Delete',

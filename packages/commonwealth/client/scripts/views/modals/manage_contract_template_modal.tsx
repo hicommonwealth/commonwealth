@@ -43,9 +43,14 @@ const templates = [
   },
 ];
 
-export class ManageContractTemplateModal extends ClassComponent {
+type ManageContractTemplateModalAttrs = {
+  contractId: number;
+  templateId?: number;
+};
+
+export class ManageContractTemplateModal extends ClassComponent<ManageContractTemplateModalAttrs> {
   private form = {
-    templateId: '',
+    templateId: null,
     displayName: '',
     nickname: '',
     slug: '',
@@ -59,34 +64,27 @@ export class ManageContractTemplateModal extends ClassComponent {
     m.route.set(`/${scope}/new/contract_template`);
   }
 
-  async handleConfirm(e) {
+  async handleConfirm(e, contractId: number) {
     e.preventDefault();
 
     const communityId = app.activeChainId();
-    const { slug, displayOption, nickname, displayName } = this.form;
+    const { slug, displayOption, nickname, displayName, templateId } =
+      this.form;
 
-    const communityTemplate = {
-      community_id: communityId,
-      // TODO do we know template id if we are about to create it
-      contract_id: 0,
-      // TODO get template id from parent
-      template_id: 0,
-    };
-
-    const communityTemplateMetadata = {
-      // TODO is cct_id the same as template_id ?
-      cct_id: '',
+    const communityContractTemplateAndMetadata = {
       slug,
       nickname,
       display_name: displayName,
       display_options: displayOption,
+      community_id: communityId,
+      template_id: templateId,
+      contract_id: contractId,
     };
 
     try {
-      await app.contracts.addCommunityContractTemplate({
-        communityTemplate,
-        communityTemplateMetadata,
-      });
+      await app.contracts.addCommunityContractTemplate(
+        communityContractTemplateAndMetadata
+      );
 
       $(e.target).trigger('modalcomplete');
       setTimeout(() => {
@@ -103,16 +101,18 @@ export class ManageContractTemplateModal extends ClassComponent {
   }
 
   handleSelectTemplate(item: DropdownItemType) {
-    const templateId = item.value;
-    const template = templates.find((t) => String(t.id) === templateId);
+    const templateId = +item.value;
+    const template = templates.find((t) => t.id === templateId);
 
     this.form.templateId = item.value;
     this.form.nickname = template.nickname;
     this.form.displayName = template.displayName;
   }
 
-  view(vnode) {
-    const isEditMode = false;
+  view(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
+    const { contractId, templateId } = vnode.attrs;
+
+    const isEditMode = templateId;
     const modalTitle = isEditMode ? 'Edit Template' : 'Add Template';
     const modalSubtitle = isEditMode
       ? 'Change the metadata associated with your template.'
@@ -179,7 +179,6 @@ export class ManageContractTemplateModal extends ClassComponent {
               this.form.nickname = e.target.value;
             }}
           />
-          {/*// TODO add validation for slash '/' at the beginning of the string?*/}
           <CWText type="caption" fontWeight="medium" className="input-label">
             Slug
           </CWText>
@@ -213,7 +212,7 @@ export class ManageContractTemplateModal extends ClassComponent {
             buttonType="mini-black"
             label={confirmButtonLabel}
             disabled={addingDisabled}
-            onclick={(e) => this.handleConfirm(e)}
+            onclick={(e) => this.handleConfirm(e, contractId)}
           />
         </div>
       </div>
@@ -221,9 +220,21 @@ export class ManageContractTemplateModal extends ClassComponent {
   }
 }
 
-export const showManageContractTemplateModal = () => {
+type ShowManageContractTemplateModalAttrs = {
+  contractId: number;
+  templateId?: number;
+};
+
+export const showManageContractTemplateModal = ({
+  contractId,
+  templateId,
+}: ShowManageContractTemplateModalAttrs) => {
   app.modals.create({
     modal: ManageContractTemplateModal,
-    data: { className: 'ManageContractTemplateOuterModal' },
+    data: {
+      className: 'ManageContractTemplateOuterModal',
+      contractId,
+      templateId,
+    },
   });
 };

@@ -53,9 +53,10 @@ const contracts = [
 ];
 
 export type Contract = {
-  id: string;
+  id: number;
   address: string;
   templates: {
+    id: number;
     title: string;
     displayName: string;
     nickname: string;
@@ -97,6 +98,7 @@ class ContractsPage extends ClassComponent {
             <div class="contracts-container">
               {contracts.map((contract) => (
                 <ContractCard
+                  id={contract.id}
                   address={contract.address}
                   templates={contract.templates}
                 />

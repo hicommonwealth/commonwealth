@@ -14,6 +14,7 @@ import { showManageContractTemplateModal } from 'views/modals/manage_contract_te
 import app from 'state';
 
 type ContractCardAttrs = {
+  id: number;
   address: string;
   templates: Contract['templates'];
 };
@@ -44,12 +45,12 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
     m.route.set(`/${scope}/new/contract_template`);
   }
 
-  handleAddTemplate() {
-    showManageContractTemplateModal();
+  handleAddTemplate(contractId) {
+    showManageContractTemplateModal({ contractId });
   }
 
   view(vnode: m.Vnode<ContractCardAttrs>) {
-    const { address, templates } = vnode.attrs;
+    const { address, templates, id } = vnode.attrs;
 
     return (
       <CWCard fullWidth className="ContractCard">
@@ -74,6 +75,8 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
             <div className="templates-container">
               {templates.map((template) => (
                 <ContractTemplateCard
+                  contractId={id}
+                  id={template.id}
                   title={template.title}
                   displayName={template.displayName}
                   nickname={template.nickname}
@@ -94,7 +97,7 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
             buttonType="tertiary-black"
             label="Add Template"
             iconLeft="plus"
-            onclick={this.handleAddTemplate}
+            onclick={() => this.handleAddTemplate(id)}
           />
           <CWText className="create-template-info" type="caption">
             Don’t see a template that fits your needs?
