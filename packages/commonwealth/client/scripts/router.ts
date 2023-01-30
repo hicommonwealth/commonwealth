@@ -625,20 +625,16 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/:scope/delegate': importRoute(import('views/pages/delegate'), {
     scoped: true,
   }),
-  '/:scope/proposal/:type/:identifier': importRoute(
-    'views/pages/view_proposal/index',
+  '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal/index'),
     { scoped: true }
   ),
-  '/:scope/proposal/:identifier': importRoute(
-    'views/pages/view_proposal/index',
+  '/:scope/proposal/:identifier': importRoute(import('views/pages/view_proposal/index'),
     { scoped: true }
   ),
-  '/:scope/discussion/:identifier': importRoute(
-    'views/pages/view_thread/index',
+  '/:scope/discussion/:identifier': importRoute(import('views/pages/view_thread/index'),
     { scoped: true }
   ),
-  '/:scope/new/proposal/:type': importRoute(
-    import('views/pages/new_proposal/index'),
+  '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'),
     {
       scoped: true,
     }
