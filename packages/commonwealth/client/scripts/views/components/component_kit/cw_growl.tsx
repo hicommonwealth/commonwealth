@@ -1,8 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_growl.scss';
 
@@ -17,24 +16,23 @@ type GrowlAttrs = {
   disabled: boolean;
   onclose?: () => void;
   position: GrowlPosition;
-};
+} & React.PropsWithChildren;
 
-export class CWGrowl extends ClassComponent<GrowlAttrs> {
-  view(vnode: ResultNode<GrowlAttrs>) {
-    const { className, position, disabled } = vnode.attrs;
-    return (
-      !disabled && (
-        <div
-          className={getClasses<{ className?: string; position: GrowlPosition }>(
-            { className, position },
-            ComponentType.Growl
-          )}
-        >
-          <CWCard className="growl-card" elevation="elevation-3" interactive>
-            {vnode.children}
-          </CWCard>
-        </div>
-      )
-    );
-  }
-}
+export const CWGrowl = (props: GrowlAttrs) => {
+  const { className, position, disabled } = props;
+
+  return (
+    !disabled && (
+      <div
+        className={getClasses<{
+          className?: string;
+          position: GrowlPosition;
+        }>({ className, position }, ComponentType.Growl)}
+      >
+        <CWCard className="growl-card" elevation="elevation-3" interactive>
+          {props.children}
+        </CWCard>
+      </div>
+    )
+  );
+};

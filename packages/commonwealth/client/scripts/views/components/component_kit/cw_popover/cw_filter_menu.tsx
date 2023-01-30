@@ -44,7 +44,7 @@ export const CWFilterMenu = (props: FilterMenuProps) => {
               <CWText type="b2" fontWeight="bold">
                 {header}
               </CWText>
-              {filterMenuItems.map((item) => {
+              {filterMenuItems.map((item, i) => {
                 const isChecked =
                   selectedItems.find((i) => {
                     return i === item.value;
@@ -52,6 +52,7 @@ export const CWFilterMenu = (props: FilterMenuProps) => {
 
                 return (
                   <CWCheckbox
+                    key={i}
                     value={item.value}
                     label={item.label}
                     checked={isChecked}

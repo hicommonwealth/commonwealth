@@ -35,7 +35,7 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../components/component_kit/helpers';
-import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
+import { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
@@ -73,7 +73,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
   private bodyType: LoginBodyType;
-  private profiles: Array<ProfileRowAttrs>;
+  private profiles: Array<ProfileRowProps>;
   private sidebarType: LoginSidebarType;
   private username: string;
   private email: string;
@@ -406,7 +406,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         handleSetEmail={(e) => {
           this.email = e.target.value;
         }}
-        setProfiles={(profiles: Array<ProfileRowAttrs>) => {
+        setProfiles={(profiles: Array<ProfileRowProps>) => {
           this.profiles = profiles;
         }}
         setSidebarType={(sidebarType: LoginSidebarType) => {
@@ -451,7 +451,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         handleSetEmail={(e) => {
           this.email = e.target.value;
         }}
-        setProfiles={(profiles: Array<ProfileRowAttrs>) => {
+        setProfiles={(profiles: Array<ProfileRowProps>) => {
           this.profiles = profiles;
         }}
         setSidebarType={(sidebarType: LoginSidebarType) => {
