@@ -23,7 +23,7 @@ type ToggleStyleAttrs = {
 } & BaseStyleProps;
 
 type ToggleAttrs = {
-  onChange: (e?: any) => void;
+  onChange?: (e?: any) => void;
 } & ToggleStyleAttrs;
 
 export class CWToggle extends ClassComponent<ToggleAttrs> {
