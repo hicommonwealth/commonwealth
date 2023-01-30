@@ -4,7 +4,6 @@ import PopperUnstyled from '@mui/base/PopperUnstyled';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
-
 import {
   ClassComponent,
   ResultNode,

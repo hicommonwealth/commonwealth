@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_growl.scss';
 
@@ -25,10 +34,10 @@ export class CWGrowl extends ClassComponent<GrowlAttrs> {
     return (
       !disabled && (
         <div
-          className={getClasses<{ className?: string; position: GrowlPosition }>(
-            { className, position },
-            ComponentType.Growl
-          )}
+          className={getClasses<{
+            className?: string;
+            position: GrowlPosition;
+          }>({ className, position }, ComponentType.Growl)}
         >
           <CWCard className="growl-card" elevation="elevation-3" interactive>
             {vnode.children}

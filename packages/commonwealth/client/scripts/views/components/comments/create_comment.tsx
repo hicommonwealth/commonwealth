@@ -1,12 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 import BN from 'bn.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 

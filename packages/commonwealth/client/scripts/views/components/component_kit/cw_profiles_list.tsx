@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_profiles_list.scss';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -61,7 +70,10 @@ export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
 
     return (
       <div
-        className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'ProfilesList')}
+        className={getClasses<{ darkMode?: boolean }>(
+          { darkMode },
+          'ProfilesList'
+        )}
       >
         <div
           className={getClasses<{ darkMode?: boolean }>(

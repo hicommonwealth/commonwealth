@@ -1,15 +1,15 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {ClassComponent, jsx, redraw, ResultNode,} from 'mithrilInterop';
+import { ClassComponent, jsx, redraw, ResultNode } from 'mithrilInterop';
 
-import {blake2AsHex} from '@polkadot/util-crypto';
+import { blake2AsHex } from '@polkadot/util-crypto';
 import type Substrate from 'controllers/chain/substrate/adapter';
 
 import app from 'state';
-import {CWDropdown} from './component_kit/cw_dropdown';
-import {CWText} from './component_kit/cw_text';
-import {CWTextInput} from './component_kit/cw_text_input';
+import { CWDropdown } from './component_kit/cw_dropdown';
+import { CWText } from './component_kit/cw_text';
+import { CWTextInput } from './component_kit/cw_text_input';
 
 type EdgewareFunctionPickerProps = {
   module: string;

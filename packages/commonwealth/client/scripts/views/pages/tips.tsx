@@ -6,11 +6,7 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import {
-  ClassComponent,
-  ResultNode,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'pages/tips.scss';
 
@@ -24,7 +20,7 @@ import { CardsCollection } from '../components/cards_collection';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { GovExplainer } from '../components/gov_explainer';
-import { User } from "../components/user/user";
+import { User } from '../components/user/user';
 import ErrorPage from './error';
 
 type TipAttrs = {

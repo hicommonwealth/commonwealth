@@ -10,11 +10,7 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import {
-  ClassComponent,
-  ResultNode,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
 

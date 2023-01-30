@@ -2,8 +2,18 @@
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import _ from 'lodash';
-import type{ Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import type { Account } from 'models';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { initChain } from 'helpers/chain';
 import { setActiveAccount } from '../../../controllers/app/login';
 import type SubstrateIdentity from '../../../controllers/chain/substrate/identity';
@@ -269,7 +279,9 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         : [],
       render('.header', 'Bio'),
       account.profile && account.profile.bio
-        ? render('p', [render(MarkdownFormattedText, { doc: account.profile.bio })])
+        ? render('p', [
+            render(MarkdownFormattedText, { doc: account.profile.bio }),
+          ])
         : render('.no-items', [
             account.profile && account.profile.name
               ? account.profile.name

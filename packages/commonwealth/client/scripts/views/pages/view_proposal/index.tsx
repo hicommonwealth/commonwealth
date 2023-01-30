@@ -2,13 +2,7 @@
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
-import {
-  ClassComponent,
-  ResultNode,
-
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -34,7 +28,7 @@ import { CommentsTree } from '../../components/comments/comments_tree';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { User } from "../../components/user/user";
+import { User } from '../../components/user/user';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';

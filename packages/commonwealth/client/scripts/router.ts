@@ -10,7 +10,7 @@ import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
-import { getRoute, getRouteParam, setRoute, render } from "mithrilInterop";
+import { getRoute, getRouteParam, setRoute, render } from 'mithrilInterop';
 
 export const pathIsDiscussion = (
   scope: string | null,
@@ -134,7 +134,7 @@ const handleLoginRedirects = () => {
     routeParam['loggedin'] &&
     routeParam['loggedin'].toString() === 'true' &&
     routeParam['path'] &&
-    !(routeParam['path'].startsWith('/login'))
+    !routeParam['path'].startsWith('/login')
   ) {
     // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
     // handle param-based redirect after email login
@@ -142,7 +142,10 @@ const handleLoginRedirects = () => {
     /* If we are creating a new account, then we alias to create a new mixpanel user
      else we identify to associate mixpanel events
     */
-    if (getRouteParam()['new'] && getRouteParam()['new'].toString() === 'true') {
+    if (
+      getRouteParam()['new'] &&
+      getRouteParam()['new'].toString() === 'true'
+    ) {
       console.log('creating account');
     }
 
@@ -493,13 +496,10 @@ const getCommonDomainRoutes = (importRoute) => ({
   ),
 
   // Notifications
-  '/:scope/notifications': importRoute(
-    import('views/pages/notifications'),
-    {
-      scoped: true,
-      deferChain: true,
-    }
-  ),
+  '/:scope/notifications': importRoute(import('views/pages/notifications'), {
+    scoped: true,
+    deferChain: true,
+  }),
   '/notifications': redirectRoute(() => '/edgeware/notifications'),
   '/notification-settings': importRoute(
     import('views/pages/notification_settings'),

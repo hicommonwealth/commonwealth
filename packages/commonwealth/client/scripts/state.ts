@@ -33,9 +33,7 @@ import type { MobileMenuName } from './views/app_mobile_menus';
 import type { SidebarMenuName } from './views/components/sidebar';
 import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
-import {
-  redraw,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',

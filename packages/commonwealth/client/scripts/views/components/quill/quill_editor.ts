@@ -1,5 +1,14 @@
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import QuillEditorInternal from './quill_editor_internal';
 import type { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 

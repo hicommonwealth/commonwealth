@@ -1,11 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_group.scss';
 

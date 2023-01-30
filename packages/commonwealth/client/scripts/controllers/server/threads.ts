@@ -8,8 +8,17 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import type { ChainEntity, Profile, Topic } from 'models';
 import {
   Attachment,

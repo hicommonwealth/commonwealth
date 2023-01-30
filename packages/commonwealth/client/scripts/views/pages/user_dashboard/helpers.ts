@@ -5,7 +5,17 @@ import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
 import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
 import $ from 'jquery';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import type { NotificationSubscription } from 'models';
 
 import app from 'state';

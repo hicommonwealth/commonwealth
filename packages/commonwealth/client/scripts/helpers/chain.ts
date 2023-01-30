@@ -4,9 +4,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
 import { handleInviteLinkRedirect } from 'router';
 import $ from 'jquery';
-import {
-  redraw, setRoute,
-} from 'mithrilInterop';
+import { redraw, setRoute } from 'mithrilInterop';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;

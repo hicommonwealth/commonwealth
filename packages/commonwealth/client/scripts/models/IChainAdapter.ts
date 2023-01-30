@@ -2,7 +2,17 @@ import type { Coin } from 'adapters/currency';
 import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';

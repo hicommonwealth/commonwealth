@@ -3,7 +3,17 @@ import React from 'react';
 
 import type { ChainInfo } from 'models';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 import type { IEventLabel } from '../../../../../../chain-events/src';

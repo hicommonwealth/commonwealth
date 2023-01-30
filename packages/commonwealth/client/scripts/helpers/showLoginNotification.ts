@@ -1,5 +1,5 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import {getRouteParam} from "mithrilInterop";
+import { getRouteParam } from 'mithrilInterop';
 
 const showLoginNotification = () => {
   const loggedIn = getRouteParam('loggedin');

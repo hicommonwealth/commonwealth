@@ -4,7 +4,17 @@ import { Thread } from 'models';
 
 import app from 'state';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import type { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';

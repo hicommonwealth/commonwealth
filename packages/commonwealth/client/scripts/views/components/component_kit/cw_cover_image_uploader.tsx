@@ -70,7 +70,10 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     }
   }
 
-  async generateImage(prompt: string, vnode: ResultNode<CoverImageUploaderAttrs>) {
+  async generateImage(
+    prompt: string,
+    vnode: ResultNode<CoverImageUploaderAttrs>
+  ) {
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
 
     try {

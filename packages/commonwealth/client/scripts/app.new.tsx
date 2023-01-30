@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { Layout } from 'views/layout';
 
 import { PageLoading } from './views/pages/loading';
-import {initAppState} from "state";
+import { initAppState } from 'state';
 
 const LandingPage = lazy(() => import('./views/pages/landing'));
 const CommunitiesPage = lazy(() => import('./views/pages/communities'));

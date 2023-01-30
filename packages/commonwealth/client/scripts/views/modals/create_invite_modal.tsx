@@ -1,12 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ChainBase } from 'common-common/src/types';

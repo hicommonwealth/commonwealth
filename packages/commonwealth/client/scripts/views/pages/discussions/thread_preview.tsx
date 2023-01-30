@@ -1,12 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import 'pages/discussions/thread_preview.scss';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
@@ -31,7 +26,7 @@ import {
 import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { SharePopover } from '../../components/share_popover';
-import { User } from "../../components/user/user";
+import { User } from '../../components/user/user';
 import {
   getCommentSubscription,
   getReactionSubscription,
@@ -40,7 +35,7 @@ import {
 } from './helpers';
 import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
-import {CWIcon} from "views/components/component_kit/cw_icons/cw_icon";
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 type ThreadPreviewAttrs = {
   thread: Thread;

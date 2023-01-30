@@ -20,7 +20,17 @@ import { ApiStatus } from 'state';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;

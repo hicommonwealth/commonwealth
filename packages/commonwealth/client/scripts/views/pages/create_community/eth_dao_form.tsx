@@ -1,7 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, setRoute, redraw, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  setRoute,
+  redraw,
+  jsx,
+} from 'mithrilInterop';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
 

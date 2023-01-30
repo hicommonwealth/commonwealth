@@ -1,12 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';

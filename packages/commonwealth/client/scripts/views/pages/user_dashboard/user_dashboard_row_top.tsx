@@ -2,12 +2,7 @@
 import React from 'react';
 
 import { formatTimestamp } from 'helpers/index';
-import {
-  ClassComponent,
-  ResultNode,
-  setRoute,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, setRoute, jsx } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';
 import moment from 'moment';

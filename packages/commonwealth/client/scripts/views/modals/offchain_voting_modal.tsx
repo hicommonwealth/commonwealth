@@ -1,17 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'modals/offchain_voting_modal.scss';
 
 import type { Vote } from 'models';
 import { AddressInfo } from 'models';
-import { User } from "../components/user/user";
+import { User } from '../components/user/user';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 
 type OffchainVotingModalAttrs = {

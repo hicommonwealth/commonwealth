@@ -140,19 +140,21 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={
             <CWText>
-              {!!app.activeChainId() && <User
-                user={
-                  new AddressInfo(
-                    null,
-                    this.proposal.author,
-                    app.activeChainId(),
-                    null
-                  )
-                }
-                showAddressWithDisplayName
-                linkify
-                popover
-              />}
+              {!!app.activeChainId() && (
+                <User
+                  user={
+                    new AddressInfo(
+                      null,
+                      this.proposal.author,
+                      app.activeChainId(),
+                      null
+                    )
+                  }
+                  showAddressWithDisplayName
+                  linkify
+                  popover
+                />
+              )}
             </CWText>
           }
           createdAt={this.proposal.created}

@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import app from 'state';
@@ -143,9 +153,15 @@ class DiscussionSectionComponent extends ClassComponent<SidebarSectionAttrs> {
         isActive: onAllDiscussionPage(getRoute()),
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(this, e, `/discussions`, app.activeChainId(), () => {
-            setDiscussionsToggleTree(`children.All.toggledState`, toggle);
-          });
+          handleRedirectClicks(
+            this,
+            e,
+            `/discussions`,
+            app.activeChainId(),
+            () => {
+              setDiscussionsToggleTree(`children.All.toggledState`, toggle);
+            }
+          );
         },
         displayData: null,
       },
@@ -158,9 +174,18 @@ class DiscussionSectionComponent extends ClassComponent<SidebarSectionAttrs> {
         isActive: onOverviewDiscussionPage(getRoute()),
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(this, e, `/overview`, app.activeChainId(), () => {
-            setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
-          });
+          handleRedirectClicks(
+            this,
+            e,
+            `/overview`,
+            app.activeChainId(),
+            () => {
+              setDiscussionsToggleTree(
+                `children.Overview.toggledState`,
+                toggle
+              );
+            }
+          );
         },
         displayData: null,
       },
@@ -175,12 +200,18 @@ class DiscussionSectionComponent extends ClassComponent<SidebarSectionAttrs> {
           (app.chain ? app.chain.serverLoaded : true),
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(this, e, `/sputnik-daos`, app.activeChainId(), () => {
-            setDiscussionsToggleTree(
-              `children.SputnikDAOs.toggledState`,
-              toggle
-            );
-          });
+          handleRedirectClicks(
+            this,
+            e,
+            `/sputnik-daos`,
+            app.activeChainId(),
+            () => {
+              setDiscussionsToggleTree(
+                `children.SputnikDAOs.toggledState`,
+                toggle
+              );
+            }
+          );
         },
         displayData: null,
       },

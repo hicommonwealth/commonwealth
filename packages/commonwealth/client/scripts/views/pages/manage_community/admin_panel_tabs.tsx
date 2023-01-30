@@ -1,14 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { UpgradeRolesForm } from './upgrade_roles_form';
 import { WebhooksForm } from './webhooks_form';
-import {RoleInfo, Webhook} from "models";
+import { RoleInfo, Webhook } from 'models';
 
 type AdminPanelTabsAttrs = {
   defaultTab: number;

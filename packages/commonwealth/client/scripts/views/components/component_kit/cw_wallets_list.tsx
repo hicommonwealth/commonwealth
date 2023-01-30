@@ -35,7 +35,7 @@ import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import {addressSwapper} from "utils";
+import { addressSwapper } from 'utils';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow

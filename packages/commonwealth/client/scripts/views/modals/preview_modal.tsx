@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'modals/preview_modal.scss';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
@@ -50,7 +60,11 @@ export class PreviewModal extends ClassComponent<PreviewModalAttrs> {
               if (vnode.attrs.doc.trim() === '') {
                 return <PreviewModalEmptyState />;
               }
-              return vnode.attrs.doc && <MarkdownFormattedText doc={vnode.attrs.doc} />;
+              return (
+                vnode.attrs.doc && (
+                  <MarkdownFormattedText doc={vnode.attrs.doc} />
+                )
+              );
             }
           })()}
         </div>

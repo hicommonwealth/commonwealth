@@ -2,7 +2,7 @@
 import React from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
- // required for getStatusText
+// required for getStatusText
 import moment from 'moment';
 import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
 

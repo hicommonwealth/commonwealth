@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import {
   ChainBase,
   ChainNetwork,
@@ -429,9 +439,15 @@ class GovernanceSectionComponent extends ClassComponent<SidebarSectionAttrs> {
         : false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(this, e, '/validators', app.activeChainId(), () => {
-          setGovernanceToggleTree('children.Validators.toggledState', toggle);
-        });
+        handleRedirectClicks(
+          this,
+          e,
+          '/validators',
+          app.activeChainId(),
+          () => {
+            setGovernanceToggleTree('children.Validators.toggledState', toggle);
+          }
+        );
       },
       isVisible: showValidators,
       isUpdated: true,

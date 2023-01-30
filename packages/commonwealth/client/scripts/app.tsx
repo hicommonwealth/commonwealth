@@ -64,8 +64,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     //     m.redraw();
     //   });
 
-
-
     // @ZAK TODO
     // /*
     //     const isCustomDomain = !!customDomain;

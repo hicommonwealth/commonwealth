@@ -17,7 +17,6 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 
-
 import 'pages/new_proposal/compound_proposal_form.scss';
 
 import app from 'state';

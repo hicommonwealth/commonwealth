@@ -2,7 +2,17 @@
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 
@@ -58,15 +68,18 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
             {featuredTopics
               .concat(otherTopics)
               .map(
-                ({
-                  id,
-                  name,
-                  description,
-                  telegram,
-                  featuredInSidebar,
-                  featuredInNewPost,
-                  defaultOffchainTemplate,
-                }, i) => {
+                (
+                  {
+                    id,
+                    name,
+                    description,
+                    telegram,
+                    featuredInSidebar,
+                    featuredInNewPost,
+                    defaultOffchainTemplate,
+                  },
+                  i
+                ) => {
                   const active =
                     getRoute() ===
                       `/${app.activeChainId()}/discussions/${encodeURI(

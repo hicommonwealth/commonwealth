@@ -1,11 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/select_address_modal.scss';

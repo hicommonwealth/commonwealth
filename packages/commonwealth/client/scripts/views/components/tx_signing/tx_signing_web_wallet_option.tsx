@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import type PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import type Substrate from 'controllers/chain/substrate/adapter';

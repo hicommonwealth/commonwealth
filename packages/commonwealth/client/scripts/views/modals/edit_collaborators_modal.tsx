@@ -1,25 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import 'modals/edit_collaborators_modal.scss';
 
 import { Thread, Profile } from 'models';
-import {
-  notifyError,
-  notifySuccess,
-} from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import 'modals/edit_collaborators_modal.scss';
 
 import app from 'state';
-import { User } from "../components/user/user";
+import { User } from '../components/user/user';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';

@@ -24,7 +24,9 @@ export class SidebarQuickSwitcher extends ClassComponent {
 
     const starredCommunities = allCommunities.filter((item) => {
       // filter out non-starred communities
-      return !(item instanceof ChainInfo && !app.communities.isStarred(item.id));
+      return !(
+        item instanceof ChainInfo && !app.communities.isStarred(item.id)
+      );
     });
 
     return (

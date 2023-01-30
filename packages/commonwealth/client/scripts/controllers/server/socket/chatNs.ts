@@ -3,7 +3,7 @@ import _ from 'lodash';
 import type { Socket } from 'socket.io-client';
 import app from 'state';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
-import{ redraw } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 export enum ChatErrors {
   NOT_LOGGED_IN = 'User must be logged in to load chat',

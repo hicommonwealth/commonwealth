@@ -8,14 +8,14 @@ import { getProposalUrlPath } from 'identifiers';
 import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 type ProfileProposalAttr = {
-  proposal: Thread
-}
+  proposal: Thread;
+};
 
 export class ProfileProposal extends ClassComponent<ProfileProposalAttr> {
   constructor(props) {
     super(props);
   }
-  view (vnode: ResultNode<ProfileProposalAttr>) {
+  view(vnode: ResultNode<ProfileProposalAttr>) {
     const proposal = vnode.attrs.proposal;
     const { slug, identifier } = proposal;
     const { attachments, author, title, createdAt, chain } = proposal;
@@ -87,6 +87,6 @@ export class ProfileProposal extends ClassComponent<ProfileProposalAttr> {
       ),
     ]);
   }
-};
+}
 
 export default ProfileProposal;

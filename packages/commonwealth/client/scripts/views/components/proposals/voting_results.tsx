@@ -2,7 +2,17 @@
 import React from 'react';
 
 import { Coin, formatNumberLong } from 'adapters/currency';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import BN from 'bn.js';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';

@@ -16,7 +16,6 @@ import moment from 'moment';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 
-
 import 'pages/snapshot_proposals.scss';
 
 import app from 'state';
@@ -135,7 +134,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
             <CardsCollection
               content={proposals.map((proposal, i) => (
                 <SnapshotProposalCard
-                    key={i}
+                  key={i}
                   snapshotId={snapshotId}
                   proposal={proposal}
                 />

@@ -77,13 +77,15 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
           </div>
           {displayedVoters.map((vote) => (
             <div className="vote-row">
-              {app.chain ? (<User
-                user={
-                  new AddressInfo(null, vote.voter, app.activeChainId(), null)
-                }
-                linkify
-                popover
-              />) : (
+              {app.chain ? (
+                <User
+                  user={
+                    new AddressInfo(null, vote.voter, app.activeChainId(), null)
+                  }
+                  linkify
+                  popover
+                />
+              ) : (
                 <CWText className="column-text">
                   {`${vote.voter.slice(0, 15)}...`}
                 </CWText>

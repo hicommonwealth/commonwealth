@@ -6,7 +6,17 @@ import { Label as ChainEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
 import type { DashboardActivityNotification } from 'models';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 import app from 'state';

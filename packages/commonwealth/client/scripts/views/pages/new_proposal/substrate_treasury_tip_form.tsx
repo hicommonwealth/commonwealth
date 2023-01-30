@@ -1,10 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import {
-  ClassComponent,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 
 import { proposalSlugToClass } from 'identifiers';
 import type { ITXModalData, ProposalModule } from 'models';
@@ -16,7 +13,7 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { User } from "../../components/user/user";
+import { User } from '../../components/user/user';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import ErrorPage from '../error';
 

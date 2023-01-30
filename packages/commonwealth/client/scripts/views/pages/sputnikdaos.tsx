@@ -5,7 +5,13 @@ import type Near from 'controllers/chain/near/adapter';
 import type { IDaoInfo } from 'controllers/chain/near/chain';
 import { formatDuration } from 'helpers';
 
-import { ClassComponent, ResultNode, setRoute, redraw, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  setRoute,
+  redraw,
+  jsx,
+} from 'mithrilInterop';
 import BN from 'bn.js';
 import moment from 'moment';
 

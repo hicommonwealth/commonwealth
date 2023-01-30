@@ -1,7 +1,6 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 

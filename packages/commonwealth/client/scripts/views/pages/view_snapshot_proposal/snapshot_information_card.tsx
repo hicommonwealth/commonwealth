@@ -4,11 +4,7 @@ import React from 'react';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
@@ -84,20 +80,23 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
               <SnapshotInfoRow
                 label="Author"
                 value={
-                app.chain ?
-                  <User
-                    user={
-                      new AddressInfo(
-                        null,
-                        proposal.author,
-                        app.activeChainId(),
-                        null
-                      )
-                    }
-                    hideAvatar
-                    linkify
-                    popover
-                  /> : proposal.author
+                  app.chain ? (
+                    <User
+                      user={
+                        new AddressInfo(
+                          null,
+                          proposal.author,
+                          app.activeChainId(),
+                          null
+                        )
+                      }
+                      hideAvatar
+                      linkify
+                      popover
+                    />
+                  ) : (
+                    proposal.author
+                  )
                 }
               />
               <SnapshotInfoLinkRow

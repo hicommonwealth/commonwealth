@@ -3,11 +3,7 @@
 import 'pages/general_contract/index.scss';
 import app from 'state';
 import type { Contract } from 'models';
-import {
-  ClassComponent,
-  jsx,
-  redraw, ResultNode
-} from 'mithrilInterop';
+import { ClassComponent, jsx, redraw, ResultNode } from 'mithrilInterop';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';

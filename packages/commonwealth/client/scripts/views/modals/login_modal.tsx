@@ -7,12 +7,7 @@ import {
 } from 'adapters/shared';
 import { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
-import {
-  ClassComponent,
-  ResultNode,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 import {
   completeClientLogin,
   loginWithMagicLink,

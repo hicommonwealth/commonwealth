@@ -4,7 +4,17 @@ import React from 'react';
 import $ from 'jquery';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'modals/confirm_modal.scss';
 

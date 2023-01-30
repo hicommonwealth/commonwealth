@@ -5,7 +5,17 @@ import { initAppState } from 'state';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
 import app from 'state';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';

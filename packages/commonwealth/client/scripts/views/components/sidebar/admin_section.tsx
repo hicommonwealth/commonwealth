@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
@@ -80,9 +89,15 @@ class AdminSectionComponent extends ClassComponent<SidebarSectionAttrs> {
         isUpdated: false,
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(this, e, `/analytics`, app.activeChainId(), () => {
-            setAdminToggleTree(`children.analytics.toggledState`, toggle);
-          });
+          handleRedirectClicks(
+            this,
+            e,
+            `/analytics`,
+            app.activeChainId(),
+            () => {
+              setAdminToggleTree(`children.analytics.toggledState`, toggle);
+            }
+          );
         },
       },
       {

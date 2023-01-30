@@ -3,7 +3,17 @@ import React from 'react';
 
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import type { Thread } from 'models';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_space_card.scss';
 import app from 'state';

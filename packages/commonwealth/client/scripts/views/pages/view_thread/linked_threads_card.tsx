@@ -53,40 +53,42 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
       <CWContentPageCard
         header="Linked Discussions"
         content={
-          <div className="LinkedThreadsCard">
-            {thread.linkedThreads.length > 0 ? (
-              <div className="links-container">
-                {this.linkedThreads.map((t) => {
-                  const discussionLink = getProposalUrlPath(
-                    t.slug,
-                    `${t.identifier}-${slugify(t.title)}`
-                  );
+          (
+            <div className="LinkedThreadsCard">
+              {thread.linkedThreads.length > 0 ? (
+                <div className="links-container">
+                  {this.linkedThreads.map((t) => {
+                    const discussionLink = getProposalUrlPath(
+                      t.slug,
+                      `${t.identifier}-${slugify(t.title)}`
+                    );
 
-                  return <a href={discussionLink}>{t.title}</a>;
-                })}
-              </div>
-            ) : (
-              <CWText type="b2" className="no-threads-text">
-                There are currently no linked discussions.
-              </CWText>
-            )}
-            {allowLinking && (
-              <CWButton
-                buttonType="mini-black"
-                label="Link discussion"
-                onClick={(e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: LinkedThreadModal,
-                    data: {
-                      linkingThread: thread,
-                      linkedThreads: this.linkedThreads,
-                    },
-                  });
-                }}
-              />
-            )}
-          </div> as any
+                    return <a href={discussionLink}>{t.title}</a>;
+                  })}
+                </div>
+              ) : (
+                <CWText type="b2" className="no-threads-text">
+                  There are currently no linked discussions.
+                </CWText>
+              )}
+              {allowLinking && (
+                <CWButton
+                  buttonType="mini-black"
+                  label="Link discussion"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    app.modals.create({
+                      modal: LinkedThreadModal,
+                      data: {
+                        linkingThread: thread,
+                        linkedThreads: this.linkedThreads,
+                      },
+                    });
+                  }}
+                />
+              )}
+            </div>
+          ) as any
           // @ZAK @REACT ^ (fix to remove 'as any')
         }
       />

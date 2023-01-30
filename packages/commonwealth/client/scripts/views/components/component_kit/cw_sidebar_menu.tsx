@@ -1,12 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  setRoute,
-  jsx
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, setRoute, jsx } from 'mithrilInterop';
 // import { ListItem, Icon, Icons } from 'construct-ui';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { navigateToSubpage } from 'router';

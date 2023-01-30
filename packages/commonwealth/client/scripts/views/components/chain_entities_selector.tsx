@@ -1,8 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, redraw, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  redraw,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/chain_entities_selector.scss';
 import type { ChainEntity, Thread } from 'models';
@@ -37,6 +42,7 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
       <div className="ChainEntitiesSelector">
         {this.chainEntitiesLoaded ? (
           render('@TODO: @REACT pleaseremoveme')
+        ) : (
           // m(QueryList, {
           //   checkmark: true,
           //   items: app.chainEntities.store.getAll().sort((a, b) => {
@@ -110,7 +116,6 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
           //     onSelect(ce);
           //   },
           // })
-        ) : (
           <div className="loading-container">
             <div className="loading-text">
               {this.chainEntitiesLoaded

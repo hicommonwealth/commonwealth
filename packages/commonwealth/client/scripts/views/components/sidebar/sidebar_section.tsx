@@ -4,11 +4,7 @@ import React from 'react';
 import 'components/sidebar/sidebar_section.scss';
 import { isNotUndefined } from 'helpers/typeGuards';
 
-import {
-  ClassComponent,
-  ResultNode,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';

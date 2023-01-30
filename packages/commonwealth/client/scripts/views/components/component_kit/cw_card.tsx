@@ -1,7 +1,17 @@
 /* @jsx jsx */
-import React, {MouseEvent} from 'react';
+import React, { MouseEvent } from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_card.scss';
 import { getClasses } from './helpers';

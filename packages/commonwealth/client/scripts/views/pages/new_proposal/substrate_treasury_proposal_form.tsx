@@ -1,10 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 import type Substrate from 'controllers/chain/substrate/adapter';
 
 import { proposalSlugToClass } from 'identifiers';
