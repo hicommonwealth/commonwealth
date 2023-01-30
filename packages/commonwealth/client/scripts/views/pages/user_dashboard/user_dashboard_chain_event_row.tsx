@@ -38,7 +38,7 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
       >
         <div className="chain-event-icon-container">
           <CWIcon
-            iconName={label.icon ? label.icon as IconName : 'element'}
+            iconName={label.icon ? (label.icon as IconName) : 'element'}
             className={label.icon === 'delegate' ? 'delegate' : ''}
           />
         </div>
