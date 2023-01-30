@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -29,7 +20,9 @@ type ThreadPreviewReactionButtonAttrs = {
   thread: Thread;
 };
 
-export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewReactionButtonAttrs> {
+export class ThreadPreviewReactionButton extends ClassComponent<
+  ThreadPreviewReactionButtonAttrs
+> {
   private loading: boolean;
   private reactors: any;
 
@@ -116,7 +109,6 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
     // return likes > 0
     //   ? null // @TODO @REACT FIX ME
     // m(Popover, {
-    //     interactionType: 'hover',
     //     content: (
     //       <div className="reaction-button-tooltip-contents">
     //         {getDisplayedReactorsForPopup({

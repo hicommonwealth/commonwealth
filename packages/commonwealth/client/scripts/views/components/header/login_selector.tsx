@@ -43,7 +43,7 @@ import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { UserBlock } from '../user/user_block';
 import { CWDivider } from '../component_kit/cw_divider';
-import { CWPopover } from '../component_kit/cw_popover/cw_popover';
+import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -249,292 +249,288 @@ class TOSModal extends ClassComponent<TOSModalAttrs> {
   }
 }
 
-export class LoginSelector extends ClassComponent {
-  private profileLoadComplete: boolean;
+export const LoginSelector = () => {
+  const [profileLoadComplete, setProfileLoadComplete] =
+    React.useState<boolean>(false);
 
-  view() {
-    if (!app.isLoggedIn()) {
-      return (
-        <div className="LoginSelector">
-          <CWButton
-            buttonType="tertiary-black"
-            iconLeft="person"
-            label="Log in"
-            onClick={() => {
-              app.modals.create({
-                modal: NewLoginModal,
-                data: {
-                  modalType: isWindowMediumSmallInclusive(window.innerWidth)
-                    ? 'fullScreen'
-                    : 'centered',
-                  breakpointFn: isWindowMediumSmallInclusive,
-                },
-              });
-            }}
-          />
-        </div>
-      );
-    }
+  const leftMenuProps = usePopover();
+  const rightMenuProps = usePopover();
 
-    const activeAddressesWithRole = app.user.activeAccounts.filter(
-      (account) => {
-        return app.roles.getRoleInCommunity({
-          account,
-          chain: app.activeChainId(),
-        });
-      }
-    );
-
-    const activeAccountsByRole = app.roles.getActiveAccountsByRole();
-
-    const nAccountsWithoutRole = activeAccountsByRole.filter(
-      ([role]) => !role
-    ).length;
-
-    if (!this.profileLoadComplete && app.profiles.allLoaded()) {
-      this.profileLoadComplete = true;
-    }
-
-    const activeChainInfo = app.chain?.meta;
-    const activeChainId = activeChainInfo?.id;
-
-    // add all addresses if joining a community
-    const activeBase = activeChainInfo?.base;
-    const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
-    const samebaseAddresses = app.user.addresses.filter((a, idx) => {
-      // if no active chain, add all addresses
-      if (!activeBase) return true;
-
-      // add all items on same base as active chain
-      const addressChainInfo = app.config.chains.getById(a.chain.id);
-      if (addressChainInfo?.base !== activeBase) return false;
-
-      // // ensure doesn't already exist
-      const addressExists = !!app.user.addresses.slice(idx + 1).find(
-        (prev) =>
-          activeBase === ChainBase.Substrate &&
-          (app.config.chains.getById(prev.chain.id)?.base ===
-          ChainBase.Substrate
-            ? addressSwapper({
-                address: prev.address,
-                currentPrefix: 42,
-              }) ===
-              addressSwapper({
-                address: a.address,
-                currentPrefix: 42,
-              })
-            : prev.address === a.address)
-      );
-      if (addressExists) return false;
-
-      // filter additionally by chain network if in list of non-interop, unless we are on that chain
-      // TODO: make this related to wallet.specificChains
-      if (
-        NON_INTEROP_NETWORKS.includes(addressChainInfo?.network) &&
-        activeChainInfo?.network !== addressChainInfo?.network
-      ) {
-        return false;
-      }
-      return true;
-    });
-
-    // Extract unique addresses
-    const uniqueAddresses = [];
-    const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
-      (addressInfo) => {
-        if (!uniqueAddresses.includes(addressInfo.address)) {
-          uniqueAddresses.push(addressInfo.address);
-          return true;
-        }
-        return false;
-      }
-    );
-
-    const activeCommunityMeta = app.chain?.meta;
-    const hasTermsOfService = !!activeCommunityMeta?.terms;
-
-    // Handles linking the existing address to the community
-    async function linkToCommunity(accountIndex: number) {
-      const originAddressInfo = sameBaseAddressesRemoveDuplicates[accountIndex];
-
-      if (originAddressInfo) {
-        try {
-          const targetChain = activeChainId || originAddressInfo.chain.id;
-
-          const address = originAddressInfo.address;
-
-          const res = await linkExistingAddressToChainOrCommunity(
-            address,
-            targetChain,
-            originAddressInfo.chain.id
-          );
-
-          if (res && res.result) {
-            const { verification_token, addresses, encodedAddress } =
-              res.result;
-            app.user.setAddresses(
-              addresses.map((a) => {
-                return new AddressInfo(
-                  a.id,
-                  a.address,
-                  a.chain,
-                  a.keytype,
-                  a.wallet_id
-                );
-              })
-            );
-            const addressInfo = app.user.addresses.find(
-              (a) => a.address === encodedAddress && a.chain.id === targetChain
-            );
-
-            const account = app.chain.accounts.get(
-              encodedAddress,
-              addressInfo.keytype
-            );
-            if (app.chain) {
-              account.setValidationToken(verification_token);
-              console.log('setting validation token');
-            }
-            if (
-              activeChainId &&
-              !app.roles.getRoleInCommunity({
-                account,
-                chain: activeChainId,
-              })
-            ) {
-              await app.roles.createRole({
-                address: _.omit(addressInfo, 'chain'),
-                chain: activeChainId,
-              });
-            }
-            await setActiveAccount(account);
-            if (
-              app.user.activeAccounts.filter((a) => isSameAccount(a, account))
-                .length === 0
-            ) {
-              app.user.setActiveAccounts(
-                app.user.activeAccounts.concat([account])
-              );
-            }
-          } else {
-            // Todo: handle error
-          }
-
-          // If token forum make sure has token and add to app.chain obj
-          if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-            await app.chain.activeAddressHasToken(
-              app.user.activeAccount.address
-            );
-          }
-          redraw();
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    }
-
-    // Handles displaying the login modal or the account selector modal
-    // TODO: Replace with pretty modal
-    async function performJoinCommunityLinking() {
-      if (
-        sameBaseAddressesRemoveDuplicates.length > 1 &&
-        app.activeChainId() !== 'axie-infinity'
-      ) {
-        app.modals.create({
-          modal: AccountSelector,
-          data: {
-            accounts: sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
-              address: addressInfo.address,
-            })),
-            walletNetwork: activeChainInfo?.network,
-            walletChain: activeChainInfo?.base,
-            onSelect: async (accountIndex) => {
-              await linkToCommunity(accountIndex);
-              $('.AccountSelector').trigger('modalexit');
-            },
-          },
-        });
-      } else if (
-        sameBaseAddressesRemoveDuplicates.length === 1 &&
-        app.activeChainId() !== 'axie-infinity'
-      ) {
-        await linkToCommunity(0);
-      } else {
-        app.modals.create({
-          modal: NewLoginModal,
-          data: {
-            modalType: isWindowMediumSmallInclusive(window.innerWidth)
-              ? 'fullScreen'
-              : 'centered',
-            breakpointFn: isWindowMediumSmallInclusive,
-          },
-        });
-      }
-    }
-
+  if (!app.isLoggedIn()) {
     return (
       <div className="LoginSelector">
-        {app.chain &&
-          !app.chainPreloading &&
-          this.profileLoadComplete &&
-          !app.user.activeAccount && (
-            <div className="join-button-container">
-              <CWButton
-                buttonType="tertiary-black"
-                onClick={async () => {
-                  if (hasTermsOfService) {
-                    app.modals.create({
-                      modal: TOSModal,
-                      data: {
-                        onAccept: async () => {
-                          $('.TOSModal').trigger('modalexit');
-                          await performJoinCommunityLinking();
-                        },
+        <CWButton
+          buttonType="tertiary-black"
+          iconLeft="person"
+          label="Log in"
+          onClick={() => {
+            app.modals.create({
+              modal: NewLoginModal,
+              data: {
+                modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                  ? 'fullScreen'
+                  : 'centered',
+                breakpointFn: isWindowMediumSmallInclusive,
+              },
+            });
+          }}
+        />
+      </div>
+    );
+  }
+
+  const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
+    return app.roles.getRoleInCommunity({
+      account,
+      chain: app.activeChainId(),
+    });
+  });
+
+  const activeAccountsByRole = app.roles.getActiveAccountsByRole();
+
+  const nAccountsWithoutRole = activeAccountsByRole.filter(
+    ([role]) => !role
+  ).length;
+
+  if (!profileLoadComplete && app.profiles.allLoaded()) {
+    setProfileLoadComplete(true);
+  }
+
+  const activeChainInfo = app.chain?.meta;
+  const activeChainId = activeChainInfo?.id;
+
+  // add all addresses if joining a community
+  const activeBase = activeChainInfo?.base;
+  const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
+  const samebaseAddresses = app.user.addresses.filter((a, idx) => {
+    // if no active chain, add all addresses
+    if (!activeBase) return true;
+
+    // add all items on same base as active chain
+    const addressChainInfo = app.config.chains.getById(a.chain.id);
+    if (addressChainInfo?.base !== activeBase) return false;
+
+    // // ensure doesn't already exist
+    const addressExists = !!app.user.addresses.slice(idx + 1).find(
+      (prev) =>
+        activeBase === ChainBase.Substrate &&
+        (app.config.chains.getById(prev.chain.id)?.base === ChainBase.Substrate
+          ? addressSwapper({
+              address: prev.address,
+              currentPrefix: 42,
+            }) ===
+            addressSwapper({
+              address: a.address,
+              currentPrefix: 42,
+            })
+          : prev.address === a.address)
+    );
+    if (addressExists) return false;
+
+    // filter additionally by chain network if in list of non-interop, unless we are on that chain
+    // TODO: make this related to wallet.specificChains
+    if (
+      NON_INTEROP_NETWORKS.includes(addressChainInfo?.network) &&
+      activeChainInfo?.network !== addressChainInfo?.network
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  // Extract unique addresses
+  const uniqueAddresses = [];
+  const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
+    (addressInfo) => {
+      if (!uniqueAddresses.includes(addressInfo.address)) {
+        uniqueAddresses.push(addressInfo.address);
+        return true;
+      }
+      return false;
+    }
+  );
+
+  const activeCommunityMeta = app.chain?.meta;
+  const hasTermsOfService = !!activeCommunityMeta?.terms;
+
+  // Handles linking the existing address to the community
+  async function linkToCommunity(accountIndex: number) {
+    const originAddressInfo = sameBaseAddressesRemoveDuplicates[accountIndex];
+
+    if (originAddressInfo) {
+      try {
+        const targetChain = activeChainId || originAddressInfo.chain.id;
+
+        const address = originAddressInfo.address;
+
+        const res = await linkExistingAddressToChainOrCommunity(
+          address,
+          targetChain,
+          originAddressInfo.chain.id
+        );
+
+        if (res && res.result) {
+          const { verification_token, addresses, encodedAddress } = res.result;
+          app.user.setAddresses(
+            addresses.map((a) => {
+              return new AddressInfo(
+                a.id,
+                a.address,
+                a.chain,
+                a.keytype,
+                a.wallet_id
+              );
+            })
+          );
+          const addressInfo = app.user.addresses.find(
+            (a) => a.address === encodedAddress && a.chain.id === targetChain
+          );
+
+          const account = app.chain.accounts.get(
+            encodedAddress,
+            addressInfo.keytype
+          );
+          if (app.chain) {
+            account.setValidationToken(verification_token);
+            console.log('setting validation token');
+          }
+          if (
+            activeChainId &&
+            !app.roles.getRoleInCommunity({
+              account,
+              chain: activeChainId,
+            })
+          ) {
+            await app.roles.createRole({
+              address: _.omit(addressInfo, 'chain'),
+              chain: activeChainId,
+            });
+          }
+          await setActiveAccount(account);
+          if (
+            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+              .length === 0
+          ) {
+            app.user.setActiveAccounts(
+              app.user.activeAccounts.concat([account])
+            );
+          }
+        } else {
+          // Todo: handle error
+        }
+
+        // If token forum make sure has token and add to app.chain obj
+        if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
+          await app.chain.activeAddressHasToken(app.user.activeAccount.address);
+        }
+        redraw();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+
+  // Handles displaying the login modal or the account selector modal
+  // TODO: Replace with pretty modal
+  async function performJoinCommunityLinking() {
+    if (
+      sameBaseAddressesRemoveDuplicates.length > 1 &&
+      app.activeChainId() !== 'axie-infinity'
+    ) {
+      app.modals.create({
+        modal: AccountSelector,
+        data: {
+          accounts: sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
+            address: addressInfo.address,
+          })),
+          walletNetwork: activeChainInfo?.network,
+          walletChain: activeChainInfo?.base,
+          onSelect: async (accountIndex) => {
+            await linkToCommunity(accountIndex);
+            $('.AccountSelector').trigger('modalexit');
+          },
+        },
+      });
+    } else if (
+      sameBaseAddressesRemoveDuplicates.length === 1 &&
+      app.activeChainId() !== 'axie-infinity'
+    ) {
+      await linkToCommunity(0);
+    } else {
+      app.modals.create({
+        modal: NewLoginModal,
+        data: {
+          modalType: isWindowMediumSmallInclusive(window.innerWidth)
+            ? 'fullScreen'
+            : 'centered',
+          breakpointFn: isWindowMediumSmallInclusive,
+        },
+      });
+    }
+  }
+
+  return (
+    <div className="LoginSelector">
+      {app.chain &&
+        !app.chainPreloading &&
+        profileLoadComplete &&
+        !app.user.activeAccount && (
+          <div className="join-button-container">
+            <CWButton
+              buttonType="tertiary-black"
+              onClick={async () => {
+                if (hasTermsOfService) {
+                  app.modals.create({
+                    modal: TOSModal,
+                    data: {
+                      onAccept: async () => {
+                        $('.TOSModal').trigger('modalexit');
+                        await performJoinCommunityLinking();
                       },
-                    });
-                  } else {
-                    await performJoinCommunityLinking();
-                  }
-                }}
-                label={
-                  sameBaseAddressesRemoveDuplicates.length === 0
-                    ? `No ${
-                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                        ''
-                      } address`
-                    : 'Join'
+                    },
+                  });
+                } else {
+                  await performJoinCommunityLinking();
                 }
-              />
-            </div>
-          )}
-        {app.chain &&
-          !app.chainPreloading &&
-          this.profileLoadComplete &&
-          app.user.activeAccount && (
-            <CWPopover
-              trigger={
-                <div className="left-button">
-                  <User user={app.user.activeAccount} hideIdentityIcon />
-                </div>
+              }}
+              label={
+                sameBaseAddressesRemoveDuplicates.length === 0
+                  ? `No ${
+                      CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                      CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                      ''
+                    } address`
+                  : 'Join'
               }
+            />
+          </div>
+        )}
+      {app.chain &&
+        !app.chainPreloading &&
+        profileLoadComplete &&
+        app.user.activeAccount && (
+          <React.Fragment>
+            <div
+              className="left-button"
+              onClick={leftMenuProps.handleInteraction}
+            >
+              <User user={app.user.activeAccount} hideIdentityIcon />
+            </div>
+            <Popover
               content={
                 <LoginSelectorMenuLeft
                   activeAddressesWithRole={activeAddressesWithRole}
                   nAccountsWithoutRole={nAccountsWithoutRole}
                 />
               }
+              {...leftMenuProps}
             />
-          )}
-        <CWPopover
-          trigger={
-            <div className="right-button">
-              <CWIconButton iconName="person" iconButtonTheme="black" />
-            </div>
-          }
-          content={<LoginSelectorMenuRight />}
-        />
+          </React.Fragment>
+        )}
+      <div className="right-button" onClick={rightMenuProps.handleInteraction}>
+        <CWIconButton iconName="person" iconButtonTheme="black" />
       </div>
-    );
-  }
-}
+      <Popover content={<LoginSelectorMenuRight />} {...rightMenuProps} />
+    </div>
+  );
+};

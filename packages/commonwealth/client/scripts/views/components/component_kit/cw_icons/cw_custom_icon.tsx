@@ -1,41 +1,29 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
+
 import { ComponentType } from '../types';
-
 import { customIconLookup } from './cw_icon_lookup';
-import type { CustomIconAttrs } from './types';
+import type { CustomIconProps } from './types';
 
-export class CWCustomIcon extends ClassComponent<CustomIconAttrs> {
-  view(vnode: ResultNode<CustomIconAttrs>) {
-    const {
-      componentType = ComponentType.CustomIcon,
-      iconName,
-      iconSize = 'medium',
-      ...otherAttrs
-    } = vnode.attrs;
+export const CWCustomIcon = (props: CustomIconProps) => {
+  const {
+    componentType = ComponentType.CustomIcon,
+    iconName,
+    iconSize = 'medium',
+    ...otherProps
+  } = props;
 
-    const CustomIcon = customIconLookup[iconName];
+  const CustomIcon = customIconLookup[iconName];
 
-    return (
-      <CustomIcon
-        componentType={componentType}
-        iconSize={iconSize}
-        {...otherAttrs}
-      />
-    );
-  }
-}
+  return (
+    <CustomIcon
+      componentType={componentType}
+      iconSize={iconSize}
+      {...otherProps}
+    />
+  );
+};

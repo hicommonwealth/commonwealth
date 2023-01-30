@@ -396,8 +396,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
             )}
             {hasNoWalletsLink && (
               <CWTooltip
-                interactionType="click"
-                tooltipContent={
+                content={
                   <React.Fragment>
                     <CWText type="caption">
                       If you don’t see your wallet then make sure:
@@ -410,9 +409,10 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                     </CWText>
                   </React.Fragment>
                 }
-                tooltipType="solidArrow"
-                trigger={
+                renderTrigger={(handleInteraction) => (
                   <CWText
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
                     type="caption"
                     className={getClasses<{ darkMode?: boolean }>(
                       { darkMode },
@@ -421,7 +421,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                   >
                     Don't see your wallet?
                   </CWText>
-                }
+                )}
               />
             )}
           </div>

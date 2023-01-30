@@ -1,28 +1,16 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_button.scss';
-import { CWIcon } from './cw_icons/cw_icon';
-import type { IconName } from './cw_icons/cw_icon_lookup';
-import { CWText } from './cw_text';
-import { getClasses } from './helpers';
 
-import type { StyleAttrs } from './types';
+import type { IconName } from './cw_icons/cw_icon_lookup';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { BaseStyleProps } from './types';
 import { ComponentType } from './types';
 
-export type ButtonType =
+type ButtonType =
   | 'primary-red'
   | 'primary-blue'
   | 'primary-black'
@@ -42,16 +30,16 @@ export type ButtonType =
   | 'mini-black'
   | 'mini-white';
 
-export type ButtonStyleAttrs = {
+type ButtonStyleProps = {
   buttonType?: ButtonType;
-} & StyleAttrs;
+} & BaseStyleProps;
 
-export type ButtonAttrs = {
+type ButtonProps = {
   iconLeft?: IconName;
   iconRight?: IconName;
-  label: string | ResultNode;
-  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-} & ButtonStyleAttrs;
+  label: string | React.ReactNode;
+} & ButtonStyleProps &
+  React.HTMLAttributes<HTMLButtonElement>;
 
 const getTextType = (buttonType: ButtonType) => {
   if (buttonType.slice(0, 2) === 'lg') {
@@ -63,48 +51,41 @@ const getTextType = (buttonType: ButtonType) => {
   }
 };
 
-export class CWButton extends ClassComponent<ButtonAttrs> {
-  view(vnode: ResultNode<ButtonAttrs>) {
-    const {
-      buttonType = 'primary-blue',
-      className,
-      disabled = false,
-      iconLeft,
-      iconRight,
-      label,
-      onClick,
-    } = vnode.attrs;
-    return (
-      <button
-        className={getClasses<ButtonStyleAttrs>(
-          {
-            disabled,
-            buttonType,
-            className,
-          },
-          ComponentType.Button
-        )}
-        onClick={onClick}
-        disabled={disabled}
-      >
-        {!!iconLeft && (
-          <CWIcon
-            iconName={iconLeft}
-            iconSize="small"
-            className="button-icon"
-          />
-        )}
-        <CWText type={getTextType(buttonType)} className="button-text" noWrap>
-          {label}
-        </CWText>
-        {!!iconRight && (
-          <CWIcon
-            iconName={iconRight}
-            iconSize="small"
-            className="button-icon"
-          />
-        )}
-      </button>
-    );
-  }
-}
+export const CWButton = (props: ButtonProps) => {
+  const {
+    buttonType = 'primary-blue',
+    className,
+    disabled = false,
+    iconLeft,
+    iconRight,
+    label,
+    onClick,
+    ...otherProps
+  } = props;
+
+  return (
+    <button
+      className={getClasses<ButtonStyleProps>(
+        {
+          disabled,
+          buttonType,
+          className,
+        },
+        ComponentType.Button
+      )}
+      onClick={onClick}
+      disabled={disabled}
+      {...otherProps}
+    >
+      {!!iconLeft && (
+        <CWIcon iconName={iconLeft} iconSize="small" className="button-icon" />
+      )}
+      <CWText type={getTextType(buttonType)} className="button-text" noWrap>
+        {label}
+      </CWText>
+      {!!iconRight && (
+        <CWIcon iconName={iconRight} iconSize="small" className="button-icon" />
+      )}
+    </button>
+  );
+};

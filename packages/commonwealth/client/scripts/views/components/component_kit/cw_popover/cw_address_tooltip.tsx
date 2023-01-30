@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_address_tooltip.scss';
 
@@ -9,22 +9,24 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWIconButton } from '../cw_icon_button';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
-import { CWTooltip } from './cw_tooltip';
+import { Popover, usePopover } from './cw_popover';
+import type { PopoverTriggerProps } from './cw_popover';
 
-type AddressTooltipAttrs = {
+type AddressTooltipProps = {
   address: string;
-  trigger: ResultNode;
-};
+} & PopoverTriggerProps;
 
-export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
-  view(vnode: ResultNode<AddressTooltipAttrs>) {
-    const { address, trigger } = vnode.attrs;
+export const CWAddressTooltip = (props: AddressTooltipProps) => {
+  const { address, renderTrigger } = props;
 
-    return (
-      <CWTooltip
-        persistOnHover
-        interactionType="hover"
-        tooltipContent={
+  const popoverProps = usePopover();
+
+  return (
+    <React.Fragment>
+      {renderTrigger(popoverProps.handleInteraction)}
+      <Popover
+        placement="top-start"
+        content={
           <div className={ComponentType.AddressTooltip}>
             <CWText type="caption">{address}</CWText>
             <CWIconButton
@@ -36,15 +38,15 @@ export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
                   .writeText(address)
                   .then(() => {
                     notifySuccess('Address copied to clipboard');
+                    popoverProps.setAnchorEl(null);
                   })
                   .catch(() => notifyError('Failed to copy address'));
               }}
             />
           </div>
         }
-        tooltipType="singleLine"
-        trigger={trigger}
+        {...popoverProps}
       />
-    );
-  }
-}
+    </React.Fragment>
+  );
+};

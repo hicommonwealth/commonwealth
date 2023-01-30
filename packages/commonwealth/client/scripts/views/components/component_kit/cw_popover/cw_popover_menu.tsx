@@ -1,24 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
-import { ReactPopover } from './cw_popover';
-import {
-  ComponentType,
+import { ComponentType } from '../types';
+import type {
   DefaultMenuItem,
   DividerMenuItem,
   HeaderMenuItem,
@@ -26,37 +15,32 @@ import {
 import { getClasses } from '../helpers';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
-import { getClasses } from '../helpers';
-import type { MenuItem } from '../types';
-import { ComponentType } from '../types';
-
-import type { SharedPopoverAttrs } from './cw_popover';
-import { CWPopover } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
+import type { PopoverTriggerProps } from './cw_popover';
 
 export type PopoverMenuItem =
   | DividerMenuItem
   | HeaderMenuItem
   | DefaultMenuItem;
 
-export const PopoverMenu = (props: {
-  renderTrigger: (onClick: () => void) => React.ReactNode;
+type PopoverMenuProps = {
   menuItems: Array<PopoverMenuItem>;
-}) => {
-  const [triggerEl, setTriggerEl] = React.useState<null | HTMLElement>(null);
+} & PopoverTriggerProps;
 
-  const handleToggle = (e?: React.MouseEvent<HTMLElement>) => {
-    setTriggerEl(triggerEl ? null : e.currentTarget);
-  };
+export const PopoverMenu = (props: PopoverMenuProps) => {
+  const { menuItems, renderTrigger } = props;
+
+  const popoverProps = usePopover();
 
   return (
-    <ClickAwayListener onClickAway={() => setTriggerEl(null)}>
+    <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
       {/* needs to be div instead of fragment so listener can work */}
       <div>
-        {props.renderTrigger(handleToggle)}
-        <ReactPopover
+        {renderTrigger(popoverProps.handleInteraction)}
+        <Popover
           content={
             <div className={ComponentType.PopoverMenu}>
-              {props.menuItems.map((item, i) => {
+              {menuItems.map((item, i) => {
                 if (item.type === 'header') {
                   return (
                     <CWText
@@ -70,8 +54,13 @@ export const PopoverMenu = (props: {
                 } else if (item.type === 'divider') {
                   return <div className="menu-section-divider" key={i} />;
                 } else {
-                  const { disabled, isSecondary, iconLeft, label, onClick } =
-                    item;
+                  const {
+                    disabled,
+                    isSecondary,
+                    iconLeft,
+                    label,
+                    onClick,
+                  } = item;
                   return (
                     <div
                       className={getClasses<{
@@ -80,7 +69,7 @@ export const PopoverMenu = (props: {
                       }>({ disabled, isSecondary }, 'PopoverMenuItem')}
                       onClick={(e) => {
                         onClick();
-                        handleToggle(e);
+                        popoverProps.handleInteraction(e);
                       }}
                       key={i}
                     >
@@ -100,7 +89,7 @@ export const PopoverMenu = (props: {
               })}
             </div>
           }
-          anchorEl={triggerEl}
+          {...popoverProps}
         />
       </div>
     </ClickAwayListener>

@@ -1,65 +1,62 @@
 /* @jsx jsx */
 import React from 'react';
-import PopperUnstyled from '@mui/base/PopperUnstyled';
+import { PopperUnstyled } from '@mui/base';
+import type { Placement } from '@popperjs/core/lib';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  Component,
-  jsx,
-  Children,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import { uuidv4 } from 'lib/util';
 
-import 'components/component_kit/cw_popover/cw_popover.scss';
+type AnchorType = HTMLElement | SVGSVGElement;
 
-import { getClasses } from '../helpers';
-import { ComponentType } from '../types';
-import type { TooltipType } from './cw_tooltip';
-import {
-  applyArrowStyles,
-  cursorInBounds,
-  findRef,
-  getPosition,
-} from './helpers';
-import { CWPortal } from '../cw_portal';
-
-export type PopoverInteractionType = 'click' | 'hover';
-
-export type SharedPopoverAttrs = {
-  hoverCloseDelay?: number;
-  hoverOpenDelay?: number;
-  interactionType?: PopoverInteractionType;
-  persistOnHover?: boolean;
-  tooltipType?: TooltipType;
-  toSide?: boolean;
-  trigger: Children;
+type UsePopoverProps = {
+  anchorEl: AnchorType;
+  id: string;
+  open: boolean;
+  setAnchorEl: React.Dispatch<React.SetStateAction<AnchorType>>;
+  handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
 };
 
-type PopoverAttrs = {
-  content: Children;
-  onToggle?: (isOpen: boolean) => void;
-} & SharedPopoverAttrs;
+type PopoverProps = {
+  content: React.ReactNode;
+  placement?: Placement;
+} & UsePopoverProps;
 
-// const defaultHoverCloseDelay = 100;
+export type PopoverTriggerProps = {
+  renderTrigger: (
+    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
+  ) => React.ReactNode;
+};
 
-export const ReactPopover = (props: {
-  anchorEl: HTMLElement;
-  content: Children;
-}) => {
-  const open = Boolean(props.anchorEl);
-  const id = open ? 'simple-popper' : undefined;
+export const usePopover = (): UsePopoverProps => {
+  const [anchorEl, setAnchorEl] = React.useState<null | AnchorType>(null);
+
+  const handleInteraction = (e: React.MouseEvent<AnchorType>) => {
+    setAnchorEl(anchorEl ? null : e.currentTarget);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? `popover-${uuidv4()}` : undefined;
+
+  return {
+    anchorEl,
+    id,
+    open,
+    setAnchorEl,
+    handleInteraction,
+  };
+};
+
+export const Popover = (props: PopoverProps) => {
+  const { anchorEl, content, id, open, placement } = props;
 
   return (
     <PopperUnstyled
       id={id}
       open={open}
-      anchorEl={props.anchorEl}
+      anchorEl={anchorEl}
+      placement={placement}
       modifiers={[
         {
           name: 'preventOverflow',
@@ -69,12 +66,12 @@ export const ReactPopover = (props: {
         },
       ]}
     >
-      {props.content}
+      {content}
     </PopperUnstyled>
   );
 };
 
-export class CWPopover extends ClassComponent<PopoverAttrs> {
+export class CWPopover extends ClassComponent {
   view() {
     return <div />;
   }

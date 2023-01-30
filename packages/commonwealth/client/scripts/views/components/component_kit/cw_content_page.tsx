@@ -196,24 +196,22 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
   }
 }
 
-type ContentPageCardAttrs = {
-  content: ResultNode;
+type ContentPageCardProps = {
+  content: React.ReactNode;
   header: string;
 };
 
-export class CWContentPageCard extends ClassComponent<ContentPageCardAttrs> {
-  view(vnode: ResultNode<ContentPageCardAttrs>) {
-    const { content, header } = vnode.attrs;
+export const CWContentPageCard = (props: ContentPageCardProps) => {
+  const { content, header } = props;
 
-    return (
-      <CWCard className="ContentPageCard">
-        <div className="header-container">
-          <CWText type="h5" fontWeight="semiBold">
-            {header}
-          </CWText>
-        </div>
-        {content}
-      </CWCard>
-    );
-  }
-}
+  return (
+    <CWCard className="ContentPageCard">
+      <div className="header-container">
+        <CWText type="h5" fontWeight="semiBold">
+          {header}
+        </CWText>
+      </div>
+      {content}
+    </CWCard>
+  );
+};

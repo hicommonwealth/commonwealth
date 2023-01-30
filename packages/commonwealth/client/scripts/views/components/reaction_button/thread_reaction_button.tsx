@@ -98,12 +98,6 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
         });
     };
 
-    const countsComponent = (
-      <CWText className="menu-buttons-text" type="caption" fontWeight="medium">
-        {likes}
-      </CWText>
-    );
-
     return (
       <div
         className={getClasses<{ disabled?: boolean }>(
@@ -122,8 +116,7 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
         />
         {likes > 0 ? (
           <CWTooltip
-            interactionType="hover"
-            tooltipContent={
+            content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
                   likes,
@@ -131,12 +124,26 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
                 })}
               </div>
             }
-            trigger={countsComponent}
-            hoverOpenDelay={100}
-            tooltipType="bordered"
+            renderTrigger={(handleInteraction) => (
+              <CWText
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+                className="menu-buttons-text"
+                type="caption"
+                fontWeight="medium"
+              >
+                {likes}
+              </CWText>
+            )}
           />
         ) : (
-          countsComponent
+          <CWText
+            className="menu-buttons-text"
+            type="caption"
+            fontWeight="medium"
+          >
+            {likes}
+          </CWText>
         )}
         {/* <CWIconButton iconName="downvote" iconSize="small" disabled /> */}
       </div>

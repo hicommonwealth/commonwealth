@@ -2,18 +2,6 @@
 
 $width: 360px;
 
-.Tooltip {
-  @include baseTooltipStyles;
-
-  border: 2px solid $neutral-400;
-  box-shadow: $elevation-2;
-  padding: 8px;
-
-  .Text {
-    color: $neutral-500;
-  }
-}
-
 .ComponentShowcase {
   display: flex;
   flex-direction: column;
@@ -27,13 +15,13 @@ $width: 360px;
     gap: 8px;
     width: $width;
 
-    .Tooltip {
-      @include baseTooltipStyles;
+    .item-row {
+      align-items: center;
+      display: flex;
+      gap: 16px;
 
-      border: 2px solid $neutral-400;
-
-      .Text {
-        color: $neutral-500;
+      .Icon {
+        color: $neutral-400;
       }
     }
   }
@@ -114,8 +102,7 @@ $width: 360px;
     .icon-row {
       align-items: center;
       display: flex;
-      flex-direction: row;
-      height: 48px;
+      height: 32px;
       justify-content: space-between;
       width: 200px;
     }

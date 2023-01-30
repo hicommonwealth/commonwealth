@@ -1,17 +1,7 @@
 /* @jsx jsx */
-import React, { MouseEvent } from 'react';
+import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_card.scss';
 import { getClasses } from './helpers';
@@ -20,54 +10,50 @@ import { ComponentType } from './types';
 
 export type CardElevation = 'elevation-1' | 'elevation-2' | 'elevation-3';
 
-type CardStyleAttrs = {
+type CardStyleProps = {
   className?: string;
   elevation?: CardElevation;
   fullWidth?: boolean;
   interactive?: boolean;
 };
 
-// TODO: @ZAK @REACT is this type assumption ok?
-type ReactMouseEvent = MouseEvent<HTMLDivElement>;
+type CardProps = {
+  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  onmouseover?: (e: React.MouseEvent<HTMLElement>) => void;
+  onMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
+  onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
+} & CardStyleProps &
+  React.PropsWithChildren;
 
-type CardAttrs = {
-  onClick?: (e?: ReactMouseEvent) => void;
-  onmouseover?: (e?: ReactMouseEvent) => void;
-  onMouseEnter?: (e?: ReactMouseEvent) => void;
-  onMouseLeave?: (e?: ReactMouseEvent) => void;
-} & CardStyleAttrs;
+export const CWCard = (props: CardProps) => {
+  const {
+    className,
+    elevation,
+    fullWidth,
+    interactive = false,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onmouseover,
+  } = props;
 
-export class CWCard extends ClassComponent<CardAttrs> {
-  view(vnode: ResultNode<CardAttrs>) {
-    const {
-      className,
-      elevation,
-      fullWidth,
-      interactive = false,
-      onClick,
-      onMouseEnter,
-      onMouseLeave,
-      onmouseover,
-    } = vnode.attrs;
-
-    return (
-      <div
-        className={getClasses<CardStyleAttrs>(
-          {
-            elevation,
-            fullWidth,
-            interactive,
-            className,
-          },
-          ComponentType.Card
-        )}
-        onClick={onClick}
-        onMouseOver={onmouseover}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
-        {vnode.children}
-      </div>
-    );
-  }
-}
+  return (
+    <div
+      className={getClasses<CardStyleProps>(
+        {
+          elevation,
+          fullWidth,
+          interactive,
+          className,
+        },
+        ComponentType.Card
+      )}
+      onClick={onClick}
+      onMouseOver={onmouseover}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {props.children}
+    </div>
+  );
+};

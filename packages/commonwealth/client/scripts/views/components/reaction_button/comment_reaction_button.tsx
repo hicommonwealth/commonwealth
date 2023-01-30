@@ -98,12 +98,6 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
         });
     };
 
-    const countsComponent = (
-      <CWText className="menu-buttons-text" type="caption" fontWeight="medium">
-        {likes}
-      </CWText>
-    );
-
     return (
       <div
         className={getClasses<{ disabled?: boolean }>(
@@ -122,8 +116,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
         />
         {likes > 0 ? (
           <CWTooltip
-            interactionType="hover"
-            tooltipContent={
+            content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
                   likes,
@@ -131,12 +124,26 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
                 })}
               </div>
             }
-            trigger={countsComponent}
-            hoverOpenDelay={100}
-            tooltipType="bordered"
+            renderTrigger={(handleInteraction) => (
+              <CWText
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+                className="menu-buttons-text"
+                type="caption"
+                fontWeight="medium"
+              >
+                {likes}
+              </CWText>
+            )}
           />
         ) : (
-          countsComponent
+          <CWText
+            className="menu-buttons-text"
+            type="caption"
+            fontWeight="medium"
+          >
+            {likes}
+          </CWText>
         )}
         {/* <CWIconButton iconName="downvote" iconSize="small" disabled /> */}
       </div>

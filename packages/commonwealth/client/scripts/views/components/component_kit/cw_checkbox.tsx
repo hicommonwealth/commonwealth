@@ -1,23 +1,14 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_checkbox.scss';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
-import type { StyleAttrs } from './types';
+import type { BaseStyleProps } from './types';
 import { ComponentType } from './types';
 
 export type CheckboxType = { label?: string; value?: string };
@@ -25,7 +16,7 @@ export type CheckboxType = { label?: string; value?: string };
 type CheckboxStyleAttrs = {
   checked?: boolean;
   indeterminate?: boolean;
-} & StyleAttrs;
+} & BaseStyleProps;
 
 type CheckboxAttrs = {
   groupName?: string;

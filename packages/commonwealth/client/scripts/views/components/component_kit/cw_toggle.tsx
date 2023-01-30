@@ -1,29 +1,21 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_toggle.scss';
+
+import type { BaseStyleProps } from './types';
 import { getClasses } from './helpers';
-import type { StyleAttrs } from './types';
 import { ComponentType } from './types';
 
 type ToggleStyleAttrs = {
   checked?: boolean;
-} & StyleAttrs;
+} & BaseStyleProps;
 
 type ToggleAttrs = {
-  onChange: (e?: any) => void;
+  onChange?: (e?: any) => void;
 } & ToggleStyleAttrs;
 
 export class CWToggle extends ClassComponent<ToggleAttrs> {
