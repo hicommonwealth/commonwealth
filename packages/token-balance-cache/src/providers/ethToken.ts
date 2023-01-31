@@ -33,6 +33,9 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
     const url = node.private_url || node.url;
     const { tokenAddress, contractType } = opts;
     if (!tokenAddress && !contractType) {
+      if (!Web3.utils.isAddress(address)) {
+        throw new Error('Invalid address');
+      }
       // use native token if no args provided
       const provider = new Web3.providers.WebsocketProvider(url);
       const web3 = new Web3(provider);
