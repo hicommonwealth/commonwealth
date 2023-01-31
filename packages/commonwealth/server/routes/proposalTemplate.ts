@@ -1,9 +1,11 @@
 import { AppError } from 'common-common/src/errors';
-import { Request, Response } from 'express';
-import { DB } from '../models';
-import { CommunityContractTemplateAttributes } from '../models/community_contract_template';
-import { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
-import { TypedRequestBody, TypedResponse, success, failure } from '../types';
+import type { Request, Response } from 'express';
+import type { DB } from '../models';
+import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
+import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success, failure } from '../types';
+import { idAndIndex } from '@polkadot/api-derive/accounts';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
   slug: string;
@@ -47,19 +49,29 @@ export async function createCommunityContractTemplateAndMetadata(
     );
   }
 
-  try {
-    const newCCT = await models.CommunityContractTemplate.create({
-      community_id,
+  const communityContract = await models.CommunityContract.findOne({
+    where: {
+      chain_id: community_id,
       contract_id,
-      template_id,
-    });
+    },
+  });
 
+  if (!communityContract) {
+    throw new AppError('Community contract does not exist');
+  }
+
+  try {
+    // TODO: can some kind of transcation happen here to make this atomic?
     const newMetadata = await models.CommunityContractTemplateMetadata.create({
       slug,
       nickname,
       display_name,
       display_options,
-      cct_id: newCCT.id,
+    });
+
+    const newCCT = await models.CommunityContractTemplate.create({
+      community_contract_id: communityContract.id,
+      template_id,
     });
 
     return success(res, { metadata: newMetadata, cct: newCCT });
@@ -199,23 +211,24 @@ export async function deleteCommunityContractTemplate(
   }
 }
 
+// TODO: Unclear when necessary
 export async function getCommunityContractTemplateMetadata(
   models: DB,
   req: Request,
   res: Response
 ) {
   try {
-    const { cct_id } = req.body.contractMetadata;
-    if (!cct_id) {
+    const { id } = req.body.contractMetadata;
+    if (!id) {
       return res.status(400).json({
         status: 'Failure',
-        message: 'Must provide cct_id',
+        message: 'Must provide id',
       });
     }
 
     const contract = await models.CommunityContractTemplateMetadata.findOne({
       where: {
-        cct_id,
+        id,
       },
     });
 
@@ -250,7 +263,7 @@ export async function updateCommunityContractTemplateMetadata(
 
     const contract = await models.CommunityContractTemplateMetadata.findOne({
       where: {
-        cct_id: contractTemplateMetadata.cct_id,
+        id: contractTemplateMetadata.id,
       },
     });
 
@@ -292,7 +305,7 @@ export async function deleteCommunityContractTemplateMetadata(
 
     const contract = await models.CommunityContractTemplateMetadata.findOne({
       where: {
-        cct_id: contractTemplateMetadata.cct_id,
+        id: contractTemplateMetadata.id,
       },
     });
 

@@ -5,15 +5,15 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.createTable('CommunityContractTemplate', {
         id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-        community_id: {
-          type: Sequelize.STRING,
-          allowNull: false,
-          primaryKey: true,
-        },
-        contract_id: {
+        community_contract_id: {
           type: Sequelize.INTEGER,
           allowNull: false,
           autoIncrement: true,
+          primaryKey: true,
+        },
+        cctmd_id: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
           primaryKey: true,
         },
         template_id: {
@@ -25,7 +25,7 @@ module.exports = {
       });
 
       await queryInterface.createTable('CommunityContractTemplateMetadata', {
-        cct_id: {
+        id: {
           type: Sequelize.INTEGER,
           primaryKey: true,
         },

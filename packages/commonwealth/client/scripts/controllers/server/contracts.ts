@@ -10,8 +10,8 @@ type AddCommunityContractTemplateAttributes = {
   nickname: string;
   display_name: string;
   display_options: string;
-  community_id: string;
   contract_id: number;
+  community_id: string;
   template_id: number;
 };
 
@@ -104,6 +104,8 @@ class ContractsController {
       symbol,
       is_factory,
       nickname,
+      cct,
+      cctmd,
     } = contractAttributes;
     this._store.add(
       new Contract({
@@ -119,8 +121,36 @@ class ContractsController {
         abi,
         isFactory: is_factory,
         nickname,
+        cct,
+        cctmd,
       })
     );
+  }
+
+  public async updateTemplate({
+    contract_id,
+    cct,
+    cctmd,
+  }: {
+    contract_id: number;
+    cct: {
+      id: number;
+      communityContractId: number;
+      cctmdId: number;
+      tempalteId: number;
+    };
+    cctmd: {
+      id: number;
+      slug: string;
+      nickname: string;
+      display_name: string;
+      display_options: string;
+    };
+  }) {
+    const currentContractInStore = this._store.getById(contract_id);
+    // TODO: Verify that this is a shallow copy situation
+    this._store.remove(this._store.getById(contract_id));
+    this._store.add(new Contract({ ...currentContractInStore, cct, cctmd }));
   }
 
   public async add({
@@ -195,10 +225,17 @@ class ContractsController {
   ) {
     try {
       // TODO add newTemplate to the store when the store will be ready
-      await $.post(
+      const newContract = await $.post(
         `${app.serverUrl()}/contract/community_template_and_metadata`,
         communityContractTemplateAndMetadata
       );
+
+      // TODO add newContract to the store when the types will be aligned
+      this.updateTemplate({
+        contract_id: communityContractTemplateAndMetadata.contract_id,
+        cct: newContract.cct,
+        cctmd: newContract.cctmd,
+      });
     } catch (err) {
       console.log(err);
       throw new Error('Failed to add community contract template');
@@ -221,25 +258,47 @@ class ContractsController {
     }
   }
 
-  public initialize(contracts = [], reset = true) {
+  public initialize(contractsWithTemplates = [], reset = true) {
     if (reset) {
       this._store.clear();
     }
-    contracts.forEach((contract) => {
+    contractsWithTemplates.forEach((contractWithTemplate) => {
       try {
         let abiJson: Array<Record<string, unknown>>;
-        if (contract.ContractAbi) {
+        let cct: {
+          id: number;
+          communityContractId: number;
+          cctmdId: number;
+          tempalteId: number;
+        };
+        let cctmd: {
+          id: number;
+          slug: string;
+          nickname: string;
+          display_name: string;
+          display_options: string;
+        };
+        if (contractWithTemplate.contract.ContractAbi) {
           // Necessary because the contract abi was stored as a string in some contracts
-          if (typeof contract.ContractAbi.abi === 'string') {
-            abiJson = JSON.parse(contract.ContractAbi.abi);
+          if (
+            typeof contractWithTemplate.contract.ContractAbi.abi === 'string'
+          ) {
+            abiJson = JSON.parse(contractWithTemplate.contract.ContractAbi.abi);
           } else {
-            abiJson = contract.ContractAbi.abi;
+            abiJson = contractWithTemplate.contract.ContractAbi.abi;
           }
         }
+        if (contractWithTemplate.cct) {
+          cct = contractWithTemplate.cct;
+          cctmd = contractWithTemplate.cct.CommunityContractTemplateMetadatum;
+        }
+
         this._store.add(
           Contract.fromJSON({
-            ...contract,
+            ...contractWithTemplate.contract,
             abi: abiJson,
+            cct: cct,
+            cctmd: cctmd,
           })
         );
       } catch (e) {

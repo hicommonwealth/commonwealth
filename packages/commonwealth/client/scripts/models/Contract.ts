@@ -15,6 +15,21 @@ class Contract {
   public readonly nickname?: string;
   public readonly abi?: Array<Record<string, unknown>>;
 
+  // Not attached to db model, but used for UI
+  public readonly cct?: {
+    id: number;
+    communityContractId: number;
+    cctmdId: number;
+    tempalteId: number;
+  };
+  public readonly cctmd?: {
+    id: number;
+    slug: string;
+    nickname: string;
+    display_name: string;
+    display_options: string;
+  };
+
   constructor({
     id,
     address,
@@ -28,6 +43,8 @@ class Contract {
     isFactory,
     nickname,
     abi,
+    cct,
+    cctmd,
   }: {
     id: number;
     address: string;
@@ -41,6 +58,19 @@ class Contract {
     isFactory?: boolean;
     nickname?: string;
     abi?: Array<Record<string, unknown>>;
+    cct?: {
+      id: number;
+      communityContractId: number;
+      cctmdId: number;
+      tempalteId: number;
+    };
+    cctmd?: {
+      id: number;
+      slug: string;
+      nickname: string;
+      display_name: string;
+      display_options: string;
+    };
   }) {
     this.id = id;
     this.address = address;
@@ -54,6 +84,8 @@ class Contract {
     this.isFactory = isFactory;
     this.nickname = nickname;
     this.abi = abi;
+    this.cct = cct;
+    this.cctmd = cctmd;
   }
 
   public static fromJSON({
@@ -69,6 +101,8 @@ class Contract {
     isFactory,
     nickname,
     abi,
+    cct,
+    cctmd,
   }) {
     return new Contract({
       id,
@@ -83,6 +117,8 @@ class Contract {
       isFactory,
       nickname,
       abi,
+      cct,
+      cctmd,
     });
   }
 }

@@ -76,6 +76,7 @@ class ContractsPage extends ClassComponent {
       return <PageLoading title="Contracts Page" />;
     }
 
+    console.log('app.contracts', app.contracts);
     return (
       <Sublayout>
         <div class="ContractsPage">
