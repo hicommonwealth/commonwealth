@@ -32,14 +32,13 @@ type UserDashboardRowAttrs = {
 export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
   view(vnode: ResultNode<UserDashboardRowAttrs>) {
     const {
-      likeCount,
-      viewCount,
       commentCount,
       categoryId,
       threadId,
       blockNumber,
       eventNetwork,
       chain,
+      commenters,
     } = vnode.attrs.notification;
 
     if (categoryId === 'chain-event') {
@@ -62,7 +61,7 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
       );
     }
 
-    const { chain_id, root_id, root_type } = JSON.parse(
+    const { chain_id, root_id, root_type, comment_id } = JSON.parse(
       vnode.attrs.notification.notificationData
     );
 
@@ -84,11 +83,11 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
           category={categoryId}
         />
         <UserDashboardRowBottom
-          path={path}
           threadId={threadId}
-          viewCount={viewCount}
+          commentId={comment_id}
+          chainId={chain_id}
           commentCount={commentCount}
-          likeCount={likeCount}
+          commenters={commenters}
         />
       </div>
     );

@@ -59,6 +59,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Transfer',
         label: `Transfer of ${data.tokenId} on ${chainId} from ${data.from} to ${data.to}.`,
+        icon: 'transfer',
       };
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases

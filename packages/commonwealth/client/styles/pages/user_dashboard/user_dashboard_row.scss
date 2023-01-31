@@ -27,7 +27,7 @@
   border-bottom-width: 2px;
   display: flex;
   gap: 16px;
-  padding: 16px 24px;
+  padding: 16px 0;
   width: 768px;
 
   @include mediumSmallInclusive {
@@ -42,8 +42,9 @@
 
 .UserDashboardRow {
   @include userDashboardRowStyles;
-
   flex-direction: column;
+  min-width: 100%;
+  max-width: 0;
 
   &.isLink {
     cursor: pointer;

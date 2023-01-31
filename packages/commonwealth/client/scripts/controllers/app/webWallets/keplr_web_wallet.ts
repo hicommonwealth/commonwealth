@@ -60,7 +60,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
-    const block = await client.getBlock(height);
+    const block = await client.getBlock(height - 2); // validator pool may be out of sync
 
     return {
       number: block.header.height,

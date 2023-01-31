@@ -190,7 +190,6 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
             this.defaultContents,
             tabIndex
           );
-          await this.editor.initialize();
           if (oncreateBind) oncreateBind(this.editor);
         }}
       >
