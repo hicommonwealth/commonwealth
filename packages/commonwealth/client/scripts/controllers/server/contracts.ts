@@ -11,7 +11,7 @@ type AddCommunityContractTemplateAttributes = {
   display_name: string;
   display_options: string;
   contract_id: number;
-  community_id: number;
+  community_id: string;
   template_id: number;
 };
 
