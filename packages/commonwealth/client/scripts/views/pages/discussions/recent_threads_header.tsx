@@ -1,7 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
@@ -23,7 +24,9 @@ type RecentThreadsHeaderAttrs = {
   totalThreadCount: number;
 };
 
-export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs> {
+export class RecentThreadsHeader extends ClassComponent<
+  RecentThreadsHeaderAttrs
+> {
   private isWindowExtraSmall: boolean;
 
   onResize() {
@@ -103,7 +106,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
                   <CWButton
                     buttonType="mini-black"
                     label="Create Thread"
-                    iconName="plus"
+                    iconLeft="plus"
                     onClick={() => {
                       navigateToSubpage('/new/discussion');
                     }}

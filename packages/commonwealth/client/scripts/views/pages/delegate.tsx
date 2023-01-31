@@ -8,8 +8,8 @@ import 'pages/delegate.scss';
 
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
+import type Compound from 'controllers/chain/ethereum/compound/adapter';
+import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import PageNotFound from './404';
 import Sublayout from 'views/sublayout';
@@ -163,7 +163,7 @@ class DelegatePage extends ClassComponent {
       }
 
       // chain loading
-      return <PageLoading message="Connecting to chain" title="Delegate" />;
+      return <PageLoading message="Connecting to chain" />;
     }
 
     return (

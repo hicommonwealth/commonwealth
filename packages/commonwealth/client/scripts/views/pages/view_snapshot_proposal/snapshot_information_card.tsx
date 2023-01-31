@@ -4,7 +4,8 @@ import React from 'react';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
@@ -18,7 +19,7 @@ import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
 
 type SnapshotInfoRowAttrs = {
   label: string;
-  value: string | ResultNode;
+  value: string | React.ReactNode;
 };
 
 class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
@@ -63,7 +64,9 @@ type SnapshotInformationCardAttrs = {
   threads: Array<{ id: string; title: string }> | null;
 };
 
-export class SnapshotInformationCard extends ClassComponent<SnapshotInformationCardAttrs> {
+export class SnapshotInformationCard extends ClassComponent<
+  SnapshotInformationCardAttrs
+> {
   view(vnode: ResultNode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;
 

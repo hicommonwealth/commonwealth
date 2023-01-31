@@ -36,9 +36,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr
+  return (arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+    .filter((s) => s) as unknown) as ThreadStage[];
 }
 
 export const modalRedirectClick = (e, route) => {
@@ -365,14 +365,16 @@ export const weiToTokens = (input: string, decimals: number) => {
   return valueTokens.toFixed();
 };
 
-export const isCommandClick = (e: MouseEvent) => {
+export const isCommandClick = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>
+) => {
   return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
 };
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
   _this,
-  e: MouseEvent,
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
   callback: () => any

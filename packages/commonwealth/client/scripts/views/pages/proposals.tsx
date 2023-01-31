@@ -98,12 +98,7 @@ class ProposalsPage extends ClassComponent {
             message="Change Metamask to point to Ethereum Mainnet"
           />
         );
-      return (
-        <PageLoading
-          message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Proposals" />}
-        />
-      );
+      return <PageLoading message="Connecting to chain" />;
     }
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;

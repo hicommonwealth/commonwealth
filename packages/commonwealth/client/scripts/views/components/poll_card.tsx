@@ -1,7 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
 import { CWButton } from './component_kit/cw_button';
@@ -140,8 +141,12 @@ export type VoteDisplayAttrs = {
 
 export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
   view(vnode: ResultNode<VoteDisplayAttrs>) {
-    const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
-      vnode.attrs;
+    const {
+      voteDirectionString,
+      timeRemaining,
+      pollEnded,
+      voteInformation,
+    } = vnode.attrs;
 
     const topResponse = voteInformation.sort(
       (option1, option2) => option2.voteCount - option1.voteCount
@@ -185,7 +190,7 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
 
 export type ResultsSectionAttrs = {
   resultString?: string;
-  onResultsClick: (e: Event) => any;
+  onResultsClick: (e: React.MouseEvent<HTMLDivElement>) => any;
   tokenSymbol?: string;
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;

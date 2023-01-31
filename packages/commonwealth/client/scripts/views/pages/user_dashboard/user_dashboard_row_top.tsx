@@ -2,7 +2,8 @@
 import React from 'react';
 
 import { formatTimestamp } from 'helpers/index';
-import { ClassComponent, ResultNode, setRoute, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';
 import moment from 'moment';
@@ -19,7 +20,9 @@ type UserDashboardRowTopAttrs = {
   category: string;
 };
 
-export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs> {
+export class UserDashboardRowTop extends ClassComponent<
+  UserDashboardRowTopAttrs
+> {
   view(vnode: ResultNode<UserDashboardRowTopAttrs>) {
     const { commentCount } = vnode.attrs.activityData;
 
@@ -65,7 +68,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         onclick={(e: any) => {
           e.preventDefault();
           e.stopPropagation();
-          m.route.set(`/${author_chain}/account/${author_address}`);
+          setRoute(`/${author_chain}/account/${author_address}`);
         }}
       />
     );

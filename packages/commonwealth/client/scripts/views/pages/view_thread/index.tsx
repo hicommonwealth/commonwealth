@@ -10,7 +10,8 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
 
@@ -553,7 +554,6 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       ];
     };
 
-    // @ts-ignore
     return (
       <Sublayout
       //  title={headerTitle}
@@ -620,9 +620,6 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                       {reactionsAndReplyButtons}
                       <CreateComment
                         updatedCommentsCallback={updatedCommentsCallback}
-                        setIsGloballyEditing={setIsGloballyEditing}
-                        isGloballyEditing={this.isGloballyEditing}
-                        parentComment={null}
                         rootProposal={thread}
                       />
                     </React.Fragment>

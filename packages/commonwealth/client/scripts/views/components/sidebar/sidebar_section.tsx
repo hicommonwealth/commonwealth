@@ -4,7 +4,8 @@ import React from 'react';
 import 'components/sidebar/sidebar_section.scss';
 import { isNotUndefined } from 'helpers/typeGuards';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
@@ -182,7 +183,6 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
       displayData,
       extraComponents,
       onClick,
-      rightIcon,
       title,
       toggleDisabled,
     } = vnode.attrs;

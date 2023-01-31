@@ -8,7 +8,6 @@ import 'pages/notification_settings/index.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -26,11 +25,7 @@ import { bundleSubs } from './helpers';
 class NotificationSettingsPage extends ClassComponent {
   view() {
     if (!app.loginStatusLoaded()) {
-      return (
-        <PageLoading
-          title={<BreadcrumbsTitleTag title="Notification Settings" />}
-        />
-      );
+      return <PageLoading />;
     } else if (!app.isLoggedIn()) {
       setRoute('/', {}, { replace: true });
       return <PageLoading />;

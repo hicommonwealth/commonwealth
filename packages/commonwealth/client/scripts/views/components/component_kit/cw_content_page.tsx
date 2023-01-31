@@ -7,7 +7,8 @@ import moment from 'moment';
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
-import { PopoverMenu, PopoverMenuItem } from './cw_popover/cw_popover_menu';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { SharePopover } from '../share_popover';
 import { CWCard } from './cw_card';
 import { CWIconButton } from './cw_icon_button';

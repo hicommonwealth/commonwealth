@@ -59,7 +59,7 @@ type CreateCommunityState = {
 } & EthChainAttrs;
 
 class CreateCommunity extends ClassComponent {
-  private state: CreateCommunityState = {
+  public state: CreateCommunityState = {
     activeForm: CommunityType.StarterCommunity,
     ethChainNames: {},
     ethChains: {},

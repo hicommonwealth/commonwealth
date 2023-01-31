@@ -80,12 +80,7 @@ class ReferendaPage extends ClassComponent {
         );
       }
 
-      return (
-        <PageLoading
-          message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Referenda" />}
-        />
-      );
+      return <PageLoading message="Connecting to chain" />;
     }
 
     const onSubstrate = app.chain?.base === ChainBase.Substrate;

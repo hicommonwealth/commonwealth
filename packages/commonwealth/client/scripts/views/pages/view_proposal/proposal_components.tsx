@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import type MolochMember from 'controllers/chain/ethereum/moloch/member';
@@ -43,7 +34,9 @@ type MolochCancelButtonAttrs = {
   molochMember: MolochMember;
 } & BaseCancelButtonAttrs;
 
-export class MolochCancelButton extends ClassComponent<MolochCancelButtonAttrs> {
+export class MolochCancelButton extends ClassComponent<
+  MolochCancelButtonAttrs
+> {
   view(vnode: ResultNode<MolochCancelButtonAttrs>) {
     const {
       proposal,
@@ -75,8 +68,12 @@ type AaveCancelButtonAttrs = {
 
 export class AaveCancelButton extends ClassComponent<AaveCancelButtonAttrs> {
   view(vnode: ResultNode<AaveCancelButtonAttrs>) {
-    const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
-      vnode.attrs;
+    const {
+      proposal,
+      votingModalOpen,
+      onModalClose,
+      toggleVotingModal,
+    } = vnode.attrs;
 
     return (
       <CWButton
@@ -95,10 +92,16 @@ type CompoundCancelButtonAttrs = {
   proposal: CompoundProposal;
 } & BaseCancelButtonAttrs;
 
-export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAttrs> {
+export class CompoundCancelButton extends ClassComponent<
+  CompoundCancelButtonAttrs
+> {
   view(vnode: ResultNode<CompoundCancelButtonAttrs>) {
-    const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
-      vnode.attrs;
+    const {
+      proposal,
+      votingModalOpen,
+      onModalClose,
+      toggleVotingModal,
+    } = vnode.attrs;
 
     return (
       <CWButton

@@ -1,18 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-  parsePathname,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx, parsePathname } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 import { navigateToSubpage } from 'router';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -40,7 +30,9 @@ type NewSnapshotProposalPageAttrs = {
   snapshotId: string;
 };
 
-export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalPageAttrs> {
+export class NewSnapshotProposalPage extends ClassComponent<
+  NewSnapshotProposalPageAttrs
+> {
   private form: ThreadForm;
   private initialized: boolean;
   private isFromExistingProposal: boolean;
@@ -232,7 +224,6 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
             <CWRadioGroup
               name="period"
               options={[{ value: '4d', label: '4-day' }]}
-              value={this.form.range}
               toggledOption="4d"
               onChange={(e: Event) => {
                 this.form.range = (e.target as any).value;

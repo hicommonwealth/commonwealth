@@ -57,7 +57,7 @@ export class SputnikProposalForm extends ClassComponent {
       <React.Fragment>
         <CWDropdown
           label="Proposal Type"
-          defaultValue={sputnikProposalOptions[0]}
+          initialValue={sputnikProposalOptions[0]}
           options={sputnikProposalOptions}
           onSelect={(item) => {
             this.sputnikProposalType = item.value;

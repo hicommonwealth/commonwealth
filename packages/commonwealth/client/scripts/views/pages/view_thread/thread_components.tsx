@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
-import { ClassComponent } from 'client/scripts/mithrilInterop';
-import type { ResultNode } from 'client/scripts/mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'router';

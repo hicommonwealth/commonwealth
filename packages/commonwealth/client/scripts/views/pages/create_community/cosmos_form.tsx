@@ -30,7 +30,7 @@ type CreateCosmosForm = ChainFormFields & EthFormFields & CosmosFormFields;
 type CreateCosmosState = ChainFormState & { form: CreateCosmosForm };
 
 export class CosmosForm extends ClassComponent {
-  private state: CreateCosmosState = {
+  public state: CreateCosmosState = {
     message: '',
     saving: false,
     form: {

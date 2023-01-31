@@ -18,7 +18,8 @@ import 'pages/search/index.scss';
 import app from 'state';
 import { SearchContentType } from 'types';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
-import { AddressInfo, Profile, SearchQuery } from 'models';
+import { AddressInfo, SearchQuery } from 'models';
+import type { Profile } from 'models';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
@@ -229,7 +230,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
-    const searchQuery = SearchQuery.fromUrlParams(getRouteParam());
+    const searchQuery = SearchQuery.fromUrlParams({ url: getRouteParam() });
 
     const { chainScope, searchTerm } = searchQuery;
     const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;

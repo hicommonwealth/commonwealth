@@ -41,7 +41,7 @@ type CreateSubstrateForm = ChainFormFields & SubstrateFormFields;
 type CreateSubstrateState = ChainFormState & { form: CreateSubstrateForm };
 
 export class SubstrateForm extends ClassComponent {
-  private state: CreateSubstrateState = {
+  public state: CreateSubstrateState = {
     saving: false,
     form: {
       name: '',
@@ -124,8 +124,13 @@ export class SubstrateForm extends ClassComponent {
           label="Save changes"
           disabled={this.state.saving}
           onClick={async () => {
-            const { name, nodeUrl, iconUrl, substrateSpec, symbol } =
-              this.state.form;
+            const {
+              name,
+              nodeUrl,
+              iconUrl,
+              substrateSpec,
+              symbol,
+            } = this.state.form;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,

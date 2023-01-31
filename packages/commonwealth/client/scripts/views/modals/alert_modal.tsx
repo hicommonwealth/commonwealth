@@ -1,9 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-
-import { ResultNode, jsx } from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/alert_modal.scss';
@@ -24,7 +23,7 @@ const AlertModal = {
           e.preventDefault();
           e.stopPropagation();
         }}
-        onmousedown={(e) => {
+        onMouseDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}

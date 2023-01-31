@@ -1,7 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ChainBase } from 'common-common/src/types';
@@ -273,7 +274,6 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
 
     return (
       <CWButton
-        loading={this.loading}
         disabled={disabled}
         label={selection === 'email' ? 'Send Invite' : 'Add address'}
         onClick={(e) => {
@@ -525,31 +525,30 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
               }}
             />
           </div>
-          {
-            searchAddressTerm?.length > 3 && !this.hideResults && null // @TODO @REACT FIX ME
-            // m(List, [
-            //   !results || results?.length === 0
-            //     ? app.searchAddressCache[searchAddressTerm]?.loaded
-            //       ? m(ListItem, {
-            //           label: (
-            //             <div className="no-addresses">
-            //               <CWText fontWeight="medium">
-            //                 {searchAddressTerm}
-            //               </CWText>
-            //               <CWText type="caption">No addresses found</CWText>
-            //             </div>
-            //           ),
-            //           onClick: () => {
-            //             if (searchAddressTerm.length < 4) {
-            //               notifyError('Query must be at least 4 characters');
-            //             }
-            //           },
-            //         })
-            //       : m(ListItem, { label: <CWSpinner size="small" /> })
-            //     : this.isTyping
-            //     ? m(ListItem, { label: <CWSpinner size="small" /> })
-            //     : results,
-            // ])
+          {searchAddressTerm?.length > 3 && !this.hideResults && null // @TODO @REACT FIX ME
+          // m(List, [
+          //   !results || results?.length === 0
+          //     ? app.searchAddressCache[searchAddressTerm]?.loaded
+          //       ? m(ListItem, {
+          //           label: (
+          //             <div className="no-addresses">
+          //               <CWText fontWeight="medium">
+          //                 {searchAddressTerm}
+          //               </CWText>
+          //               <CWText type="caption">No addresses found</CWText>
+          //             </div>
+          //           ),
+          //           onClick: () => {
+          //             if (searchAddressTerm.length < 4) {
+          //               notifyError('Query must be at least 4 characters');
+          //             }
+          //           },
+          //         })
+          //       : m(ListItem, { label: <CWSpinner size="small" /> })
+          //     : this.isTyping
+          //     ? m(ListItem, { label: <CWSpinner size="small" /> })
+          //     : results,
+          // ])
           }
           <InviteButton
             selection="address"

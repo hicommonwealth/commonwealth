@@ -58,7 +58,8 @@ type MessageRowProps = {
 
 type TextInputProps = BaseTextInputProps &
   InputStyleProps &
-  InputInternalStyleProps;
+  InputInternalStyleProps &
+  React.HTMLAttributes<HTMLDivElement>;
 
 export const MessageRow = (props: MessageRowProps) => {
   const { hasFeedback, label, statusMessage, validationStatus } = props;
