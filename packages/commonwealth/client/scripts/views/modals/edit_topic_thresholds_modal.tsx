@@ -38,12 +38,6 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
         ? 6
         : 18;
 
-    console.log(app.chain.meta);
-    console.log(
-      app.chain.base === ChainBase.CosmosSDK && app.chain.meta.id !== 'evmos'
-    );
-    console.log('decimals', decimals);
-
     return (
       <div class="EditTopicThresholdsRow">
         <CWText>{topic.name}</CWText>
