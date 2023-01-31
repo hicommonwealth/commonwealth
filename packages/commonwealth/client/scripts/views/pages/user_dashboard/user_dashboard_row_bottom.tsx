@@ -2,28 +2,17 @@
 import React from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
 import app from 'state';
-import {
-  CWAvatarGroup,
-  ProfileWithAddress,
-} from '../../components/component_kit/cw_avatar_group';
+import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
+import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { subscribeToThread } from './helpers';
 
@@ -73,10 +62,10 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
           </div>
         </div>
         <div className="actions" onClick={(e) => e.stopPropagation()}>
-          <CWPopoverMenu
+          <PopoverMenu
             menuItems={[
               {
-                onclick: (e) => {
+                onClick: () => {
                   subscribeToThread(
                     threadId,
                     bothActive,
@@ -88,19 +77,20 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
                 iconLeft: bothActive ? 'unsubscribe' : 'bell',
               },
             ]}
-            trigger={
+            renderTrigger={(onClick) => (
               <CWIconButton
                 iconName={bothActive ? 'unsubscribe' : 'bell'}
                 iconSize="small"
+                onClick={onClick}
               />
-            }
+            )}
           />
-          <CWPopoverMenu
+          <PopoverMenu
             menuItems={[
               {
                 iconLeft: 'copy',
                 label: 'Copy URL',
-                onclick: async () => {
+                onClick: async () => {
                   if (commentId) {
                     await navigator.clipboard.writeText(
                       `${domain}/${chainId}/discussion/${threadId}?comment=${commentId}`
@@ -115,7 +105,7 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
               {
                 iconLeft: 'twitter',
                 label: 'Share on Twitter',
-                onclick: async () => {
+                onClick: async () => {
                   if (commentId) {
                     await window.open(
                       `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}
@@ -130,7 +120,13 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
                 },
               },
             ]}
-            trigger={<CWIconButton iconName="share" iconSize="small" />}
+            renderTrigger={(onClick) => (
+              <CWIconButton
+                iconName="share"
+                iconSize="small"
+                onClick={onClick}
+              />
+            )}
           />
         </div>
       </div>

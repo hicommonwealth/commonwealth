@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import { notifyInfo } from 'controllers/app/notifications';
 import $ from 'jquery';
@@ -69,7 +60,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         redraw();
       });
     } else if (tab === DashboardViews.Global) {
-      if (this.globalNotifications.length === 0) this.loadingData = true;
+      if (this.globalNotifications && this.globalNotifications.length === 0)
+        this.loadingData = true;
       fetchActivity(tab).then((activity) => {
         this.globalNotifications = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
@@ -261,9 +253,11 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   <React.Fragment>
                     {fyNotifications && fyNotifications.length > 0 ? (
                       <React.Fragment>
-                        {fyNotifications.slice(0, this.fyCount).map((data) => {
-                          return <UserDashboardRow notification={data} />;
-                        })}
+                        {fyNotifications
+                          .slice(0, this.fyCount)
+                          .map((data, i) => (
+                            <UserDashboardRow key={i} notification={data} />
+                          ))}
                         {notificationsRemaining(
                           fyNotifications.length,
                           this.fyCount
@@ -279,8 +273,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                     <React.Fragment>
                       {globalNotifications
                         .slice(0, this.globalCount)
-                        .map((data) => (
-                          <UserDashboardRow notification={data} />
+                        .map((data, i) => (
+                          <UserDashboardRow key={i} notification={data} />
                         ))}
                       {notificationsRemaining(
                         globalNotifications.length,
@@ -297,8 +291,10 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                       <React.Fragment>
                         {chainEvents
                           .slice(0, this.chainEventCount)
-                          .map((data) => {
-                            return <UserDashboardRow notification={data} />;
+                          .map((data, i) => {
+                            return (
+                              <UserDashboardRow key={i} notification={data} />
+                            );
                           })}
                         {notificationsRemaining(
                           chainEvents.length,

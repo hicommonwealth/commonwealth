@@ -93,8 +93,8 @@ export class DashboardCommunitiesPreview extends ClassComponent {
         const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
         return threadCountB - threadCountA;
       })
-      .map((chain) => {
-        return <CommunityPreviewCard chain={chain} />;
+      .map((chain, i) => {
+        return <CommunityPreviewCard key={i} chain={chain} />;
       });
 
     return (

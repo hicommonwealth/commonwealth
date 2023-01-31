@@ -1,7 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
-import { ClassComponent } from 'mithrilInterop';
 import type { Profile } from 'client/scripts/models';
 
 import 'components/component_kit/cw_avatar_group.scss';
@@ -18,7 +28,7 @@ type AvatarGroupAttrs = {
 };
 
 export class CWAvatarGroup extends ClassComponent<AvatarGroupAttrs> {
-  view(vnode: m.Vnode<AvatarGroupAttrs>) {
+  view(vnode: ResultNode<AvatarGroupAttrs>) {
     const { profiles, chainId } = vnode.attrs;
     if (!profiles || profiles?.length === 0) return;
 
@@ -38,22 +48,24 @@ export class CWAvatarGroup extends ClassComponent<AvatarGroupAttrs> {
     return (
       <div className="AvatarGroup">
         <div className="avatar-group-icons">
-          {truncatedProfiles.map((profile) => {
+          {truncatedProfiles.map((profile, i) => {
             if (profile.avatarUrl) {
               return (
-                <div className="avatar-group-icon">
+                <div className="avatar-group-icon" key={i}>
                   <CWAvatar avatarUrl={profile.avatarUrl} size={16} />
                 </div>
               );
+            } else {
+              const address = profile.Addresses.find((addr) => {
+                return addr.chain == chainId;
+              });
+
+              return (
+                <div className="avatar-group-icon" key={i}>
+                  <CWJdenticon address={address.address} size={16} />
+                </div>
+              );
             }
-            const address = profile.Addresses.find((addr) => {
-              return addr.chain == chainId;
-            });
-            return (
-              <div className="avatar-group-icon">
-                <CWJdenticon address={address.address} size={16} />
-              </div>
-            );
           })}
         </div>
         <CWText className="avatar-group-count" type="caption">
