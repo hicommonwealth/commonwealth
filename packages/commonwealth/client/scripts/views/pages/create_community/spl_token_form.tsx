@@ -1,10 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
-import type * as solw3 from '@solana/web3.js';
+import type * as solanaWeb3 from '@solana/web3.js';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
-import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -34,7 +33,7 @@ import { defaultChainRows, initChainForm } from './chain_input_rows';
 import type { ChainFormFields, ChainFormState } from './types';
 
 type SplTokenFormFields = {
-  cluster: solw3.Cluster;
+  cluster: solanaWeb3.Cluster;
   decimals: number;
   mint: string;
 };
@@ -44,7 +43,7 @@ type CreateERC20Form = ChainFormFields & SplTokenFormFields;
 type CreateSplTokenState = ChainFormState & { form: CreateERC20Form };
 
 export class SplTokenForm extends ClassComponent {
-  private state: CreateSplTokenState = {
+  public state: CreateSplTokenState = {
     message: '',
     loaded: false,
     loading: false,
@@ -67,7 +66,7 @@ export class SplTokenForm extends ClassComponent {
     const updateTokenForum = async () => {
       this.state.status = undefined;
       this.state.message = '';
-      let mintPubKey: solw3.PublicKey;
+      let mintPubKey: solanaWeb3.PublicKey;
       const solw3 = await import('@solana/web3.js');
       try {
         mintPubKey = new solw3.PublicKey(this.state.form.mint);
@@ -105,7 +104,7 @@ export class SplTokenForm extends ClassComponent {
             { label: 'devnet', value: 'devnet' },
           ]}
           onSelect={(o) => {
-            this.state.form.cluster = o.value as solw3.Cluster;
+            this.state.form.cluster = o.value as solanaWeb3.Cluster;
             this.state.loaded = false;
           }}
         />

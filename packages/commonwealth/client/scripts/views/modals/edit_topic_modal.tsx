@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { navigateToSubpage } from 'router';
@@ -137,7 +128,6 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
         <div className="compact-modal-body">
           <CWTextInput
             label="Name"
-            name="name"
             value={this?.form?.name}
             onInput={(e) => {
               this.form.name = (e.target as HTMLInputElement).value;
@@ -162,10 +152,10 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
               return ['success', 'Valid topic name'];
             }}
             tabIndex={1}
-            oncreate={(vvnode) => {
-              // use oncreate to focus because autoFocus: true fails when component is recycled in a modal
-              setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
-            }}
+            // oncreate={(vvnode) => {
+            //   // use oncreate to focus because autoFocus: true fails when component is recycled in a modal
+            //   setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
+            // }}
           />
           <CWTextInput
             label="Description"

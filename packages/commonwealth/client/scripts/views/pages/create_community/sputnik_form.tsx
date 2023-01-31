@@ -40,7 +40,7 @@ type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 type CreateSputnikState = ChainFormState & { form: CreateSputnikForm };
 
 export class SputnikForm extends ClassComponent {
-  private state: CreateSputnikState = {
+  public state: CreateSputnikState = {
     saving: false,
     form: {
       name: '',

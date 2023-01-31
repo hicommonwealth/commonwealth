@@ -3,15 +3,12 @@ import React from 'react';
 
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
   getRoute,
   getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 // import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
@@ -59,8 +56,9 @@ function setToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-    JSON.stringify(newTree);
+  localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+    newTree
+  );
 }
 
 class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
@@ -202,7 +200,7 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
     //   },
     // });
 
-    const categoryAdminButton = (category: string): ResultNode => {
+    const categoryAdminButton = (category: string): React.ReactNode => {
       const handleMouseout = () => {
         if (this.menuToggleTree['children'][category]['toggledState']) {
           this.menuToggleTree['children'][category]['toggledState'] = false;
@@ -405,7 +403,9 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
 
     // TODO: @ZAK @REACT m.vnode => ResultNode causes type error
     // const overlayContent: m.Vnode = ...
-    const overlayContent: ResultNode = this.adminModals['CreateCategory'] ? (
+    const overlayContent: React.ReactNode = this.adminModals[
+      'CreateCategory'
+    ] ? (
       <CreateCategory handleClose={closeOverlay} />
     ) : this.adminModals['CreateChannel'] ? (
       <CreateChannel handleClose={closeOverlay} category={this.adminCategory} />

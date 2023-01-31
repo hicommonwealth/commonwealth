@@ -1,13 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  setRoute,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
 
@@ -58,7 +53,7 @@ type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
 type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
 
 export class EthDaoForm extends ClassComponent<EthChainAttrs> {
-  private state: CreateEthDaoState = {
+  public state: CreateEthDaoState = {
     message: '',
     loaded: false,
     loading: false,

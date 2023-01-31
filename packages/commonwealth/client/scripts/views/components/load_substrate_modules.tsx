@@ -23,7 +23,7 @@ import { BreadcrumbsTitleTag } from './breadcrumbs_title_tag';
 export const loadSubstrateModules = (
   name: string,
   getModules: () => ProposalModule<any, any, any>[]
-): ResultNode | undefined => {
+): React.ReactNode | undefined => {
   const onSubstrate = app.chain?.base === ChainBase.Substrate;
 
   if (onSubstrate) {
@@ -45,12 +45,7 @@ export const loadSubstrateModules = (
 
       app.chain.loadModules(modules);
 
-      return (
-        <PageLoading
-          message={`Loading ${name.toLowerCase()}`}
-          title={<BreadcrumbsTitleTag title={name} />}
-        />
-      );
+      return <PageLoading message={`Loading ${name.toLowerCase()}`} />;
     }
   }
 };

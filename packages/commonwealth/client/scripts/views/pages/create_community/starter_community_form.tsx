@@ -42,7 +42,7 @@ type CreateStarterForm = ChainFormFields & { base: ChainBase };
 type CreateStarterState = ChainFormState & { form: CreateStarterForm };
 
 export class StarterCommunityForm extends ClassComponent {
-  private state: CreateStarterState = {
+  public state: CreateStarterState = {
     message: '',
     loaded: false,
     loading: false,

@@ -9,17 +9,9 @@ import { notifyError } from 'controllers/app/notifications';
 import { providers } from 'ethers';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -48,7 +40,7 @@ type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
 type CreateERC20State = ChainFormState & { form: CreateERC20Form };
 
 export class ERC20Form extends ClassComponent<EthChainAttrs> {
-  private state: CreateERC20State = {
+  public state: CreateERC20State = {
     message: '',
     loaded: false,
     loading: false,

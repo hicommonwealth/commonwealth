@@ -72,7 +72,6 @@ export class NewTopicModal extends ClassComponent {
         <div className="compact-modal-body">
           <CWTextInput
             label="Name"
-            name="name"
             value={this.form.name}
             onInput={(e) => {
               this.form.name = (e.target as HTMLInputElement).value;
@@ -111,10 +110,10 @@ export class NewTopicModal extends ClassComponent {
             autoFocus
             autoComplete="off"
             tabIndex={1}
-            oncreate={(vvnode) => {
-              // use oncreate to focus because autoFocus: true fails when component is recycled in a modal
-              setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
-            }}
+            // oncreate={(vvnode) => {
+            //   // use oncreate to focus because autoFocus: true fails when component is recycled in a modal
+            //   setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
+            // }}
           />
           <CWTextInput
             label="Description"
@@ -170,15 +169,15 @@ export class NewTopicModal extends ClassComponent {
           <CWButton
             label="Create topic"
             disabled={this.saving || !!this.error || disabled}
-            onClick={async (e: MouseEvent) => {
+            onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
               e.preventDefault();
               const { form } = this;
               try {
                 let defaultOffchainTemplate;
                 if (this.quillEditorState) {
                   this.quillEditorState.disable();
-                  defaultOffchainTemplate =
-                    this.quillEditorState.textContentsAsString;
+                  defaultOffchainTemplate = this.quillEditorState
+                    .textContentsAsString;
                 }
                 await app.topics.add(
                   form.name,

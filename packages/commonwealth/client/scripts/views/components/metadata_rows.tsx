@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import { CWLabel } from './component_kit/cw_label';
 import { CWText } from './component_kit/cw_text';
@@ -73,7 +64,7 @@ export class InputRow extends ClassComponent<InputRowAttrs> {
 }
 
 type ToggleRowAttrs = {
-  caption?: (e) => void;
+  caption?: (e) => string;
   defaultValue: boolean;
   disabled?: boolean;
   onToggle: (e) => void;
