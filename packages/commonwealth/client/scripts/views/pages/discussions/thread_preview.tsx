@@ -1,7 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/discussions/thread_preview.scss';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
@@ -16,7 +17,8 @@ import 'pages/discussions/thread_preview.scss';
 import app from 'state';
 import { slugify } from 'utils';
 import { isCommandClick, pluralize } from 'helpers';
-import { AddressInfo, Thread } from 'models';
+import { AddressInfo } from 'models';
+import type { Thread } from 'models';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import {

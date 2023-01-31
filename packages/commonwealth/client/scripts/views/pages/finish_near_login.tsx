@@ -81,7 +81,7 @@ const redirectToNextPage = () => {
 };
 
 class FinishNearLogin extends ClassComponent<Record<string, never>> {
-  private state: IState = {
+  public state: IState = {
     validating: false,
     validationCompleted: false,
     validatedAccount: null,

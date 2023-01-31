@@ -16,12 +16,12 @@ class NewContractPage extends ClassComponent {
   view(vnode) {
     // Payable functions are not supported in this implementation
     if (!app.contracts || !app.chain) {
-      return <PageLoading title="General Contract" />;
+      return <PageLoading message="General Contract" />;
     }
 
     if (app.chain.base !== ChainBase.Ethereum) {
       return (
-        <PageNotFound content="Contract ABI UI Generator Only Available for Ethereum based Chains" />
+        <PageNotFound message="Contract ABI UI Generator Only Available for Ethereum based Chains" />
       );
     }
 

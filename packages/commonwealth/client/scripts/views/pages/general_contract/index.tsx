@@ -3,7 +3,8 @@
 import 'pages/general_contract/index.scss';
 import app from 'state';
 import type { Contract } from 'models';
-import { ClassComponent, jsx, redraw, ResultNode } from 'mithrilInterop';
+import { ClassComponent, jsx, redraw } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
@@ -18,7 +19,7 @@ import {
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
-import { Result } from 'ethers/lib/utils';
+import type { Result } from 'ethers/lib/utils';
 import PageNotFound from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -94,11 +95,11 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
     }
 
     if (!app.contracts || !app.chain) {
-      return <PageLoading title="General Contract" />;
+      return <PageLoading message="General Contract" />;
     } else {
       if (app.chain.base !== ChainBase.Ethereum) {
         return (
-          <PageNotFound content="Contract ABI UI Generator Only Available for Ethereum based Chains" />
+          <PageNotFound message="Contract ABI UI Generator Only Available for Ethereum based Chains" />
         );
       }
     }
@@ -154,8 +155,9 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
                   </div>
                   <div className="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
-                      const fnOutputArray =
-                        this.functionNameToFunctionOutput.get(fn.name);
+                      const fnOutputArray = this.functionNameToFunctionOutput.get(
+                        fn.name
+                      );
                       return (
                         <div>
                           <div className="function-outputs">

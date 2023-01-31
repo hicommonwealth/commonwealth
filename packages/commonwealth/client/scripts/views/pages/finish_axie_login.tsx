@@ -56,7 +56,7 @@ const validate = async (
 };
 
 class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
-  private state: IState = {
+  public state: IState = {
     validating: false,
     error: '',
   };

@@ -5,17 +5,8 @@ import { WalletId } from 'common-common/src/types';
 import { unlinkLogin } from 'controllers/app/login';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { formatAddressShort, link, orderAccountsByAddress } from 'helpers';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, render, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import type { AddressInfo } from 'models';
 
@@ -30,7 +21,7 @@ import { getClasses } from '../../components/component_kit/helpers';
 
 type AccountRowAttrs = {
   account: AddressInfo;
-  onClick?: (e: Event) => any;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => any;
 };
 
 class AccountRow extends ClassComponent<AccountRowAttrs> {
@@ -103,7 +94,6 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
             this.removing ||
             app.user.addresses.some((a) => a.walletId === WalletId.Magic)
           }
-          loading={this.removing}
           label="Remove"
         />
       </div>

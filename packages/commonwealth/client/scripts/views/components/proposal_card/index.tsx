@@ -4,7 +4,8 @@ import React from 'react';
 import { navigateToSubpage } from 'router';
 import { ProposalType } from 'common-common/src/types';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
@@ -28,7 +29,7 @@ import {
 import { ProposalTag } from './proposal_tag';
 
 type ProposalCardAttrs = {
-  injectedContent?: ResultNode;
+  injectedContent?: React.ReactNode;
   proposal: AnyProposal;
 };
 

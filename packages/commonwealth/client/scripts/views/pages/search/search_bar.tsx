@@ -127,7 +127,9 @@ export class SearchBar extends ClassComponent {
               }, 500); // hack to prevent the dropdown closing too quickly on click
             }}
             onInput={(e) => {
-              this.setState({ searchTerm: e.target.value?.toLowerCase() });
+              this.setState({
+                searchTerm: e.currentTarget.value?.toLowerCase(),
+              });
 
               if (this.state.searchTerm?.length > 3) {
                 handleGetSearchPreview();

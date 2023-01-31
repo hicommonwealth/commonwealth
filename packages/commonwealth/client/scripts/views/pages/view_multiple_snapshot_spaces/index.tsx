@@ -5,17 +5,8 @@ import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import type { Thread } from 'models';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/snapshot/multiple_snapshots_page.scss';
 
@@ -107,18 +98,14 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
           <CWText type="h3">{redirectOptions.headerMessage}</CWText>
           {app.chain && this.spacesMetadata && (
             <CardsCollection
-              content={
-                <React.Fragment>
-                  {this.spacesMetadata.map((data) => (
-                    <SnapshotSpaceCard
-                      space={data.space}
-                      proposals={data.proposals}
-                      redirectAction={redirectOptions.redirectOption}
-                      proposal={redirectOptions.proposal}
-                    />
-                  ))}
-                </React.Fragment>
-              }
+              content={this.spacesMetadata.map((data) => (
+                <SnapshotSpaceCard
+                  space={data.space}
+                  proposals={data.proposals}
+                  redirectAction={redirectOptions.redirectOption}
+                  proposal={redirectOptions.proposal}
+                />
+              ))}
             />
           )}
         </div>

@@ -1,7 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import BN from 'bn.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
@@ -55,7 +56,9 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       this.uploadsInProgress = 0;
     }
 
-    const handleSubmitComment = async (e?: Event) => {
+    const handleSubmitComment = async (
+      e?: React.MouseEvent<HTMLButtonElement>
+    ) => {
       if (!this.quillEditorState) {
         if (e) e.preventDefault();
         this.error = 'Editor not initialized, please try again';
@@ -119,8 +122,9 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
     const { error, sendingComment, uploadsInProgress } = this;
 
     // token balance check if needed
-    const tokenPostingThreshold: BN =
-      TopicGateCheck.getTopicThreshold(activeTopicName);
+    const tokenPostingThreshold: BN = TopicGateCheck.getTopicThreshold(
+      activeTopicName
+    );
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
     const userFailsThreshold =

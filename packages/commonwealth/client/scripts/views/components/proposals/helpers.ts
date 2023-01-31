@@ -73,7 +73,7 @@ export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
 };
 
 export const cancelProposal = (
-  e: Event,
+  e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   toggleVotingModal: (newModalState: boolean) => void,
   proposal: AnyProposal,
   onModalClose?: () => void

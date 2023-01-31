@@ -1,18 +1,16 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import $ from 'jquery';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
-import {
-  ChainBase,
-  ChainCategoryType,
-  ChainNetwork,
-} from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
@@ -299,16 +297,12 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         />
         <InputRow
           title="Banner"
-          name="Banner Text"
-          label="Banner"
           maxLength={512}
           placeholder="Text for across the top of your community"
           value={this.communityBanner}
           onChangeHandler={(v) => {
             this.communityBanner = v;
           }}
-          tabIndex={1}
-          editorNamespace="new-banner"
         />
         <div className="tag-row">
           <CWLabel label="Community Tags" />
@@ -410,17 +404,15 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             }
             try {
               if (this.chatEnabled) {
-                this.default_deny_permissions =
-                  this.permissionsManager.removeDenyPermission(
-                    default_deny_permissions,
-                    Action.VIEW_CHAT_CHANNELS
-                  );
+                this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
+                  default_deny_permissions,
+                  Action.VIEW_CHAT_CHANNELS
+                );
               } else {
-                this.default_deny_permissions =
-                  this.permissionsManager.addDenyPermission(
-                    default_deny_permissions,
-                    Action.VIEW_CHAT_CHANNELS
-                  );
+                this.default_deny_permissions = this.permissionsManager.addDenyPermission(
+                  default_deny_permissions,
+                  Action.VIEW_CHAT_CHANNELS
+                );
               }
               await chain.updateChainData({
                 name,
@@ -492,8 +484,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 <CWText type="h4">Snapshot Notifications</CWText>
                 <CWToggle
                   onChange={() => {
-                    this.snapshotNotificationsEnabled =
-                      !this.snapshotNotificationsEnabled;
+                    this.snapshotNotificationsEnabled = !this
+                      .snapshotNotificationsEnabled;
                     this.redraw();
                   }}
                   checked={this.snapshotNotificationsEnabled}
