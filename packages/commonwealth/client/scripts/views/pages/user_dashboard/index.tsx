@@ -51,7 +51,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     redraw();
     const tab = this.activePage;
     if (tab === DashboardViews.ForYou) {
-      if (this.fyNotifications.length === 0) this.loadingData = true;
+      if (this.fyNotifications && this.fyNotifications.length === 0) this.loadingData = true;
       fetchActivity(tab).then((activity) => {
         this.fyNotifications = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
@@ -70,7 +70,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         redraw();
       });
     } else if (tab === DashboardViews.Chain) {
-      if (this.chainEvents.length === 0) this.loadingData = true;
+      if (this.chainEvents && this.chainEvents.length === 0) this.loadingData = true;
       fetchActivity(tab).then((activity) => {
         this.chainEvents = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
