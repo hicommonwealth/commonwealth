@@ -36,8 +36,11 @@ export default class Erc721BalanceProvider extends BalanceProvider<EthBPOpts> {
   ): Promise<string> {
     const url = node.private_url || node.url;
     const { tokenAddress, contractType } = opts;
-    if (!tokenAddress && !contractType) {
-      throw new Error('Need Token Address and Contract Type');
+    if (contractType != this.name) {
+      throw new Error('Invalid Contract Type');
+    }
+    if (!tokenAddress) {
+      throw new Error('Need Token Address');
     }
     if (!Web3.utils.isAddress(tokenAddress)) {
       throw new Error('Invalid token address');
