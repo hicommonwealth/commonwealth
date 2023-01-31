@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { AppError } from 'common-common/src/errors';
-import { DB } from '../models';
-import { TypedRequestBody, TypedResponse, success } from '../types';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 import { ETHERSCAN_JS_API_KEY } from '../config';
-import { ContractAttributes } from '../models/contract';
-import { ContractAbiAttributes } from '../models/contract_abi';
+import type { ContractAttributes } from '../models/contract';
+import type { ContractAbiAttributes } from '../models/contract_abi';
 import validateAbi from '../util/abiValidation';
 
 export enum Network {

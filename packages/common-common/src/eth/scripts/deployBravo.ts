@@ -1,5 +1,4 @@
 import { providers } from 'ethers';
-import Web3 from 'web3';
 
 import {
   MPond__factory,
@@ -9,6 +8,7 @@ import {
 
 async function main() {
   // TODO: configure URL based on chain
+  const Web3 = (await import('web3')).default;
   const web3Provider = new Web3.providers.WebsocketProvider(
     'http://localhost:8545',
     {

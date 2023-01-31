@@ -1,4 +1,4 @@
-import { Express } from 'express';
+import type { Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import externalSwagger from '../swagger/swagger_external.json';
 import { SERVER_URL } from '../config';

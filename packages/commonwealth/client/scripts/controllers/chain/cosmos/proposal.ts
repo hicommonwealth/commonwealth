@@ -2,7 +2,6 @@ import type {
   MsgDepositEncodeObject,
   MsgVoteEncodeObject,
 } from '@cosmjs/stargate';
-import { longify } from '@cosmjs/stargate/build/queries/utils';
 import BN from 'bn.js';
 import { ProposalType } from 'common-common/src/types';
 import type {
@@ -298,10 +297,11 @@ export class CosmosProposal extends Proposal<
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
+    const cosm = await import('@cosmjs/stargate/build/queries/utils');
     const msg: MsgDepositEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
       value: {
-        proposalId: longify(this.data.identifier),
+        proposalId: cosm.longify(this.data.identifier),
         depositor: depositor.address,
         amount: [amount.toCoinObject()],
       },
@@ -314,10 +314,11 @@ export class CosmosProposal extends Proposal<
     if (this.status !== 'VotingPeriod') {
       throw new Error('proposal not in voting period');
     }
+    const cosm = await import('@cosmjs/stargate/build/queries/utils');
     const msg: MsgVoteEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgVote',
       value: {
-        proposalId: longify(this.data.identifier),
+        proposalId: cosm.longify(this.data.identifier),
         voter: vote.account.address,
         option: vote.option,
       },

@@ -1,8 +1,9 @@
 import 'chai/register-should';
 import chai from 'chai';
-import { GetRolesReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
+import type { GetRolesReq } from 'common-common/src/api/extApiTypes';
+import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import { testRoles } from 'test/integration/api/external/dbEntityHooks.spec';
-import { RoleAttributes } from 'server/models/role';
+import type { RoleAttributes } from 'server/models/role';
 import { get } from 'test/integration/api/external/appHook.spec';
 import chaiHttp from 'chai-http';
 
