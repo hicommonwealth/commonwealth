@@ -8,10 +8,8 @@ import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import {
-  CWDropdown,
-  DropdownItemType,
-} from 'views/components/component_kit/cw_dropdown';
+import type { DropdownItemType } from 'views/components/component_kit/cw_dropdown';
+import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { notifyError } from 'controllers/app/notifications';
 
 // TODO this should be aligned with display_options

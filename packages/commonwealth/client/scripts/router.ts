@@ -298,10 +298,13 @@ const getCustomDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/new/contract_template': importRoute(import('views/pages/new_contract_template'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  '/new/contract_template': importRoute(
+    import('views/pages/new_contract_template'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
   '/contract/:contractAddress': importRoute(
     import('views/pages/general_contract'),
     {
@@ -576,7 +579,7 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/:scope/contracts': importRoute('views/pages/contracts', {
+  '/:scope/contracts': importRoute(import('views/pages/contracts'), {
     scoped: true,
     deferChain: true,
   }),

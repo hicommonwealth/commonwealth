@@ -1,9 +1,10 @@
 import { AppError } from 'common-common/src/errors';
-import { Request, Response } from 'express';
-import { DB } from '../models';
-import { CommunityContractTemplateAttributes } from '../models/community_contract_template';
-import { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
-import { TypedRequestBody, TypedResponse, success, failure } from '../types';
+import type { Request, Response } from 'express';
+import type { DB } from '../models';
+import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
+import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success, failure } from '../types';
 import { idAndIndex } from '@polkadot/api-derive/accounts';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
