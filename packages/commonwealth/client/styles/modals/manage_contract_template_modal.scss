@@ -14,6 +14,10 @@
       width: auto;
     }
 
+    .disabled-dropdown {
+      pointer-events: none;
+    }
+
     .subtitle {
       margin-top: 16px;
     }
