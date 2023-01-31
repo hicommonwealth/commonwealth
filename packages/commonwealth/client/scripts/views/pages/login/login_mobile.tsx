@@ -87,14 +87,12 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
           )}
           {bodyType === 'walletList' && (
             <CWWalletsList
-              connectAnotherWayonClick={() => {
+              connectAnotherWayOnclick={() => {
                 setBodyType('connectWithEmail');
               }}
               wallets={wallets}
               darkMode={true}
               setSelectedWallet={setSelectedWallet}
-              setProfiles={setProfiles}
-              setSidebarType={setSidebarType}
               setBodyType={setBodyType}
               accountVerifiedCallback={accountVerifiedCallback}
               showResetWalletConnect={showResetWalletConnect}
@@ -103,13 +101,11 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
           )}
           {bodyType === 'selectPrevious' && (
             <CWWalletsList
-              connectAnotherWayonClick={() => {
+              connectAnotherWayOnclick={() => {
                 setBodyType('connectWithEmail');
               }}
               wallets={wallets}
-              darkMode={true}
-              setProfiles={setProfiles}
-              setSidebarType={setSidebarType}
+              darkMode
               setSelectedWallet={setSelectedLinkingWallet}
               setBodyType={setBodyType}
               accountVerifiedCallback={accountVerifiedCallback}

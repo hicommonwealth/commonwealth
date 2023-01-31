@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_wallet_option_row.scss';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
@@ -21,74 +11,69 @@ import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
 
-type WalletOptionRowStyleAttrs = {
+type WalletOptionRowStyleProps = {
   disabled?: boolean;
   darkMode?: boolean;
 };
 
-type WalletOptionRowAttrs = {
+type WalletOptionRowProps = {
   onClick?: () => void;
   walletName: CustomIconName;
   walletLabel?: string;
-} & WalletOptionRowStyleAttrs;
+} & WalletOptionRowStyleProps;
 
-export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
-  view(vnode: ResultNode<WalletOptionRowAttrs>) {
-    const {
-      disabled = false,
-      darkMode,
-      onClick,
-      walletName,
-      walletLabel,
-    } = vnode.attrs;
-    return (
-      <div
-        className={getClasses<WalletOptionRowStyleAttrs>(
-          {
-            disabled,
-            darkMode,
-          },
-          ComponentType.WalletOptionRow
-        )}
-        onClick={onClick}
-      >
-        <CWCustomIcon size={32} iconName={walletName} iconSize="large" />
-        <CWText
-          type="h5"
-          fontWeight="semiBold"
-          className="wallet-option-text"
-          noWrap
-        >
-          {walletLabel}
-        </CWText>
-      </div>
-    );
-  }
-}
+export const CWWalletOptionRow = (props: WalletOptionRowProps) => {
+  const {
+    disabled = false,
+    darkMode,
+    onClick,
+    walletName,
+    walletLabel,
+  } = props;
 
-export class CWWalletMissingOptionRow extends ClassComponent<{
-  darkMode?: boolean;
-}> {
-  view(vnode: ResultNode<{ darkMode }>) {
-    return (
-      <div
-        className={getClasses<WalletOptionRowStyleAttrs>(
-          {
-            disabled: true,
-            darkMode: vnode.attrs.darkMode,
-          },
-          ComponentType.WalletOptionRow
-        )}
+  return (
+    <div
+      className={getClasses<WalletOptionRowStyleProps>(
+        {
+          disabled,
+          darkMode,
+        },
+        ComponentType.WalletOptionRow
+      )}
+      onClick={onClick}
+    >
+      <CWCustomIcon iconSize="large" iconName={walletName} />
+      <CWText
+        type="h5"
+        fontWeight="semiBold"
+        className="wallet-option-text"
+        noWrap
       >
-        <CWText
-          type="h5"
-          fontWeight="semiBold"
-          className="wallet-option-text"
-          noWrap
-        >
-          No wallet found
-        </CWText>
-      </div>
-    );
-  }
-}
+        {walletLabel}
+      </CWText>
+    </div>
+  );
+};
+
+export const CWWalletMissingOptionRow = (props: { darkMode?: boolean }) => {
+  return (
+    <div
+      className={getClasses<WalletOptionRowStyleProps>(
+        {
+          disabled: true,
+          darkMode: props.darkMode,
+        },
+        ComponentType.WalletOptionRow
+      )}
+    >
+      <CWText
+        type="h5"
+        fontWeight="semiBold"
+        className="wallet-option-text"
+        noWrap
+      >
+        No wallet found
+      </CWText>
+    </div>
+  );
+};

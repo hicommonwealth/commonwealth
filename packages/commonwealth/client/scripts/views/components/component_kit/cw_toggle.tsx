@@ -1,8 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_toggle.scss';
 
@@ -10,39 +9,37 @@ import type { BaseStyleProps } from './types';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
-type ToggleStyleAttrs = {
+type ToggleStyleProps = {
   checked?: boolean;
 } & BaseStyleProps;
 
-type ToggleAttrs = {
+type ToggleProps = {
   onChange?: (e?: any) => void;
-} & ToggleStyleAttrs;
+} & ToggleStyleProps;
 
-export class CWToggle extends ClassComponent<ToggleAttrs> {
-  view(vnode: ResultNode<ToggleAttrs>) {
-    const { className, disabled = false, onChange, checked } = vnode.attrs;
+export const CWToggle = (props: ToggleProps) => {
+  const { className, disabled = false, onChange, checked } = props;
 
-    const params = {
-      disabled,
-      onChange,
-      checked,
-      type: 'checkbox',
-    };
+  const params = {
+    disabled,
+    onChange,
+    checked,
+    type: 'checkbox',
+  };
 
-    return (
-      <label
-        className={getClasses<ToggleStyleAttrs>(
-          {
-            checked,
-            disabled,
-            className,
-          },
-          ComponentType.Toggle
-        )}
-      >
-        <input className="toggle-input" {...params} />
-        <div className="slider" />
-      </label>
-    );
-  }
-}
+  return (
+    <label
+      className={getClasses<ToggleStyleProps>(
+        {
+          checked,
+          disabled,
+          className,
+        },
+        ComponentType.Toggle
+      )}
+    >
+      <input className="toggle-input" {...params} />
+      <div className="slider" />
+    </label>
+  );
+};
