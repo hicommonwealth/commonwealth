@@ -6,9 +6,9 @@ import type {
   StakingExtension,
   StdFee,
 } from '@cosmjs/stargate';
-import { QueryClient } from '@cosmjs/stargate';
+import type { QueryClient } from '@cosmjs/stargate';
 import type { Event } from '@cosmjs/tendermint-rpc';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import type { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';

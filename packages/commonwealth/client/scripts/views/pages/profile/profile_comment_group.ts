@@ -2,7 +2,7 @@ import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import m from 'mithril';
 import type { Account, Comment } from 'models';
-import { Thread } from 'models';
+import type { Thread } from 'models';
 
 import app from 'state';
 import { renderQuillTextBody } from '../../components/quill/helpers';

@@ -1,6 +1,5 @@
 import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
-import { EthSignType } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
@@ -59,7 +58,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
-    const block = await client.getBlock(height - 1);
+    const block = await client.getBlock(height - 2); // validator pool may be out of sync
 
     return {
       number: block.header.height,
@@ -73,11 +72,12 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     account: Account,
     canvasMessage: CanvasData
   ): Promise<string> {
+    const keplr = await import('@keplr-wallet/types');
     const signature = await window.keplr.signEthereum(
       this._chainId,
       account.address,
       JSON.stringify(canvasMessage),
-      EthSignType.MESSAGE
+      keplr.EthSignType.MESSAGE
     );
     return `0x${Buffer.from(signature).toString('hex')}`;
   }

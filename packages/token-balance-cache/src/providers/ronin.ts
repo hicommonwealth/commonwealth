@@ -1,6 +1,5 @@
 import BN from 'bn.js';
 import type { StateMutabilityType, AbiType } from 'web3-utils';
-import Web3 from 'web3';
 import { providers } from 'ethers';
 import { ERC20__factory } from 'common-common/src/eth/types';
 
@@ -14,6 +13,7 @@ export default class RoninBalanceProvider extends BalanceProvider {
   public validBases = [BalanceType.AxieInfinity];
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
+    const Web3 = (await import('web3')).default;
     if (!Web3.utils.isAddress(address)) {
       throw new Error('Invalid address');
     }
