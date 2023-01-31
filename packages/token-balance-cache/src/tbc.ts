@@ -27,12 +27,25 @@ async function queryChainNodesFromDB(lastQueryUnixTime: number): Promise<IChainN
       ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
       : process.env.DATABASE_URL;
 
-  const db = new Client({
+  let config: any = {
     connectionString: DATABASE_URI,
     ssl: process.env.NODE_ENV !== 'production' ? false : {
       rejectUnauthorized: false,
     },
-  });
+  }
+  // if (process.env.IS_CI) {
+  //   config = {
+  //     connectionString: DATABASE_URI,
+  //     user: 'commonwealth',
+  //     host: 'localhost',
+  //     database: 'commonwealth',
+  //     password: 'edgeware',
+  //     port: 5432,
+  //   }
+  // }
+  console.log("this is the env var");
+  console.log(DATABASE_URI);
+  const db = new Client(config);
   await db.connect();
   const nodeQuery = await db.query<IChainNode>(query);
   const nodeArray = nodeQuery.rows;

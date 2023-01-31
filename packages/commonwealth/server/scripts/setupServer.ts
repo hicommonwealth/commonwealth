@@ -12,6 +12,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const setupServer = (app: Express, rollbar: Rollbar, models: DB, rabbitMQController: RabbitMQController) => {
   app.set('port', PORT);
+  console.log('starting server');
   const server = http.createServer(app);
   setupWebSocketServer(server, rollbar, models, rabbitMQController);
 
@@ -43,6 +44,7 @@ const setupServer = (app: Express, rollbar: Rollbar, models: DB, rabbitMQControl
   };
 
   server.listen(PORT);
+  console.log('listened to port');
   server.on('error', onError);
   server.on('listening', onListen);
 };

@@ -243,8 +243,14 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  await ruleCache.start();
+  try {
+    if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
+    await ruleCache.start();
+  } catch (e) {
+    console.log('Error: failed to conenct to postgresql');
+    console.log(e);
+    process.exit(1);
+  }
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 

@@ -2,38 +2,12 @@ name: CI
 on: [push]
 
 jobs:
-  setup: # We do this at the beginning and cache it, so that subsequent jobs don't all download on cache miss
-    name: Install Yarn Dependencies
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14.x
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn --ignore-engines --prefer-offline
-
   commonwealth:
-    needs: setup
     name: Commonwealth Tests
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: packages/commonwealth
+    strategy:
+      matrix:
+        node: [ 14 ]
 
     services:
       postgres:
@@ -59,46 +33,48 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: ${{ matrix.node }}
 
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn --ignore-engines --prefer-offline
-
-      - name: Install playwright browser drivers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
-
-      - name: Start server
-        run: yarn start &
-        env:
-          PORT: 8090
-
-      - name: Wait for server
-        run: yarn wait-server
-        env:
-          PORT: 8090
+        run: yarn --ignore-engines
 
       - name: Run e2e tests
-        run: yarn test-e2e
-        env:
-          PORT: 8090
+        run: DATABASE_URL="postgresql:/""/commonwealth:edgeware@postgres/commonwealth" yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
+      - name: Run Token Balance Cache Unit Tests
+        run: yarn --cwd packages/token-balance-cache test
+
+      - name: Run Chain Events Unit Tests
+        run: yarn --cwd packages/chain-events unit-test
+
+#      - name: Cache browsers
+#        id: playwright-cache
+#        uses: actions/cache@v3
+#        with:
+#          path: '~/.cache/ms-playwright'
+#          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+#
+#      - name: Install playwright browser drivers
+#        if: steps.playwright-cache.outputs.cache-hit != 'true'
+#        run: npx playwright install --with-deps
+
+#      - name: Run e2e tests
+#        run: DATABASE_URL=postgresql://commonwealth:edgeware@postgres/commonwealth yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
 
       - name: Typecheck
-        run: yarn check-types
+        run: yarn --cwd packages/commonwealth check-types
 
       - name: Run unit tests
-        run: yarn unit-test
+        run: yarn --cwd packages/commonwealth unit-test
 
       - name: Run API tests
-        run: yarn test-api
+        run: yarn --cwd packages/commonwealth test-api
         env:
           NO_CLIENT: true
 
@@ -107,69 +83,3 @@ jobs:
         with:
           name: code-coverage-report
           path: coverage
-
-  token-balance-cache:
-    needs: setup
-    name: Token Balance Cache Tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/token-balance-cache
-
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14.x
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn --ignore-engines --prefer-offline
-
-      - name: Run unit tests
-        run: yarn test
-
-  chain-events:
-    needs: setup
-    name: Chain Events Tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/chain-events
-
-    steps:
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14.x
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn --ignore-engines --prefer-offline
-
-      - name: Run unit tests
-        run: yarn unit-test
-
-      # TODO: fix integration tests -- they currently fail
-      # - name: Run integration tests
-      #  run: yarn integration-test
-
-      # TODO: reintegrate code coverage once we get nyc working with hardhat
-
-      # TODO: fix linter and then reintegrate using current ts version
-      # - name: Run linter
-      #   run: yarn lint
