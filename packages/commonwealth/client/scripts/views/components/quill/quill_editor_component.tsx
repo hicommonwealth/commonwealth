@@ -167,7 +167,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
     return (
       <div
         class={editorClass}
-        oncreate={async (childVnode) => {
+        oncreate={(childVnode) => {
           this.$editor = $(childVnode.dom).find('.quill-editor');
           this.editor = new QuillEditor(
             this.$editor,
@@ -180,7 +180,6 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
             this.defaultContents,
             tabIndex
           );
-          await this.editor.initialize();
           if (oncreateBind) oncreateBind(this.editor);
         }}
       >
