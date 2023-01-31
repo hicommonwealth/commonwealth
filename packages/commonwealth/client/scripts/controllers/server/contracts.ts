@@ -15,6 +15,15 @@ type AddCommunityContractTemplateAttributes = {
   template_id: number;
 };
 
+type EditCommunityContractTemplateAttributes = {
+  cct_id: string;
+  slug: string;
+  nickname: string;
+  display_name: string;
+  display_options: string;
+  contract_id: number;
+};
+
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
   private _initialized = false;
@@ -216,12 +225,12 @@ class ContractsController {
     communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes
   ) {
     try {
+      // TODO add newTemplate to the store when the store will be ready
       const newContract = await $.post(
         `${app.serverUrl()}/contract/community_template_and_metadata`,
         communityContractTemplateAndMetadata
       );
 
-      // TODO add newContract to the store when the types will be aligned
       this.updateTemplate({
         contract_id: communityContractTemplateAndMetadata.contract_id,
         cct: newContract.cct,
@@ -230,6 +239,28 @@ class ContractsController {
     } catch (err) {
       console.log(err);
       throw new Error('Failed to add community contract template');
+    }
+  }
+
+  public async editCommunityContractTemplate(
+    communityContractTemplateMetadata: EditCommunityContractTemplateAttributes
+  ) {
+    try {
+      // TODO update store with editedTemplate when the store will be ready
+      const updateContract = await $.ajax({
+        url: `${app.serverUrl()}/contract/community_template/metadata`,
+        data: communityContractTemplateMetadata,
+        type: 'PUT',
+      });
+
+      this.updateTemplate({
+        contract_id: communityContractTemplateMetadata.contract_id,
+        cct: updateContract.cct,
+        cctmd: updateContract.cctmd,
+      });
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to save community contract template');
     }
   }
 

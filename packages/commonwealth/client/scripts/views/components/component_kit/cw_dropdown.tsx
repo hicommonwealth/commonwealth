@@ -16,6 +16,7 @@ export type DropdownItemType = {
 type DropdownAttrs = {
   initialValue?: DropdownItemType;
   label: string;
+  containerClassName?: string;
   placeholder?: string;
   onSelect?: (item: DropdownItemType) => void;
   options: Array<DropdownItemType>;
@@ -31,11 +32,12 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
   }
 
   view(vnode: m.Vnode<DropdownAttrs>) {
-    const { label, options, onSelect } = vnode.attrs;
+    const { label, options, onSelect, containerClassName } = vnode.attrs;
 
     return (
       <div class="dropdown-wrapper">
         <CWTextInput
+          containerClassName={containerClassName}
           iconRight="chevronDown"
           placeholder={this.selectedValue.label}
           displayOnly

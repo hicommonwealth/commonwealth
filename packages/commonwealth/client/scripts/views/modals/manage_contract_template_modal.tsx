@@ -29,7 +29,7 @@ const templates = [
     displayName: 'New Treasury Proposal 1',
     nickname: 'Little Treasures',
     slug: '/whatever-was-here-for-add-template',
-    display: 'In Create Dropdown and in Create Sidebar',
+    displayOption: 3,
   },
   {
     id: 2,
@@ -37,7 +37,7 @@ const templates = [
     displayName: 'New Treasury Proposal 2',
     nickname: 'Little Treasures 2',
     slug: '/whatever-was-here-for-add-template-2',
-    display: 'In Create Dropdown',
+    displayOption: 2,
   },
 ];
 
@@ -52,8 +52,15 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     displayName: '',
     nickname: '',
     slug: '',
-    displayOption: '',
+    displayOption: null,
   };
+
+  closeModalOnSuccess(e) {
+    $(e.target).trigger('modalcomplete');
+    setTimeout(() => {
+      $(e.target).trigger('modalexit');
+    }, 0);
+  }
 
   handleCreateNewTemplate(e) {
     const scope = app.customDomainId() || m.route.param('scope');
@@ -62,7 +69,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     m.route.set(`/${scope}/new/contract_template`);
   }
 
-  async handleConfirm(e, contractId: number) {
+  async handleAddTemplate(e, contractId: number) {
     e.preventDefault();
 
     const communityId = app.activeChainId();
@@ -84,10 +91,33 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
         communityContractTemplateAndMetadata
       );
 
-      $(e.target).trigger('modalcomplete');
-      setTimeout(() => {
-        $(e.target).trigger('modalexit');
-      }, 0);
+      this.closeModalOnSuccess(e);
+    } catch (err) {
+      notifyError(err.message);
+    }
+  }
+
+  async handleSaveEditingTemplate(e, contractId: number) {
+    e.preventDefault();
+
+    const { slug, displayOption, nickname, displayName, templateId } =
+      this.form;
+
+    const editedCommunityContractTemplate = {
+      cct_id: templateId,
+      slug,
+      nickname,
+      display_name: displayName,
+      display_options: displayOption,
+      contract_id: contractId,
+    };
+
+    try {
+      await app.contracts.editCommunityContractTemplate(
+        editedCommunityContractTemplate
+      );
+
+      this.closeModalOnSuccess(e);
     } catch (err) {
       notifyError(err.message);
     }
@@ -107,10 +137,24 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     this.form.displayName = template.displayName;
   }
 
+  oninit(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
+    const { templateId } = vnode.attrs;
+    const isEditMode = !!templateId;
+    const template = templates.find((t) => t.id === templateId);
+
+    if (isEditMode) {
+      this.form.templateId = templateId;
+      this.form.displayName = template.displayName;
+      this.form.nickname = template.nickname;
+      this.form.slug = template.slug;
+      this.form.displayOption = template.displayOption;
+    }
+  }
+
   view(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
     const { contractId, templateId } = vnode.attrs;
 
-    const isEditMode = templateId;
+    const isEditMode = !!templateId;
     const modalTitle = isEditMode ? 'Edit Template' : 'Add Template';
     const modalSubtitle = isEditMode
       ? 'Change the metadata associated with your template.'
@@ -118,12 +162,22 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     const confirmButtonLabel = isEditMode ? 'Save' : 'Add';
 
     // disable if at least one input is not filled
-    const addingDisabled = !Object.values(this.form).every(Boolean);
+    const confirmButtonDisabled = !Object.values(this.form).every(Boolean);
 
     const templateOptions = templates.map((template) => ({
       value: String(template.id),
       label: template.title,
     }));
+
+    const initialTemplateName = isEditMode
+      ? templateOptions.find((option) => +option.value === this.form.templateId)
+      : { label: 'Select template type ', value: '' };
+
+    const initialDisplayOption = isEditMode
+      ? displayOptions.find(
+          (option) => +option.value === this.form.displayOption
+        )
+      : { label: 'Select display option', value: '' };
 
     return (
       <div class="ManageContractTemplateModal">
@@ -137,7 +191,8 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
             Template
           </CWText>
           <CWDropdown
-            initialValue={{ label: 'Select template type ', value: '' }}
+            {...(isEditMode ? { containerClassName: 'disabled-dropdown' } : {})}
+            initialValue={initialTemplateName}
             label="Choose a template for your proposal"
             options={templateOptions}
             onSelect={(item) => this.handleSelectTemplate(item)}
@@ -192,7 +247,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
           </CWText>
           <CWDropdown
             label="Choose where to display template"
-            initialValue={{ label: 'Select display option', value: '' }}
+            initialValue={initialDisplayOption}
             options={displayOptions}
             onSelect={(result) => {
               this.form.displayOption = result.value;
@@ -209,8 +264,12 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
           <CWButton
             buttonType="mini-black"
             label={confirmButtonLabel}
-            disabled={addingDisabled}
-            onclick={(e) => this.handleConfirm(e, contractId)}
+            disabled={confirmButtonDisabled}
+            onclick={(e) =>
+              isEditMode
+                ? this.handleSaveEditingTemplate(e, contractId)
+                : this.handleAddTemplate(e, contractId)
+            }
           />
         </div>
       </div>
