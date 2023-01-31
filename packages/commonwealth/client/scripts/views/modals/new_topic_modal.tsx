@@ -4,7 +4,7 @@ import ClassComponent from 'class_component';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
-import { pluralizeWithoutNumberPrefix } from 'helpers';
+import { getDecimals, pluralizeWithoutNumberPrefix } from 'helpers';
 import $ from 'jquery';
 import m from 'mithril';
 
@@ -55,18 +55,7 @@ export class NewTopicModal extends ClassComponent {
       disabled = true;
     }
 
-    let decimals;
-
-    if (app.chain.meta.id === 'evmos') {
-      // Custom for evmos
-      decimals = 18;
-    } else if (app.chain && app.chain.meta) {
-      decimals = app.chain.meta.decimals;
-    } else if (app.chain.network === ChainNetwork.ERC721) {
-      decimals = 0;
-    } else if (app.chain.base === ChainBase.CosmosSDK) {
-      decimals = 6;
-    }
+    const decimals = getDecimals();
 
     return (
       <div class="NewTopicModal">

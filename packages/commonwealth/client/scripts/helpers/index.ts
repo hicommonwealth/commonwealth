@@ -410,3 +410,20 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
       return null;
   }
 }
+
+// Decimals For Tokens
+export function getDecimals(): number {
+  let decimals;
+  if (app.chain.meta.id === 'evmos') {
+    // Custom for evmos
+    decimals = 18;
+  } else if (app.chain && app.chain.meta) {
+    decimals = app.chain.meta.decimals;
+  } else if (app.chain.network === ChainNetwork.ERC721) {
+    decimals = 0;
+  } else if (app.chain.base === ChainBase.CosmosSDK) {
+    decimals = 6;
+  }
+
+  return decimals;
+}

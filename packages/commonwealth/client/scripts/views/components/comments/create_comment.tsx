@@ -7,7 +7,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import 'components/comments/create_comment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { weiToTokens } from 'helpers';
+import { getDecimals, weiToTokens } from 'helpers';
 import m from 'mithril';
 import type { AnyProposal } from 'models';
 import { Thread } from 'models';
@@ -134,18 +134,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       uploadsInProgress ||
       userFailsThreshold;
 
-    let decimals;
-
-    if (app.chain.meta.id === 'evmos') {
-      // Custom for evmos
-      decimals = 18;
-    } else if (app.chain && app.chain.meta) {
-      decimals = app.chain.meta.decimals;
-    } else if (app.chain.network === ChainNetwork.ERC721) {
-      decimals = 0;
-    } else if (app.chain.base === ChainBase.CosmosSDK) {
-      decimals = 6;
-    }
+    const decimals = getDecimals();
 
     return (
       <div class="CreateComment">
