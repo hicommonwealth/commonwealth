@@ -213,6 +213,10 @@ class ContractsController {
             abiJson = contract.ContractAbi.abi;
           }
         }
+        if (contract.CommunityContractTemplate) {
+          console.log('hiii');
+          console.log(contract.CommunityContractTemplate);
+        }
         this._store.add(
           Contract.fromJSON({
             ...contract,

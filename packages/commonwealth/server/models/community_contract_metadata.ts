@@ -3,7 +3,7 @@ import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityContractTemplateMetadataAttributes = {
-  cct_id: number;
+  id: number;
   slug: string;
   nickname: string;
   display_name: string;
@@ -25,7 +25,7 @@ export default (
   >sequelize.define(
     'CommunityContractTemplateMetadata',
     {
-      cct_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+      id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
       slug: { type: dataTypes.STRING, allowNull: false },
       nickname: { type: dataTypes.STRING, allowNull: false },
       display_name: { type: dataTypes.STRING, allowNull: false },
@@ -37,16 +37,6 @@ export default (
       timestamps: false,
     }
   );
-
-  CommunityContractTemplateMetadata.associate = (models) => {
-    CommunityContractTemplateMetadata.belongsTo(
-      models.CommunityContractTemplate,
-      {
-        foreignKey: 'cct_id',
-        targetKey: 'id',
-      }
-    );
-  };
 
   return CommunityContractTemplateMetadata;
 };

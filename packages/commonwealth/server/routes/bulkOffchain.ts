@@ -1,4 +1,5 @@
 /* eslint-disable no-async-promise-executor */
+import { Contract } from 'client/scripts/models';
 import { ServerError } from 'common-common/src/errors';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided
@@ -7,6 +8,7 @@ import { ServerError } from 'common-common/src/errors';
 //
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
+import { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { CommunityRoleInstance } from 'server/models/community_role';
 import type { DB } from '../models';
 import type { ChatChannelInstance } from '../models/chat_channel';
@@ -38,7 +40,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     chatChannels,
     rules,
     communityBanner,
-    contracts,
+    contractsWithTemplatesData,
     communityRoles,
   ] = await (<
     Promise<
@@ -51,7 +53,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         ChatChannelInstance[],
         RuleInstance[],
         CommunityBannerInstance,
-        ContractInstance[],
+        Array<{
+          contract: ContractInstance;
+          cct: CommunityContractTemplateInstance;
+        }>,
         CommunityRoleInstance[]
       ]
     >
@@ -202,14 +207,38 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
             chain_id: chain.id,
           },
         });
-        const contractsPromise = models.Contract.findAll({
-          where: {
-            id: { [Op.in]: communityContracts.map((cc) => cc.contract_id) },
-          },
-          include: [{ model: models.ContractAbi, required: false }],
-        });
-        resolve(contractsPromise);
+
+        const contractsWithTemplates: Array<{
+          contract: ContractInstance;
+          cct: CommunityContractTemplateInstance;
+        }> = [];
+        for (const cc of communityContracts) {
+          const cct = await models.CommunityContractTemplate.findOne({
+            where: {
+              community_contract_id: cc.id,
+            },
+            include: {
+              model: models.CommunityContractTemplateMetadata,
+              required: false,
+            },
+          });
+          const contract = await models.Contract.findOne({
+            where: {
+              id: cc.contract_id,
+            },
+            include: [
+              {
+                model: models.ContractAbi,
+                required: false,
+              },
+            ],
+          });
+
+          contractsWithTemplates.push({ contract, cct });
+        }
+        resolve(contractsWithTemplates);
       } catch (e) {
+        console.log(e);
         reject(new ServerError('Could not fetch contracts'));
       }
     }),
@@ -231,7 +260,9 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       chatChannels: JSON.stringify(chatChannels),
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
-      contracts: contracts.map((c) => c.toJSON()),
+      contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
+        return { contract: c.contract.toJSON(), template: c.cct };
+      }),
       communityRoles: communityRoles.map((r) => r.toJSON()),
     },
   });

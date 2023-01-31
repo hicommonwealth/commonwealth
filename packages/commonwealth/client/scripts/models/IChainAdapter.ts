@@ -69,7 +69,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numVotingThreads,
       chatChannels,
       communityBanner,
-      contracts,
+      contractsWithTemplatesData,
       communityRoles,
     } = response.result;
     this.app.topics.initialize(topics, true);
@@ -77,7 +77,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
-    this.app.contracts.initialize(contracts, true);
+    this.app.contracts.initialize(
+      contractsWithTemplatesData.map((c) => c.contract),
+      true
+    );
+    console.log(response.result);
 
     // add community roles to the chain's roles
     this.meta.communityRoles = communityRoles;
