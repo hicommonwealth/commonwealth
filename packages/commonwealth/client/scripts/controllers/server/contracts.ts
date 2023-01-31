@@ -10,8 +10,7 @@ type AddCommunityContractTemplateAttributes = {
   nickname: string;
   display_name: string;
   display_options: string;
-  community_id: string;
-  contract_id: number;
+  community_contract_id: string;
   template_id: number;
 };
 
@@ -198,29 +197,47 @@ class ContractsController {
     }
   }
 
-  public initialize(contracts = [], reset = true) {
+  public initialize(contractsWithTemplates = [], reset = true) {
     if (reset) {
       this._store.clear();
     }
-    contracts.forEach((contract) => {
+    contractsWithTemplates.forEach((contractWithTemplate) => {
       try {
         let abiJson: Array<Record<string, unknown>>;
-        if (contract.ContractAbi) {
+        let cct: {
+          id: number;
+          communityContractId: number;
+          cctmdId: number;
+          tempalteId: number;
+        };
+        let cctmd: {
+          id: number;
+          slug: string;
+          nickname: string;
+          display_name: string;
+          display_options: string;
+        };
+        if (contractWithTemplate.contract.ContractAbi) {
           // Necessary because the contract abi was stored as a string in some contracts
-          if (typeof contract.ContractAbi.abi === 'string') {
-            abiJson = JSON.parse(contract.ContractAbi.abi);
+          if (
+            typeof contractWithTemplate.contract.ContractAbi.abi === 'string'
+          ) {
+            abiJson = JSON.parse(contractWithTemplate.contract.ContractAbi.abi);
           } else {
-            abiJson = contract.ContractAbi.abi;
+            abiJson = contractWithTemplate.contract.ContractAbi.abi;
           }
         }
-        if (contract.CommunityContractTemplate) {
-          console.log('hiii');
-          console.log(contract.CommunityContractTemplate);
+        if (contractWithTemplate.cct) {
+          cct = contractWithTemplate.cct;
+          cctmd = contractWithTemplate.cct.CommunityContractTemplateMetadatum;
         }
+
         this._store.add(
           Contract.fromJSON({
-            ...contract,
+            ...contractWithTemplate.contract,
             abi: abiJson,
+            cct: cct,
+            cctmd: cctmd,
           })
         );
       } catch (e) {

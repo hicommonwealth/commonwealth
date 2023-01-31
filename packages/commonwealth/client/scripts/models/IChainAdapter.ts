@@ -77,11 +77,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
-    this.app.contracts.initialize(
-      contractsWithTemplatesData.map((c) => c.contract),
-      true
-    );
-    console.log(response.result);
+    this.app.contracts.initialize(contractsWithTemplatesData, true);
+    console.log(this.app.contracts);
 
     // add community roles to the chain's roles
     this.meta.communityRoles = communityRoles;
