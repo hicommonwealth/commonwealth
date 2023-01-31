@@ -3,8 +3,6 @@ import React from 'react';
 import { PopperUnstyled } from '@mui/base';
 import type { Placement } from '@popperjs/core/lib';
 
-import 'components/component_kit/cw_popover/cw_popover.scss';
-
 import { ClassComponent, jsx } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 
