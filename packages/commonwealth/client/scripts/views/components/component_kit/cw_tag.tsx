@@ -1,8 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_tag.scss';
 
@@ -20,27 +19,25 @@ type TagType =
   | 'proposal'
   | 'referendum';
 
-export type TagAttrs = {
+export type TagProps = {
   iconName?: IconName;
   label: string;
   type?: TagType;
 };
 
-export class CWTag extends ClassComponent<TagAttrs> {
-  view(vnode: ResultNode<TagAttrs>) {
-    const { iconName, label, type } = vnode.attrs;
+export const CWTag = (props: TagProps) => {
+  const { iconName, label, type } = props;
 
-    return (
-      <div
-        className={getClasses<{ type?: TagType }>({ type }, ComponentType.Tag)}
-      >
-        {!!iconName && (
-          <CWIcon iconName={iconName} iconSize="small" className="tag-icon" />
-        )}
-        <CWText type="caption" fontWeight="medium" className="tag-text" noWrap>
-          {label}
-        </CWText>
-      </div>
-    );
-  }
-}
+  return (
+    <div
+      className={getClasses<{ type?: TagType }>({ type }, ComponentType.Tag)}
+    >
+      {!!iconName && (
+        <CWIcon iconName={iconName} iconSize="small" className="tag-icon" />
+      )}
+      <CWText type="caption" fontWeight="medium" className="tag-text" noWrap>
+        {label}
+      </CWText>
+    </div>
+  );
+};

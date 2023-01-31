@@ -73,13 +73,11 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             <div className="inner-body-container centered">
               <LoginBoilerplate />
               <CWWalletsList
-                connectAnotherWayonClick={() => {
+                connectAnotherWayOnclick={() => {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
                 setSelectedWallet={setSelectedWallet}
-                setProfiles={setProfiles}
-                setSidebarType={setSidebarType}
                 setBodyType={setBodyType}
                 accountVerifiedCallback={accountVerifiedCallback}
                 linking={false}
@@ -216,16 +214,14 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 </CWText>
               </div>
               <CWWalletsList
-                connectAnotherWayonClick={() => {
+                connectAnotherWayOnclick={() => {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
-                setProfiles={setProfiles}
-                setSidebarType={setSidebarType}
                 setSelectedWallet={setSelectedLinkingWallet}
                 setBodyType={setBodyType}
                 accountVerifiedCallback={accountVerifiedCallback}
-                linking={true}
+                linking
                 showResetWalletConnect={showResetWalletConnect}
               />
             </div>
