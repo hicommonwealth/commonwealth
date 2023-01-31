@@ -68,7 +68,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
     }
     try {
       const resp = await window.solana.connect();
-      const key = (await resp.publicKey()).toString();
+      const key = resp.publicKey.toString();
       this._accounts = [key];
       this._enabling = false;
       this._enabled = true;
