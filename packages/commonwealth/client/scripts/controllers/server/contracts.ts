@@ -21,6 +21,7 @@ type EditCommunityContractTemplateAttributes = {
   nickname: string;
   display_name: string;
   display_options: string;
+  contract_id: number;
 };
 
 class ContractsController {
@@ -230,7 +231,6 @@ class ContractsController {
         communityContractTemplateAndMetadata
       );
 
-      // TODO add newContract to the store when the types will be aligned
       this.updateTemplate({
         contract_id: communityContractTemplateAndMetadata.contract_id,
         cct: newContract.cct,
@@ -247,10 +247,16 @@ class ContractsController {
   ) {
     try {
       // TODO update store with editedTemplate when the store will be ready
-      await $.ajax({
+      const updateContract = await $.ajax({
         url: `${app.serverUrl()}/contract/community_template/metadata`,
         data: communityContractTemplateMetadata,
         type: 'PUT',
+      });
+
+      this.updateTemplate({
+        contract_id: communityContractTemplateMetadata.contract_id,
+        cct: updateContract.cct,
+        cctmd: updateContract.cctmd,
       });
     } catch (err) {
       console.log(err);

@@ -97,7 +97,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     }
   }
 
-  async handleSaveEditingTemplate(e) {
+  async handleSaveEditingTemplate(e, contractId: number) {
     e.preventDefault();
 
     const { slug, displayOption, nickname, displayName, templateId } =
@@ -109,6 +109,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
       nickname,
       display_name: displayName,
       display_options: displayOption,
+      contract_id: contractId,
     };
 
     try {
@@ -266,7 +267,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
             disabled={confirmButtonDisabled}
             onclick={(e) =>
               isEditMode
-                ? this.handleSaveEditingTemplate(e)
+                ? this.handleSaveEditingTemplate(e, contractId)
                 : this.handleAddTemplate(e, contractId)
             }
           />
