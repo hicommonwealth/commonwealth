@@ -45,3 +45,44 @@ export async function createTemplate(
     throw new AppError('Error creating template');
   }
 }
+
+type getTemplateAndMetadataReq = {
+  abi_id: number;
+};
+
+type getTemplateAndMetadataResp = {
+  templates: Array<any>; // TODO: type this
+};
+
+export async function getTemplates(
+  models: DB,
+  req: TypedRequestBody<getTemplateAndMetadataReq>,
+  res: TypedResponse<getTemplateAndMetadataResp>
+) {
+  const { abi_id } = req.body;
+
+  if (!abi_id) {
+    throw new AppError('Must provide abi_id');
+  }
+
+  const abi = await models.ContractAbi.findOne({
+    where: {
+      id: abi_id,
+    },
+  });
+
+  if (!abi) {
+    throw new AppError('ABI does not exist');
+  }
+
+  try {
+    const templates = await models.Template.findAll({
+      where: {
+        abi_id,
+      },
+    });
+    return success(res, { templates });
+  } catch (e) {
+    throw new AppError('Error getting templates');
+  }
+}
