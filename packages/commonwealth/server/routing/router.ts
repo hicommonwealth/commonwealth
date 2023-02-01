@@ -123,6 +123,7 @@ import {
   updateCommunityContractTemplateMetadata,
   deleteCommunityContractTemplateMetadata,
 } from '../routes/proposalTemplate';
+import { createTemplate } from '../routes/templates';
 
 import status from '../routes/status';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -261,6 +262,13 @@ function setupRouter(
     '/contract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
+  );
+
+  // Templates
+  router.post(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    createTemplate.bind(this, models)
   );
 
   // community contract
