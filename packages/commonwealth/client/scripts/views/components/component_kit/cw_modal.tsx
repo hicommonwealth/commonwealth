@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'components/component_kit/cw_modal.scss';
@@ -131,3 +140,37 @@ export class ModalExitButton extends ClassComponent<ModalExitButtonAttrs> {
     );
   }
 }
+
+import ModalUnstyled from '@mui/base/ModalUnstyled';
+
+const Backdrop = React.forwardRef<
+  HTMLDivElement,
+  { className: string; ownerState: any }
+>((props, ref) => {
+  const { ownerState, ...other } = props;
+  // pull out ownerState per https://github.com/mui/material-ui/issues/32882
+
+  return <div ref={ref} {...other} />;
+});
+
+export const Modal = (props: {
+  content: React.ReactNode;
+  isFullScreen?: boolean;
+  onClose: () => void;
+  open: boolean;
+}) => {
+  const { content, isFullScreen, onClose, open } = props;
+
+  return (
+    <ModalUnstyled open={open} onClose={onClose} slots={{ backdrop: Backdrop }}>
+      <div
+        className={getClasses<{ isFullScreen?: boolean }>(
+          { isFullScreen },
+          'ModalContainer'
+        )}
+      >
+        {content}
+      </div>
+    </ModalUnstyled>
+  );
+};

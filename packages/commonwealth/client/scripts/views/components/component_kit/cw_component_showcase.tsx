@@ -15,6 +15,7 @@ import {
 
 import 'components/component_kit/cw_component_showcase.scss';
 
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
@@ -45,6 +46,8 @@ import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
+import { NewLoginModal } from '../../modals/login_modal';
+import { Modal } from './cw_modal';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -152,9 +155,17 @@ export const ComponentShowcase = () => {
   const [radioGroupSelection, setRadioGroupSelection] = React.useState<string>(
     radioGroupOptions[2].value
   );
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
     <div className="ComponentShowcase">
+      <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
+      <Modal
+        content={<div>hi</div>}
+        // isFullScreen
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
       <div className="basic-gallery">
         <CWText type="h3">Popover Menu</CWText>
         <PopoverMenu
