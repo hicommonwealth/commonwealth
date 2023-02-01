@@ -40,7 +40,6 @@ describe('Update Community/Chain Tests', () => {
       jwt: jwtToken,
       isAuthenticatedForum: 'false',
       privacyEnabled: 'false',
-      invitesEnabled: 'false',
       id: 'tester',
       name: 'tester community',
       creator_address: loggedInAddr,
