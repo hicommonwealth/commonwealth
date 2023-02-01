@@ -1,17 +1,18 @@
 import $ from 'jquery';
 import app from 'state';
 
-import { AddressInfo, RoleInfo, Account, ChainInfo } from 'models';
+import type { AddressInfo, RoleInfo, ChainInfo } from 'models';
+import { Account } from 'models';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
+import type { Action } from 'commonwealth/shared/permissions';
 import {
-  Action,
   AccessLevel,
   PermissionManager,
   ToCheck,
   everyonePermissions,
 } from 'commonwealth/shared/permissions';
-import { RoleObject } from 'commonwealth/shared/types';
-import { UserController } from './user';
+import type { RoleObject } from 'commonwealth/shared/types';
+import type { UserController } from './user';
 
 const getPermissionLevel = (permission: AccessLevel | undefined) => {
   if (permission === undefined) {
@@ -90,28 +91,6 @@ export class RolesController {
           );
         });
       }
-    });
-  }
-
-  public acceptInvite(options: {
-    address: string;
-    inviteCode: any;
-  }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/acceptInvite`, {
-      address: options.address,
-      reject: false,
-      inviteCode: options.inviteCode,
-      jwt: this.User.jwt,
-    }).then((result) => {
-      this.addRole(result.result.role);
-    });
-  }
-
-  public rejectInvite(options: { inviteCode: any }) {
-    return $.post(`${app.serverUrl()}/acceptInvite`, {
-      inviteCode: options.inviteCode,
-      reject: true,
-      jwt: app.user.jwt,
     });
   }
 

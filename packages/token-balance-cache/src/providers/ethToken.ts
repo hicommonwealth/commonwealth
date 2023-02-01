@@ -1,5 +1,3 @@
-import Web3 from 'web3';
-
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
@@ -32,6 +30,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
   ): Promise<string> {
     const url = node.private_url || node.url;
     const { tokenAddress, contractType } = opts;
+    const Web3 = (await import('web3')).default;
     if (!tokenAddress && !contractType) {
       if (!Web3.utils.isAddress(address)) {
         throw new Error('Invalid address');

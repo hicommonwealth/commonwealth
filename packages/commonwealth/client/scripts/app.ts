@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
+import '../../static/fonts/fonts.css';
 import '../styles/normalize.css'; // reset
 import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
@@ -11,11 +12,7 @@ import $ from 'jquery';
 import './fragment-fix';
 import app, { initAppState, LoginState } from 'state';
 
-import {
-  getRoutes,
-  handleInviteLinkRedirect,
-  handleLoginRedirects,
-} from 'router';
+import { getRoutes, handleLoginRedirects } from 'router';
 import momentUpdateLocale from 'helpers/momentUpdateLocale';
 import injectGoogleTagManagerScript from 'helpers/injectGoogleTagManagerScript';
 import handleWindowError from 'helpers/handleWindowError';
@@ -49,7 +46,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           app.user.discussionDrafts.refreshAll().then(() => m.redraw());
         }
 
-        handleInviteLinkRedirect();
         // If the user updates their email
         handleUpdateEmailConfirmation();
 

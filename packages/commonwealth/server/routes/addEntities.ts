@@ -1,8 +1,9 @@
-import { OnlyErrorResp } from 'common-common/src/api/extApiTypes';
+import type { OnlyErrorResp } from 'common-common/src/api/extApiTypes';
 import { validationResult } from 'express-validator';
 import { filterAddressOwnedByUser } from '../middleware/lookupAddressIsOwnedByUser';
-import { DB } from '../models';
-import { failure, success, TypedRequest, TypedResponse } from '../types';
+import type { DB } from '../models';
+import type { TypedRequest, TypedResponse } from '../types';
+import { failure, success } from '../types';
 
 export async function addEntities<
   M extends Record<string, unknown> = Record<string, unknown>

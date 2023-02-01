@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
 
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
 
 import domain from '../routes/domain';
@@ -55,9 +55,6 @@ import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import bulkMembers from '../routes/bulkMembers';
 import bulkAddresses from '../routes/bulkAddresses';
-import createInvite from '../routes/createInvite';
-import acceptInvite from '../routes/acceptInvite';
-import addMember from '../routes/addMember';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileOld from '../routes/getProfile';
@@ -125,7 +122,7 @@ import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
 import getWebhooks from '../routes/webhooks/getWebhooks';
-import ViewCountCache from '../util/viewCountCache';
+import type ViewCountCache from '../util/viewCountCache';
 import updateChainCategory from '../routes/updateChainCategory';
 import updateChainCustomDomain from '../routes/updateChainCustomDomain';
 import updateChainPriority from '../routes/updateChainPriority';
@@ -140,15 +137,15 @@ import bulkBalances from '../routes/bulkBalances';
 import getSupportedEthChains from '../routes/getSupportedEthChains';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import updateAddress from '../routes/updateAddress';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { sendMessage } from '../routes/snapshotAPI';
 import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
 import setProjectChain from '../routes/setProjectChain';
-import RuleCache from '../util/rules/ruleCache';
+import type RuleCache from '../util/rules/ruleCache';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
-import BanCache from '../util/banCheckCache';
+import type BanCache from '../util/banCheckCache';
 import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
@@ -159,8 +156,8 @@ import { getChain } from '../routes/getChain';
 import { getChainNode } from '../routes/getChainNode';
 import { getChainContracts } from '../routes/getChainContracts';
 import { getSubscribedChains } from '../routes/getSubscribedChains';
-import GlobalActivityCache from '../util/globalActivityCache';
-import DatabaseValidationService from '../middleware/databaseValidationService';
+import type GlobalActivityCache from '../util/globalActivityCache';
+import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
@@ -561,23 +558,6 @@ function setupRouter(
     '/bulkMembers',
     databaseValidationService.validateChain,
     bulkMembers.bind(this, models)
-  );
-  router.post(
-    '/createInvite',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createInvite.bind(this, models)
-  );
-  router.post(
-    '/acceptInvite',
-    passport.authenticate('jwt', { session: false }),
-    acceptInvite.bind(this, models)
-  );
-  router.post(
-    '/addMember',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    addMember.bind(this, models)
   );
   router.post(
     '/upgradeMember',

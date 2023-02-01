@@ -1,5 +1,5 @@
 import { AppError } from 'common-common/src/errors';
-import { AbiItem } from 'web3-utils';
+import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
 import { Errors } from '../routes/contractAbis/createContractAbi';
 
