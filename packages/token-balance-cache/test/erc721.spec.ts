@@ -69,6 +69,6 @@ describe('ERC721 BP unit tests', () => {
           contractType: 'test-fail',
         }
       )
-    ).to.be.rejectedWith(new Error('Property does not exist in model schema.'));
+    ).to.be.rejectedWith(new Error('Invalid Contract Type'));
   });
 });
