@@ -1,6 +1,7 @@
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
+import type Web3 from 'web3';
 
 type EthBPOpts = {
   tokenAddress?: string;
