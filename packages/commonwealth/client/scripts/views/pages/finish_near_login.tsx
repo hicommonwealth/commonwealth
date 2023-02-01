@@ -1,8 +1,9 @@
 /* @jsx m */
 
-import { Chain } from '@canvas-js/interfaces';
+import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
-import { initAppState, navigateToSubpage } from 'app';
+import { initAppState } from 'state';
+import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
 import ClassComponent from 'class_component';
 import { ChainBase, WalletId } from 'common-common/src/types';

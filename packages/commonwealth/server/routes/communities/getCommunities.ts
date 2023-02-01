@@ -4,10 +4,11 @@ import type {
 } from 'common-common/src/api/extApiTypes';
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
-import type { DB } from '../../models';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { failure, success } from '../../types';
 import { formatPaginationNoSort } from '../../util/queries';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { success, failure } from '../../types';
+import type { DB } from '../../models';
+import { paginationValidation } from '../../util/helperValidations';
 
 export const getCommunitiesValidation = [
   oneOf(
@@ -21,6 +22,7 @@ export const getCommunitiesValidation = [
     `${needParamErrMsg} (community_id, network, comment_id, address_ids, addresses)`
   ),
   query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
 ];
 
 const getCommunities = async (

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { IERC721Metadata__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
@@ -16,7 +16,6 @@ import 'pages/create_community.scss';
 import app from 'state';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import Web3 from 'web3';
 import { isAddress } from 'web3-utils';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -100,6 +99,7 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
           } else {
             // attempt to query ERC721Detailed token info from chain
             console.log('Querying chain for ERC info');
+            const Web3 = (await import('web3')).default;
             const provider = new Web3.providers.WebsocketProvider(args.url);
             try {
               const ethersProvider = new providers.Web3Provider(provider);
@@ -191,8 +191,14 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
-            const { altWalletUrl, chainString, ethChainId, nodeUrl, symbol } =
-              this.state.form;
+            const {
+              altWalletUrl,
+              chainString,
+              ethChainId,
+              nodeUrl,
+              symbol,
+              iconUrl,
+            } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
@@ -208,6 +214,7 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
                 chain_string: chainString,
                 eth_chain_id: ethChainId,
                 jwt: app.user.jwt,
+                icon_url: iconUrl,
                 network: ChainNetwork.ERC721,
                 node_url: nodeUrl,
                 type: ChainType.Token,

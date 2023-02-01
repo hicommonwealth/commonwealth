@@ -1,29 +1,24 @@
-import type { Action, Permissions } from 'common-common/src/permissions';
-import {
-  BASE_PERMISSIONS,
-  computePermissions,
-  isPermitted,
-} from 'common-common/src/permissions';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import type { AddressInfo, ChainInfo, RoleInfo } from 'models';
-import { Account, RolePermission } from 'models';
 import app from 'state';
+
+import type { AddressInfo, RoleInfo, ChainInfo } from 'models';
+import { Account } from 'models';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
+import type { Action } from 'commonwealth/shared/permissions';
+import {
+  AccessLevel,
+  PermissionManager,
+  ToCheck,
+  everyonePermissions,
+} from 'commonwealth/shared/permissions';
+import type { RoleObject } from 'commonwealth/shared/types';
 import type { UserController } from './user';
 
-const getPermissionLevel = (permission: RolePermission | undefined) => {
-  switch (permission) {
-    case undefined:
-      return 0;
-    case RolePermission.member:
-      return 1;
-    case RolePermission.moderator:
-      return 2;
-    case RolePermission.admin:
-      return 3;
-    default:
-      return 4;
+const getPermissionLevel = (permission: AccessLevel | undefined) => {
+  if (permission === undefined) {
+    return AccessLevel.Everyone;
   }
+  return permission;
 };
 
 export class RolesController {
@@ -96,28 +91,6 @@ export class RolesController {
           );
         });
       }
-    });
-  }
-
-  public acceptInvite(options: {
-    address: string;
-    inviteCode: any;
-  }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/acceptInvite`, {
-      address: options.address,
-      reject: false,
-      inviteCode: options.inviteCode,
-      jwt: this.User.jwt,
-    }).then((result) => {
-      this.addRole(result.result.role);
-    });
-  }
-
-  public rejectInvite(options: { inviteCode: any }) {
-    return $.post(`${app.serverUrl()}/acceptInvite`, {
-      inviteCode: options.inviteCode,
-      reject: true,
-      jwt: app.user.jwt,
     });
   }
 
@@ -254,7 +227,7 @@ export class RolesController {
     const adminRole = this.roles.find((role) => {
       return (
         role.address === this.User.activeAccount.address &&
-        role.permission === RolePermission.admin &&
+        role.permission === AccessLevel.Admin &&
         options.chain &&
         role.chain_id === options.chain
       );
@@ -317,11 +290,7 @@ export function isActiveAddressPermitted(
   );
 
   // populate permission assignment array with role allow and deny permissions
-  const roles: Array<{
-    permission: RolePermission;
-    allow: Permissions;
-    deny: Permissions;
-  }> = chainRoles.map((r) => {
+  const roles: Array<RoleObject> = chainRoles.map((r) => {
     const communityRole = chain_info.communityRoles.find(
       (cr) => cr.name === r.permission
     );
@@ -332,12 +301,13 @@ export function isActiveAddressPermitted(
     };
   });
 
+  const permissionsManager = new PermissionManager();
   if (chainRoles.length > 0) {
     const permission = aggregatePermissions(roles, {
       allow: chain_info.defaultAllowPermissions,
       deny: chain_info.defaultDenyPermissions,
     });
-    if (!isPermitted(permission, action)) {
+    if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
     return true;
@@ -345,13 +315,16 @@ export function isActiveAddressPermitted(
   // If no roles are given for the chain, compute permissions with chain default permissions
   else {
     // compute permissions with chain default permissions
-    const permission = computePermissions(BASE_PERMISSIONS, [
-      {
-        allow: chain_info.defaultAllowPermissions,
-        deny: chain_info.defaultDenyPermissions,
-      },
-    ]);
-    if (!isPermitted(permission, action)) {
+    const permission = permissionsManager.computePermissions(
+      everyonePermissions,
+      [
+        {
+          allow: chain_info.defaultAllowPermissions,
+          deny: chain_info.defaultDenyPermissions,
+        },
+      ]
+    );
+    if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
     return true;

@@ -5,7 +5,7 @@ import type { ChainInfo, IChainModule, ITXModalData, NodeInfo } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import Web3 from 'web3';
+import type Web3 from 'web3';
 import type EthereumAccount from './account';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -61,18 +61,23 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return this._totalbalance;
   }
 
-  public async initApi(node?: NodeInfo): Promise<Web3> {
-    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+  public async _initApi(node: NodeInfo): Promise<Web3> {
     try {
       // TODO: support http?
+      const Web3 = (await import('web3')).default;
       const provider = new Web3.providers.WebsocketProvider(node.url);
       this._api = new Web3(provider);
+      return this._api;
     } catch (error) {
       console.log(`Could not connect to Ethereum on ${node.url}`);
       this.app.chain.networkStatus = ApiStatus.Disconnected;
       throw error;
     }
+  }
 
+  public async initApi(node?: NodeInfo): Promise<Web3> {
+    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+    await this._initApi(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
     const blockNumber = await this._api.eth.getBlockNumber();

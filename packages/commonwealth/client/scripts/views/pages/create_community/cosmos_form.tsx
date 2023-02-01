@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
@@ -103,6 +103,7 @@ export class CosmosForm extends ClassComponent {
               ethChainId,
               nodeUrl,
               symbol,
+              iconUrl,
             } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
@@ -121,6 +122,7 @@ export class CosmosForm extends ClassComponent {
                 jwt: app.user.jwt,
                 network: this.state.form.id,
                 node_url: nodeUrl,
+                icon_url: iconUrl,
                 type: ChainType.Chain,
                 default_symbol: symbol,
                 ...this.state.form,

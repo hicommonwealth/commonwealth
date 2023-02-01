@@ -1,8 +1,8 @@
 /* @jsx m */
 
-import * as solw3 from '@solana/web3.js';
+import type * as solw3 from '@solana/web3.js';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
@@ -56,6 +56,7 @@ export class SplTokenForm extends ClassComponent {
       this.state.status = undefined;
       this.state.message = '';
       let mintPubKey: solw3.PublicKey;
+      const solw3 = await import('@solana/web3.js');
       try {
         mintPubKey = new solw3.PublicKey(this.state.form.mint);
       } catch (e) {

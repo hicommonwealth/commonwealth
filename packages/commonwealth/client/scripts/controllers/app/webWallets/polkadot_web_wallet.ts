@@ -12,7 +12,7 @@ import { stringToHex } from '@polkadot/util';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import type { Account, IWebWallet } from 'models';
-import { CanvasData } from 'shared/adapters/shared';
+import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 
 class PolkadotWebWalletController

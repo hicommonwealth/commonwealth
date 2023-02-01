@@ -1,18 +1,22 @@
-import Sequelize from 'sequelize';
+import moment from 'moment';
 import models from 'server/database';
+import Sequelize from 'sequelize';
+import type { ThreadInstance } from 'server/models/thread';
+import type { CommentInstance } from 'server/models/comment';
+import type { UserInstance } from 'server/models/user';
 import type { AddressInstance } from 'server/models/address';
 import type { ChainInstance } from 'server/models/chain';
-import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { CollaborationAttributes } from 'server/models/collaboration';
-import type { CommentInstance } from 'server/models/comment';
 import type { ReactionAttributes } from 'server/models/reaction';
-import type { ThreadInstance } from 'server/models/thread';
+import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { TopicAttributes } from 'server/models/topic';
-import type { UserInstance } from 'server/models/user';
 import type { ProfileAttributes } from '../../../../server/models/profile';
+import type { RoleAttributes } from '../../../../server/models/role';
+import type { RuleAttributes } from '../../../../server/models/rule';
 
 const Op = Sequelize.Op;
 
+/* eslint-disable import/no-mutable-exports */
 export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
@@ -23,8 +27,10 @@ export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
+export let testRoles: RoleAttributes[];
+export let testRules: RuleAttributes[];
 
-before(async () => {
+async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Collaboration.destroy({
@@ -35,14 +41,24 @@ before(async () => {
   await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Rule.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Chain.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
     force: true,
   });
+  await models.ChainNode.destroy({
+    where: { id: { [Op.lt]: 0 } },
+    force: true,
+  });
   await models.Profile.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Role.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+}
+
+beforeEach(async () => {
+  await clearTestEntities();
 
   testUsers = await Promise.all(
-    [...Array(2).keys()].map(
+    [...Array(4).keys()].map(
       async (i) =>
         (
           await models.User.findOrCreate({
@@ -145,16 +161,48 @@ before(async () => {
   ];
 
   testAddresses = await Promise.all(
-    [...Array(2).keys()].map(
+    [...Array(4).keys()].map(
       async (i) =>
         (
           await models.Address.findOrCreate({
             where: {
               id: -i - 1,
+              user_id: -i - 1,
               address: `testAddress${-i - 1}`,
               chain: 'cmntest',
               verification_token: '',
               profile_id: -i - 1,
+              verified: moment.now(),
+            },
+          })
+        )[0]
+    )
+  );
+
+  testRoles = await Promise.all(
+    [...Array(2).keys()].map(
+      async (i) =>
+        (
+          await models.Role.findOrCreate({
+            where: {
+              id: -i - 1,
+              address_id: -i - 1,
+              chain_id: 'cmntest',
+            },
+          })
+        )[0]
+    )
+  );
+
+  testRules = await Promise.all(
+    [...Array(2).keys()].map(
+      async (i) =>
+        (
+          await models.Rule.findOrCreate({
+            where: {
+              id: -i - 1,
+              chain_id: 'cmntest',
+              rule: '',
             },
           })
         )[0]
@@ -290,24 +338,6 @@ before(async () => {
   );
 });
 
-after(async () => {
-  await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Collaboration.destroy({
-    where: { thread_id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Chain.destroy({
-    where: { chain_node_id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.ChainNode.destroy({
-    where: { id: { [Op.lt]: 0 } },
-    force: true,
-  });
-  await models.Profile.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+afterEach(async () => {
+  await clearTestEntities();
 });

@@ -1,4 +1,4 @@
-import * as solw3 from '@solana/web3.js';
+import type * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 import m from 'mithril';
 import type { ChainInfo, IChainModule, ITXModalData } from 'models';
@@ -41,6 +41,8 @@ export default class SolanaChain
     this._denom = chain.default_symbol;
 
     let url: string;
+
+    const solw3 = await import('@solana/web3.js');
     try {
       url = solw3.clusterApiUrl(chain.node.url as solw3.Cluster);
     } catch (e) {

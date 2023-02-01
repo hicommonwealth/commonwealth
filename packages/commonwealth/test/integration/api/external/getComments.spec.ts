@@ -1,12 +1,11 @@
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import chai from 'chai';
 import type { GetCommentsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
+import { testComments } from 'test/integration/api/external/dbEntityHooks.spec';
 import type { CommentAttributes } from 'server/models/comment';
 import { get } from 'test/integration/api/external/appHook.spec';
-import 'test/integration/api/external/dbEntityHooks.spec';
-import { testComments } from 'test/integration/api/external/dbEntityHooks.spec';
+import chaiHttp from 'chai-http';
 
 chai.use(chaiHttp);
 
@@ -14,7 +13,7 @@ describe('getComments Tests', () => {
   it('should return comments with specified community_id correctly', async () => {
     const r: GetCommentsReq = {
       community_id: testComments[0].chain,
-      count_only: 'false' as any,
+      count_only: false,
     };
     const resp = await get('/api/comments', r);
 

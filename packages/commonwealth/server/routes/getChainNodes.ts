@@ -1,11 +1,11 @@
+import type { DB } from 'server/models';
 import type {
   GetChainNodesReq,
   GetChainNodesResp,
 } from 'common-common/src/api/extApiTypes';
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
-import { oneOf, query, validationResult } from 'express-validator';
-import type { DB } from 'server/models';
 import type { ChainNodeResp, TokenBalanceCache } from 'token-balance-cache/src';
+import { oneOf, query, validationResult } from 'express-validator';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { failure, success } from '../types';
 

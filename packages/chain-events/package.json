@@ -9,9 +9,9 @@
   "main": "src/index.ts",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rimraf dist/ && tsc --project tsconfig.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
+    "build": "rimraf dist/ && tsc --project tsconfig.src.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
     "build-services": "tsc --project tsconfig.services.json && tsc-alias --project tsconfig.services.json",
-    "compile-contracts": "cd eth && npx hardhat compile",
+    "compile-contracts": "cd eth && npx hardhat compile && npx eslint --no-ignore --no-inline-config --fix \"./src/contractTypes/**/*.ts\"",
     "check-services-types": "tsc --noEmit --project tsconfig.services.json",
     "check-src-types": "tsc --noEmit --project tsconfig.src.json",
     "check-types": "tsc --noEmit --project tsconfig.json",
@@ -20,7 +20,6 @@
     "integration-test": "cd eth && hardhat test ../test/integration/*.spec.ts",
     "test-services": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/*.test.ts --timeout 20000",
     "test-app": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/chainEventsApp.test.ts",
-    "format": "prettier --ignore-path ../../.prettierignore --write .",
     "lint-all": "eslint './**/*.ts'",
     "listen": "ts-node -T ./scripts/listener.ts",
     "listenV2": "ts-node -T ./scripts/listenerV2.ts",
@@ -42,10 +41,10 @@
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a chain-events) --verbose --no-privileges --no-owner -f latest.dump",
     "dump-db-empty": "pg_dump $(heroku config:get DATABASE_URL -a chain-events) --exclude-table-data=\"public.\\\"ChainEntities\\\"\" --exclude-table-data=\"public.\\\"ChainEventTypes\\\"\" --exclude-table-data=\"public.\\\"ChainEvents\\\"\" --verbose --no-privileges --no-owner -f latest.dump",
-    "migrate-events": "NODE_OPTIONS='--max-old-space-size=460' ts-node --project tsconfig.json scripts/migrateChainEntities.ts run-as-script"
+    "migrate-events": "NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) ts-node --project tsconfig.json scripts/migrateChainEntities.ts run-as-script"
   },
   "engines": {
-    "node": "14.x"
+    "node": "18.x"
   },
   "repository": {
     "type": "git",
@@ -105,8 +104,6 @@
     "@types/node": "^14.0.14",
     "@types/underscore": "^1.10.1",
     "@types/yargs": "^15.0.9",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
     "chai": "^4.2.0",
     "copyfiles": "^2.4.1",
     "dotenv": "^10.0.0",

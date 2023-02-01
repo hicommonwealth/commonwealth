@@ -1,5 +1,5 @@
 import { WsProvider } from '@polkadot/rpc-provider/ws';
-import { ApiPromise } from '@polkadot/api/promise';
+import type { ApiPromise } from '@polkadot/api/promise';
 import type { RegisteredTypes } from '@polkadot/types/types';
 
 import type {
@@ -57,7 +57,8 @@ export async function createApi(
     // construct API using provider
     if (success) {
       unsubscribe();
-      return ApiPromise.create({
+      const polkadot = await import('@polkadot/api/promise');
+      return polkadot.ApiPromise.create({
         provider,
         ...typeOverrides,
       });

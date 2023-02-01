@@ -1,8 +1,6 @@
-import { SubstrateEvents, SubstrateTypes } from '../dist/index';
-import type { Registration } from '@polkadot/types/interfaces';
-import type { Option } from '@polkadot/types';
-import { ParseType } from '../dist/substrate/filters/type_parser';
 import fs from 'fs';
+import { createApi, ParseType, Subscriber } from '../src/chains/substrate';
+import { EventKind } from '../src/chains/substrate/types';
 
 const args = process.argv.slice(2);
 const chain = args[0] || 'edgeware';
@@ -17,8 +15,8 @@ const networks = {
 const url = networks[chain];
 
 if (!url) throw new Error(`no url for chain ${chain}`);
-SubstrateEvents.createApi(url, {}).then(async (api) => {
-  const subscriber = new SubstrateEvents.Subscriber(api);
+createApi(url, {}).then(async (api) => {
+  const subscriber = new Subscriber(api);
   const identities = {};
   const FINISH_BLOCK = 1000000;
   subscriber.subscribe(async (block) => {
@@ -30,12 +28,10 @@ SubstrateEvents.createApi(url, {}).then(async (api) => {
         event.section,
         event.method
       );
-      if (kind === SubstrateTypes.EventKind.IdentitySet) {
+      if (kind === EventKind.IdentitySet) {
         // query the entire identity data
         const who = event.data[0].toString();
-        const registrationOpt = await api.query.identity.identityOf<
-          Option<Registration>
-        >(who);
+        const registrationOpt = await api.query.identity.identityOf(who);
 
         // if the identity data exists, populate the object
         if (registrationOpt.isSome) {
@@ -44,8 +40,8 @@ SubstrateEvents.createApi(url, {}).then(async (api) => {
         }
       }
       if (
-        kind === SubstrateTypes.EventKind.IdentityCleared ||
-        kind === SubstrateTypes.EventKind.IdentityKilled
+        kind === EventKind.IdentityCleared ||
+        kind === EventKind.IdentityKilled
       ) {
         // clear deleted identities from our scaped object
         const who = event.data[0].toString();

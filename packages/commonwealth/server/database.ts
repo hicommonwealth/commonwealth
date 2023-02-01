@@ -24,7 +24,6 @@ import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
 import DiscussionDraftFactory from './models/discussion_draft';
 import IdentityCacheFactory from './models/identity_cache';
-import InviteCodeFactory from './models/invite_code';
 import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
@@ -50,7 +49,6 @@ import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
 import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
-import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
 import { factory, formatFilename } from 'common-common/src/logging';
 
@@ -80,7 +78,6 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   },
 });
 
-export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),
@@ -102,7 +99,6 @@ const models: Models = {
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
-  InviteCode: InviteCodeFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
@@ -130,7 +126,6 @@ const models: Models = {
   Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
   User: UserModelFactory(sequelize, DataTypes),
-  WaitlistRegistration: WaitlistRegistrationFactory(sequelize, DataTypes),
   Webhook: WebhookFactory(sequelize, DataTypes),
 };
 

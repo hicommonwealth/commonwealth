@@ -91,6 +91,10 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
         // Otherwise, set this.activeMode based on the app setting
         this.activeMode = app.user?.disableRichText ? 'markdown' : 'richText';
       }
+    } else if (mode === 'markdown') {
+      this.activeMode = 'markdown';
+    } else {
+      this.activeMode = 'richText';
     }
   }
 

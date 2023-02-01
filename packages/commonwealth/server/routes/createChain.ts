@@ -1,6 +1,4 @@
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import type { Cluster } from '@solana/web3.js';
-import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 import { AppError, ServerError } from 'common-common/src/errors';
 import {
@@ -12,7 +10,6 @@ import {
 import type { NextFunction } from 'express';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
-import Web3 from 'web3';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
@@ -20,11 +17,12 @@ import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { ChainAttributes } from '../models/chain';
 import type { ChainNodeAttributes } from '../models/chain_node';
-import type { RoleAttributes, RoleInstance } from '../models/role';
+import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 
+import type { RoleInstanceWithPermission } from '../util/roles';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 
@@ -161,6 +159,7 @@ const createChain = async (
     req.body.base === ChainBase.Ethereum &&
     req.body.type !== ChainType.Offchain
   ) {
+    const Web3 = (await import('web3')).default;
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new AppError(Errors.InvalidAddress));
     }
@@ -198,7 +197,8 @@ const createChain = async (
     req.body.base === ChainBase.Solana &&
     req.body.type !== ChainType.Offchain
   ) {
-    let pubKey: solw3.PublicKey;
+    const solw3 = await import('@solana/web3.js');
+    let pubKey;
     try {
       pubKey = new solw3.PublicKey(req.body.address);
     } catch (e) {
@@ -224,7 +224,8 @@ const createChain = async (
       return next(new AppError(Errors.InvalidNodeUrl));
     }
     try {
-      const tmClient = await Tendermint34Client.connect(url);
+      const cosm = await import('@cosmjs/tendermint-rpc');
+      const tmClient = await cosm.Tendermint34Client.connect(url);
       await tmClient.block();
     } catch (err) {
       return next(new ServerError(Errors.InvalidNode));
@@ -381,7 +382,7 @@ const createChain = async (
 
   // try to make admin one of the user's addresses
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role: RoleInstance | undefined;
+  let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
   if (chain.base === ChainBase.Ethereum) {
@@ -436,7 +437,13 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
-    await createRole(models, addressToBeAdmin.id, chain.id, 'admin', true);
+    role = await createRole(
+      models,
+      addressToBeAdmin.id,
+      chain.id,
+      'admin',
+      true
+    );
 
     await models.Subscription.findOrCreate({
       where: {

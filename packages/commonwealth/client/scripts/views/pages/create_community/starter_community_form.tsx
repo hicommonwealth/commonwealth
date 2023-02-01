@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
@@ -175,6 +175,7 @@ export class StarterCommunityForm extends ClassComponent {
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
+              console.log(err);
               notifyError(
                 err.responseJSON?.error ||
                   'Creating new starter community failed'

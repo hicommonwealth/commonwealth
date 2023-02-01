@@ -2,16 +2,15 @@
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import { initChain, selectChain } from 'app';
 import ClassComponent from 'class_component';
-import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 import m from 'mithril';
-import { ChainInfo, RolePermission } from 'models';
 
 import 'pages/spec_settings.scss';
 
 import app from 'state';
+import { ChainBase } from 'common-common/src/types';
+import { ChainInfo, AccessLevel } from 'models';
 import { constructSubstrateUrl } from 'substrate';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
@@ -21,6 +20,7 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import Sublayout from '../sublayout';
 import { PageNotFound } from './404';
 import { PageLoading } from './loading';
+import { initChain, selectChain } from 'helpers/chain';
 
 class SpecSettingsPage extends ClassComponent {
   private chain: string;
@@ -37,7 +37,7 @@ class SpecSettingsPage extends ClassComponent {
     const substrateAdminChainIds = roles
       .filter(
         (r) =>
-          r.permission === RolePermission.admin &&
+          r.permission === AccessLevel.Admin &&
           app.config.chains.getById(r.chain_id).base === ChainBase.Substrate
       )
       .map((r) => r.chain_id);

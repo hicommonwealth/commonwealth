@@ -22,7 +22,6 @@ import type { ContractAbiModelStatic } from './models/contract_abi';
 import type { DiscordBotConfigModelStatic } from './models/discord_bot_config';
 import type { DiscussionDraftModelStatic } from './models/discussion_draft';
 import type { IdentityCacheStatic } from './models/identity_cache';
-import type { InviteCodeModelStatic } from './models/invite_code';
 import type { LinkedThreadModelStatic } from './models/linked_thread';
 import type { LoginTokenModelStatic } from './models/login_token';
 import type { NotificationModelStatic } from './models/notification';
@@ -48,7 +47,6 @@ import type { TopicModelStatic } from './models/topic';
 import type { UserModelStatic } from './models/user';
 import type { ViewCountModelStatic } from './models/viewcount';
 import type { VoteModelStatic } from './models/vote';
-import type { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
 import type { WebhookModelStatic } from './models/webhook';
 
 export type Models = {
@@ -72,7 +70,6 @@ export type Models = {
   DiscussionDraft: DiscussionDraftModelStatic;
   DiscordBotConfig: DiscordBotConfigModelStatic;
   IdentityCache: IdentityCacheStatic;
-  InviteCode: InviteCodeModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
@@ -100,7 +97,6 @@ export type Models = {
   Token: TokenModelStatic;
   TaggedThread: TaggedThreadModelStatic;
   User: UserModelStatic;
-  WaitlistRegistration: WaitlistRegistrationModelStatic;
   Webhook: WebhookModelStatic;
 };
 

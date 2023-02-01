@@ -2,7 +2,7 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
 import type { Account } from 'models';
-import { initChain } from '../../../app';
+import { initChain } from 'helpers/chain';
 import { setActiveAccount } from '../../../controllers/app/login';
 import type SubstrateIdentity from '../../../controllers/chain/substrate/identity';
 import app from '../../../state';
