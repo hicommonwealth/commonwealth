@@ -63,6 +63,6 @@ describe('Eth Token BP unit tests', () => {
       ethTokenBp.getBalance(await mockNodesProvider()[0], 'abcd', {
         testBalance: '12345678912345678910',
       })
-    ).to.be.rejectedWith(new Error('Invalid address!'));
+    ).to.be.rejectedWith('Invalid address!');
   });
 });

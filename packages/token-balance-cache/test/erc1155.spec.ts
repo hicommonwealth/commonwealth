@@ -80,6 +80,6 @@ describe('ERC1155 BP unit tests', () => {
           contractType: 'erc20',
         }
       )
-    ).to.be.rejectedWith(new Error('Invalid Contract Type'));
+    ).to.be.rejectedWith('Invalid Contract Type');
   });
 });
