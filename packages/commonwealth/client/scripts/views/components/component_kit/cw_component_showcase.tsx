@@ -156,15 +156,34 @@ export const ComponentShowcase = () => {
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
+    React.useState<boolean>(false);
 
   return (
     <div className="ComponentShowcase">
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
       <Modal
         content={<div>hi</div>}
-        // isFullScreen
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
+      />
+      <CWButton
+        label="Full Screen Modal"
+        onClick={() => setIsFullScreenModalOpen(true)}
+      />
+      <Modal
+        content={
+          <div>
+            <CWText>hi</CWText>
+            <CWIconButton
+              iconName="close"
+              onClick={() => setIsFullScreenModalOpen(false)}
+            />
+          </div>
+        }
+        isFullScreen
+        onClose={() => setIsFullScreenModalOpen(false)}
+        open={isFullScreenModalOpen}
       />
       <div className="basic-gallery">
         <CWText type="h3">Popover Menu</CWText>
