@@ -1,11 +1,10 @@
 import { assert, expect, use as chaiUse } from 'chai';
 import { BalanceType } from 'common-common/src/types';
 import Web3 from 'web3';
-import chaiAsPromised from 'chai-as-promised'
+import chaiAsPromised from 'chai-as-promised';
 
 import type { IChainNode } from '../src/types';
 import { BalanceProvider } from '../src/types';
-
 
 chaiUse(chaiAsPromised);
 
