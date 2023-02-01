@@ -31,7 +31,7 @@ class GqlLazyLoader {
 
   private static async init() {
     if (!this.gql) {
-      this.gql = await import('graphql-tag');
+      this.gql = (await import('graphql-tag')).gql;
     }
   }
 

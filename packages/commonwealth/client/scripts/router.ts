@@ -636,6 +636,8 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
+
+  // Snapshot Routes (Community Scoped)
   '/:scope/snapshot/:snapshotId': importRoute(
     import('views/pages/snapshot_proposals'),
     {
@@ -655,6 +657,25 @@ const getCommonDomainRoutes = (importRoute) => ({
     import('views/pages/new_snapshot_proposal'),
     { scoped: true, deferChain: true }
   ),
+
+  // Snapshot Routes (Globally Scoped)
+  '/snapshot/:snapshotId': importRoute(
+    import('views/pages/snapshot_proposals'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
+  '/snapshot/:snapshotId/:identifier': importRoute(
+    import('views/pages/view_snapshot_proposal'),
+    { scoped: true, deferChain: true }
+  ),
+  '/new/snapshot/:snapshotId': importRoute(
+    import('views/pages/new_snapshot_proposal'),
+    { scoped: true, deferChain: true }
+  ),
+
+  // Snapshot Legacy Redirects (Community Scoped)
   '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
     (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}`
   ),
