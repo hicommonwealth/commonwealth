@@ -77,6 +77,6 @@ describe('ERC1155 BP unit tests', () => {
           contractType: 'erc20',
         }
       )
-    ).to.be.rejectedWith(new Error('Property does not exist in model schema.'));
+    ).should.be.rejectedWith(new Error('Property does not exist in model schema.'));
   });
 });
