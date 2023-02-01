@@ -455,7 +455,6 @@ export interface CommunityArgs {
   description: string;
   default_chain: string;
   isAuthenticatedForum: string;
-  invitesEnabled: string;
   privacyEnabled: string;
 }
 
@@ -467,25 +466,6 @@ export const createCommunity = async (args: CommunityArgs) => {
     .send({ ...args });
   const community = res.body.result;
   return community;
-};
-
-export interface InviteArgs {
-  jwt: string;
-  invitedEmail?: string;
-  invitedAddress?: string;
-  chain?: string;
-  community?: string;
-  address: string;
-}
-
-export const createInvite = async (args: InviteArgs) => {
-  const res = await chai
-    .request(app)
-    .post('/api/createInvite')
-    .set('Accept', 'application/json')
-    .send({ ...args });
-  const invite = res.body;
-  return invite;
 };
 
 // always prune both token and non-token holders asap

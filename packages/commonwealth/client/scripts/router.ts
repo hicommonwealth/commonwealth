@@ -7,10 +7,6 @@ import {
   APPLICATION_UPDATE_ACTION,
   APPLICATION_UPDATE_MESSAGE,
 } from 'helpers/constants';
-import { notifyError, notifyInfo } from 'controllers/app/notifications';
-import { NewLoginModal } from 'views/modals/login_modal';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
-import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 
 export const pathIsDiscussion = (
   scope: string | null,
@@ -121,42 +117,6 @@ const redirectRoute = (
     return m(Layout);
   },
 });
-
-const handleInviteLinkRedirect = () => {
-  const inviteMessage = m.route.param('invitemessage');
-
-  if (!inviteMessage) {
-    return;
-  }
-
-  const isAcceptInviteMessage =
-    m.route.param('message') === 'Must be logged in to accept invites';
-
-  if (inviteMessage === 'failure' && isAcceptInviteMessage) {
-    notifyInfo('Log in to join a community with an invite link');
-
-    app.modals.create({
-      modal: NewLoginModal,
-      data: {
-        modalType: isWindowMediumSmallInclusive(window.innerWidth)
-          ? 'fullScreen'
-          : 'centered',
-        breakpointFn: isWindowMediumSmallInclusive,
-      },
-    });
-  } else if (inviteMessage === 'failure') {
-    const message = m.route.param('message');
-    notifyError(message);
-  } else if (inviteMessage === 'success') {
-    if (app.config.invites.length === 0) {
-      return;
-    }
-
-    app.modals.create({ modal: ConfirmInviteModal });
-  } else {
-    notifyError('Unexpected error with invite link');
-  }
-};
 
 const handleLoginRedirects = () => {
   if (
@@ -676,6 +636,8 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
+
+  // Snapshot Routes (Community Scoped)
   '/:scope/snapshot/:snapshotId': importRoute(
     import('views/pages/snapshot_proposals'),
     {
@@ -695,6 +657,25 @@ const getCommonDomainRoutes = (importRoute) => ({
     import('views/pages/new_snapshot_proposal'),
     { scoped: true, deferChain: true }
   ),
+
+  // Snapshot Routes (Globally Scoped)
+  '/snapshot/:snapshotId': importRoute(
+    import('views/pages/snapshot_proposals'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
+  '/snapshot/:snapshotId/:identifier': importRoute(
+    import('views/pages/view_snapshot_proposal'),
+    { scoped: true, deferChain: true }
+  ),
+  '/new/snapshot/:snapshotId': importRoute(
+    import('views/pages/new_snapshot_proposal'),
+    { scoped: true, deferChain: true }
+  ),
+
+  // Snapshot Legacy Redirects (Community Scoped)
   '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
     (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}`
   ),
@@ -733,9 +714,4 @@ const getRoutes = (customDomain: string) => {
   };
 };
 
-export {
-  getRoutes,
-  navigateToSubpage,
-  handleLoginRedirects,
-  handleInviteLinkRedirect,
-};
+export { getRoutes, navigateToSubpage, handleLoginRedirects };
