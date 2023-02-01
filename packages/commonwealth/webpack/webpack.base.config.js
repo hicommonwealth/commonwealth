@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 
 require('dotenv').config();
 
@@ -33,11 +32,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
-      attributes: {
-        'data-cfasync': 'false',
-      },
     }),
-    new HtmlWebpackInjectAttributesPlugin(),
     new webpack.IgnorePlugin({
       resourceRegExp: /^\.\/locale$/,
       contextRegExp: /moment$/,
