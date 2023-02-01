@@ -17,7 +17,7 @@ import {
 import 'pages/landing/landing_page_header.scss';
 
 import app from 'state';
-import { NewLoginModal } from 'views/modals/login_modal';
+import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 // eslint-disable-next-line max-len
@@ -110,7 +110,7 @@ export class HeaderLandingPage extends ClassComponent<HeaderLandingPageAttrs> {
                   style={{ padding: '8px 16px' }}
                   onClick={() =>
                     app.modals.create({
-                      modal: NewLoginModal,
+                      modal: LoginModal,
                       data: {
                         modalType: isWindowMediumSmallInclusive(
                           window.innerWidth

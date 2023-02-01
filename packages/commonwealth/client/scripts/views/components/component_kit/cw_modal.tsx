@@ -166,7 +166,7 @@ export const Modal = (props: {
       <div
         className={getClasses<{ isFullScreen?: boolean }>(
           { isFullScreen },
-          'ModalContainer'
+          'modal-container'
         )}
       >
         {content}

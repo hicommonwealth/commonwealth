@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 
@@ -15,7 +24,7 @@ import PageNotFound from './404';
 import { CWText } from '../components/component_kit/cw_text';
 import { PageLoading } from './loading';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
-import { NewLoginModal } from '../modals/login_modal';
+import { LoginModal } from '../modals/login_modal';
 
 class Web3LoginPage extends ClassComponent {
   private error?: string;
@@ -73,7 +82,7 @@ class Web3LoginPage extends ClassComponent {
                   onSuccess();
                 } else {
                   app.modals.create({
-                    modal: NewLoginModal,
+                    modal: LoginModal,
                     data: {
                       onSuccess,
                       modalType: isWindowMediumSmallInclusive(window.innerWidth)

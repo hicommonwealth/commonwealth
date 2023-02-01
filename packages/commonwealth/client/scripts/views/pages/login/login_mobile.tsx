@@ -19,7 +19,6 @@ import { CWAccountCreationButton } from '../../components/component_kit/cw_accou
 import { CWAddress } from '../../components/component_kit/cw_address';
 import { CWAvatarUsernameInput } from '../../components/component_kit/cw_avatar_username_input';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ModalExitButton } from '../../components/component_kit/cw_modal';
 import {
   CWProfileRow,
   CWProfilesList,
@@ -34,6 +33,7 @@ import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
 import { LoginAttrs } from './types';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 export class LoginMobile extends ClassComponent<LoginAttrs> {
   view(vnode: ResultNode<LoginAttrs>) {
@@ -59,6 +59,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
       setSelectedLinkingWallet,
       magicLoading,
       showResetWalletConnect,
+      onModalClose,
     } = vnode.attrs;
 
     const hasBoilerplate =
@@ -72,7 +73,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
 
     return (
       <div className="LoginMobile">
-        <ModalExitButton iconButtonTheme="hasBackground" />
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
         {bodyType === 'ethWalletList' && <LoginEthAlert />}
         <div className={bodyType}>
           <LoginText headerText={headerText} bodyText={bodyText} isMobile />

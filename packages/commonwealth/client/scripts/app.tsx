@@ -37,7 +37,7 @@ import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
 // import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
-import { NewLoginModal } from 'views/modals/login_modal';
+import { LoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
@@ -45,7 +45,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import DiscussionsPage from 'views/pages/discussions';
 import { createRoutesFromElements, Route } from 'react-router';
 import { createRoot } from 'react-dom/client';
-
 
 // eslint-disable-next-line max-len
 const APPLICATION_UPDATE_MESSAGE =
