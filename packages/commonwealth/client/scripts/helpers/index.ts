@@ -3,7 +3,9 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
 import type { RouteOptions } from 'mithril';
 import m from 'mithril';
+import type { Account, IChainAdapter } from 'models';
 import { ThreadStage } from 'models';
+import type { Coin } from 'adapters/currency';
 import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
@@ -409,4 +411,21 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     default:
       return null;
   }
+}
+
+// Decimals For Tokens
+export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
+  let decimals;
+  if (chain.meta.id === 'evmos') {
+    // Custom for evmos
+    decimals = 18;
+  } else if (chain && chain.meta) {
+    decimals = chain.meta.decimals;
+  } else if (chain.network === ChainNetwork.ERC721) {
+    decimals = 0;
+  } else if (chain.base === ChainBase.CosmosSDK) {
+    decimals = 6;
+  }
+
+  return decimals;
 }

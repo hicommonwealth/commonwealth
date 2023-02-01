@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
+import { getDecimals } from 'helpers';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
@@ -28,13 +29,7 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
       this.newTokenThresholdInWei = topic.tokenThreshold?.toString() || '0';
     }
 
-    const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+    const decimals = getDecimals(app.chain);
 
     return (
       <div class="EditTopicThresholdsRow">
