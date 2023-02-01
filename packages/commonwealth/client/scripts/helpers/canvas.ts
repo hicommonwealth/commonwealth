@@ -11,30 +11,6 @@ import { getCosmosSignatureData } from 'controllers/server/sessionSigners/cosmos
 import { constructTypedCanvasMessage } from '../../../shared/adapters/chain/ethereum/keys';
 import { validationTokenToSignDoc } from '../../../shared/adapters/chain/cosmos/keys';
 
-import { utils as ethersUtils } from 'ethers';
-import * as ethUtil from 'ethereumjs-util';
-import * as bech32 from 'bech32';
-import {
-  recoverTypedSignature,
-  SignTypedDataVersion,
-} from '@metamask/eth-sig-util';
-import {
-  serializeSignDoc,
-  rawSecp256k1PubkeyToRawAddress,
-  decodeSignature,
-} from '@cosmjs/amino';
-import { Bech32 } from '@cosmjs/encoding';
-import {
-  Sha256,
-  Secp256k1,
-  Secp256k1Signature,
-  ExtendedSecp256k1Signature,
-} from '@cosmjs/crypto';
-import { PublicKey } from 'near-api-js/lib/utils';
-import { signatureVerify } from '@polkadot/util-crypto';
-import nacl from 'tweetnacl';
-import bs58 from 'bs58';
-
 // TODO: verify payload is not expired
 export const verify = async ({
   action,
@@ -59,6 +35,7 @@ export const verify = async ({
   if (payload.chain === 'ethereum') {
     // verify ethereum signature
     if (action) {
+      const ethersUtils = (await import('ethers')).utils;
       const [domain, types, value] =
         getActionSignatureDataEIP712(actionPayload);
       const recoveredAddr = ethersUtils.verifyTypedData(
@@ -69,45 +46,56 @@ export const verify = async ({
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
+      const ethSigUtil = await import('@metamask/eth-sig-util');
       const { types, domain, message } =
         constructTypedCanvasMessage(sessionPayload);
-      const recoveredAddr = recoverTypedSignature({
+      const recoveredAddr = ethSigUtil.recoverTypedSignature({
         data: { types, domain, message, primaryType: 'Message' as const },
         signature,
-        version: SignTypedDataVersion.V4,
+        version: ethSigUtil.SignTypedDataVersion.V4,
       });
       return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
     }
   } else if (payload.chain === 'cosmos') {
     // verify terra sessions (actions are verified like other cosmos chains)
+    const [bech32, cosmAmino, cosmEncoding, cosmCrypto] = await Promise.all([
+      import('bech32'),
+      import('@cosmjs/amino'),
+      import('@cosmjs/encoding'),
+      import('@cosmjs/crypto'),
+    ]);
     if (
       !action &&
       bech32.bech32.decode(sessionPayload.from).prefix === 'terra'
     ) {
-      const prefix = Bech32.decode(sessionPayload.from).prefix;
-      const signDocDigest = new Sha256(
+      const prefix = cosmEncoding.Bech32.decode(sessionPayload.from).prefix;
+      const signDocDigest = new cosmCrypto.Sha256(
         Buffer.from(serializeSessionPayload(sessionPayload))
       ).digest();
       // decode "{ pub_key, signature }" to an object with { pubkey, signature }
-      const { pubkey, signature: decodedSignature } = decodeSignature(
+      const { pubkey, signature: decodedSignature } = cosmAmino.decodeSignature(
         JSON.parse(signature)
       );
       const secpSignature =
-        Secp256k1Signature.fromFixedLength(decodedSignature);
-      const valid = await Secp256k1.verifySignature(
+        cosmCrypto.Secp256k1Signature.fromFixedLength(decodedSignature);
+      const valid = await cosmCrypto.Secp256k1.verifySignature(
         secpSignature,
         signDocDigest,
         pubkey
       );
       if (
         payload.from !==
-        Bech32.encode(prefix, rawSecp256k1PubkeyToRawAddress(pubkey))
+        cosmEncoding.Bech32.encode(
+          prefix,
+          cosmAmino.rawSecp256k1PubkeyToRawAddress(pubkey)
+        )
       )
         return false;
       return valid;
     }
     // verify cosmos-ethereum sessions (actions are verified like other cosmos chains)
     if (!action && signature.startsWith('0x')) {
+      const ethUtil = await import('ethereumjs-util');
       const msgHash = ethUtil.hashPersonalMessage(
         Buffer.from(serializeSessionPayload(sessionPayload))
       );
@@ -139,42 +127,51 @@ export const verify = async ({
         actionPayload,
         actionSignerAddress
       );
-      const signDocDigest = new Sha256(
-        serializeSignDoc(signDocPayload)
+      const signDocDigest = new cosmCrypto.Sha256(
+        cosmAmino.serializeSignDoc(signDocPayload)
       ).digest();
       const prefix = 'cosmos'; // not: Bech32.decode(payload.from).prefix;
       const extendedSecp256k1Signature =
-        ExtendedSecp256k1Signature.fromFixedLength(
+        cosmCrypto.ExtendedSecp256k1Signature.fromFixedLength(
           Buffer.from(signature, 'hex')
         );
-      const pubkey = Secp256k1.compressPubkey(
-        Secp256k1.recoverPubkey(extendedSecp256k1Signature, signDocDigest)
+      const pubkey = cosmCrypto.Secp256k1.compressPubkey(
+        cosmCrypto.Secp256k1.recoverPubkey(
+          extendedSecp256k1Signature,
+          signDocDigest
+        )
       );
       return (
         actionSignerAddress ===
-        Bech32.encode(prefix, rawSecp256k1PubkeyToRawAddress(pubkey))
+        cosmEncoding.Bech32.encode(
+          prefix,
+          cosmAmino.rawSecp256k1PubkeyToRawAddress(pubkey)
+        )
       );
     } else {
       const signDocPayload = await validationTokenToSignDoc(
         Buffer.from(serializeSessionPayload(sessionPayload)),
         payload.from
       );
-      const signDocDigest = new Sha256(
-        serializeSignDoc(signDocPayload)
+      const signDocDigest = new cosmCrypto.Sha256(
+        cosmAmino.serializeSignDoc(signDocPayload)
       ).digest();
-      const prefix = Bech32.decode(payload.from).prefix;
+      const prefix = cosmEncoding.Bech32.decode(payload.from).prefix;
       // decode "{ pub_key, signature }" to an object with { pubkey, signature }
-      const { pubkey, signature: decodedSignature } = decodeSignature(
+      const { pubkey, signature: decodedSignature } = cosmAmino.decodeSignature(
         JSON.parse(signature)
       );
       if (
         payload.from !==
-        Bech32.encode(prefix, rawSecp256k1PubkeyToRawAddress(pubkey))
+        cosmEncoding.Bech32.encode(
+          prefix,
+          cosmAmino.rawSecp256k1PubkeyToRawAddress(pubkey)
+        )
       )
         return false;
       const secpSignature =
-        Secp256k1Signature.fromFixedLength(decodedSignature);
-      const valid = await Secp256k1.verifySignature(
+        cosmCrypto.Secp256k1Signature.fromFixedLength(decodedSignature);
+      const valid = await cosmCrypto.Secp256k1.verifySignature(
         secpSignature,
         signDocDigest,
         pubkey
@@ -182,6 +179,8 @@ export const verify = async ({
       return valid;
     }
   } else if (payload.chain === 'solana') {
+    const nacl = await import('tweetnacl');
+    const bs58 = await import('bs58');
     // verify solana signature
     const stringPayload = action
       ? serializeActionPayload(actionPayload)
@@ -198,11 +197,14 @@ export const verify = async ({
     );
     return valid;
   } else if (payload.chain === 'near') {
+    const nearlib = await import('near-api-js/lib/utils');
+    const nacl = await import('tweetnacl');
+    const bs58 = await import('bs58');
     // verify near signature
     if (action) {
       const stringPayload = serializeActionPayload(actionPayload);
       const message = new TextEncoder().encode(stringPayload);
-      const publicKey = PublicKey.fromString(actionSignerAddress);
+      const publicKey = nearlib.PublicKey.fromString(actionSignerAddress);
       const signatureBytes = bs58.decode(signature); // encoded in sessionSigners/near.ts
       const valid = nacl.sign.detached.verify(
         message,
@@ -220,7 +222,7 @@ export const verify = async ({
       const { signature: signatureEncoded, publicKey: publicKeyEncoded } =
         JSON.parse(signature);
       // encoded in client/scripts/controllers/chain/near/account.ts
-      const publicKey = PublicKey.fromString(
+      const publicKey = nearlib.PublicKey.fromString(
         bs58.encode(Buffer.from(publicKeyEncoded, 'base64'))
       );
       const signatureBytes = Buffer.from(signatureEncoded, 'base64');
@@ -233,6 +235,7 @@ export const verify = async ({
     }
   } else if (payload.chain === 'substrate') {
     // verify substrate signature
+    const polkadotUtil = await import('@polkadot/util-crypto');
     const stringPayload = action
       ? serializeActionPayload(actionPayload)
       : serializeSessionPayload(sessionPayload);
@@ -241,7 +244,7 @@ export const verify = async ({
       action ? signature : signature.slice(2),
       'hex'
     );
-    const valid = signatureVerify(
+    const valid = polkadotUtil.signatureVerify(
       message,
       signatureBytes,
       action ? actionSignerAddress : payload.from
