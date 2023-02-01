@@ -5,7 +5,7 @@ import type {
   PostTopicsReq,
   PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
-import { PostProfilesReq } from 'common-common/src/api/extApiTypes';
+import express from 'express';
 import type { DB } from 'commonwealth/server/models';
 import {
   getComments,
@@ -24,6 +24,8 @@ import {
   getThreads,
   getThreadsValidation,
 } from 'commonwealth/server/routes/threads/getThreads';
+import type { Express } from 'express';
+import type Router from 'express/lib/router/index';
 import passport from 'passport';
 import type { TokenBalanceCache } from 'token-balance-cache/src';
 import { addEntities } from '../routes/addEntities';
