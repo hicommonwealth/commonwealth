@@ -71,14 +71,16 @@ describe('ERC1155 BP unit tests', () => {
     const erc1155Bp: MockErc1155BalanceProvider =
       new MockErc1155BalanceProvider();
 
-    return expect(erc1155Bp.getBalance(
-      await mockNodesProvider()[0],
-      '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-      {
-        testBalance: '12345678912345678910',
-        testTokenId: '123',
-        contractType: 'erc20',
-      }
-    )).to.be.rejectedWith('Invalid Contract Type');
+    return expect(
+      erc1155Bp.getBalance(
+        await mockNodesProvider()[0],
+        '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+        {
+          testBalance: '12345678912345678910',
+          testTokenId: '123',
+          contractType: 'erc20',
+        }
+      )
+    ).to.be.rejectedWith('Invalid Contract Type');
   });
 });
