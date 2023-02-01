@@ -7,7 +7,6 @@ import app from 'state';
 
 import 'sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
-import { handleEmailInvites } from 'views/menus/invites_menu';
 import { AppMobileMenus } from './app_mobile_menus';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './footer';
@@ -56,10 +55,6 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
     const showSidebar = app.sidebarToggled || !this.isWindowSmallInclusive;
-
-    if (m.route.param('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(this), 0);
-    }
 
     return (
       <div class="Sublayout">
