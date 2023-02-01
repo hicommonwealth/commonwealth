@@ -55,7 +55,7 @@ export class NewTopicModal extends ClassComponent {
       disabled = true;
     }
 
-    const decimals = getDecimals();
+    const decimals = getDecimals(app.chain);
 
     return (
       <div class="NewTopicModal">

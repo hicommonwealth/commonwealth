@@ -134,7 +134,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       uploadsInProgress ||
       userFailsThreshold;
 
-    const decimals = getDecimals();
+    const decimals = getDecimals(app.chain);
 
     return (
       <div class="CreateComment">

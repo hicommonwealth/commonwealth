@@ -29,7 +29,7 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
       this.newTokenThresholdInWei = topic.tokenThreshold?.toString() || '0';
     }
 
-    const decimals = getDecimals();
+    const decimals = getDecimals(app.chain);
 
     return (
       <div class="EditTopicThresholdsRow">
