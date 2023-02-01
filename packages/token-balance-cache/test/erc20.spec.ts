@@ -61,7 +61,8 @@ describe('ERC20 BP unit tests', () => {
 
   it('erc20 balance provider should return error if wrong contract type', async () => {
     const erc20Bp: MockErc20BalanceProvider = new MockErc20BalanceProvider();
-    expect(
+
+    return expect(
       erc20Bp.getBalance(
         await mockNodesProvider()[0],
         '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
@@ -70,6 +71,6 @@ describe('ERC20 BP unit tests', () => {
           contractType: 'test-fail',
         }
       )
-    ).to.be.rejectedWith(new Error('Invalid Contract Type'));
+    ).to.be.rejectedWith('Invalid Contract Type');
   });
 });

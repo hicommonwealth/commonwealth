@@ -59,10 +59,10 @@ describe('Eth Token BP unit tests', () => {
   it('ethToken balance provider should return error if invalid address', async () => {
     const ethTokenBp: MockEthTokenBalanceProvider =
       new MockEthTokenBalanceProvider();
-    expect(
+    return expect(
       ethTokenBp.getBalance(await mockNodesProvider()[0], 'abcd', {
         testBalance: '12345678912345678910',
       })
-    ).to.be.rejectedWith(new Error('Invalid address!'));
+    ).to.be.rejectedWith('Invalid address!');
   });
 });
