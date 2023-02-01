@@ -637,19 +637,22 @@ const getCommonDomainRoutes = (importRoute) => ({
     deferChain: true,
   }),
   '/:scope/snapshot/:snapshotId': importRoute(
-    'views/pages/snapshot_proposals',
-    { scoped: true, deferChain: true }
+    import('views/pages/snapshot_proposals'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
   ),
   '/:scope/multiple-snapshots': importRoute(
-    'views/pages/view_multiple_snapshot_spaces',
+    import('views/pages/view_multiple_snapshot_spaces'),
     { scoped: true, deferChain: true }
   ),
   '/:scope/snapshot/:snapshotId/:identifier': importRoute(
-    'views/pages/view_snapshot_proposal',
+    import('views/pages/view_snapshot_proposal'),
     { scoped: true, deferChain: true }
   ),
   '/:scope/new/snapshot/:snapshotId': importRoute(
-    'views/pages/new_snapshot_proposal',
+    import('views/pages/new_snapshot_proposal'),
     { scoped: true, deferChain: true }
   ),
   '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
