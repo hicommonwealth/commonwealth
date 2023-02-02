@@ -1,17 +1,17 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { NotificationCategories } from 'common-common/src/types';
+import m from 'mithril';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
 import app from 'state';
-import { NotificationCategories } from 'common-common/src/types';
-import { subscribeToThread } from './helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { SharePopover } from '../../components/share_popover';
+import { subscribeToThread } from './helpers';
 
 type UserDashboardRowBottomAttrs = {
   commentCount: number;

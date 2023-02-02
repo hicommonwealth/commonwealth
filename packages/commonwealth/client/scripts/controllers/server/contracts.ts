@@ -1,16 +1,18 @@
 import $ from 'jquery';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
-import { BalanceType, ContractType } from 'common-common/src/types';
+import type { BalanceType, ContractType } from 'common-common/src/types';
 
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
   private _initialized = false;
+
   public get store() {
     return this._store;
   }
+
   public get initialized() {
     return this._initialized;
   }
@@ -38,7 +40,7 @@ class ContractsController {
     abi: string,
     nickname: string
   ) {
-    const response = await $.post(`${app.serverUrl()}/createContractAbi`, {
+    const response = await $.post(`${app.serverUrl()}/contractAbi`, {
       jwt: app.user.jwt,
       contractId: contract.id,
       abi,
@@ -130,7 +132,7 @@ class ContractsController {
     decimals: number;
     nickname: string;
   }) {
-    const response = await $.post(`${app.serverUrl()}/createContract`, {
+    const response = await $.post(`${app.serverUrl()}/contract`, {
       community,
       balance_type,
       chain_node_id,
@@ -168,6 +170,7 @@ class ContractsController {
   public addToStore(contract: Contract) {
     return this._store.add(contract);
   }
+
   public initialize(contracts = [], reset = true) {
     if (reset) {
       this._store.clear();

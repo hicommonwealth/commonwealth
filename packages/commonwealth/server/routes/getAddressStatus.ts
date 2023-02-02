@@ -1,7 +1,7 @@
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { DB } from '../models';
 
 const Op = Sequelize.Op;
 
@@ -11,7 +11,12 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const getAddressStatus = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const getAddressStatus = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body.address) {
     return next(new AppError(Errors.NeedAddress));
   }
@@ -20,22 +25,26 @@ const getAddressStatus = async (models: DB, req: Request, res: Response, next: N
   }
 
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: req.body.chain },
   });
   if (!chain) {
     return next(new AppError(Errors.InvalidChain));
   }
 
   const existingAddress = await models.Address.findOne({
-    where: { chain: req.body.chain, address: req.body.address, verified: { [Op.ne]: null } }
+    where: {
+      chain: req.body.chain,
+      address: req.body.address,
+      verified: { [Op.ne]: null },
+    },
   });
 
   let result;
   if (existingAddress) {
-    const belongsToUser = req.user && (existingAddress.user_id === req.user.id);
+    const belongsToUser = req.user && existingAddress.user_id === req.user.id;
     result = {
       exists: true,
-      belongsToUser
+      belongsToUser,
     };
   } else {
     result = {

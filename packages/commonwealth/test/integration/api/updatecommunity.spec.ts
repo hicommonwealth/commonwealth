@@ -4,13 +4,11 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import { NotificationCategories } from 'common-common/src/types';
-import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
 
 import { Errors as ChainError } from '../../../server/routes/updateChain';
+import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -42,7 +40,6 @@ describe('Update Community/Chain Tests', () => {
       jwt: jwtToken,
       isAuthenticatedForum: 'false',
       privacyEnabled: 'false',
-      invitesEnabled: 'false',
       id: 'tester',
       name: 'tester community',
       creator_address: loggedInAddr,

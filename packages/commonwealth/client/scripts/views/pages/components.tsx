@@ -1,7 +1,7 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 import Sublayout from 'views/sublayout';
 import { ComponentShowcase } from '../components/component_kit/cw_component_showcase';
 

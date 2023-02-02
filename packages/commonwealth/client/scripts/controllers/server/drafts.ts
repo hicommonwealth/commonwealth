@@ -1,17 +1,13 @@
 /* eslint-disable no-restricted-syntax */
-import _ from 'lodash';
-import { DiscussionDraft, Attachment } from 'models';
-
 import $ from 'jquery';
-import app from 'state';
+import { Attachment, DiscussionDraft } from 'models';
 import moment from 'moment';
+import app from 'state';
 import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
   const attachments = draft.Attachments
-    ? draft.Attachments.map(
-        (a) => new Attachment(a.url, a.description)
-      )
+    ? draft.Attachments.map((a) => new Attachment(a.url, a.description))
     : [];
   return new DiscussionDraft(
     draft.Address.address,

@@ -2,13 +2,12 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-
     return queryInterface.sequelize.transaction(async (t) => {
       // Delete orphaned Roles from previously deleted community
       await queryInterface.bulkDelete(
         'Roles',
         {
-          offchain_community_id: 'infinity'
+          offchain_community_id: 'infinity',
         },
         { transaction: t }
       );
@@ -17,7 +16,7 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         {
-          community: 'nft-co'
+          community: 'nft-co',
         },
         { transaction: t }
       );
@@ -27,8 +26,10 @@ module.exports = {
         'OffchainCommunities',
         {
           id: 'infinity',
-        }, { // WHERE
-          id: 'nft-co'
+        },
+        {
+          // WHERE
+          id: 'nft-co',
         },
         { transaction: t }
       );
@@ -37,9 +38,11 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'Roles',
         {
-          offchain_community_id: 'infinity'
-        }, { // WHERE
-          offchain_community_id: 'nft-co'
+          offchain_community_id: 'infinity',
+        },
+        {
+          // WHERE
+          offchain_community_id: 'nft-co',
         },
         { transaction: t }
       );
@@ -48,9 +51,11 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'OffchainThreads',
         {
-          community: 'infinity'
-        }, { // WHERE
-          community: 'nft-co'
+          community: 'infinity',
+        },
+        {
+          // WHERE
+          community: 'nft-co',
         },
         { transaction: t }
       );
@@ -59,14 +64,14 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'OffchainTopics',
         {
-          community_id: 'infinity'
-        }, { // WHERE
-          community_id: 'nft-co'
+          community_id: 'infinity',
+        },
+        {
+          // WHERE
+          community_id: 'nft-co',
         },
         { transaction: t }
       );
-
-
     });
   },
 
@@ -74,14 +79,15 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       // Reactions is destructive, no reversal.
 
-
       // Fix OffchainCommunity Model id to "infinity" from "nft-co"
       await queryInterface.bulkUpdate(
         'OffchainCommunities',
         {
-          id: 'nft-co'
-        }, { // WHERE
-          id: 'infinity'
+          id: 'nft-co',
+        },
+        {
+          // WHERE
+          id: 'infinity',
         },
         { transaction: t }
       );
@@ -90,9 +96,11 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'Roles',
         {
-          offchain_community_id: 'nft-co'
-        }, { // WHERE
-          offchain_community_id: 'infinity'
+          offchain_community_id: 'nft-co',
+        },
+        {
+          // WHERE
+          offchain_community_id: 'infinity',
         },
         { transaction: t }
       );
@@ -101,9 +109,11 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'OffchainThreads',
         {
-          community: 'nft-co'
-        }, { // WHERE
-          community: 'infinity'
+          community: 'nft-co',
+        },
+        {
+          // WHERE
+          community: 'infinity',
         },
         { transaction: t }
       );
@@ -112,12 +122,14 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'OffchainTopics',
         {
-          community_id: 'nft-co'
-        }, { // WHERE
-          community_id: 'infinity'
+          community_id: 'nft-co',
+        },
+        {
+          // WHERE
+          community_id: 'infinity',
         },
         { transaction: t }
       );
     });
-  }
+  },
 };

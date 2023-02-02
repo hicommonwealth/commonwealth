@@ -354,7 +354,7 @@ describe('parseFunctionFromABI() unit tests', () => {
       },
     ];
     expect(() => parseFunctionFromABI(abi, 'withdraw')).to.throw(
-      'Could not find function withdraw in ABI',
+      'Could not find function withdraw in ABI'
     );
   });
 });

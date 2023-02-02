@@ -1,26 +1,27 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
 import BN from 'bn.js';
+import ClassComponent from 'class_component';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/comments/create_comment.scss';
+import { notifyError } from 'controllers/app/notifications';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import { getDecimals, weiToTokens } from 'helpers';
+import m from 'mithril';
+import type { AnyProposal } from 'models';
+import { Thread } from 'models';
 
 import app from 'state';
-import { Thread, AnyProposal } from 'models';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ContentType } from 'types';
-import { EditProfileModal } from 'views/modals/edit_profile_modal';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import { QuillEditor } from 'views/components/quill/quill_editor';
 import User from 'views/components/widgets/user';
-import { notifyError } from 'controllers/app/notifications';
-import { weiToTokens } from 'helpers';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { jumpHighlightComment } from './helpers';
+import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
+import { jumpHighlightComment } from './helpers';
 
 type CreateCommmentAttrs = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -123,18 +124,17 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
     const userFailsThreshold =
-      tokenPostingThreshold?.gtn(0) && userBalance?.gtn(0) && userBalance.lt(tokenPostingThreshold);
+      tokenPostingThreshold?.gtn(0) &&
+      userBalance?.gtn(0) &&
+      userBalance.lt(tokenPostingThreshold);
 
     const disabled =
-      this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress || userFailsThreshold;
+      this.quillEditorState?.isBlank() ||
+      sendingComment ||
+      uploadsInProgress ||
+      userFailsThreshold;
 
-    const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+    const decimals = getDecimals(app.chain);
 
     return (
       <div class="CreateComment">

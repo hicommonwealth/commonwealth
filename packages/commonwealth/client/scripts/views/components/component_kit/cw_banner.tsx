@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_banner.scss';
+import m from 'mithril';
+import { CWIconButton } from './cw_icon_button';
 
 import { CWText } from './cw_text';
-import { ComponentType } from './types';
-import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
+import { ComponentType } from './types';
 
 type BannerAttrs = {
   bannerContent: string | m.Vnode;

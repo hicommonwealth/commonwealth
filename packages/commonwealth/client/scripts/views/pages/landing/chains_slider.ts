@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import 'pages/landing/chains_slider.scss';
-import { Chain } from './index';
+import type { Chain } from './index';
 
 interface IState {
   chains: Chain[];
@@ -39,7 +39,7 @@ const chainToTag = (chain, index: number) => {
           'h3',
           {
             class: 'text-2xl font-extrabold mb-1',
-            style: 'word-break: break-word'
+            style: 'word-break: break-word',
           },
           chain.name
         ),
@@ -49,10 +49,15 @@ const chainToTag = (chain, index: number) => {
   );
 };
 
-const TokensChainsComponent: m.Component<IState, IState & { displayedChains, index: number }> = {
+const TokensChainsComponent: m.Component<
+  IState,
+  IState & { displayedChains; index: number }
+> = {
   oninit: (vnode) => {
     vnode.state.index = 0;
-    vnode.state.displayedChains = vnode.attrs.chains.slice(0, initialSlides).map(chainToTag);
+    vnode.state.displayedChains = vnode.attrs.chains
+      .slice(0, initialSlides)
+      .map(chainToTag);
     vnode.state.oncreateSlider = vnode.attrs.oncreateSlider;
   },
   oncreate: (vnode) => {
@@ -65,7 +70,10 @@ const TokensChainsComponent: m.Component<IState, IState & { displayedChains, ind
 
     glide.on('run.after', () => {
       vnode.state.displayedChains.push(
-        chainToTag(vnode.attrs.chains[vnode.state.index + initialSlides], vnode.state.index + initialSlides - 1)
+        chainToTag(
+          vnode.attrs.chains[vnode.state.index + initialSlides],
+          vnode.state.index + initialSlides - 1
+        )
       );
       glide.update();
     });
@@ -91,10 +99,10 @@ const TokensChainsComponent: m.Component<IState, IState & { displayedChains, ind
           m(
             'p',
             {
-              class:
-                'text-left max-w-screen-md mx-auto text-2xl text-center',
+              class: 'text-left max-w-screen-md mx-auto text-2xl text-center',
             },
-            ' Subscribe to chain activity like whale transfers or major votes. Discuss new ideas, crowdfund projects, and access native governance for Layer 1s, tokens, and NFTs alike. '
+            ' Subscribe to chain activity like whale transfers or major votes. Discuss new ideas, crowdfund' +
+              ' projects, and access native governance for Layer 1s, tokens, and NFTs alike. '
           ),
         ]),
         m(

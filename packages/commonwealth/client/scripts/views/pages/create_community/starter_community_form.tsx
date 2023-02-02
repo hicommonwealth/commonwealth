@@ -1,27 +1,27 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import { baseToNetwork } from '../../../helpers';
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { ChainFormFields, ChainFormState } from './types';
 import { CommunityType } from '.';
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+import { baseToNetwork } from '../../../helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { defaultChainRows, initChainForm } from './chain_input_rows';
+import type { ChainFormFields, ChainFormState } from './types';
 
 // TODO: ChainFormState contains "uploadInProgress" which is technically
 // not part of the form what we pass to /createChain, but of the general view's state,
@@ -29,6 +29,7 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 type CreateStarterForm = ChainFormFields & { base: ChainBase };
 
 type CreateStarterState = ChainFormState & { form: CreateStarterForm };
+
 export class StarterCommunityForm extends ClassComponent {
   private state: CreateStarterState = {
     message: '',
@@ -174,6 +175,7 @@ export class StarterCommunityForm extends ClassComponent {
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
+              console.log(err);
               notifyError(
                 err.responseJSON?.error ||
                   'Creating new starter community failed'

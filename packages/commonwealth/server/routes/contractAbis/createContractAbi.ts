@@ -1,9 +1,9 @@
-import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { DB } from '../../models';
-import { ContractAbiAttributes } from '../../models/contract_abi';
-import { ContractAttributes } from '../../models/contract';
-import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { AppError } from 'common-common/src/errors';
+import type { DB } from '../../models';
+import type { ContractAbiAttributes } from '../../models/contract_abi';
+import type { ContractAttributes } from '../../models/contract';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
 
 export const Errors = {

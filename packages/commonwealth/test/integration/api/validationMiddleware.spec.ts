@@ -4,15 +4,12 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import { Errors as DeleteDraftErrors } from 'server/routes/drafts/deleteDraft';
-import { Errors as CreateDraftErrors } from 'server/routes/drafts/createDraft';
-import { Errors as EditDraftErrors } from 'server/routes/drafts/editDraft';
 import MockExpressRequest from 'mock-express-request';
-import app, { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
+import { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import models from '../../../server/database';
 import DatabaseValidationService from '../../../server/middleware/databaseValidationService';
+import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -30,7 +27,7 @@ describe('DatabaseValidationService Tests', () => {
   let user2Address;
   let user2JWT;
   let user2Id;
-  let databaseValidationService
+  let databaseValidationService;
 
   before(async function () {
     this.timeout(300000);

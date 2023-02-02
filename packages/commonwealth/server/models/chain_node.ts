@@ -1,7 +1,7 @@
-import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { DataTypes } from 'sequelize';
-import { BalanceType } from 'common-common/src/types';
-import { ModelStatic, ModelInstance } from './types';
+import type { BalanceType } from 'common-common/src/types';
+import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import type { DataTypes } from 'sequelize';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ChainNodeAttributes = {
   url: string;
@@ -12,11 +12,9 @@ export type ChainNodeAttributes = {
   balance_type: BalanceType;
   name: string;
   description?: string;
-}
+};
 
-export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
-  // TODO: add mixins as needed
-}
+export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
 
 export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 
@@ -48,15 +46,13 @@ export default (
       underscored: true,
       defaultScope: {
         attributes: {
-          exclude: [
-            'private_url'
-          ],
-        }
+          exclude: ['private_url'],
+        },
       },
       scopes: {
-        withPrivateData: {}
-      }
-    },
+        withPrivateData: {},
+      },
+    }
   );
 
   ChainNode.associate = (models) => {

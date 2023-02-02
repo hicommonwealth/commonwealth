@@ -1,21 +1,26 @@
-import { Response, NextFunction, Request } from 'express';
-import {AppError} from "common-common/src/errors";
-import { WhereOptions } from 'sequelize/types';
-import { ChainEntityMetaAttributes } from 'server/models/chain_entity_meta';
-import { DB } from '../models';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { WhereOptions } from 'sequelize/types';
+import type { ChainEntityMetaAttributes } from 'server/models/chain_entity_meta';
+import type { DB } from '../models';
 
 export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',
   InvalidChain: 'Invalid chain',
 };
 
-const getEntityMeta = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const getEntityMeta = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.query.chain) {
     return next(new AppError(Errors.NeedChain));
   }
 
   const chain = await models.Chain.findOne({
-    where: { id: req.query.chain }
+    where: { id: req.query.chain },
   });
 
   if (!chain) {
@@ -37,10 +42,13 @@ const getEntityMeta = async (models: DB, req: Request, res: Response, next: Next
       {
         model: models.Thread,
         attributes: ['title'],
-      }
+      },
     ],
   });
-  return res.json({ status: 'Success', result: entityMeta.map((e) => e.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: entityMeta.map((e) => e.toJSON()),
+  });
 };
 
 export default getEntityMeta;

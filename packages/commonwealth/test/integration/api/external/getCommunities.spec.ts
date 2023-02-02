@@ -1,7 +1,10 @@
 import 'chai/register-should';
 import chai from 'chai';
-import { GetCommunitiesReq } from 'common-common/src/api/extApiTypes';
-import { testChains, testComments } from 'test/integration/api/external/dbEntityHooks.spec';
+import type { GetCommunitiesReq } from 'common-common/src/api/extApiTypes';
+import {
+  testChains,
+  testComments,
+} from 'test/integration/api/external/dbEntityHooks.spec';
 import { get } from './appHook.spec';
 
 describe('getCommunities Tests', () => {
@@ -20,7 +23,10 @@ describe('getCommunities Tests', () => {
   });
 
   it('should return count only when specified correctly', async () => {
-    const r: GetCommunitiesReq = { network: testChains[0].network, count_only: true };
+    const r: GetCommunitiesReq = {
+      network: testChains[0].network,
+      count_only: true,
+    };
     const resp = await get('/api/communities', r, true);
 
     chai.assert.equal(resp.result.count, 2);
@@ -31,10 +37,16 @@ describe('getCommunities Tests', () => {
     let resp = await get('/api/communities', {}, true);
 
     chai.assert.lengthOf(resp.result, 1);
-    chai.assert.equal(resp.result[0].msg,
-      'Please provide a parameter to query by (community_id, network, comment_id, address_ids, addresses)');
+    chai.assert.equal(
+      resp.result[0].msg,
+      'Please provide a parameter to query by (community_id, network, comment_id, address_ids, addresses)'
+    );
 
-    resp = await get('/api/communities', { community_id: testComments[0].chain, count_only: 3 }, true);
+    resp = await get(
+      '/api/communities',
+      { community_id: testComments[0].chain, count_only: 3 },
+      true
+    );
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

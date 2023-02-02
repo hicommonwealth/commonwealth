@@ -1,8 +1,8 @@
 import { assert } from 'chai';
-import { validateRule } from '../../../server/util/rules/ruleParser';
-import AdminOnlyRule from '../../../server/ruleTypes/adminOnly';
-import * as modelUtils from '../../util/modelUtils';
 import models from '../../../server/database';
+import AdminOnlyRule from '../../../server/ruleTypes/adminOnly';
+import { validateRule } from '../../../server/util/rules/ruleParser';
+import * as modelUtils from '../../util/modelUtils';
 
 describe('AdminOnly rule tests', () => {
   let loggedInAddr: string;

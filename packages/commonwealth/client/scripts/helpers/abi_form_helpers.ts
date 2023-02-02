@@ -1,15 +1,9 @@
 import Web3 from 'web3';
-import { AbiInput, AbiItem } from 'web3-utils';
-import { AbiCoder } from 'web3-eth-abi';
+import type { AbiInput } from 'web3-utils';
 import { BigNumber, ethers } from 'ethers';
-import { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
+import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
 const Bytes32 = ethers.utils.formatBytes32String;
-
-export function encodeFunctionSignature(abi: AbiItem): string {
-  const coder = new Web3().eth.abi;
-  return coder.encodeFunctionSignature(abi);
-}
 
 export function validateAbiInput(
   val: string,

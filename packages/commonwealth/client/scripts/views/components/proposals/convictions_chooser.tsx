@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import {
-  convictionToWeight,
-  convictionToLocktime,
   convictions,
+  convictionToLocktime,
+  convictionToWeight,
 } from 'controllers/chain/substrate/democracy_referendum';
+import m from 'mithril';
 import { CWDropdown } from '../component_kit/cw_dropdown';
 
 type ConvictionsChooserAttrs = { callback: (number) => void };

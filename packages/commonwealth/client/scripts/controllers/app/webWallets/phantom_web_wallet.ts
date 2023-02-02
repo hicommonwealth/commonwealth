@@ -1,9 +1,9 @@
 declare let window: any;
 
-import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import { CanvasData } from 'shared/adapters/shared';
+import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -36,12 +36,18 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return app.chain?.id || this.defaultNetwork;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getRecentBlock(chainIdentifier: string) {
-    return null
+    return null;
   }
 
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
-    const encodedMessage = new TextEncoder().encode(JSON.stringify(canvasMessage));
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
+    const encodedMessage = new TextEncoder().encode(
+      JSON.stringify(canvasMessage)
+    );
     const { signature } = await window.solana.signMessage(
       encodedMessage,
       'utf8'

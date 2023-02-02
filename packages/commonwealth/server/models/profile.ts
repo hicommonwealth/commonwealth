@@ -1,9 +1,9 @@
-import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { AddressAttributes, AddressInstance } from './address';
+import type { ModelInstance, ModelStatic } from './types';
 
-import { UserAttributes, UserInstance } from './user';
-import { ModelStatic, ModelInstance } from './types';
-import { AddressAttributes, AddressInstance } from './address';
+import type { UserAttributes, UserInstance } from './user';
 
 export type ProfileAttributes = {
   id?: number;

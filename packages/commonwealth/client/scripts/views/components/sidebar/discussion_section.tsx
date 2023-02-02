@@ -1,15 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
+import m from 'mithril';
 
 import app from 'state';
 import { handleRedirectClicks } from '../../../helpers';
-import { SidebarSectionGroup } from './sidebar_section';
-import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { verifyCachedToggleTree } from './helpers';
+import { SidebarSectionGroup } from './sidebar_section';
+import type {
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+  ToggleTree,
+} from './types';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(

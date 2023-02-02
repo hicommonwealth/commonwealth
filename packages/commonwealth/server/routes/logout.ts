@@ -1,9 +1,6 @@
-import { Request, Response } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
-import { DB } from '../models';
-
-const log = factory.getLogger(formatFilename(__filename));
+import type { Request, Response } from 'express';
+import type { DB } from '../models';
 
 const logout = async (models: DB, req: Request, res: Response) => {
   // Passport has a race condition where req.logout resolves too
