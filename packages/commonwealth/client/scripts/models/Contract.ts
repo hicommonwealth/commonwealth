@@ -16,19 +16,19 @@ class Contract {
   public readonly abi?: Array<Record<string, unknown>>;
 
   // Not attached to db model, but used for UI
-  public readonly cct?: {
+  public readonly ccts?: Array<{
     id: number;
     communityContractId: number;
-    cctmdId: number;
-    tempalteId: number;
-  };
-  public readonly cctmd?: {
-    id: number;
-    slug: string;
-    nickname: string;
-    display_name: string;
-    display_options: string;
-  };
+    templateId: number;
+
+    cctmd: {
+      id: number;
+      slug: string;
+      nickname: string;
+      display_name: string;
+      display_options: string;
+    };
+  }>;
 
   constructor({
     id,
@@ -43,8 +43,7 @@ class Contract {
     isFactory,
     nickname,
     abi,
-    cct,
-    cctmd,
+    ccts,
   }: {
     id: number;
     address: string;
@@ -58,19 +57,19 @@ class Contract {
     isFactory?: boolean;
     nickname?: string;
     abi?: Array<Record<string, unknown>>;
-    cct?: {
+    ccts?: Array<{
       id: number;
       communityContractId: number;
-      cctmdId: number;
-      tempalteId: number;
-    };
-    cctmd?: {
-      id: number;
-      slug: string;
-      nickname: string;
-      display_name: string;
-      display_options: string;
-    };
+      templateId: number;
+
+      cctmd: {
+        id: number;
+        slug: string;
+        nickname: string;
+        display_name: string;
+        display_options: string;
+      };
+    }>;
   }) {
     this.id = id;
     this.address = address;
@@ -84,8 +83,7 @@ class Contract {
     this.isFactory = isFactory;
     this.nickname = nickname;
     this.abi = abi;
-    this.cct = cct;
-    this.cctmd = cctmd;
+    this.ccts = ccts;
   }
 
   public static fromJSON({
@@ -101,8 +99,7 @@ class Contract {
     isFactory,
     nickname,
     abi,
-    cct,
-    cctmd,
+    ccts,
   }) {
     return new Contract({
       id,
@@ -117,8 +114,7 @@ class Contract {
       isFactory,
       nickname,
       abi,
-      cct,
-      cctmd,
+      ccts,
     });
   }
 }

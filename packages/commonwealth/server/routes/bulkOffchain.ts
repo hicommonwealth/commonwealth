@@ -8,7 +8,7 @@ import { ServerError } from 'common-common/src/errors';
 //
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
+import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { CommunityRoleInstance } from 'server/models/community_role';
 import type { DB } from '../models';
 import type { ChatChannelInstance } from '../models/chat_channel';
@@ -55,7 +55,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         CommunityBannerInstance,
         Array<{
           contract: ContractInstance;
-          cct: CommunityContractTemplateInstance;
+          ccts: Array<CommunityContractTemplateInstance>;
         }>,
         CommunityRoleInstance[]
       ]
@@ -210,10 +210,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
 
         const contractsWithTemplates: Array<{
           contract: ContractInstance;
-          cct: CommunityContractTemplateInstance;
+          ccts: Array<CommunityContractTemplateInstance>;
         }> = [];
         for (const cc of communityContracts) {
-          const cct = await models.CommunityContractTemplate.findOne({
+          const ccts = await models.CommunityContractTemplate.findAll({
             where: {
               community_contract_id: cc.id,
             },
@@ -234,7 +234,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
             ],
           });
 
-          contractsWithTemplates.push({ contract, cct });
+          contractsWithTemplates.push({ contract, ccts });
         }
         resolve(contractsWithTemplates);
       } catch (e) {
@@ -261,7 +261,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
-        return { contract: c.contract.toJSON(), cct: c.cct };
+        return { contract: c.contract.toJSON(), ccts: c.ccts };
       }),
       communityRoles: communityRoles.map((r) => r.toJSON()),
     },
