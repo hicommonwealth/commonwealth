@@ -13,7 +13,7 @@ import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { ContractCard } from './contract_card';
 
-const contracts = [
+const contractsOld = [
   {
     id: 1,
     address: 'QwRsdskjfkdsjfiaSOppPaspodjapsdaspodaspdoPlnH',
@@ -76,7 +76,25 @@ class ContractsPage extends ClassComponent {
       return <PageLoading title="Contracts Page" />;
     }
 
-    console.log('app.contracts', app.contracts);
+    const contracts = app.contracts.store
+      .getCommunityContracts()
+      .map((contract) => {
+        return {
+          id: contract.id,
+          address: contract.address,
+          templates: contract.ccts.map((cct) => {
+            return {
+              id: cct.id,
+              title: cct.cctmd.display_name,
+              displayName: cct.cctmd.display_name,
+              nickname: cct.cctmd.nickname,
+              slug: cct.cctmd.slug,
+              display: cct.cctmd.display_options,
+            };
+          }),
+        };
+      });
+
     return (
       <Sublayout>
         <div class="ContractsPage">
