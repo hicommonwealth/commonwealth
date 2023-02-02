@@ -1,16 +1,20 @@
 import BN from 'bn.js';
 import type { StateMutabilityType, AbiType } from 'web3-utils';
 import { providers } from 'ethers';
-import { ERC20__factory } from 'common-common/src/eth/types';
+import { ERC20, ERC20__factory } from 'common-common/src/eth/types';
 
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
 
-export default class RoninBalanceProvider extends BalanceProvider {
+export default class RoninBalanceProvider extends BalanceProvider<ERC20> {
   public name = 'ronin';
   public opts = {};
   public validBases = [BalanceType.AxieInfinity];
+
+  public async getExternalProvider(node: IChainNode): Promise<ERC20> {
+    return null;
+  }
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
     const Web3 = (await import('web3')).default;
@@ -31,6 +35,7 @@ export default class RoninBalanceProvider extends BalanceProvider {
     );
     await axsApi.deployed();
     const axsBalanceBigNum = await axsApi.balanceOf(address);
+    
 
     const axsStakingAbi = [
       {

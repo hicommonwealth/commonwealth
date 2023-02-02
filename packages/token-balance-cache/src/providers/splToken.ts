@@ -8,7 +8,7 @@ type SplTokenBPOpts = {
   tokenAddress: string;
 };
 
-export default class SplTokenBalanceProvider extends BalanceProvider<SplTokenBPOpts> {
+export default class SplTokenBalanceProvider extends BalanceProvider<solw3.Connection, SplTokenBPOpts> {
   public name = 'spl-token';
   public opts = {
     tokenAddress: 'string',
@@ -21,6 +21,13 @@ export default class SplTokenBalanceProvider extends BalanceProvider<SplTokenBPO
     opts: SplTokenBPOpts
   ): string {
     return `${address}-${node.url as solw3.Cluster}-${opts.tokenAddress}`;
+  }
+
+  public async getExternalProvider(node: IChainNode): Promise<solw3.Connection> {
+    const solw3 = await import('@solana/web3.js');
+    const url = solw3.clusterApiUrl(node.url as solw3.Cluster);
+    const connection = new solw3.Connection(url);
+    return connection;
   }
 
   public async getBalance(
@@ -38,10 +45,10 @@ export default class SplTokenBalanceProvider extends BalanceProvider<SplTokenBPO
       throw new Error('Invalid address');
     }
 
-    const url = solw3.clusterApiUrl(node.url as solw3.Cluster);
-    const connection = new solw3.Connection(url);
+    
     const mintPubKey = new solw3.PublicKey(opts.tokenAddress);
     const userPubKey = new solw3.PublicKey(address);
+    const connection = await this.getExternalProvider(node);
     const { value } = await connection.getParsedTokenAccountsByOwner(
       userPubKey,
       { mint: mintPubKey }

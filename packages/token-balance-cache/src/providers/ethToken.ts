@@ -1,14 +1,18 @@
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
-import type Web3 from 'web3';
+import Web3 from 'web3';
+import type { WebsocketProvider } from 'web3-core';
 
 type EthBPOpts = {
   tokenAddress?: string;
   contractType?: string;
 };
 
-export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> {
+export default class EthTokenBalanceProvider extends BalanceProvider<
+  Web3,
+  EthBPOpts
+> {
   public name = 'eth-token';
   public opts = {
     contractType: 'string?',
@@ -24,32 +28,31 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
     return `${node.id}-${address}-${'native'}`;
   }
 
+  public async getExternalProvider(
+    node: IChainNode,
+  ): Promise<Web3> {
+    const url = node.private_url || node.url;
+    const provider = new Web3.providers.WebsocketProvider(url);
+    return new Web3(provider);
+  }
+
   public async getBalance(
     node: IChainNode,
     address: string,
     opts: EthBPOpts
   ): Promise<string> {
-    const url = node.private_url || node.url;
     const { tokenAddress, contractType } = opts;
     const Web3 = (await import('web3')).default;
     if (!tokenAddress && !contractType) {
       if (!Web3.utils.isAddress(address)) {
         throw new Error('Invalid address');
       }
-      // use native token if no args provided
-      const provider = new Web3.providers.WebsocketProvider(url);
-      const web3 = new Web3(provider);
-      return await this.fetchBalance(web3, provider, address);
-    }
-  }
 
-  private async fetchBalance(
-    api: Web3,
-    provider: any,
-    address: string
-  ): Promise<string> {
-    const balance = await api.eth.getBalance(address);
-    provider.disconnect(1000, 'finished');
-    return balance;
+      const api = await this.getExternalProvider(node);
+      const balance = await api.eth.getBalance(address);
+      (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
+      // use native token if no args provided
+      return balance;
+    }
   }
 }

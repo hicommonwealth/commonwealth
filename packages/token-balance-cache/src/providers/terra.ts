@@ -5,10 +5,14 @@ import { BalanceType } from 'common-common/src/types';
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 
-export default class TerraBalanceProvider extends BalanceProvider {
+export default class TerraBalanceProvider extends BalanceProvider<string> {
   public name = 'terra';
   public opts = {};
   public validBases = [BalanceType.Terra];
+
+  public getExternalProvider(node: IChainNode): Promise<string> {
+    return null;
+  }
 
   // TODO: update against staking logic on master
   public async getBalance(node: IChainNode, address: string): Promise<string> {

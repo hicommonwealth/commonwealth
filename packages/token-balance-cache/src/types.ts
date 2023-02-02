@@ -1,4 +1,6 @@
+import type { ERC1155, ERC20, ERC721 } from 'common-common/src/eth/types';
 import type { BalanceType } from 'common-common/src/types';
+import Web3 from 'web3';
 
 // map of addresses to balances
 export interface ICache {
@@ -35,6 +37,7 @@ export type ChainNodeResp = {
 };
 
 export abstract class BalanceProvider<
+  ExternalProviderT,
   OptT extends Record<string, unknown> = Record<string, unknown>
 > {
   public readonly name: string;
@@ -51,6 +54,11 @@ export abstract class BalanceProvider<
     address: string,
     opts: OptT
   ): Promise<string>;
+
+  public abstract getExternalProvider(
+    node: IChainNode,
+    opts: OptT
+  ): Promise<ExternalProviderT>;
 }
 
 export type BalanceProviderResp = {

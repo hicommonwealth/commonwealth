@@ -1,8 +1,9 @@
 import Web3 from 'web3';
-import { BigNumber, providers } from 'ethers';
+import type { WebsocketProvider } from 'web3-core';
 import type { ERC20 } from 'common-common/src/eth/types';
 import { ERC20__factory } from 'common-common/src/eth/types';
-
+import type { BigNumber} from 'ethers';
+import { providers } from 'ethers';
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
@@ -12,13 +13,14 @@ type EthBPOpts = {
   contractType?: string;
 };
 
-export default class Erc20BalanceProvider extends BalanceProvider<EthBPOpts> {
+export default class Erc20BalanceProvider extends BalanceProvider<
+  ERC20,
+  EthBPOpts
+> {
   public name = 'erc20';
-  // Added Token Id as String because it can be a BigNumber (uint256 on solidity)
   public opts = {
     contractType: 'string?',
     tokenAddress: 'string?',
-    tokenId: 'string?',
   };
   public validBases = [BalanceType.Ethereum];
 
@@ -30,12 +32,24 @@ export default class Erc20BalanceProvider extends BalanceProvider<EthBPOpts> {
     return `${node.id}-${address}-${opts.tokenAddress}`;
   }
 
+  public async getExternalProvider(node: IChainNode, opts: EthBPOpts): Promise<ERC20> {
+    const url = node.private_url || node.url;
+    const { tokenAddress } = opts;
+    const provider = new Web3.providers.WebsocketProvider(url);
+
+    const erc20Api = ERC20__factory.connect(
+      tokenAddress,
+      new providers.Web3Provider(provider)
+    );
+    await erc20Api.deployed();
+    return erc20Api;
+  }
+
   public async getBalance(
     node: IChainNode,
     address: string,
     opts: EthBPOpts
   ): Promise<string> {
-    const url = node.private_url || node.url;
     const { tokenAddress, contractType } = opts;
     if (contractType != this.name) {
       throw new Error('Invalid Contract Type');
@@ -50,22 +64,13 @@ export default class Erc20BalanceProvider extends BalanceProvider<EthBPOpts> {
       throw new Error('Invalid address');
     }
 
-    const provider = new Web3.providers.WebsocketProvider(url);
-    const erc20Api: ERC20 = ERC20__factory.connect(
-      tokenAddress,
-      new providers.Web3Provider(provider as any)
-    );
-    await erc20Api.deployed();
-    return await this.fetchBalance(erc20Api, provider, address);
-  }
+    const erc20Api: ERC20 = await this.getExternalProvider(node, opts);
+    const balanceBigNum: BigNumber = await erc20Api.balanceOf(address);
 
-  private async fetchBalance(
-    api: ERC20,
-    provider: any,
-    address: string
-  ): Promise<string> {
-    const balanceBigNum: BigNumber = await api.balanceOf(address);
-    provider.disconnect(1000, 'finished');
+    (
+      (erc20Api.provider as providers.Web3Provider)
+        .provider as WebsocketProvider
+    ).disconnect(1000, 'finished');
     return balanceBigNum.toString();
   }
 }
