@@ -39,14 +39,24 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
     });
   }
 
-  handleCreateNewTemplate() {
+  handleCreateNewTemplate(e, contractId) {
     // TODO add some contract ID to know where should template be created
     const scope = app.customDomainId() || m.route.param('scope');
-    m.route.set(`/${scope}/new/contract_template`);
+    m.route.set(`/${scope}/new/contract_template/${contractId}`);
   }
 
-  handleAddTemplate(contractId) {
-    showManageContractTemplateModal({ contractId });
+  async handleAddTemplate(contractId) {
+    try {
+      const templates = await app.contracts.getTemplatesForContract(contractId);
+      showManageContractTemplateModal({
+        contractId,
+        templateId: null,
+        template: null,
+        templates,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   view(vnode: m.Vnode<ContractCardAttrs>) {
@@ -105,7 +115,7 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
               type="caption"
               fontWeight="medium"
               className="cta"
-              onclick={this.handleCreateNewTemplate}
+              onclick={(e) => this.handleCreateNewTemplate(e, id)}
             >
               Create a New Template
             </CWText>

@@ -1,10 +1,14 @@
-import type { TypedRequestBody, TypedResponse } from 'server/types';
+import type {
+  TypedRequestBody,
+  TypedRequestQuery,
+  TypedResponse,
+} from 'server/types';
 import { success } from '../types';
 import type { DB } from '../models';
 import { AppError } from '../../../common-common/src/errors';
 
 type CreateTemplateAndMetadataReq = {
-  abi_id: number;
+  contract_id: string;
   name: string;
   template: string;
 };
@@ -18,36 +22,43 @@ export async function createTemplate(
   req: TypedRequestBody<CreateTemplateAndMetadataReq>,
   res: TypedResponse<CreateTemplateAndMetadataResp>
 ) {
-  const { abi_id, name, template } = req.body;
+  const { contract_id, name, template } = req.body;
 
-  if (!abi_id || !name || !template) {
-    throw new AppError('Must provide abi_id, name, and template');
+  if (!contract_id || !name || !template) {
+    throw new AppError('Must provide contract_id, name, and template');
   }
 
-  const abi = await models.ContractAbi.findOne({
+  const contract = await models.Contract.findOne({
     where: {
-      id: abi_id,
+      id: contract_id,
     },
   });
 
-  if (!abi) {
-    throw new AppError('ABI does not exist');
+  const abi = await models.ContractAbi.findOne({
+    where: {
+      id: contract.abi_id,
+    },
+  });
+
+  if (!contract || !abi) {
+    throw new AppError('Contract or Contract ABI does not exist');
   }
 
   try {
     const newTemplate = await models.Template.create({
-      abi_id,
+      abi_id: contract.abi_id,
       name,
       template,
     });
     return success(res, { template_id: newTemplate.id });
   } catch (e) {
+    console.log(e);
     throw new AppError('Error creating template');
   }
 }
 
 type getTemplateAndMetadataReq = {
-  abi_id: number;
+  contract_id: number;
 };
 
 type getTemplateAndMetadataResp = {
@@ -56,10 +67,22 @@ type getTemplateAndMetadataResp = {
 
 export async function getTemplates(
   models: DB,
-  req: TypedRequestBody<getTemplateAndMetadataReq>,
+  req: TypedRequestQuery<getTemplateAndMetadataReq>,
   res: TypedResponse<getTemplateAndMetadataResp>
 ) {
-  const { abi_id } = req.body;
+  const { contract_id } = req.query;
+
+  const contract = await models.Contract.findOne({
+    where: {
+      id: contract_id,
+    },
+  });
+
+  if (!contract) {
+    throw new AppError('Contract does not exist');
+  }
+
+  const abi_id = contract?.abi_id;
 
   if (!abi_id) {
     throw new AppError('Must provide abi_id');

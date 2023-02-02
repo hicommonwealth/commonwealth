@@ -12,45 +12,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { ContractCard } from './contract_card';
-
-const contractsOld = [
-  {
-    id: 1,
-    address: 'QwRsdskjfkdsjfiaSOppPaspodjapsdaspodaspdoPlnH',
-    templates: [
-      {
-        id: 1,
-        title: 'Treasury Spend',
-        displayName: 'New Treasury Proposal 1',
-        nickname: 'Little Treasures',
-        slug: '/whatever-was-here-for-add-template',
-        display: 'In Create Dropdown and in Create Sidebar',
-      },
-      {
-        id: 2,
-        title: 'Parameter Change',
-        displayName: 'New Treasury Proposal 2',
-        nickname: 'Little Treasures 2',
-        slug: '/whatever-was-here-for-add-template-2',
-        display: 'In Create Dropdown',
-      },
-    ],
-  },
-  {
-    id: 2,
-    address: 'QwRsdskjfkdsjfiaS2222222',
-    templates: [
-      {
-        id: 2,
-        title: 'Parameter Change',
-        displayName: 'New Treasury Proposal 1',
-        nickname: 'Little Treasures',
-        slug: '/whatever-was-here-for-add-template',
-        display: 'In Create Dropdown and in Create Sidebar',
-      },
-    ],
-  },
-];
+import { displayOptions } from '../../modals/manage_contract_template_modal';
 
 export type Contract = {
   id: number;
@@ -84,12 +46,14 @@ class ContractsPage extends ClassComponent {
           address: contract.address,
           templates: contract.ccts.map((cct) => {
             return {
-              id: cct.id,
+              id: cct.templateId,
               title: cct.cctmd.display_name,
               displayName: cct.cctmd.display_name,
               nickname: cct.cctmd.nickname,
               slug: cct.cctmd.slug,
-              display: cct.cctmd.display_options,
+              display: displayOptions.find(
+                (option) => cct.cctmd.display_options === option.value
+              )?.label,
             };
           }),
         };

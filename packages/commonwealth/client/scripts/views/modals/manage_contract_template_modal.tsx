@@ -13,7 +13,7 @@ import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { notifyError } from 'controllers/app/notifications';
 
 // TODO this should be aligned with display_options
-const displayOptions = [
+export const displayOptions = [
   { value: '2', label: 'In Create Dropdown' },
   { value: '1', label: 'In Create Sidebar' },
   { value: '3', label: 'In Create Dropdown and in Create Sidebar' },
@@ -21,7 +21,7 @@ const displayOptions = [
 ];
 
 // TODO: Update: this should just be fetched from GET contract/template route
-const templates = [
+const templatesOld = [
   {
     id: 1,
     title: 'Treasury Spend',
@@ -43,6 +43,20 @@ const templates = [
 type ManageContractTemplateModalAttrs = {
   contractId: number;
   templateId?: number;
+  template: {
+    id: number;
+    title: string;
+    displayName: string;
+    nickname: string;
+    slug: string;
+    display: string;
+  }; // CCT for this Template
+  templates: Array<{
+    id: number;
+    abi_id: string;
+    template: string;
+    name: string;
+  }>; // Global Templates
 };
 
 export class ManageContractTemplateModal extends ClassComponent<ManageContractTemplateModalAttrs> {
@@ -61,11 +75,11 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     }, 0);
   }
 
-  handleCreateNewTemplate(e) {
+  handleCreateNewTemplate(e, contractId: number) {
     const scope = app.customDomainId() || m.route.param('scope');
 
     $(e.target).trigger('modalexit');
-    m.route.set(`/${scope}/new/contract_template`);
+    m.route.set(`/${scope}/new/contract_template/${contractId}`);
   }
 
   async handleAddTemplate(e, contractId: number) {
@@ -127,31 +141,32 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     $(e.target).trigger('modalexit');
   }
 
-  handleSelectTemplate(item: DropdownItemType) {
+  handleSelectTemplate(item: DropdownItemType, templates) {
     const templateId = +item.value;
     const template = templates.find((t) => t.id === templateId);
 
     this.form.templateId = item.value;
-    this.form.nickname = template.nickname;
-    this.form.displayName = template.displayName;
+    // this.form.nickname = template.name;
+    this.form.displayName = template.name;
   }
 
   oninit(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
-    const { templateId } = vnode.attrs;
+    const { templateId, template, templates } = vnode.attrs;
     const isEditMode = !!templateId;
-    const template = templates.find((t) => t.id === templateId);
+    console.log(templateId, template, templates);
+    const globalTemplate = templates.find((t) => t.id === templateId);
 
     if (isEditMode) {
-      this.form.templateId = templateId;
+      this.form.templateId = globalTemplate.id;
       this.form.displayName = template.displayName;
       this.form.nickname = template.nickname;
       this.form.slug = template.slug;
-      this.form.displayOption = template.displayOption;
+      this.form.displayOption = template.display;
     }
   }
 
   view(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
-    const { contractId, templateId } = vnode.attrs;
+    const { contractId, templateId, templates } = vnode.attrs;
 
     const isEditMode = !!templateId;
     const modalTitle = isEditMode ? 'Edit Template' : 'Add Template';
@@ -165,7 +180,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
 
     const templateOptions = templates.map((template) => ({
       value: String(template.id),
-      label: template.title,
+      label: template.name,
     }));
 
     const initialTemplateName = isEditMode
@@ -194,7 +209,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
             initialValue={initialTemplateName}
             label="Choose a template for your proposal"
             options={templateOptions}
-            onSelect={(item) => this.handleSelectTemplate(item)}
+            onSelect={(item) => this.handleSelectTemplate(item, templates)}
           />
           {isEditMode && (
             <CWText className="create-template-info" type="caption">
@@ -203,7 +218,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
                 type="caption"
                 fontWeight="medium"
                 className="cta"
-                onclick={this.handleCreateNewTemplate}
+                onclick={(e) => this.handleCreateNewTemplate(e, contractId)}
               >
                 Create a New Template
               </CWText>
@@ -279,11 +294,27 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
 type ShowManageContractTemplateModalAttrs = {
   contractId: number;
   templateId?: number;
+  template: {
+    id: number;
+    title: string;
+    displayName: string;
+    nickname: string;
+    slug: string;
+    display: string;
+  };
+  templates: Array<{
+    id: number;
+    abi_id: string;
+    template: string;
+    name: string;
+  }>;
 };
 
 export const showManageContractTemplateModal = ({
   contractId,
   templateId,
+  template,
+  templates,
 }: ShowManageContractTemplateModalAttrs) => {
   app.modals.create({
     modal: ManageContractTemplateModal,
@@ -291,6 +322,8 @@ export const showManageContractTemplateModal = ({
       className: 'ManageContractTemplateOuterModal',
       contractId,
       templateId,
+      template,
+      templates,
     },
   });
 };

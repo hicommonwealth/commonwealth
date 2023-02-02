@@ -20,12 +20,23 @@ class CreateContractTemplateForm extends ClassComponent {
     template: '',
   };
 
-  createContractTemplate() {
+  async createContractTemplate(form) {
     const scope = app.customDomainId() || m.route.param('scope');
+
+    const contract_id = m.route.param('contract_id');
     try {
       this.saving = true;
-      console.log(this.form);
-      m.route.set(`/${scope}/contracts`);
+      try {
+        await app.contracts.addTemplate({
+          name: this.form.displayName,
+          template: this.form.template,
+          contract_id,
+        });
+        m.route.set(`/${scope}/contracts`);
+      } catch (e) {
+        console.log(e);
+        // TODO: Throw a visual error
+      }
     } catch (err) {
       notifyError('Failed to create new contract template');
       console.log(err);
@@ -95,7 +106,7 @@ class CreateContractTemplateForm extends ClassComponent {
             buttonType="mini-black"
             label="Create"
             disabled={isCreatingDisabled}
-            onclick={this.createContractTemplate}
+            onclick={() => this.createContractTemplate(this.form)}
           />
         </div>
       </div>

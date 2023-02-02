@@ -27,15 +27,11 @@ export default (
       abi_id: { type: dataTypes.INTEGER, allowNull: false },
       name: { type: dataTypes.STRING, allowNull: false },
       template: { type: dataTypes.JSONB, allowNull: false },
-      created_at: { type: dataTypes.DATE, allowNull: false },
-      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'Template',
-      timestamps: true,
+      timestamps: false,
       underscored: true,
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
     }
   );
 

@@ -226,6 +226,41 @@ class ContractsController {
     return this._store.add(contract);
   }
 
+  public async addTemplate({
+    name,
+    template,
+    contract_id,
+  }: {
+    name: string;
+    template: string;
+    contract_id: string;
+  }) {
+    try {
+      await $.post(`${app.serverUrl()}/contract/template`, {
+        jwt: app.user.jwt,
+        name,
+        template,
+        contract_id,
+      });
+    } catch (e) {
+      console.log(e);
+      throw new Error('Failed to create template');
+    }
+  }
+
+  public async getTemplatesForContract(contractId: number) {
+    try {
+      const res = await $.get(`${app.serverUrl()}/contract/template`, {
+        jwt: app.user.jwt,
+        contract_id: contractId,
+      });
+      return res.result.templates;
+    } catch (e) {
+      console.log(e);
+      throw new Error('Failed to get templates');
+    }
+  }
+
   public async addCommunityContractTemplate(
     communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes
   ) {

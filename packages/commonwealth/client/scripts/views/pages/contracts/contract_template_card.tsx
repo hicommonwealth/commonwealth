@@ -2,6 +2,7 @@
 
 import 'pages/contracts/contract_template_card.scss';
 import m from 'mithril';
+import app from 'state';
 import ClassComponent from 'class_component';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -21,8 +22,18 @@ interface InfoOrder {
 }
 
 export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAttrs> {
-  handleEditTemplate(contractId, templateId) {
-    showManageContractTemplateModal({ contractId, templateId });
+  async handleEditTemplate(contractId, templateId, template) {
+    try {
+      const templates = await app.contracts.getTemplatesForContract(contractId);
+      showManageContractTemplateModal({
+        contractId,
+        templateId,
+        template,
+        templates,
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   handleDeleteTemplate(name: string) {
@@ -66,7 +77,8 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
               {
                 label: 'Edit Template',
                 iconLeft: 'write',
-                onclick: () => this.handleEditTemplate(contractId, templateId),
+                onclick: () =>
+                  this.handleEditTemplate(contractId, templateId, templateInfo),
               },
               {
                 label: 'Delete',
