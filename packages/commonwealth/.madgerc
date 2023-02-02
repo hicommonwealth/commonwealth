@@ -1,6 +1,6 @@
 {
   "tsConfig": "./tsconfig.json",
-  "webpackConfig": "./webpack/webpack.config.dev.js",
+  "webpackConfig": "./webpack/webpack.dev.config.js",
   "includeNpm": true,
 	"graphVizOptions": {
 		"G": {

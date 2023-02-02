@@ -1,13 +1,14 @@
 import _ from 'lodash';
 
 import app from 'state';
-import { ToggleTree } from './types';
+import type { ToggleTree } from './types';
 
 function comparisonCustomizer(value1, value2) {
   if (typeof value1 === 'boolean' && typeof value2 === 'boolean') {
     return true;
   }
 }
+
 // Check that our current cached tree is structurally correct
 export function verifyCachedToggleTree(
   treeName: string,

@@ -1,27 +1,26 @@
-import m from 'mithril';
-// Logged Out Homepage View
-import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';
-
-import app, { LoginState } from 'state';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { ChainInfo } from 'models';
-import HeaderLandingPage from './landing_page_header';
-import JoinCommonWealthSection from './landing_page_pre_footer';
-import TokensCommunityComponent from './tokens_community_hero';
-import TokensCreatorComponent from './creators_card_section';
-import TokensChainsComponent from './chains_slider';
-import TokenHoldersComponent from './find_your_community_section';
-import ChainsCrowdfundingComponent from './crowdfunding_card_section';
+import m from 'mithril';
+import type { ChainInfo } from 'models';
 
 // Logged In Homepage View
 import 'pages/landing/index.scss';
+// Logged Out Homepage View
+import 'pages/landing/landing_page.scss';
 
-import { handleEmailInvites } from '../../menus/invites_menu';
-import UserDashboard from '../user_dashboard';
+import app, { LoginState } from 'state';
 import { Footer } from '../../footer';
+
+import UserDashboard from '../user_dashboard';
+import TokensChainsComponent from './chains_slider';
+import TokensCreatorComponent from './creators_card_section';
+import ChainsCrowdfundingComponent from './crowdfunding_card_section';
+import TokenHoldersComponent from './find_your_community_section';
+import HeaderLandingPage from './landing_page_header';
+import JoinCommonWealthSection from './landing_page_pre_footer';
+import TokensCommunityComponent from './tokens_community_hero';
 
 export interface Chain {
   img: string;
@@ -90,9 +89,6 @@ const LandingPage: m.Component<{}, IState> = {
     ];
   },
   view: (vnode) => {
-    if (m.route.param('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(vnode.state), 0);
-    }
     if (app.loginState !== LoginState.LoggedIn) {
       return m('.LandingPage', { class: 'bg-primary' }, [
         m(
@@ -166,7 +162,9 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: ' Off-chain polling & on-chain voting ',
-                text: ' Whether you use Snapshot, COMP governance contracts, or native Layer 1 voting, access everything from one place. ',
+                text:
+                  ' Whether you use Snapshot, COMP governance contracts, or native Layer 1 voting, access' +
+                  ' everything from one place. ',
               },
               card: {
                 id: 'tab2-codepen',
@@ -194,7 +192,9 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: ' A rich forum experience ',
-                text: ' Discuss memes or key decisions, in a Discourse-style forum. Enhance your posts with built in Markdown and fun reactions. ',
+                text:
+                  ' Discuss memes or key decisions, in a Discourse-style forum. Enhance your posts with' +
+                  ' built in Markdown and fun reactions. ',
               },
               card: {
                 id: 'tab4-codepen',
@@ -216,13 +216,17 @@ const LandingPage: m.Component<{}, IState> = {
               img: 'static/img/1stButtonToken.svg',
               alt: '',
               title: 'Claim your token',
-              text: ' We generate pages for your favorite community and address from real-time chain activity. Claim yours. ',
+              text:
+                ' We generate pages for your favorite community and address from real-time chain activity.' +
+                ' Claim yours. ',
             },
             {
               img: 'static/img/bell.svg',
               alt: '',
               title: 'Stay updated',
-              text: ' Be the first to know when community events are happening with in-app, email, and mobile push notifications. ',
+              text:
+                ' Be the first to know when community events are happening with in-app, email, and mobile' +
+                ' push notifications. ',
             },
             {
               img: 'static/img/calendar.svg',
@@ -240,7 +244,9 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: 'Fund new projects',
-                text: 'Anyone from within your community can easily turn a conversation thread into a Kickstarter-like campaign. ',
+                text:
+                  'Anyone from within your community can easily turn a conversation thread into a' +
+                  ' Kickstarter-like campaign. ',
               },
               card: {
                 id: 'tab-card',
@@ -254,7 +260,9 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: 'Create Community Endowments',
-                text: ' Pool funds with other like-minded folks, and fund interesting projects within your community or across the web. ',
+                text:
+                  ' Pool funds with other like-minded folks, and fund interesting projects within' +
+                  ' your community or across the web. ',
               },
               card: {
                 id: 'tab2-card',
@@ -268,7 +276,9 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: 'Launch New Tokens',
-                text: ' Use a project to raise funds for a new DeFi token or NFT. Optionally plug in an allowlist for KYC compliance. ',
+                text:
+                  ' Use a project to raise funds for a new DeFi token or NFT.' +
+                  ' Optionally plug in an allowlist for KYC compliance. ',
               },
               card: {
                 id: 'tab3-card',

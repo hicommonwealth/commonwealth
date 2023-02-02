@@ -1,22 +1,63 @@
-import { QueryTypes, Op, Sequelize } from 'sequelize';
-import jwt from 'jsonwebtoken';
-import _ from 'lodash';
-import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { JWT_SECRET } from '../config';
-import '../types';
-import { DB } from '../models';
-import { sequelize } from '../database';
 import { ServerError } from 'common-common/src/errors';
+import jwt from 'jsonwebtoken';
+import { Op, QueryTypes } from 'sequelize';
+import type { AddressInstance } from 'server/models/address';
+import type { ChainInstance } from 'server/models/chain';
+import type { ChainCategoryInstance } from 'server/models/chain_category';
+import type { ChainCategoryTypeInstance } from 'server/models/chain_category_type';
+import type { ChainNodeInstance } from 'server/models/chain_node';
+import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
+import type { DiscussionDraftAttributes } from 'server/models/discussion_draft';
+import type { NotificationCategoryInstance } from 'server/models/notification_category';
+import type { SocialAccountInstance } from 'server/models/social_account';
+import type { StarredCommunityAttributes } from 'server/models/starred_community';
+import type { EmailNotificationInterval } from 'server/models/user';
+import { JWT_SECRET } from '../config';
+import { sequelize } from '../database';
+import type { DB } from '../models';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { success } from '../types';
+import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 
-const log = factory.getLogger(formatFilename(__filename));
+type ThreadCountQueryData = {
+  concat: string;
+  count: number;
+};
+
+type StatusResp = {
+  chainsWithSnapshots: {
+    chain: ChainInstance;
+    snapshot: string[];
+  }[];
+  nodes: ChainNodeInstance[];
+  notificationCategories: NotificationCategoryInstance[];
+  chainCategories: ChainCategoryInstance[];
+  chainCategoryTypes: ChainCategoryTypeInstance[];
+  recentThreads: ThreadCountQueryData[];
+  roles?: RoleInstanceWithPermission[];
+  loggedIn?: boolean;
+  user?: {
+    email: string;
+    emailVerified: boolean;
+    emailInterval: EmailNotificationInterval;
+    jwt: string;
+    addresses: AddressInstance[];
+    socialAccounts: SocialAccountInstance[];
+    selectedChain: ChainInstance;
+    isAdmin: boolean;
+    disableRichText: boolean;
+    lastVisited: string;
+    starredCommunities: StarredCommunityAttributes[];
+    discussionDrafts: DiscussionDraftAttributes[];
+    unseenPosts: { [chain: string]: number };
+  };
+};
 
 const status = async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestQuery,
+  res: TypedResponse<StatusResp>
 ) => {
   try {
     const [
@@ -45,14 +86,34 @@ const status = async (
       models.ChainCategoryType.findAll(),
     ]);
 
+    const chainsWithSnapshots = await Promise.all(
+      chains.map(async (chain) => {
+        const snapshot_spaces: CommunitySnapshotSpaceWithSpaceAttached[] =
+          await models.CommunitySnapshotSpaces.findAll({
+            where: {
+              chain_id: chain.id,
+            },
+            include: {
+              model: models.SnapshotSpace,
+              as: 'snapshot_space',
+            },
+          });
+
+        const snapshot_space_names = snapshot_spaces.map((space) => {
+          return space.snapshot_space?.snapshot_space;
+        });
+
+        return {
+          chain,
+          snapshot: snapshot_space_names.length > 0 ? snapshot_space_names : [],
+        };
+      })
+    );
+
     const thirtyDaysAgo = new Date(
       (new Date() as any) - 1000 * 24 * 60 * 60 * 30
     );
     const { user } = req;
-    type ThreadCountQueryData = {
-      concat: string;
-      count: number;
-    };
 
     if (!user) {
       const threadCountQueryData: ThreadCountQueryData[] =
@@ -68,14 +129,13 @@ const status = async (
           { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
         );
 
-      return res.json({
-        chains,
+      return success(res, {
+        chainsWithSnapshots,
         nodes,
         notificationCategories,
         chainCategories,
         chainCategoryTypes,
         recentThreads: threadCountQueryData,
-        loggedIn: false,
       });
     }
 
@@ -140,14 +200,6 @@ const status = async (
       where: { user_id: user.id },
     });
 
-    // get invites for user
-    const invites = await models.InviteCode.findAll({
-      where: {
-        invited_email: user.email,
-        used: false,
-      },
-    });
-
     // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
     /**
      * Purpose of this section is to count the number of threads that have new updates grouped by community
@@ -177,7 +229,8 @@ const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime());
       // append the SELECT query
-      query += `SELECT id, chain FROM "Threads" WHERE (kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
+      query += `SELECT id, chain FROM "Threads" WHERE
+ (kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
       if (i === commsAndChains.length - 1) query += ';';
     }
 
@@ -190,8 +243,10 @@ const status = async (
       })
     );
 
-    // this section iterates through the retrieved threads counting the number of threads and keeping a set of activePosts
-    // the set of activePosts is used to compare with the comments under threads so that there are no duplicate active threads counted
+    // this section iterates through the retrieved threads
+    // counting the number of threads and keeping a set of activePosts
+    // the set of activePosts is used to compare with the comments
+    // under threads so that there are no duplicate active threads counted
     for (const thread of threadNum) {
       if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {};
       unseenPosts[thread.chain].activePosts
@@ -257,7 +312,8 @@ const status = async (
         unseenPosts[name] = {};
         continue;
       }
-      // if the time is valid but the chain is not defined in the unseenPosts object then initialize the object with zeros
+      // if the time is valid but the chain is not defined in the unseenPosts object
+      // then initialize the object with zeros
       if (!unseenPosts[name]) {
         unseenPosts[name] = {
           activePosts: 0,
@@ -284,15 +340,14 @@ const status = async (
      */
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-    return res.json({
-      chains,
+    return success(res, {
+      chainsWithSnapshots,
       nodes,
       notificationCategories,
       chainCategories,
       chainCategoryTypes,
       recentThreads: threadCountQueryData,
       roles,
-      invites,
       loggedIn: true,
       user: {
         email: user.email,

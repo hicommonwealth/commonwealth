@@ -1,17 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'sublayout.scss';
+import m from 'mithril';
 
 import app from 'state';
-import { handleEmailInvites } from 'views/menus/invites_menu';
+
+import 'sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
+import { AppMobileMenus } from './app_mobile_menus';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import { isWindowSmallInclusive } from './components/component_kit/helpers';
-import { AppMobileMenus } from './app_mobile_menus';
 import { SublayoutHeader } from './sublayout_header';
 
 // Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs
@@ -56,10 +55,6 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
     const showSidebar = app.sidebarToggled || !this.isWindowSmallInclusive;
-
-    if (m.route.param('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(this), 0);
-    }
 
     return (
       <div class="Sublayout">

@@ -1,46 +1,45 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import $ from 'jquery';
-import Web3 from 'web3';
-
-import 'pages/create_community.scss';
-
-import app from 'state';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
-import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { isAddress } from 'web3-utils';
+import { initAppState } from 'state';
+import ClassComponent from 'class_component';
 
 import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
-import { IdRow, InputRow } from 'views/components/metadata_rows';
+import AaveApi from 'controllers/chain/ethereum/aave/api';
 import CompoundAPI, {
   GovernorTokenType,
   GovernorType,
 } from 'controllers/chain/ethereum/compound/api';
-import AaveApi from 'controllers/chain/ethereum/aave/api';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import $ from 'jquery';
+import m from 'mithril';
+
+import 'pages/create_community.scss';
+
+import app from 'state';
+import { slugifyPreserveDashes } from 'utils';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
-
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { IdRow, InputRow } from 'views/components/metadata_rows';
 
 import {
-  initChainForm,
   defaultChainRows,
   ethChainRows,
+  initChainForm,
 } from 'views/pages/create_community/chain_input_rows';
 
-import {
+import type {
   ChainFormFields,
   ChainFormState,
   EthChainAttrs,
   EthFormFields,
 } from 'views/pages/create_community/types';
+import { isAddress } from 'web3-utils';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 type EthDaoFormFields = {
@@ -93,6 +92,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
       this.state.message = '';
       try {
         if (this.state.form.network === ChainNetwork.Compound) {
+          const Web3 = (await import('web3')).default;
           const provider = new Web3.providers.WebsocketProvider(
             this.state.form.nodeUrl
           );
@@ -112,6 +112,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
           this.state.status = 'success';
           this.state.message = `Found ${govType} with token type ${tokenType}`;
         } else if (this.state.form.network === ChainNetwork.Aave) {
+          const Web3 = (await import('web3')).default;
           const provider = new Web3.providers.WebsocketProvider(
             this.state.form.nodeUrl
           );
@@ -206,8 +207,14 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
-            const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
-              this.state.form;
+            const {
+              chainString,
+              ethChainId,
+              nodeUrl,
+              tokenName,
+              symbol,
+              iconUrl,
+            } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
@@ -222,6 +229,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
                 eth_chain_id: ethChainId,
                 jwt: app.user.jwt,
                 node_url: nodeUrl,
+                icon_url: iconUrl,
                 token_name: tokenName,
                 type: ChainType.DAO,
                 default_symbol: symbol,

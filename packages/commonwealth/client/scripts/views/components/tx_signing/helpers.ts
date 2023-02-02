@@ -1,7 +1,8 @@
 import m from 'mithril';
 
-import { ITXModalData, TransactionStatus } from 'models';
-import { NextFn, StageName } from './types';
+import type { ITXModalData } from 'models';
+import { TransactionStatus } from 'models';
+import type { NextFn, StageName } from './types';
 
 const createProposalTransactionLabels = {
   // substrate: accounts

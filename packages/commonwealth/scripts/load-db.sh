@@ -7,6 +7,12 @@
 
 load-env-var '.env';
 
+if [[ -z "${PGPASSWORD}" ]]; then
+  PGPASSWORD="edgeware"
+else
+  PGPASSWORD="${PGPASSWORD}"
+fi
+
 DUMP_NAME=latest.dump
 if [ "$1" ]; then
   DUMP_NAME=$1

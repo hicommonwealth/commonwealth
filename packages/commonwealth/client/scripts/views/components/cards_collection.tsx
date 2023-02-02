@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/cards_collection.scss';
+import m from 'mithril';
 
 import { CWText } from './component_kit/cw_text';
 

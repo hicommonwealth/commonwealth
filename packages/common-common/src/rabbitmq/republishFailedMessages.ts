@@ -1,8 +1,4 @@
-import {RabbitMQController} from "./rabbitMQController";
-import {factory, formatFilename} from "../logging";
-
-const log = factory.getLogger(formatFilename(__filename));
-
+import type { RabbitMQController } from './rabbitMQController';
 
 export abstract class RepublishFailedMessages<DB> {
   private _timeoutHandle: NodeJS.Timeout;
@@ -13,17 +9,20 @@ export abstract class RepublishFailedMessages<DB> {
     private readonly _intervalMS: number
   ) {
     if (_intervalMS <= 0) {
-      throw new Error("Interval (in milliseconds) must be greater than 0");
+      throw new Error('Interval (in milliseconds) must be greater than 0');
     }
     if (!_rmqController.initialized) {
-      throw new Error("RabbitMQ Controller must be initialized");
+      throw new Error('RabbitMQ Controller must be initialized');
     }
   }
 
   protected abstract job(): Promise<void>;
 
   public run() {
-    this._timeoutHandle = global.setInterval(() => this.job(), this._intervalMS);
+    this._timeoutHandle = global.setInterval(
+      () => this.job(),
+      this._intervalMS
+    );
   }
 
   public close() {

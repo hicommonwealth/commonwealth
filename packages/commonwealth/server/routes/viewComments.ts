@@ -1,11 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import validateChain from '../middleware/validateChain';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 import { getLastEdited } from '../util/getLastEdited';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoRootId: 'Must provide root_id',
@@ -17,8 +13,7 @@ const viewComments = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   if (!req.query.root_id) {
     return next(new AppError(Errors.NoRootId));

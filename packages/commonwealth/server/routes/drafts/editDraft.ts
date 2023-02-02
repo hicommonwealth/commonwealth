@@ -1,11 +1,7 @@
 /* eslint-disable no-restricted-syntax */
-import { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../../middleware/validateChain';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoId: 'Must supply draft ID.',
@@ -19,9 +15,6 @@ const editDraft = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));
   }

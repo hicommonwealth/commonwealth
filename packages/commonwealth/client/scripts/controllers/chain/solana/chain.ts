@@ -1,14 +1,19 @@
-import { ITXModalData, NodeInfo, IChainModule, ChainInfo } from 'models';
-import { ApiStatus, IApp } from 'state';
-import m from 'mithril';
-import moment from 'moment';
+import type * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
-import * as solw3 from '@solana/web3.js';
+import m from 'mithril';
+import type { ChainInfo, IChainModule, ITXModalData } from 'models';
+import moment from 'moment';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
+import type SolanaAccount from './account';
 
 import { SolanaToken } from './types';
-import SolanaAccount from './account';
 
-export default class SolanaChain implements IChainModule<SolanaToken, SolanaAccount> {
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+export default class SolanaChain
+  implements IChainModule<SolanaToken, SolanaAccount>
+{
   private _denom: string;
   public get denom(): string {
     return this._denom;
@@ -17,10 +22,14 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
   private _decimals: BN;
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   private _connection: solw3.Connection;
-  public get connection() { return this._connection; }
+  public get connection() {
+    return this._connection;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -32,6 +41,8 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
     this._denom = chain.default_symbol;
 
     let url: string;
+
+    const solw3 = await import('@solana/web3.js');
     try {
       url = solw3.clusterApiUrl(chain.node.url as solw3.Cluster);
     } catch (e) {
@@ -43,7 +54,9 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
 
     // slots are approx equal to block heights
     this.app.chain.block.height = await this._connection.getSlot();
-    this.app.chain.block.duration = await this._connection.getBlockTime(this.app.chain.block.height);
+    this.app.chain.block.duration = await this._connection.getBlockTime(
+      this.app.chain.block.height
+    );
     this.app.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
     this.app.chain.networkStatus = ApiStatus.Connected;
     m.redraw();
@@ -64,7 +77,7 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void,
+    cb?: (success: boolean) => void
   ): ITXModalData {
     throw new Error('unsupported');
   }

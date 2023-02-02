@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../middleware/validateChain';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { DB } from '../models';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -29,10 +28,6 @@ const deleteEditors = async (
   } catch (e) {
     return next(new AppError(Errors.InvalidEditorFormat));
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-
-  const author = req.address;
 
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)

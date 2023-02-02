@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
+import { CWLabel } from './component_kit/cw_label';
+import { CWText } from './component_kit/cw_text';
+import { CWTextArea } from './component_kit/cw_text_area';
 
 import { CWTextInput } from './component_kit/cw_text_input';
-import { CWLabel } from './component_kit/cw_label';
-import { CWTextArea } from './component_kit/cw_text_area';
 import { CWToggle } from './component_kit/cw_toggle';
-import { CWText } from './component_kit/cw_text';
 
 type InputRowAttrs = {
   value: string | number;

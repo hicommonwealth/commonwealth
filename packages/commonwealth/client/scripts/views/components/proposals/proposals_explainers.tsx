@@ -1,14 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-
-import { navigateToSubpage } from 'app';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
+import ClassComponent from 'class_component';
+import type Compound from 'controllers/chain/ethereum/compound/adapter';
+import m from 'mithril';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import { GovExplainer } from '../gov_explainer';
 import { CWButton } from '../component_kit/cw_button';
+import { GovExplainer } from '../gov_explainer';
 
 type SubstrateProposalStatsAttrs = { nextLaunchBlock: number };
 

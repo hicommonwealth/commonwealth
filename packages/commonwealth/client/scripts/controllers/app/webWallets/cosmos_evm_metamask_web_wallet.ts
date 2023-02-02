@@ -1,14 +1,18 @@
 import { bech32 } from 'bech32';
-
-declare let window: any;
-
-import Web3 from 'web3';
-import { provider } from 'web3-core';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
+import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
+import type Web3 from 'web3';
+import type {
+  provider,
+  TransactionConfig,
+  RLPEncodedTransaction,
+} from 'web3-core';
+
+declare let window: any;
 
 function encodeEthAddress(bech32Prefix: string, address: string): string {
   return bech32.encode(
@@ -21,6 +25,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;
+  private _chainId: string;
   private _accounts: string[] = [];
   private _ethAccounts: string[];
   private _provider: provider;
@@ -52,26 +57,46 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async signMessage(message: string): Promise<string> {
+  public get api(): any {
+    return this._web3;
+  }
+
+  public async getRecentBlock(chainIdentifier: string) {
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.StargateClient.connect(url);
+    const height = await client.getHeight();
+    const block = await client.getBlock(height);
+
+    return {
+      number: block.header.height,
+      hash: block.id,
+      // seconds since epoch
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
+    };
+  }
+
+  public getChainId() {
+    return this._chainId;
+  }
+
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const signature = await this._web3.eth.personal.sign(
-      message,
+      JSON.stringify(canvasMessage),
       this._ethAccounts[0],
       ''
     );
     return signature;
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signMessage(account.validationToken);
-    return webWalletSignature;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    // Sign with the method on eth_webwallet, because we don't have access to the private key
-    return account.validate(walletSignature);
+  public async signTransaction(
+    tx: TransactionConfig
+  ): Promise<RLPEncodedTransaction> {
+    const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
+    return rlpEncodedTx;
   }
 
   // ACTIONS
@@ -80,6 +105,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // (this needs to be called first, before other requests)
+      const Web3 = (await import('web3')).default;
       this._web3 = new Web3((window as any).ethereum);
       await this._web3.givenProvider.enable();
 
@@ -94,6 +120,15 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
           );
         }
       }
+
+      // fetch chain id from URL using stargate client
+      const url = `${window.location.origin}/cosmosAPI/${
+        app.chain?.id || this.defaultNetwork
+      }`;
+      const cosm = await import('@cosmjs/stargate');
+      const client = await cosm.StargateClient.connect(url);
+      const chainId = await client.getChainId();
+      this._chainId = chainId;
 
       await this.initAccountsChanged();
       this._enabled = true;

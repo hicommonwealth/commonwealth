@@ -1,13 +1,12 @@
-import Sequelize from 'sequelize';
-import { NotificationCategories } from 'common-common/src/types';
 import { AppError } from 'common-common/src/errors';
-import { SubscriptionAttributes } from '../models/subscription';
-import validateChain, {
-  ValidateChainParams,
-} from '../middleware/validateChain';
-import { DB } from '../models';
-import { success, TypedRequestBody, TypedResponse } from '../types';
-import { RoleAttributes } from '../models/role';
+import { NotificationCategories } from 'common-common/src/types';
+import Sequelize from 'sequelize';
+import type { ValidateChainParams } from '../middleware/validateChain';
+import type { DB } from '../models';
+import type { RoleAttributes } from '../models/role';
+import type { SubscriptionAttributes } from '../models/subscription';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {
@@ -31,9 +30,7 @@ const createRole = async (
   req: TypedRequestBody<CreateRoleReq>,
   res: TypedResponse<CreateRoleResp>
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-
-  if (error) throw new AppError(error);
+  const chain = req.chain;
   if (!req.user) throw new AppError(Errors.NotLoggedIn);
   if (!req.body.address_id) throw new AppError(Errors.InvalidAddress);
 

@@ -1,15 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { formatNumberShort } from 'adapters/currency';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_thread_vote_button.scss';
-
-import { formatNumberShort } from 'adapters/currency';
-import { CWText } from './cw_text';
-import { ComponentType } from './types';
+import m from 'mithril';
 import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
 import { getClasses } from './helpers';
+import { ComponentType } from './types';
 
 type ThreadVoteButtonAttrs = {
   updateVoteCount: (newCount: number) => void;

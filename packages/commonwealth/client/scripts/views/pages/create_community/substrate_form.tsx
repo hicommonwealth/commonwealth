@@ -1,27 +1,24 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import $ from 'jquery';
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import m from 'mithril';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { initAppState } from 'app';
-import { slugify } from 'utils';
-import { ChainBase, ChainType } from 'common-common/src/types';
 import { constructSubstrateUrl } from 'substrate';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { slugify } from 'utils';
 import { InputRow } from 'views/components/metadata_rows';
-import {
-  MixpanelCommunityCreationEvent
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { defaultChainRows, initChainForm } from './chain_input_rows';
+import type { ChainFormFields, ChainFormState } from './types';
 
 type SubstrateFormFields = {
   nodeUrl: string;
@@ -90,14 +87,15 @@ export class SubstrateForm extends ClassComponent {
               await app.chain.deinit();
             }
 
+            const polkadot = await import('@polkadot/api');
             // create new API
-            const provider = new WsProvider(
+            const provider = new polkadot.WsProvider(
               constructSubstrateUrl(this.state.form.nodeUrl),
               false
             );
             try {
               await provider.connect();
-              const api = await ApiPromise.create({
+              const api = await polkadot.ApiPromise.create({
                 throwOnConnect: true,
                 provider,
                 ...JSON.parse(this.state.form.substrateSpec),

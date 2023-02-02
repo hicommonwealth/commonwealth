@@ -1,23 +1,23 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import app from 'state';
-import $ from 'jquery';
-
-import 'modals/new_topic_modal.scss';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { QuillEditor } from 'views/components/quill/quill_editor';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
-import { pluralizeWithoutNumberPrefix } from 'helpers';
+import { getDecimals, pluralizeWithoutNumberPrefix } from 'helpers';
+import $ from 'jquery';
+import m from 'mithril';
+
+import 'modals/new_topic_modal.scss';
+import app from 'state';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWLabel } from '../components/component_kit/cw_label';
-import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
+import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 type NewTopicModalForm = {
@@ -55,13 +55,7 @@ export class NewTopicModal extends ClassComponent {
       disabled = true;
     }
 
-    const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+    const decimals = getDecimals(app.chain);
 
     return (
       <div class="NewTopicModal">

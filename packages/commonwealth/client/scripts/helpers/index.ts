@@ -1,12 +1,15 @@
-import $ from 'jquery';
-import m, { RouteOptions } from 'mithril';
-import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ICardListItem } from 'models/interfaces';
-import app from 'state';
+import $ from 'jquery';
+import type { RouteOptions } from 'mithril';
+import m from 'mithril';
+import type { Account, IChainAdapter } from 'models';
 import { ThreadStage } from 'models';
-import { navigateToSubpage } from '../app';
+import type { Coin } from 'adapters/currency';
+import type { ICardListItem } from 'models/interfaces';
+import moment from 'moment';
+import app from 'state';
+import { navigateToSubpage } from 'router';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -78,8 +81,8 @@ export function link(
   children,
   extraAttrs?: object,
   saveScrollPositionAs?: string,
-  beforeRouteSet?: Function,
-  afterRouteSet?: Function
+  beforeRouteSet?: () => void,
+  afterRouteSet?: () => void
 ) {
   const attrs = {
     href: target,
@@ -408,4 +411,21 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     default:
       return null;
   }
+}
+
+// Decimals For Tokens
+export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
+  let decimals;
+  if (chain.meta.id === 'evmos') {
+    // Custom for evmos
+    decimals = 18;
+  } else if (chain && chain.meta) {
+    decimals = chain.meta.decimals;
+  } else if (chain.network === ChainNetwork.ERC721) {
+    decimals = 0;
+  } else if (chain.base === ChainBase.CosmosSDK) {
+    decimals = 6;
+  }
+
+  return decimals;
 }

@@ -1,16 +1,16 @@
-import _ from 'lodash';
-import BN from 'bn.js';
-import { IApp } from 'state';
-import CosmosChain from 'controllers/chain/cosmos/chain';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { Account } from 'models';
-import {
-  MsgSendEncodeObject,
+import type {
   MsgDelegateEncodeObject,
+  MsgSendEncodeObject,
   MsgUndelegateEncodeObject,
   MsgWithdrawDelegatorRewardEncodeObject,
 } from '@cosmjs/stargate';
-import CosmosAccounts from './accounts';
+import BN from 'bn.js';
+import CosmosChain from 'controllers/chain/cosmos/chain';
+import type { CosmosToken } from 'controllers/chain/cosmos/types';
+import _ from 'lodash';
+import { Account } from 'models';
+import type { IApp } from 'state';
+import type CosmosAccounts from './accounts';
 
 export default class CosmosAccount extends Account {
   private _Chain: CosmosChain;
@@ -21,15 +21,24 @@ export default class CosmosAccount extends Account {
   // NOTE: this balance query will not work on Terra, as it uses a nonstandard Cosmos interface.
   //   We should either deprecate this query and replace it with TokenBalanceCache, or create a
   //   workaround specific for Terra.
-  public get balance() { return this.updateBalance().then(() => this._balance); }
+  public get balance() {
+    return this.updateBalance().then(() => this._balance);
+  }
 
-  constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
+  constructor(
+    app: IApp,
+    ChainInfo: CosmosChain,
+    Accounts: CosmosAccounts,
+    address: string
+  ) {
     super({ chain: app.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {
-        if (app.chain.chain instanceof CosmosChain) this._Chain = app.chain.chain;
-        else console.error('Did not successfully initialize account with chain');
+        if (app.chain.chain instanceof CosmosChain)
+          this._Chain = app.chain.chain;
+        else
+          console.error('Did not successfully initialize account with chain');
       });
     } else {
       this._Chain = ChainInfo;
@@ -40,7 +49,10 @@ export default class CosmosAccount extends Account {
 
   public updateBalance = _.throttle(async () => {
     try {
-      const bal = await this._Chain.api.bank.balance(this.address, this._Chain.denom);
+      const bal = await this._Chain.api.bank.balance(
+        this.address,
+        this._Chain.denom
+      );
       this._balance = this._Chain.coins(new BN(bal.amount));
     } catch (e) {
       // if coins is null, they have a zero balance
@@ -55,8 +67,8 @@ export default class CosmosAccount extends Account {
       value: {
         fromAddress: this.address,
         toAddress: recipient.address,
-        amount: [ { denom: amount.denom, amount: amount.toString() } ],
-      }
+        amount: [{ denom: amount.denom, amount: amount.toString() }],
+      },
     };
     await this._Chain.sendTx(this, msg);
   }
@@ -68,7 +80,7 @@ export default class CosmosAccount extends Account {
         delegatorAddress: this.address,
         validatorAddress,
         amount: amount.toCoinObject(),
-      }
+      },
     };
     await this._Chain.sendTx(this, msg);
   }
@@ -80,7 +92,7 @@ export default class CosmosAccount extends Account {
         delegatorAddress: this.address,
         validatorAddress,
         amount: amount.toCoinObject(),
-      }
+      },
     };
     await this._Chain.sendTx(this, msg);
   }
@@ -91,7 +103,7 @@ export default class CosmosAccount extends Account {
       value: {
         delegatorAddress: this.address,
         validatorAddress,
-      }
+      },
     };
     await this._Chain.sendTx(this, msg);
   }

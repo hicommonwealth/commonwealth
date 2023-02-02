@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { formatNumberLong } from 'helpers';
+import m from 'mithril';
+import { AddressInfo } from 'models';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
-import { formatNumberLong } from 'helpers';
-import User from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
+import User from '../../components/widgets/user';
 
 type SnapshotVoteType = {
   balance: number;
@@ -56,7 +56,7 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
         <div class="votes-container">
           <div class="column-header-row">
             <CWText type="h5" className="column-header-text">
-              User
+              {app.chain ? 'User' : 'Address'}
             </CWText>
             <CWText type="h5" className="column-header-text">
               Vote
@@ -67,16 +67,22 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
           </div>
           {displayedVoters.map((vote) => (
             <div class="vote-row">
-              {m(User, {
-                user: new AddressInfo(
-                  null,
-                  vote.voter,
-                  app.activeChainId(),
-                  null
-                ),
-                linkify: true,
-                popover: true,
-              })}
+              {app.chain ? (
+                m(User, {
+                  user: new AddressInfo(
+                    null,
+                    vote.voter,
+                    app.activeChainId(),
+                    null
+                  ),
+                  linkify: true,
+                  popover: true,
+                })
+              ) : (
+                <CWText className="column-text">
+                  {`${vote.voter.slice(0, 15)}...`}
+                </CWText>
+              )}
               <CWText className="column-text" noWrap>
                 {choices[vote.choice - 1]}
               </CWText>

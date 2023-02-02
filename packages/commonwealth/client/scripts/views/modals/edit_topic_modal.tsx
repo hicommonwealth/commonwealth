@@ -1,25 +1,25 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/edit_topic_modal.scss';
-
-import app from 'state';
-import { navigateToSubpage } from 'app';
 import { Topic } from 'models';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
+import app from 'state';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { pluralizeWithoutNumberPrefix } from 'helpers';
-import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
+
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../components/component_kit/cw_button';
-import { QuillEditor } from '../components/quill/quill_editor';
-import { QuillTextContents } from '../components/quill/types';
+import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import type { QuillEditor } from '../components/quill/quill_editor';
+import type { QuillTextContents } from '../components/quill/types';
 
 type EditTopicModalAttrs = {
   defaultOffchainTemplate: string;

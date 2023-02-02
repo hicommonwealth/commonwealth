@@ -3,13 +3,9 @@ import { BigNumber } from 'ethers';
 
 import { SupportedNetwork } from '../../../src';
 import { StorageFetcher } from '../../../src/chains/aave/storageFetcher';
-import {
-  EventKind,
-  Proposal,
-  ProposalState,
-  RawEvent,
-} from '../../../src/chains/aave/types';
-import { AaveGovernanceV2 } from '../../../src/contractTypes';
+import type { Proposal, RawEvent } from '../../../src/chains/aave/types';
+import { EventKind, ProposalState } from '../../../src/chains/aave/types';
+import type { AaveGovernanceV2 } from '../../../src/contractTypes';
 
 const { assert } = chai;
 
@@ -21,7 +17,7 @@ const constructEvent = (blockNumber: number, data): RawEvent => {
 };
 
 const makeApi = (proposals: Proposal[]) => {
-  const governance = ({
+  const governance = {
     provider: {
       getBlockNumber: async () => 200,
       getBlock: async () => ({ number: 200 }),
@@ -72,7 +68,7 @@ const makeApi = (proposals: Proposal[]) => {
       ProposalQueued: () => 'ProposalQueued',
       ProposalExecuted: () => 'ProposalExecuted',
     },
-  } as unknown) as AaveGovernanceV2;
+  } as unknown as AaveGovernanceV2;
   return { governance };
 };
 

@@ -1,19 +1,28 @@
-import { RabbitMQController, getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import {
-  RabbitMQSubscription,
-  ServiceConsumer,
-} from 'common-common/src/ServiceConsumer';
-import { BrokerConfig } from 'rascal';
+  getRabbitMQConfig,
+  RabbitMQController,
+} from 'common-common/src/rabbitmq';
+import type { RabbitMQSubscription } from 'common-common/src/serviceConsumer';
+import { ServiceConsumer } from 'common-common/src/serviceConsumer';
+import type { BrokerConfig } from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
-import Rollbar from "rollbar";
-import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN} from '../config';
-import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
+import Rollbar from 'rollbar';
+import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
 import models from '../database';
+import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
-import {processChainEventTypeCUD} from "./messageProcessors/chainEventTypeCUDQueue";
+import { processChainEventTypeCUD } from './messageProcessors/chainEventTypeCUDQueue';
+import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
+import v8 from 'v8';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
   const rollbar = new Rollbar({
@@ -34,7 +43,10 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
     log.error(
       'Rascal consumer setup failed. Please check the Rascal configuration'
     );
-    rollbar.critical('Rascal consumer setup failed. Please check the Rascal configuration', e);
+    rollbar.critical(
+      'Rascal consumer setup failed. Please check the Rascal configuration',
+      e
+    );
     throw e;
   }
   const context = {
@@ -60,10 +72,17 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
     msgProcessorContext: context,
   };
 
+  const snapshotEventProcessorRmqSub: RabbitMQSubscription = {
+    messageProcessor: processSnapshotMessage,
+    subscriptionName: RascalSubscriptions.SnapshotListener,
+    msgProcessorContext: context,
+  };
+
   const subscriptions: RabbitMQSubscription[] = [
     chainEntityCUDProcessorRmqSub,
     ceNotifsCUDProcessorRmqSub,
     ceTypeCUDProcessorRmqSub,
+    snapshotEventProcessorRmqSub,
   ];
 
   const serviceConsumer = new ServiceConsumer(

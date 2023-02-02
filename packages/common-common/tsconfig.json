@@ -1,17 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "baseUrl": "."
+    "outDir": "../build",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "paths": {
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"],
+      "snapshot-listener/*": ["../../packages/snapshot-listener/*"]
+    }
   },
-  "include": [
-    "src",
-  ],
-  "exclude": [
-    "./node_modules",
-    "node_modules",
-    "./test",
-    "build",
-    "dist",
-  ]
+  "include": ["src", "test"],
+  "exclude": ["./node_modules", "build", "dist"]
 }

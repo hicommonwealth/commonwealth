@@ -5,27 +5,27 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import sleep from 'sleep-promise';
 import moment from 'moment';
+import { Errors as CreateCommentErrors } from 'server/routes/createComment';
 import { Errors as ThreadErrors } from 'server/routes/createThread';
 import { Errors as EditThreadErrors } from 'server/routes/editThread';
-import { Errors as CreateCommentErrors } from 'server/routes/createComment';
-import { Errors as ViewCountErrors } from 'server/routes/viewCount';
-import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
 import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
+import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
+import { Errors as ViewCountErrors } from 'server/routes/viewCount';
+import sleep from 'sleep-promise';
 import app, { resetDatabase } from 'commonwealth/server-test';
 import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
-import { addAllowDenyPermissions } from 'commonwealth/test/util/modelUtils';
-import { Action } from '../../../../common-common/src/permissions';
+import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
+import { Action } from 'commonwealth/shared/permissions';
+import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownComment = require('../../util/fixtures/markdownComment');
 
 describe('Thread Tests', () => {
   const chain = 'ethereum';
-  const chain2 = 'alex'
+  const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
   // author_chain, which is required for authorship lookup.
   // Therefore, a valid chain MUST be included alongside
@@ -83,7 +83,12 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    addAllowDenyPermissions('member', chain2, 0, Action.CREATE_THREAD );
+    addAllowDenyPermissionsForCommunityRole(
+      'member',
+      chain2,
+      0,
+      Action.CREATE_THREAD
+    );
   });
 
   describe('/createThread', () => {
@@ -172,6 +177,7 @@ describe('Thread Tests', () => {
         readOnly,
         jwt: userJWT,
       });
+      console.log({ tRes });
       expect(tRes).not.to.be.null;
       expect(tRes.status).to.be.equal('Success');
       expect(tRes.result.read_only).to.be.equal(true);
@@ -196,7 +202,6 @@ describe('Thread Tests', () => {
         description: 'test enabled community',
         default_chain: chain,
         isAuthenticatedForum: 'false',
-        invitesEnabled: 'false',
         privacyEnabled: 'false',
       };
       const c = await modelUtils.createCommunity(communityArgs);
@@ -280,7 +285,7 @@ describe('Thread Tests', () => {
         jwt: userJWT2,
       });
       expect(res2.status).not.to.be.equal('Success');
-    })
+    });
   });
 
   describe('/bulkThreads', () => {
@@ -315,7 +320,6 @@ describe('Thread Tests', () => {
         jwt: userJWT,
         isAuthenticatedForum: 'false',
         privacyEnabled: 'true',
-        invitesEnabled: 'true',
         id: 'test',
         name: 'test community',
         creator_address: userAddress,

@@ -1,18 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { isAddress } from 'web3-utils';
-import validateChain from '../middleware/validateChain';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
-import {
-  createRole,
-  findAllRoles,
-  findOneRole,
-  RoleInstanceWithPermission,
-} from '../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
+import type { DB } from '../models';
+import type { RoleInstanceWithPermission } from '../util/roles';
+import { createRole, findAllRoles, findOneRole } from '../util/roles';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',
@@ -31,8 +22,7 @@ const upgradeMember = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   const { address, new_role } = req.body;
   if (!address) return next(new AppError(Errors.InvalidAddress));
   if (!new_role) return next(new AppError(Errors.InvalidRole));

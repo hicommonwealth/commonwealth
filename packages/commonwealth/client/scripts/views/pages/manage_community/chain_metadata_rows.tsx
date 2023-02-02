@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import $ from 'jquery';
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
 import 'pages/manage_community/chain_metadata_rows.scss';
 
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
+import { uuidv4 } from 'lib/util';
 import {
   ChainBase,
   ChainCategoryType,
@@ -15,21 +15,26 @@ import {
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo, RoleInfo } from 'models';
+import type { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
-  addPermission,
-  isPermitted,
-  removePermission,
-} from 'common-common/src/permissions';
+  PermissionManager,
+  ToCheck,
+} from 'commonwealth/shared/permissions';
+
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ManageRoles } from './manage_roles';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
 import {
-  setSelectedTags,
   buildCategoryMap,
   setChainCategories,
+  setSelectedTags,
 } from './helpers';
-import { CWLabel } from '../../components/component_kit/cw_label';
+import { ManageRoles } from './manage_roles';
 
 type ChainMetadataRowsAttrs = {
   admins: Array<RoleInfo>;
@@ -62,12 +67,20 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   network: ChainNetwork;
   symbol: string;
   snapshot: string[];
+  snapshotString: string;
   selectedTags: { [type in ChainCategoryType]?: boolean };
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
   communityBanner: string;
   quillBanner: any;
   bannerStateUpdated: boolean;
+  discordBotConnected: boolean;
+  discordBotConnecting: boolean;
+  channelsLoaded: boolean;
+  snapshotChannels: { id: string; name: string }[];
+  selectedSnapshotChannel: { id: string; name: string } | null;
+  snapshotNotificationsEnabled: boolean;
+  permissionsManager = new PermissionManager();
 
   oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -80,9 +93,10 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !isPermitted(
+    this.chatEnabled = !this.permissionsManager.hasPermission(
       chain.defaultDenyPermissions,
-      Action.VIEW_CHAT_CHANNELS
+      Action.VIEW_CHAT_CHANNELS,
+      ToCheck.Allow
     );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
@@ -91,14 +105,39 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.iconUrl = chain.iconUrl;
     this.network = chain.network;
     this.snapshot = chain.snapshot;
+    this.snapshotString = chain.snapshot.toString();
     this.defaultOverview = chain.defaultOverview;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
+    this.discordBotConnected = chain.discordConfigId !== null;
+    this.discordBotConnecting = this.discordBotConnected;
     this.communityBanner = chain.communityBanner;
+    this.channelsLoaded = false;
+    this.snapshotChannels = [];
+    this.snapshotNotificationsEnabled = false;
   }
 
   view(vnode: m.VnodeDOM<ChainMetadataRowsAttrs, this>) {
     const chain: ChainInfo = vnode.attrs.chain;
+
+    const getChannels = async () => {
+      try {
+        const res = await app.discord.getChannels(chain.id);
+        this.snapshotChannels = res.channels;
+        this.selectedSnapshotChannel = res.selectedChannel;
+        if (this.selectedSnapshotChannel.id) {
+          this.snapshotNotificationsEnabled = true;
+        }
+        this.channelsLoaded = true;
+        m.redraw();
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    if (this.discordBotConnected && !this.channelsLoaded) {
+      getChannels();
+    }
+
     return (
       <div class="ChainMetadataRows">
         <div class="AvatarUploadRow">
@@ -231,7 +270,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
-            value={this.snapshot.join('')}
+            value={this.snapshotString}
             placeholder={this.network}
             onChangeHandler={(v) => {
               const snapshots = v
@@ -245,6 +284,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 })
                 .filter((val) => val.length > 4);
               this.snapshot = snapshots;
+              this.snapshotString = v;
             }}
           />
         )}
@@ -287,6 +327,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             })}
           </div>
         </div>
+
         <ManageRoles
           label="Admins"
           roledata={vnode.attrs.admins}
@@ -366,18 +407,19 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               console.log(err);
             }
-
             try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = removePermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.removeDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               } else {
-                this.default_deny_permissions = addPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.addDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               }
               await chain.updateChainData({
                 name,
@@ -402,10 +444,155 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               notifyError(err || 'Chain update failed');
             }
-
             m.redraw();
           }}
         />
+        <div class="commonbot-section">
+          <CWText type="h3">Commonbot Settings</CWText>
+          {this.discordBotConnected ? (
+            <>
+              <div class="connected-line">
+                <CWText type="h4">Connection Status</CWText>
+                <div class="connect-group">
+                  <CWIcon iconName="check" iconSize="small" />
+                  <CWText>Connected</CWText>
+                </div>
+              </div>
+              <CWButton
+                label="reconnect"
+                buttonType="mini-black"
+                className="connect-button"
+                onclick={async () => {
+                  try {
+                    const verification_token = uuidv4();
+                    await app.discord.createConfig(verification_token);
+
+                    window.open(
+                      `https://discord.com/oauth2/authorize?client_id=${
+                        process.env.DISCORD_CLIENT_ID
+                      }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+                        process.env.DISCORD_UI_URL
+                      )}/callback&response_type=code&scope=bot&state=${encodeURI(
+                        JSON.stringify({
+                          cw_chain_id: app.activeChainId(),
+                          verification_token,
+                        })
+                      )}`
+                    );
+                    this.discordBotConnected = false;
+                    this.discordBotConnecting = true;
+                    m.redraw();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
+              <div class="snapshot-settings">
+                <CWText type="h4">Snapshot Notifications</CWText>
+                <CWToggle
+                  onchange={() => {
+                    this.snapshotNotificationsEnabled =
+                      !this.snapshotNotificationsEnabled;
+                    m.redraw();
+                  }}
+                  checked={this.snapshotNotificationsEnabled}
+                />
+              </div>
+              <div class="connected-line">
+                {this.channelsLoaded && (
+                  <CWDropdown
+                    label={'Select Channel'}
+                    options={this.snapshotChannels.map((channel) => {
+                      return {
+                        label: channel.name,
+                        value: channel.id,
+                      };
+                    })}
+                    initialValue={{
+                      value: this.selectedSnapshotChannel?.id ?? 'channel',
+                      label:
+                        this.selectedSnapshotChannel?.name ??
+                        'Select a Channel',
+                    }}
+                    onSelect={(item) => {
+                      this.selectedSnapshotChannel = {
+                        id: item.value,
+                        name: item.label,
+                      };
+                      m.redraw();
+                    }}
+                  />
+                )}
+              </div>
+
+              <CWButton
+                label="Save Commonbot Settings"
+                className="save-snapshot"
+                buttonType="primary-black"
+                onclick={async () => {
+                  if (
+                    this.snapshotNotificationsEnabled &&
+                    !this.selectedSnapshotChannel?.name
+                  ) {
+                    notifyError('Please select a channel');
+                    return;
+                  }
+                  try {
+                    const channelId = this.snapshotNotificationsEnabled
+                      ? this.selectedSnapshotChannel?.id
+                      : 'disabled';
+
+                    await app.discord.setConfig(channelId);
+                    notifySuccess('Snapshot Notifications Settings Saved');
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
+            </>
+          ) : this.discordBotConnecting ? (
+            <>
+              <div class="settings-row">
+                <div class="spinner-group">
+                  <CWSpinner />
+                  <CWText>Connecting...</CWText>
+                </div>
+                <CWText>Refresh to check if connection succeeded</CWText>
+              </div>
+            </>
+          ) : (
+            <div class="settings-row">
+              <CWButton
+                label="Connect"
+                buttonType="primary-black"
+                onclick={async () => {
+                  try {
+                    const verification_token = uuidv4();
+
+                    await app.discord.createConfig(verification_token);
+
+                    window.open(
+                      `https://discord.com/oauth2/authorize?client_id=${
+                        process.env.DISCORD_CLIENT_ID
+                      }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+                        process.env.DISCORD_UI_URL
+                      )}/callback&response_type=code&scope=bot&state=${encodeURI(
+                        JSON.stringify({
+                          cw_chain_id: app.activeChainId(),
+                          verification_token,
+                        })
+                      )}`
+                    );
+                    this.discordBotConnecting = true;
+                    m.redraw();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
     );
   }

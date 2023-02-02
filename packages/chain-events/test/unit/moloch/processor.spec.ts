@@ -2,7 +2,8 @@ import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/moloch/processor';
-import { Api, RawEvent, EventKind } from '../../../src/chains/moloch/types';
+import type { Api, RawEvent } from '../../../src/chains/moloch/types';
+import { EventKind } from '../../../src/chains/moloch/types';
 
 const { assert } = chai;
 
@@ -11,17 +12,17 @@ const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 describe('Moloch Event Processor Tests', () => {
   it('should process a raw event into a CWEvent', async () => {
     const processor = new Processor(
-      ({
+      {
         proposalQueue: async () => ({
           startingPeriod: '1',
           details: 'hello',
           yesVotes: '10',
           noVotes: '5',
         }),
-      } as unknown) as Api,
+      } as unknown as Api,
       1
     );
-    const event = ({
+    const event = {
       event: 'ProcessProposal',
       blockNumber: 10,
       args: {
@@ -34,7 +35,7 @@ describe('Moloch Event Processor Tests', () => {
         yesVotes: toHex(10),
         noVotes: toHex(5),
       },
-    } as unknown) as RawEvent;
+    } as unknown as RawEvent;
     const result = await processor.process(event);
     assert.deepEqual(result, [
       {
@@ -57,42 +58,42 @@ describe('Moloch Event Processor Tests', () => {
 
   it('should gracefully fail to process an event with invalid type', async () => {
     const processor = new Processor({} as Api, 1);
-    const event = ({
+    const event = {
       event: 'NothingHappened',
       blockNumber: 10,
       args: {
         proposalIndex: toHex(1),
       },
-    } as unknown) as RawEvent;
+    } as unknown as RawEvent;
     const result = await processor.process(event);
     assert.isEmpty(result);
   });
 
   it('should gracefully fail to process an event with invalid data', async () => {
     const processor = new Processor({} as Api, 1);
-    const event = ({
+    const event = {
       event: 'SubmitProposal',
       blockNumber: 10,
       args: {
         proposalIndex: toHex(1),
       },
-    } as unknown) as RawEvent;
+    } as unknown as RawEvent;
     const result = await processor.process(event);
     assert.isEmpty(result);
   });
 
   it('should gracefully fail to process an event with invalid api call', async () => {
     const processor = new Processor(
-      ({
+      {
         provider: {
           getBlock: () => {
             throw new Error('fail!');
           },
         },
-      } as unknown) as Api,
+      } as unknown as Api,
       1
     );
-    const event = ({
+    const event = {
       event: 'SubmitProposal',
       blockNumber: 10,
       args: {
@@ -103,7 +104,7 @@ describe('Moloch Event Processor Tests', () => {
         tokenTribute: toHex(5),
         sharesRequested: toHex(6),
       },
-    } as unknown) as RawEvent;
+    } as unknown as RawEvent;
     const result = await processor.process(event);
     assert.isEmpty(result);
   });

@@ -1,14 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import $ from 'jquery';
+import m from 'mithril';
+import type { ChainInfo, Comment } from 'models';
+import { AddressInfo, Thread } from 'models';
 
 import app from 'state';
-import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { NewLoginModal } from '../../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 

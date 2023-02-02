@@ -1,6 +1,6 @@
-import { ChainInfo } from 'models';
-import { IApp } from 'state';
 import Near from 'controllers/chain/near/adapter';
+import type { ChainInfo } from 'models';
+import type { IApp } from 'state';
 import NearSputnikDao from './dao';
 
 export default class NearSputnik extends Near {

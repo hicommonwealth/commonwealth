@@ -1,4 +1,4 @@
-@import 'shared';
+@import '../../shared';
 
 .Sidebar {
   display: flex;
@@ -117,8 +117,8 @@
     position: absolute;
     z-index: 1000;
 
-    animation: slidein .2s ease-in-out;
-  
+    animation: slidein 0.2s ease-in-out;
+
     background-color: $neutral-25;
     border-right: 1px solid $neutral-200;
     height: calc(100vh - #{$global-header-height});
@@ -140,7 +140,7 @@
     from {
       left: -100%;
     }
-  
+
     to {
       left: 0;
     }
@@ -150,10 +150,9 @@
     from {
       left: 0;
     }
-  
+
     to {
       left: -100%;
     }
   }
 }
-

@@ -1,24 +1,16 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
+import { initAppState } from 'state';
+import type { WalletId } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 import m from 'mithril';
-import app from 'state';
-import { isSameAccount } from 'helpers';
-
-import { initAppState } from 'app';
-import { Magic } from 'magic-sdk';
-import { ChainBase, WalletId } from 'common-common/src/types';
-import {
-  ChainInfo,
-  SocialAccount,
-  Account,
-  AddressInfo,
-  ITokenAdapter,
-  BlockInfo,
-} from 'models';
+import type { BlockInfo, ChainInfo } from 'models';
+import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';
 import moment from 'moment';
-import { notifyError } from 'controllers/app/notifications';
+import app from 'state';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -144,7 +136,7 @@ export async function updateLastVisited(
     if (updateFrontend) {
       app.user.lastVisited[activeEntity.id] = new Date().toISOString();
     }
-    const response = await $.post(`${app.serverUrl()}/writeUserSetting`, {
+    await $.post(`${app.serverUrl()}/writeUserSetting`, {
       jwt: app.user.jwt,
       key: 'lastVisited',
       value,
@@ -246,14 +238,15 @@ export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
   chain: string,
-  validationBlockInfo?: BlockInfo,
+  sessionPublicAddress?: string,
+  validationBlockInfo?: BlockInfo
 ): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
-    block_info: JSON.stringify(validationBlockInfo)
+    block_info: JSON.stringify(validationBlockInfo),
   });
   const id = response.result.id;
   const chainInfo = app.config.chains.getById(chain);
@@ -263,6 +256,7 @@ export async function createUserWithAddress(
     chain: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
+    sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
   });
   return { account, newlyCreated: response.result.newly_created };
@@ -295,6 +289,7 @@ export async function unlinkLogin(account: AddressInfo) {
 }
 
 export async function loginWithMagicLink(email: string) {
+  const { Magic } = await import('magic-sdk');
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({

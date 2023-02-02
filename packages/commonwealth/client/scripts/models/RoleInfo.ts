@@ -1,5 +1,5 @@
 import { AddressInfo } from 'models';
-import RolePermission from './RolePermission';
+import type { AccessLevel } from 'commonwealth/shared/permissions';
 
 class RoleInfo {
   public readonly id: number;
@@ -8,7 +8,7 @@ class RoleInfo {
   public readonly address: string;
   public readonly address_chain: string;
   public readonly chain_id: string;
-  public permission: RolePermission;
+  public permission: AccessLevel;
   public allow: bigint;
   public deny: bigint;
   public is_user_default: boolean;
@@ -19,7 +19,7 @@ class RoleInfo {
     address: string,
     address_chain: string,
     chain_id: string,
-    permission: RolePermission,
+    permission: AccessLevel,
     allow: bigint,
     deny: bigint,
     is_user_default: boolean

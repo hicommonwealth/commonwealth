@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import $ from 'jquery';
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import Dropzone from 'dropzone';
 
 import 'components/avatar_upload.scss';
+import Dropzone from 'dropzone';
+import { isUndefined } from 'helpers/typeGuards';
+import $ from 'jquery';
+import m from 'mithril';
+import type { Account } from 'models';
 
 import app from 'state';
-import { Account } from 'models';
-import { isUndefined } from 'helpers/typeGuards';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';

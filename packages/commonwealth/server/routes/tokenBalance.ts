@@ -1,13 +1,9 @@
-import {
-  TokenBalanceCache,
-  FetchTokenBalanceErrors,
-} from 'token-balance-cache/src/index';
-
 import { AppError, ServerError } from 'common-common/src/errors';
-import validateChain from '../middleware/validateChain';
-import { DB } from '../models';
-import { TypedResponse, success, TypedRequestBody } from '../types';
-import { ChainInstance } from '../models/chain';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 
 export const Errors = {
   NoAddress: 'Address not found',
@@ -33,14 +29,7 @@ const tokenBalance = async (
     throw new AppError(Errors.NoAddress);
   }
 
-  let chain: ChainInstance;
-  let error: string;
-  try {
-    [chain, error] = await validateChain(models, req.body);
-    if (error) throw new AppError(error);
-  } catch (err) {
-    throw new AppError(err);
-  }
+  const chain = req.chain;
 
   let chain_node_id = chain?.ChainNode?.id;
   if (!chain_node_id) {
