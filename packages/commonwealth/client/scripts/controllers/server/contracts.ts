@@ -105,8 +105,7 @@ class ContractsController {
       symbol,
       is_factory,
       nickname,
-      cct,
-      cctmd,
+      ccts,
     } = contractAttributes;
     this._store.add(
       new Contract({
@@ -122,24 +121,18 @@ class ContractsController {
         abi,
         isFactory: is_factory,
         nickname,
-        cct,
-        cctmd,
+        ccts,
       })
     );
   }
 
   public async updateTemplate({
     contract_id,
-    cct,
+    cct_id,
     cctmd,
   }: {
     contract_id: number;
-    cct: {
-      id: number;
-      communityContractId: number;
-      cctmdId: number;
-      tempalteId: number;
-    };
+    cct_id: number;
     cctmd: {
       id: number;
       slug: string;
@@ -151,7 +144,19 @@ class ContractsController {
     const currentContractInStore = this._store.getById(contract_id);
     // TODO: Verify that this is a shallow copy situation
     this._store.remove(this._store.getById(contract_id));
-    this._store.add(new Contract({ ...currentContractInStore, cct, cctmd }));
+
+    // Update the cctmd in the ccts array
+    const ccts = currentContractInStore.ccts.map((cct) => {
+      if (cct.id === cct_id) {
+        return {
+          ...cct,
+          cctmd: { ...cctmd },
+        };
+      } else {
+        return cct;
+      }
+    });
+    this._store.add(new Contract({ ...currentContractInStore, ccts }));
   }
 
   public async add({
@@ -221,6 +226,41 @@ class ContractsController {
     return this._store.add(contract);
   }
 
+  public async addTemplate({
+    name,
+    template,
+    contract_id,
+  }: {
+    name: string;
+    template: string;
+    contract_id: string;
+  }) {
+    try {
+      await $.post(`${app.serverUrl()}/contract/template`, {
+        jwt: app.user.jwt,
+        name,
+        template,
+        contract_id,
+      });
+    } catch (e) {
+      console.log(e);
+      throw new Error('Failed to create template');
+    }
+  }
+
+  public async getTemplatesForContract(contractId: number) {
+    try {
+      const res = await $.get(`${app.serverUrl()}/contract/template`, {
+        jwt: app.user.jwt,
+        contract_id: contractId,
+      });
+      return res.result.templates;
+    } catch (e) {
+      console.log(e);
+      throw new Error('Failed to get templates');
+    }
+  }
+
   public async addCommunityContractTemplate(
     communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes
   ) {
@@ -233,8 +273,8 @@ class ContractsController {
 
       this.updateTemplate({
         contract_id: communityContractTemplateAndMetadata.contract_id,
-        cct: newContract.cct,
-        cctmd: newContract.cctmd,
+        cct_id: newContract.cct.id,
+        cctmd: newContract.metadata,
       });
     } catch (err) {
       console.log(err);
@@ -255,7 +295,7 @@ class ContractsController {
 
       this.updateTemplate({
         contract_id: communityContractTemplateMetadata.contract_id,
-        cct: updateContract.cct,
+        cct_id: updateContract.cct.id,
         cctmd: updateContract.cctmd,
       });
     } catch (err) {
@@ -271,19 +311,18 @@ class ContractsController {
     contractsWithTemplates.forEach((contractWithTemplate) => {
       try {
         let abiJson: Array<Record<string, unknown>>;
-        let cct: {
+        let ccts: Array<{
           id: number;
           communityContractId: number;
-          cctmdId: number;
-          tempalteId: number;
-        };
-        let cctmd: {
-          id: number;
-          slug: string;
-          nickname: string;
-          display_name: string;
-          display_options: string;
-        };
+          templateId: number;
+          cctmd: {
+            id: number;
+            slug: string;
+            nickname: string;
+            display_name: string;
+            display_options: string;
+          };
+        }>;
         if (contractWithTemplate.contract.ContractAbi) {
           // Necessary because the contract abi was stored as a string in some contracts
           if (
@@ -294,17 +333,22 @@ class ContractsController {
             abiJson = contractWithTemplate.contract.ContractAbi.abi;
           }
         }
-        if (contractWithTemplate.cct) {
-          cct = contractWithTemplate.cct;
-          cctmd = contractWithTemplate.cct.CommunityContractTemplateMetadatum;
+        if (contractWithTemplate.ccts) {
+          ccts = contractWithTemplate.ccts.map((cct) => {
+            return {
+              id: cct.id,
+              communityContractId: cct.community_contract_id,
+              templateId: cct.template_id,
+              cctmd: cct.CommunityContractTemplateMetadatum,
+            };
+          });
         }
 
         this._store.add(
           Contract.fromJSON({
             ...contractWithTemplate.contract,
             abi: abiJson,
-            cct: cct,
-            cctmd: cctmd,
+            ccts: ccts,
           })
         );
       } catch (e) {

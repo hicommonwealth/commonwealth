@@ -547,7 +547,7 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/:scope/new/contract_template': importRoute(
+  '/:scope/new/contract_template/:contract_id': importRoute(
     import('views/pages/new_contract_template'),
     {
       scoped: true,

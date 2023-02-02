@@ -275,14 +275,22 @@ export async function updateCommunityContractTemplateMetadata(
       },
     });
 
-    if (!contract) {
+    // TODO: Actually update the data
+
+    const cct = await models.CommunityContractTemplate.findOne({
+      where: {
+        cctmd_id: contract.id,
+      },
+    });
+
+    if (!contract || !cct) {
       return res.status(404).json({
         status: 'Failure',
         message: 'Template not found',
       });
     }
 
-    return res.json({ status: 'Success', data: contract });
+    return res.json({ status: 'Success', data: { cctmd: contract, cct } });
   } catch (err) {
     throw new AppError('Error updating community contract template metadata');
   }
