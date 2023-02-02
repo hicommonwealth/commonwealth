@@ -48,14 +48,6 @@ export async function createCommunityContractTemplateAndMetadata(
     template_id,
   } = req.body;
 
-  console.log('slug', slug);
-  console.log('nickname', nickname);
-  console.log('display_name', display_name);
-  console.log('display_options', display_options);
-  console.log('community_id', community_id);
-  console.log('contract_id', contract_id);
-  console.log('template_id', template_id);
-
 
   if (!community_id || !contract_id || !template_id) {
     throw new AppError(
