@@ -1,6 +1,15 @@
 /* eslint-disable no-restricted-syntax */
-import type { CWEvent, IChainEntityKind, IEventProcessor, IEventSubscriber, } from 'chain-events/src';
-import { eventToEntity, getUniqueEntityKey, SupportedNetwork, } from 'chain-events/src';
+import type {
+  CWEvent,
+  IChainEntityKind,
+  IEventProcessor,
+  IEventSubscriber,
+} from 'chain-events/src';
+import {
+  eventToEntity,
+  getUniqueEntityKey,
+  SupportedNetwork,
+} from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import { getBaseUrl, getFetch } from 'helpers/getUrl';
@@ -33,17 +42,22 @@ class ChainEntityController {
   private _subscriber: IEventSubscriber<any, any>;
   private _handlers: { [t: string]: EntityHandler[] } = {};
 
-  public getByUniqueId(chain: string, uniqueId: string): ChainEntity{
+  public getByUniqueId(chain: string, uniqueId: string): ChainEntity {
     const [slug, type_id] = uniqueId.split('_');
     const type = proposalSlugToChainEntityType(<ProposalType>slug);
 
-    return this._store.get(chain).filter(e => e.type === type && e.typeId === type_id)[0];
+    return this._store
+      .get(chain)
+      .filter((e) => e.type === type && e.typeId === type_id)[0];
   }
 
   public getPreimage(hash: string) {
-    const chainEntities: ChainEntity[] = Array.from(this._store.values()).flat();
-    const preimage = chainEntities.filter(preimageEntity =>
-      preimageEntity.typeId === hash && preimageEntity.chainEvents.length > 0
+    const chainEntities: ChainEntity[] = Array.from(
+      this._store.values()
+    ).flat();
+    const preimage = chainEntities.filter(
+      (preimageEntity) =>
+        preimageEntity.typeId === hash && preimageEntity.chainEvents.length > 0
     );
 
     if (preimage.length === 0) {
@@ -55,15 +69,16 @@ class ChainEntityController {
     );
 
     if (notedEvent && notedEvent.data) {
-      return (notedEvent.data as SubstrateTypes.IPreimageNoted)
-        .preimage;
+      return (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
     } else {
       return null;
     }
   }
 
   public getByType(type: IChainEntityKind): ChainEntity[] {
-    return Array.from(this._store.values()).flat().filter(e => e.type === type);
+    return Array.from(this._store.values())
+      .flat()
+      .filter((e) => e.type === type);
   }
 
   /**
@@ -84,15 +99,20 @@ class ChainEntityController {
       getFetch(getBaseUrl() + '/getEntityMeta', options),
     ]);
 
-    const data = []
+    const data = [];
     // save chain-entity metadata to the appropriate chain-entity
-    const metaMap: Map<string, {title: string, threadId: number}> = new Map(entityMetas.map(e => [e.ce_id, {title: e.title, threadId: e.thread_id}]));
+    const metaMap: Map<string, { title: string; threadId: number }> = new Map(
+      entityMetas.map((e) => [
+        e.ce_id,
+        { title: e.title, threadId: e.thread_id },
+      ])
+    );
 
     if (Array.isArray(entities)) {
       // save the chain-entity objects in the store
       for (const entityJSON of entities) {
         const metaData = metaMap.get(entityJSON.id);
-        if(metaData) {
+        if (metaData) {
           entityJSON.title = metaData.title;
           entityJSON.threadId = metaData.threadId;
         }
@@ -108,7 +128,7 @@ class ChainEntityController {
 
   public async getRawEntities(chain: string): Promise<ChainEntity[]> {
     const entities = await getFetch(getBaseUrl() + '/entities', { chain });
-    const data = []
+    const data = [];
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);
@@ -172,7 +192,11 @@ class ChainEntityController {
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
 
-      const entity = this._store.get(chain).filter(e => e.type === entityKind && e.typeId === fieldValue.toString())[0];
+      const entity = this._store
+        .get(chain)
+        .filter(
+          (e) => e.type === entityKind && e.typeId === fieldValue.toString()
+        )[0];
 
       if (!entity) {
         console.log(

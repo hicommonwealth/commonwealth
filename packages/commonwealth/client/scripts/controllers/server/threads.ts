@@ -174,7 +174,9 @@ class ThreadsController {
     const chainEntitiesProcessed: ChainEntity[] = [];
     if (chain_entity_meta) {
       for (const meta of chain_entity_meta) {
-        const full_entity = Array.from(app.chainEntities.store.values()).flat().filter(e => e.id === meta.ce_id)[0];
+        const full_entity = Array.from(app.chainEntities.store.values())
+          .flat()
+          .filter((e) => e.id === meta.ce_id)[0];
         if (full_entity) {
           if (meta.title) full_entity.title = meta.title;
           chainEntitiesProcessed.push(full_entity);
