@@ -48,6 +48,15 @@ export async function createCommunityContractTemplateAndMetadata(
     template_id,
   } = req.body;
 
+  console.log('slug', slug);
+  console.log('nickname', nickname);
+  console.log('display_name', display_name);
+  console.log('display_options', display_options);
+  console.log('community_id', community_id);
+  console.log('contract_id', contract_id);
+  console.log('template_id', template_id);
+
+
   if (!community_id || !contract_id || !template_id) {
     throw new AppError(
       'Must provide community_id, contract_id, and template_id'
@@ -60,15 +69,13 @@ export async function createCommunityContractTemplateAndMetadata(
     );
   }
 
-  const communityContract = await models.CommunityContract.findOne({
-    where: {
-      chain_id: community_id,
-      contract_id,
-    },
+  const communityContract = await models.CommunityContract.create({
+    chain_id: community_id,
+    contract_id,
   });
 
   if (!communityContract) {
-    throw new AppError('Community contract does not exist');
+    throw new AppError('Failed to create community contract');
   }
 
   try {

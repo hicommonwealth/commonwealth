@@ -119,7 +119,7 @@ import {
   getCommunityContractTemplateMetadata,
   updateCommunityContractTemplateMetadata,
   deleteCommunityContractTemplateMetadata,
-} from '../routes/proposalTemplate';
+} from '../routes/proposalTemplate'; 
 
 import status from '../routes/status';
 import createSubscription from '../routes/subscription/createSubscription';

@@ -58,26 +58,29 @@ describe('Contract route tests', () => {
     expect(userJWT).to.not.be.null;
   });
 
-  describe(' /api/contract/community_template', () => {
+  describe(' /api/contract/community_template_and_metadata', () => {
     it('should create a contract template and metadata', async () => {
       const body = {
-        community_id: generateRandomString(),
-        contract_id: generateRandomNumber(),
-        template_id: generateRandomNumber(),
         slug: generateRandomString(),
         nickname: generateRandomString(),
         display_name: generateRandomString(),
-        display_options: generateRandomString(),
+        display_options: '0',
+        community_id: chain,
+        contract_id: generateRandomNumber(),
+        template_id: generateRandomNumber(),
       };
+      console.log('body', body)
       const res = await chai.request
         .agent(app)
-        .post('/api/contract/community_template')
+        .post('/api/contract/community_template_and_metadata')
         .set('Accept', 'application/json')
         .query({
           chain,
           jwt: adminJWT,
         })
         .send({ body });
+
+        console.log('res.body', res.body);
 
       expect(res.status).to.equal(200);
     });
