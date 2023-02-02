@@ -260,6 +260,19 @@ function setupRouter(
     createContract.bind(this, models)
   );
 
+  // Templates
+  router.post(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    createTemplate.bind(this, models)
+  );
+
+  router.get(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    getTemplates.bind(this, models)
+  );
+
   // community contract
   router.post(
     '/contract/community_template_and_metadata',
