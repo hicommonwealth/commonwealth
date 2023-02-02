@@ -2,10 +2,10 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
-import faker from 'faker';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import faker from 'faker';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
@@ -74,6 +74,8 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
+      console.log('YOOOOOOO');
+      console.log(res.body);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
@@ -267,7 +269,7 @@ describe('Webhook Tests', () => {
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(markdownComment.text),
-        root_id: `discussion_${res.result.id}`,
+        root_id: `discussion_$`,
       });
       res = await modelUtils.createThread({
         chainId: chain,
@@ -285,7 +287,7 @@ describe('Webhook Tests', () => {
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(richTextComment.text),
-        root_id: `discussion_${res.result.id}`,
+        root_id: `discussion_`,
       });
     });
   });

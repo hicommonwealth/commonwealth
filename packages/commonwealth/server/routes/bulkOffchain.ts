@@ -1,32 +1,28 @@
 /* eslint-disable no-async-promise-executor */
+import { ServerError } from 'common-common/src/errors';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import { CommunityRoleInstance } from 'server/models/community_role';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { DB } from '../models';
-import { ChatChannelInstance } from '../models/chat_channel';
-import { CommunityBannerInstance } from '../models/community_banner';
-import { ContractInstance } from '../models/contract';
-import { RuleInstance } from '../models/rule';
-import { ThreadInstance } from '../models/thread';
-import { TopicInstance } from '../models/topic';
-import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
+import type { CommunityRoleInstance } from 'server/models/community_role';
+import type { DB } from '../models';
+import type { ChatChannelInstance } from '../models/chat_channel';
+import type { CommunityBannerInstance } from '../models/community_banner';
+import type { ContractInstance } from '../models/contract';
+import type { RuleInstance } from '../models/rule';
+import type { ThreadInstance } from '../models/thread';
+import type { TopicInstance } from '../models/topic';
 import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
+import type { RoleInstanceWithPermission } from '../util/roles';
+import { findAllRoles } from '../util/roles';
 
 export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
-const bulkOffchain = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
   // globally shared SQL replacements
   const communityOptions = 'chain = :chain';

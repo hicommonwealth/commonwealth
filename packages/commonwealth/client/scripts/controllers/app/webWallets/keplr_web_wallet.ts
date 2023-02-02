@@ -1,20 +1,12 @@
 import app from 'state';
 
-import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
-import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
+import type { AccountData } from '@cosmjs/proto-signing';
+import type { OfflineDirectSigner } from '@cosmjs/proto-signing';
 
-import { Account, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { CanvasData } from 'shared/adapters/shared';
-
-interface Pubkey {
-  readonly type: string;
-  readonly value: any;
-}
-interface StdSignature {
-  readonly pub_key: Pubkey;
-  readonly signature: string;
-}
+import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
+import type { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -38,18 +30,23 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public get available(): boolean {
     return !!window.keplr;
   }
+
   public get enabling() {
     return this._enabling;
   }
+
   public get enabled() {
     return this.available && this._enabled;
   }
+
   public get accounts() {
     return this._accounts || [];
   }
+
   public get api() {
     return window.keplr;
   }
+
   public get offlineSigner() {
     return this._offlineSigner;
   }
@@ -59,26 +56,31 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${
-      chainIdentifier
-    }`;
-    const cosm = await import('@cosmjs/stargate')
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
-    const block = await client.getBlock(height);
+    const block = await client.getBlock(height - 2); // validator pool may be out of sync
 
     return {
       number: block.header.height,
       hash: block.id,
       // seconds since epoch
-      timestamp: Math.floor((new Date(block.header.time)).getTime() / 1000)
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
     };
   }
 
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const chainId = this.getChainId();
-    const stdSignature = await window.keplr.signArbitrary(chainId, account.address, JSON.stringify(canvasMessage))
-    return JSON.stringify({signature: stdSignature});
+    const stdSignature = await window.keplr.signArbitrary(
+      chainId,
+      account.address,
+      JSON.stringify(canvasMessage)
+    );
+    return JSON.stringify({ signature: stdSignature });
   }
 
   // ACTIONS

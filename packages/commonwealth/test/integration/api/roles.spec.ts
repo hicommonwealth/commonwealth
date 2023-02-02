@@ -3,15 +3,15 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import jwt from 'jsonwebtoken';
 import { NotificationCategories } from 'common-common/src/types';
+import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
 
 import { Errors as createErrors } from '../../../server/routes/createRole';
-import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
 import { Errors as deleteErrors } from '../../../server/routes/deleteRole';
+import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
+import * as modelUtils from '../../util/modelUtils';
 import { generateEthAddress } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
@@ -97,7 +97,7 @@ describe('Roles Test', () => {
     let newUserId;
 
     beforeEach(
-      'Create a new user as member of community to invite or upgrade',
+      'Create a new user as member of community or upgrade',
       async () => {
         const res = await modelUtils.createAndVerifyAddress({ chain });
         newUserAddress = res.address;
@@ -374,7 +374,6 @@ describe('Roles Test', () => {
         jwt: jwtToken,
         isAuthenticatedForum: 'false',
         privacyEnabled: 'true',
-        invitesEnabled: 'true',
         id: 'test',
         name: 'test community',
         creator_address: loggedInAddr,

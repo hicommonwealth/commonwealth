@@ -1,12 +1,12 @@
 /**
  * Fetches events from Compound contract in real time.
  */
-import { Listener } from '@ethersproject/providers';
+import type { Listener } from '@ethersproject/providers';
 
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, Api } from './types';
+import type { RawEvent, Api } from './types';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;

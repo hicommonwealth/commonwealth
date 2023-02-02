@@ -1,13 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_checkbox.scss';
-
-import { ComponentType, StyleAttrs } from './types';
-import { getClasses } from './helpers';
+import m from 'mithril';
 import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+
+import type { StyleAttrs } from './types';
+import { ComponentType } from './types';
 
 export type CheckboxType = { label?: string; value?: string };
 

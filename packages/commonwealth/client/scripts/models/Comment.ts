@@ -1,10 +1,11 @@
-import moment from 'moment';
-import { VersionHistory } from '../controllers/server/threads';
-import { IUniqueId } from './interfaces';
-import Attachment from './Attachment';
+import type moment from 'moment';
+import type { VersionHistory } from '../controllers/server/threads';
+import type Attachment from './Attachment';
+import type { IUniqueId } from './interfaces';
 
 class Comment<T extends IUniqueId> {
   [x: string]: any;
+
   public readonly chain: string;
   public readonly author: string;
   public readonly text: string;

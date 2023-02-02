@@ -1,5 +1,5 @@
-import * as Icons from './cw_icons';
 import * as CustomIcons from './cw_custom_icons';
+import * as Icons from './cw_icons';
 
 export const iconLookup = {
   arrowLeft: Icons.CWArrowLeft,
@@ -82,7 +82,6 @@ export const iconLookup = {
 export const customIconLookup = {
   'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
-  invites: CustomIcons.CWInvites,
   keplr: CustomIcons.CWKeplr,
   magic: CustomIcons.CWMagic,
   metamask: CustomIcons.CWMetaMask,

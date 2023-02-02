@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "engines": {
-    "node": "14.x"
+    "node": "18.x"
   },
   "repository": {
     "type": "git",
@@ -12,7 +12,9 @@
   "keywords": [],
   "scripts": {
     "test": "ts-mocha --config ./.mocharc.json ./test/*.spec.ts",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
+    "lint-all": "eslint './**/*.ts'"
   },
   "dependencies": {},
   "devDependencies": {

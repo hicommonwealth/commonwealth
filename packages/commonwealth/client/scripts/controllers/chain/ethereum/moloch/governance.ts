@@ -1,19 +1,19 @@
+import type { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 import BN from 'bn.js';
-
-import { ProposalModule, ITXModalData } from 'models';
-
-import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 
 import { MolochEvents } from 'chain-events/src';
 
-import { IApp } from 'state';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+
+import type { IApp } from 'state';
+import { attachSigner } from '../contractApi';
+import type MolochAPI from './api';
+import type MolochChain from './chain';
+import type MolochMember from './member';
+import type MolochMembers from './members';
 
 import MolochProposal from './proposal';
-import MolochMembers from './members';
-import MolochAPI from './api';
-import MolochMember from './member';
-import MolochChain from './chain';
-import { attachSigner } from '../contractApi';
 
 export default class MolochGovernance extends ProposalModule<
   MolochAPI,
@@ -36,21 +36,56 @@ export default class MolochGovernance extends ProposalModule<
   private _Members: MolochMembers;
 
   // GETTERS
-  public get proposalCount() { return this._proposalCount; }
-  public get proposalDeposit() { return this._proposalDeposit; }
-  public get gracePeriod() { return this._gracePeriod; }
-  public get summoningTime() { return this._summoningTime; }
-  public get votingPeriodLength() { return this._votingPeriodLength; }
-  public get periodDuration() { return this._periodDuration; }
-  public get abortWindow() { return this._abortWindow; }
-  public get totalShares() { return this._totalShares; }
-  public get totalSharesRequested() { return this._totalSharesRequested; }
-  public get guildbank() { return this._guildBank; }
-  public get currentPeriod() {
-    return ((Date.now() / 1000) - this.summoningTime.toNumber()) / this.periodDuration.toNumber();
+  public get proposalCount() {
+    return this._proposalCount;
   }
 
-  public get api() { return this._api; }
+  public get proposalDeposit() {
+    return this._proposalDeposit;
+  }
+
+  public get gracePeriod() {
+    return this._gracePeriod;
+  }
+
+  public get summoningTime() {
+    return this._summoningTime;
+  }
+
+  public get votingPeriodLength() {
+    return this._votingPeriodLength;
+  }
+
+  public get periodDuration() {
+    return this._periodDuration;
+  }
+
+  public get abortWindow() {
+    return this._abortWindow;
+  }
+
+  public get totalShares() {
+    return this._totalShares;
+  }
+
+  public get totalSharesRequested() {
+    return this._totalSharesRequested;
+  }
+
+  public get guildbank() {
+    return this._guildBank;
+  }
+
+  public get currentPeriod() {
+    return (
+      (Date.now() / 1000 - this.summoningTime.toNumber()) /
+      this.periodDuration.toNumber()
+    );
+  }
+
+  public get api() {
+    return this._api;
+  }
 
   // INIT / DEINIT
   constructor(app: IApp) {
@@ -63,19 +98,45 @@ export default class MolochGovernance extends ProposalModule<
     this._api = api;
     this._guildBank = await this._api.Contract.guildBank();
 
-    this._totalSharesRequested = new BN((await this._api.Contract.totalSharesRequested()).toString(), 10);
-    this._totalShares = new BN((await this._api.Contract.totalShares()).toString(), 10);
-    this._gracePeriod = new BN((await this._api.Contract.gracePeriodLength()).toString(), 10);
-    this._abortWindow = new BN((await this._api.Contract.abortWindow()).toString(), 10);
-    this._summoningTime = new BN((await this._api.Contract.summoningTime()).toString(), 10);
-    this._votingPeriodLength = new BN((await this._api.Contract.votingPeriodLength()).toString(), 10);
-    this._periodDuration = new BN((await this._api.Contract.periodDuration()).toString(), 10);
-    this._proposalDeposit = new BN((await this._api.Contract.proposalDeposit()).toString(), 10);
+    this._totalSharesRequested = new BN(
+      (await this._api.Contract.totalSharesRequested()).toString(),
+      10
+    );
+    this._totalShares = new BN(
+      (await this._api.Contract.totalShares()).toString(),
+      10
+    );
+    this._gracePeriod = new BN(
+      (await this._api.Contract.gracePeriodLength()).toString(),
+      10
+    );
+    this._abortWindow = new BN(
+      (await this._api.Contract.abortWindow()).toString(),
+      10
+    );
+    this._summoningTime = new BN(
+      (await this._api.Contract.summoningTime()).toString(),
+      10
+    );
+    this._votingPeriodLength = new BN(
+      (await this._api.Contract.votingPeriodLength()).toString(),
+      10
+    );
+    this._periodDuration = new BN(
+      (await this._api.Contract.periodDuration()).toString(),
+      10
+    );
+    this._proposalDeposit = new BN(
+      (await this._api.Contract.proposalDeposit()).toString(),
+      10
+    );
 
     // fetch all proposals
     console.log('Fetching moloch proposals from backend.');
     await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.store.getByType(MolochEvents.Types.EntityKind.Proposal);
+    const entities = this.app.chainEntities.store.getByType(
+      MolochEvents.Types.EntityKind.Proposal
+    );
     entities.map((p) => this._entityConstructor(p));
     this._proposalCount = new BN(this.store.getAll().length);
     this._initialized = true;
@@ -85,6 +146,7 @@ export default class MolochGovernance extends ProposalModule<
     this.store.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args: any[]): ITXModalData {
     throw new Error('Method not implemented.');
   }
@@ -95,7 +157,7 @@ export default class MolochGovernance extends ProposalModule<
     applicantAddress: string,
     tokenTribute: BN,
     sharesRequested: BN,
-    details: string,
+    details: string
   ) {
     if (!(await this._Members.isDelegate(submitter.address))) {
       throw new Error('sender must be valid delegate');
@@ -106,13 +168,19 @@ export default class MolochGovernance extends ProposalModule<
     }
 
     const MAX_N_SHARES = new BN(10).pow(new BN(18));
-    const newShareCount = sharesRequested.add(this.totalShares).add(this.totalSharesRequested);
+    const newShareCount = sharesRequested
+      .add(this.totalShares)
+      .add(this.totalSharesRequested);
     if (newShareCount.gt(MAX_N_SHARES)) {
       throw new Error('too many shares requested');
     }
 
     // first, we must approve xfer of proposal deposit tokens from the submitter
-    const tokenContract = await attachSigner(this.app.wallets, submitter, this.api.token);
+    const tokenContract = await attachSigner(
+      this.app.wallets,
+      submitter,
+      this.api.token
+    );
     const approvalTx = await tokenContract.approve(
       submitter.address,
       this.proposalDeposit.toString(10),
@@ -124,7 +192,6 @@ export default class MolochGovernance extends ProposalModule<
       throw new Error('failed to approve amount');
     }
 
-
     // once approved we assume the applicant has approved the tribute and proceed
     // TODO: this assumes the active user is the signer on the contract -- we should make this explicit
     await attachSigner(this.app.wallets, submitter, this.api.Contract);
@@ -133,7 +200,7 @@ export default class MolochGovernance extends ProposalModule<
       tokenTribute.toString(),
       sharesRequested.toString(),
       details,
-      { gasLimit: this._api.gasLimit },
+      { gasLimit: this._api.gasLimit }
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {

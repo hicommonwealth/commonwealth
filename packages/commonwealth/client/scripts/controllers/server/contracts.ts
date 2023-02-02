@@ -1,25 +1,25 @@
 import $ from 'jquery';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
-import { BalanceType, ContractType } from 'common-common/src/types';
+import type { BalanceType, ContractType } from 'common-common/src/types';
 
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
   private _initialized = false;
+
   public get store() {
     return this._store;
   }
+
   public get initialized() {
     return this._initialized;
   }
   public getFactoryContractByNickname(nickname: string) {
     return this._store.getFactoryContractByNickname(nickname);
   }
-  public getFactoryContracts() {
-    return this._store.getFactoryContracts();
-  }
+
   public getByIdentifier(id) {
     return this._store.getById(id);
   }
@@ -28,6 +28,9 @@ class ContractsController {
   }
   public getByType(type: string) {
     return this._store.getContractByType(type);
+  }
+  public getFactoryContracts() {
+    return this._store.getFactoryContracts();
   }
   public getCommunityContracts() {
     return this._store.getCommunityContracts();
@@ -38,7 +41,7 @@ class ContractsController {
     abi: string,
     nickname: string
   ) {
-    const response = await $.post(`${app.serverUrl()}/createContractAbi`, {
+    const response = await $.post(`${app.serverUrl()}/contractAbi`, {
       jwt: app.user.jwt,
       contractId: contract.id,
       abi,
@@ -58,6 +61,7 @@ class ContractsController {
         jwt: app.user.jwt,
       }
     );
+    console.log(response);
     const resultContract = response['result']['contract'];
     const resultAbi = response['result']['contractAbi'];
     this.update(resultAbi.abi, resultContract);
@@ -178,7 +182,7 @@ class ContractsController {
     nickname: string;
     eth_chain_id: number;
   }) {
-    const response = await $.post(`${app.serverUrl()}/createContract`, {
+    const response = await $.post(`${app.serverUrl()}/contract`, {
       community,
       balance_type,
       chain_node_id,
@@ -218,6 +222,7 @@ class ContractsController {
   public addToStore(contract: Contract) {
     return this._store.add(contract);
   }
+
   public initialize(contracts = [], reset = true) {
     if (reset) {
       this._store.clear();

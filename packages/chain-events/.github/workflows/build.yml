@@ -12,7 +12,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: 14.x
+          node-version: 18.x
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -34,7 +34,7 @@ jobs:
 
       - name: Run integration tests
         run: yarn integration-test
-      
+
       # TODO: reintegrate code coverage once we get nyc working with hardhat
 
       - name: Run linter

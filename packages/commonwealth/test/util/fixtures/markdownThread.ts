@@ -8,5 +8,6 @@ module.exports = {
   kind: 'discussion',
   stage: 'discussion',
   versionHistory:
-    '{"timestamp":"2020-03-20T23:56:44.533Z","body":"markdown test\\n\\n# Markdown test\\n\\n> test test\\n\\n## Test Test\\n"}',
+    '{"timestamp":"2020-03-20T23:56:44.533Z",' +
+    '"body":"markdown test\\n\\n# Markdown test\\n\\n> test test\\n\\n## Test Test\\n"}',
 };

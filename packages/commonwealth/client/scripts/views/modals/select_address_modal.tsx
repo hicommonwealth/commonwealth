@@ -1,25 +1,25 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { formatAsTitleCase, isSameAccount } from 'helpers';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/select_address_modal.scss';
+import type { Account, RoleInfo } from 'models';
 
 import app from 'state';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, RoleInfo } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
-import { isSameAccount, formatAsTitleCase } from 'helpers';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../shared/utils';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../components/component_kit/cw_button';
-import { getClasses } from '../components/component_kit/helpers';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
+import { getClasses } from '../components/component_kit/helpers';
 
 export class SelectAddressModal extends ClassComponent {
   private loading: boolean;

@@ -1,21 +1,21 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { proposalSlugToClass } from 'identifiers';
+import m from 'mithril';
+import type { ITXModalData, ProposalModule } from 'models';
 
 import app from 'state';
-import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import User from '../../components/widgets/user';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { ProposalType } from '../../../../../../common-common/src/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTextArea } from '../../components/component_kit/cw_text_area';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import User from '../../components/widgets/user';
 import { createTXModal } from '../../modals/tx_signing_modal';
+import ErrorPage from '../error';
 
 export class SubstrateTreasuryTipForm extends ClassComponent {
   private beneficiary: string;

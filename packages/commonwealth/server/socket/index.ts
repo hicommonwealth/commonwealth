@@ -1,34 +1,31 @@
 // Use https://admin.socket.io/#/ to monitor
-// TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
-import { Server, Socket } from 'socket.io';
-import * as jwt from 'jsonwebtoken';
-import { ExtendedError } from 'socket.io/dist/namespace';
-import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { createChatNamespace } from './createChatNamespace';
+import { factory, formatFilename } from 'common-common/src/logging';
+import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import { RascalSubscriptions } from 'common-common/src/rabbitmq';
+import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import { StatsDController } from 'common-common/src/statsd';
+import type * as http from 'http';
+import * as jwt from 'jsonwebtoken';
 import {
   ConnectionTimeoutError,
   createClient,
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
 } from 'redis';
-import { StatsDController } from 'common-common/src/statsd';
-import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  getRabbitMQConfig,
-  RabbitMQController,
-  RascalSubscriptions,
-} from 'common-common/src/rabbitmq';
-import Rollbar from 'rollbar';
-import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import type Rollbar from 'rollbar';
+// TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
+import type { Socket } from 'socket.io';
+import type { ExtendedError } from 'socket.io/dist/namespace';
 import { WebsocketNamespaces } from '../../shared/types';
+import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
+import type { DB } from '../models';
+import { createChatNamespace } from './createChatNamespace';
 import {
   createNamespace,
   publishToChainEventsRoom,
   publishToSnapshotRoom,
 } from './createNamespace';
-import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
-import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -62,6 +59,7 @@ export async function setupWebSocketServer(
 ) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
+  const { Server } = await import('socket.io');
   const io = new Server(httpServer, {
     transports: ['websocket'],
     cors: {
@@ -124,7 +122,9 @@ export async function setupWebSocketServer(
   const subClient = pubClient.duplicate();
 
   pubClient.on('error', (err) => {
-    StatsDController.get().increment('cw.socket.pub_errors', { name: err.name });
+    StatsDController.get().increment('cw.socket.pub_errors', {
+      name: err.name,
+    });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis pub-client connection to ${REDIS_URL} timed out!`
@@ -156,7 +156,9 @@ export async function setupWebSocketServer(
     log.info('Redis pub-client disconnected');
   });
   subClient.on('error', (err) => {
-    StatsDController.get().increment('cw.socket.sub_errors', { name: err.name });
+    StatsDController.get().increment('cw.socket.sub_errors', {
+      name: err.name,
+    });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis sub-client connection to ${REDIS_URL} timed out!`
@@ -207,19 +209,19 @@ export async function setupWebSocketServer(
     WebsocketNamespaces.SnapshotProposals
   );
 
-  const chatNamespace = createChatNamespace(io, models, redisCache);
+  createChatNamespace(io, models, redisCache);
 
   try {
     await rabbitMQController.startSubscription(
       publishToChainEventsRoom,
       RascalSubscriptions.ChainEventNotifications,
-      {server: chainEventsNamespace}
+      { server: chainEventsNamespace }
     );
 
     await rabbitMQController.startSubscription(
       publishToSnapshotRoom,
       RascalSubscriptions.SnapshotProposalNotifications,
-      {server: snapshotProposalNamespace}
+      { server: snapshotProposalNamespace }
     );
   } catch (e) {
     log.error(

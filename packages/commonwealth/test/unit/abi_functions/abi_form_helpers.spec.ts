@@ -182,5 +182,4 @@ describe('processAbiInputsToDataTypes() unit tests', () => {
     );
     expect(processedArgs).to.deep.equal([]);
   });
-
 });

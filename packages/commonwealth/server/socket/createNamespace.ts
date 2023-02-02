@@ -1,11 +1,13 @@
-import { Server } from 'socket.io';
 import { addPrefix, factory } from 'common-common/src/logging';
-import {
-  SnapshotProposalNotification,
+import type { Server } from 'socket.io';
+import type {
   ChainEventNotification,
+  SnapshotProposalNotification,
+  WebsocketNamespaces,
+} from '../../shared/types';
+import {
   WebsocketEngineEvents,
   WebsocketMessageNames,
-  WebsocketNamespaces,
 } from '../../shared/types';
 import { authenticate } from './index';
 
@@ -85,18 +87,16 @@ export async function publishToChainEventsRoom(
   this: { server: Server },
   notification: ChainEventNotification
 ) {
-  this.server.to(notification.ChainEvent.ChainEventType.id).emit(
-    WebsocketMessageNames.ChainEventNotification,
-    notification
-  );
+  this.server
+    .to(notification.ChainEvent.ChainEventType.id)
+    .emit(WebsocketMessageNames.ChainEventNotification, notification);
 }
 
 export async function publishToSnapshotRoom(
   this: { server: Server },
   notification: SnapshotProposalNotification
 ) {
-  this.server.to(notification.SnapshotProposal.id).emit(
-    WebsocketMessageNames.SnapshotProposalNotification,
-    notification
-  );
+  this.server
+    .to(notification.SnapshotProposal.id)
+    .emit(WebsocketMessageNames.SnapshotProposalNotification, notification);
 }

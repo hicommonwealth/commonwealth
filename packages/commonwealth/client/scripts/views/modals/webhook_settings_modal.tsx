@@ -1,25 +1,25 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { NotificationCategories } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import {
+  DydxChainNotificationTypes,
+  EdgewareChainNotificationTypes,
+  KulupuChainNotificationTypes,
+  KusamaChainNotificationTypes,
+  PolkadotChainNotificationTypes,
+} from 'helpers/chain_notification_types';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/webhook_settings_modal.scss';
+import { Webhook } from 'models';
 
 import app from 'state';
-import { Webhook } from 'models';
-import { NotificationCategories } from 'common-common/src/types';
-import {
-  EdgewareChainNotificationTypes,
-  KusamaChainNotificationTypes,
-  KulupuChainNotificationTypes,
-  PolkadotChainNotificationTypes,
-  DydxChainNotificationTypes,
-} from 'helpers/chain_notification_types';
-import { notifyError } from 'controllers/app/notifications';
-import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 
 type WebhookSettingsModalAttrs = {

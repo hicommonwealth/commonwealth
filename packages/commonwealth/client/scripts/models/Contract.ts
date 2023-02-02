@@ -1,5 +1,5 @@
-import moment from 'moment';
-import ContractAbi from './ContractAbi';
+import type moment from 'moment';
+import type ContractAbi from './ContractAbi';
 
 class Contract {
   public readonly id: number;
@@ -12,9 +12,9 @@ class Contract {
   public readonly decimals?: number;
   public readonly tokenName?: string;
   public readonly symbol?: string;
-  public readonly abi?: Array<Record<string, unknown>>;
   public readonly isFactory?: boolean;
   public readonly nickname?: string;
+  public readonly abi?: Array<Record<string, unknown>>;
 
   public readonly contractAbi?: ContractAbi;
 

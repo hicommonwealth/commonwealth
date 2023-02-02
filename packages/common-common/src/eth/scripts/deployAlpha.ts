@@ -1,5 +1,4 @@
 import { providers } from 'ethers';
-import Web3 from 'web3';
 
 import {
   MPond__factory,
@@ -8,15 +7,19 @@ import {
 } from '../types';
 
 async function main() {
+  const Web3 = (await import('web3')).default;
   // TODO: configure URL based on chain
-  const web3Provider = new Web3.providers.WebsocketProvider('http://localhost:8545', {
-    reconnect: {
-      auto: true,
-      delay: 5000,
-      maxAttempts: 10,
-      onTimeout: true,
-    },
-  });
+  const web3Provider = new Web3.providers.WebsocketProvider(
+    'http://localhost:8545',
+    {
+      reconnect: {
+        auto: true,
+        delay: 5000,
+        maxAttempts: 10,
+        onTimeout: true,
+      },
+    }
+  );
   const provider = new providers.Web3Provider(web3Provider as any);
   // 12s minute polling interval (default is 4s)
   provider.pollingInterval = 12000;
@@ -37,7 +40,7 @@ async function main() {
   const alpha = await delegateFactory.deploy(
     timelock.address,
     mpond.address,
-    member,
+    member
   );
   console.log(alpha.address);
 }

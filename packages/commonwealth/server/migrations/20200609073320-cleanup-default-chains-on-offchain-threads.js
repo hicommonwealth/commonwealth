@@ -9,5 +9,5 @@ UPDATE "OffchainThreads" SET chain=NULL WHERE chain='edgeware-testnet'`);
   down: (queryInterface, Sequelize) => {
     // no down migration
     return new Promise((resolve) => resolve());
-  }
+  },
 };

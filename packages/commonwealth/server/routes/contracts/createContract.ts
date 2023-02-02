@@ -1,10 +1,13 @@
-import Web3 from 'web3';
-import { ContractType } from 'common-common/src/types';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { DB } from '../../models';
-import { ContractAttributes, ContractInstance } from '../../models/contract';
-import { ChainNodeAttributes } from '../../models/chain_node';
-import { TypedRequestBody, TypedResponse, success } from '../../types';
+import type { ContractType } from 'common-common/src/types';
+import { AppError } from 'common-common/src/errors';
+import type { DB } from '../../models';
+import type {
+  ContractAttributes,
+  ContractInstance,
+} from '../../models/contract';
+import type { ChainNodeAttributes } from '../../models/chain_node';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
 
 export const Errors = {
@@ -76,7 +79,8 @@ const createContract = async (
     throw new AppError(Errors.NoType);
   }
 
-  if (!Web3.utils.isAddress(address)) {
+  const Web3 = (await import('web3-utils')).default;
+  if (!Web3.isAddress(address)) {
     throw new AppError(Errors.InvalidAddress);
   }
 

@@ -1,66 +1,70 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
-import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
+import { Icon, Icons, ListItem } from 'construct-ui';
+import m from 'mithril';
+import type { ChainInfo, RoleInfo } from 'models';
+import { AddressInfo } from 'models';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { AddressInfo, ChainInfo, RoleInfo } from 'models';
-import { getClasses } from './helpers';
-import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
-import { ComponentType, MenuItem } from './types';
 import { CommunityLabel } from '../community_label';
 import User from '../widgets/user';
+import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+import type { MenuItem } from './types';
+import { ComponentType } from './types';
 
 // TODO: Switch to new component kit system, migrate to more native setup
 const renderCommunity = (item: ChainInfo) => {
-  const roles: RoleInfo[] = [];
-  roles.push(...app.roles.getAllRolesInCommunity({ chain: item.id }));
+  const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
 
-  return m(ListItem, {
-    class: app.communities.isStarred(item.id) ? 'starred' : '',
-    label: <CommunityLabel community={item} />,
-    selected: app.activeChainId() === item.id,
-    onclick: (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      app.sidebarToggled = false;
-      app.sidebarMenu = 'default';
-      m.route.set(item.id ? `/${item.id}` : '/');
-    },
-    contentRight: app.isLoggedIn() && roles.length > 0 && (
-      <div
-        class="community-star-toggle"
-        onclick={async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          await app.communities.setStarred(item.id);
-          m.redraw();
-        }}
-      >
-        {roles.map((role) => {
-          // TODO: sometimes address_chain is null here -- why??
-          return m(User, {
-            avatarSize: 18,
-            avatarOnly: true,
-            user: new AddressInfo(
-              role.address_id,
-              role.address,
-              role.address_chain || role.chain_id,
-              null
-            ),
-          });
-        })}
-        <div class="star-icon">
-          {m(Icon, { name: Icons.STAR, key: item.id })}
+  return (
+    <div
+      class={getClasses<{ isSelected: boolean }>(
+        { isSelected: app.activeChainId() === item.id },
+        'SidebarMenuItem community'
+      )}
+      onclick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        app.sidebarToggled = false;
+        app.sidebarMenu = 'default';
+        m.route.set(item.id ? `/${item.id}` : '/');
+      }}
+    >
+      <CommunityLabel community={item} />
+      {app.isLoggedIn() && roles.length > 0 && (
+        <div class="roles-and-star">
+          {roles.map((role) => {
+            return m(User, {
+              avatarSize: 18,
+              avatarOnly: true,
+              user: new AddressInfo(
+                role.address_id,
+                role.address,
+                role.address_chain || role.chain_id,
+                null
+              ),
+            });
+          })}
+          <div
+            class={
+              app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
+            }
+            onclick={async (e) => {
+              e.stopPropagation();
+              await app.communities.setStarred(item.id);
+              m.redraw();
+            }}
+          />
         </div>
-      </div>
-    ),
-  });
+      )}
+    </div>
+  );
 };
 
 class CWSidebarMenuItem extends ClassComponent<MenuItem> {
@@ -93,11 +97,7 @@ class CWSidebarMenuItem extends ClassComponent<MenuItem> {
         </div>
       );
     } else if (vnode.attrs.type === 'community') {
-      return (
-        <div class="SidebarMenuItem community">
-          {renderCommunity(vnode.attrs.community)}
-        </div>
-      );
+      return renderCommunity(vnode.attrs.community);
     }
   }
 }

@@ -1,7 +1,7 @@
-import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { ContractAttributes, ContractInstance } from './contract';
+import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import type { DataTypes } from 'sequelize';
+import type { ModelInstance, ModelStatic } from './types';
+import type { ContractAttributes} from './contract';
 
 export type ContractAbiAttributes = {
   id: number;
@@ -18,9 +18,7 @@ export type ContractAbiAttributes = {
   Contracts?: ContractAttributes[];
 };
 
-export type ContractAbiInstance = ModelInstance<ContractAbiAttributes> & {
-  getContracts: Sequelize.HasManyGetAssociationsMixin<ContractInstance>;
-};
+export type ContractAbiInstance = ModelInstance<ContractAbiAttributes>;
 
 export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
 

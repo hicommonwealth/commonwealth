@@ -2,14 +2,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
+import type {
   Signer,
   BigNumberish,
+  Overrides} from "ethers";
+import {
   Contract,
-  ContractFactory,
-  Overrides,
+  ContractFactory
 } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import type { Provider, TransactionRequest } from "@ethersproject/providers";
 
 import type { ProjectFactory } from "../ProjectFactory";
 

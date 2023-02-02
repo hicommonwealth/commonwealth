@@ -1,6 +1,6 @@
-import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type DiscordBotConfigAttributes = {
   id: number;

@@ -1,6 +1,5 @@
+import type { IChainEntityKind } from 'chain-events/src';
 import moment from 'moment';
-
-import { IChainEntityKind } from 'chain-events/src';
 import ChainEvent from './ChainEvent';
 
 class ChainEntity {
@@ -55,18 +54,18 @@ class ChainEntity {
     author,
     completed,
   }: {
-    chain: string,
-    type: IChainEntityKind,
-    typeId: string,
-    chainEvents: any[],
-    createdAt: moment.MomentInput,
-    updatedAt: moment.MomentInput,
-    threadId: number,
-    threadTitle: string,
-    author: string,
-    id?: number,
-    title?: string,
-    completed?: boolean,
+    chain: string;
+    type: IChainEntityKind;
+    typeId: string;
+    chainEvents: any[];
+    createdAt: moment.MomentInput;
+    updatedAt: moment.MomentInput;
+    threadId: number;
+    threadTitle: string;
+    author: string;
+    id?: number;
+    title?: string;
+    completed?: boolean;
   }) {
     this.id = id;
     this.chain = chain;

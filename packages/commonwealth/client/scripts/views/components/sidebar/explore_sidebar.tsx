@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/sidebar/explore_sidebar.scss';
+import m from 'mithril';
+import { ChainInfo } from 'models';
 
 import app from 'state';
-import { ChainInfo } from 'models';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
-import { MenuItem } from '../component_kit/types';
+import type { MenuItem } from '../component_kit/types';
 
 export class ExploreCommunitiesSidebar extends ClassComponent {
   view() {

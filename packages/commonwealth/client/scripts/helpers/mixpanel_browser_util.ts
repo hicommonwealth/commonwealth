@@ -1,5 +1,5 @@
 import mixpanel from 'mixpanel-browser';
-import { BaseMixpanelPayload } from '../../../shared/analytics/types';
+import type { BaseMixpanelPayload } from '../../../shared/analytics/types';
 
 // ----- Client Side Mixpanel Library Utils ------ //
 
