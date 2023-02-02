@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import m from 'mithril';
-import { Notification, NotificationSubscription } from 'models';
+import {ChainInfo, Notification, NotificationSubscription} from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
 
 import app from 'state';
@@ -42,12 +42,19 @@ interface NotifOptions {
 class NotificationsController {
   private _discussionStore: NotificationStore = new NotificationStore();
   private _chainEventStore: NotificationStore = new NotificationStore();
+  // these are the chains that chain-events has active listeners for (used to detemine what chains are shown on the
+  // notification settings page
+  private _chainEventSubscribedChainIds: string[];
 
   private _maxChainEventNotificationId: number = Number.POSITIVE_INFINITY;
   private _maxDiscussionNotificationId: number = Number.POSITIVE_INFINITY;
 
   private _numPages = 0;
   private _numUnread = 0;
+
+  public get chainEventSubscribedChainIds(): string[] {
+    return this._chainEventSubscribedChainIds;
+  }
 
   public get numPages(): number {
     return this._numPages;
@@ -375,11 +382,18 @@ class NotificationsController {
     });
   }
 
+  public getSubscribedChains() {
+    return get('/getSupportedEthChains', {}, (result) => {
+      this._chainEventSubscribedChainIds = result.map(x => x.id);
+    });
+  }
+
   public async refresh() {
     return Promise.all([
       this.getDiscussionNotifications(),
       this.getChainEventNotifications(),
       this.getSubscriptions(),
+      this.getSubscribedChains()
     ]);
   }
 }

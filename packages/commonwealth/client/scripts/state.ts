@@ -6,7 +6,7 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import DiscordController from 'controllers/server/discord';
 import { WebSocketController } from 'controllers/server/socket';
 import { EventEmitter } from 'events';
-import type { ChainInfo, IChainAdapter } from 'models';
+import type { IChainAdapter } from 'models';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 import type { ChainCategoryAttributes } from 'server/models/chain_category';
 import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
@@ -49,7 +49,6 @@ export const enum LoginState {
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
-  subscribedChains: ChainInfo[];
   chainEntities: ChainEntityController;
 
   // XXX: replace this with some app.chain helper
@@ -149,7 +148,6 @@ const roles = new RolesController(user);
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
-  subscribedChains: [],
   chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 

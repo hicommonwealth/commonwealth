@@ -51,7 +51,7 @@ class NotificationSettingsPage extends ClassComponent {
       )
     );
 
-    const subscribedChainIds = app.subscribedChains.map((x) => x.id);
+    const subscribedChainIds = app.user.notifications.chainEventSubscribedChainIds;
 
     // chains/communities the user has addresses for but does not have existing subscriptions for
     const relevantSubscribedChains = app.user.addresses
