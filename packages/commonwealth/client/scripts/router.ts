@@ -468,46 +468,46 @@ const getCustomDomainRoutes = (importRoute) => ({
 
 const getCommonDomainRoutes = (importRoute) => ({
   // Global routes
-  '/': importRoute(import('views/pages/landing'), {
-    hideSidebar: false,
-  }),
-  '/communities': importRoute(import('views/pages/communities'), {
-    hideSidebar: false,
-  }),
-  '/search': importRoute(import('views/pages/search'), {
-    deferChain: true,
-  }),
-  '/whyCommonwealth': importRoute(import('views/pages/why_commonwealth'), {
-    hideSidebar: true,
-  }),
-  '/dashboard': importRoute(import('views/pages/user_dashboard'), {
-    deferChain: true,
-  }),
-  '/dashboard/:type': importRoute(import('views/pages/user_dashboard'), {
-    deferChain: true,
-  }),
-  '/web3login': importRoute(import('views/pages/web3login'), {
-    deferChain: true,
-  }),
+  // '/': importRoute(import('views/pages/landing'), {
+  //   hideSidebar: false,
+  // }),
+  // '/communities': importRoute(import('views/pages/communities'), {
+  //   hideSidebar: false,
+  // }),
+  // '/search': importRoute(import('views/pages/search'), {
+  //   deferChain: true,
+  // }),
+  // '/whyCommonwealth': importRoute(import('views/pages/why_commonwealth'), {
+  //   hideSidebar: true,
+  // }),
+  // '/dashboard': importRoute(import('views/pages/user_dashboard'), {
+  //   deferChain: true,
+  // }),
+  // '/dashboard/:type': importRoute(import('views/pages/user_dashboard'), {
+  //   deferChain: true,
+  // }),
+  // '/web3login': importRoute(import('views/pages/web3login'), {
+  //   deferChain: true,
+  // }),
 
   // Scoped routes
-  '/:scope/proposal/discussion/:identifier': redirectRoute(
-    (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
-  ),
+  // '/:scope/proposal/discussion/:identifier': redirectRoute(
+  //   (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
+  // ),
 
   // Notifications
-  '/:scope/notifications': importRoute(import('views/pages/notifications'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/notifications': redirectRoute(() => '/edgeware/notifications'),
-  '/notification-settings': importRoute(
-    import('views/pages/notification_settings'),
-    {
-      scoped: true,
-      deferChain: true,
-    }
-  ),
+  // '/:scope/notifications': importRoute(import('views/pages/notifications'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  // '/notifications': redirectRoute(() => '/edgeware/notifications'),
+  // '/notification-settings': importRoute(
+  //   import('views/pages/notification_settings'),
+  //   {
+  //     scoped: true,
+  //     deferChain: true,
+  //   }
+  // ),
 
   // NEAR
   '/:scope/finishNearLogin': importRoute(
@@ -519,22 +519,23 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/finishaxielogin': importRoute(import('views/pages/finish_axie_login')),
 
   // Settings
-  '/settings': redirectRoute(() => '/edgeware/settings'),
-  '/:scope/settings': importRoute(import('views/pages/settings'), {
-    scoped: true,
-  }),
+  // '/settings': redirectRoute(() => '/edgeware/settings'),
+  // '/:scope/settings': importRoute(import('views/pages/settings'), {
+  //   scoped: true,
+  // }),
 
   // Discussions
   '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
-  '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
+  // '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
+
   '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
   '/:scope': importRoute(import('views/pages/discussions_redirect'), {
     scoped: true,
   }),
-  '/:scope/discussions': importRoute(import('views/pages/discussions'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  // '/:scope/discussions': importRoute(import('views/pages/discussions'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
   '/:scope/overview': importRoute(import('views/pages/overview'), {
     scoped: true,
     deferChain: true,
@@ -547,10 +548,10 @@ const getCommonDomainRoutes = (importRoute) => ({
     'views/pages/general_contract',
     { scoped: true }
   ),
-  '/:scope/discussions/:topic': importRoute(import('views/pages/discussions'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  // '/:scope/discussions/:topic': importRoute(import('views/pages/discussions'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
   '/:scope/search': importRoute(import('views/pages/search'), {
     scoped: true,
     deferChain: true,
@@ -584,42 +585,42 @@ const getCommonDomainRoutes = (importRoute) => ({
   ),
 
   // Governance
-  '/:scope/referenda': importRoute(import('views/pages/referenda'), {
-    scoped: true,
-  }),
-  '/:scope/proposals': importRoute(import('views/pages/proposals'), {
-    scoped: true,
-  }),
-  '/:scope/council': importRoute(import('views/pages/council'), {
-    scoped: true,
-  }),
-  '/:scope/delegate': importRoute(import('views/pages/delegate'), {
-    scoped: true,
-  }),
-  '/:scope/proposal/:type/:identifier': importRoute(
-    'views/pages/view_proposal/index',
-    { scoped: true }
-  ),
-  '/:scope/proposal/:identifier': importRoute(
-    'views/pages/view_proposal/index',
-    { scoped: true }
-  ),
-  '/:scope/discussion/:identifier': importRoute(
-    'views/pages/view_thread/index',
-    { scoped: true }
-  ),
-  '/:scope/new/proposal/:type': importRoute(
-    import('views/pages/new_proposal/index'),
-    {
-      scoped: true,
-    }
-  ),
-  '/:scope/new/proposal': importRoute(
-    import('views/pages/new_proposal/index'),
-    {
-      scoped: true,
-    }
-  ),
+  // '/:scope/referenda': importRoute(import('views/pages/referenda'), {
+  //   scoped: true,
+  // }),
+  // '/:scope/proposals': importRoute(import('views/pages/proposals'), {
+  //   scoped: true,
+  // }),
+  // '/:scope/council': importRoute(import('views/pages/council'), {
+  //   scoped: true,
+  // }),
+  // '/:scope/delegate': importRoute(import('views/pages/delegate'), {
+  //   scoped: true,
+  // }),
+  // '/:scope/proposal/:type/:identifier': importRoute(
+  //   'views/pages/view_proposal/index',
+  //   { scoped: true }
+  // ),
+  // '/:scope/proposal/:identifier': importRoute(
+  //   'views/pages/view_proposal/index',
+  //   { scoped: true }
+  // ),
+  // '/:scope/discussion/:identifier': importRoute(
+  //   'views/pages/view_thread/index',
+  //   { scoped: true }
+  // ),
+  // '/:scope/new/proposal/:type': importRoute(
+  //   import('views/pages/new_proposal/index'),
+  //   {
+  //     scoped: true,
+  //   }
+  // ),
+  // '/:scope/new/proposal': importRoute(
+  //   import('views/pages/new_proposal/index'),
+  //   {
+  //     scoped: true,
+  //   }
+  // ),
 
   // Treasury
   '/:scope/treasury': importRoute(import('views/pages/treasury'), {
