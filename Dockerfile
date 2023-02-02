@@ -1,16 +1,17 @@
-ARG PORT
-
 FROM node:18.13.0-alpine
 
-WORKDIR /commonwealth
+WORKDIR /usr/src/app
 
 COPY . .
 
+# yarn needs git, otherwise it will fail
+RUN apk --no-cache add git
+
 RUN yarn --ignore-engines
+
+ARG PORT
+ENV PORT=$PORT
 
 EXPOSE $PORT
 
-RUN yarn start &
-
-HEALTHCHECK --interval=5m --timeout=3s \
-  CMD curl -f http://localhost/$PORT || exit 1
+CMD ["yarn", "start"]

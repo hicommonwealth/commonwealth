@@ -2,10 +2,17 @@
 *
 
 # allow useful stuff
-!**/yarn.lock
-!**/packages.json
+!yarn.lock
+!package.json
 !scripts/
 !packages/
+!tsconfig.json
 
-# ignore tests in useful stuff
+# ignore useless stuff in useful directories
 **/test
+**/latest.dump
+**/server-tests.ts
+**/*.md
+**/*.txt
+**/*.sql
+**/Dockerfile
