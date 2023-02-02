@@ -40,7 +40,7 @@ export class ContractSection implements m.ClassComponent<SidebarSectionAttrs> {
       onclick: (e: any) => {
         e.stopPropagation();
         handleRedirectClicks(e, `/new/contract`, app.activeChainId(), null);
-      }
+      },
     });
 
     const contractData = (contractAddress: string): SectionGroupAttrs => {
