@@ -48,7 +48,6 @@ export async function createCommunityContractTemplateAndMetadata(
     template_id,
   } = req.body;
 
-
   if (!community_id || !contract_id || !template_id) {
     throw new AppError(
       'Must provide community_id, contract_id, and template_id'
@@ -138,7 +137,8 @@ export async function getCommunityContractTemplate(
     }
 
     return success(res, {
-      metadata, cct
+      metadata,
+      cct,
     });
   } catch (err) {
     throw new AppError('Error getting community contract template');
@@ -155,8 +155,7 @@ export async function updateCommunityContractTemplate(
       throw new AppError('Must provide community_contract_id and template_id');
     }
 
-    const contractTemplate: CommunityContractTemplateAttributes =
-      req.body;
+    const contractTemplate: CommunityContractTemplateAttributes = req.body;
 
     if (!contractTemplate) {
       throw new AppError('Must provide contract template');
@@ -193,8 +192,7 @@ export async function deleteCommunityContractTemplate(
       throw new AppError('Must provide community_contract_id and template_id');
     }
 
-    const contractTemplate: CommunityContractTemplateAttributes =
-      req.body;
+    const contractTemplate: CommunityContractTemplateAttributes = req.body;
 
     if (!contractTemplate) {
       throw new AppError('Must provide contract template');
