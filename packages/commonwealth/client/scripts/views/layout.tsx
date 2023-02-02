@@ -1,7 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
@@ -13,20 +14,12 @@ import {
   selectChain,
 } from 'helpers/chain';
 
-import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
-import 'layout.scss';
 import app from 'state';
 import PageNotFound from 'views/pages/404';
 import { AppToasts } from 'views/toast';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
-import { useParams } from 'react-router-dom';
-
-export const withRouter = (WrappedComponent) => (props) => {
-  const params = useParams();
-  return <WrappedComponent {...props} params={params} />;
-};
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -157,4 +150,3 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
 }
 
 export const Layout = LayoutComponent;
-// export const Layout = withRouter(LayoutComponent);
