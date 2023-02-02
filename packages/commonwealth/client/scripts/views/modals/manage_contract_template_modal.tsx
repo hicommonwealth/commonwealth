@@ -20,8 +20,7 @@ const displayOptions = [
   { value: '0', label: 'Hidden' },
 ];
 
-// TODO: In the final app, this will come from the /status route
-// and be accessible via app.templates or something to that effect
+// TODO: Update: this should just be fetched from GET contract/template route
 const templates = [
   {
     id: 1,
