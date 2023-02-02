@@ -30,6 +30,8 @@ import {
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
+import { addSwagger } from './server/routing/addSwagger';
+import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
@@ -257,6 +259,7 @@ async function main() {
     new DatabaseValidationService(models);
 
   setupAPI(
+    '/api',
     app,
     models,
     viewCountCache,
@@ -266,6 +269,11 @@ async function main() {
     globalActivityCache,
     dbValidationService
   );
+
+  // new API
+  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addSwagger('/external/docs', app);
+
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
