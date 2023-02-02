@@ -120,6 +120,7 @@ import {
   updateCommunityContractTemplateMetadata,
   deleteCommunityContractTemplateMetadata,
 } from '../routes/proposalTemplate';
+import { createTemplate, getTemplates } from '../routes/templates';
 
 import status from '../routes/status';
 import createSubscription from '../routes/subscription/createSubscription';
