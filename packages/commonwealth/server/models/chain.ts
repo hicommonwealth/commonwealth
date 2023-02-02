@@ -3,7 +3,7 @@ import type {
   ChainBase,
   ChainNetwork,
   ChainType,
-  ContractsViewable
+  ContractsViewable,
 } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';

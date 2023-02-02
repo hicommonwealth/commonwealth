@@ -5,7 +5,7 @@ import IdStore from './IdStore';
 class ContractsStore extends IdStore<Contract> {
   private _storeAddress: { [address: string]: Contract } = {};
   private _storeType: { [type: string]: Array<Contract> } = {};
-  private _storeFactories : Array<Contract> = [];
+  private _storeFactories: Array<Contract> = [];
 
   public add(contract: Contract) {
     super.add(contract);
@@ -34,7 +34,9 @@ class ContractsStore extends IdStore<Contract> {
   }
   public getFactoryContractByNickname(nickname: string): Contract {
     // filter through the _storeId map for a contract with a specified nickname
-    const contracts = this._storeFactories.filter((c) => c.nickname === nickname);
+    const contracts = this._storeFactories.filter(
+      (c) => c.nickname === nickname
+    );
     // if there is more than one contract with the same nickname, return the first one
     if (contracts.length > 0) {
       return contracts[0];

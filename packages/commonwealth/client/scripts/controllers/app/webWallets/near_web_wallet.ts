@@ -47,7 +47,7 @@ class NearWebWalletController implements IWebWallet<any> {
     return this._enabled;
   }
 
-  api: () => any
+  api: () => any;
 
   public async initConnection() {
     throw new Error('not implemented');

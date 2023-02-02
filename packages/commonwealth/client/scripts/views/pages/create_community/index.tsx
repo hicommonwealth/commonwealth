@@ -41,7 +41,7 @@ const ADMIN_ONLY_TABS = [
   CommunityType.Cosmos,
   CommunityType.EthDao,
   CommunityType.SputnikDao,
-  CommunityType.AbiFactory
+  CommunityType.AbiFactory,
 ];
 
 type CreateCommunityState = {
@@ -104,7 +104,12 @@ class CreateCommunity extends ClassComponent {
         case CommunityType.SplToken:
           return <SplTokenForm />;
         case CommunityType.AbiFactory:
-          return <AbiFactoryForm ethChains={ethChains} ethChainNames={ethChainNames} />;
+          return (
+            <AbiFactoryForm
+              ethChains={ethChains}
+              ethChainNames={ethChainNames}
+            />
+          );
         default:
           throw new Error(`Invalid community type: ${this.state.activeForm}`);
       }

@@ -63,7 +63,7 @@ const createContract = async (
     decimals,
     chain_node_id,
     balance_type,
-    eth_chain_id
+    eth_chain_id,
   } = req.body;
 
   if (!req.user) {

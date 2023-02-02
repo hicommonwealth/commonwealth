@@ -206,7 +206,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           where: {
             id: { [Op.in]: communityContracts.map((cc) => cc.contract_id) },
           },
-          include: [{ model: models.ContractAbi, required: false }, { model: models.ChainNode, required: false}],
+          include: [
+            { model: models.ContractAbi, required: false },
+            { model: models.ChainNode, required: false },
+          ],
         });
         resolve(contractsPromise);
       } catch (e) {

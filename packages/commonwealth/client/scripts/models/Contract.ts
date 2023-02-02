@@ -81,7 +81,7 @@ class Contract {
     isFactory,
     nickname,
     contractAbi,
-    ethChainId
+    ethChainId,
   }) {
     return new Contract({
       id,
@@ -97,7 +97,7 @@ class Contract {
       isFactory,
       nickname,
       contractAbi,
-      ethChainId
+      ethChainId,
     });
   }
 }

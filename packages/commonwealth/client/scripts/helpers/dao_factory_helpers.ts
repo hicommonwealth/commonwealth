@@ -1,20 +1,16 @@
 import $ from 'jquery';
 import m from 'mithril';
-import Web3 from 'web3';
-import { Contract, IWebWallet } from 'models';
-import { initAppState } from 'app';
-import app from 'state';
+import type Web3 from 'web3';
+import type { Contract, IWebWallet } from 'models';
+import app, { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import { AbiItem } from 'web3-utils';
+import type { AbiItem } from 'web3-utils';
 import type { TransactionReceipt } from 'web3-core';
 import { parseEventFromABI } from '../../../shared/abi_utils';
 import type { CreateFactoryEthDaoForm } from '../views/pages/create_community/types';
 import { processAbiInputsToDataTypes } from './abi_form_helpers';
-import ContractAbi from '../models/ContractAbi';
-import {
-  sendFunctionCall,
-} from '../controllers/chain/ethereum/callContractFunction';
+import { sendFunctionCall } from '../controllers/chain/ethereum/callContractFunction';
 import { ethers } from 'ethers';
 
 export function decodeTxParameterFromEvent(

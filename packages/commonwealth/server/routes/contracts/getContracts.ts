@@ -42,7 +42,7 @@ const getContracts = async (
     {
       model: models.ChainNode,
       required: false,
-    }
+    },
   ];
 
   const where = {};

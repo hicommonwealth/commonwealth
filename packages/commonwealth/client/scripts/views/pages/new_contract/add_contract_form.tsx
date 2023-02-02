@@ -40,7 +40,7 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
     symbol: '',
     token_name: '',
     decimals: 0,
-    ethChainId: 1
+    ethChainId: 1,
   };
 
   oninit(vnode: m.Vnode<EthChainAttrs>) {

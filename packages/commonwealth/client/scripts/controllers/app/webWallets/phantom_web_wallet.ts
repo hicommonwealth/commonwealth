@@ -32,7 +32,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  api: () => any
+  api: () => any;
 
   public getChainId() {
     return app.chain?.id || this.defaultNetwork;

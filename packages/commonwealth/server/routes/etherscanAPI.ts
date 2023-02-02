@@ -30,7 +30,7 @@ export const Errors = {
   EtherscanResponseFailed: 'Etherscan Response failed',
   InvalidABI: 'Invalid ABI',
   InvalidChainNode: 'Invalid Chain Node',
-  HasAbi: "Contract Already Has Abi"
+  HasAbi: 'Contract Already Has Abi',
 };
 
 type FetchEtherscanContractReq = {
@@ -57,7 +57,10 @@ const fetchEtherscanContract = async (
   // get Contract Object from Db by address
   const contract = await models.Contract.findOne({
     where: { address },
-    include:[{ model: models.ContractAbi, required: false }, { model: models.ChainNode, required: false }]
+    include: [
+      { model: models.ContractAbi, required: false },
+      { model: models.ChainNode, required: false },
+    ],
   });
   if (!contract) {
     throw new AppError(Errors.NoContractFound);
