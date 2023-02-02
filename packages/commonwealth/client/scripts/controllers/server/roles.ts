@@ -94,28 +94,6 @@ export class RolesController {
     });
   }
 
-  public acceptInvite(options: {
-    address: string;
-    inviteCode: any;
-  }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/acceptInvite`, {
-      address: options.address,
-      reject: false,
-      inviteCode: options.inviteCode,
-      jwt: this.User.jwt,
-    }).then((result) => {
-      this.addRole(result.result.role);
-    });
-  }
-
-  public rejectInvite(options: { inviteCode: any }) {
-    return $.post(`${app.serverUrl()}/acceptInvite`, {
-      inviteCode: options.inviteCode,
-      reject: true,
-      jwt: app.user.jwt,
-    });
-  }
-
   // TODO: clarify differences between getRoleInCommunity, getRoleOfCommunity, isRoleOfCommunity, getAllRolesInCommunity
 
   /**
