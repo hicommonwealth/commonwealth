@@ -7,9 +7,9 @@ import app from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { AbiItem } from 'web3-utils';
-import { TransactionReceipt } from 'web3-core';
+import type { TransactionReceipt } from 'web3-core';
 import { parseEventFromABI } from '../../../shared/abi_utils';
-import { CreateFactoryEthDaoForm } from '../views/pages/create_community/types';
+import type { CreateFactoryEthDaoForm } from '../views/pages/create_community/types';
 import { processAbiInputsToDataTypes } from './abi_form_helpers';
 import ContractAbi from '../models/ContractAbi';
 import {

@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { ContractType } from 'common-common/src/types';
+import { ChainNetwork, ContractType } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/adapter';
 import $ from 'jquery';
 import type { ChainInfo, ITokenAdapter } from 'models';
