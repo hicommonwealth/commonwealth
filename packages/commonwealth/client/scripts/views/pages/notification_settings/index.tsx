@@ -104,7 +104,7 @@ class NotificationSettingsPage extends ClassComponent {
           </div>
           {relevantSubscribedChains.map((chain) => {
             return (
-              <div class="notification-row">
+              <div class="notification-row chain-events-subscriptions-padding">
                 <div class="notification-row-header">
                   <div class="left-content-container">
                     <div class="avatar-and-name">
@@ -114,6 +114,18 @@ class NotificationSettingsPage extends ClassComponent {
                       </CWText>
                     </div>
                   </div>
+                  <CWCheckbox
+                    label="Receive Emails"
+                    disabled={true}
+                    checked={false}
+                    onchange={() => {
+                      app.user.notifications
+                        .enableImmediateEmails([])
+                        .then(() => {
+                          m.redraw();
+                        });
+                    }}
+                  />
                   <CWToggle
                     checked={false}
                     onchange={() => {
@@ -132,7 +144,6 @@ class NotificationSettingsPage extends ClassComponent {
             const chainInfo = app.config.chains.getById(chainName);
             const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
             const hasSomeInAppSubs = subs.some((s) => s.isActive);
-
             return (
               <div class="notification-row chain-events-subscriptions-padding">
                 <div class="notification-row-header">
