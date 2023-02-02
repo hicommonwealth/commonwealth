@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import m from 'mithril';
-import {ChainInfo, Notification, NotificationSubscription} from 'models';
+import { Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
 
 import app from 'state';
@@ -384,7 +384,7 @@ class NotificationsController {
 
   public getSubscribedChains() {
     return post('/getSubscribedChains', {}, (result) => {
-      this._chainEventSubscribedChainIds = result.map(x => x.id);
+      this._chainEventSubscribedChainIds = result.map((x) => x.id);
     });
   }
 
@@ -393,7 +393,7 @@ class NotificationsController {
       this.getDiscussionNotifications(),
       this.getChainEventNotifications(),
       this.getSubscriptions(),
-      this.getSubscribedChains()
+      this.getSubscribedChains(),
     ]);
   }
 }
