@@ -61,9 +61,8 @@ export async function createCommunityContractTemplateAndMetadata(
     );
   }
 
-  const communityContract = await models.CommunityContract.create({
-    chain_id: community_id,
-    contract_id,
+  const communityContract = await models.CommunityContract.findOne({
+    where: { id: contract_id },
   });
 
   if (!communityContract) {
