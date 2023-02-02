@@ -28,6 +28,7 @@ function setupCosmosProxy(app: Express, models: DB) {
         const response = await axios.post(chain.ChainNode.url, req.body, {
           headers: {
             origin: 'https://commonwealth.im',
+            timeout: 2000
           },
         });
         log.trace(

@@ -1,7 +1,7 @@
 import type { EncodeObject } from '@cosmjs/proto-signing';
 
 import type {
-  BankExtension,
+  BankExtension, DeliverTxResponse,
   GovExtension,
   StakingExtension,
   StdFee,
@@ -17,6 +17,7 @@ import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import { promiseUntilConnected } from '../../../../../shared/utils';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
 
@@ -88,9 +89,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
 
     // Poll for new block immediately
-    const { block } = await this._tmClient.block();
+    const { block } = await promiseUntilConnected(() => this._tmClient.block());
     const height = +block.header.height;
-    const { block: prevBlock } = await this._tmClient.block(height - 1);
+    const { block: prevBlock } = await promiseUntilConnected(() => this._tmClient.block(height - 1));
     const time = moment.unix(block.header.time.valueOf() / 1000);
     // TODO: check if this is correctly seconds or milliseconds
     this.app.chain.block.duration =
@@ -98,14 +99,17 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this.app.chain.block.lastTime = time;
     this.app.chain.block.height = height;
 
-    const {
-      pool: { bondedTokens },
-    } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bondedTokens));
-
+    try {
+      const {
+        pool: { bondedTokens },
+      } = await promiseUntilConnected(() => this._api.staking.pool());
+      this._staked = this.coins(new BN(bondedTokens));
+    } catch (e) {
+      console.log(e);
+    }
     const {
       params: { bondDenom },
-    } = await this._api.staking.params();
+    } = await promiseUntilConnected(() => this._api.staking.params());
     this._denom = bondDenom;
     this.app.chain.networkStatus = ApiStatus.Connected;
     m.redraw();
@@ -147,16 +151,16 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     // send the transaction using keplr-supported signing client
     try {
-      const result = await client.signAndBroadcast(
+      const result: DeliverTxResponse = await client.signAndBroadcast(
         account.address,
         [tx],
         DEFAULT_FEE,
         DEFAULT_MEMO
       );
       console.log(result);
-      if (cosm.isBroadcastTxFailure(result)) {
+      if (cosm.isDeliverTxSuccess(result)) {
         throw new Error('TX execution failed.');
-      } else if (cosm.isBroadcastTxSuccess(result)) {
+      } else if (cosm.isDeliverTxFailure(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({
           hash: Buffer.from(txHash, 'hex'),

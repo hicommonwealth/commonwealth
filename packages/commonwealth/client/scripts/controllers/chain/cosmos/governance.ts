@@ -19,6 +19,7 @@ import { Any } from 'cosmjs-types/google/protobuf/any';
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import moment from 'moment';
+import { promiseUntilConnected } from '../../../../../shared/utils';
 import type CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
 import type CosmosChain from './chain';
@@ -108,7 +109,7 @@ class CosmosGovernance extends ProposalModule<
     // query chain-wide params
     const { depositParams } = await this._Chain.api.gov.params('deposit');
     const { tallyParams } = await this._Chain.api.gov.params('tallying');
-    const { votingParams } = await this._Chain.api.gov.params('voting');
+    const { votingParams } = await promiseUntilConnected(() => this._Chain.api.gov.params('voting'));
     this._votingPeriodS = votingParams.votingPeriod.seconds.toNumber();
     this._yesThreshold = await asciiLiteralToDecimal(tallyParams.threshold);
     this._vetoThreshold = await asciiLiteralToDecimal(
@@ -182,7 +183,7 @@ class CosmosGovernance extends ProposalModule<
       while (nextKey.length > 0) {
         console.log(nextKey);
         const { proposals: addlProposals, pagination: nextPage } =
-          await this._Chain.api.gov.proposals(0, '', '', nextKey);
+          await promiseUntilConnected(() => this._Chain.api.gov.proposals(0, '', '', nextKey));
         proposals.push(...addlProposals);
         nextKey = nextPage.nextKey;
       }

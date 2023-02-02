@@ -329,3 +329,27 @@ export function aggregatePermissions(
   );
   return permission;
 }
+
+// adds timeout to promise
+async function timeoutPromise(f: Function, timeoutMs: number = 1500) {
+  return await Promise.race([
+    f(),
+    new Promise((resolve) => setTimeout(resolve, timeoutMs)).then(() => 'Timeout')
+  ]);
+}
+
+export async function promiseUntilConnected(f: Function, tries: number = 10, timeoutMs: number = 300) {
+  console.log(f);
+  let retVal;
+  let i = 0;
+  do {
+    retVal = await timeoutPromise( () => Promise.any([...Array(3).keys()].map(_ => f())), timeoutMs);
+  } while(retVal === 'Timeout' && i++ < tries)
+
+  if(retVal === tries) {
+    throw new Error('Promise timed out');
+  }
+  console.log('===');
+  console.log(retVal);
+  return retVal
+}
