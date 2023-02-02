@@ -1,18 +1,16 @@
-FROM node:14-alpine
+ARG PORT
 
-WORKDIR /app
+FROM node:18.13.0-alpine
 
-COPY ./package.json .
-COPY ./packages/commonwealth/package.json  ./packages/commonwealth/
+WORKDIR /commonwealth
 
-RUN apk add --update --no-cache python3 build-base gcc && ln -sf \
-/usr/bin/python3 /usr/bin/python
+COPY . .
 
-RUN npm i -g yarn --force && apk add git && yarn --ignore-engines
+RUN yarn --ignore-engines
 
-COPY . . 
-COPY --from=builder /packages/commonwealth/build /packages/commonwealth/build
+EXPOSE $PORT
 
-WORKDIR /monorepo/packages/commonwealth
-CMD ["true"]
+RUN yarn start &
 
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost/$PORT || exit 1

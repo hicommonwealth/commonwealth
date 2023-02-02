@@ -1,19 +1,15 @@
-FROM builder
+FROM node:18.13.0-alpine
 
-COPY . .
+WORKDIR /commonwealth
 
-RUN apk add --update --no-cache python3 build-base gcc && ln -sf \
-/usr/bin/python3 /usr/bin/python && apk add postgresql-client
+COPY ../../ .
 
-ENV WAIT_VERSION 2.7.2
-
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
-
-RUN chmod +x /wait
-
-RUN yarn --ignore-engines && apk add git && yarn build
+RUN yarn --ignore-engines
 
 EXPOSE 8080
 
-CMD /wait && yarn start
+RUN yarn start &
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost/ || exit 1
 

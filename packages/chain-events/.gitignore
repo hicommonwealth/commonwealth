@@ -2,7 +2,6 @@
 /eth/build
 /eth/artifacts
 /eth/cache
-/build
 node_modules/
 .vscode
 yarn-error.log

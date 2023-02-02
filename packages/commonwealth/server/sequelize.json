@@ -3,7 +3,7 @@
     "username": "commonwealth",
     "password": "edgeware",
     "database": "commonwealth",
-    "host": "db",
+    "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {

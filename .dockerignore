@@ -1,5 +1,11 @@
-*/node_modules
-node_modules/
-.DS_Store
-*/.DS_Store
-*.log
+# ignore everything
+*
+
+# allow useful stuff
+!**/yarn.lock
+!**/packages.json
+!scripts/
+!packages/
+
+# ignore tests in useful stuff
+**/test
