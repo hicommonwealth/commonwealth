@@ -133,90 +133,6 @@
             "description": "Bad Request"
           }
         }
-      },
-      "put": {
-        "summary": "Creates comments.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "jwt",
-            "description": "The jwt token of the user.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "comments",
-            "description": "List of comment ids.",
-            "required": true,
-            "type": "object",
-            "properties": {
-              "comments": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": ["address_id", "community_id", "text"],
-                  "properties": {
-                    "address_id": {
-                      "type": "integer"
-                    },
-                    "community_id": {
-                      "type": "string"
-                    },
-                    "text": {
-                      "type": "string"
-                    },
-                    "root_id": {
-                      "type": "string",
-                      "default": "discussion_${threadId}"
-                    },
-                    "parent_id": {
-                      "type": "integer",
-                      "default": "null"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Deletes comments.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "jwt",
-            "description": "The jwt token of the user.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "ids",
-            "type": "array",
-            "items": {
-              "type": "integer"
-            },
-            "description": "List of comment ids."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
       }
     },
     "/reactions": {
@@ -280,85 +196,6 @@
         "responses": {
           "200": {
             "description": "A list of reactions."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "post": {
-        "summary": "Creates reactions.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "jwt",
-            "description": "The jwt token of the user.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "reactions",
-            "description": "List of reactions to create.",
-            "required": true,
-            "type": "object",
-            "properties": {
-              "reactions": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "address_id": {
-                      "type": "integer",
-                      "required": true
-                    },
-                    "community_id": {
-                      "type": "string",
-                      "required": true
-                    },
-                    "reaction": {
-                      "type": "string",
-                      "required": true,
-                      "default": "like"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Deletes reactions.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "jwt",
-            "description": "The jwt token of the user.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "ids",
-            "type": "array",
-            "items": {
-              "type": "integer"
-            },
-            "description": "List of reaction ids."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
           },
           "400": {
             "description": "Bad Request"
@@ -431,84 +268,6 @@
             "description": "Please provide a parameter to query by (community_id, network, comment_id, address_ids, addresses)"
           }
         }
-      },
-      "put": {
-        "summary": "Creates communities.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "communities",
-            "description": "List of comment ids.",
-            "required": true,
-            "type": "object",
-            "properties": {
-              "comments": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer",
-                      "required": true
-                    },
-                    "name": {
-                      "type": "string",
-                      "required": true
-                    },
-                    "chain_node_id": {
-                      "type": "string",
-                      "required": true
-                    },
-                    "default_symbol": {
-                      "type": "string",
-                      "default": ""
-                    },
-                    "icon_url": {
-                      "type": "string",
-                      "default": ""
-                    },
-                    "network": {
-                      "type": "string",
-                      "default": "erc20"
-                    },
-                    "description": {
-                      "type": "string",
-                      "default": ""
-                    },
-                    "type": {
-                      "type": "string",
-                      "default": "token"
-                    },
-                    "website": {
-                      "type": "string",
-                      "default": ""
-                    },
-                    "discrod": {
-                      "type": "string",
-                      "default": ""
-                    },
-                    "telegram": {
-                      "type": "string",
-                      "default": ""
-                    },
-                    "github": {
-                      "type": "string",
-                      "default": ""
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
       }
     },
     "/profiles": {
@@ -558,60 +317,6 @@
             "description": "Please provide a parameter to query by (addresses, profile_ids)"
           }
         }
-      },
-      "post": {
-        "summary": "Creates profiles.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "profiles",
-            "description": "List of profiles to create.",
-            "required": true,
-            "type": "object",
-            "properties": {
-              "profiles": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "user_id": {
-                      "type": "integer",
-                      "required": true
-                    },
-                    "profile_name": {
-                      "type": "string",
-                      "default": null
-                    },
-                    "email": {
-                      "type": "integer",
-                      "default": null
-                    },
-                    "website": {
-                      "type": "string",
-                      "default": null
-                    },
-                    "bio": {
-                      "type": "string",
-                      "default": null
-                    },
-                    "avatar_url": {
-                      "type": "string",
-                      "default": null
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
       }
     },
     "/topics": {
@@ -643,70 +348,6 @@
         "responses": {
           "200": {
             "description": "A list of topics."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "post": {
-        "summary": "Creates topics.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "topics",
-            "description": "List of topics to create.",
-            "required": true,
-            "type": "object",
-            "properties": {
-              "topics": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "community_id": {
-                      "type": "string",
-                      "required": true
-                    },
-                    "name": {
-                      "type": "string",
-                      "required": true
-                    },
-                    "description": {
-                      "type": "string",
-                      "default": null
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Deletes topics.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "ids",
-            "type": "array",
-            "items": {
-              "type": "integer"
-            },
-            "description": "List of topic ids."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
           },
           "400": {
             "description": "Bad Request"
@@ -748,35 +389,6 @@
             "description": "Bad Request"
           }
         }
-      },
-      "delete": {
-        "summary": "Deletes roles.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "jwt",
-            "description": "The jwt token of the user.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "ids",
-            "type": "array",
-            "items": {
-              "type": "integer"
-            },
-            "description": "List of role ids."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
       }
     },
     "/rules": {
@@ -813,44 +425,6 @@
         "responses": {
           "200": {
             "description": "A list of rules."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "post": {
-        "summary": "Creates rules.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "rules",
-            "description": "List of rules to create.",
-            "required": true,
-            "type": "object",
-            "properties": {
-              "rules": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "community_id": {
-                      "type": "string",
-                      "required": true
-                    },
-                    "rule": {
-                      "type": "string",
-                      "required": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
           },
           "400": {
             "description": "Bad Request"
