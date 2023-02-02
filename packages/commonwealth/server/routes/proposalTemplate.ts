@@ -5,7 +5,6 @@ import type { CommunityContractTemplateAttributes } from '../models/community_co
 import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success, failure } from '../types';
-import { idAndIndex } from '@polkadot/api-derive/accounts';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
   slug: string;
@@ -17,15 +16,27 @@ type CreateCommunityContractTemplateAndMetadataReq = {
   template_id: number;
 };
 
-type CreateCommunityContractTemplateAndMetadataResp = {
+type CommunityContractTemplateAndMetadataResp = {
   metadata: CommunityContractTemplateMetadataAttributes;
   cct: CommunityContractTemplateAttributes;
+};
+
+type CommunityContractTemplateRequest = {
+  id: number;
+  community_contract_id: number;
+  cctmd_id: number;
+  template_id: number;
+};
+
+type CommunityContractTemplateResp = {
+  community_contract_id: number;
+  template_id: number;
 };
 
 export async function createCommunityContractTemplateAndMetadata(
   models: DB,
   req: TypedRequestBody<CreateCommunityContractTemplateAndMetadataReq>,
-  res: TypedResponse<CreateCommunityContractTemplateAndMetadataResp>
+  res: TypedResponse<CommunityContractTemplateAndMetadataResp>
 ) {
   const {
     slug,
@@ -84,40 +95,53 @@ export async function createCommunityContractTemplateAndMetadata(
 
 export async function getCommunityContractTemplate(
   models: DB,
-  req: Request,
-  res: Response
+  req: TypedRequestBody<CommunityContractTemplateRequest>,
+  res: TypedResponse<CommunityContractTemplateAndMetadataResp>
 ) {
   try {
     if (!req.body) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide request body as json',
-      });
+      throw new AppError('Must provide community_contract_id and template_id');
     }
-    const contractTemplate: CommunityContractTemplateAttributes =
-      req.body.contract;
+    const contractTemplate: CommunityContractTemplateAttributes = req.body;
 
     if (!contractTemplate) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide community_id, contract_id, and template_id',
-      });
+      throw new AppError('Must provide contract template');
     }
 
-    const contract = await models.CommunityContractTemplate.findOne({
+    const communityContract = await models.CommunityContractTemplate.findOne({
       where: {
         template_id: contractTemplate.template_id,
       },
     });
 
-    if (!contract) {
-      return res.status(404).json({
-        status: 'Failure',
-        message: 'Template not found',
-      });
+    if (!communityContract) {
+      throw new AppError('Contract does not exist');
     }
 
-    return res.status(200).json({ status: 'Success', data: contract });
+    const metadata = await models.CommunityContractTemplateMetadata.findOne({
+      where: {
+        id: communityContract.cctmd_id,
+      },
+    });
+
+    if (!metadata) {
+      throw new AppError('Metadata does not exist');
+    }
+
+    const cct = await models.CommunityContractTemplate.findOne({
+      where: {
+        community_contract_id: contractTemplate.community_contract_id,
+        template_id: contractTemplate.template_id,
+      },
+    });
+
+    if (!cct) {
+      throw new AppError('Contract template does not exist');
+    }
+
+    return success(res, {
+      metadata, cct
+    });
   } catch (err) {
     throw new AppError('Error getting community contract template');
   }
@@ -125,25 +149,19 @@ export async function getCommunityContractTemplate(
 
 export async function updateCommunityContractTemplate(
   models: DB,
-  req: Request,
-  res: Response
+  req: TypedRequestBody<CommunityContractTemplateRequest>,
+  res: TypedResponse<CommunityContractTemplateResp>
 ) {
   try {
     if (!req.body) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide contract template',
-      });
+      throw new AppError('Must provide community_contract_id and template_id');
     }
 
     const contractTemplate: CommunityContractTemplateAttributes =
-      req.body.contract;
+      req.body;
 
     if (!contractTemplate) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide community_id, contract_id, and template_id',
-      });
+      throw new AppError('Must provide contract template');
     }
 
     const contract = await models.CommunityContractTemplate.findOne({
@@ -153,15 +171,15 @@ export async function updateCommunityContractTemplate(
     });
 
     if (!contract) {
-      return res.status(404).json({
-        status: 'Failure',
-        message: 'Template not found',
-      });
+      throw new AppError('Contract does not exist');
     }
 
     const updated = await contract.update(contractTemplate);
 
-    return res.status(200).json({ status: 'Success', data: updated });
+    return success(res, {
+      community_contract_id: updated.community_contract_id,
+      template_id: updated.template_id,
+    });
   } catch (err) {
     throw new AppError('Error updating community contract template');
   }
@@ -169,25 +187,19 @@ export async function updateCommunityContractTemplate(
 
 export async function deleteCommunityContractTemplate(
   models: DB,
-  req: Request,
-  res: Response
+  req: TypedRequestBody<CommunityContractTemplateRequest>,
+  res: TypedResponse<CommunityContractTemplateResp>
 ) {
   try {
     if (!req.body) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide contract template',
-      });
+      throw new AppError('Must provide community_contract_id and template_id');
     }
 
     const contractTemplate: CommunityContractTemplateAttributes =
-      req.body.contract;
+      req.body;
 
     if (!contractTemplate) {
-      return res.status(400).json({
-        status: 'Failure',
-        message: 'Must provide community_id, contract_id, and template_id',
-      });
+      throw new AppError('Must provide contract template');
     }
 
     const contract = await models.CommunityContractTemplate.findOne({
@@ -197,15 +209,15 @@ export async function deleteCommunityContractTemplate(
     });
 
     if (!contract) {
-      return res.status(404).json({
-        status: 'Failure',
-        message: 'Template not found',
-      });
+      throw new AppError('Contract does not exist');
     }
 
     await contract.destroy();
 
-    return res.status(200).json({ status: 'Success', data: contract });
+    return success(res, {
+      community_contract_id: contract.community_contract_id,
+      template_id: contract.template_id,
+    });
   } catch (err) {
     throw new AppError('Error deleting community contract template');
   }
