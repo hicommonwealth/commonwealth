@@ -2,28 +2,29 @@
 import React from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
- // required for getStatusText
+// required for getStatusText
 import moment from 'moment';
 import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
 
 import 'components/proposal_card/index.scss';
-
-import { blocknumToDuration, formatNumberLong } from 'helpers';
-import { ProposalStatus, AnyProposal } from 'models';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import MolochProposal, {
   MolochProposalState,
 } from 'controllers/chain/ethereum/moloch/proposal';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import { Countdown } from 'views/components/countdown';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+
+import { blocknumToDuration, formatNumberLong } from 'helpers';
 import {
   chainEntityTypeToProposalShortName,
   proposalSlugToChainEntityType,
 } from 'identifiers';
+import type { AnyProposal } from 'models';
+import { ProposalStatus } from 'models';
+import { Countdown } from 'views/components/countdown';
 
 export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Passing

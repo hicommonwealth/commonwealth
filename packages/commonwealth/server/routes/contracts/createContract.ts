@@ -1,17 +1,14 @@
-import { NextFunction } from 'express';
-import Web3 from 'web3';
-import BN from 'bn.js';
-import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { ContractType } from 'common-common/src/types';
-import { DB } from 'server/models';
-import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
-import { AbiItem } from 'web3-utils';
-import { ContractAttributes } from '../../models/contract';
-import { ChainNodeAttributes } from '../../models/chain_node';
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-
-const log = factory.getLogger(formatFilename(__filename));
+import type { ContractType } from 'common-common/src/types';
+import { AppError } from 'common-common/src/errors';
+import type { DB } from '../../models';
+import type {
+  ContractAttributes,
+  ContractInstance,
+} from '../../models/contract';
+import type { ChainNodeAttributes } from '../../models/chain_node';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
+import validateAbi from '../../util/abiValidation';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -20,7 +17,8 @@ export const Errors = {
   InvalidAddress: 'Address is invalid',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidNode: 'Node url returned invalid response',
-  InvalidABI: 'Invalid ABI',
+  InvalidABI: 'Invalid ABI passed in',
+  NoAbiNickname: 'Must provide ABI nickname',
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBalanceType: 'Must provide balance type',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
@@ -40,7 +38,8 @@ export type CreateContractReq = ContractAttributes &
     community: string;
     node_url: string;
     address: string;
-    abi: string;
+    abi?: string;
+    abiNickname?: string;
     contractType: ContractType;
   };
 
@@ -51,14 +50,14 @@ export type CreateContractResp = {
 const createContract = async (
   models: DB,
   req: TypedRequestBody<CreateContractReq>,
-  res: TypedResponse<CreateContractResp>,
-  next: NextFunction
+  res: TypedResponse<CreateContractResp>
 ) => {
   const {
     community,
     address,
     contractType,
     abi,
+    abiNickname,
     symbol,
     token_name,
     decimals,
@@ -67,49 +66,44 @@ const createContract = async (
   } = req.body;
 
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    throw new AppError('Not logged in');
   }
   // require Admin privilege for creating Contract
+  // TODO: should be admin role, not JUST site admin
   if (!req.user.isAdmin) {
-    return next(new Error(Errors.NotAdmin));
-  }
-
-  if (abi && (Object.keys(abi) as Array<string>).length === 0) {
-    return next(new Error(Errors.InvalidABI));
-  }
-  let abiAsRecord: Array<Record<string, unknown>>;
-  if (abi) {
-    try {
-      // Parse ABI to validate it as a properly formatted ABI
-      abiAsRecord = JSON.parse(abi);
-      if (!abiAsRecord) {
-        return next(new Error(Errors.InvalidABI));
-      }
-      const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-      if (!abiItems) {
-        return next(new Error(Errors.InvalidABI));
-      }
-    } catch {
-      return next(new Error(Errors.InvalidABI));
-    }
+    throw new AppError(Errors.NotAdmin);
   }
 
   if (!contractType || !contractType.trim()) {
-    return next(new Error(Errors.NoType));
+    throw new AppError(Errors.NoType);
   }
 
-  if (!Web3.utils.isAddress(address)) {
-    return next(new Error(Errors.InvalidAddress));
+  const Web3 = (await import('web3-utils')).default;
+  if (!Web3.isAddress(address)) {
+    throw new AppError(Errors.InvalidAddress);
   }
 
   if (decimals < 0 || decimals > 18) {
-    return next(new Error(Errors.InvalidDecimal));
+    throw new AppError(Errors.InvalidDecimal);
   }
   if (!chain_node_id) {
-    return next(new Error(Errors.NoNodeUrl));
+    throw new AppError(Errors.NoNodeUrl);
   }
   if (!balance_type) {
-    return next(new Error(Errors.InvalidBalanceType));
+    throw new AppError(Errors.InvalidBalanceType);
+  }
+
+  let abiAsRecord: Array<Record<string, unknown>>;
+  if (abi) {
+    if (!abiNickname) {
+      throw new AppError(Errors.NoAbiNickname);
+    }
+
+    if ((Object.keys(abi) as Array<string>).length === 0) {
+      throw new AppError(Errors.InvalidABI);
+    }
+
+    abiAsRecord = validateAbi(abi);
   }
 
   const oldContract = await models.Contract.findOne({
@@ -117,7 +111,14 @@ const createContract = async (
   });
 
   if (oldContract && oldContract.address === address) {
-    return next(new Error(Errors.ContractAddressExists));
+    // contract already exists so attempt to add it to the community if it's not already there
+    await models.CommunityContract.findOrCreate({
+      where: {
+        chain_id: community,
+        contract_id: oldContract.id,
+      },
+    });
+    return success(res, { contract: oldContract.toJSON() });
   }
 
   // override provided URL for eth chains (typically ERC20) with stored, unless none found
@@ -128,16 +129,17 @@ const createContract = async (
   });
 
   if (!node) {
-    return next(new Error(Errors.InvalidNodeUrl));
+    throw new AppError(Errors.InvalidNodeUrl);
   }
 
-  let contract;
-  if (abi != null) {
+  let contract: ContractInstance;
+  if (abi) {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
       const contract_abi = await models.ContractAbi.create(
         {
           abi: abiAsRecord,
+          nickname: abiNickname,
         },
         { transaction: t }
       );

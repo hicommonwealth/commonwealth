@@ -50,12 +50,30 @@ module.exports = {
       );
 
       const chainCategories = [];
-      const daos = ['agoric', 'clover', 'cosmos', 'edgeware', 'marlin', 'metacartel', 'phala', 'regen-network', 'stafi'];
+      const daos = [
+        'agoric',
+        'clover',
+        'cosmos',
+        'edgeware',
+        'marlin',
+        'metacartel',
+        'phala',
+        'regen-network',
+        'stafi',
+      ];
       const defi = ['clover', 'injective'];
 
-      daos.forEach((c) => chainCategories.push({ chain_id: c, category_type_id: 2 }));
-      defi.forEach((c) => chainCategories.push({ chain_id: c, category_type_id: 1 }));
-      return queryInterface.bulkInsert('ChainCategories', [...chainCategories], { transaction: t });
+      daos.forEach((c) =>
+        chainCategories.push({ chain_id: c, category_type_id: 2 })
+      );
+      defi.forEach((c) =>
+        chainCategories.push({ chain_id: c, category_type_id: 1 })
+      );
+      return queryInterface.bulkInsert(
+        'ChainCategories',
+        [...chainCategories],
+        { transaction: t }
+      );
     });
   },
 

@@ -4,9 +4,9 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_collapsible.scss';
+import { CWIconButton } from './cw_icon_button';
 
 import { ComponentType } from './types';
-import { CWIconButton } from './cw_icon_button';
 
 type CollapsibleProps = {
   collapsibleContent: React.ReactNode;

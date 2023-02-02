@@ -12,15 +12,15 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
-import app from 'state';
 
 import 'components/user_survey_popup.scss';
+import app from 'state';
 
 import { CWButton } from './component_kit/cw_button';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWGrowl } from './component_kit/cw_growl';
-import { CWText } from './component_kit/cw_text';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWText } from './component_kit/cw_text';
 
 const USER_SURVEY_DISPLAY_INTERVAL = 1000 * 60 * 60; // 1 Hour wait
 

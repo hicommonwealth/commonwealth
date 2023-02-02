@@ -1,52 +1,44 @@
-import { Request, Response, NextFunction } from 'express';
-
-import { StargateClient } from '@cosmjs/stargate';
-import { bech32 } from 'bech32';
-import bs58 from 'bs58';
-
-import Keyring, { decodeAddress } from '@polkadot/keyring';
-import { KeyringOptions } from '@polkadot/keyring/types';
-import { stringToU8a, hexToU8a, stringToHex } from '@polkadot/util';
-import { KeypairType } from '@polkadot/util-crypto/types';
-import * as ethUtil from 'ethereumjs-util';
 import {
   recoverTypedSignature,
   SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
 
-import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import {
-  pubkeyToAddress,
-  serializeSignDoc,
-  decodeSignature,
-  StdSignDoc,
-} from '@cosmjs/amino';
+import type { KeyringOptions } from '@polkadot/keyring/types';
+import { hexToU8a, stringToHex } from '@polkadot/util';
+import type { KeypairType } from '@polkadot/util-crypto/types';
 
-import nacl from 'tweetnacl';
+import { bech32 } from 'bech32';
+import bs58 from 'bs58';
+import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
 } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { addressSwapper } from '../../shared/utils';
-import { ChainInstance } from '../models/chain';
-import { ProfileAttributes } from '../models/profile';
-import { AddressInstance } from '../models/address';
+import * as ethUtil from 'ethereumjs-util';
+import type { NextFunction, Request, Response } from 'express';
+
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
-import { DB } from '../models';
-import { DynamicTemplate } from '../../shared/types';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { mixpanelTrack } from '../util/mixpanelUtil';
+import {
+  chainBasetoCanvasChain,
+  constructCanvasMessage,
+} from '../../shared/adapters/shared';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { chainBasetoCanvasChain, constructCanvasMessage } from '../../shared/adapters/shared';
+import { DynamicTemplate } from '../../shared/types';
+import { addressSwapper } from '../../shared/utils';
+import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
+import type { ChainInstance } from '../models/chain';
+import type { ProfileAttributes } from '../models/profile';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
-const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   NoChain: 'Must provide chain',
   InvalidChain: 'Invalid chain',
@@ -69,7 +61,7 @@ const verifySignature = async (
   user_id: number,
   signatureString: string,
   sessionPublicAddress: string | null, // used when signing a block to login
-  sessionBlockInfo: string | null,     // used when signing a block to login
+  sessionBlockInfo: string | null // used when signing a block to login
 ): Promise<boolean> => {
   if (!chain) {
     log.error('no chain provided to verifySignature');
@@ -81,10 +73,10 @@ const verifySignature = async (
     chainBasetoCanvasChain(chain.base),
     // TODO: Figure out how to retrieve the right chain ID
     // this is not currently being checked
-    "unknown",
+    'unknown',
     addressModel.address,
     sessionPublicAddress,
-    addressModel.block_info!
+    addressModel.block_info
   );
 
   let isValid: boolean;
@@ -92,7 +84,8 @@ const verifySignature = async (
     //
     // substrate address handling
     //
-    const address = decodeAddress(addressModel.address);
+    const polkadot = await import('@polkadot/keyring');
+    const address = polkadot.decodeAddress(addressModel.address);
     const keyringOptions: KeyringOptions = { type: 'sr25519' };
     if (
       !addressModel.keytype ||
@@ -103,7 +96,9 @@ const verifySignature = async (
         keyringOptions.type = addressModel.keytype as KeypairType;
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
-      const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
+      const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(
+        address
+      );
       const message = stringToHex(JSON.stringify(canvasMessage));
 
       const signatureU8a =
@@ -167,11 +162,14 @@ const verifySignature = async (
     // the account they registered with.
     // TODO: ensure ion works
     const bech32Prefix = chain.bech32_prefix;
+
+    const cosmCrypto = await import('@cosmjs/crypto');
     if (!bech32Prefix) {
       log.error('No bech32 prefix found.');
       isValid = false;
     } else {
-      const generatedAddress = pubkeyToAddress(
+      const cosm = await import('@cosmjs/amino');
+      const generatedAddress = cosm.pubkeyToAddress(
         stdSignature.pub_key,
         bech32Prefix
       );
@@ -179,13 +177,14 @@ const verifySignature = async (
       if (generatedAddress === addressModel.address) {
         try {
           // directly verify the generated signature, generated via SignBytes
-          const { pubkey, signature } = decodeSignature(stdSignature);
-          const secpSignature = Secp256k1Signature.fromFixedLength(signature);
-          const messageHash = new Sha256(
+          const { pubkey, signature } = cosm.decodeSignature(stdSignature);
+          const secpSignature =
+            cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
+          const messageHash = new cosmCrypto.Sha256(
             Buffer.from(JSON.stringify(canvasMessage))
           ).digest();
 
-          isValid = await Secp256k1.verifySignature(
+          isValid = await cosmCrypto.Secp256k1.verifySignature(
             secpSignature,
             messageHash,
             pubkey
@@ -207,11 +206,12 @@ const verifySignature = async (
       log.error('No bech32 prefix found.');
       isValid = false;
     } else {
-      const generatedAddress = pubkeyToAddress(
+      const cosm = await import('@cosmjs/amino');
+      const generatedAddress = cosm.pubkeyToAddress(
         stdSignature.pub_key,
         bech32Prefix
       );
-      const generatedAddressWithCosmosPrefix = pubkeyToAddress(
+      const generatedAddressWithCosmosPrefix = cosm.pubkeyToAddress(
         stdSignature.pub_key,
         'cosmos'
       );
@@ -222,14 +222,19 @@ const verifySignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const generatedSignDoc = validationTokenToSignDoc(Buffer.from(JSON.stringify(canvasMessage)), generatedAddress)
+          const generatedSignDoc = await validationTokenToSignDoc(
+            Buffer.from(JSON.stringify(canvasMessage)),
+            generatedAddress
+          );
 
-          const { pubkey, signature } = decodeSignature(stdSignature);
-          const secpSignature = Secp256k1Signature.fromFixedLength(signature);
-          const messageHash = new Sha256(
-            serializeSignDoc(generatedSignDoc)
+          const { pubkey, signature } = cosm.decodeSignature(stdSignature);
+          const cosmCrypto = await import('@cosmjs/crypto');
+          const secpSignature =
+            cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
+          const messageHash = new cosmCrypto.Sha256(
+            cosm.serializeSignDoc(generatedSignDoc)
           ).digest();
-          isValid = await Secp256k1.verifySignature(
+          isValid = await cosmCrypto.Secp256k1.verifySignature(
             secpSignature,
             messageHash,
             pubkey
@@ -256,7 +261,9 @@ const verifySignature = async (
       const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
 
       if (addressModel.block_info !== sessionBlockInfo) {
-        throw new Error(`Eth verification failed for ${addressModel.address}: signed a different block than expected`)
+        throw new Error(
+          `Eth verification failed for ${addressModel.address}: signed a different block than expected`
+        );
       }
       const address = recoverTypedSignature({
         data: typedCanvasMessage,
@@ -281,6 +288,7 @@ const verifySignature = async (
     //
 
     // both in base64 encoding
+    const nacl = await import('tweetnacl');
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
     isValid = nacl.sign.detached.verify(
       Buffer.from(JSON.stringify(canvasMessage)),
@@ -296,6 +304,7 @@ const verifySignature = async (
     try {
       const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
+        const nacl = await import('tweetnacl');
         isValid = nacl.sign.detached.verify(
           Buffer.from(`${JSON.stringify(canvasMessage)}`),
           Buffer.from(signatureString, 'base64'),
@@ -363,7 +372,7 @@ const processAddress = async (
   signature: string,
   user: Express.User,
   sessionPublicAddress: string | null,
-  sessionBlockInfo: string | null,
+  sessionBlockInfo: string | null
 ): Promise<void> => {
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
@@ -471,7 +480,7 @@ const verifyAddress = async (
     req.body.signature,
     req.user,
     req.body.session_public_address,
-    req.body.session_block_data,
+    req.body.session_block_data
   );
 
   if (req.user) {

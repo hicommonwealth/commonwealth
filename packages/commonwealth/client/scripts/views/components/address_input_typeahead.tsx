@@ -1,25 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-import $ from 'jquery';
-// import { InputSelect, ListItem } from 'construct-ui';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import 'components/address_input_typeahead.scss';
+import $ from 'jquery';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
-import { AddressInfo } from 'models';
 import { CWText } from './component_kit/cw_text';
 
 type AddressInputTypeaheadItem = {

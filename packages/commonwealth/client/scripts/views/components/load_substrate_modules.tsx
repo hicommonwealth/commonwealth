@@ -1,12 +1,21 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ChainBase } from 'common-common/src/types';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
+import type { ProposalModule } from 'models';
 
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import { ProposalModule } from 'models';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import { BreadcrumbsTitleTag } from './breadcrumbs_title_tag';
@@ -14,7 +23,7 @@ import { BreadcrumbsTitleTag } from './breadcrumbs_title_tag';
 export const loadSubstrateModules = (
   name: string,
   getModules: () => ProposalModule<any, any, any>[]
-): ResultNode | undefined => {
+): React.ReactNode | undefined => {
   const onSubstrate = app.chain?.base === ChainBase.Substrate;
 
   if (onSubstrate) {
@@ -36,12 +45,7 @@ export const loadSubstrateModules = (
 
       app.chain.loadModules(modules);
 
-      return (
-        <PageLoading
-          message={`Loading ${name.toLowerCase()}`}
-          title={<BreadcrumbsTitleTag title={name} />}
-        />
-      );
+      return <PageLoading message={`Loading ${name.toLowerCase()}`} />;
     }
   }
 };

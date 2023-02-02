@@ -4,9 +4,9 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_profiles_list.scss';
+import { CWIcon } from './cw_icons/cw_icon';
 
 import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
 import { getClasses } from './helpers';
 
 type ProfileRowStyleProps = {
@@ -60,7 +60,7 @@ export const CWProfilesList = (props: ProfilesListProps) => {
       <div
         className={getClasses<{ darkMode?: boolean }>(
           { darkMode },
-          'profile-rows-container'
+          'ProfilesList'
         )}
       >
         {profiles.map((profile) => (

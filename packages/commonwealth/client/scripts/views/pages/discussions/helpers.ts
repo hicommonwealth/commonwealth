@@ -1,3 +1,4 @@
+import { notifySuccess } from 'controllers/app/notifications';
 import {
   ClassComponent,
   ResultNode,
@@ -9,11 +10,10 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
+import type { NotificationSubscription, Thread } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import { NotificationSubscription, Thread } from 'models';
-import { notifySuccess } from 'controllers/app/notifications';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 

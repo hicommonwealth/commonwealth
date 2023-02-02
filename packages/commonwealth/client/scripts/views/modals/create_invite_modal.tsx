@@ -1,37 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
-// import { ListItem, List, SelectList } from 'construct-ui';
-import { checkAddressChecksum } from 'web3-utils';
 import { decodeAddress } from '@polkadot/util-crypto';
-import moment from 'moment';
+import { ChainBase } from 'common-common/src/types';
 
 import 'modals/create_invite_modal.scss';
+import type { ChainInfo, Profile } from 'models';
+import { RoleInfo } from 'models';
+import { SearchScope } from 'models/SearchQuery';
+import moment from 'moment';
 
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, RoleInfo, Profile } from 'models';
-import { SearchScope } from 'models/SearchQuery';
-import { notifyError } from 'controllers/app/notifications';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { checkAddressChecksum } from 'web3-utils';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
-import { UserBlock } from '../components/user/user_block';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 
 type SearchParams = {
   chainScope?: string;
@@ -287,7 +274,6 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
 
     return (
       <CWButton
-        loading={this.loading}
         disabled={disabled}
         label={selection === 'email' ? 'Send Invite' : 'Add address'}
         onClick={(e) => {
@@ -539,31 +525,30 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
               }}
             />
           </div>
-          {
-            searchAddressTerm?.length > 3 && !this.hideResults && null // @TODO @REACT FIX ME
-            // m(List, [
-            //   !results || results?.length === 0
-            //     ? app.searchAddressCache[searchAddressTerm]?.loaded
-            //       ? m(ListItem, {
-            //           label: (
-            //             <div className="no-addresses">
-            //               <CWText fontWeight="medium">
-            //                 {searchAddressTerm}
-            //               </CWText>
-            //               <CWText type="caption">No addresses found</CWText>
-            //             </div>
-            //           ),
-            //           onClick: () => {
-            //             if (searchAddressTerm.length < 4) {
-            //               notifyError('Query must be at least 4 characters');
-            //             }
-            //           },
-            //         })
-            //       : m(ListItem, { label: <CWSpinner size="small" /> })
-            //     : this.isTyping
-            //     ? m(ListItem, { label: <CWSpinner size="small" /> })
-            //     : results,
-            // ])
+          {searchAddressTerm?.length > 3 && !this.hideResults && null // @TODO @REACT FIX ME
+          // m(List, [
+          //   !results || results?.length === 0
+          //     ? app.searchAddressCache[searchAddressTerm]?.loaded
+          //       ? m(ListItem, {
+          //           label: (
+          //             <div className="no-addresses">
+          //               <CWText fontWeight="medium">
+          //                 {searchAddressTerm}
+          //               </CWText>
+          //               <CWText type="caption">No addresses found</CWText>
+          //             </div>
+          //           ),
+          //           onClick: () => {
+          //             if (searchAddressTerm.length < 4) {
+          //               notifyError('Query must be at least 4 characters');
+          //             }
+          //           },
+          //         })
+          //       : m(ListItem, { label: <CWSpinner size="small" /> })
+          //     : this.isTyping
+          //     ? m(ListItem, { label: <CWSpinner size="small" /> })
+          //     : results,
+          // ])
           }
           <InviteButton
             selection="address"

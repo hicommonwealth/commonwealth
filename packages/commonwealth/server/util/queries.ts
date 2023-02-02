@@ -1,4 +1,5 @@
-import { IPagination, OrderByOptions } from '../../../common-common/src/api/extApiTypes';
+import type { IPagination } from 'common-common/src/api/extApiTypes';
+import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 
 /*
 These methods are for generating the sequelize formatting for
@@ -24,14 +25,18 @@ export const formatPagination = (query: IPagination) => {
   else if (limit) pagination = limitBy(limit);
 
   pagination.order = [[OrderByOptions.CREATED, 'DESC']];
-  if (query.sort === OrderByOptions.UPDATED) pagination.order = [[OrderByOptions.UPDATED, 'DESC']];
+  if (query.sort === OrderByOptions.UPDATED)
+    pagination.order = [[OrderByOptions.UPDATED, 'DESC']];
 
   return pagination;
 };
 
-export const formatPaginationNoSort = (query: { limit?: number, page?: number }) => {
+export const formatPaginationNoSort = (query: {
+  limit?: number;
+  page?: number;
+}) => {
   const { limit, page } = query;
-  let pagination = {};
+  let pagination: any = {};
   if (limit && page) pagination = paginate(limit, page);
   else if (limit) pagination = limitBy(limit);
 

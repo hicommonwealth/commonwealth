@@ -4,10 +4,10 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_tabs.scss';
+import { CWText } from './cw_text';
 
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
-import { CWText } from './cw_text';
 
 type TabStyleProps = {
   disabled?: boolean;

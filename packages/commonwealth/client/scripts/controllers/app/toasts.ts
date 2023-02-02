@@ -1,14 +1,27 @@
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 // import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
 import { uuidv4 } from 'lib/util';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelErrorCaptureEvent } from 'analytics/types';
+// import { Icons, Intent, Size, Toast, ToasterPosition } from 'construct-ui';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import app from 'state';
 
 const timeout = 3000;
 
 export class ToastStore {
   private _toasts: any[];
+
   constructor() {
     this._toasts = [];
   }
@@ -36,6 +49,7 @@ export class ToastStore {
     // this._toasts.push(toast);
     redraw();
   }
+
   public createError(message) {
     // mixpanelBrowserTrack({
     //   message,
@@ -58,6 +72,7 @@ export class ToastStore {
     // this._toasts.push(toast);
     redraw();
   }
+
   public createInfo(message) {
     const key = uuidv4();
     // const toast = render(Toast, {

@@ -5,7 +5,8 @@ import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_tooltip.scss';
 
-import { PopoverTriggerProps, Popover, usePopover } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
+import type { PopoverTriggerProps } from './cw_popover';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';

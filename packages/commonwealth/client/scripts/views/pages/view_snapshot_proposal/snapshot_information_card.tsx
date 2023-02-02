@@ -1,34 +1,25 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-import moment from 'moment';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { capitalize } from 'lodash';
+import { AddressInfo } from 'models';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
-import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 
 type SnapshotInfoRowAttrs = {
   label: string;
-  value: string | ResultNode;
+  value: string | React.ReactNode;
 };
 
 class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
@@ -73,7 +64,9 @@ type SnapshotInformationCardAttrs = {
   threads: Array<{ id: string; title: string }> | null;
 };
 
-export class SnapshotInformationCard extends ClassComponent<SnapshotInformationCardAttrs> {
+export class SnapshotInformationCard extends ClassComponent<
+  SnapshotInformationCardAttrs
+> {
   view(vnode: ResultNode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;
 
@@ -90,19 +83,23 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
               <SnapshotInfoRow
                 label="Author"
                 value={
-                  <User
-                    user={
-                      new AddressInfo(
-                        null,
-                        proposal.author,
-                        app.activeChainId(),
-                        null
-                      )
-                    }
-                    hideAvatar
-                    linkify
-                    popover
-                  />
+                  app.chain ? (
+                    <User
+                      user={
+                        new AddressInfo(
+                          null,
+                          proposal.author,
+                          app.activeChainId(),
+                          null
+                        )
+                      }
+                      hideAvatar
+                      linkify
+                      popover
+                    />
+                  ) : (
+                    proposal.author
+                  )
                 }
               />
               <SnapshotInfoLinkRow

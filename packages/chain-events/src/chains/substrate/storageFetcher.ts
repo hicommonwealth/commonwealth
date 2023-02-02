@@ -6,9 +6,9 @@
  */
 
 import _ from 'underscore';
-import { ApiPromise } from '@polkadot/api';
-import { Option, Vec } from '@polkadot/types';
-import {
+import type { ApiPromise } from '@polkadot/api';
+import type { Option, Vec } from '@polkadot/types';
+import type {
   BalanceOf,
   AccountId,
   Hash,
@@ -20,20 +20,15 @@ import {
   PropIndex,
   OpenTip,
 } from '@polkadot/types/interfaces';
-import { Codec } from '@polkadot/types/types';
-import { DeriveProposalImage } from '@polkadot/api-derive/types';
+import type { Codec } from '@polkadot/types/types';
+import type { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction, hexToString } from '@polkadot/util';
 
-import {
-  CWEvent,
-  IChainEntityKind,
-  IStorageFetcher,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { CWEvent, IChainEntityKind } from '../../interfaces';
+import { IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import {
-  EventKind,
+import type {
   IDemocracyProposed,
   IDemocracyStarted,
   IDemocracyPassed,
@@ -48,16 +43,15 @@ import {
   ISignalingVotingCompleted,
   IEventData,
   IIdentitySet,
-  parseJudgement,
   IdentityJudgement,
   ITreasuryBountyBecameActive,
   ITreasuryBountyAwarded,
   ITreasuryBountyEvents,
-  EntityKind,
   INewTip,
   ITipVoted,
   ITipClosing,
 } from './types';
+import { EventKind, parseJudgement, EntityKind } from './types';
 
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   protected readonly log;
@@ -80,17 +74,17 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const blockNumber = +(await this._api.rpc.chain.getHeader()).number;
 
     // fetch all identities and registrars from chain
-    const identities: Option<
-      Registration
-    >[] = await this._api.query.identity.identityOf.multi(addresses);
+    const identities: Option<Registration>[] =
+      await this._api.query.identity.identityOf.multi(addresses);
     const registrars = await this._api.query.identity.registrars();
 
     // construct events
     const cwEvents: CWEvent<IIdentitySet>[] = _.zip(addresses, identities)
       .map(
-        ([address, id]: [string, Option<Registration>]): CWEvent<
-          IIdentitySet
-        > => {
+        ([address, id]: [
+          string,
+          Option<Registration>
+        ]): CWEvent<IIdentitySet> => {
           // if no identity found, do nothing
           if (!id.isSome) return null;
           const { info, judgements } = id.unwrap();
@@ -257,11 +251,10 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       };
     };
     if (id === undefined) {
-      const deposits: Array<Option<
-        [BalanceOf, Vec<AccountId>] & Codec
-      >> = await this._api.queryMulti(
-        publicProps.map(([idx]) => [this._api.query.democracy.depositOf, idx])
-      );
+      const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> =
+        await this._api.queryMulti(
+          publicProps.map(([idx]) => [this._api.query.democracy.depositOf, idx])
+        );
       const proposedEvents = _.zip(publicProps, deposits)
         .map(([prop, depositOpt]) => constructEvent(prop, depositOpt))
         .filter((e) => !!e);
@@ -302,7 +295,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }
 
     this.log.info('Migrating democracy referenda...');
-    const activeReferenda = await this._api.derive.democracy.referendumsActive();
+    const activeReferenda =
+      await this._api.derive.democracy.referendumsActive();
     const startEvents = activeReferenda.map((r) => {
       return {
         kind: EventKind.DemocracyStarted,
@@ -362,6 +356,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       return [];
     }
     this.log.info('Migrating preimages...');
+    // eslint-disable-next-line
+    // @ts-ignore
     const hashCodecs = hashes.map((hash) => this._api.createType('Hash', hash));
     const preimages = await this._api.derive.democracy.preimages(hashCodecs);
     const notedEvents: Array<[number, IPreimageNoted]> = _.zip(
@@ -443,9 +439,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const proposedEvents = proposalIds
       .map((idx, index) => {
         if (!proposals[index] || !proposals[index].isSome) return null;
-        const { proposer, value, beneficiary, bond } = proposals[
-          index
-        ].unwrap();
+        const { proposer, value, beneficiary, bond } =
+          proposals[index].unwrap();
         return {
           kind: EventKind.TreasuryProposed,
           proposalIndex: +idx,
@@ -783,9 +778,10 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       Vec<[Hash, BlockNumber] & Codec>
     >();
     // in "completed" phase
-    const completedProposals = await this._api.query.signaling.completedProposals<
-      Vec<[Hash, BlockNumber] & Codec>
-    >();
+    const completedProposals =
+      await this._api.query.signaling.completedProposals<
+        Vec<[Hash, BlockNumber] & Codec>
+      >();
     const proposalHashes = [
       ...inactiveProposals,
       ...activeProposals,

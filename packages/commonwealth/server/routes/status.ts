@@ -1,27 +1,25 @@
-import { QueryTypes, Op } from 'sequelize';
-import jwt from 'jsonwebtoken';
-import { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-import { Request } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainNodeInstance } from 'server/models/chain_node';
-import { NotificationCategoryInstance } from 'server/models/notification_category';
-import { ChainCategoryInstance } from 'server/models/chain_category';
-import { ChainCategoryTypeInstance } from 'server/models/chain_category_type';
-import { InviteCodeAttributes } from 'server/models/invite_code';
-import { EmailNotificationInterval } from 'server/models/user';
-import { SocialAccountInstance } from 'server/models/social_account';
-import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
-import { StarredCommunityAttributes } from 'server/models/starred_community';
-import { DiscussionDraftAttributes } from 'server/models/discussion_draft';
-import { TypedResponse, success, TypedRequestQuery } from '../types';
-import { JWT_SECRET } from '../config';
-import { DB } from '../models';
-import { sequelize } from '../database';
 import { ServerError } from 'common-common/src/errors';
-import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
+import jwt from 'jsonwebtoken';
+import { Op, QueryTypes } from 'sequelize';
+import type { AddressInstance } from 'server/models/address';
+import type { ChainInstance } from 'server/models/chain';
+import type { ChainCategoryInstance } from 'server/models/chain_category';
+import type { ChainCategoryTypeInstance } from 'server/models/chain_category_type';
+import type { ChainNodeInstance } from 'server/models/chain_node';
+import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
+import type { DiscussionDraftAttributes } from 'server/models/discussion_draft';
+import type { InviteCodeAttributes } from 'server/models/invite_code';
+import type { NotificationCategoryInstance } from 'server/models/notification_category';
+import type { SocialAccountInstance } from 'server/models/social_account';
+import type { StarredCommunityAttributes } from 'server/models/starred_community';
+import type { EmailNotificationInterval } from 'server/models/user';
+import { JWT_SECRET } from '../config';
+import { sequelize } from '../database';
+import type { DB } from '../models';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { success } from '../types';
+import type { RoleInstanceWithPermission } from '../util/roles';
+import { findAllRoles } from '../util/roles';
 
 type ThreadCountQueryData = {
   concat: string;
@@ -241,7 +239,8 @@ const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime());
       // append the SELECT query
-      query += `SELECT id, chain FROM "Threads" WHERE (kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
+      query += `SELECT id, chain FROM "Threads" WHERE
+ (kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
       if (i === commsAndChains.length - 1) query += ';';
     }
 
@@ -254,8 +253,10 @@ const status = async (
       })
     );
 
-    // this section iterates through the retrieved threads counting the number of threads and keeping a set of activePosts
-    // the set of activePosts is used to compare with the comments under threads so that there are no duplicate active threads counted
+    // this section iterates through the retrieved threads
+    // counting the number of threads and keeping a set of activePosts
+    // the set of activePosts is used to compare with the comments
+    // under threads so that there are no duplicate active threads counted
     for (const thread of threadNum) {
       if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {};
       unseenPosts[thread.chain].activePosts
@@ -321,7 +322,8 @@ const status = async (
         unseenPosts[name] = {};
         continue;
       }
-      // if the time is valid but the chain is not defined in the unseenPosts object then initialize the object with zeros
+      // if the time is valid but the chain is not defined in the unseenPosts object
+      // then initialize the object with zeros
       if (!unseenPosts[name]) {
         unseenPosts[name] = {
           activePosts: 0,

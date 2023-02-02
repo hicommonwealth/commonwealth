@@ -1,6 +1,11 @@
 /* @jsx jsx */
 import React from 'react';
 
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import { proposalSlugToClass } from 'identifiers';
+import type { ITXModalData, ProposalModule } from 'models';
 import {
   ClassComponent,
   ResultNode,
@@ -12,21 +17,15 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
-
 import app from 'state';
-import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ProposalType } from '../../../../../../common-common/src/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
 import { createTXModal } from '../../modals/tx_signing_modal';
+import ErrorPage from '../error';
 
 export class SubstrateCollectiveProposalForm extends ClassComponent {
   private councilMotionDescription: string;
@@ -177,14 +176,15 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               throw new Error('Invalid threshold');
             }
 
-            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-              (a) => {
-                return (
-                  proposalSlugToClass().get(
-                    ProposalType.SubstrateCollectiveProposal
-                  ) as ProposalModule<any, any, any>
-                ).createTx(...a);
-              };
+            let createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.SubstrateCollectiveProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
 
             let args = [];
 

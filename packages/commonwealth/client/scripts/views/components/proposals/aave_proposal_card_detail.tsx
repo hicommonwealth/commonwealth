@@ -1,24 +1,14 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'components/proposals/aave_proposal_card_detail.scss';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { User } from '../user/user';
-import { CWText } from '../component_kit/cw_text';
 import { CWLabel } from '../component_kit/cw_label';
+import { CWText } from '../component_kit/cw_text';
 
 export const roundVote = (percentage) => {
   return percentage.toFixed(2).split('.0')[0].slice(0, 4);

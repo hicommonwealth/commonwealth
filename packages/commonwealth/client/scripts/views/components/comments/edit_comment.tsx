@@ -1,19 +1,28 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/comments/edit_comment.scss';
+import type { Comment } from 'models';
 
 import app from 'state';
-import { Comment } from 'models';
 import { ContentType } from 'types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { clearEditingLocalStorage } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
-import { QuillEditor } from '../quill/quill_editor';
+import type { QuillEditor } from '../quill/quill_editor';
 import { QuillEditorComponent } from '../quill/quill_editor_component';
+import { clearEditingLocalStorage } from './helpers';
 
 type EditCommentAttrs = {
   comment: Comment<any>;

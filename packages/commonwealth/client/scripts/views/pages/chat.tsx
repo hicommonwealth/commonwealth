@@ -1,13 +1,22 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/chat.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { ChatWindow } from 'views/components/chat/chat_window';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';

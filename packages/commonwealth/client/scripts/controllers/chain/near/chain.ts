@@ -1,29 +1,36 @@
+import { NearToken } from 'adapters/chain/near/types';
+import BN from 'bn.js';
+import { uuidv4 } from 'lib/util';
+import type { ChainInfo, IChainModule, ITXModalData } from 'models';
+import moment from 'moment';
+import type { ConnectConfig, Near as NearApi } from 'near-api-js';
 import {
-  Near as NearApi,
   Account as NearApiAccount,
   connect as nearConnect,
   WalletAccount,
-  ConnectConfig,
 } from 'near-api-js';
-import {
+import type { FunctionCallOptions } from 'near-api-js/lib/account';
+import type {
   CodeResult,
   NodeStatusResult,
 } from 'near-api-js/lib/providers/provider';
-import { FunctionCallOptions } from 'near-api-js/lib/account';
-import { Action, FunctionCall } from 'near-api-js/lib/transaction';
-import { uuidv4 } from 'lib/util';
-import { ChainInfo, IChainModule, ITXModalData } from 'models';
-import { NearToken } from 'adapters/chain/near/types';
-import BN from 'bn.js';
-import { ApiStatus, IApp } from 'state';
-import moment from 'moment';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import type { Action, FunctionCall } from 'near-api-js/lib/transaction';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
+import type { NearAccount, NearAccounts } from './account';
+import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
+import { isGroupRole } from './sputnik/types';
 import {
-  isGroupRole,
-  NearSputnikConfig,
-  NearSputnikPolicy,
-} from './sputnik/types';
-import { NearAccounts, NearAccount } from './account';
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;
@@ -55,7 +62,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   public get denom() {
     return this.app.chain.currency;
   }
+
   private _decimals: BN;
+
   public coins(n: number | string | BN, inDollars = false) {
     return new NearToken(n, inDollars, this._decimals);
   }
@@ -76,6 +85,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   private _networkId = 'testnet';
+
   public get isMainnet() {
     return this._networkId === 'mainnet';
   }
@@ -121,9 +131,12 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       // update block heights and times
       this.app.chain.block.lastTime = moment(latest_block_time);
       this.app.chain.block.height = latest_block_height;
-      const prevBlock = await this._api.connection.provider.block(latest_block_height - 1)
+      const prevBlock = await this._api.connection.provider.block(
+        latest_block_height - 1
+      );
       // TODO: check ms vs seconds here
-      this.app.chain.block.duration = +latest_block_time - prevBlock.header.timestamp;
+      this.app.chain.block.duration =
+        +latest_block_time - prevBlock.header.timestamp;
       if (this.app.chain.networkStatus !== ApiStatus.Connected) {
         this.app.chain.networkStatus = ApiStatus.Connected;
         redraw();

@@ -1,15 +1,26 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
+import { isNonEmptyString } from '../helpers/typeGuards';
+import type { ChainInfo } from '../models';
+import { ITokenAdapter } from '../models';
 import {
   CWBanner,
   CWMessageBanner,
 } from './components/component_kit/cw_banner';
-import { ChainInfo, ITokenAdapter } from '../models';
-import { isNonEmptyString } from '../helpers/typeGuards';
 import { TermsBanner } from './components/terms_banner';
 
 type SublayoutBannersAttrs = {

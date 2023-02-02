@@ -1,5 +1,6 @@
-import { SearchResult, SearchQuery } from '../models'
 import { Store } from '.';
+import type { SearchQuery } from '../models';
+import { SearchResult } from '../models';
 
 class SearchStore extends Store<SearchResult> {
   private _storeSearch: { [encodedQueryString: string]: SearchResult } = {};
@@ -12,11 +13,11 @@ class SearchStore extends Store<SearchResult> {
     return this;
   }
 
-  public getOrAdd(query: SearchQuery){
+  public getOrAdd(query: SearchQuery) {
     if (!this._storeSearch[query.toEncodedString()]) {
-      this.add(new SearchResult(query))
+      this.add(new SearchResult(query));
     }
-    return this.getByQueryString(query.toEncodedString())
+    return this.getByQueryString(query.toEncodedString());
   }
 
   public remove(search: SearchResult) {
@@ -24,7 +25,7 @@ class SearchStore extends Store<SearchResult> {
     if (!this._storeSearch[search.query.toEncodedString()]) {
       throw new Error('Search is not in store');
     } else {
-      delete this._storeSearch[search.query.toEncodedString()]
+      delete this._storeSearch[search.query.toEncodedString()];
     }
     return this;
   }
@@ -35,7 +36,7 @@ class SearchStore extends Store<SearchResult> {
   }
 
   public getByQueryString(queryString: string): SearchResult {
-    return this._storeSearch[queryString] || null
+    return this._storeSearch[queryString] || null;
   }
 }
 

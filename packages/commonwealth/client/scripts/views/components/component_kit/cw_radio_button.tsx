@@ -4,10 +4,10 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_button.scss';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import { CWText } from './cw_text';
 
 export type RadioButtonType = {
   label?: string;

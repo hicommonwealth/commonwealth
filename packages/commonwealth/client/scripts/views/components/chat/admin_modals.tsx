@@ -2,27 +2,18 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import app from 'state';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { MixpanelChatEvents } from 'analytics/types';
-import { IChannel } from 'controllers/server/socket/chatNs';
-import { CWCard } from '../component_kit/cw_card';
 import { CWButton } from '../component_kit/cw_button';
-import { CWTextInput } from '../component_kit/cw_text_input';
+import { CWCard } from '../component_kit/cw_card';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
+import { CWTextInput } from '../component_kit/cw_text_input';
+import { IChannel } from 'controllers/server/socket/chatNs';
+import { MixpanelChatEvents } from 'analytics/types';
 
 type ChannelAttrs = {
   category?: string;

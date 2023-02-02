@@ -4,12 +4,11 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_thread_vote_button.scss';
-
-import { formatNumberShort } from 'adapters/currency';
-import { CWText } from './cw_text';
-import { ComponentType } from './types';
 import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
 import { getClasses } from './helpers';
+import { ComponentType } from './types';
+import { formatNumberShort } from 'adapters/currency';
 
 type ThreadVoteButtonProps = {
   updateVoteCount: (newCount: number) => void;
@@ -17,10 +16,12 @@ type ThreadVoteButtonProps = {
 };
 
 export const CWThreadVoteButton = (props: ThreadVoteButtonProps) => {
-  const [isHoveringUpvote, setIsHoveringUpvote] =
-    React.useState<boolean>(false);
-  const [isHoveringDownvote, setIsHoveringDownvote] =
-    React.useState<boolean>(false);
+  const [isHoveringUpvote, setIsHoveringUpvote] = React.useState<boolean>(
+    false
+  );
+  const [isHoveringDownvote, setIsHoveringDownvote] = React.useState<boolean>(
+    false
+  );
 
   const { updateVoteCount, voteCount } = props;
 

@@ -1,36 +1,28 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import BN from 'bn.js';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/comments/create_comment.scss';
+import { notifyError } from 'controllers/app/notifications';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import { weiToTokens } from 'helpers';
+import type { AnyProposal } from 'models';
+import { Thread } from 'models';
 
 import app from 'state';
-import { Thread, AnyProposal } from 'models';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ContentType } from 'types';
-import { EditProfileModal } from 'views/modals/edit_profile_modal';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import { QuillEditor } from 'views/components/quill/quill_editor';
 import { User } from 'views/components/user/user';
-import { notifyError } from 'controllers/app/notifications';
-import { weiToTokens } from 'helpers';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { jumpHighlightComment } from './helpers';
+import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
+import { jumpHighlightComment } from './helpers';
 
 type CreateCommmentAttrs = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -64,7 +56,9 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       this.uploadsInProgress = 0;
     }
 
-    const handleSubmitComment = async (e?: Event) => {
+    const handleSubmitComment = async (
+      e?: React.MouseEvent<HTMLButtonElement>
+    ) => {
       if (!this.quillEditorState) {
         if (e) e.preventDefault();
         this.error = 'Editor not initialized, please try again';
@@ -128,8 +122,9 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
     const { error, sendingComment, uploadsInProgress } = this;
 
     // token balance check if needed
-    const tokenPostingThreshold: BN =
-      TopicGateCheck.getTopicThreshold(activeTopicName);
+    const tokenPostingThreshold: BN = TopicGateCheck.getTopicThreshold(
+      activeTopicName
+    );
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
     const userFailsThreshold =

@@ -1,36 +1,26 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { RegisteredTypes } from '@polkadot/types/types';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import $ from 'jquery';
 
 import 'pages/spec_settings.scss';
 
 import app from 'state';
-import { initChain, selectChain } from 'app';
 import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, RolePermission } from 'models';
+import { ChainInfo, AccessLevel } from 'models';
 import { constructSubstrateUrl } from 'substrate';
-import Sublayout from '../sublayout';
-import { PageLoading } from './loading';
-import PageNotFound from './404';
-import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWTextArea } from '../components/component_kit/cw_text_area';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import Sublayout from '../sublayout';
+import PageNotFound from './404';
+import { PageLoading } from './loading';
+import { initChain, selectChain } from 'helpers/chain';
 
 class SpecSettingsPage extends ClassComponent {
   private chain: string;
@@ -47,7 +37,7 @@ class SpecSettingsPage extends ClassComponent {
     const substrateAdminChainIds = roles
       .filter(
         (r) =>
-          r.permission === RolePermission.admin &&
+          r.permission === AccessLevel.Admin &&
           app.config.chains.getById(r.chain_id).base === ChainBase.Substrate
       )
       .map((r) => r.chain_id);

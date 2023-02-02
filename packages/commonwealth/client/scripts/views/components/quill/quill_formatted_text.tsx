@@ -1,18 +1,28 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, jsx, Component, rootRender } from 'mithrilInterop';
-import { findAll } from 'highlight-words-core';
-import smartTruncate from 'smart-truncate';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  jsx,
+  Component,
+  rootRender,
+} from 'mithrilInterop';
 
 import 'components/quill/quill_formatted_text.scss';
+import { findAll } from 'highlight-words-core';
+import smartTruncate from 'smart-truncate';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { getClasses } from '../component_kit/helpers';
+import { countLinesQuill } from './helpers';
 
 // import { loadScript } from 'helpers';
 import { renderQuillDelta } from './render_quill_delta';
-import { getClasses } from '../component_kit/helpers';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { countLinesQuill } from './helpers';
 
 export type QuillTextParams = {
   collapse?: boolean;
@@ -71,11 +81,9 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
     // if we're showing highlighted search terms, render the doc once, and cache the result
     if (searchTerm) {
       if (JSON.stringify(this.truncatedDoc) !== this.cachedDocWithHighlights) {
-        const vnodes = this.truncatedDoc ? renderQuillDelta(
-          this.truncatedDoc,
-          hideFormatting,
-          true
-        ) : []; // collapse = true, to inline blocks
+        const vnodes = this.truncatedDoc
+          ? renderQuillDelta(this.truncatedDoc, hideFormatting, true)
+          : []; // collapse = true, to inline blocks
 
         const root = document.createElement('div');
 
@@ -141,18 +149,19 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
             'QuillFormattedText'
           )}
           // oncreate={() => {
-            // if (!(<any>window).twttr) {
-            //   loadScript('//platform.twitter.com/widgets.js').then(() => {
-            //     console.log('Twitter Widgets loaded');
-            //   })
+          // if (!(<any>window).twttr) {
+          //   loadScript('//platform.twitter.com/widgets.js').then(() => {
+          //     console.log('Twitter Widgets loaded');
+          //   })
           // }}
         >
-          {this.truncatedDoc && renderQuillDelta(
-            this.truncatedDoc,
-            hideFormatting,
-            collapse,
-            openLinksInNewTab
-          )}
+          {this.truncatedDoc &&
+            renderQuillDelta(
+              this.truncatedDoc,
+              hideFormatting,
+              collapse,
+              openLinksInNewTab
+            )}
           {this.isTruncated && (
             <div className="show-more-button-wrapper">
               <div className="show-more-button" onClick={toggleDisplay}>
