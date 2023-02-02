@@ -1,13 +1,13 @@
 import { ChainBase } from 'common-common/src/types';
 import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
 import app from 'state';
-import Web3 from 'web3';
-import { TransactionConfig, TransactionReceipt } from 'web3-core/types';
-import { AbiItem } from 'web3-utils';
-import Contract from 'client/scripts/models/Contract';
-import { IWebWallet } from 'client/scripts/models';
+import type Web3 from 'web3';
+import type { TransactionConfig, TransactionReceipt } from 'web3-core/types';
+import type { AbiItem } from 'web3-utils';
+import type Contract from 'client/scripts/models/Contract';
+import type { IWebWallet } from 'client/scripts/models';
 import { ethers } from 'ethers';
-import { Result } from 'ethers/lib/utils';
+import type { Result } from 'ethers/lib/utils';
 
 async function sendFunctionCall(
   fn: AbiItem,

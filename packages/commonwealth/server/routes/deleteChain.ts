@@ -115,11 +115,6 @@ const deleteChain = async (
         transaction: t,
       });
 
-      await models.InviteCode.destroy({
-        where: { chain_id: chain.id },
-        transaction: t,
-      });
-
       await models.Subscription.destroy({
         where: { chain_id: chain.id },
         transaction: t,

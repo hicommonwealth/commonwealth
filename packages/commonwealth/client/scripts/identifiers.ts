@@ -7,15 +7,6 @@ import { requiresTypeSlug } from 'utils';
 import type ThreadsController from './controllers/server/threads';
 import app from './state';
 
-export const pathIsDiscussion = (
-  scope: string | null,
-  path: string
-): boolean => {
-  return (
-    path.startsWith(`/${scope}/discussion`) || path.startsWith('/discussion')
-  );
-};
-
 // returns a URL path to a proposal based on its type and id, taking into account
 // custom domain prefixes as well.
 export const getProposalUrlPath = (

@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import { providers } from 'ethers';
 import type { ERC20, ERC721 } from 'common-common/src/eth/types';
 import { ERC20__factory, ERC721__factory } from 'common-common/src/eth/types';
@@ -35,6 +34,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
   ): Promise<string> {
     const url = node.private_url || node.url;
     const { tokenAddress, contractType } = opts;
+    const Web3 = (await import('web3')).default;
     if (!tokenAddress && !contractType) {
       // use native token if no args provided
       const provider = new Web3.providers.WebsocketProvider(url);

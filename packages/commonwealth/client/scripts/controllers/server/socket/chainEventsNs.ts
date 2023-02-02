@@ -1,7 +1,6 @@
 import type { NotificationSubscription } from 'models';
 import { Notification } from 'models';
 import type { Socket } from 'socket.io-client';
-import { io } from 'socket.io-client';
 import app from 'state';
 import type { ChainEventNotification } from 'types';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
@@ -12,6 +11,7 @@ export class ChainEventsNamespace {
   private subscriptionRoomsJoined = new Set();
 
   public async init() {
+    const { io } = await import('socket.io-client');
     this.ceNs = io(`/${WebsocketNamespaces.ChainEvents}`, {
       transports: ['websocket'],
     });
