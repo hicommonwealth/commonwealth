@@ -134,7 +134,7 @@ export default class MolochGovernance extends ProposalModule<
     // fetch all proposals
     console.log('Fetching moloch proposals from backend.');
     await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.store.getByType(
+    const entities = this.app.chainEntities.getByType(
       MolochEvents.Types.EntityKind.Proposal
     );
     entities.map((p) => this._entityConstructor(p));

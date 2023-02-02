@@ -52,7 +52,7 @@ class SubstrateCollective extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chainEntities.store.getByType(
+    const entities = this.app.chainEntities.getByType(
       SubstrateTypes.EntityKind.CollectiveProposal
     );
     entities.forEach((e) => {

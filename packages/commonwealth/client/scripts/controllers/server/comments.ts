@@ -156,7 +156,7 @@ class CommentsController {
       prefix.includes('referendum') ||
       prefix.includes('motion')
     ) {
-      chainEntity = app.chainEntities.store.getByUniqueId(
+      chainEntity = app.chainEntities.getByUniqueId(
         app.activeChainId(),
         proposalIdentifier
       );
