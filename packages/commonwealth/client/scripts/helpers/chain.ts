@@ -214,7 +214,9 @@ export const selectChain = async (
   return true;
 };
 
-export const initNewChain = async (newChain: IChainAdapter<any, any>): Promise<boolean> => {
+export const initNewChain = async (
+  newChain: IChainAdapter<any, any>
+): Promise<boolean> => {
   // Load server data without initializing modules/chain connection.
   const finalizeInitialization = await newChain.initServer();
 

@@ -236,9 +236,7 @@ const app: IApp = {
 };
 
 function handleLoginSockets(user_data: any) {
-  app.loginState = user_data
-    ? LoginState.LoggedIn
-    : LoginState.LoggedOut;
+  app.loginState = user_data ? LoginState.LoggedIn : LoginState.LoggedOut;
 
   if (app.loginState === LoginState.LoggedIn) {
     console.log('Initializing socket connection with JTW:', app.user.jwt);
