@@ -63,6 +63,8 @@ log.info(
 );
 
 async function main() {
+  console.log(process.env.DATABASE_URI);
+  console.log(process.env.DATABASE_URL);
   const DEV = process.env.NODE_ENV !== 'production';
 
   // CLI parameters for which task to run

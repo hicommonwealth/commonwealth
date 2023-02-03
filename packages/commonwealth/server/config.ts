@@ -74,6 +74,7 @@ export const DATABASE_URI = (() => {
 export const VULTR_IP = process.env.VULTR_IP;
 
 export const RABBITMQ_URI = (() => {
+  if (process.env.RABBITMQ_URI) return process.env.RABBITMQ_URI;
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
     if (
       process.env.VULTR_RABBITMQ_CONTAINER_PORT &&

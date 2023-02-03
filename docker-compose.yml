@@ -1,25 +1,71 @@
 version: "3.9"
 services:
-  server:
+  server-local-db:
+    env_file:
+      ./packages/commonwealth/.env
     build:
-      context: .
+      context: ./
+      dockerfile: ./packages/commonwealth/Dockerfile
       args:
         - PORT=8080
+        - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+        - REDIS_URL=redis:6379
     ports:
-      - "8080:8080"
+      - "8090:8090"
     depends_on:
       rabbitmq:
         condition: service_healthy
       redis:
         condition: service_healthy
+    profiles:
+      - separate
+
+  server:
+    env_file:
+      ./packages/commonwealth/.env
+    build:
+      context: ./
+      dockerfile: ./packages/commonwealth/Dockerfile
+      args:
+        - PORT=8080
+        - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+        - REDIS_URL=redis:6379
+        - DATABASE_URL=postgresql://commonwealth:edgeware@postgres/commonwealth
+    ports:
+      - "8090:8090"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:14.6-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=commonwealth
+      - POSTGRES_PASSWORD=edgeware
+      - POSTGRES_DATABASE=commonwealth
+    ports:
+      - '5432:5432'
+#    volumes:
+#      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
 
   redis:
     image: redis:alpine
     restart: always
     ports:
       - '6379:6379'
-    volumes:
-      - $PWD/redis-data:/var/lib/redis
+#    volumes:
+#      - $PWD/redis-data:/var/lib/redis
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 5s
@@ -32,9 +78,9 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
-    volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+#    volumes:
+#      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+#      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 5s
