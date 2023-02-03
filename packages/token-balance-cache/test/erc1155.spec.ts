@@ -1,41 +1,33 @@
 import { assert, expect, use as chaiUse } from 'chai';
 import { BalanceType } from 'common-common/src/types';
-import Web3 from 'web3';
+import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
 import chaiAsPromised from 'chai-as-promised';
+import Erc1155BalanceProvider from '../src/providers/erc1155';
 
 chaiUse(chaiAsPromised);
 
 import type { IChainNode } from '../src/types';
-import { BalanceProvider } from '../src/types';
 
-class MockErc1155BalanceProvider extends BalanceProvider<{
-  testBalance: string;
-}> {
-  public readonly name = 'test-erc1155';
-  public readonly opts = {
-    testBalance: 'string',
-    testTokenId: 'string?',
-    contractType: 'string?',
-  };
-  public readonly validBases = [BalanceType.Ethereum];
-  public async getBalance(
-    _node: IChainNode,
-    address: string,
-    opts: { testBalance: string; testTokenId?: string; contractType?: string }
-  ): Promise<string> {
-    const { testBalance, testTokenId, contractType } = opts;
-    if (Web3.utils.isAddress(address)) {
-      if (contractType != this.name) {
-        throw new Error('Invalid Contract Type');
-      }
-      if (!testTokenId) {
-        throw new Error('Token Id Required For ERC-1155');
-      }
-      return testBalance;
-    } else {
-      throw new Error('Invalid address!');
-    }
+type EthBPOpts = {
+  tokenAddress?: string;
+  contractType?: string;
+  tokenId?: string;
+};
+
+class MockProvider {
+  public async balanceOf(
+    account: string,
+    id: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber> {
+    return BigNumber.from('12345678912345678910');
   }
+
+  provider = {
+    provider: {
+      disconnect: (code: number, reason: string) => {},
+    },
+  };
 }
 
 async function mockNodesProvider(): Promise<IChainNode[]> {
@@ -50,6 +42,16 @@ async function mockNodesProvider(): Promise<IChainNode[]> {
   ];
 }
 
+class MockErc1155BalanceProvider extends Erc1155BalanceProvider {
+  public readonly validBases = [BalanceType.Ethereum];
+  public async getExternalProvider(
+    node: IChainNode,
+    opts: EthBPOpts
+  ): Promise<any> {
+    return new MockProvider();
+  }
+}
+
 describe('ERC1155 BP unit tests', () => {
   it('erc1155 balance provider should return balance', async () => {
     const erc1155Bp: MockErc1155BalanceProvider =
@@ -58,9 +60,9 @@ describe('ERC1155 BP unit tests', () => {
       await mockNodesProvider()[0],
       '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
       {
-        testBalance: '12345678912345678910',
-        testTokenId: '123',
-        contractType: 'test-erc1155',
+        tokenAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+        contractType: 'erc1155',
+        tokenId: '1',
       }
     );
 
@@ -76,9 +78,9 @@ describe('ERC1155 BP unit tests', () => {
         await mockNodesProvider()[0],
         '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
         {
-          testBalance: '12345678912345678910',
-          testTokenId: '123',
-          contractType: 'erc20',
+          tokenAddress: '123',
+          contractType: 'abc',
+          tokenId: '1',
         }
       )
     ).to.be.rejectedWith('Invalid Contract Type');

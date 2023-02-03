@@ -1,33 +1,43 @@
 import { assert, expect, use as chaiUse } from 'chai';
 import { BalanceType } from 'common-common/src/types';
-import Web3 from 'web3';
+import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
 import chaiAsPromised from 'chai-as-promised';
+import Erc721BalanceProvider from '../src/providers/erc721';
 
 chaiUse(chaiAsPromised);
 
 import type { IChainNode } from '../src/types';
 import { BalanceProvider } from '../src/types';
 
-class MockErc721BalanceProvider extends BalanceProvider<{
-  testBalance: string;
-}> {
-  public readonly name = 'test-erc721';
-  public readonly opts = { testBalance: 'string', contractType: 'string?' };
+type EthBPOpts = {
+  tokenAddress?: string;
+  contractType?: string;
+  tokenId?: string;
+};
+
+class MockProvider {
+  public async balanceOf(
+    account: string,
+    id: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber> {
+    return BigNumber.from('1');
+  }
+
+  provider = {
+    provider: {
+      disconnect: (code: number, reason: string) => {},
+    },
+  };
+}
+
+class MockErc721BalanceProvider extends Erc721BalanceProvider {
   public readonly validBases = [BalanceType.Ethereum];
-  public async getBalance(
-    _node: IChainNode,
-    address: string,
-    opts: { testBalance: string; contractType: string }
-  ): Promise<string> {
-    const { testBalance, contractType } = opts;
-    if (contractType != this.name) {
-      throw new Error('Invalid Contract Type');
-    }
-    if (Web3.utils.isAddress(address)) {
-      return testBalance;
-    } else {
-      throw new Error('Invalid address!');
-    }
+  public async getExternalProvider(
+    node: IChainNode,
+    opts: EthBPOpts
+  ): Promise<any> {
+    return new MockProvider();
   }
 }
 
@@ -50,8 +60,8 @@ describe('ERC721 BP unit tests', () => {
       await mockNodesProvider()[0],
       '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
       {
-        testBalance: '1',
-        contractType: 'test-erc721',
+        tokenAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+        contractType: 'erc721',
       }
     );
 
@@ -65,7 +75,7 @@ describe('ERC721 BP unit tests', () => {
         await mockNodesProvider()[0],
         '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
         {
-          testBalance: '12345678912345678910',
+          tokenAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
           contractType: 'test-fail',
         }
       )

@@ -1,7 +1,8 @@
 import BN from 'bn.js';
 import type { StateMutabilityType, AbiType } from 'web3-utils';
 import { providers } from 'ethers';
-import { ERC20, ERC20__factory } from 'common-common/src/eth/types';
+import type { ERC20} from 'common-common/src/eth/types';
+import { ERC20__factory } from 'common-common/src/eth/types';
 
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';

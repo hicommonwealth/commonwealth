@@ -78,6 +78,10 @@ export default class Erc1155BalanceProvider extends BalanceProvider<
       address,
       tokenId
     );
+    console.log(
+      (erc1155Api.provider as providers.Web3Provider)
+        .provider as WebsocketProvider
+    );
     (
       (erc1155Api.provider as providers.Web3Provider)
         .provider as WebsocketProvider
