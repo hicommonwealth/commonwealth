@@ -597,15 +597,15 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
   }),
   '/:scope/proposal/:type/:identifier': importRoute(
-    import('views/pages/view_proposal/index'),
+    'views/pages/view_proposal/index',
     { scoped: true }
   ),
   '/:scope/proposal/:identifier': importRoute(
-    import('views/pages/view_proposal/index'),
+    'views/pages/view_proposal/index',
     { scoped: true }
   ),
   '/:scope/discussion/:identifier': importRoute(
-    import('views/pages/view_thread/index'),
+    'views/pages/view_thread/index',
     { scoped: true }
   ),
   '/:scope/new/proposal/:type': importRoute(

@@ -8,7 +8,7 @@ import {
   AccessLevel,
   PermissionManager,
   everyonePermissions,
-} from './permissions';
+} from 'commonwealth/shared/permissions';
 import type { RoleObject } from './types';
 import { ProposalType } from 'common-common/src/types';
 

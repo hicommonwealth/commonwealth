@@ -1,11 +1,5 @@
 import type { Signer } from '@polkadot/api/types';
 
-import {
-  isWeb3Injected,
-  web3Accounts,
-  web3Enable,
-  web3FromAddress,
-} from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
@@ -19,6 +13,7 @@ class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>
 {
   // GETTERS/SETTERS
+  private polkadot;
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];
   private _enabling = false;
@@ -29,7 +24,7 @@ class PolkadotWebWalletController
   public readonly chain = ChainBase.Substrate;
 
   public get available() {
-    return isWeb3Injected;
+    return this.polkadot && this.polkadot.isWeb3Injected;
   }
 
   public get enabled() {
@@ -51,7 +46,7 @@ class PolkadotWebWalletController
       address: who,
       currentPrefix: 42,
     });
-    const injector = await web3FromAddress(reencodedAddress);
+    const injector = await this.polkadot.web3FromAddress(reencodedAddress);
     return injector.signer;
   }
 
@@ -82,6 +77,7 @@ class PolkadotWebWalletController
   }
 
   public async enable() {
+    this.polkadot = await import('@polkadot/extension-dapp');
     console.log('Attempting to enable Substrate web wallet');
     if (!this.available) throw new Error('Web wallet not available');
 
@@ -89,11 +85,11 @@ class PolkadotWebWalletController
     // (this needs to be called first, before other requests)
     this._enabling = true;
     try {
-      await web3Enable('commonwealth');
+      await this.polkadot.web3Enable('commonwealth');
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account
-      this._accounts = await web3Accounts();
+      this._accounts = await this.polkadot.polkadotweb3Accounts();
 
       this._enabled = true;
       this._enabling = false;
