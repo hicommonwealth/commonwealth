@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import {DB} from "../models";
-import {AppError} from "common-common/src/errors";
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 
 const viewChainIcons = async (
   models: DB,
@@ -9,16 +9,16 @@ const viewChainIcons = async (
   next: NextFunction
 ) => {
   if (!req.body.chains) {
-    return next(new AppError("Must provide a list of chains"))
+    return next(new AppError('Must provide a list of chains'));
   }
-  const chains = JSON.parse(req.body.chains)
+  const chains = JSON.parse(req.body.chains);
 
   const iconUrls = await models.Chain.findAll({
     attributes: ['id', 'icon_url'],
     where: {
-      id: chains
+      id: chains,
     },
-    raw: true
+    raw: true,
   });
 
   return res.json({ status: 'Success', result: iconUrls });

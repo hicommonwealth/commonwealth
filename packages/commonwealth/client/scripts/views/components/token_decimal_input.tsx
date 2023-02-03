@@ -15,7 +15,7 @@ import {
 
 import 'components/token_decimal_input.scss';
 
-import { weiToTokens, tokensToWei } from 'helpers';
+import { tokensToWei, weiToTokens } from 'helpers';
 import { CWText } from './component_kit/cw_text';
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWToggle } from './component_kit/cw_toggle';

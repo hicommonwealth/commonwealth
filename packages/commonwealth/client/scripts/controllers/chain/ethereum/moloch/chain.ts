@@ -1,5 +1,5 @@
 import EthereumChain from '../chain';
-import MolochAPI from './api';
+import type MolochAPI from './api';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.

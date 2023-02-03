@@ -18,10 +18,9 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 import 'components/header/notifications_menu.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { NotificationRow } from '../pages/notifications/notification_row';
 import { CWButton } from '../components/component_kit/cw_button';
 import {
   Popover,

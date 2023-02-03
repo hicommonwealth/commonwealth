@@ -13,16 +13,16 @@ import {
   jsx,
 } from 'mithrilInterop';
 import { debounce } from 'lodash';
+import { pluralize } from 'helpers';
+import { isNotUndefined } from 'helpers/typeGuards';
 
 import 'pages/discussions/index.scss';
 
 import app from 'state';
-import { pluralize } from 'helpers';
-import { isNotUndefined } from 'helpers/typeGuards';
-import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
-import { RecentThreadsHeader } from './recent_threads_header';
 import { CWText } from '../../components/component_kit/cw_text';
+import Sublayout from '../../sublayout';
+import { PageLoading } from '../loading';
+import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
 
 type DiscussionPageAttrs = { topic?: string };

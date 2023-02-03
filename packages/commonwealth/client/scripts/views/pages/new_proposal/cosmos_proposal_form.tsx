@@ -1,31 +1,22 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
-import app from 'state';
-import { navigateToSubpage } from 'app';
-import CosmosAccount from 'controllers/chain/cosmos/account';
+import { navigateToSubpage } from 'router';
 import { notifyError } from 'controllers/app/notifications';
+import type CosmosAccount from 'controllers/chain/cosmos/account';
+import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import Cosmos from 'controllers/chain/cosmos/adapter';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWTextArea } from '../../components/component_kit/cw_text_area';
+
+import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTextArea } from '../../components/component_kit/cw_text_area';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
 export class CosmosProposalForm extends ClassComponent {
   private cosmosProposalType: 'textProposal' | 'communitySpend';

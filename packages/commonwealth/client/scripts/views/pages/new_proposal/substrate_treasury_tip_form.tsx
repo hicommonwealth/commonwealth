@@ -1,31 +1,21 @@
 /* @jsx jsx */
 import React from 'react';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { ClassComponent, jsx } from 'mithrilInterop';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { proposalSlugToClass } from 'identifiers';
+import type { ITXModalData, ProposalModule } from 'models';
 
 import app from 'state';
-import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { User } from '../../components/user/user';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { ProposalType } from '../../../../../../common-common/src/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTextArea } from '../../components/component_kit/cw_text_area';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { User } from '../../components/user/user';
 import { createTXModal } from '../../modals/tx_signing_modal';
+import ErrorPage from '../error';
 
 export class SubstrateTreasuryTipForm extends ClassComponent {
   private beneficiary: string;

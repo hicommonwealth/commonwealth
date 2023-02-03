@@ -4,11 +4,11 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_account_creation_button.scss';
+import { CWCard } from './cw_card';
+import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWCard } from './cw_card';
-import { CWText } from './cw_text';
 
 type AccountCreationButtonProps = {
   creationType?: 'newAccount' | 'linkAccount';

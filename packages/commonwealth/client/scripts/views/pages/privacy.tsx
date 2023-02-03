@@ -2,13 +2,23 @@
 import React from 'react';
 /* eslint-disable max-len */
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-
-import 'pages/privacy_and_terms.scss';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { renderMultilineText } from 'helpers';
-import Sublayout from '../sublayout';
+
+import 'pages/privacy_and_terms.scss';
 import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from '../sublayout';
 
 const PrivacyPolicy = `
 Last updated: January 14, 2019

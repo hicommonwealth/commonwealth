@@ -1,43 +1,27 @@
 /* @jsx jsx */
 import React from 'react';
-
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-
-import 'pages/view_thread/thread_components.scss';
-import 'pages/view_proposal/proposal_header_links.scss';
+import { ClassComponent } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import {
   externalLink,
   extractDomain,
   pluralize,
   threadStageToLabel,
 } from 'helpers';
-import {
-  Account,
-  Thread,
-  ThreadStage as ThreadStageType,
-  AddressInfo,
-} from 'models';
-import { User } from '../../components/user/user';
-import { CWText } from '../../components/component_kit/cw_text';
+import { ThreadStage as ThreadStageType, AddressInfo } from 'models';
+import type { Account, Thread } from 'models';
+
 import {
   Popover,
   usePopover,
 } from '../../components/component_kit/cw_popover/cw_popover';
-import { getClasses } from '../../components/component_kit/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
+import { getClasses } from '../../components/component_kit/helpers';
+import { User } from '../../components/user/user';
 
 type ThreadComponentAttrs = {
   thread: Thread;

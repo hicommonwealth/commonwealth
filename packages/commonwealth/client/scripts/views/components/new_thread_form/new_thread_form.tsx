@@ -3,47 +3,40 @@ import React from 'react';
 
 import {
   ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
   getRoute,
   getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
-import { capitalize } from 'lodash';
-import $ from 'jquery';
+import type { ResultNode } from 'mithrilInterop';
+import { navigateToSubpage } from 'router';
 
 import 'components/new_thread_form.scss';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import type { DraftParams } from 'controllers/server/drafts';
+import { detectURL } from 'helpers/threads';
+import $ from 'jquery';
+import { capitalize } from 'lodash';
+import type { Account, DiscussionDraft, Topic } from 'models';
+import { ThreadKind, ThreadStage } from 'models';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { detectURL } from 'helpers/threads';
-import {
-  Topic,
-  DiscussionDraft,
-  Account,
-  ThreadStage,
-  ThreadKind,
-} from 'models';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { DraftParams } from 'controllers/server/drafts';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
-import { TopicSelector } from '../topic_selector';
-import { QuillEditorComponent } from '../quill/quill_editor_component';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { QuillEditor } from '../quill/quill_editor';
-import { NewThreadFormType, NewDraftErrors } from './types';
-import { updateTopicList, checkNewThreadErrors } from './helpers';
-import { CWTabBar, CWTab } from '../component_kit/cw_tabs';
-import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWButton } from '../component_kit/cw_button';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
 import { CWText } from '../component_kit/cw_text';
+import { CWTextInput } from '../component_kit/cw_text_input';
 import { getClasses } from '../component_kit/helpers';
 import { renderQuillTextBody } from '../quill/helpers';
+import type { QuillEditor } from '../quill/quill_editor';
+import { QuillEditorComponent } from '../quill/quill_editor_component';
+import { TopicSelector } from '../topic_selector';
+import { checkNewThreadErrors, updateTopicList } from './helpers';
+import type { NewThreadFormType } from './types';
+import { NewDraftErrors } from './types';
 
 type NewThreadFormAttrs = {
   hasTopics: boolean;
@@ -233,8 +226,12 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
   }
 
   async onremove() {
-    const { fromDraft, form, quillEditorState, overwriteConfirmationModal } =
-      this;
+    const {
+      fromDraft,
+      form,
+      quillEditorState,
+      overwriteConfirmationModal,
+    } = this;
     if (
       this.form.kind === ThreadKind.Discussion &&
       !overwriteConfirmationModal
@@ -274,8 +271,9 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     const author = app.user.activeAccount;
     const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
-    const discussionDrafts =
-      app.user.discussionDrafts.store.getByCommunity(chainId);
+    const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(
+      chainId
+    );
 
     const defaultTemplate = localStorage.getItem(
       `${chainId}-active-topic-default-template`
@@ -469,7 +467,6 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         ? 'Uploading...'
                         : 'Create thread'
                     }
-                    name="submission"
                     tabIndex={4}
                   />
                   <CWButton
@@ -479,10 +476,11 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                       // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
                       this.saving = true;
 
-                      const existingDraftId =
-                        this.recentlyDeletedDrafts.includes(this.fromDraft)
-                          ? undefined
-                          : this.fromDraft;
+                      const existingDraftId = this.recentlyDeletedDrafts.includes(
+                        this.fromDraft
+                      )
+                        ? undefined
+                        : this.fromDraft;
 
                       try {
                         await this._saveDraft(
@@ -501,7 +499,6 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                       }
                     }}
                     label={fromDraft ? 'Update saved draft' : 'Save draft'}
-                    name="save"
                     tabIndex={5}
                   />
                 </div>
@@ -574,7 +571,6 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                 />
                 <CWButton
                   label="Create thread"
-                  name="submit"
                   disabled={disableSubmission}
                   onClick={async (e) => {
                     if (!detectURL(this.form.url)) {

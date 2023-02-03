@@ -1,10 +1,11 @@
 /* @jsx jsx */
 import React from 'react';
 
+import $ from 'jquery';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import $ from 'jquery';
+import { jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'modals/confirm_modal.scss';
 
@@ -31,7 +32,7 @@ const ConfirmModal = {
           e.preventDefault();
           e.stopPropagation();
         }}
-        onmousedown={(e) => {
+        onMouseDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
@@ -48,9 +49,9 @@ const ConfirmModal = {
                 $(e.target).trigger('modalexit');
               }, 0);
             }}
-            oncreate={(vvnode) => {
-              $(vvnode.dom).focus();
-            }}
+            // oncreate={(vvnode) => {
+            //   $(vvnode.dom).focus();
+            // }}
             label={primaryButton}
           />
           <CWButton

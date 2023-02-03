@@ -4,9 +4,9 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_validation_text.scss';
+import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
-import { CWText } from './cw_text';
 
 export type ValidationStatus = 'success' | 'failure';
 

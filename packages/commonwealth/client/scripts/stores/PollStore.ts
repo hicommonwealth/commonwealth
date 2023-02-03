@@ -1,4 +1,4 @@
-import Poll from '../models/Poll';
+import type Poll from '../models/Poll';
 import IdStore from './IdStore';
 
 class PollStore extends IdStore<Poll> {

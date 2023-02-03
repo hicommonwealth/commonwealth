@@ -6,8 +6,8 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
-import {
-  ComponentType,
+import { ComponentType } from '../types';
+import type {
   DefaultMenuItem,
   DividerMenuItem,
   HeaderMenuItem,
@@ -15,7 +15,8 @@ import {
 import { getClasses } from '../helpers';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
-import { PopoverTriggerProps, Popover, usePopover } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
+import type { PopoverTriggerProps } from './cw_popover';
 
 export type PopoverMenuItem =
   | DividerMenuItem
@@ -53,8 +54,13 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                 } else if (item.type === 'divider') {
                   return <div className="menu-section-divider" key={i} />;
                 } else {
-                  const { disabled, isSecondary, iconLeft, label, onClick } =
-                    item;
+                  const {
+                    disabled,
+                    isSecondary,
+                    iconLeft,
+                    label,
+                    onClick,
+                  } = item;
                   return (
                     <div
                       className={getClasses<{

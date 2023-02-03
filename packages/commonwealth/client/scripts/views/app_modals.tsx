@@ -37,17 +37,7 @@ import React from 'react';
 //  },
 // })
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, render, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';

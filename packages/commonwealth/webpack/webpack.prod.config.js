@@ -1,9 +1,9 @@
 const path = require('path');
 const webpack = require('webpack');
-const {merge} = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { WebpackDeduplicationPlugin } = require('webpack-deduplication-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -20,10 +20,13 @@ module.exports = merge(common, {
       'process.env.NODE_ENV': JSON.stringify('production'),
       CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com'),
     }),
+    new WebpackDeduplicationPlugin({
+      cacheDir: './cache',
+    }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
       generateStatsFile: true,
-      statsOptions: {source: false},
+      statsOptions: { source: false },
     }),
   ],
   module: {
@@ -42,11 +45,6 @@ module.exports = merge(common, {
           loader: 'babel-loader',
         },
       },
-    ]
+    ],
   },
-  optimization: {
-    minimizer: [
-      new CssMinimizerPlugin({ minimizerOptions: { preset: ['default'] } }),
-    ]
-  }
 });

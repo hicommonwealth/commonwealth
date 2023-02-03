@@ -1,9 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 import { PopperUnstyled } from '@mui/base';
-import { Placement } from '@popperjs/core/lib';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import type { Placement } from '@popperjs/core/lib';
 
+import { ClassComponent, jsx } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 
 type AnchorType = HTMLElement | SVGSVGElement;

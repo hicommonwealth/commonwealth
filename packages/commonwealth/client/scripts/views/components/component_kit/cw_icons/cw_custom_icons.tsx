@@ -8,7 +8,7 @@ import { jsx } from 'mithrilInterop';
 import 'components/component_kit/cw_icon.scss';
 
 import { getClasses } from '../helpers';
-import { CustomIconProps, CustomIconStyleProps } from './types';
+import type { CustomIconProps, CustomIconStyleProps } from './types';
 
 // ADDING CUSTOM ICONS: INSTRUCTIONS
 //

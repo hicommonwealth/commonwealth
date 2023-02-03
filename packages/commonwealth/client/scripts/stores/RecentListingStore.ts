@@ -1,7 +1,7 @@
 import moment from 'moment';
-import IdStore from './IdStore';
-import { Thread } from '../models';
+import type { Thread } from '../models';
 import { orderDiscussionsbyLastComment } from '../views/pages/discussions/helpers';
+import IdStore from './IdStore';
 
 interface IListingParams {
   topicName?: string;
@@ -161,10 +161,7 @@ class RecentListingStore extends IdStore<Thread> {
 
   // Filter function to determine inclusion of threads on listing page
 
-  private _isBeforeCutoff(
-    params: IListingParams,
-    thread: Thread
-  ): boolean {
+  private _isBeforeCutoff(params: IListingParams, thread: Thread): boolean {
     const { topicName, stageName, pinned } = params;
     const listingCutoff = topicName
       ? this._fetchState.topicCutoffDate[topicName]

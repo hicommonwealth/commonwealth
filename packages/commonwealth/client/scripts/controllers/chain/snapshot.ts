@@ -1,20 +1,22 @@
-import {
-  getProposals,
-  getSpace,
-  SnapshotProposal,
-  SnapshotSpace,
-} from 'helpers/snapshot_utils';
+import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { getProposals, getSpace } from 'helpers/snapshot_utils';
 
 class SnapshotController {
   private _space: SnapshotSpace;
-  public get space() { return this._space; }
+  public get space() {
+    return this._space;
+  }
 
   private _proposals: SnapshotProposal[];
-  public get proposals() { return this._proposals; }
+  public get proposals() {
+    return this._proposals;
+  }
 
-  private _initializing: boolean = false;
-  private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
+  private _initializing = false;
+  private _initialized = false;
+  public get initialized() {
+    return this._initialized;
+  }
 
   // private _votes = new Store<SnapshotVote>();
 

@@ -14,18 +14,17 @@ import {
 } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
+import type { Profile } from 'models';
 
 import 'pages/members.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { PageLoading } from 'views/pages/loading';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
-import { Profile } from 'models';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { CWText } from '../components/component_kit/cw_text';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -55,13 +54,7 @@ class MembersPage extends ClassComponent {
   view() {
     const activeEntity = app.chain;
 
-    if (!activeEntity)
-      return (
-        <PageLoading
-          message="Loading members"
-          title={<BreadcrumbsTitleTag title="Members" />}
-        />
-      );
+    if (!activeEntity) return <PageLoading message="Loading members" />;
 
     // get members once
     const activeInfo = app.chain.meta;
@@ -102,13 +95,7 @@ class MembersPage extends ClassComponent {
       });
     }
 
-    if (!this.membersLoaded)
-      return (
-        <PageLoading
-          message="Loading members"
-          title={<BreadcrumbsTitleTag title="Members" />}
-        />
-      );
+    if (!this.membersLoaded) return <PageLoading message="Loading members" />;
 
     const navigatedFromAccount =
       app.lastNavigatedBack() &&
@@ -209,10 +196,7 @@ class MembersPage extends ClassComponent {
     } = this;
 
     return (
-      <Sublayout
-        title={<BreadcrumbsTitleTag title="Members" />}
-        onScroll={this.onScroll}
-      >
+      <Sublayout onScroll={this.onScroll}>
         <div className="MembersPage">
           <CWText type="h3" fontWeight="medium">
             {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}

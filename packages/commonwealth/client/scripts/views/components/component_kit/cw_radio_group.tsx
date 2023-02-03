@@ -5,7 +5,8 @@ import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_group.scss';
 
-import { CWRadioButton, RadioButtonType } from './cw_radio_button';
+import type { RadioButtonType } from './cw_radio_button';
+import { CWRadioButton } from './cw_radio_button';
 import { ComponentType } from './types';
 
 type RadioGroupProps = {

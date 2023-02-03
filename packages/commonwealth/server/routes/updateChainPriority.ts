@@ -1,6 +1,7 @@
-import { success, TypedRequestBody, TypedResponse } from '../types';
-import { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 
 enum UpdatePriorityErrors {
   NoChainID = 'No chain_id provided.',

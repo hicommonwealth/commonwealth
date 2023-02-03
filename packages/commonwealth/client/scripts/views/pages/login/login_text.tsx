@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/login/login_text.scss';
 
@@ -25,7 +34,10 @@ export class LoginText extends ClassComponent<LoginTextAttrs> {
 
     return (
       <div
-        className={getClasses<{ className?: string }>({ className }, 'LoginText')}
+        className={getClasses<{ className?: string }>(
+          { className },
+          'LoginText'
+        )}
       >
         <div className="header-container">
           <CWText

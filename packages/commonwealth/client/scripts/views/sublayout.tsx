@@ -9,15 +9,15 @@ import {
   jsx,
 } from 'mithrilInterop';
 
-import 'sublayout.scss';
-
 import app from 'state';
-import { handleEmailInvites } from 'views/menus/invites_menu';
+
+import 'sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
+import { handleEmailInvites } from 'views/menus/invites_menu';
+import { AppMobileMenus } from './app_mobile_menus';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import { isWindowSmallInclusive } from './components/component_kit/helpers';
-import { AppMobileMenus } from './app_mobile_menus';
 import { SublayoutHeader } from './sublayout_header';
 
 // Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs

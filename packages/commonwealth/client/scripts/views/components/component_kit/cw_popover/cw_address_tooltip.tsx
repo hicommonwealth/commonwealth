@@ -9,7 +9,8 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWIconButton } from '../cw_icon_button';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
-import { Popover, PopoverTriggerProps, usePopover } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
+import type { PopoverTriggerProps } from './cw_popover';
 
 type AddressTooltipProps = {
   address: string;

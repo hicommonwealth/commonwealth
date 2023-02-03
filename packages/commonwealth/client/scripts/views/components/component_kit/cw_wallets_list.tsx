@@ -4,27 +4,28 @@ import React from 'react';
 import { redraw, jsx } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import type { ChainNetwork } from 'common-common/src/types';
 
 import 'components/component_kit/cw_wallets_list.scss';
-
-import { Account, AddressInfo, IWebWallet } from 'models';
-import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
-import Near from 'controllers/chain/near/adapter';
-import Substrate from 'controllers/chain/substrate/adapter';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import { notifyInfo } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
-import { addressSwapper } from 'commonwealth/shared/utils';
-import { CWText } from './cw_text';
-import {
-  CWWalletOptionRow,
-  CWWalletMissingOptionRow,
-} from './cw_wallet_option_row';
-import { CWTooltip } from './cw_popover/cw_tooltip';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import { User } from '../user/user';
 import { CWIconButton } from './cw_icon_button';
+import { CWTooltip } from './cw_popover/cw_tooltip';
+import { CWText } from './cw_text';
+import type { Account, IWebWallet } from 'models';
+import { AddressInfo } from 'models';
+import {
+  CWWalletMissingOptionRow,
+  CWWalletOptionRow,
+} from './cw_wallet_option_row';
+import { getClasses, isWindowMediumSmallInclusive } from './helpers';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import type Near from 'controllers/chain/near/adapter';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { addressSwapper } from 'utils';
 
 const LinkAccountItem = (props: {
   account: { address: string; meta?: { name: string } };

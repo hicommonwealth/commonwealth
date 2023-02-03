@@ -8,5 +8,8 @@ module.exports = {
   kind: 'discussion',
   stage: 'discussion',
   versionHistory:
-    '{"timestamp":"2020-03-20T23:57:18.253Z","body":"{\\"ops\\":[{\\"insert\\":\\"Test Test\\\\n\\\\nTest\\"},{\\"attributes\\":{\\"header\\":1},\\"insert\\":\\"\\\\n\\"},{\\"insert\\":\\"\\\\nTest\\"},{\\"attributes\\":{\\"header\\":2},\\"insert\\":\\"\\\\n\\"},{\\"insert\\":\\"\\\\n\\"},{\\"attributes\\":{\\"bold\\":true},\\"insert\\":\\"Test\\"},{\\"insert\\":\\"\\\\n\\"}]}"}',
+    '{"timestamp":"2020-03-20T23:57:18.253Z","body":"{\\"ops\\":[{\\"insert\\":\\"Test Test\\\\n\\\\nTest\\"},' +
+    '{\\"attributes\\":{\\"header\\":1},\\"insert\\":\\"\\\\n\\"},{\\"insert\\":\\"\\\\nTest\\"},' +
+    '{\\"attributes\\":{\\"header\\":2},\\"insert\\":\\"\\\\n\\"},{\\"insert\\":\\"\\\\n\\"},' +
+    '{\\"attributes\\":{\\"bold\\":true},\\"insert\\":\\"Test\\"},{\\"insert\\":\\"\\\\n\\"}]}"}',
 };

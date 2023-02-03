@@ -1,7 +1,17 @@
 import $ from 'jquery';
 import app from 'state';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { StarredCommunity } from 'models';
 
 class CommunitiesController {
@@ -45,7 +55,7 @@ class CommunitiesController {
           resolve();
           redraw();
         })
-        .catch((err) => {
+        .catch(() => {
           reject();
         });
     });

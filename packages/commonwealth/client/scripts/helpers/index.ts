@@ -1,12 +1,11 @@
-import $ from 'jquery';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import moment from 'moment';
+import { render, setRoute } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ICardListItem } from 'models/interfaces';
-import app from 'state';
+import $ from 'jquery';
 import { ThreadStage } from 'models';
-import { navigateToSubpage } from '../app';
+import type { ICardListItem } from 'models/interfaces';
+import moment from 'moment';
+import app from 'state';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -37,9 +36,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr
+  return (arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+    .filter((s) => s) as unknown) as ThreadStage[];
 }
 
 export const modalRedirectClick = (e, route) => {
@@ -78,8 +77,8 @@ export function link(
   children,
   extraAttrs?: object,
   saveScrollPositionAs?: string,
-  beforeRouteSet?: Function,
-  afterRouteSet?: Function
+  beforeRouteSet?: () => void,
+  afterRouteSet?: () => void
 ) {
   const attrs = {
     href: target,
@@ -366,14 +365,16 @@ export const weiToTokens = (input: string, decimals: number) => {
   return valueTokens.toFixed();
 };
 
-export const isCommandClick = (e: MouseEvent) => {
+export const isCommandClick = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>
+) => {
   return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
 };
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
   _this,
-  e: MouseEvent,
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
   callback: () => any

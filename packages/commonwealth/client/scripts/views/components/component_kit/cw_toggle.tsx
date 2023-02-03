@@ -5,8 +5,9 @@ import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_toggle.scss';
 
-import { ComponentType, BaseStyleProps } from './types';
+import type { BaseStyleProps } from './types';
 import { getClasses } from './helpers';
+import { ComponentType } from './types';
 
 type ToggleStyleProps = {
   checked?: boolean;

@@ -8,7 +8,7 @@ import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
 
 import { getClasses } from '../helpers';
-import { IconProps, IconStyleProps } from './types';
+import type { IconProps, IconStyleProps } from './types';
 
 // ADDING ICONS: INSTRUCTIONS
 //

@@ -13,18 +13,17 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
+import type { Data } from '@polkadot/types/primitive';
+import { u8aToString } from '@polkadot/util';
+import { notifyError } from 'controllers/app/notifications';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { IdentityInfoProps } from 'controllers/chain/substrate/identities';
+import type SubstrateIdentity from 'controllers/chain/substrate/identity';
 
 import 'modals/edit_identity_modal.scss';
 
-import { Data } from '@polkadot/types/primitive';
-import { u8aToString } from '@polkadot/util';
-
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { IdentityInfoProps } from 'controllers/chain/substrate/identities';
-import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { CWButton } from '../components/component_kit/cw_button';
 import { ModalExitButton } from '../components/component_kit/cw_modal';

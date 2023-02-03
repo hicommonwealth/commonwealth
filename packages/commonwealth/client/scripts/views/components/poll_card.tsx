@@ -1,28 +1,19 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
+import { CWButton } from './component_kit/cw_button';
 
 import { CWCard } from './component_kit/cw_card';
-import { CWButton } from './component_kit/cw_button';
-import { CWProgressBar } from './component_kit/cw_progress_bar';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWCheckbox } from './component_kit/cw_checkbox';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
+import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
-import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import { getClasses } from './component_kit/helpers';
 
 const LIVE_PREVIEW_MAX = 3;
@@ -150,8 +141,12 @@ export type VoteDisplayAttrs = {
 
 export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
   view(vnode: ResultNode<VoteDisplayAttrs>) {
-    const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
-      vnode.attrs;
+    const {
+      voteDirectionString,
+      timeRemaining,
+      pollEnded,
+      voteInformation,
+    } = vnode.attrs;
 
     const topResponse = voteInformation.sort(
       (option1, option2) => option2.voteCount - option1.voteCount
@@ -195,7 +190,7 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
 
 export type ResultsSectionAttrs = {
   resultString?: string;
-  onResultsClick: (e: Event) => any;
+  onResultsClick: (e: React.MouseEvent<HTMLDivElement>) => any;
   tokenSymbol?: string;
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;

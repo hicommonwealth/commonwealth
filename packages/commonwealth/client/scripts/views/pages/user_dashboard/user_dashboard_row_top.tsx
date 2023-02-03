@@ -1,35 +1,28 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-import moment from 'moment';
+import { formatTimestamp } from 'helpers/index';
+import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { capitalize } from 'lodash';
+import { AddressInfo } from 'models';
+import moment from 'moment';
 
 import 'pages/user_dashboard/user_dashboard_row_top.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
 import { User } from 'views/components/user/user';
-import { formatTimestamp } from 'helpers/index';
-import { getCommentPreview } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
+import { getCommentPreview } from './helpers';
 
 type UserDashboardRowTopAttrs = {
   activityData: any;
   category: string;
 };
 
-export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs> {
+export class UserDashboardRowTop extends ClassComponent<
+  UserDashboardRowTopAttrs
+> {
   view(vnode: ResultNode<UserDashboardRowTopAttrs>) {
     const { commentCount } = vnode.attrs.activityData;
 
@@ -75,7 +68,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         onclick={(e: any) => {
           e.preventDefault();
           e.stopPropagation();
-          m.route.set(`/${author_chain}/account/${author_address}`);
+          setRoute(`/${author_chain}/account/${author_address}`);
         }}
       />
     );
