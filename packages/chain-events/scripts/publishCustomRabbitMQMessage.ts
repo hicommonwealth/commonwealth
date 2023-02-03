@@ -1,8 +1,8 @@
-import {IEventData} from '../src/chains/aave/types';
-import {CWEvent, SupportedNetwork} from '../src';
-import {publishRmqMsg} from 'common-common/src/rabbitmq/util';
-import {RABBITMQ_API_URI} from '../services/config';
-import {RascalExchanges, RascalRoutingKeys} from 'common-common/src/rabbitmq';
+import { IEventData } from '../src/chains/aave/types';
+import { CWEvent, SupportedNetwork } from '../src';
+import { publishRmqMsg } from 'common-common/src/rabbitmq/util';
+import { RABBITMQ_API_URI } from '../services/config';
+import { RascalExchanges, RascalRoutingKeys } from 'common-common/src/rabbitmq';
 import models from 'chain-events/services/database/database';
 
 async function main() {
@@ -44,22 +44,29 @@ async function clear() {
   try {
     let eventsDeleted, entitiesDeleted;
     await models.sequelize.transaction(async (t) => {
-      const entityId = (await models.ChainEntity.findOne({
-        where: {chain: 'dydx', type_id: '10'}, transaction: t
-      })).id;
+      const entityId = (
+        await models.ChainEntity.findOne({
+          where: { chain: 'dydx', type_id: '10' },
+          transaction: t,
+        })
+      ).id;
 
       eventsDeleted = await models.ChainEvent.destroy({
-        where: {entity_id: entityId}, transaction: t
+        where: { entity_id: entityId },
+        transaction: t,
       });
 
       entitiesDeleted = await models.ChainEntity.destroy({
-        where: {id: entityId}, transaction: t
+        where: { id: entityId },
+        transaction: t,
       });
     });
 
-    console.log(`Events deleted: ${eventsDeleted}\nEntities deleted: ${entitiesDeleted}`);
+    console.log(
+      `Events deleted: ${eventsDeleted}\nEntities deleted: ${entitiesDeleted}`
+    );
   } catch (e) {
-    console.log("Failed to clear - reverted.")
+    console.log('Failed to clear - reverted.');
     console.error(e);
   }
 
