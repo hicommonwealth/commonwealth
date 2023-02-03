@@ -136,7 +136,7 @@ class SessionsController {
         session: JSON.stringify({}),
         action: JSON.stringify({}),
         hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-      }
+      };
       // await sessionSigninModal().catch((err) => {
       //   console.log('Login failed');
       //   throw err;
