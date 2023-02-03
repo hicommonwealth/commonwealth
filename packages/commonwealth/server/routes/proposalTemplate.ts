@@ -151,35 +151,63 @@ export async function getCommunityContractTemplate(
 
 export async function updateCommunityContractTemplate(
   models: DB,
-  req: TypedRequestBody<CommunityContractTemplateRequest>,
-  res: TypedResponse<CommunityContractTemplateResp>
+  req: TypedRequestBody<CreateCommunityContractTemplateAndMetadataReq>,
+  res: TypedResponse<CommunityContractTemplateAndMetadataResp>
 ) {
   try {
     if (!req.body) {
       throw new AppError('Must provide community_contract_id and template_id');
     }
+    const {
+      slug,
+      nickname,
+      display_name,
+      display_options,
+      community_id,
+      contract_id,
+      template_id,
+    } = req.body;
 
-    const contractTemplate: CommunityContractTemplateAttributes = req.body;
-
-    if (!contractTemplate) {
-      throw new AppError('Must provide contract template');
+    if (!community_id || !contract_id || !template_id) {
+      throw new AppError(
+        'Must provide community_id, contract_id, and template_id'
+      );
     }
 
-    const contract = await models.CommunityContractTemplate.findOne({
-      where: {
-        template_id: contractTemplate.template_id,
-      },
+    if (!slug || !nickname || !display_name || !display_options) {
+      throw new AppError(
+        'Must provide slug, nickname, display_name, and display_options'
+      );
+    }
+
+    const communityContractTemplate =
+      await models.CommunityContractTemplate.findOne({
+        where: { id: contract_id },
+      });
+
+    if (!communityContractTemplate) {
+      throw new AppError('Failed to create community contract');
+    }
+
+    const metadataToUpdate =
+      await models.CommunityContractTemplateMetadata.findOne({
+        where: { id: communityContractTemplate.cctmd_id },
+      });
+
+    if (!metadataToUpdate) {
+      throw new AppError('Failed to find metadata to update');
+    }
+
+    const updatedMetadata = await metadataToUpdate.update({
+      slug,
+      nickname,
+      display_name,
+      display_options,
     });
 
-    if (!contract) {
-      throw new AppError('Contract does not exist');
-    }
-
-    const updated = await contract.update(contractTemplate);
-
     return success(res, {
-      community_contract_id: updated.community_contract_id,
-      template_id: updated.template_id,
+      metadata: updatedMetadata,
+      cct: communityContractTemplate,
     });
   } catch (err) {
     throw new AppError('Error updating community contract template');
