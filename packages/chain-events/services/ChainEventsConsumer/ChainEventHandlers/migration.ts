@@ -1,26 +1,14 @@
 /**
  * Processes events during migration, upgrading from simple notifications to entities.
  */
-import type { WhereOptions } from 'sequelize';
-import type {
-  RabbitMQController,
-  RmqCENotificationCUD,
-} from 'common-common/src/rabbitmq';
-import { RascalPublications } from 'common-common/src/rabbitmq';
-import { factory, formatFilename } from 'common-common/src/logging';
+import type {WhereOptions} from 'sequelize';
+import type {RabbitMQController,} from 'common-common/src/rabbitmq';
+import {factory, formatFilename} from 'common-common/src/logging';
 
-import type { CWEvent } from '../../../src';
-import {
-  IEventHandler,
-  eventToEntity,
-  getUniqueEntityKey,
-  EntityEventKind,
-} from '../../../src';
-import type { DB } from '../../database/database';
-import type {
-  ChainEventAttributes,
-  ChainEventInstance,
-} from '../../database/models/chain_event';
+import type {CWEvent} from '../../../src';
+import {EntityEventKind, eventToEntity, getUniqueEntityKey, IEventHandler,} from '../../../src';
+import type {DB} from '../../database/database';
+import type {ChainEventAttributes, ChainEventInstance,} from '../../database/models/chain_event';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -71,31 +59,12 @@ export default class extends IEventHandler<ChainEventInstance> {
       }
 
       log.info('No existing event found, creating new event in db!');
-      const dbEvent = await this._models.ChainEvent.create({
+      return await this._models.ChainEvent.create({
         block_number: event.blockNumber,
         event_data: event.data,
         network: event.network,
         chain,
       });
-
-      const formattedEvent: ChainEventAttributes = dbEvent.toJSON();
-
-      const publishData: RmqCENotificationCUD.RmqMsgType = {
-        ChainEvent: formattedEvent,
-        event,
-        cud: 'create',
-      };
-
-      await this._rmqController.safePublish(
-        publishData,
-        dbEvent.id,
-        RascalPublications.ChainEventNotificationsCUDMain,
-        {
-          sequelize: this._models.sequelize,
-          model: this._models.ChainEvent,
-        }
-      );
-      return dbEvent;
     };
 
     const entity = eventToEntity(event.network, event.data.kind);
