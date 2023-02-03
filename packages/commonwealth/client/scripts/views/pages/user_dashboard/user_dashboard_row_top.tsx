@@ -24,8 +24,6 @@ export class UserDashboardRowTop extends ClassComponent<
   UserDashboardRowTopAttrs
 > {
   view(vnode: ResultNode<UserDashboardRowTopAttrs>) {
-    const { commentCount } = vnode.attrs.activityData;
-
     const {
       created_at,
       chain_id,
