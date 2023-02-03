@@ -62,7 +62,15 @@ const getFilteredContent = (content, address) => {
         : content.notificationCategory === NotificationCategories.NewThread
         ? 'created a new thread'
         : '';
-    const actedOn = decodeURIComponent(content.title);
+
+    // Titles may be URI-encoded, or not (e.g. some imports)
+    let actedOn
+    try {
+      actedOn = decodeURIComponent(content.title);
+    } catch (err) {
+      actedOn = content.title;
+    }
+
     const actedOnLink = content.url;
 
     const notificationTitlePrefix =
@@ -75,7 +83,12 @@ const getFilteredContent = (content, address) => {
         : 'Activity on: ';
 
     // url decoded
-    const bodytext = decodeURIComponent(content.body);
+    let bodytext
+    try {
+      bodytext = decodeURIComponent(content.body);
+    } catch (err) {
+      bodytext = content.body;
+    }
 
     const notificationPreviewImageUrl = (() => {
       // retrieves array of matching `bodytext` against REGEX_IMAGE
