@@ -56,7 +56,9 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
             {chain.name}
           </CWText>
         </div>
-        <CWText className="card-subtext">{chain.description}</CWText>
+        <CWText className="card-subtext" type="b2">
+          {chain.description}
+        </CWText>
         {/* if no recently active threads, hide this module altogether */}
         {!!monthlyThreadCount && (
           <React.Fragment>
@@ -91,23 +93,26 @@ export class DashboardCommunitiesPreview extends ClassComponent {
         const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
         return threadCountB - threadCountA;
       })
-      .map((chain) => {
-        return <CommunityPreviewCard chain={chain} />;
+      .map((chain, i) => {
+        return <CommunityPreviewCard key={i} chain={chain} />;
       });
 
     return (
       <div className="DashboardCommunitiesPreview">
-        <CWText type="h3">Active Communities</CWText>
+        <CWText type="h4">Suggested Communities</CWText>
         <div className="community-preview-cards-collection">
           {sortedChains.length > 3 ? sortedChains.slice(0, 3) : sortedChains}
         </div>
-        <CWButton
-          onClick={() => {
-            setRoute('/communities');
-            redraw();
-          }}
-          label="View more communities"
-        />
+        <div className="buttons">
+          <CWButton
+            onClick={() => {
+              setRoute('/communities');
+              redraw();
+            }}
+            label="Explore communities"
+            buttonType="mini-black"
+          />
+        </div>
       </div>
     );
   }

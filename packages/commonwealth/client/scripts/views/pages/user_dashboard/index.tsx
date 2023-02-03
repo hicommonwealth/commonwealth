@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import { notifyInfo } from 'controllers/app/notifications';
 import $ from 'jquery';
@@ -55,7 +46,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     redraw();
     const tab = this.activePage;
     if (tab === DashboardViews.ForYou) {
-      if (this.fyNotifications.length === 0) this.loadingData = true;
+      if (this.fyNotifications && this.fyNotifications.length === 0)
+        this.loadingData = true;
       fetchActivity(tab).then((activity) => {
         this.fyNotifications = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
@@ -64,7 +56,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         redraw();
       });
     } else if (tab === DashboardViews.Global) {
-      if (this.globalNotifications.length === 0) this.loadingData = true;
+      if (this.globalNotifications && this.globalNotifications.length === 0)
+        this.loadingData = true;
       fetchActivity(tab).then((activity) => {
         this.globalNotifications = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
@@ -73,7 +66,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         redraw();
       });
     } else if (tab === DashboardViews.Chain) {
-      if (this.chainEvents.length === 0) this.loadingData = true;
+      if (this.chainEvents && this.chainEvents.length === 0)
+        this.loadingData = true;
       fetchActivity(tab).then((activity) => {
         this.chainEvents = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
@@ -166,8 +160,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         <div className="UserDashboard">
           <div className="dashboard-column">
             <div className="dashboard-header">
-              <CWText type="h3" fontWeight="semiBold">
-                Activity
+              <CWText type="h3" fontWeight="medium">
+                Home
               </CWText>
               <CWTabBar>
                 <CWTab
@@ -201,17 +195,66 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   }}
                 />
               </CWTabBar>
-              {loadingData && <CWSpinner />}
             </div>
+            {loadingData && <CWSpinner />}
             {!loadingData && (
               <React.Fragment>
+                {/* TODO: add filter functionality */}
+                {/* <CWPopover
+                  trigger={
+                    <CWButton
+                      buttonType="mini-white"
+                      label="Filter"
+                      iconRight="chevronDown"
+                    />
+                  }
+                  content={
+                    <CWCard className="dashboard-filter-items">
+                      <CWCheckbox
+                        checked={false}
+                        value=""
+                        label="Threads"
+                        onchange={() => {
+                          // TODO: add filter functionality
+                        }}
+                      />
+                      <CWCheckbox
+                        checked={false}
+                        value=""
+                        label="Polls"
+                        onchange={() => {
+                          // TODO: add filter functionality
+                        }}
+                      />
+                      <CWCheckbox
+                        checked={false}
+                        value=""
+                        label="Proposals"
+                        onchange={() => {
+                          // TODO: add filter functionality
+                        }}
+                      />
+                      <CWCheckbox
+                        checked={false}
+                        value=""
+                        label="Crowdfunds"
+                        onchange={() => {
+                          // TODO: add filter functionality
+                        }}
+                      />
+                    </CWCard>
+                  }
+                />
+                <CWDivider /> */}
                 {activePage === DashboardViews.ForYou && (
                   <React.Fragment>
                     {fyNotifications && fyNotifications.length > 0 ? (
                       <React.Fragment>
-                        {fyNotifications.slice(0, this.fyCount).map((data) => {
-                          return <UserDashboardRow notification={data} />;
-                        })}
+                        {fyNotifications
+                          .slice(0, this.fyCount)
+                          .map((data, i) => (
+                            <UserDashboardRow key={i} notification={data} />
+                          ))}
                         {notificationsRemaining(
                           fyNotifications.length,
                           this.fyCount
@@ -227,8 +270,8 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                     <React.Fragment>
                       {globalNotifications
                         .slice(0, this.globalCount)
-                        .map((data) => (
-                          <UserDashboardRow notification={data} />
+                        .map((data, i) => (
+                          <UserDashboardRow key={i} notification={data} />
                         ))}
                       {notificationsRemaining(
                         globalNotifications.length,
@@ -245,8 +288,10 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                       <React.Fragment>
                         {chainEvents
                           .slice(0, this.chainEventCount)
-                          .map((data) => {
-                            return <UserDashboardRow notification={data} />;
+                          .map((data, i) => {
+                            return (
+                              <UserDashboardRow key={i} notification={data} />
+                            );
                           })}
                         {notificationsRemaining(
                           chainEvents.length,

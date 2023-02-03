@@ -6,17 +6,8 @@ import { Label as ChainEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
 import type { DashboardActivityNotification } from 'models';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 import app from 'state';
@@ -32,14 +23,13 @@ type UserDashboardRowAttrs = {
 export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
   view(vnode: ResultNode<UserDashboardRowAttrs>) {
     const {
-      likeCount,
-      viewCount,
       commentCount,
       categoryId,
       threadId,
       blockNumber,
       eventNetwork,
       chain,
+      commenters,
     } = vnode.attrs.notification;
 
     if (categoryId === 'chain-event') {
@@ -62,7 +52,7 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
       );
     }
 
-    const { chain_id, root_id, root_type } = JSON.parse(
+    const { chain_id, root_id, root_type, comment_id } = JSON.parse(
       vnode.attrs.notification.notificationData
     );
 
@@ -84,11 +74,11 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
           category={categoryId}
         />
         <UserDashboardRowBottom
-          path={path}
           threadId={threadId}
-          viewCount={viewCount}
+          commentId={comment_id}
+          chainId={chain_id}
           commentCount={commentCount}
-          likeCount={likeCount}
+          commenters={commenters}
         />
       </div>
     );
