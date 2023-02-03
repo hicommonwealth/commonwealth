@@ -6,14 +6,13 @@ import externalSwagger from '../swagger/swagger_external.json';
 export function addSwagger(endpoint: string, app: Express) {
   // redirect from commonwealthapp.herokuapp.com to commonwealth.im
   const urlParts = SERVER_URL.split('://');
-  externalSwagger.host = urlParts[1];
 
-  if (externalSwagger.host.includes('commonwealthapp.herokuapp.com')) {
+  if (SERVER_URL.includes('commonwealthapp.herokuapp.com')) {
     externalSwagger.host = 'comomonwealth.im';
-  } else if (
-    externalSwagger.host.includes('commonwealth-staging2.herokuapp.com')
-  ) {
+  } else if (SERVER_URL.includes('staging2')) {
     externalSwagger.host = 'affinity.fun';
+  } else {
+    externalSwagger.host = urlParts[1];
   }
 
   externalSwagger.schemes = [urlParts[0]];
