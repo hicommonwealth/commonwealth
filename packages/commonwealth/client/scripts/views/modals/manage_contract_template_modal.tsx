@@ -20,26 +20,6 @@ export const displayOptions = [
   { value: '0', label: 'Hidden' },
 ];
 
-// TODO: Update: this should just be fetched from GET contract/template route
-const templatesOld = [
-  {
-    id: 1,
-    title: 'Treasury Spend',
-    displayName: 'New Treasury Proposal 1',
-    nickname: 'Little Treasures',
-    slug: '/whatever-was-here-for-add-template',
-    displayOption: 3,
-  },
-  {
-    id: 2,
-    title: 'Parameter Change',
-    displayName: 'New Treasury Proposal 2',
-    nickname: 'Little Treasures 2',
-    slug: '/whatever-was-here-for-add-template-2',
-    displayOption: 2,
-  },
-];
-
 type ManageContractTemplateModalAttrs = {
   contractId: number;
   templateId?: number;
@@ -67,6 +47,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     slug: '',
     displayOption: null,
   };
+  private contractTemplates = [];
 
   closeModalOnSuccess(e) {
     $(e.target).trigger('modalcomplete');
@@ -105,6 +86,8 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
       );
 
       this.closeModalOnSuccess(e);
+      console.log(app.contracts.store);
+      m.redraw();
     } catch (err) {
       notifyError(err.message);
     }
@@ -146,27 +129,25 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     const template = templates.find((t) => t.id === templateId);
 
     this.form.templateId = item.value;
-    // this.form.nickname = template.name;
     this.form.displayName = template.name;
   }
 
   oninit(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
-    const { templateId, template, templates } = vnode.attrs;
+    const { contractId, templateId, template, templates } = vnode.attrs;
     const isEditMode = !!templateId;
-    console.log(templateId, template, templates);
-    const globalTemplate = templates.find((t) => t.id === templateId);
 
     if (isEditMode) {
-      this.form.templateId = globalTemplate.id;
+      this.form.templateId = templateId;
       this.form.displayName = template.displayName;
       this.form.nickname = template.nickname;
       this.form.slug = template.slug;
       this.form.displayOption = template.display;
     }
+    this.contractTemplates = templates;
   }
 
   view(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
-    const { contractId, templateId, templates } = vnode.attrs;
+    const { contractId, templateId } = vnode.attrs;
 
     const isEditMode = !!templateId;
     const modalTitle = isEditMode ? 'Edit Template' : 'Add Template';
@@ -178,7 +159,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     // disable if at least one input is not filled
     const confirmButtonDisabled = !Object.values(this.form).every(Boolean);
 
-    const templateOptions = templates.map((template) => ({
+    const templateOptions = this.contractTemplates.map((template) => ({
       value: String(template.id),
       label: template.name,
     }));
@@ -209,7 +190,9 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
             initialValue={initialTemplateName}
             label="Choose a template for your proposal"
             options={templateOptions}
-            onSelect={(item) => this.handleSelectTemplate(item, templates)}
+            onSelect={(item) =>
+              this.handleSelectTemplate(item, this.contractTemplates)
+            }
           />
           {isEditMode && (
             <CWText className="create-template-info" type="caption">
@@ -307,7 +290,7 @@ type ShowManageContractTemplateModalAttrs = {
     abi_id: string;
     template: string;
     name: string;
-  }>;
+  }>; // Global Templates
 };
 
 export const showManageContractTemplateModal = ({

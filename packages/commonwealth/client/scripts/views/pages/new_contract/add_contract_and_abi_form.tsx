@@ -19,13 +19,22 @@ class AddContractAndAbiForm extends ClassComponent {
     abi: '',
   };
 
-  handleAddContract() {
+  async handleAddContract() {
     const scope = app.customDomainId() || m.route.param('scope');
+
     try {
       this.saving = true;
+      const chainNodeId = app.chain.meta.ChainNode.id;
+
+      await app.contracts.addContractAndAbi({
+        chain_node_id: chainNodeId,
+        abi: this.form.abi,
+        address: this.form.address,
+      });
+
       m.route.set(`/${scope}/contracts`);
     } catch (err) {
-      notifyError('Failed to add Contract and ABI');
+      notifyError(err.message);
       console.log(err);
     } finally {
       this.saving = false;
@@ -37,10 +46,9 @@ class AddContractAndAbiForm extends ClassComponent {
     m.route.set(`/${scope}/contracts`);
   }
 
-  view(vnode) {
+  view() {
     const isAddressValid = isAddress(this.form.address);
-    const isAbiValid = !!this.form.abi;
-    const isAddingDisabled = this.saving || !isAddressValid || !isAbiValid;
+    const isAddingDisabled = this.saving || !isAddressValid;
 
     return (
       <div class="AddContractAndAbiForm">
@@ -82,7 +90,7 @@ class AddContractAndAbiForm extends ClassComponent {
             buttonType="mini-black"
             label="Add"
             disabled={isAddingDisabled}
-            onclick={this.handleAddContract}
+            onclick={() => this.handleAddContract()}
           />
         </div>
       </div>

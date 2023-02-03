@@ -11,13 +11,12 @@ import type {
 import { success, failure } from '../types';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
+  cct_id: string;
   slug: string;
   nickname: string;
   display_name: string;
   display_options: string;
-  community_id: string;
   contract_id: number;
-  template_id: number;
 };
 
 type CommunityContractTemplateAndMetadataResp = {
@@ -64,8 +63,9 @@ export async function createCommunityContractTemplateAndMetadata(
     );
   }
 
+  // TODO something is off here
   const communityContract = await models.CommunityContract.findOne({
-    where: { id: contract_id },
+    where: { contract_id: contract_id },
   });
 
   if (!communityContract) {
@@ -83,11 +83,13 @@ export async function createCommunityContractTemplateAndMetadata(
 
     const newCCT = await models.CommunityContractTemplate.create({
       community_contract_id: communityContract.id,
+      cctmd_id: newMetadata.id,
       template_id,
     });
 
     return success(res, { metadata: newMetadata, cct: newCCT });
   } catch (err) {
+    console.log('err', err);
     throw new AppError(
       'Unkown Server error creating community contract template'
     );
@@ -163,15 +165,12 @@ export async function updateCommunityContractTemplate(
       nickname,
       display_name,
       display_options,
-      community_id,
       contract_id,
-      template_id,
+      cct_id,
     } = req.body;
 
-    if (!community_id || !contract_id || !template_id) {
-      throw new AppError(
-        'Must provide community_id, contract_id, and template_id'
-      );
+    if (!contract_id) {
+      throw new AppError('Must provide contract_id.');
     }
 
     if (!slug || !nickname || !display_name || !display_options) {
@@ -182,11 +181,11 @@ export async function updateCommunityContractTemplate(
 
     const communityContractTemplate =
       await models.CommunityContractTemplate.findOne({
-        where: { id: contract_id },
+        where: { id: cct_id },
       });
 
     if (!communityContractTemplate) {
-      throw new AppError('Failed to create community contract');
+      throw new AppError('Failed to find community contract');
     }
 
     const metadataToUpdate =
@@ -210,6 +209,7 @@ export async function updateCommunityContractTemplate(
       cct: communityContractTemplate,
     });
   } catch (err) {
+    console.log(err);
     throw new AppError('Error updating community contract template');
   }
 }

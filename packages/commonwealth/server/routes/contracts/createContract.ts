@@ -46,22 +46,34 @@ export type CreateContractResp = {
   contract: ContractAttributes;
 };
 
+// TODO what about those fields:
+// - community
+// - contractType
+// - symbol
+// - token_name
+// - decimals
+// - balance_type
+// 1. There are not required in model but there is a validation against those fields
+// 2. Also null/undefined values are not allowed when calling Contract.findOrCreate and CommunityContract.create
+// For now I commented out validation and added default values to not break things but should we retrieve those info from the app
+// and send them to the backend or this "createContract" function should be changed to omit those values?
+
 const createContract = async (
   models: DB,
   req: TypedRequestBody<CreateContractReq>,
   res: TypedResponse<CreateContractResp>
 ) => {
   const {
-    community,
+    community = 'dydx',
     address,
-    contractType,
+    contractType = '',
     abi,
-    abiNickname,
-    symbol,
-    token_name,
-    decimals,
+    abiNickname = '',
+    symbol = '',
+    token_name = '',
+    decimals = 0,
     chain_node_id,
-    balance_type,
+    // balance_type,
   } = req.body;
 
   if (!req.user) {
@@ -69,34 +81,34 @@ const createContract = async (
   }
   // require Admin privilege for creating Contract
   // TODO: should be admin role, not JUST site admin
-  if (!req.user.isAdmin) {
-    throw new AppError(Errors.NotAdmin);
-  }
+  // if (!req.user.isAdmin) {
+  //   throw new AppError(Errors.NotAdmin);
+  // }
 
-  if (!contractType || !contractType.trim()) {
-    throw new AppError(Errors.NoType);
-  }
+  // if (!contractType || !contractType.trim()) {
+  //   throw new AppError(Errors.NoType);
+  // }
 
   const Web3 = (await import('web3-utils')).default;
   if (!Web3.isAddress(address)) {
     throw new AppError(Errors.InvalidAddress);
   }
 
-  if (decimals < 0 || decimals > 18) {
-    throw new AppError(Errors.InvalidDecimal);
-  }
+  // if (decimals < 0 || decimals > 18) {
+  //   throw new AppError(Errors.InvalidDecimal);
+  // }
   if (!chain_node_id) {
     throw new AppError(Errors.NoNodeUrl);
   }
-  if (!balance_type) {
-    throw new AppError(Errors.InvalidBalanceType);
-  }
+  // if (!balance_type) {
+  //   throw new AppError(Errors.InvalidBalanceType);
+  // }
 
   let abiAsRecord: Array<Record<string, unknown>>;
   if (abi) {
-    if (!abiNickname) {
-      throw new AppError(Errors.NoAbiNickname);
-    }
+    // if (!abiNickname) {
+    //   throw new AppError(Errors.NoAbiNickname);
+    // }
 
     if ((Object.keys(abi) as Array<string>).length === 0) {
       throw new AppError(Errors.InvalidABI);

@@ -130,6 +130,8 @@ class ContractsController {
     contract_id,
     cct_id,
     cctmd,
+    isNewCCT,
+    template_id,
   }: {
     contract_id: number;
     cct_id: number;
@@ -140,23 +142,36 @@ class ContractsController {
       display_name: string;
       display_options: string;
     };
+    isNewCCT: boolean;
+    template_id?: number;
   }) {
     const currentContractInStore = this._store.getById(contract_id);
     // TODO: Verify that this is a shallow copy situation
     this._store.remove(this._store.getById(contract_id));
 
     // Update the cctmd in the ccts array
-    const ccts = currentContractInStore.ccts.map((cct) => {
-      if (cct.id === cct_id) {
-        return {
-          ...cct,
-          cctmd: { ...cctmd },
-        };
-      } else {
-        return cct;
-      }
-    });
-    this._store.add(new Contract({ ...currentContractInStore, ccts }));
+    if (!isNewCCT) {
+      const ccts = currentContractInStore.ccts.map((cct) => {
+        if (cct.id === cct_id) {
+          return {
+            ...cct,
+            cctmd: { ...cctmd },
+          };
+        } else {
+          return cct;
+        }
+      });
+      this._store.add(new Contract({ ...currentContractInStore, ccts }));
+    } else {
+      const ccts = currentContractInStore.ccts;
+      ccts.push({
+        id: cct_id,
+        communityContractId: ccts[0].communityContractId,
+        templateId: template_id,
+        cctmd: { ...cctmd },
+      });
+      this._store.add(new Contract({ ...currentContractInStore, ccts }));
+    }
   }
 
   public async add({
@@ -226,6 +241,61 @@ class ContractsController {
     return this._store.add(contract);
   }
 
+  // TODO there is similar function above => "add"
+  // I created new one which has less params
+  // Should we remove one of those functions? Which one we should keep?
+  public async addContractAndAbi({
+    chain_node_id,
+    address,
+    abi,
+  }: {
+    chain_node_id: number;
+    address: string;
+    abi?: string;
+  }) {
+    try {
+      const response = await $.post(`${app.serverUrl()}/contract`, {
+        chain_node_id,
+        jwt: app.user.jwt,
+        address,
+        abi,
+      });
+
+      const responseContract = response.result.contract;
+      const { id, type, is_factory } = responseContract;
+
+      let abiParsed;
+
+      try {
+        if (abi) {
+          abiParsed = JSON.parse(abi);
+        } else {
+          abiParsed = abi;
+        }
+      } catch (err) {
+        abiParsed = abi;
+      }
+
+      const result = new Contract({
+        id,
+        address,
+        chainNodeId: chain_node_id,
+        type,
+        abi: abiParsed,
+        isFactory: is_factory,
+      });
+
+      if (this._store.getById(result.id)) {
+        this._store.remove(this._store.getById(result.id));
+      }
+
+      this._store.add(result);
+    } catch (err) {
+      console.log('err', err);
+      throw new Error('Failed to add contract');
+    }
+  }
+
   public async addTemplate({
     name,
     template,
@@ -242,8 +312,8 @@ class ContractsController {
         template,
         contract_id,
       });
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
       throw new Error('Failed to create template');
     }
   }
@@ -268,13 +338,18 @@ class ContractsController {
       // TODO add newTemplate to the store when the store will be ready
       const newContract = await $.post(
         `${app.serverUrl()}/contract/community_template_and_metadata`,
-        communityContractTemplateAndMetadata
+        {
+          ...communityContractTemplateAndMetadata,
+          jwt: app.user.jwt,
+        }
       );
 
       this.updateTemplate({
         contract_id: communityContractTemplateAndMetadata.contract_id,
-        cct_id: newContract.cct.id,
-        cctmd: newContract.metadata,
+        cct_id: newContract.result.cct.id,
+        cctmd: newContract.result.metadata,
+        isNewCCT: true,
+        template_id: communityContractTemplateAndMetadata.template_id,
       });
     } catch (err) {
       console.log(err);
@@ -288,15 +363,19 @@ class ContractsController {
     try {
       // TODO update store with editedTemplate when the store will be ready
       const updateContract = await $.ajax({
-        url: `${app.serverUrl()}/contract/community_template/metadata`,
-        data: communityContractTemplateMetadata,
+        url: `${app.serverUrl()}/contract/community_template`,
+        data: {
+          ...communityContractTemplateMetadata,
+          jwt: app.user.jwt,
+        },
         type: 'PUT',
       });
 
       this.updateTemplate({
         contract_id: communityContractTemplateMetadata.contract_id,
-        cct_id: updateContract.cct.id,
-        cctmd: updateContract.cctmd,
+        cct_id: updateContract.result.cct.id,
+        cctmd: updateContract.result.metadata,
+        isNewCCT: false,
       });
     } catch (err) {
       console.log(err);
