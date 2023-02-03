@@ -89,3 +89,8 @@ export function parseContractType(arg: string): ContractType {
   if (ct) return ct;
   throw new Error('Invalid contract type');
 }
+
+export type EthBPOpts = {
+  tokenAddress?: string;
+  contractType?: string;
+};

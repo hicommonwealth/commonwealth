@@ -1,3 +1,4 @@
+import { validateOpts } from 'util/validateOpts';
 import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
 import type { ERC20 } from 'common-common/src/eth/types';
@@ -53,19 +54,7 @@ export default class Erc20BalanceProvider extends BalanceProvider<
     address: string,
     opts: EthBPOpts
   ): Promise<string> {
-    const { tokenAddress, contractType } = opts;
-    if (contractType != this.name) {
-      throw new Error('Invalid Contract Type');
-    }
-    if (!tokenAddress) {
-      throw new Error('Need Token Address');
-    }
-    if (!Web3.utils.isAddress(tokenAddress)) {
-      throw new Error('Invalid token address');
-    }
-    if (!Web3.utils.isAddress(address)) {
-      throw new Error('Invalid address');
-    }
+    validateOpts(this.name, address, opts);
 
     const erc20Api: ERC20 = await this.getExternalProvider(node, opts);
     const balanceBigNum: BigNumber = await erc20Api.balanceOf(address);

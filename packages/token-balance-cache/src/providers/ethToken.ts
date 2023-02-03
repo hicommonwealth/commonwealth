@@ -1,13 +1,8 @@
-import type { IChainNode } from '../types';
+import type { EthBPOpts, IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
 import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
-
-type EthBPOpts = {
-  tokenAddress?: string;
-  contractType?: string;
-};
 
 export default class EthTokenBalanceProvider extends BalanceProvider<
   Web3,

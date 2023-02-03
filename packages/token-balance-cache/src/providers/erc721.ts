@@ -5,14 +5,10 @@ import { providers } from 'ethers';
 import type { ERC721 } from 'common-common/src/eth/types';
 import { ERC721__factory } from 'common-common/src/eth/types';
 
-import type { IChainNode } from '../types';
+import type { EthBPOpts, IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
-
-type EthBPOpts = {
-  tokenAddress?: string;
-  contractType?: string;
-};
+import { validateOpts } from 'util/validateOpts';
 
 export default class Erc721BalanceProvider extends BalanceProvider<
   ERC721,
@@ -54,19 +50,7 @@ export default class Erc721BalanceProvider extends BalanceProvider<
     address: string,
     opts: EthBPOpts
   ): Promise<string> {
-    const { tokenAddress, contractType } = opts;
-    if (contractType != this.name) {
-      throw new Error('Invalid Contract Type');
-    }
-    if (!tokenAddress) {
-      throw new Error('Need Token Address');
-    }
-    if (!Web3.utils.isAddress(tokenAddress)) {
-      throw new Error('Invalid token address');
-    }
-    if (!Web3.utils.isAddress(address)) {
-      throw new Error('Invalid address');
-    }
+    validateOpts(this.name, address, opts);
 
     const erc721Api: ERC721 = await this.getExternalProvider(node, opts);
 
