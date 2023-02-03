@@ -50,6 +50,8 @@ export default class Nft extends Ethereum implements ITokenAdapter {
     const nftContract = nftContracts[0];
     this.contractAddress = nftContract.address;
 
+    await super.initApi();
+
     // Initialize contract API
     const api = new NftApi(
       ERC721__factory.connect,
@@ -57,7 +59,6 @@ export default class Nft extends Ethereum implements ITokenAdapter {
       this.chain.api.currentProvider as any
     );
 
-    await super.initApi();
     await api.init();
     this.contractApi = api;
   }

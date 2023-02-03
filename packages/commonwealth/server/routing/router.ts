@@ -55,9 +55,6 @@ import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import bulkMembers from '../routes/bulkMembers';
 import bulkAddresses from '../routes/bulkAddresses';
-import createInvite from '../routes/createInvite';
-import acceptInvite from '../routes/acceptInvite';
-import addMember from '../routes/addMember';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileOld from '../routes/getProfile';
@@ -172,6 +169,7 @@ import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
 
 function setupRouter(
+  endpoint: string,
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
@@ -564,23 +562,6 @@ function setupRouter(
     '/bulkMembers',
     databaseValidationService.validateChain,
     bulkMembers.bind(this, models)
-  );
-  router.post(
-    '/createInvite',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createInvite.bind(this, models)
-  );
-  router.post(
-    '/acceptInvite',
-    passport.authenticate('jwt', { session: false }),
-    acceptInvite.bind(this, models)
-  );
-  router.post(
-    '/addMember',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    addMember.bind(this, models)
   );
   router.post(
     '/upgradeMember',
@@ -996,11 +977,7 @@ function setupRouter(
   router.post('/getChainContracts', getChainContracts.bind(this, models));
   router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
 
-  // new API
-  addExternalRoutes(router, app, models, tokenBalanceCache);
-  addSwagger(app);
-
-  app.use('/api', router);
+  app.use(endpoint, router);
 }
 
 export default setupRouter;
