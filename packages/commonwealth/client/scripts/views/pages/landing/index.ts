@@ -13,7 +13,6 @@ import 'pages/landing/landing_page.scss';
 import app, { LoginState } from 'state';
 import { Footer } from '../../footer';
 
-import { handleEmailInvites } from '../../menus/invites_menu';
 import UserDashboard from '../user_dashboard';
 import TokensChainsComponent from './chains_slider';
 import TokensCreatorComponent from './creators_card_section';
@@ -90,9 +89,6 @@ const LandingPage: m.Component<{}, IState> = {
     ];
   },
   view: (vnode) => {
-    if (m.route.param('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(vnode.state), 0);
-    }
     if (app.loginState !== LoginState.LoggedIn) {
       return m('.LandingPage', { class: 'bg-primary' }, [
         m(

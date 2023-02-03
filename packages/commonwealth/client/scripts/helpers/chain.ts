@@ -3,7 +3,6 @@ import { ChainInfo, NodeInfo } from 'models';
 import m from 'mithril';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
-import { handleInviteLinkRedirect } from 'router';
 import $ from 'jquery';
 
 export const deinitChainOrCommunity = async () => {
@@ -208,9 +207,6 @@ export const selectChain = async (
       chain: chain.id,
     });
   }
-
-  // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
-  handleInviteLinkRedirect();
 
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
