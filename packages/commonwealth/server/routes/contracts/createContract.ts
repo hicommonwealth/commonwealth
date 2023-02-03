@@ -68,7 +68,7 @@ const createContract = async (
     address,
     contractType = '',
     abi,
-    abiNickname,
+    abiNickname = '',
     symbol = '',
     token_name = '',
     decimals = 0,

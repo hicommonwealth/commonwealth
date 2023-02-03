@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import 'pages/contracts/contract_template_card.scss';
-import type m from 'mithril';
+import m from 'mithril';
 import app from 'state';
 import ClassComponent from 'class_component';
 import { CWCard } from 'views/components/component_kit/cw_card';
