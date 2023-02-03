@@ -45,10 +45,13 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
   }
 
   async handleAddTemplate(contractId) {
+    const templates = await app.contracts.getTemplatesForContract(contractId);
+
     showManageContractTemplateModal({
       contractId,
       templateId: null,
       template: null,
+      templates,
     });
   }
 

@@ -168,8 +168,6 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
       ? templateOptions.find((option) => +option.value === this.form.templateId)
       : { label: 'Select template type ', value: '' };
 
-    console.log({ displayOptions: this.form.displayOption });
-
     const initialDisplayOption = isEditMode
       ? displayOptions.find(
           (option) => +option.value === this.form.displayOption
