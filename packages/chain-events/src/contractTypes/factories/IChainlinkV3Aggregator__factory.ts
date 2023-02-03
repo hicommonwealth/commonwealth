@@ -2,8 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import type { Signer } from "ethers";
+import { Contract } from "ethers";
+import type { Provider } from "@ethersproject/providers";
 
 import type { IChainlinkV3Aggregator } from "../IChainlinkV3Aggregator";
 

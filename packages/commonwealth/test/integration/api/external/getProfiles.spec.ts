@@ -1,6 +1,6 @@
 import 'chai/register-should';
 import chai from 'chai';
-import { GetProfilesReq } from 'common-common/src/api/extApiTypes';
+import type { GetProfilesReq } from 'common-common/src/api/extApiTypes';
 import {
   testAddresses,
   testProfiles,

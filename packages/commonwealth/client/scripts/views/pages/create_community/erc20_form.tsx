@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import ClassComponent from 'class_component';
 import { IERC20Metadata__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
@@ -16,7 +16,6 @@ import 'pages/create_community.scss';
 import app from 'state';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import Web3 from 'web3';
 import { isAddress } from 'web3-utils';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -108,6 +107,7 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
           } else {
             // attempt to query ERC20Detailed token info from chain
             console.log('Querying chain for ERC info');
+            const Web3 = (await import('web3')).default;
             const provider = new Web3.providers.WebsocketProvider(args.url);
             try {
               const ethersProvider = new providers.Web3Provider(provider);

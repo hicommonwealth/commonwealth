@@ -1,16 +1,14 @@
 import crypto from 'crypto';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { bech32 } from 'bech32';
-import Web3 from 'web3';
-import { PublicKey } from '@solana/web3.js';
-import { NextFunction } from 'express';
+import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { createRole, findOneRole } from './roles';
 import { mixpanelTrack } from './mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { UserInstance } from '../models/user';
-import { DB } from '../models';
+import type { UserInstance } from '../models/user';
+import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
 
@@ -64,7 +62,8 @@ export async function createAddressHelper(
       const { words } = bech32.decode(req.address, 50);
       encodedAddress = bech32.encode(chain.bech32_prefix, words);
     } else if (chain.base === ChainBase.Ethereum) {
-      if (!Web3.utils.isAddress(encodedAddress)) {
+      const Web3 = (await import('web3-utils')).default;
+      if (!Web3.isAddress(encodedAddress)) {
         throw new AppError('Eth address is not valid');
       }
     } else if (chain.base === ChainBase.NEAR) {
@@ -73,6 +72,7 @@ export async function createAddressHelper(
         throw new AppError('NEAR address is not valid');
       }
     } else if (chain.base === ChainBase.Solana) {
+      const { PublicKey } = await import('@solana/web3.js');
       const key = new PublicKey(encodedAddress);
       if (key.toBase58() !== encodedAddress) {
         throw new AppError(`Solana address is not valid: ${key.toBase58()}`);

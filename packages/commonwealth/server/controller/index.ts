@@ -1,6 +1,6 @@
 import { QueryTypes } from 'sequelize';
-import { Request, Response } from 'express';
-import { DB } from '../models';
+import type { Request, Response } from 'express';
+import type { DB } from '../models';
 import { PermissionManager, Action } from 'commonwealth/shared/permissions';
 import { isAddressPermitted } from '../util/roles';
 
@@ -89,7 +89,7 @@ export async function updateRole(models: DB, req: Request, res: Response) {
     return res.status(400).json({ error: 'No role_id provided' });
   }
 
- const permitted = await isAddressPermitted(
+  const permitted = await isAddressPermitted(
     models,
     address_id,
     chain_id,
@@ -207,12 +207,7 @@ export async function updatePermission(
     return res.status(400).json({ error: 'No body provided' });
   }
 
-  const {
-    address,
-    address_id,
-    chain_id,
-    permission_id
-  } = req.body;
+  const { address, address_id, chain_id, permission_id } = req.body;
 
   if (!address) {
     return res.status(400).json({ error: 'No address provided' });

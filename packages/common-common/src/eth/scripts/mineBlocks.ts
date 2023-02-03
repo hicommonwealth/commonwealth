@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import { providers } from 'ethers';
 
 async function increaseTime(
@@ -14,6 +13,7 @@ async function increaseTime(
 }
 
 async function main(argv: string[]) {
+  const Web3 = (await import('web3')).default;
   const web3Provider = new Web3.providers.WebsocketProvider(
     'ws://localhost:8545'
   );

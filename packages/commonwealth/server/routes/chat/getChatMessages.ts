@@ -1,11 +1,10 @@
 import { AppError } from 'common-common/src/errors';
 import { Action } from 'commonwealth/shared/permissions';
-import { DB } from '../../models';
-import { ChatChannelAttributes } from '../../models/chat_channel';
-import { success, TypedRequestQuery, TypedResponse } from '../../types';
-import {
-  checkReadPermitted
-} from '../../util/roles';
+import type { DB } from '../../models';
+import type { ChatChannelAttributes } from '../../models/chat_channel';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { success } from '../../types';
+import { checkReadPermitted } from '../../util/roles';
 
 export const Errors = {
   NoCommunityId: 'No community id given',

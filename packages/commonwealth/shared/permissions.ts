@@ -53,7 +53,6 @@ export const everyonePermissions: Permissions = {
   [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
 };
 
-
 export const impliedAllowPermissionsByAction: Permissions = {
   [Action.CREATE_CHAT]: [Action.CREATE_CHAT, Action.VIEW_CHAT_CHANNELS],
   [Action.VIEW_THREADS]: [Action.VIEW_THREADS, Action.VIEW_COMMENTS],
@@ -146,7 +145,6 @@ export enum ToCheck {
 export class PermissionManager {
   private action: Action;
 
-
   public getAllowedPermissionsByAction(action: Action): Action[] | Action {
     const permissions = impliedAllowPermissionsByAction[action];
     if (!permissions) {
@@ -167,9 +165,8 @@ export class PermissionManager {
     allowPermission: bigint,
     actionNumber: number
   ): bigint {
-    const impliedAllowPermissions = this.getAllowedPermissionsByAction(
-      actionNumber
-    );
+    const impliedAllowPermissions =
+      this.getAllowedPermissionsByAction(actionNumber);
     if (Array.isArray(impliedAllowPermissions)) {
       impliedAllowPermissions.forEach((impliedAllowPermission) => {
         allowPermission = allowPermission | BigInt(1 << impliedAllowPermission);
@@ -184,9 +181,8 @@ export class PermissionManager {
     denyPermission: bigint,
     actionNumber: number
   ): bigint {
-    const impliedDenyPermissions = this.getDeniedPermissionsByAction(
-      actionNumber
-    );
+    const impliedDenyPermissions =
+      this.getDeniedPermissionsByAction(actionNumber);
     if (Array.isArray(impliedDenyPermissions)) {
       impliedDenyPermissions.forEach((impliedDenyPermission) => {
         denyPermission = denyPermission | BigInt(1 << impliedDenyPermission);
@@ -201,16 +197,16 @@ export class PermissionManager {
     allowPermission: bigint,
     actionNumber: number
   ): bigint {
-    const impliedAllowPermissions = this.getAllowedPermissionsByAction(
-      actionNumber
-    );
+    const impliedAllowPermissions =
+      this.getAllowedPermissionsByAction(actionNumber);
     if (Array.isArray(impliedAllowPermissions)) {
       impliedAllowPermissions.forEach((impliedAllowPermission) => {
         allowPermission =
           allowPermission & ~BigInt(1 << impliedAllowPermission);
       });
     } else {
-      allowPermission = allowPermission & ~BigInt(1 << impliedAllowPermissions);
+      allowPermission =
+        BigInt(allowPermission) & ~BigInt(1 << impliedAllowPermissions);
     }
     return allowPermission;
   }
@@ -219,15 +215,16 @@ export class PermissionManager {
     denyPermission: bigint,
     actionNumber: number
   ): bigint {
-    const impliedDenyPermissions = this.getDeniedPermissionsByAction(
-      actionNumber
-    );
+    const impliedDenyPermissions =
+      this.getDeniedPermissionsByAction(actionNumber);
     if (Array.isArray(impliedDenyPermissions)) {
       impliedDenyPermissions.forEach((impliedDenyPermission) => {
-        denyPermission = denyPermission & ~BigInt(1 << impliedDenyPermission);
+        denyPermission =
+          BigInt(denyPermission) & ~BigInt(1 << impliedDenyPermission);
       });
     } else {
-      denyPermission = denyPermission & ~BigInt(1 << impliedDenyPermissions);
+      denyPermission =
+        BigInt(denyPermission) & ~BigInt(1 << impliedDenyPermissions);
     }
     return denyPermission;
   }
@@ -251,8 +248,8 @@ export class PermissionManager {
     allowPermission: string,
     denyPermission: string
   ): allowDenyBigInt {
-    const allowPermissionAsBigInt: bigint = BigInt(allowPermission);
-    const denyPermissionAsBigInt: bigint = BigInt(denyPermission);
+    const allowPermissionAsBigInt = BigInt(allowPermission);
+    const denyPermissionAsBigInt = BigInt(denyPermission);
     return { allow: allowPermissionAsBigInt, deny: denyPermissionAsBigInt };
   }
 
@@ -281,7 +278,7 @@ export class PermissionManager {
     return permissionsBigInt;
   }
 
-  hasPermission(permission: bigint, action: number, type: ToCheck ): boolean {
+  hasPermission(permission: bigint, action: number, type: ToCheck): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
     const hasAction: boolean =
       (BigInt(permission) & actionAsBigInt) == actionAsBigInt;

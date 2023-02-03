@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import { formatCoin } from 'adapters/currency';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';

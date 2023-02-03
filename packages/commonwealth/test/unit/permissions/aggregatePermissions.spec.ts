@@ -6,7 +6,7 @@ import {
   ToCheck,
 } from 'commonwealth/shared/permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
-import { RoleObject } from 'commonwealth/shared/types';
+import type { RoleObject } from 'commonwealth/shared/types';
 
 describe('aggregatePermissions() unit tests', () => {
   let base_permission;
@@ -138,13 +138,25 @@ describe('aggregatePermissions() unit tests', () => {
 
     const permission = aggregatePermissions(roles, chain_permission);
     assert.isTrue(
-      permissionsManager.hasPermission(permission, Action.CREATE_THREAD, ToCheck.Allow)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
     assert.isFalse(
-      permissionsManager.hasPermission(permission, Action.VIEW_CHAT_CHANNELS, ToCheck.Allow)
+      permissionsManager.hasPermission(
+        permission,
+        Action.VIEW_CHAT_CHANNELS,
+        ToCheck.Allow
+      )
     );
     assert.isTrue(
-      permissionsManager.hasPermission(permission, Action.CREATE_CHAT, ToCheck.Allow)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_CHAT,
+        ToCheck.Allow
+      )
     );
   });
 
@@ -189,11 +201,19 @@ describe('aggregatePermissions() unit tests', () => {
     const permission = aggregatePermissions(roles, chain_permission);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.hasPermission(permission, Action.CREATE_THREAD, ToCheck.Allow)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
     // eslint-disable-next-line no-bitwise
     assert.isFalse(
-      permissionsManager.hasPermission(permission, Action.VIEW_CHAT_CHANNELS, ToCheck.Allow)
+      permissionsManager.hasPermission(
+        permission,
+        Action.VIEW_CHAT_CHANNELS,
+        ToCheck.Allow
+      )
     );
   });
 });
