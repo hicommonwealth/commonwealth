@@ -161,20 +161,11 @@ export async function updateCommunityContractTemplate(
     if (!req.body) {
       throw new AppError('Must provide community_contract_id and template_id');
     }
-    const {
-      slug,
-      nickname,
-      display_name,
-      display_options,
-      community_id,
-      contract_id,
-      template_id,
-    } = req.body;
+    const { slug, nickname, display_name, display_options, contract_id } =
+      req.body;
 
-    if (!community_id || !contract_id || !template_id) {
-      throw new AppError(
-        'Must provide community_id, contract_id, and template_id'
-      );
+    if (!contract_id) {
+      throw new AppError('Must provide contract_id.');
     }
 
     if (!slug || !nickname || !display_name || !display_options) {
@@ -189,7 +180,7 @@ export async function updateCommunityContractTemplate(
       });
 
     if (!communityContractTemplate) {
-      throw new AppError('Failed to create community contract');
+      throw new AppError('Failed to find community contract');
     }
 
     const metadataToUpdate =

@@ -365,7 +365,10 @@ class ContractsController {
       // TODO update store with editedTemplate when the store will be ready
       const updateContract = await $.ajax({
         url: `${app.serverUrl()}/contract/community_template/metadata`,
-        data: communityContractTemplateMetadata,
+        data: {
+          ...communityContractTemplateMetadata,
+          jwt: app.user.jwt,
+        },
         type: 'PUT',
       });
 
