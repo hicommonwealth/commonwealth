@@ -1,5 +1,5 @@
 import app, { ApiStatus } from 'state';
-import { ChainInfo, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
 import m from 'mithril';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
@@ -214,7 +214,7 @@ export const selectChain = async (
   return true;
 };
 
-export const initNewChain = async (newChain: any): Promise<boolean> => {
+export const initNewChain = async (newChain: IChainAdapter<any, any>): Promise<boolean> => {
   // Load server data without initializing modules/chain connection.
   const finalizeInitialization = await newChain.initServer();
 

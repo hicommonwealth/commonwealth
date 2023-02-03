@@ -235,8 +235,8 @@ const app: IApp = {
   cachedIdentityWidget: null,
 };
 
-function handleLoginSockets(data: any) {
-  app.loginState = data.result.user
+function handleLoginSockets(user_data: any) {
+  app.loginState = user_data
     ? LoginState.LoggedIn
     : LoginState.LoggedOut;
 
@@ -306,7 +306,7 @@ export async function initAppState(
         // update the login status
         updateActiveUser(data.result.user);
 
-        handleLoginSockets(data);
+        handleLoginSockets(data.result.user);
 
         app.user.setStarredCommunities(
           data.result.user ? data.result.user.starredCommunities : []
