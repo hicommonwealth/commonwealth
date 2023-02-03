@@ -64,7 +64,7 @@ const getFilteredContent = (content, address) => {
         : '';
 
     // Titles may be URI-encoded, or not (e.g. some imports)
-    let actedOn
+    let actedOn;
     try {
       actedOn = decodeURIComponent(content.title);
     } catch (err) {
@@ -82,13 +82,7 @@ const getFilteredContent = (content, address) => {
         ? 'Reaction on: '
         : 'Activity on: ';
 
-    // url decoded
-    let bodytext
-    try {
-      bodytext = decodeURIComponent(content.body);
-    } catch (err) {
-      bodytext = content.body;
-    }
+    const bodytext = decodeURIComponent(content.body);
 
     const notificationPreviewImageUrl = (() => {
       // retrieves array of matching `bodytext` against REGEX_IMAGE
