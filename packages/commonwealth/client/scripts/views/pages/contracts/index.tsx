@@ -12,20 +12,6 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { ContractCard } from './contract_card';
-import { displayOptions } from '../../modals/manage_contract_template_modal';
-
-export type Contract = {
-  id: number;
-  address: string;
-  templates: {
-    id: number;
-    title: string;
-    displayName: string;
-    nickname: string;
-    slug: string;
-    display: string;
-  }[];
-};
 
 class ContractsPage extends ClassComponent {
   handleAddContract() {
@@ -33,31 +19,12 @@ class ContractsPage extends ClassComponent {
     m.route.set(`/${scope}/new/contract`);
   }
 
-  view(vnode) {
+  view() {
     if (!app.contracts || !app.chain) {
       return <PageLoading title="Contracts Page" />;
     }
 
-    const contracts = app.contracts.store
-      .getCommunityContracts()
-      .map((contract) => {
-        return {
-          id: contract.id,
-          address: contract.address,
-          templates: contract.ccts.map((cct) => {
-            return {
-              id: cct.templateId,
-              title: cct.cctmd.display_name,
-              displayName: cct.cctmd.display_name,
-              nickname: cct.cctmd.nickname,
-              slug: cct.cctmd.slug,
-              display: displayOptions.find(
-                (option) => cct.cctmd.display_options === option.value
-              )?.label,
-            };
-          }),
-        };
-      });
+    const contracts = app.contracts.store.getCommunityContracts();
 
     return (
       <Sublayout>
@@ -83,7 +50,7 @@ class ContractsPage extends ClassComponent {
                 <ContractCard
                   id={contract.id}
                   address={contract.address}
-                  templates={contract.templates}
+                  templates={contract.ccts}
                 />
               ))}
             </div>

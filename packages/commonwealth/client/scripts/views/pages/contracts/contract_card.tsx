@@ -8,7 +8,7 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { ContractTemplateCard } from './contract_template_card';
-import type { Contract } from 'views/pages/contracts';
+import type { Contract } from '../../../models';
 import { showConfirmationModal } from 'views/modals/confirmation_modal';
 import { showManageContractTemplateModal } from 'views/modals/manage_contract_template_modal';
 import app from 'state';
@@ -16,7 +16,7 @@ import app from 'state';
 type ContractCardAttrs = {
   id: number;
   address: string;
-  templates: Contract['templates'];
+  templates: Contract['ccts'];
 };
 
 export class ContractCard extends ClassComponent<ContractCardAttrs> {
@@ -81,17 +81,19 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
           <CWText type="caption" className="label">
             Templates
           </CWText>
-          {templates ? (
+          {templates?.length ? (
             <div className="templates-container">
               {templates.map((template) => (
                 <ContractTemplateCard
                   contractId={id}
                   id={template.id}
-                  title={template.title}
-                  displayName={template.displayName}
-                  nickname={template.nickname}
-                  slug={template.slug}
-                  display={template.display}
+                  // TODO missing field in model? In figma Norf’s Favorite Template  or Treasury Spend
+                  // title={template.title}
+                  title="title"
+                  displayName={template.cctmd.display_name}
+                  nickname={template.cctmd.nickname}
+                  slug={template.cctmd.slug}
+                  display={template.cctmd.display_options}
                 />
               ))}
             </div>

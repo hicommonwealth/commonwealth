@@ -226,6 +226,61 @@ class ContractsController {
     return this._store.add(contract);
   }
 
+  // TODO there is similar function above => "add"
+  // I created new one which has less params
+  // Should we remove one of those functions? Which one we should keep?
+  public async addContractAndAbi({
+    chain_node_id,
+    address,
+    abi,
+  }: {
+    chain_node_id: number;
+    address: string;
+    abi?: string;
+  }) {
+    try {
+      const response = await $.post(`${app.serverUrl()}/contract`, {
+        chain_node_id,
+        jwt: app.user.jwt,
+        address,
+        abi,
+      });
+
+      const responseContract = response.result.contract;
+      const { id, type, is_factory } = responseContract;
+
+      let abiParsed;
+
+      try {
+        if (abi) {
+          abiParsed = JSON.parse(abi);
+        } else {
+          abiParsed = abi;
+        }
+      } catch (err) {
+        abiParsed = abi;
+      }
+
+      const result = new Contract({
+        id,
+        address,
+        chainNodeId: chain_node_id,
+        type,
+        abi: abiParsed,
+        isFactory: is_factory,
+      });
+
+      if (this._store.getById(result.id)) {
+        this._store.remove(this._store.getById(result.id));
+      }
+
+      this._store.add(result);
+    } catch (err) {
+      console.log('err', err);
+      throw new Error('Failed to add contract');
+    }
+  }
+
   public async addTemplate({
     name,
     template,
