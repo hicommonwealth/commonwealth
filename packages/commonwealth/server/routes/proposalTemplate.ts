@@ -3,11 +3,7 @@ import type { Request, Response } from 'express';
 import type { DB } from '../models';
 import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
 import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
-import type {
-  TypedRequestBody,
-  TypedRequestQuery,
-  TypedResponse,
-} from '../types';
+import type { TypedRequestBody, TypedRequestQuery, TypedResponse } from '../types';
 import { success, failure } from '../types';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
@@ -196,7 +192,10 @@ export async function deleteCommunityContractTemplate(
       throw new AppError('Must provide community_contract_id and template_id');
     }
 
-    const { contract_id, template_id } = req.body;
+  const {
+    contract_id,
+    template_id,
+  } = req.body;
 
     const shouldDeleteCommunityContract = req.query.community_contract;
     const contractTemplate: CommunityContractTemplateAttributes = req.body;
@@ -205,30 +204,28 @@ export async function deleteCommunityContractTemplate(
       throw new AppError('Must provide contract template');
     }
 
-    const communityContractTemplate =
-      await models.CommunityContractTemplate.findOne({
-        where: { template_id },
-      });
+    const communityContractTemplate = await models.CommunityContractTemplate.findOne({
+      where: { template_id }
+    });
 
     if (!communityContractTemplate) {
       throw new AppError('Contract does not exist');
     }
 
-    const communityContractMetadata =
-      await models.CommunityContractTemplateMetadata.findOne({
-        where: {
-          id: contractTemplate.cctmd_id,
-        },
-      });
+    const communityContractMetadata = await models.CommunityContractTemplateMetadata.findOne({
+      where: {
+        id: contractTemplate.cctmd_id,
+      },
+    })
 
-    if (!communityContractMetadata) {
-      throw new AppError('Contract metadata does not exist');
+    if(!communityContractMetadata){
+      throw new AppError('Contract metadata does not exist')
     }
 
-    if (shouldDeleteCommunityContract) {
+    if(shouldDeleteCommunityContract){
       const communityContract = await models.CommunityContract.findOne({
-        where: { id: contract_id },
-      });
+          where: { id: contract_id },
+      })
       await communityContract.destroy();
     }
 
@@ -236,8 +233,8 @@ export async function deleteCommunityContractTemplate(
     await communityContractMetadata.destroy();
 
     return success(res, {
-      metadata: communityContractMetadata,
-      cct: communityContractTemplate,
+      metadata : communityContractMetadata,
+      cct: communityContractTemplate
     });
   } catch (err) {
     throw new AppError('Error deleting community contract template');
