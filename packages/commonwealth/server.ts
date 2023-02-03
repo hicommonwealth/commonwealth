@@ -23,6 +23,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
+  EXTERNAL_API,
   RABBITMQ_URI,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
@@ -272,7 +273,7 @@ async function main() {
   );
 
   // new API
-  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addExternalRoutes(EXTERNAL_API, app, models, tokenBalanceCache);
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(externalSwagger));
   addSwagger('/docs', app);
 
