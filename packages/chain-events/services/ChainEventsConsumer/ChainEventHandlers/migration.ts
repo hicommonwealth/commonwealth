@@ -1,14 +1,22 @@
 /**
  * Processes events during migration, upgrading from simple notifications to entities.
  */
-import type {WhereOptions} from 'sequelize';
-import type {RabbitMQController,} from 'common-common/src/rabbitmq';
-import {factory, formatFilename} from 'common-common/src/logging';
+import type { WhereOptions } from 'sequelize';
+import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
 
-import type {CWEvent} from '../../../src';
-import {EntityEventKind, eventToEntity, getUniqueEntityKey, IEventHandler,} from '../../../src';
-import type {DB} from '../../database/database';
-import type {ChainEventAttributes, ChainEventInstance,} from '../../database/models/chain_event';
+import type { CWEvent } from '../../../src';
+import {
+  EntityEventKind,
+  eventToEntity,
+  getUniqueEntityKey,
+  IEventHandler,
+} from '../../../src';
+import type { DB } from '../../database/database';
+import type {
+  ChainEventAttributes,
+  ChainEventInstance,
+} from '../../database/models/chain_event';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -28,9 +28,9 @@ import type { BrokerConfig } from 'rascal';
 import { RABBITMQ_URI } from '../../commonwealth/server/config';
 import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
 import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from '../services/config';
-import NotificationsHandler from "../services/ChainEventsConsumer/ChainEventHandlers/notification";
-import models from "../services/database/database";
-import {EventKind} from "../src/chains/substrate/types";
+import NotificationsHandler from '../services/ChainEventsConsumer/ChainEventHandlers/notification';
+import models from '../services/database/database';
+import { EventKind } from '../src/chains/substrate/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
