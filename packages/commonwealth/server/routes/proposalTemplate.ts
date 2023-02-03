@@ -60,6 +60,7 @@ export async function createCommunityContractTemplateAndMetadata(
     );
   }
 
+  // TODO something is off here
   const communityContract = await models.CommunityContract.findOne({
     where: { id: contract_id },
   });
@@ -84,6 +85,7 @@ export async function createCommunityContractTemplateAndMetadata(
 
     return success(res, { metadata: newMetadata, cct: newCCT });
   } catch (err) {
+    console.log('err', err)
     throw new AppError(
       'Unkown Server error creating community contract template'
     );

@@ -40,23 +40,16 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
   }
 
   handleCreateNewTemplate(e, contractId) {
-    // TODO add some contract ID to know where should template be created
     const scope = app.customDomainId() || m.route.param('scope');
     m.route.set(`/${scope}/new/contract_template/${contractId}`);
   }
 
   async handleAddTemplate(contractId) {
-    try {
-      const templates = await app.contracts.getTemplatesForContract(contractId);
-      showManageContractTemplateModal({
-        contractId,
-        templateId: null,
-        template: null,
-        templates,
-      });
-    } catch (e) {
-      console.log(e);
-    }
+    showManageContractTemplateModal({
+      contractId,
+      templateId: null,
+      template: null,
+    });
   }
 
   view(vnode: m.Vnode<ContractCardAttrs>) {

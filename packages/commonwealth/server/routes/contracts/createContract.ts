@@ -106,9 +106,9 @@ const createContract = async (
 
   let abiAsRecord: Array<Record<string, unknown>>;
   if (abi) {
-    if (!abiNickname) {
-      throw new AppError(Errors.NoAbiNickname);
-    }
+    // if (!abiNickname) {
+    //   throw new AppError(Errors.NoAbiNickname);
+    // }
 
     if ((Object.keys(abi) as Array<string>).length === 0) {
       throw new AppError(Errors.InvalidABI);

@@ -297,8 +297,8 @@ class ContractsController {
         template,
         contract_id,
       });
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
       throw new Error('Failed to create template');
     }
   }
@@ -323,7 +323,10 @@ class ContractsController {
       // TODO add newTemplate to the store when the store will be ready
       const newContract = await $.post(
         `${app.serverUrl()}/contract/community_template_and_metadata`,
-        communityContractTemplateAndMetadata
+        {
+          ...communityContractTemplateAndMetadata,
+          jwt: app.user.jwt,
+        }
       );
 
       this.updateTemplate({

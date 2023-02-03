@@ -1,19 +1,24 @@
 /* @jsx m */
 
 import 'pages/contracts/contract_template_card.scss';
-import m from 'mithril';
+import type m from 'mithril';
 import app from 'state';
 import ClassComponent from 'class_component';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import type { Contract } from 'views/pages/contracts/index';
 import { CWPopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { showConfirmationModal } from 'views/modals/confirmation_modal';
 import { showManageContractTemplateModal } from 'views/modals/manage_contract_template_modal';
 
-type ContractTemplateCardAttrs = Contract['templates'][0] & {
+type ContractTemplateCardAttrs = {
   contractId: number;
+  id: number;
+  title: string;
+  displayName: string;
+  nickname: string;
+  slug: string;
+  display: string;
 };
 
 interface InfoOrder {
@@ -29,7 +34,7 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
         contractId,
         templateId,
         template,
-        templates,
+        // templates,
       });
     } catch (e) {
       console.error(e);
