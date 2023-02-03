@@ -1,4 +1,8 @@
-import type { BankExtension, QueryClient, StakingExtension } from '@cosmjs/stargate';
+import type {
+  BankExtension,
+  QueryClient,
+  StakingExtension,
+} from '@cosmjs/stargate';
 import { BalanceType } from 'common-common/src/types';
 
 import type { IChainNode } from '../types';
@@ -12,7 +16,7 @@ export default class CosmosBalanceProvider extends BalanceProvider<
   public validBases = [BalanceType.Cosmos];
 
   public async getExternalProvider(
-    node: IChainNode,
+    node: IChainNode
   ): Promise<QueryClient & BankExtension & StakingExtension> {
     const cosmRpc = await import('@cosmjs/tendermint-rpc');
     /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */
@@ -38,8 +42,7 @@ export default class CosmosBalanceProvider extends BalanceProvider<
     const { data } = cosmEnc.Bech32.decode(address);
     const encodedAddress = cosmEnc.Bech32.encode(node.bech32, data);
 
-    const api = await this.getExternalProvider(node)
-    
+    const api = await this.getExternalProvider(node);
 
     try {
       const { params } = await api.staking.params();

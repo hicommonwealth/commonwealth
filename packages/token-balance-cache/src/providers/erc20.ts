@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
 import type { ERC20 } from 'common-common/src/eth/types';
 import { ERC20__factory } from 'common-common/src/eth/types';
-import type { BigNumber} from 'ethers';
+import type { BigNumber } from 'ethers';
 import { providers } from 'ethers';
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
@@ -32,7 +32,10 @@ export default class Erc20BalanceProvider extends BalanceProvider<
     return `${node.id}-${address}-${opts.tokenAddress}`;
   }
 
-  public async getExternalProvider(node: IChainNode, opts: EthBPOpts): Promise<ERC20> {
+  public async getExternalProvider(
+    node: IChainNode,
+    opts: EthBPOpts
+  ): Promise<ERC20> {
     const url = node.private_url || node.url;
     const { tokenAddress } = opts;
     const provider = new Web3.providers.WebsocketProvider(url);

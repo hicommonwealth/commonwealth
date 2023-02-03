@@ -28,9 +28,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<
     return `${node.id}-${address}-${'native'}`;
   }
 
-  public async getExternalProvider(
-    node: IChainNode,
-  ): Promise<Web3> {
+  public async getExternalProvider(node: IChainNode): Promise<Web3> {
     const url = node.private_url || node.url;
     const provider = new Web3.providers.WebsocketProvider(url);
     return new Web3(provider);
