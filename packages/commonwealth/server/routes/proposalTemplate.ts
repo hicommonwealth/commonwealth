@@ -11,13 +11,12 @@ import type {
 import { success, failure } from '../types';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
+  cct_id: string;
   slug: string;
   nickname: string;
   display_name: string;
   display_options: string;
-  community_id: string;
   contract_id: number;
-  template_id: number;
 };
 
 type CommunityContractTemplateAndMetadataResp = {
@@ -161,8 +160,14 @@ export async function updateCommunityContractTemplate(
     if (!req.body) {
       throw new AppError('Must provide community_contract_id and template_id');
     }
-    const { slug, nickname, display_name, display_options, contract_id } =
-      req.body;
+    const {
+      slug,
+      nickname,
+      display_name,
+      display_options,
+      contract_id,
+      cct_id,
+    } = req.body;
 
     if (!contract_id) {
       throw new AppError('Must provide contract_id.');
@@ -176,7 +181,7 @@ export async function updateCommunityContractTemplate(
 
     const communityContractTemplate =
       await models.CommunityContractTemplate.findOne({
-        where: { id: contract_id },
+        where: { id: cct_id },
       });
 
     if (!communityContractTemplate) {
@@ -204,6 +209,7 @@ export async function updateCommunityContractTemplate(
       cct: communityContractTemplate,
     });
   } catch (err) {
+    console.log(err);
     throw new AppError('Error updating community contract template');
   }
 }

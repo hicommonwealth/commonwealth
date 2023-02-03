@@ -161,7 +161,6 @@ class ContractsController {
           return cct;
         }
       });
-      console.log({ ccts });
       this._store.add(new Contract({ ...currentContractInStore, ccts }));
     } else {
       const ccts = currentContractInStore.ccts;
@@ -364,7 +363,7 @@ class ContractsController {
     try {
       // TODO update store with editedTemplate when the store will be ready
       const updateContract = await $.ajax({
-        url: `${app.serverUrl()}/contract/community_template/metadata`,
+        url: `${app.serverUrl()}/contract/community_template`,
         data: {
           ...communityContractTemplateMetadata,
           jwt: app.user.jwt,
@@ -374,8 +373,8 @@ class ContractsController {
 
       this.updateTemplate({
         contract_id: communityContractTemplateMetadata.contract_id,
-        cct_id: updateContract.cct.id,
-        cctmd: updateContract.cctmd,
+        cct_id: updateContract.result.cct.id,
+        cctmd: updateContract.result.metadata,
         isNewCCT: false,
       });
     } catch (err) {
