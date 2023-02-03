@@ -42,24 +42,29 @@ async function main() {
 
 async function clear() {
   try {
-    let eventsDeleted, entitiesDeleted;
+    let eventsDeleted = 0,
+      entitiesDeleted = 0;
     await models.sequelize.transaction(async (t) => {
       const entityId = (
         await models.ChainEntity.findOne({
           where: { chain: 'dydx', type_id: '10' },
           transaction: t,
         })
-      ).id;
+      )?.id;
 
-      eventsDeleted = await models.ChainEvent.destroy({
-        where: { entity_id: entityId },
-        transaction: t,
-      });
+      if (entityId) {
+        eventsDeleted = await models.ChainEvent.destroy({
+          where: { entity_id: entityId },
+          transaction: t,
+        });
 
-      entitiesDeleted = await models.ChainEntity.destroy({
-        where: { id: entityId },
-        transaction: t,
-      });
+        entitiesDeleted = await models.ChainEntity.destroy({
+          where: { id: entityId },
+          transaction: t,
+        });
+      } else {
+        console.log('Entity does not exist.');
+      }
     });
 
     console.log(
