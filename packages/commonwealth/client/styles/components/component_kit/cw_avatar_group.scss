@@ -13,7 +13,8 @@
       border: 2px solid #fff;
       border-radius: 50%;
       overflow: hidden;
-      width: 20px;
+      width: 16px;
+      height: 16px;
     }
 
     .avatar-group-icon:not(:last-child) {
@@ -22,6 +23,7 @@
 
     svg {
       background: $white;
+      position: absolute;
     }
   }
   .avatar-group-count {
