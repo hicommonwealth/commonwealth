@@ -1,8 +1,8 @@
 /* eslint-disable quotes */
-import { Request, Response, NextFunction } from 'express';
-import { Op, QueryTypes } from 'sequelize';
-import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import { Op, QueryTypes } from 'sequelize';
+import type { DB } from '../models';
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
@@ -70,7 +70,6 @@ const searchDiscussions = async (
   // Community-scoped search
   let communityOptions = '';
   if (req.query.chain) {
-
     // set up query parameters
     communityOptions = `AND "Threads".chain = $chain `;
     bind = { chain: chain.id };

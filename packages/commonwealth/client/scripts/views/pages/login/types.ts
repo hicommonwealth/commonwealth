@@ -1,5 +1,5 @@
-import { Account, IWebWallet } from 'models';
-import { ProfileRowProps } from '../../components/component_kit/cw_profiles_list';
+import type { Account, IWebWallet } from 'models';
+import type { ProfileRowProps } from '../../components/component_kit/cw_profiles_list';
 
 export type LoginSidebarType =
   | 'connectWallet'

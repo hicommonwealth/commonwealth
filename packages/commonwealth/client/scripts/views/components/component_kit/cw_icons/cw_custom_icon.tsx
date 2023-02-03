@@ -5,9 +5,9 @@ import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
 
-import { customIconLookup } from './cw_icon_lookup';
-import { CustomIconProps } from './types';
 import { ComponentType } from '../types';
+import { customIconLookup } from './cw_icon_lookup';
+import type { CustomIconProps } from './types';
 
 export const CWCustomIcon = (props: CustomIconProps) => {
   const {

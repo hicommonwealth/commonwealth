@@ -2,43 +2,33 @@
 import React from 'react';
 
 import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-import app from 'state';
-import $ from 'jquery';
-import _ from 'underscore';
-
-import {
-  constructCanvasMessage,
   chainBasetoCanvasChain,
+  constructCanvasMessage,
 } from 'adapters/shared';
-import { initAppState } from 'app';
+import { initAppState } from 'state';
+import { ChainBase } from 'common-common/src/types';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import {
   completeClientLogin,
   loginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { notifyError } from 'controllers/app/notifications';
-import { Account, IWebWallet } from 'models';
-import { ChainBase } from 'common-common/src/types';
+import $ from 'jquery';
+import type { Account, IWebWallet } from 'models';
+import app from 'state';
+import _ from 'underscore';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../components/component_kit/helpers';
-import { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
+import type { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
-import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
+import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;

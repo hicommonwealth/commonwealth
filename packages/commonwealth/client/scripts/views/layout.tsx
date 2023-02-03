@@ -1,34 +1,25 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
 
 import {
+  deinitChainOrCommunity,
   initChain,
   initNewTokenChain,
-  deinitChainOrCommunity,
   selectChain,
-} from 'app';
+} from 'helpers/chain';
+
+import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
+import 'layout.scss';
 import app from 'state';
-import { AppToasts } from 'views/toast';
 import PageNotFound from 'views/pages/404';
-import { AppModals } from './app_modals';
-import { UserSurveyPopup } from './components/user_survey_popup';
-import { CWSpinner } from './components/component_kit/cw_spinner';
+import { AppToasts } from 'views/toast';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
+import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import { useParams } from 'react-router-dom';
 

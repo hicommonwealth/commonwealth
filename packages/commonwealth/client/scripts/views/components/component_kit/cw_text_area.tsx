@@ -7,12 +7,9 @@ import 'components/component_kit/cw_text_area.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
-import { ValidationStatus } from './cw_validation_text';
-import {
-  MessageRow,
-  BaseTextInputProps,
-  useTextInputWithValidation,
-} from './cw_text_input';
+import type { ValidationStatus } from './cw_validation_text';
+import { MessageRow, useTextInputWithValidation } from './cw_text_input';
+import type { BaseTextInputProps } from './cw_text_input';
 
 type TextAreaStyleProps = {
   disabled?: boolean;

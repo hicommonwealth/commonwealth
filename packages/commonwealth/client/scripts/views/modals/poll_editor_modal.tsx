@@ -1,35 +1,27 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { pluralize } from 'helpers';
+
+import 'modals/poll_editor_modal.scss';
+import type { Thread } from 'models';
 import moment from 'moment';
+import app from 'state';
 import _ from 'underscore';
-// import { SelectList } from 'construct-ui';
 
 import 'modals/poll_editor_modal.scss';
 
 import { getNextPollEndingTime } from 'utils';
-import app from 'state';
-import { Thread } from 'models';
-import { pluralize } from 'helpers';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
+import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { ModalExitButton } from '../components/component_kit/cw_modal';
 
 type PollEditorAttrs = {
   thread: Thread;

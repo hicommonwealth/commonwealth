@@ -1,19 +1,28 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import moment from 'moment';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
+import { formatLastUpdated, formatTimestamp } from 'helpers';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import moment from 'moment';
 
 import app from 'state';
-import { formatLastUpdated, formatTimestamp } from 'helpers';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
-import { navigateToSubpage } from '../../../app';
+import { navigateToSubpage } from '../../../router';
 import { CWCard } from '../../components/component_kit/cw_card';
-import { ProposalTag } from '../../components/proposal_card/proposal_tag';
 import { CWText } from '../../components/component_kit/cw_text';
+import { ProposalTag } from '../../components/proposal_card/proposal_tag';
 
 type SnapshotProposalCardAttrs = {
   snapshotId: string;
@@ -38,9 +47,13 @@ export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAtt
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
-          localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-            window.scrollY;
-          navigateToSubpage(proposalLink);
+          if (app.chain) {
+            localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+              window.scrollY;
+            navigateToSubpage(proposalLink);
+          } else {
+            navigateToSubpage(proposalLink);
+          }
         }}
       >
         <div className="proposal-card-metadata">

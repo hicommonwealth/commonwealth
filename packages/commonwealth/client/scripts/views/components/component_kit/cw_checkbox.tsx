@@ -4,10 +4,11 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_checkbox.scss';
-
-import { ComponentType, BaseStyleProps } from './types';
-import { getClasses } from './helpers';
 import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+
+import type { BaseStyleProps } from './types';
+import { ComponentType } from './types';
 
 export type CheckboxType = { label?: string; value?: string };
 

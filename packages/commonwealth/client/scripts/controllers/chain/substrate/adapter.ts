@@ -1,18 +1,22 @@
-import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { ChainBase } from 'common-common/src/types';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import SubstrateAccounts from 'controllers/chain/substrate/account';
+import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
+import {
+  SubstrateCouncil,
+  SubstrateTechnicalCommittee,
+} from 'controllers/chain/substrate/collective';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
-import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
-import ChainEntityController from 'controllers/server/chain_entities';
-import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { IApp } from 'state';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import SubstratePhragmenElections from './phragmen_elections';
-import SubstrateTreasuryTips from './treasury_tips';
+import type { ChainInfo } from 'models';
+import { IChainAdapter } from 'models';
+import type { IApp } from 'state';
 import SubstrateIdentities from './identities';
+import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateChain from './shared';
+import SubstrateTreasuryTips from './treasury_tips';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
@@ -34,10 +38,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     return !!this.chain?.timedOut;
   }
 
-  constructor(
-    meta: ChainInfo,
-    app: IApp,
-  ) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new SubstrateChain(this.app);
     this.accounts = new SubstrateAccounts(this.app);
@@ -54,7 +55,10 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
   public async initApi(additionalOptions?) {
     if (this.apiInitialized) return;
-    await this.chain.resetApi(this.meta, additionalOptions || this.meta.substrateSpec);
+    await this.chain.resetApi(
+      this.meta,
+      additionalOptions || this.meta.substrateSpec
+    );
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     await this.identities.init(this.chain, this.accounts);
@@ -70,17 +74,19 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public async deinit(): Promise<void> {
     await super.deinit();
     this.chain.deinitEventLoop();
-    await Promise.all([
-      this.phragmenElections,
-      this.council,
-      this.technicalCommittee,
-      this.democracyProposals,
-      this.democracy,
-      this.treasury,
-      this.bounties,
-      this.tips,
-      this.identities,
-    ].map((m) => m.initialized ? m.deinit() : Promise.resolve()));
+    await Promise.all(
+      [
+        this.phragmenElections,
+        this.council,
+        this.technicalCommittee,
+        this.democracyProposals,
+        this.democracy,
+        this.treasury,
+        this.bounties,
+        this.tips,
+        this.identities,
+      ].map((m) => (m.initialized ? m.deinit() : Promise.resolve()))
+    );
     this.accounts.deinit();
     this.chain.deinitMetadata();
     await this.chain.deinitApi();

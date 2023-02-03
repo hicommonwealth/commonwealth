@@ -1,25 +1,16 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 import $ from 'jquery';
+import type { ChainInfo, Comment } from 'models';
+import { AddressInfo, Thread } from 'models';
 
 import app from 'state';
-import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
 import { User } from 'views/components/user/user';
 import { LoginModal } from '../../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -41,7 +32,7 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       } = rxn;
 
       return (
-        <div style="display: flex; width: 120px;">
+        <div style={{ display: 'flex', width: '120px' }}>
           <CWText noWrap>
             <User
               user={new AddressInfo(null, address, chain?.id || chain, null)}
@@ -59,7 +50,9 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
   }
 
   return (
-    <div style="display: flex; flex-direction: column;">{slicedReactors}</div>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {slicedReactors}
+    </div>
   );
 };
 
@@ -82,7 +75,7 @@ export const fetchReactionsByPost = async (post: Post) => {
 };
 
 export const onReactionClick = (
-  e: MouseEvent,
+  e: React.MouseEvent<HTMLDivElement>,
   hasReacted: boolean,
   dislike: (userAddress: string) => void,
   like: (chain: ChainInfo, chainId: string, userAddress: string) => void

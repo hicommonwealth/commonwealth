@@ -2,17 +2,27 @@
 import React from 'react';
 /* eslint-disable no-useless-escape */
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, rootRender } from 'mithrilInterop';
-import DOMPurify from 'dompurify';
-import { findAll } from 'highlight-words-core';
-import smartTruncate from 'smart-truncate';
-import { marked } from 'marked';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+  rootRender,
+} from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';
+import DOMPurify from 'dompurify';
+import { findAll } from 'highlight-words-core';
+import { marked } from 'marked';
+import smartTruncate from 'smart-truncate';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 import { getClasses } from '../component_kit/helpers';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { countLinesMarkdown } from './helpers';
 
 const renderer = new marked.Renderer();

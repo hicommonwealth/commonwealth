@@ -17,8 +17,8 @@ export default function DiscussionsRedirect() {
         navigate(`/${app.chain.id}/discussions`);
         // this.navigateToSubpage('/discussions');
       }
-    })
+    });
   });
 
-  return (<PageLoading />);
+  return <PageLoading />;
 }

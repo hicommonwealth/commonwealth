@@ -12,9 +12,7 @@
     {
       "kind": "Everyone",
       "name": "all",
-      "permissions": [
-        "*:AddProposal"
-      ],
+      "permissions": ["*:AddProposal"],
       "vote_policy": {}
     },
     {

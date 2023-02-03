@@ -2,8 +2,9 @@ import React, { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, BrowserRouter, useParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import { Layout } from 'views/layout';
-import { initAppState } from 'app';
+
 import { PageLoading } from './views/pages/loading';
+import { initAppState } from 'state';
 
 const LandingPage = lazy(() => import('./views/pages/landing'));
 const CommunitiesPage = lazy(() => import('./views/pages/communities'));

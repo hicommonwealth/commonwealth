@@ -13,24 +13,24 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { orderAccountsByAddress } from 'helpers';
+import { navigateToSubpage } from 'router';
 
 import 'modals/confirm_invite_modal.scss';
+import type { AddressInfo } from 'models';
 
 import app from 'state';
-import { orderAccountsByAddress } from 'helpers';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { navigateToSubpage } from 'app';
-import { InviteCodeAttributes } from 'types';
-import { AddressInfo } from 'models';
+import type { InviteCodeAttributes } from 'types';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
+import { UserBlock } from '../components/user/user_block';
 import {
   getClasses,
   isWindowSmallInclusive,
 } from '../components/component_kit/helpers';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
-import { UserBlock } from '../components/user/user_block';
 
 type SideMenuAttrs = {
   invites: Array<InviteCodeAttributes>;
@@ -272,16 +272,6 @@ export class ConfirmInviteModal extends ClassComponent {
                           web3loginParams
                         );
                       }
-
-                      // show web3 login modal
-                      app.modals.lazyCreate('link_new_address_modal', {
-                        joiningCommunity,
-                        targetCommunity,
-                        successCallback: () => {
-                          setRoute(next);
-                          $(e.target).trigger('modalexit');
-                        },
-                      });
                     }}
                   >
                     Connect a new address

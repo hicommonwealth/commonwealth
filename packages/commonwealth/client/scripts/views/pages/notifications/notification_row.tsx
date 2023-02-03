@@ -4,12 +4,8 @@ import React from 'react';
 import {
   ClassComponent,
   ResultNode,
-  render,
-  setRoute,
-  getRoute,
   getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 import moment from 'moment';
@@ -18,7 +14,7 @@ import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 import 'pages/notifications/notification_row.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { NotificationCategories } from 'common-common/src/types';
 import { Notification, AddressInfo } from 'models';
 import { link } from 'helpers';

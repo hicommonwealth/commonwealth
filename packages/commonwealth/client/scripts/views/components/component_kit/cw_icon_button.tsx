@@ -4,7 +4,7 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import { CWIcon } from './cw_icons/cw_icon';
-import { IconComponentProps } from './cw_icons/types';
+import type { IconComponentProps } from './cw_icons/types';
 import { ComponentType } from './types';
 
 export const CWIconButton = (props: IconComponentProps) => {

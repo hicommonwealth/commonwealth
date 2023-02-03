@@ -1,5 +1,5 @@
-import { ChainInfo } from 'models';
-import { IconName } from './cw_icons/cw_icon_lookup';
+import type { ChainInfo } from 'models';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',

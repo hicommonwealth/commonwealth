@@ -1,22 +1,28 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
+import { notifyError } from 'controllers/app/notifications';
+import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { castVote } from 'helpers/snapshot_utils';
+import { formatNumberShort } from 'adapters/currency';
+import { MixpanelSnapshotEvents } from 'analytics/types';
 
 import 'modals/confirm_snapshot_vote_modal.scss';
 
 import app from 'state';
-import {
-  SnapshotProposal,
-  SnapshotSpace,
-  castVote,
-} from 'helpers/snapshot_utils';
-import { notifyError } from 'controllers/app/notifications';
-import { formatNumberShort } from 'adapters/currency';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { MixpanelSnapshotEvents } from 'analytics/types';
 import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';

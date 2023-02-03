@@ -1,11 +1,22 @@
-
 import _ from 'lodash';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import app from 'state';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { link } from 'helpers';
-import { Thread, Comment, Account } from 'models';
 import { getProposalUrlPath } from 'identifiers';
+import type { Account, Comment } from 'models';
+import type { Thread } from 'models';
+
+import app from 'state';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 
 interface IProfileCommentGroupAttrs {
@@ -19,7 +30,7 @@ const ProfileCommentGroup: Component<IProfileCommentGroupAttrs> = {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
 
-    const { slug, identifier } = proposal;
+    const { slug, identifier, title } = proposal.proposal;
 
     // hide rows from communities that don't match
     if (app.isCustomDomain() && proposal.chain !== app.customDomainId()) return;
@@ -33,7 +44,7 @@ const ProfileCommentGroup: Component<IProfileCommentGroupAttrs> = {
             link(
               'a.link-bold',
               `/${proposal.chain}${getProposalUrlPath(slug, identifier, true)}`,
-              proposal instanceof Thread ? 'thread' : 'proposal',
+              `${title}`,
               {},
               `profile-${account.address}-${account.chain.id}-${proposal.chain}-scrollY`
             ),

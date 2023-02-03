@@ -1,31 +1,38 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelPageViewEvent,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
+import Sublayout from '../../sublayout';
+import { PageLoading } from '../loading';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
-import { EthChainAttrs } from './types';
 import { EthDaoForm } from './eth_dao_form';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
-import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import type { EthChainAttrs } from './types';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -36,7 +43,7 @@ export enum CommunityType {
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
-  AddContract = 'Add Contract',
+  AbiFactory = 'Abi Factory',
 }
 
 const ADMIN_ONLY_TABS = [
@@ -52,7 +59,7 @@ type CreateCommunityState = {
 } & EthChainAttrs;
 
 class CreateCommunity extends ClassComponent {
-  private state: CreateCommunityState = {
+  public state: CreateCommunityState = {
     activeForm: CommunityType.StarterCommunity,
     ethChainNames: {},
     ethChains: {},

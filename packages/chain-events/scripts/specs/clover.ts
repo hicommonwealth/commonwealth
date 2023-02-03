@@ -1,4 +1,4 @@
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { RegisteredTypes } from '@polkadot/types/types';
 
 export const CloverSpec: RegisteredTypes = {
   types: {

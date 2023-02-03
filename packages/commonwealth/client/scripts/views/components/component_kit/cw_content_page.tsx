@@ -7,15 +7,16 @@ import moment from 'moment';
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
-import { ComponentType } from './types';
-import { CWTabBar, CWTab } from './cw_tabs';
-import { CWText } from './cw_text';
-import { PopoverMenu, PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { CWIconButton } from './cw_icon_button';
-import { isWindowMediumSmallInclusive } from './helpers';
-import { CWIcon } from './cw_icons/cw_icon';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { SharePopover } from '../share_popover';
 import { CWCard } from './cw_card';
+import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
+import { CWTab, CWTabBar } from './cw_tabs';
+import { CWText } from './cw_text';
+import { isWindowMediumSmallInclusive } from './helpers';
+import { ComponentType } from './types';
 
 export type ContentPageSidebarItem = {
   label: string;

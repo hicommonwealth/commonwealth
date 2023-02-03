@@ -1,24 +1,34 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
+import { Action } from 'commonwealth/shared/permissions';
 
-import { Action } from 'common-common/src/permissions';
+import 'components/sidebar/index.scss';
+import { isActiveAddressPermitted } from 'controllers/server/roles';
 
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
-import { isActiveAddressPermitted } from 'controllers/server/roles';
-import { DiscussionSection } from './discussion_section';
-import { GovernanceSection } from './governance_section';
-import { ExternalLinksModule } from './external_links_module';
+import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
-import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { DiscussionSection } from './discussion_section';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
-import { CreateContentSidebar } from '../../menus/create_content_menu';
+import { ExternalLinksModule } from './external_links_module';
+import { GovernanceSection } from './governance_section';
+import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 
 export type SidebarMenuName =
   | 'default'

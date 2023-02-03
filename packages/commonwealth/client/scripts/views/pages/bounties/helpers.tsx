@@ -15,20 +15,23 @@ import {
 
 import 'pages/bounties.scss';
 
-import app from 'state';
-import { SubstrateBounty } from 'controllers/chain/substrate/bounty';
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { SubstrateBounty } from 'controllers/chain/substrate/bounty';
 import { AddressInfo } from 'models';
+
+import 'pages/bounties.scss';
+
+import app from 'state';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { User } from 'views/components/user/user';
 import {
   ApproveBountyModal,
-  ProposeCuratorModal,
   AwardBountyModal,
   ExtendExpiryModal,
+  ProposeCuratorModal,
 } from 'views/modals/bounty_modals';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { createTXModal } from 'views/modals/tx_signing_modal';

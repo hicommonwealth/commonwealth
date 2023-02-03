@@ -1,12 +1,13 @@
 /**
  * Processes Aave events.
  */
-import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
+import type { CWEvent } from '../../interfaces';
+import { IEventProcessor, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import { ParseType } from './filters/type_parser';
 import { Enrich } from './filters/enricher';
-import { IEventData, RawEvent, Api } from './types';
+import type { IEventData, RawEvent, Api } from './types';
 
 export class Processor extends IEventProcessor<Api, RawEvent> {
   constructor(protected _api: Api, protected readonly chain?: string) {

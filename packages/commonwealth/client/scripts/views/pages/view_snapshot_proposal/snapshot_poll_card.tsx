@@ -1,22 +1,23 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWText } from '../../components/component_kit/cw_text';
 
+import type {
+  PollCardAttrs,
+  VoteInformation,
+} from '../../components/poll_card';
 import {
   buildVoteDirectionString,
   CastVoteSection,
-  PollCardAttrs,
   PollOptions,
   ResultsSection,
   VoteDisplay,
-  VoteInformation,
 } from '../../components/poll_card';
-import { CWCard } from '../../components/component_kit/cw_card';
-import { CWText } from '../../components/component_kit/cw_text';
 
 export type SnapshotPollCardAttrs = Omit<
   PollCardAttrs,

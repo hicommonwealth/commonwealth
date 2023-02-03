@@ -1,28 +1,20 @@
 /* @jsx jsx */
 import React from 'react';
 
+import 'components/thread_selector.scss';
+import { notifyError } from 'controllers/app/notifications';
+import type { Thread } from 'models';
+import type { SearchParams } from 'models/SearchQuery';
 import {
   ClassComponent,
   ResultNode,
   render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
-
-import 'components/thread_selector.scss';
-
 import app from 'state';
-import { Thread } from 'models';
-import { SearchParams } from 'models/SearchQuery';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { formatAddressShort } from '../../../../shared/utils';
-import { CWTextInput } from './component_kit/cw_text_input';
-import { CWText } from './component_kit/cw_text';
 import { CWSpinner } from './component_kit/cw_spinner';
+import { CWTextInput } from './component_kit/cw_text_input';
 
 const renderThreadPreview = (
   linkedThreads: Array<Thread>,

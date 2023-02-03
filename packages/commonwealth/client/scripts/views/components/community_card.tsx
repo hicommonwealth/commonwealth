@@ -1,18 +1,27 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/community_card.scss';
 
 import { isCommandClick } from 'helpers';
-import { ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
+import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWText } from './component_kit/cw_text';
-import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 
 type CommunityCardAttrs = { chain: ChainInfo };
 

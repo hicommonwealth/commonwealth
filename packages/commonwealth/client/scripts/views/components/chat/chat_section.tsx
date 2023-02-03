@@ -1,35 +1,40 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import _ from 'lodash';
-// import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
+import {
+  ClassComponent,
+  getRoute,
+  getRouteParam,
+  redraw,
+  jsx,
+} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
+// import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
+import type { IChannel } from 'controllers/server/socket/chatNs';
+import { handleRedirectClicks } from 'helpers';
 
 import app from 'state';
-import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
-import { handleRedirectClicks } from 'helpers';
+import { CWSpinner } from '../component_kit/cw_spinner';
+import { verifyCachedToggleTree } from '../sidebar/helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
+import type {
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+  SubSectionAttrs,
+  ToggleTree,
+} from '../sidebar/types';
 import {
   CreateCategory,
   CreateChannel,
-  RenameCategory,
-  RenameChannel,
   DeleteCategory,
   DeleteChannel,
+  RenameCategory,
+  RenameChannel,
 } from './admin_modals';
-import {
-  ToggleTree,
-  SubSectionAttrs,
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-} from '../sidebar/types';
-import { verifyCachedToggleTree } from '../sidebar/helpers';
-import { CWSpinner } from '../component_kit/cw_spinner';
 
 enum Errors {
   None = '',
@@ -51,8 +56,9 @@ function setToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-    JSON.stringify(newTree);
+  localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+    newTree
+  );
 }
 
 class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
@@ -194,7 +200,7 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
     //   },
     // });
 
-    const categoryAdminButton = (category: string): ResultNode => {
+    const categoryAdminButton = (category: string): React.ReactNode => {
       const handleMouseout = () => {
         if (this.menuToggleTree['children'][category]['toggledState']) {
           this.menuToggleTree['children'][category]['toggledState'] = false;
@@ -395,7 +401,11 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
       redraw();
     };
 
-    const overlayContent: ResultNode = this.adminModals['CreateCategory'] ? (
+    // TODO: @ZAK @REACT m.vnode => ResultNode causes type error
+    // const overlayContent: m.Vnode = ...
+    const overlayContent: React.ReactNode = this.adminModals[
+      'CreateCategory'
+    ] ? (
       <CreateCategory handleClose={closeOverlay} />
     ) : this.adminModals['CreateChannel'] ? (
       <CreateChannel handleClose={closeOverlay} category={this.adminCategory} />

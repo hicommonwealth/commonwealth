@@ -1,36 +1,27 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { WalletId } from 'common-common/src/types';
+import { unlinkLogin } from 'controllers/app/login';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import { formatAddressShort, link, orderAccountsByAddress } from 'helpers';
+import { ClassComponent, render, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
+import type { AddressInfo } from 'models';
 
 import 'pages/settings/linked_addresses_section.scss';
 
 import app from 'state';
-import { orderAccountsByAddress, link, formatAddressShort } from 'helpers';
-import { unlinkLogin } from 'controllers/app/login';
-import { AddressInfo } from 'models';
 import { User } from 'views/components/user/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import MolochMember from 'controllers/chain/ethereum/moloch/member';
-import { WalletId } from 'common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 
 type AccountRowAttrs = {
   account: AddressInfo;
-  onClick?: (e: Event) => any;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => any;
 };
 
 class AccountRow extends ClassComponent<AccountRowAttrs> {
@@ -103,7 +94,6 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
             this.removing ||
             app.user.addresses.some((a) => a.walletId === WalletId.Magic)
           }
-          loading={this.removing}
           label="Remove"
         />
       </div>

@@ -1,24 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  redirectWithLoginSuccess,
-  redirectWithLoginError,
-} from './finishEmailLogin';
-import { DB } from '../models';
+import type { Request, Response } from 'express';
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
+import type { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../shared/analytics/types';
+import { redirectWithLoginError } from './finishEmailLogin';
 
-const log = factory.getLogger(formatFilename(__filename));
-const finishOAuthLogin = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
   const token = req.query.token;
   if (!token) {
     return redirectWithLoginError(res, 'Missing token');

@@ -6,7 +6,7 @@ module.exports = {
       'OffchainThreads',
       'kind',
       Sequelize.STRING
-    )
+    );
   },
 
   down: (queryInterface, Sequelize) => {
@@ -14,6 +14,6 @@ module.exports = {
       'OffchainThreads',
       'kind',
       Sequelize.STRING
-    )
-  }
+    );
+  },
 };

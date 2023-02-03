@@ -1,15 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-
-import 'pages/view_proposal/proposal_header_links.scss';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
+import { ProposalType } from 'common-common/src/types';
 
 import { externalLink, extractDomain, link } from 'helpers';
-import { AnyProposal } from 'models';
 import { getProposalUrlPath } from 'identifiers';
-import { ProposalType } from 'common-common/src/types';
+import type { AnyProposal } from 'models';
+
+import 'pages/view_proposal/proposal_header_links.scss';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type ProposalHeaderLinkAttrs = {

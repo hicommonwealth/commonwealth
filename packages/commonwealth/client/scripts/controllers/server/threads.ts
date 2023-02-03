@@ -1,167 +1,41 @@
 /* eslint-disable no-restricted-globals */
-/* eslint-disable no-restricted-syntax */
-import _ from 'lodash';
-import moment from 'moment';
+import { NotificationCategories } from 'common-common/src/types';
+import { updateLastVisited } from 'controllers/app/login';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { notifyError } from 'controllers/app/notifications';
+import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import $ from 'jquery';
+/* eslint-disable no-restricted-syntax */
+
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
+import type { ChainEntity, Profile, Topic } from 'models';
+import {
+  Attachment,
+  NotificationSubscription,
+  Poll,
+  Thread,
+  ThreadStage,
+} from 'models';
+import moment from 'moment';
+import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
-import {
-  Thread,
-  Attachment,
-  ThreadStage,
-  NodeInfo,
-  Profile,
-  ChainEntity,
-  NotificationSubscription,
-  Poll,
-  Topic,
-} from 'models';
-import { NotificationCategories } from 'common-common/src/types';
-
-import { notifyError } from 'controllers/app/notifications';
-import { updateLastVisited } from 'controllers/app/login';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { LinkedThreadAttributes } from 'server/models/linked_thread';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
+
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
-
-export const modelFromServer = (thread) => {
-  const {
-    id,
-    title,
-    body,
-    last_edited,
-    version_history,
-    snapshot_proposal,
-    Attachments,
-    created_at,
-    topic,
-    kind,
-    stage,
-    chain,
-    read_only,
-    plaintext,
-    url,
-    pinned,
-    collaborators,
-    chain_entity_meta,
-    has_poll,
-    polls = [], // associated Polls
-    reactions,
-    last_commented_on,
-    linked_threads,
-    numberOfComments,
-  } = thread;
-
-  const attachments = Attachments
-    ? Attachments.map((a) => new Attachment(a.url, a.description))
-    : [];
-
-  if (reactions) {
-    for (const reaction of reactions) {
-      app.reactions.store.add(modelReactionFromServer(reaction));
-    }
-  }
-
-  let versionHistoryProcessed;
-  if (version_history) {
-    versionHistoryProcessed = version_history.map((v) => {
-      if (!v) return;
-      let history;
-      try {
-        history = JSON.parse(v);
-        history.author =
-          typeof history.author === 'string'
-            ? JSON.parse(history.author)
-            : typeof history.author === 'object'
-            ? history.author
-            : null;
-        history.timestamp = moment(history.timestamp);
-      } catch (e) {
-        console.log(e);
-      }
-      return history;
-    });
-  }
-
-  let chainEntitiesProcessed: ChainEntity[] = [];
-  if (chain_entity_meta) {
-    for (const meta of chain_entity_meta) {
-      const full_entity = app.chainEntities.store.getById(meta.ce_id);
-      if (full_entity) {
-        if (meta.title) full_entity.title = meta.title;
-        chainEntitiesProcessed.push(full_entity);
-      }
-    }
-  }
-
-  const lastEditedProcessed = last_edited
-    ? moment(last_edited)
-    : versionHistoryProcessed && versionHistoryProcessed?.length > 1
-    ? versionHistoryProcessed[0].timestamp
-    : null;
-
-  let topicFromStore = null;
-  if (topic?.id) {
-    topicFromStore = app.topics.store.getById(topic.id);
-  }
-
-  let decodedTitle;
-  try {
-    decodedTitle = decodeURIComponent(title);
-  } catch (err) {
-    console.error(`Could not decode title: "${title}"`);
-    decodedTitle = title;
-  }
-
-  let decodedBody;
-  try {
-    decodedBody = decodeURIComponent(body);
-  } catch (err) {
-    console.error(`Could not decode body: "${body}"`);
-    decodedBody = body;
-  }
-
-  const linkedThreads = (linked_threads || []).map(
-    (lT: LinkedThreadAttributes) => ({
-      linkedThread: lT.linked_thread,
-      linkingThread: lT.linking_thread,
-    })
-  );
-
-  return new Thread({
-    id,
-    author: thread.Address.address,
-    authorChain: thread.Address.chain,
-    title: decodedTitle,
-    body: decodedBody,
-    createdAt: moment(created_at),
-    attachments,
-    snapshotProposal: snapshot_proposal,
-    topic: topicFromStore,
-    kind,
-    stage,
-    chain,
-    readOnly: read_only,
-    plaintext,
-    url,
-    pinned,
-    collaborators,
-    chainEntities: chainEntitiesProcessed,
-    versionHistory: versionHistoryProcessed,
-    lastEdited: lastEditedProcessed,
-    hasPoll: has_poll,
-    polls: polls.map((p) => new Poll(p)),
-    lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
-    linkedThreads,
-    numberOfComments,
-  });
-};
 
 /*
 
@@ -178,7 +52,7 @@ regardless of whether they belong on a given listing.
 Threads are fetched in several ways depending on context. On chain or community initialization,
 /bulkOffchain is called directly from the init page (bypassing the threads controller) and
 fetching the most recent 20 posts for that chain/community (including pinned posts). As a user
-scrolls through the discussions listing, the onScroll listener continuously calls the controller
+scrolls through the discussions listing, the onscroll listener continuously calls the controller
 fn loadNextPage, passing a "cutoff date"—the date of the least recently active thread thus far
 rendered on the listing—and receiving the next page worth of threads (typically the next 20).
 
@@ -197,16 +71,29 @@ export interface VersionHistory {
 }
 
 class ThreadsController {
-  private _store = new ProposalStore<Thread>();
-  private _listingStore: RecentListingStore = new RecentListingStore();
-  private _overviewStore = new ProposalStore<Thread>();
+  private static _instance: ThreadsController;
+  private readonly _store: ProposalStore<Thread>;
+  private readonly _listingStore: RecentListingStore;
+  private readonly _overviewStore: ProposalStore<Thread>;
+
+  private constructor() {
+    this._store = new ProposalStore<Thread>();
+    this._listingStore = new RecentListingStore();
+    this._overviewStore = new ProposalStore<Thread>();
+  }
+
+  public static get Instance() {
+    return this._instance || (this._instance = new this());
+  }
 
   public get store() {
     return this._store;
   }
+
   public get listingStore() {
     return this._listingStore;
   }
+
   public get overviewStore() {
     return this._overviewStore;
   }
@@ -234,6 +121,143 @@ class ThreadsController {
 
   public getById(id: number) {
     return this._store.getByIdentifier(id);
+  }
+
+  public modelFromServer(thread) {
+    const {
+      id,
+      title,
+      body,
+      last_edited,
+      version_history,
+      snapshot_proposal,
+      Attachments,
+      created_at,
+      topic,
+      kind,
+      stage,
+      chain,
+      read_only,
+      plaintext,
+      url,
+      pinned,
+      collaborators,
+      chain_entity_meta,
+      has_poll,
+      polls = [], // associated Polls
+      reactions,
+      last_commented_on,
+      linked_threads,
+      numberOfComments,
+    } = thread;
+
+    const attachments = Attachments
+      ? Attachments.map((a) => new Attachment(a.url, a.description))
+      : [];
+
+    if (reactions) {
+      for (const reaction of reactions) {
+        app.reactions.store.add(modelReactionFromServer(reaction));
+      }
+    }
+
+    let versionHistoryProcessed;
+    if (version_history) {
+      versionHistoryProcessed = version_history.map((v) => {
+        if (!v) return;
+        let history;
+        try {
+          history = JSON.parse(v);
+          history.author =
+            typeof history.author === 'string'
+              ? JSON.parse(history.author)
+              : typeof history.author === 'object'
+              ? history.author
+              : null;
+          history.timestamp = moment(history.timestamp);
+        } catch (e) {
+          console.log(e);
+        }
+        return history;
+      });
+    }
+
+    const chainEntitiesProcessed: ChainEntity[] = [];
+    if (chain_entity_meta) {
+      for (const meta of chain_entity_meta) {
+        const full_entity = app.chainEntities.store.getById(meta.ce_id);
+        if (full_entity) {
+          if (meta.title) full_entity.title = meta.title;
+          chainEntitiesProcessed.push(full_entity);
+        }
+      }
+    }
+
+    const lastEditedProcessed = last_edited
+      ? moment(last_edited)
+      : versionHistoryProcessed && versionHistoryProcessed?.length > 1
+      ? versionHistoryProcessed[0].timestamp
+      : null;
+
+    let topicFromStore = null;
+    if (topic?.id) {
+      topicFromStore = app.topics.store.getById(topic.id);
+    }
+
+    let decodedTitle;
+    try {
+      decodedTitle = decodeURIComponent(title);
+    } catch (err) {
+      console.error(`Could not decode title: "${title}"`);
+      decodedTitle = title;
+    }
+
+    let decodedBody;
+    try {
+      decodedBody = decodeURIComponent(body);
+    } catch (err) {
+      console.error(`Could not decode body: "${body}"`);
+      decodedBody = body;
+    }
+
+    const linkedThreads = (linked_threads || []).map(
+      (lT: LinkedThreadAttributes) => ({
+        linkedThread: lT.linked_thread,
+        linkingThread: lT.linking_thread,
+      })
+    );
+
+    const t = new Thread({
+      id,
+      author: thread.Address.address,
+      authorChain: thread.Address.chain,
+      title: decodedTitle,
+      body: decodedBody,
+      createdAt: moment(created_at),
+      attachments,
+      snapshotProposal: snapshot_proposal,
+      topic: topicFromStore,
+      kind,
+      stage,
+      chain,
+      readOnly: read_only,
+      plaintext,
+      url,
+      pinned,
+      collaborators,
+      chainEntities: chainEntitiesProcessed,
+      versionHistory: versionHistoryProcessed,
+      lastEdited: lastEditedProcessed,
+      hasPoll: has_poll,
+      polls: polls.map((p) => new Poll(p)),
+      lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
+      linkedThreads,
+      numberOfComments,
+    });
+
+    ThreadsController.Instance.store.add(t);
+
+    return t;
   }
 
   public async create(
@@ -266,8 +290,7 @@ class ThreadsController {
         readOnly,
         jwt: app.user.jwt,
       });
-      const result = modelFromServer(response.result);
-      this._store.add(result);
+      const result = this.modelFromServer(response.result);
 
       // Update stage counts
       if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
@@ -329,7 +352,7 @@ class ThreadsController {
         jwt: app.user.jwt,
       },
       success: (response) => {
-        const result = modelFromServer(response.result);
+        const result = this.modelFromServer(response.result);
         // Update counters
         if (proposal.stage === ThreadStage.Voting) this.numVotingThreads--;
         if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
@@ -384,7 +407,7 @@ class ThreadsController {
         jwt: app.user.jwt,
       },
       success: (response) => {
-        const result = modelFromServer(response.result);
+        const result = this.modelFromServer(response.result);
         // Update counters
         if (args.stage === ThreadStage.Voting) this.numVotingThreads--;
         if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
@@ -414,9 +437,8 @@ class ThreadsController {
         read_only: args.readOnly,
       },
       success: (response) => {
-        const result = modelFromServer(response.result);
+        const result = this.modelFromServer(response.result);
         // Post edits propagate to all thread stores
-        this._store.update(result);
         this._listingStore.add(result);
         this._overviewStore.update(result);
         return result;
@@ -437,9 +459,8 @@ class ThreadsController {
         thread_id: args.proposal.id,
       },
       success: (response) => {
-        const result = modelFromServer(response.result);
+        const result = this.modelFromServer(response.result);
         // Post edits propagate to all thread stores
-        this._store.update(result);
         this._listingStore.add(result);
         return result;
       },
@@ -536,7 +557,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    this._store.add(modelFromServer(response.result));
+    this.modelFromServer(response.result);
   }
 
   public async removeLinkedThread(
@@ -557,7 +578,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    this._store.add(modelFromServer(response.result));
+    this.modelFromServer(response.result);
   }
 
   public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
@@ -590,7 +611,7 @@ class ThreadsController {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
     return response.result.map((rawThread) => {
-      const thread = modelFromServer(rawThread);
+      const thread = this.modelFromServer(rawThread);
       const existing = this._store.getByIdentifier(thread.id);
       if (existing) this._store.remove(existing);
       this._store.update(thread);
@@ -666,7 +687,7 @@ class ThreadsController {
     const { threads } = response.result;
     // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
     const modeledThreads: Thread[] = threads.map((t) => {
-      return modelFromServer(t);
+      return this.modelFromServer(t);
     });
 
     modeledThreads.forEach((thread) => {
@@ -709,12 +730,11 @@ class ThreadsController {
       this._listingStore.clear();
     }
     for (const thread of initialThreads) {
-      const modeledThread = modelFromServer(thread);
+      const modeledThread = this.modelFromServer(thread);
       if (!thread.Address) {
         console.error('Thread missing address');
       }
       try {
-        this._store.add(modeledThread);
         this._listingStore.add(modeledThread);
       } catch (e) {
         console.error(e.message);

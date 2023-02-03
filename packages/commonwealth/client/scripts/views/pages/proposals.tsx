@@ -1,34 +1,43 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import type Cosmos from 'controllers/chain/cosmos/adapter';
+import type Aave from 'controllers/chain/ethereum/aave/adapter';
+import type Compound from 'controllers/chain/ethereum/compound/adapter';
+import type Moloch from 'controllers/chain/ethereum/moloch/adapter';
+import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { ProposalModule } from 'models';
 
 import 'pages/proposals.scss';
 
 import app from 'state';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
-import Cosmos from 'controllers/chain/cosmos/adapter';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
-import { ProposalCard } from 'views/components/proposal_card';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
+import { ProposalCard } from 'views/components/proposal_card';
 import PageNotFound from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
-import NearSputnik from 'controllers/chain/near/sputnik/adapter';
-import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CardsCollection } from '../components/cards_collection';
+import { getStatusText } from '../components/proposal_card/helpers';
+import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import {
   CompoundProposalStats,
   SubstrateProposalStats,
 } from '../components/proposals/proposals_explainers';
-import { getStatusText } from '../components/proposal_card/helpers';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -89,12 +98,7 @@ class ProposalsPage extends ClassComponent {
             message="Change Metamask to point to Ethereum Mainnet"
           />
         );
-      return (
-        <PageLoading
-          message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Proposals" />}
-        />
-      );
+      return <PageLoading message="Connecting to chain" />;
     }
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;

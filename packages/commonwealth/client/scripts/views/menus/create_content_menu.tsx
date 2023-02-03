@@ -12,20 +12,22 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
+import { navigateToSubpage } from 'router';
+import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import {
   PopoverMenu,
   PopoverMenuItem,
 } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
+
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
+import type { MenuItem } from '../components/component_kit/types';
 
 const getCreateContentMenuItems = (): PopoverMenuItem[] => {
   const activeAccount = app.user.activeAccount;

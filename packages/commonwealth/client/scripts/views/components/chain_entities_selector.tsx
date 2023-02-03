@@ -1,16 +1,18 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import { uuidv4 } from 'lib/util';
-// import { QueryList, ListItem } from 'construct-ui';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  redraw,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/chain_entities_selector.scss';
+import type { ChainEntity, Thread } from 'models';
 
 import app from 'state';
-import { ChainEntity, Thread } from 'models';
-import { chainEntityTypeToProposalName } from 'identifiers';
 
 type ChainEntitiesSelectorAttrs = {
   chainEntitiesToSet: Array<ChainEntity>;
@@ -29,19 +31,18 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
 
     if (!this.initialized) {
       this.initialized = true;
-      app.chainEntities
-        ?.refresh(app.chain.id)
-        .then(() => {
-          // refreshing loads the latest chain entities into app.chainEntities store
-          this.chainEntitiesLoaded = true;
-          redraw();
-        });
+      app.chainEntities?.refresh(app.chain.id).then(() => {
+        // refreshing loads the latest chain entities into app.chainEntities store
+        this.chainEntitiesLoaded = true;
+        redraw();
+      });
     }
 
     return (
       <div className="ChainEntitiesSelector">
         {this.chainEntitiesLoaded ? (
           render('@TODO: @REACT pleaseremoveme')
+        ) : (
           // m(QueryList, {
           //   checkmark: true,
           //   items: app.chainEntities.store.getAll().sort((a, b) => {
@@ -115,7 +116,6 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
           //     onSelect(ce);
           //   },
           // })
-        ) : (
           <div className="loading-container">
             <div className="loading-text">
               {this.chainEntitiesLoaded

@@ -13,13 +13,14 @@ import {
   jsx,
 } from 'mithrilInterop';
 
-import app from 'state';
-import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { notifyError } from 'controllers/app/notifications';
-import NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import type { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
+
+import app from 'state';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWButton } from '../../components/component_kit/cw_button';
 
 const sputnikProposalOptions = [
   {
@@ -56,7 +57,7 @@ export class SputnikProposalForm extends ClassComponent {
       <React.Fragment>
         <CWDropdown
           label="Proposal Type"
-          defaultValue={sputnikProposalOptions[0]}
+          initialValue={sputnikProposalOptions[0]}
           options={sputnikProposalOptions}
           onSelect={(item) => {
             this.sputnikProposalType = item.value;

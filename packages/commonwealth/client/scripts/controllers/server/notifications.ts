@@ -1,13 +1,23 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-
-import {NotificationStore} from 'stores';
-import {NotificationSubscription, Notification, ChainEventType} from 'models';
-import {modelFromServer} from 'models/NotificationSubscription';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
+import { ChainEventType, Notification, NotificationSubscription } from 'models';
+import { modelFromServer } from 'models/NotificationSubscription';
 
 import app from 'state';
+
+import { NotificationStore } from 'stores';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
@@ -33,11 +43,11 @@ const get = (route, args, callback) => {
       }
     })
     .catch((e) => console.error(e));
-}
+};
 
 interface NotifOptions {
-  chain_filter: string,
-  maxId: number
+  chain_filter: string;
+  maxId: number;
 }
 
 class NotificationsController {
@@ -111,7 +121,7 @@ class NotificationsController {
       {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
-      (result) => {
+      () => {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
@@ -129,7 +139,7 @@ class NotificationsController {
       {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
-      (result) => {
+      () => {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.disable();
@@ -147,7 +157,7 @@ class NotificationsController {
       {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
-      (result) => {
+      () => {
         for (const s of subscriptions) {
           s.enableImmediateEmail();
         }
@@ -162,7 +172,7 @@ class NotificationsController {
       {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
-      (result) => {
+      () => {
         for (const s of subscriptions) {
           s.disableImmediateEmail();
         }
@@ -177,7 +187,7 @@ class NotificationsController {
       {
         subscription_id: subscription.id,
       },
-      (result) => {
+      () => {
         const idx = this._subscriptions.indexOf(subscription);
         if (idx === -1) {
           throw new Error('subscription not found!');
@@ -204,7 +214,7 @@ class NotificationsController {
           .slice(0, MAX_NOTIFICATIONS_READ)
           .map((n) => n.id),
       },
-      (result) => {
+      () => {
         for (const n of unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ)) {
           n.markRead();
         }
@@ -216,7 +226,7 @@ class NotificationsController {
   }
 
   public clearAllRead() {
-    return post('/clearReadNotifications', {}, (result) => {
+    return post('/clearReadNotifications', {}, () => {
       const toClear = this.allNotifications.filter((n) => n.isRead);
       for (const n of toClear) {
         this.removeFromStore(n);
@@ -246,7 +256,7 @@ class NotificationsController {
           .slice(0, MAX_NOTIFICATIONS_CLEAR)
           .map((n) => n.id),
       },
-      async (result) => {
+      async () => {
         notifications
           .slice(0, MAX_NOTIFICATIONS_CLEAR)
           .map((n) => this.removeFromStore(n));
@@ -297,8 +307,8 @@ class NotificationsController {
     }
 
     const options: NotifOptions = app.isCustomDomain()
-      ? {chain_filter: app.activeChainId(), maxId: undefined}
-      : {chain_filter: undefined, maxId: undefined};
+      ? { chain_filter: app.activeChainId(), maxId: undefined }
+      : { chain_filter: undefined, maxId: undefined };
 
     if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
       options.maxId = this._maxChainEventNotificationId;
@@ -316,8 +326,8 @@ class NotificationsController {
       throw new Error('must be logged in to refresh notifications');
     }
     const options: NotifOptions = app.isCustomDomain()
-      ? {chain_filter: app.activeChainId(), maxId: undefined}
-      : {chain_filter: undefined, maxId: undefined};
+      ? { chain_filter: app.activeChainId(), maxId: undefined }
+      : { chain_filter: undefined, maxId: undefined };
 
     if (this._maxDiscussionNotificationId !== Number.POSITIVE_INFINITY)
       options.maxId = this._maxDiscussionNotificationId;
@@ -362,14 +372,16 @@ class NotificationsController {
           // the minimum id is the new max id for next page
           if (notificationsReadJSON.id < this._maxChainEventNotificationId) {
             this._maxChainEventNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1) this._maxChainEventNotificationId = 0;
+            if (notificationsReadJSON.id === 1)
+              this._maxChainEventNotificationId = 0;
           }
         } else {
           if (!this._discussionStore.getById(notification.id))
             this._discussionStore.add(notification);
           if (notificationsReadJSON.id < this._maxDiscussionNotificationId) {
             this._maxDiscussionNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1) this._maxDiscussionNotificationId = 0;
+            if (notificationsReadJSON.id === 1)
+              this._maxDiscussionNotificationId = 0;
           }
         }
       }
@@ -383,9 +395,7 @@ class NotificationsController {
       this._subscriptions = [];
 
       const subs = result;
-      subs.forEach((sub) =>
-        this._subscriptions.push(modelFromServer(sub))
-      );
+      subs.forEach((sub) => this._subscriptions.push(modelFromServer(sub)));
     });
   }
 

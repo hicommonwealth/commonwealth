@@ -1,14 +1,14 @@
-import * as Sequelize from 'sequelize';
-import { CreateOptions, DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { AddressInstance, AddressAttributes } from './address';
-import { ChainAttributes, ChainInstance } from './chain';
-import { ProfileInstance, ProfileAttributes } from './profile';
-import {
-  SocialAccountInstance,
+import type * as Sequelize from 'sequelize';
+import type { CreateOptions, DataTypes } from 'sequelize';
+import type { DB } from '../models';
+import type { AddressAttributes, AddressInstance } from './address';
+import type { ChainAttributes, ChainInstance } from './chain';
+import type { ProfileAttributes, ProfileInstance } from './profile';
+import type {
   SocialAccountAttributes,
+  SocialAccountInstance,
 } from './social_account';
-import { DB } from '../models';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'daily' | 'never';
 
@@ -152,9 +152,6 @@ export default (
     models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);
     models.User.hasMany(models.StarredCommunity);
-    models.User.belongsToMany(models.Chain, {
-      through: models.WaitlistRegistration,
-    });
   };
 
   return User;

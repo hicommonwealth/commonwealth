@@ -1,23 +1,19 @@
+import type { Signer } from '@polkadot/api/types';
+
+import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+import { stringToHex } from '@polkadot/util';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { addressSwapper } from 'commonwealth/shared/utils';
+import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 
-import {
-  web3Accounts,
-  web3Enable,
-  web3FromAddress,
-  isWeb3Injected,
-} from '@polkadot/extension-dapp';
-import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import { Signer } from '@polkadot/api/types';
-import { stringToHex } from '@polkadot/util';
-import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import { addressSwapper } from 'commonwealth/shared/utils';
-import { CanvasData } from 'shared/adapters/shared';
-
-class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
+class PolkadotWebWalletController
+  implements IWebWallet<InjectedAccountWithMeta>
 {
   // GETTERS/SETTERS
+  private polkadot;
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];
   private _enabling = false;
@@ -28,7 +24,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   public readonly chain = ChainBase.Substrate;
 
   public get available() {
-    return isWeb3Injected;
+    return this.polkadot && this.polkadot.isWeb3Injected;
   }
 
   public get enabled() {
@@ -50,7 +46,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
       address: who,
       currentPrefix: 42,
     });
-    const injector = await web3FromAddress(reencodedAddress);
+    const injector = await this.polkadot.web3FromAddress(reencodedAddress);
     return injector.signer;
   }
 
@@ -58,12 +54,16 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
     return app.chain?.id || this.defaultNetwork;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getRecentBlock(chainIdentifier: string) {
-    return null
+    return null;
   }
 
   // ACTIONS
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const message = stringToHex(JSON.stringify(canvasMessage));
 
     const signer = await this.getSigner(account.address);
@@ -77,6 +77,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   }
 
   public async enable() {
+    this.polkadot = await import('@polkadot/extension-dapp');
     console.log('Attempting to enable Substrate web wallet');
     if (!this.available) throw new Error('Web wallet not available');
 
@@ -84,11 +85,11 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
     // (this needs to be called first, before other requests)
     this._enabling = true;
     try {
-      const injectedExtensionInfo = await web3Enable('commonwealth');
+      await this.polkadot.web3Enable('commonwealth');
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account
-      this._accounts = await web3Accounts();
+      this._accounts = await this.polkadot.polkadotweb3Accounts();
 
       this._enabled = true;
       this._enabling = false;

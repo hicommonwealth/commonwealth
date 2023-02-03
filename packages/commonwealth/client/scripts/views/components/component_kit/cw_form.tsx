@@ -4,10 +4,9 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_form.scss';
-
-import { ComponentType } from './types';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';
+import { ComponentType } from './types';
 
 type FormProps = {
   description: string;

@@ -1,9 +1,19 @@
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { MarkdownFormattedText } from './markdown_formatted_text';
-import { QuillFormattedText, QuillTextParams } from './quill_formatted_text';
-import { DeltaOps } from './types';
+import type { QuillTextParams } from './quill_formatted_text';
+import { QuillFormattedText } from './quill_formatted_text';
+import type { DeltaOps } from './types';
 
 export const countLinesQuill = (ops: DeltaOps[]) => {
   let count = 0;

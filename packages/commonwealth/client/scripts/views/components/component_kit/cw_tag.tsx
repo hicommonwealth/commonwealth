@@ -4,12 +4,12 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_tag.scss';
-
-import { ComponentType } from './types';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
-import { IconName } from './cw_icons/cw_icon_lookup';
-import { CWIcon } from './cw_icons/cw_icon';
+
+import { ComponentType } from './types';
 
 type TagType =
   | 'passed'

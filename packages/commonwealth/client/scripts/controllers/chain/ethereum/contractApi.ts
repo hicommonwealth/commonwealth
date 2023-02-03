@@ -1,12 +1,21 @@
-import { Web3Provider, ExternalProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
-import { ethers, Contract } from 'ethers';
+import type {
+  ExternalProvider,
+  JsonRpcSigner,
+  Provider,
+  Web3Provider,
+} from '@ethersproject/providers';
 import { ChainBase } from 'common-common/src/types';
-import WebWalletController from 'controllers/app/web_wallets';
+import type WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { Account } from 'models';
+import type { Contract } from 'ethers';
+import { ethers } from 'ethers';
+import type { Account } from 'models';
 
-export type ContractFactoryT<ContractT> = (address: string, provider: Provider) => ContractT;
+export type ContractFactoryT<ContractT> = (
+  address: string,
+  provider: Provider
+) => ContractT;
 
 export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
@@ -15,9 +24,13 @@ export async function attachSigner<CT extends Contract>(
 ): Promise<CT> {
   const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);
   let signer: JsonRpcSigner;
-  if (signingWallet instanceof MetamaskWebWalletController
-    || signingWallet instanceof WalletConnectWebWalletController) {
-    const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
+  if (
+    signingWallet instanceof MetamaskWebWalletController ||
+    signingWallet instanceof WalletConnectWebWalletController
+  ) {
+    const walletProvider = new ethers.providers.Web3Provider(
+      signingWallet.provider as any
+    );
     // 12s minute polling interval (default is 4s)
     walletProvider.pollingInterval = 12000;
     signer = walletProvider.getSigner(sender.address);
@@ -52,6 +65,7 @@ abstract class ContractApi<ContractT extends Contract> {
     this.Contract = factory(this.contractAddress, this.Provider);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async init(...args): Promise<void> {
     await this.Contract.deployed();
   }

@@ -13,6 +13,7 @@ import { uuidv4 } from 'lib/util';
 
 export class ModalStore {
   private _modals: any[];
+
   constructor() {
     this._modals = [];
   }
@@ -21,17 +22,6 @@ export class ModalStore {
     modalspec.id = uuidv4();
     this._modals.push(modalspec);
     redraw();
-  }
-
-  // name must be filename in the modals folder
-  public async lazyCreate(name: string, data = {}) {
-    const modalImport = await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "modal-[request]" */
-      `../../views/modals/${name}`
-    );
-    const modal = modalImport.default;
-    this.create({ modal, data });
   }
 
   public remove(modalspec) {

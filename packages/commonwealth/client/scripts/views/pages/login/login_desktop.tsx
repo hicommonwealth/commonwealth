@@ -20,16 +20,16 @@ import { CWAvatarUsernameInput } from '../../components/component_kit/cw_avatar_
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import {
-  CWProfilesList,
   CWProfileRow,
+  CWProfilesList,
 } from '../../components/component_kit/cw_profiles_list';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
-import { LoginAttrs } from './types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import type { LoginAttrs } from './types';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 export class LoginDesktop extends ClassComponent<LoginAttrs> {

@@ -1,45 +1,41 @@
 /* @jsx jsx */
 import React from 'react';
 
+import type { Chain } from '@canvas-js/interfaces';
+import { constructCanvasMessage } from 'adapters/shared';
+import { initAppState } from 'state';
+import { navigateToSubpage } from 'router';
+import BN from 'bn.js';
 import {
   ClassComponent,
-  ResultNode,
-  render,
   setRoute,
-  getRoute,
   getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
-import { WalletAccount, WalletConnection } from 'near-api-js';
-import { FunctionCallOptions } from 'near-api-js/lib/account';
-import BN from 'bn.js';
-import $ from 'jquery';
-
-import app from 'state';
-import { initAppState, navigateToSubpage } from 'app';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import {
-  updateActiveAddresses,
+  completeClientLogin,
   createUserWithAddress,
   setActiveAccount,
-  completeClientLogin,
+  updateActiveAddresses,
 } from 'controllers/app/login';
-import { Account } from 'models';
-import Near from 'controllers/chain/near/adapter';
-import { NearAccount } from 'controllers/chain/near/account';
-import { ChainBase, WalletId } from 'common-common/src/types';
-import Sublayout from 'views/sublayout';
+import type { NearAccount } from 'controllers/chain/near/account';
+import type Near from 'controllers/chain/near/adapter';
+import $ from 'jquery';
+import type { Account } from 'models';
+import type { WalletConnection } from 'near-api-js';
+import { WalletAccount } from 'near-api-js';
+import type { FunctionCallOptions } from 'near-api-js/lib/account';
+
+import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
-import { LoginModal } from '../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
-import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
-
-import NearChain from 'client/scripts/controllers/chain/near/chain';
-import { constructCanvasMessage } from 'adapters/shared';
-import { Chain } from '@canvas-js/interfaces';
+import { CWText } from '../components/component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { LoginModal } from '../modals/login_modal';
 
 interface IState {
   validating: boolean;
@@ -85,7 +81,7 @@ const redirectToNextPage = () => {
 };
 
 class FinishNearLogin extends ClassComponent<Record<string, never>> {
-  private state: IState = {
+  public state: IState = {
     validating: false,
     validationCompleted: false,
     validatedAccount: null,

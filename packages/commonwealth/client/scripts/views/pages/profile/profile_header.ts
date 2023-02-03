@@ -1,15 +1,25 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { setActiveAccount } from 'controllers/app/login';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+
+import type SubstrateIdentity from 'controllers/chain/substrate/identity';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
-
-import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { User } from 'views/components/user/user';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setActiveAccount } from 'controllers/app/login';
-import { alertModalWithText } from '../../modals/alert_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { alertModalWithText } from '../../modals/alert_modal';
 import { BanUserModal } from '../../modals/ban_user_modal';
 
 export interface IProfileHeaderAttrs {
@@ -28,10 +38,8 @@ export interface IProfileHeaderState {
 
 const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
-    const { account, refreshCallback, onOwnProfile, onLinkedProfile } =
-      vnode.attrs;
+    const { account, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
-    const isClaimable = !account || !account.profile || account.profile.isEmpty;
 
     // For Banning
     const loggedInUserIsAdmin =
@@ -73,7 +81,11 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             render(
               '.User',
               account.profile
-                ? render(User, { user: account, hideAvatar: true, showRole: true })
+                ? render(User, {
+                    user: account,
+                    hideAvatar: true,
+                    showRole: true,
+                  })
                 : account.address
             ),
           ]),
@@ -88,7 +100,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               src: '/static/img/copy_default.svg',
               alt: '',
               class: 'cursor-pointer',
-              onClick: (e) => {
+              onClick: () => {
                 window.navigator.clipboard
                   .writeText(account.address)
                   .then(() => notifySuccess('Copied address to clipboard'));

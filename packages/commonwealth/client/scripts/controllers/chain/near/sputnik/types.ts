@@ -1,8 +1,8 @@
+import type { NearToken } from 'adapters/chain/near/types';
+import type { IIdentifiable } from 'adapters/shared';
 import BN from 'bn.js';
-import { IIdentifiable } from 'adapters/shared';
-import { IVote } from 'models';
-import { NearAccount } from 'controllers/chain/near/account';
-import { NearToken } from 'adapters/chain/near/types';
+import type { NearAccount } from 'controllers/chain/near/account';
+import type { IVote } from 'models';
 
 export interface NearSputnikConfig {
   metadata: string;
@@ -36,9 +36,11 @@ type U128 = string;
 type u64 = string;
 type Nanoseconds = string;
 export type WeightOrRatio = U128 | [u64, u64];
+
 export function isRatio(r: WeightOrRatio): r is [u64, u64] {
   return r.length === 2;
 }
+
 export function isWeight(w: WeightOrRatio): w is U128 {
   return !isRatio(w);
 }
@@ -54,9 +56,11 @@ export type VotePolicy = {
 };
 
 type RoleKind = 'Everyone' | { Member: Balance } | { Group: AccountId[] };
+
 export function isMemberRole(r: RoleKind): r is { Member: Balance } {
   return typeof r === 'object' && typeof r['Member'] !== 'undefined';
 }
+
 export function isGroupRole(r: RoleKind): r is { Group: AccountId[] } {
   return typeof r === 'object' && typeof r['Group'] !== 'undefined';
 }
@@ -165,6 +169,7 @@ export function isAddMemberToRole(
     typeof kind === 'object' && typeof kind['AddMemberToRole'] === 'object'
   );
 }
+
 export function isRemoveMemberFromRole(
   kind: NearSputnikProposalKind
 ): kind is RemoveMemberFromRole {
@@ -172,19 +177,23 @@ export function isRemoveMemberFromRole(
     typeof kind === 'object' && typeof kind['RemoveMemberFromRole'] === 'object'
   );
 }
+
 export function isTransfer(kind: NearSputnikProposalKind): kind is Transfer {
   return typeof kind === 'object' && typeof kind['Transfer'] === 'object';
 }
+
 export function isFunctionCall(
   kind: NearSputnikProposalKind
 ): kind is FunctionCall {
   return typeof kind === 'object' && typeof kind['FunctionCall'] === 'object';
 }
+
 export function isChangePolicy(
   kind: NearSputnikProposalKind
 ): kind is ChangePolicy {
   return typeof kind === 'object' && typeof kind['ChangePolicy'] === 'object';
 }
+
 export function isChangeConfig(
   kind: NearSputnikProposalKind
 ): kind is ChangeConfig {
@@ -206,6 +215,7 @@ export function kindToPolicyLabel(kind: NearSputnikProposalKind): string {
   if (isChangePolicy(kind)) return 'policy';
   throw new Error(`invalid proposal kind: ${JSON.stringify(kind)}`);
 }
+
 export function getVotePolicy(
   policy: NearSputnikPolicy,
   kind: NearSputnikProposalKind
