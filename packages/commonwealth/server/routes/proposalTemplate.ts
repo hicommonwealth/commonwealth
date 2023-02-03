@@ -84,6 +84,7 @@ export async function createCommunityContractTemplateAndMetadata(
 
     const newCCT = await models.CommunityContractTemplate.create({
       community_contract_id: communityContract.id,
+      cctmd_id: newMetadata.id,
       template_id,
     });
 

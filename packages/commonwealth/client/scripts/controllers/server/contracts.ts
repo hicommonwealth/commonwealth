@@ -130,6 +130,8 @@ class ContractsController {
     contract_id,
     cct_id,
     cctmd,
+    isNewCCT,
+    template_id,
   }: {
     contract_id: number;
     cct_id: number;
@@ -140,23 +142,37 @@ class ContractsController {
       display_name: string;
       display_options: string;
     };
+    isNewCCT: boolean;
+    template_id?: number;
   }) {
     const currentContractInStore = this._store.getById(contract_id);
     // TODO: Verify that this is a shallow copy situation
     this._store.remove(this._store.getById(contract_id));
 
     // Update the cctmd in the ccts array
-    const ccts = currentContractInStore.ccts.map((cct) => {
-      if (cct.id === cct_id) {
-        return {
-          ...cct,
-          cctmd: { ...cctmd },
-        };
-      } else {
-        return cct;
-      }
-    });
-    this._store.add(new Contract({ ...currentContractInStore, ccts }));
+    if (!isNewCCT) {
+      const ccts = currentContractInStore.ccts.map((cct) => {
+        if (cct.id === cct_id) {
+          return {
+            ...cct,
+            cctmd: { ...cctmd },
+          };
+        } else {
+          return cct;
+        }
+      });
+      console.log({ ccts });
+      this._store.add(new Contract({ ...currentContractInStore, ccts }));
+    } else {
+      const ccts = currentContractInStore.ccts;
+      ccts.push({
+        id: cct_id,
+        communityContractId: ccts[0].communityContractId,
+        templateId: template_id,
+        cctmd: { ...cctmd },
+      });
+      this._store.add(new Contract({ ...currentContractInStore, ccts }));
+    }
   }
 
   public async add({
@@ -331,8 +347,10 @@ class ContractsController {
 
       this.updateTemplate({
         contract_id: communityContractTemplateAndMetadata.contract_id,
-        cct_id: newContract.cct.id,
-        cctmd: newContract.metadata,
+        cct_id: newContract.result.cct.id,
+        cctmd: newContract.result.metadata,
+        isNewCCT: true,
+        template_id: communityContractTemplateAndMetadata.template_id,
       });
     } catch (err) {
       console.log(err);
@@ -355,6 +373,7 @@ class ContractsController {
         contract_id: communityContractTemplateMetadata.contract_id,
         cct_id: updateContract.cct.id,
         cctmd: updateContract.cctmd,
+        isNewCCT: false,
       });
     } catch (err) {
       console.log(err);

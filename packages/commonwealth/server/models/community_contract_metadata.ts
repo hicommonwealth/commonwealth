@@ -28,7 +28,6 @@ export default (
       id: {
         type: dataTypes.INTEGER,
         autoIncrement: true,
-        allowNull: false,
         primaryKey: true,
       },
       slug: { type: dataTypes.STRING, allowNull: false },

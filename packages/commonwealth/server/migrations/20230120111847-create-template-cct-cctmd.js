@@ -29,7 +29,6 @@ module.exports = {
           type: Sequelize.INTEGER,
           primaryKey: true,
           autoIncrement: true,
-          allowNull: false,
         },
         slug: {
           type: Sequelize.STRING,

@@ -81,12 +81,13 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     };
 
     try {
-      // TODO does not work
       await app.contracts.addCommunityContractTemplate(
         communityContractTemplateAndMetadata
       );
 
       this.closeModalOnSuccess(e);
+      console.log(app.contracts.store);
+      m.redraw();
     } catch (err) {
       notifyError(err.message);
     }
@@ -131,11 +132,8 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     this.form.displayName = template.name;
   }
 
-  async oninit(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
+  oninit(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
     const { contractId, templateId, template, templates } = vnode.attrs;
-    this.contractTemplates =
-      (await app.contracts.getTemplatesForContract(contractId)) || [];
-
     const isEditMode = !!templateId;
 
     if (isEditMode) {
@@ -145,6 +143,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
       this.form.slug = template.slug;
       this.form.displayOption = template.display;
     }
+    this.contractTemplates = templates;
   }
 
   view(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
@@ -168,6 +167,8 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     const initialTemplateName = isEditMode
       ? templateOptions.find((option) => +option.value === this.form.templateId)
       : { label: 'Select template type ', value: '' };
+
+    console.log({ displayOptions: this.form.displayOption });
 
     const initialDisplayOption = isEditMode
       ? displayOptions.find(
@@ -286,12 +287,19 @@ type ShowManageContractTemplateModalAttrs = {
     slug: string;
     display: string;
   };
+  templates: Array<{
+    id: number;
+    abi_id: string;
+    template: string;
+    name: string;
+  }>; // Global Templates
 };
 
 export const showManageContractTemplateModal = ({
   contractId,
   templateId,
   template,
+  templates,
 }: ShowManageContractTemplateModalAttrs) => {
   app.modals.create({
     modal: ManageContractTemplateModal,
@@ -300,6 +308,7 @@ export const showManageContractTemplateModal = ({
       contractId,
       templateId,
       template,
+      templates,
     },
   });
 };
