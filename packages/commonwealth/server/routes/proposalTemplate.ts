@@ -180,17 +180,19 @@ export async function updateCommunityContractTemplate(
       );
     }
 
-    const communityContractTemplate = await models.CommunityContractTemplate.findOne({
-      where: { id: contract_id },
-    });
+    const communityContractTemplate =
+      await models.CommunityContractTemplate.findOne({
+        where: { id: contract_id },
+      });
 
-  if (!communityContractTemplate) {
-    throw new AppError('Failed to create community contract');
-  }
+    if (!communityContractTemplate) {
+      throw new AppError('Failed to create community contract');
+    }
 
-    const metadataToUpdate = await models.CommunityContractTemplateMetadata.findOne({
-      where: { id: communityContractTemplate.cctmd_id },
-    })
+    const metadataToUpdate =
+      await models.CommunityContractTemplateMetadata.findOne({
+        where: { id: communityContractTemplate.cctmd_id },
+      });
 
     if (!metadataToUpdate) {
       throw new AppError('Failed to find metadata to update');
