@@ -23,6 +23,7 @@ const DiscussionsRedirect = lazy(
   () => import('./views/pages/discussions_redirect')
 );
 const OverviewPage = lazy(() => import('./views/pages/overview'));
+const FeedPage = lazy(() => import('./views/pages/feed'));
 const SputnikDAOsPage = lazy(() => import('./views/pages/sputnikdaos'));
 const ChatPage = lazy(() => import('./views/pages/chat'));
 const NewThreadPage = lazy(() => import('./views/pages/new_thread'));
@@ -194,6 +195,10 @@ const App = () => {
         <Route
           path="/:scope/overview"
           element={withLayout(OverviewPage, { scoped: true, deferChain: true })}
+        />
+        <Route
+          path="/:scope/feed"
+          element={withLayout(FeedPage, { scoped: true, deferChain: true })}
         />
         <Route
           path="/:scope/discussions/:topic"
