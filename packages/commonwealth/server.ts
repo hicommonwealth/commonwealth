@@ -38,6 +38,7 @@ import setupAppRoutes from './server/scripts/setupAppRoutes';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
+import externalSwagger from './server/swagger/swagger_external.json';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupEntityProxy from './server/util/entitiesProxy';
@@ -49,6 +50,7 @@ import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
+import swaggerUi from 'swagger-ui-express';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -271,6 +273,7 @@ async function main() {
 
   // new API
   addExternalRoutes('/external', app, models, tokenBalanceCache);
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(externalSwagger));
   addSwagger('/docs', app);
 
   setupCosmosProxy(app, models);
