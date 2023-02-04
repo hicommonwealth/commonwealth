@@ -254,25 +254,6 @@ class SubstrateIdentities implements StorageModule {
     );
   }
 
-  public providejudgementTx(
-    who: SubstrateAccount,
-    regIdx: number,
-    target: SubstrateIdentity,
-    judgement: IdentityJudgement
-  ) {
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) =>
-        api.tx.identity.provideJudgement(
-          regIdx,
-          target.account.address,
-          judgement as any // PalletIdentityJudgment
-        ),
-      'providejudgement',
-      `registrar ${regIdx} provides judgement for identity ${target.username}`
-    );
-  }
-
   // requires RegistrarOrigin or Root!
   public addRegistrarMethod(account: SubstrateAccount): Call {
     const func = this._Chain.getTxMethod('identity', 'addRegistrar', [

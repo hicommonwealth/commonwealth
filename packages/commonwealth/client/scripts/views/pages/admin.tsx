@@ -168,12 +168,6 @@ class ChainStats extends ClassComponent {
           <CWLabel label="Voting Bond" />
           <CWText>{formatCoin(substrate.phragmenElections.votingBond)}</CWText>
         </div>
-        <div class="stat">
-          <CWLabel label="Candidacy Bond" />
-          <CWText>
-            {formatCoin(substrate.phragmenElections.candidacyBond)}
-          </CWText>
-        </div>
       </div>
     );
   }
