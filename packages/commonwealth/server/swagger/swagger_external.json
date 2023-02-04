@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/threads": {
+    "/threads2": {
       "get": {
         "summary": "Returns a list of threads.",
         "parameters": [

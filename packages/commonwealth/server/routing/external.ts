@@ -68,7 +68,7 @@ export function addExternalRoutes(
 ): Router {
   const router = express.Router();
 
-  router.get('/threads', getThreadsValidation, getThreads.bind(this, models));
+  router.get('/threads2', getThreadsValidation, getThreads.bind(this, models));
 
   router.get(
     '/comments',
