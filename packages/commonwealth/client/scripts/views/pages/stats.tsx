@@ -51,32 +51,53 @@ class StatsPage extends ClassComponent {
             const aa = activeAccounts.map((a) => Number(a.new_items));
 
             // Comments
-            batchedComments['day'] = c.slice(0, 1).reduce((a, b) => a + b, 0);;
+            batchedComments['day'] = c.slice(0, 1).reduce((a, b) => a + b, 0);
             batchedComments['week'] = c.slice(0, 7).reduce((a, b) => a + b, 0);
-            batchedComments['2week'] = c.slice(0, 14).reduce((a, b) => a + b, 0);
-            batchedComments['month'] = c.slice(0, 28).reduce((a, b) => a + b, 0);
+            batchedComments['2week'] = c
+              .slice(0, 14)
+              .reduce((a, b) => a + b, 0);
+            batchedComments['month'] = c
+              .slice(0, 28)
+              .reduce((a, b) => a + b, 0);
 
             // Roles
-            batchedRoles['day'] = r.slice(0, 1).reduce((a, b) => a + b, 0);;
+            batchedRoles['day'] = r.slice(0, 1).reduce((a, b) => a + b, 0);
             batchedRoles['week'] = r.slice(0, 7).reduce((a, b) => a + b, 0);
             batchedRoles['2week'] = r.slice(0, 14).reduce((a, b) => a + b, 0);
             batchedRoles['month'] = r.slice(0, 28).reduce((a, b) => a + b, 0);
 
             // Threads
-            batchedThreads['day'] = t.slice(0, 1).reduce((a, b) => a + b, 0);;
+            batchedThreads['day'] = t.slice(0, 1).reduce((a, b) => a + b, 0);
             batchedThreads['week'] = t.slice(0, 7).reduce((a, b) => a + b, 0);
             batchedThreads['2week'] = t.slice(0, 14).reduce((a, b) => a + b, 0);
             batchedThreads['month'] = t.slice(0, 28).reduce((a, b) => a + b, 0);
 
             // Active Accounts
-            batchedActiveAccounts['day'] = aa.slice(0, 1).reduce((a, b) => a + b, 0);;
-            batchedActiveAccounts['week'] = aa.slice(0, 7).reduce((a, b) => a + b, 0);
-            batchedActiveAccounts['2week'] = aa.slice(0, 14).reduce((a, b) => a + b, 0);
-            batchedActiveAccounts['month'] = aa.slice(0, 28).reduce((a, b) => a + b, 0);
+            batchedActiveAccounts['day'] = aa
+              .slice(0, 1)
+              .reduce((a, b) => a + b, 0);
+            batchedActiveAccounts['week'] = aa
+              .slice(0, 7)
+              .reduce((a, b) => a + b, 0);
+            batchedActiveAccounts['2week'] = aa
+              .slice(0, 14)
+              .reduce((a, b) => a + b, 0);
+            batchedActiveAccounts['month'] = aa
+              .slice(0, 28)
+              .reduce((a, b) => a + b, 0);
 
-            this.batchedData = { batchedRoles, batchedComments, batchedThreads, batchedActiveAccounts };
-            console.log(batchedRoles, batchedThreads, batchedComments, batchedActiveAccounts)
-
+            this.batchedData = {
+              batchedRoles,
+              batchedComments,
+              batchedThreads,
+              batchedActiveAccounts,
+            };
+            console.log(
+              batchedRoles,
+              batchedThreads,
+              batchedComments,
+              batchedActiveAccounts
+            );
 
             const data = {};
             result.comments.forEach(({ date, new_items }) => {
@@ -116,7 +137,7 @@ class StatsPage extends ClassComponent {
           m.redraw();
         })
         .catch((error: any) => {
-          console.log(error)
+          console.log(error);
           if (error.responseJSON?.error) {
             this.error = error.responseJSON.error;
           } else if (error.responseText) {
@@ -144,7 +165,12 @@ class StatsPage extends ClassComponent {
         />
       );
 
-    const { batchedRoles, batchedComments, batchedThreads, batchedActiveAccounts } = this.batchedData;
+    const {
+      batchedRoles,
+      batchedComments,
+      batchedThreads,
+      batchedActiveAccounts,
+    } = this.batchedData;
     return (
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Analytics" />}
