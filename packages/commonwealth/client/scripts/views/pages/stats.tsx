@@ -151,7 +151,7 @@ class StatsPage extends ClassComponent {
       >
         <div class="StatsPage">
           <div class="stat-row">
-            <CWText fontWeight="medium">Duration</CWText>
+            <CWText fontWeight="medium"></CWText>
             <CWText fontWeight="medium">New Addresses</CWText>
             <CWText fontWeight="medium">New Comments</CWText>
             <CWText fontWeight="medium">New Threads</CWText>
