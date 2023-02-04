@@ -30,7 +30,7 @@ const communityStats = async (
     return next(new AppError('Must be admin'));
   }
 
-  const numberOfPrevDays = 14;
+  const numberOfPrevDays = 27;
 
   // get new objects created over the last ${numberOfPrevDays} days
   const newObjectsQuery = async (table, chainName) => {
