@@ -125,9 +125,13 @@ async function main() {
   const setupMiddleware = () => {
     // redirect from commonwealthapp.herokuapp.com to commonwealth.im
     app.all(/.*/, (req, res, next) => {
+      if (req.ip.includes(process.env.DISABLE_REDIRECT_URL)) {
+        next();
+      }
+
       const host = req.header('host');
-      if (host.match(/commonwealthapp.herokuapp.com/i)) {
-        res.redirect(301, `https://commonwealth.im${req.url}`);
+      if (host.match(`/${process.env.HEROKU_APP_NAME}.herokuapp.com/i`)) {
+        res.redirect(301, `${process.env.SERVER_URL}${req.url}`);
       } else {
         next();
       }
