@@ -151,61 +151,45 @@ class StatsPage extends ClassComponent {
       >
         <div class="StatsPage">
           <div class="stat-row">
-            <CWText fontWeight="medium"></CWText>
+            <CWText fontWeight="medium">Duration</CWText>
             <CWText fontWeight="medium">New Addresses</CWText>
             <CWText fontWeight="medium">New Comments</CWText>
             <CWText fontWeight="medium">New Threads</CWText>
             <CWText fontWeight="medium">Active Addresses</CWText>
           </div>
           <div class="stat-row">
-            <CWText fontWeight="medium">24 hours</CWText>
-            <CWText fontWeight="medium">{batchedRoles['day']}</CWText>
-            <CWText fontWeight="medium">{batchedComments['day']}</CWText>
-            <CWText fontWeight="medium">{batchedThreads['day']}</CWText>
-            <CWText fontWeight="medium">{batchedActiveAccounts['day']}</CWText>
+            <CWText>24 hours</CWText>
+            <CWText>{batchedRoles['day']}</CWText>
+            <CWText>{batchedComments['day']}</CWText>
+            <CWText>{batchedThreads['day']}</CWText>
+            <CWText>{batchedActiveAccounts['day']}</CWText>
           </div>
           <div class="stat-row">
-            <CWText fontWeight="medium">1 week</CWText>
-            <CWText fontWeight="medium">{batchedRoles['week']}</CWText>
-            <CWText fontWeight="medium">{batchedComments['week']}</CWText>
-            <CWText fontWeight="medium">{batchedThreads['week']}</CWText>
-            <CWText fontWeight="medium">{batchedActiveAccounts['week']}</CWText>
+            <CWText>1 week</CWText>
+            <CWText>{batchedRoles['week']}</CWText>
+            <CWText>{batchedComments['week']}</CWText>
+            <CWText>{batchedThreads['week']}</CWText>
+            <CWText>{batchedActiveAccounts['week']}</CWText>
           </div>
           <div class="stat-row">
-            <CWText fontWeight="medium">2 weeks</CWText>
-            <CWText fontWeight="medium">{batchedRoles['2week']}</CWText>
-            <CWText fontWeight="medium">{batchedComments['2week']}</CWText>
-            <CWText fontWeight="medium">{batchedThreads['2week']}</CWText>
-            <CWText fontWeight="medium">{batchedActiveAccounts['2week']}</CWText>
+            <CWText>2 weeks</CWText>
+            <CWText>{batchedRoles['2week']}</CWText>
+            <CWText>{batchedComments['2week']}</CWText>
+            <CWText>{batchedThreads['2week']}</CWText>
+            <CWText>{batchedActiveAccounts['2week']}</CWText>
           </div>
           <div class="stat-row">
-            <CWText fontWeight="medium">1 month</CWText>
-            <CWText fontWeight="medium">{batchedRoles['month']}</CWText>
-            <CWText fontWeight="medium">{batchedComments['month']}</CWText>
-            <CWText fontWeight="medium">{batchedThreads['month']}</CWText>
-            <CWText fontWeight="medium">{batchedActiveAccounts['month']}</CWText>
-          </div>
-          {/* {_.orderBy(Object.entries(this.data), (o) => o[0])
-            .reverse()
-            .map(([date, row]: [any, any]) => (
-              <div class="stat-row">
-                <CWText>{moment(date).format('l')}</CWText>
-                <CWText>{row.roles || 0}</CWText>
-                <CWText>{row.comments || 0}</CWText>
-                <CWText>{row.threads || 0}</CWText>
-                <CWText>{row.activeAccounts}</CWText>
-              </div>
-            ))} */}
-
-          <div class="stat-row">
-            <CWText fontWeight="medium">Total Addresses</CWText>
-            <CWText fontWeight="medium">Total Comments</CWText>
-            <CWText fontWeight="medium">Total Threads</CWText>
+            <CWText>1 month</CWText>
+            <CWText>{batchedRoles['month']}</CWText>
+            <CWText>{batchedComments['month']}</CWText>
+            <CWText>{batchedThreads['month']}</CWText>
+            <CWText>{batchedActiveAccounts['month']}</CWText>
           </div>
           <div class="stat-row">
-            <CWText>{this.totalData.totalRoles}</CWText>
-            <CWText>{this.totalData.totalComments}</CWText>
-            <CWText>{this.totalData.totalThreads}</CWText>
+            <CWText fontWeight="medium">{'Total (all time)'}</CWText>
+            <CWText fontWeight="medium">{this.totalData.totalRoles}</CWText>
+            <CWText fontWeight="medium">{this.totalData.totalComments}</CWText>
+            <CWText fontWeight="medium">{this.totalData.totalThreads}</CWText>
           </div>
         </div>
       </Sublayout>
