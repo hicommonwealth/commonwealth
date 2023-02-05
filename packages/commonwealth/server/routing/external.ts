@@ -1,3 +1,4 @@
+import { app } from 'chain-events/services/app/Server';
 import type {
   PostReactionsReq,
   PostRolesReq,
@@ -5,6 +6,7 @@ import type {
   PostTopicsReq,
   PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
+import cors from 'cors';
 import express from 'express';
 import type { DB } from 'commonwealth/server/models';
 import {
@@ -201,6 +203,11 @@ export function addExternalRoutes(
     getTokenBalanceValidation,
     getTokenBalance.bind(this, models, tokenBalanceCache)
   );
+
+  app.use(cors());
+
+  // cors pre-flight request
+  app.options('*', cors());
 
   app.use(endpoint, router);
 
