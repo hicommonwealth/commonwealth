@@ -145,21 +145,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
           r.preimage?.args[0] === proposal.identifier
       );
 
-      const councilMotions = (
-        (app.chain as Substrate).council?.store?.getAll() || []
-      ).filter(
-        (mo) =>
-          mo.call.section === 'treasury' &&
-          (mo.call.method === 'approveProposal' ||
-            mo.call.method === 'rejectProposal') &&
-          mo.call.args[0] === proposal.identifier
-      );
-
-      if (
-        democracyProposals.length === 0 &&
-        referenda.length === 0 &&
-        councilMotions.length === 0
-      ) {
+      if (democracyProposals.length === 0 && referenda.length === 0) {
         return;
       }
 

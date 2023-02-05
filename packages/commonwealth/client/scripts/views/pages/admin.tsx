@@ -157,17 +157,6 @@ class ChainStats extends ClassComponent {
             {formatCoin(substrate.democracyProposals.minimumDeposit)}
           </CWText>
         </div>
-        <CWText type="h5">Phragmen Elections</CWText>
-        <div class="stat">
-          <CWLabel label="Term Length" />
-          <CWText>
-            {formatBlocks(substrate.phragmenElections.termDuration)}
-          </CWText>
-        </div>
-        <div class="stat">
-          <CWLabel label="Voting Bond" />
-          <CWText>{formatCoin(substrate.phragmenElections.votingBond)}</CWText>
-        </div>
       </div>
     );
   }

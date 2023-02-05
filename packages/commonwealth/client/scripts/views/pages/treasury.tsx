@@ -25,12 +25,7 @@ function getModules() {
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
-    return [
-      chain.council,
-      chain.treasury,
-      chain.democracyProposals,
-      chain.democracy,
-    ];
+    return [chain.treasury, chain.democracyProposals, chain.democracy];
   } else {
     throw new Error('invalid chain');
   }
