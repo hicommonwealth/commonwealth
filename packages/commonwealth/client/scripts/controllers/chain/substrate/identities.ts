@@ -4,7 +4,6 @@ import type {
   AccountId,
   Call,
   IdentityFields,
-  IdentityJudgement,
   RegistrarInfo,
 } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';

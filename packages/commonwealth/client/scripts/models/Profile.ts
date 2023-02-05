@@ -12,7 +12,6 @@ class Profile {
   private _bio: string;
   private _avatarUrl: string;
   private _initialized: boolean;
-  private _judgements: { [registrar: string]: string } = {};
   private _isOnchain = false;
   private _lastActive: Date;
   private _isCouncillor = false;
@@ -38,10 +37,6 @@ class Profile {
 
   get initialized() {
     return this._initialized;
-  }
-
-  get judgements() {
-    return this._judgements;
   }
 
   get isOnchain() {
@@ -94,7 +89,6 @@ class Profile {
     headline,
     bio,
     avatarUrl,
-    judgements,
     lastActive,
     isCouncillor = false,
     isValidator = false
@@ -106,7 +100,6 @@ class Profile {
     this._headline = headline;
     this._bio = bio;
     this._avatarUrl = avatarUrl;
-    this._judgements = judgements;
     this._lastActive = lastActive;
     this._isCouncillor = isCouncillor;
     this._isValidator = isValidator;

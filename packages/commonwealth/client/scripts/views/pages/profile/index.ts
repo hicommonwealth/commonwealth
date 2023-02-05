@@ -181,7 +181,6 @@ const loadProfile = async (
           profileData?.headline,
           profileData?.bio,
           profileData?.avatarUrl,
-          a.OffchainProfile.judgements,
           a.last_active,
           a.is_councillor,
           a.is_validator

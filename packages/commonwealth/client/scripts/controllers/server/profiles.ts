@@ -130,7 +130,6 @@ class ProfilesController {
                   pInfo.headline,
                   pInfo.bio,
                   pInfo.avatarUrl,
-                  profileData.judgements,
                   lastActive,
                   isCouncillor,
                   isValidator
