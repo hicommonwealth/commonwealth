@@ -79,28 +79,3 @@ export interface ISubstrateTreasuryTip extends IIdentifiable {
   closing?: number;
   payout?: u128;
 }
-
-export interface ISubstrateCollectiveProposal extends IIdentifiable {
-  hash: string;
-  index: number;
-  threshold: number;
-}
-
-export interface ISubstratePhragmenElection extends IIdentifiable {
-  round: number;
-  endBlock: number;
-}
-
-export interface IPhragmenVote {
-  votes: string[];
-  stake: u128;
-}
-
-export interface IPhragmenResult {
-  who: string;
-  score: u128;
-}
-
-export interface ISubstratePhragmenElectionState extends ICompletable {
-  candidates: string[];
-}

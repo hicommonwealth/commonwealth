@@ -383,7 +383,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/overview': redirectRoute(() => '/overview'),
   '/:scope/projects': redirectRoute(() => '/projects'),
   '/:scope/backers': redirectRoute(() => '/backers'),
-  '/:scope/collectives': redirectRoute(() => '/collectives'),
   '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
   '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
   '/:scope/home': redirectRoute(() => '/'),
