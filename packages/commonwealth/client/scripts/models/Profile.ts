@@ -14,7 +14,6 @@ class Profile {
   private _initialized: boolean;
   private _isOnchain = false;
   private _lastActive: Date;
-  private _isCouncillor = false;
   private _isValidator = false;
   private _isEmpty = false;
   private _isNameInvalid = false;
@@ -45,10 +44,6 @@ class Profile {
 
   get lastActive() {
     return this._lastActive;
-  }
-
-  get isCouncillor() {
-    return this._isCouncillor;
   }
 
   get isValidator() {
@@ -90,7 +85,6 @@ class Profile {
     bio,
     avatarUrl,
     lastActive,
-    isCouncillor = false,
     isValidator = false
   ) {
     this._initialized = true;
@@ -101,7 +95,6 @@ class Profile {
     this._bio = bio;
     this._avatarUrl = avatarUrl;
     this._lastActive = lastActive;
-    this._isCouncillor = isCouncillor;
     this._isValidator = isValidator;
   }
 
@@ -111,7 +104,6 @@ class Profile {
     bio,
     avatarUrl,
     lastActive,
-    isCouncillor = false,
     isValidator = false
   ) {
     this._initialized = true;
@@ -121,7 +113,6 @@ class Profile {
     this._bio = bio;
     this._avatarUrl = avatarUrl;
     this._lastActive = lastActive;
-    this._isCouncillor = isCouncillor;
     this._isValidator = isValidator;
   }
 

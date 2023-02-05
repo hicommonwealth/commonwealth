@@ -2,7 +2,6 @@ import { Compact, u128 } from '@polkadot/types';
 import type { Call } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import type BN from 'bn.js';
-import type { BountyStatus } from 'models/types';
 import { Coin } from '../../currency';
 import type { ICompletable, IIdentifiable } from '../../shared';
 
@@ -79,17 +78,6 @@ export interface ISubstrateTreasuryTip extends IIdentifiable {
   findersFee: boolean;
   closing?: number;
   payout?: u128;
-}
-
-export interface ISubstrateBounty extends IIdentifiable {
-  index: number;
-  proposer: string;
-  value: u128;
-  fee: u128;
-  curator_deposit: u128;
-  bond: u128;
-  description: string;
-  status?: BountyStatus;
 }
 
 export interface ISubstrateCollectiveProposal extends IIdentifiable {

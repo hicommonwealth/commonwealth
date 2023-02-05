@@ -719,36 +719,6 @@ export class CWCopy extends ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCouncilProposal extends ClassComponent<IconAttrs> {
-  view(vnode: m.Vnode<IconAttrs>) {
-    const {
-      className,
-      componentType,
-      disabled,
-      iconButtonTheme,
-      iconSize,
-      selected,
-      ...otherAttrs
-    } = vnode.attrs;
-    return (
-      <svg
-        class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
-          componentType
-        )}
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        fill="none"
-        viewBox="0 0 32 32"
-        {...otherAttrs}
-      >
-        <path d="M14.586 8.914a2 2 0 012.828 0l6.364 6.364a2 2 0 010 2.829l-6.364 6.364a2 2 0 01-2.828 0l-6.364-6.364a2 2 0 010-2.829l6.364-6.364zM11 8.5a3 3 0 11-6 0 3 3 0 016 0zM27 8.5a3 3 0 11-6 0 3 3 0 016 0zM11 24.5a3 3 0 11-6 0 3 3 0 016 0zM27 24.5a3 3 0 11-6 0 3 3 0 016 0z"></path>
-      </svg>
-    );
-  }
-}
-
 export class CWCow extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {

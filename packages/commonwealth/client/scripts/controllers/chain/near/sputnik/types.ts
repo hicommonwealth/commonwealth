@@ -153,8 +153,6 @@ export type NearSputnikProposalKind =
   | 'UpgradeRemote'
   | 'Transfer'
   | 'SetStakingContract'
-  | 'AddBounty'
-  | 'BountyDone'
   | 'Vote'
   | ChangePolicy
   | AddMemberToRole
@@ -206,8 +204,6 @@ export function kindToPolicyLabel(kind: NearSputnikProposalKind): string {
   if (kind === 'UpgradeRemote') return 'upgrade_remote';
   if (kind === 'Transfer' || isTransfer(kind)) return 'transfer';
   if (kind === 'SetStakingContract') return 'set_vote_token';
-  if (kind === 'AddBounty') return 'add_bounty';
-  if (kind === 'BountyDone') return 'bounty_done';
   if (kind === 'Vote') return 'vote';
   if (isAddMemberToRole(kind)) return 'add_member_to_role';
   if (isRemoveMemberFromRole(kind)) return 'remove_member_from_role';

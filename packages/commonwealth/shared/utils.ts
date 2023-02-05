@@ -64,7 +64,6 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
   return (
     type === ProposalType.SubstrateDemocracyReferendum ||
     type === ProposalType.SubstrateDemocracyProposal ||
-    type === ProposalType.SubstrateBountyProposal ||
     type === ProposalType.SubstrateTreasuryTip ||
     type === ProposalType.SubstrateCollectiveProposal ||
     type === ProposalType.SubstrateTechnicalCommitteeMotion ||

@@ -114,7 +114,7 @@ class TreasuryPage extends ClassComponent {
                 {
                   statName: 'Treasury Proposals',
                   statDescription: `are used to request funds from the on-chain \
-                  treasury. They are approved/rejected by referendum or council.`,
+                  treasury. They are approved/rejected by referendum.`,
                 },
               ]}
               stats={[
