@@ -148,9 +148,7 @@ export const getCanVote = (
     canVote = false;
   } else if (hasVotedForAnyChoice) {
     // enable re-voting for particular types
-    if (
-      proposal instanceof SubstrateDemocracyProposal
-    ) {
+    if (proposal instanceof SubstrateDemocracyProposal) {
       canVote = true;
     } else {
       canVote = false;

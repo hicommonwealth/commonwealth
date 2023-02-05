@@ -172,7 +172,7 @@ export const getPrimaryTagText = (proposal: AnyProposal) => `
 
 export const getSecondaryTagText = (proposal: AnyProposal) => {
   if (
-    (proposal instanceof SubstrateDemocracyProposal) &&
+    proposal instanceof SubstrateDemocracyProposal &&
     proposal.getReferendum()
   ) {
     return `REF #${proposal.getReferendum().identifier}`;

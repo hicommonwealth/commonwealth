@@ -91,7 +91,8 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
 
     if (
       proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateDemocracyReferendum) {
+      proposal instanceof SubstrateDemocracyReferendum
+    ) {
       user = app.user.activeAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
       user = app.user.activeAccount as CosmosAccount;

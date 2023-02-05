@@ -73,7 +73,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
 
       return (
         <div class="LinkedProposalsEmbed">
-          {(proposal instanceof SubstrateDemocracyProposal) &&
+          {proposal instanceof SubstrateDemocracyProposal &&
             proposal.getReferendum() && (
               <>
                 <CWText>
