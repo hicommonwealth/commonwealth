@@ -245,13 +245,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ArrayOfReactions"
-                }
+                  "reactions": {
+                    "address_id": "number",
+                    "reaction": "string",
+                    "id": "number",
+                    "chain": "string",
+                    "thread_id": "number",
+                    "proposal_id": "number",
+                    "comment_id": "number",
+                    "created_at": "date",
+                    "updated_at": "date",
+                    "Chain": {
+                      "ChainAttributes": { }
+                    },
+                    "Address": {
+                      "AddressAttributes": { }
+                    }
+                  },
+                  "count": "number"
               }
             }
           },
           "400": {
             "description": "Bad Request"
+            }
           }
         }
       }
