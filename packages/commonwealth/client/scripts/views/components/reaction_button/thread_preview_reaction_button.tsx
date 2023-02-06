@@ -95,36 +95,37 @@ export const ThreadPreviewReactionButton = (
     handleInteraction?: (e: React.MouseEvent<AnchorType>) => void;
   }) => {
     return (
-      <div
-        onMouseEnter={async (e) => {
-          setReactors(await fetchReactionsByPost(thread));
-          buttonProps.handleInteraction(e);
-        }}
-        onMouseLeave={buttonProps.handleInteraction}
-        onClick={async (e) => {
-          if (!app.isLoggedIn() || !app.user.activeAccount) {
-            <Modal
-              content={
-                <LoginModal onModalClose={() => setIsModalOpen(false)} />
-              }
-              isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-              onClose={() => setIsModalOpen(false)}
-              open={isModalOpen}
-            />;
-          } else {
-            onReactionClick(e, hasReacted, dislike, like);
-          }
-        }}
-        className={`ThreadPreviewReactionButton${isLoading ? ' disabled' : ''}${
-          hasReacted ? ' has-reacted' : ''
-        }`}
-      >
-        <CWIcon
-          iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
-          iconSize="small"
+      <React.Fragment>
+        <Modal
+          content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsModalOpen(false)}
+          open={isModalOpen}
         />
-        <div className="reactions-count">{likes}</div>
-      </div>
+        <div
+          onMouseEnter={async (e) => {
+            setReactors(await fetchReactionsByPost(thread));
+            buttonProps.handleInteraction(e);
+          }}
+          onMouseLeave={buttonProps.handleInteraction}
+          onClick={async (e) => {
+            if (!app.isLoggedIn() || !app.user.activeAccount) {
+              setIsModalOpen(true);
+            } else {
+              onReactionClick(e, hasReacted, dislike, like);
+            }
+          }}
+          className={`ThreadPreviewReactionButton${
+            isLoading ? ' disabled' : ''
+          }${hasReacted ? ' has-reacted' : ''}`}
+        >
+          <CWIcon
+            iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
+            iconSize="small"
+          />
+          <div className="reactions-count">{likes}</div>
+        </div>
+      </React.Fragment>
     );
   };
 

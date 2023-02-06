@@ -98,65 +98,66 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
   };
 
   return (
-    <div
-      className={getClasses<{ disabled?: boolean }>(
-        { disabled: isLoading },
-        'CommentReactionButton'
-      )}
-      onMouseEnter={async () => {
-        setReactors(await fetchReactionsByPost(comment));
-      }}
-    >
-      <CWIconButton
-        iconName="upvote"
-        iconSize="small"
-        selected={hasReacted}
-        onClick={async (e) => {
-          if (!app.isLoggedIn() || !app.user.activeAccount) {
-            <Modal
-              content={
-                <LoginModal onModalClose={() => setIsModalOpen(false)} />
-              }
-              isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-              onClose={() => setIsModalOpen(false)}
-              open={isModalOpen}
-            />;
-          } else {
-            onReactionClick(e, hasReacted, dislike, like);
-          }
-        }}
+    <React.Fragment>
+      <Modal
+        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
       />
-      {likes > 0 ? (
-        <CWTooltip
-          content={
-            <div className="reaction-button-tooltip-contents">
-              {getDisplayedReactorsForPopup({
-                likes,
-                reactors: reactors,
-              })}
-            </div>
-          }
-          renderTrigger={(handleInteraction) => (
-            <CWText
-              onMouseEnter={handleInteraction}
-              onMouseLeave={handleInteraction}
-              className="menu-buttons-text"
-              type="caption"
-              fontWeight="medium"
-            >
-              {likes}
-            </CWText>
-          )}
+      <div
+        className={getClasses<{ disabled?: boolean }>(
+          { disabled: isLoading },
+          'CommentReactionButton'
+        )}
+        onMouseEnter={async () => {
+          setReactors(await fetchReactionsByPost(comment));
+        }}
+      >
+        <CWIconButton
+          iconName="upvote"
+          iconSize="small"
+          selected={hasReacted}
+          onClick={async (e) => {
+            if (!app.isLoggedIn() || !app.user.activeAccount) {
+              setIsModalOpen(true);
+            } else {
+              onReactionClick(e, hasReacted, dislike, like);
+            }
+          }}
         />
-      ) : (
-        <CWText
-          className="menu-buttons-text"
-          type="caption"
-          fontWeight="medium"
-        >
-          {likes}
-        </CWText>
-      )}
-    </div>
+        {likes > 0 ? (
+          <CWTooltip
+            content={
+              <div className="reaction-button-tooltip-contents">
+                {getDisplayedReactorsForPopup({
+                  likes,
+                  reactors: reactors,
+                })}
+              </div>
+            }
+            renderTrigger={(handleInteraction) => (
+              <CWText
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+                className="menu-buttons-text"
+                type="caption"
+                fontWeight="medium"
+              >
+                {likes}
+              </CWText>
+            )}
+          />
+        ) : (
+          <CWText
+            className="menu-buttons-text"
+            type="caption"
+            fontWeight="medium"
+          >
+            {likes}
+          </CWText>
+        )}
+      </div>
+    </React.Fragment>
   );
 };

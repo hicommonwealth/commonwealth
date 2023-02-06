@@ -143,10 +143,12 @@ export class ModalExitButton extends ClassComponent<ModalExitButtonAttrs> {
 
 import ModalUnstyled from '@mui/base/ModalUnstyled';
 
+// Backdrop is needed for modal clickaway events
 const Backdrop = React.forwardRef<
   HTMLDivElement,
   { className: string; ownerState: any }
 >((props, ref) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { ownerState, ...other } = props;
   // pull out ownerState per https://github.com/mui/material-ui/issues/32882
 
