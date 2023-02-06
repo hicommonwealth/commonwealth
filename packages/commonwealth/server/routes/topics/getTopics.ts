@@ -1,4 +1,7 @@
-import type { GetTopicsReq, GetTopicsResp, } from 'common-common/src/api/extApiTypes';
+import type {
+  GetTopicsReq,
+  GetTopicsResp,
+} from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
 import Sequelize, { Op } from 'sequelize';
 import type { DB } from '../../models';
@@ -25,21 +28,25 @@ export const getTopics = async (
 
   const { community_id, count_only } = req.query;
 
-  const where = { chain_id: community_id, };
+  const where = { chain_id: community_id };
 
   // Join in last_commented_on of thread that is most recently commented on
-  const include = [{
-    model: models.Thread,
-    as: 'threads',
-    where: {
-      [Op.and]: [Sequelize.literal(` "threads"."last_commented_on" = (
+  const include = [
+    {
+      model: models.Thread,
+      as: 'threads',
+      where: {
+        [Op.and]: [
+          Sequelize.literal(` "threads"."last_commented_on" = (
       Select MAX(last_commented_on)
       FROM "Threads"
       WHERE
-      "Threads"."topic_id" = "Topic"."id")`)],
+      "Threads"."topic_id" = "Topic"."id")`),
+        ],
+      },
+      attributes: ['last_commented_on'],
     },
-    attributes: [['last_commented_on', 'latest_activity']]
-  }];
+  ];
 
   let topics, count;
   if (!count_only) {
@@ -53,9 +60,17 @@ export const getTopics = async (
     count = await models.Topic.count({
       where,
       ...formatPagination(req.query),
-      include
+      include,
     });
   }
+
+  // rename the threads.last_commented_on field
+  topics.forEach((t) => {
+    if (t['threads.last_commented_on']) {
+      t['latest_activity'] = t['threads.last_commented_on'];
+      delete t['threads.last_commented_on'];
+    }
+  });
 
   return success(res, { topics, count });
 };

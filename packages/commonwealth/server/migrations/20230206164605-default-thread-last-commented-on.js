@@ -8,5 +8,5 @@ UPDATE "Threads" SET last_commented_on=created_at WHERE last_commented_on is NUL
 
   down: async (queryInterface, Sequelize) => {
     return Promise.resolve();
-  }
+  },
 };

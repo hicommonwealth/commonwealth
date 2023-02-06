@@ -94,7 +94,7 @@ export default (
       last_commented_on: {
         type: dataTypes.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW
+        defaultValue: Sequelize.NOW,
       },
     },
     {
