@@ -163,10 +163,10 @@ class ContractsController {
       });
       this._store.add(new Contract({ ...currentContractInStore, ccts }));
     } else {
-      const ccts = currentContractInStore.ccts;
+      const ccts = currentContractInStore.ccts || [];
       ccts.push({
         id: cct_id,
-        communityContractId: ccts[0].communityContractId,
+        communityContractId: contract_id,
         templateId: template_id,
         cctmd: { ...cctmd },
       });
@@ -384,9 +384,11 @@ class ContractsController {
 
   public async deleteCommunityContract(contract: {
     contract_id: number;
-    template_id: string;
+    template_id?: number;
   }) {
     try {
+      const contractToDelete = this._store.getById(contract.contract_id);
+
       await $.ajax({
         url: `${app.serverUrl()}/contract/community_template?community_contract=true`,
         data: {
@@ -395,6 +397,8 @@ class ContractsController {
         },
         type: 'DELETE',
       });
+
+      this._store.remove(contractToDelete);
     } catch (err) {
       console.log(err);
       throw new Error('Failed to delete contract');

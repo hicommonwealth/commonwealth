@@ -3,12 +3,8 @@ import type { Request, Response } from 'express';
 import type { DB } from '../models';
 import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
 import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
-import type {
-  TypedRequestBody,
-  TypedRequestQuery,
-  TypedResponse,
-} from '../types';
-import { success, failure } from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
   cct_id: string;
@@ -17,6 +13,8 @@ type CreateCommunityContractTemplateAndMetadataReq = {
   display_name: string;
   display_options: string;
   contract_id: number;
+  community_id: number;
+  template_id: number;
 };
 
 type CommunityContractTemplateAndMetadataResp = {
@@ -28,11 +26,6 @@ type CommunityContractTemplateRequest = {
   id: number;
   community_contract_id: number;
   cctmd_id: number;
-  template_id: number;
-};
-
-type CommunityContractTemplateResp = {
-  community_contract_id: number;
   template_id: number;
 };
 
@@ -224,7 +217,7 @@ export async function deleteCommunityContractTemplate(
       throw new AppError('Must provide community_contract_id and template_id');
     }
 
-    const { contract_id, template_id } = req.body;
+    const { contract_id, template_id = null } = req.body;
 
     const shouldDeleteCommunityContract = req.query.community_contract;
     const contractTemplate: CommunityContractTemplateAttributes = req.body;

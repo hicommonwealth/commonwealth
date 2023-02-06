@@ -35,8 +35,8 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
         onConfirm: async () => {
           await app.contracts.deleteCommunityContract({
             contract_id: id,
-            template_id: '',
           });
+          m.redraw();
         },
       },
     });
