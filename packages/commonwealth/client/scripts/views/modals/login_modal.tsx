@@ -36,6 +36,7 @@ type LoginModalAttrs = {
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
   onSuccess?: () => void;
+  onModalClose: () => void;
 };
 
 async function signWithWallet<T extends { address: string }>(
@@ -59,7 +60,7 @@ async function signWithWallet<T extends { address: string }>(
   return wallet.signCanvasMessage(account, canvasMessage);
 }
 
-export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
+export class LoginModal extends ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
   private bodyType: LoginBodyType;
@@ -79,7 +80,8 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private magicLoading: boolean;
   private showMobile: boolean;
 
-  oninit(vnode: ResultNode<LoginModalAttrs>) {
+  oncreate(vnode: ResultNode<LoginModalAttrs>) {
+    console.log(vnode);
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
@@ -174,9 +176,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         this.magicLoading = false;
         if (onSuccess) onSuccess();
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          $('.LoginMobile').trigger('modalexit');
+          vnode.attrs.onModalClose();
         } else {
-          $('.LoginDesktop').trigger('modalexit');
+          vnode.attrs.onModalClose();
         }
       } catch (e) {
         notifyError("Couldn't send magic link");
@@ -199,9 +201,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         completeClientLogin(account);
         if (exitOnComplete) {
           if (isWindowMediumSmallInclusive(window.innerWidth)) {
-            $('.LoginMobile').trigger('modalexit');
+            vnode.attrs.onModalClose();
           } else {
-            $('.LoginDesktop').trigger('modalexit');
+            vnode.attrs.onModalClose();
           }
           if (onSuccess) onSuccess();
         }
@@ -217,9 +219,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         }
         if (exitOnComplete) {
           if (isWindowMediumSmallInclusive(window.innerWidth)) {
-            $('.LoginMobile').trigger('modalexit');
+            vnode.attrs.onModalClose();
           } else {
-            $('.LoginDesktop').trigger('modalexit');
+            vnode.attrs.onModalClose();
           }
           if (onSuccess) onSuccess();
         }
@@ -305,9 +307,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         console.log(e);
         notifyError('Failed to create account. Please try again.');
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          $('.LoginMobile').trigger('modalexit');
+          vnode.attrs.onModalClose();
         } else {
-          $('.LoginDesktop').trigger('modalexit');
+          vnode.attrs.onModalClose();
         }
       }
       this.bodyType = 'welcome';
@@ -354,9 +356,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           await app.profiles.updateProfileForAccount(this.primaryAccount, data);
         }
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          $('.LoginMobile').trigger('modalexit');
+          vnode.attrs.onModalClose();
         } else {
-          $('.LoginDesktop').trigger('modalexit');
+          vnode.attrs.onModalClose();
         }
         if (onSuccess) onSuccess();
         redraw();
@@ -364,9 +366,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         console.log(e);
         notifyError('Failed to save profile info');
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
-          $('.LoginMobile').trigger('modalexit');
+          vnode.attrs.onModalClose();
         } else {
-          $('.LoginDesktop').trigger('modalexit');
+          vnode.attrs.onModalClose();
         }
       }
     };
@@ -415,6 +417,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         saveProfileInfoCallback={saveProfileInfoCallback}
         performLinkingCallback={performLinkingCallback}
         showResetWalletConnect={wcEnabled}
+        onModalClose={vnode.attrs.onModalClose}
       />
     ) : (
       <LoginDesktop
@@ -460,6 +463,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         saveProfileInfoCallback={saveProfileInfoCallback}
         performLinkingCallback={performLinkingCallback}
         showResetWalletConnect={wcEnabled}
+        onModalClose={vnode.attrs.onModalClose}
       />
     );
   }

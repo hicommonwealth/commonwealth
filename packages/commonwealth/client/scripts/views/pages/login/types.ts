@@ -47,4 +47,5 @@ export type LoginAttrs = {
   saveProfileInfoCallback: () => void;
   performLinkingCallback: () => void;
   showResetWalletConnect: boolean;
+  onModalClose: () => void;
 };

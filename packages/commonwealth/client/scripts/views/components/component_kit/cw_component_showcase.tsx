@@ -5,6 +5,7 @@ import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
@@ -38,6 +39,7 @@ import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
+import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 
 const displayIcons = (icons) => {
@@ -139,16 +141,46 @@ export const ComponentShowcase = () => {
   const [isToggled, setIsToggled] = React.useState<boolean>(false);
   const [voteCount, setVoteCount] = React.useState<number>(0);
   const [selectedTab, setSelectedTab] = React.useState<number>(1);
-  const [isRadioButtonChecked, setIsRadioButtonChecked] =
-    React.useState<boolean>(false);
-  const [isCheckboxChecked, setIsCheckboxChecked] =
-    React.useState<boolean>(false);
+  const [isRadioButtonChecked, setIsRadioButtonChecked] = React.useState<
+    boolean
+  >(false);
+  const [isCheckboxChecked, setIsCheckboxChecked] = React.useState<boolean>(
+    false
+  );
   const [radioGroupSelection, setRadioGroupSelection] = React.useState<string>(
     radioGroupOptions[2].value
   );
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = React.useState<
+    boolean
+  >(false);
 
   return (
     <div className="ComponentShowcase">
+      <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
+      <Modal
+        content={<div>hi</div>}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+      <CWButton
+        label="Full Screen Modal"
+        onClick={() => setIsFullScreenModalOpen(true)}
+      />
+      <Modal
+        content={
+          <div>
+            <CWText>hi</CWText>
+            <CWIconButton
+              iconName="close"
+              onClick={() => setIsFullScreenModalOpen(false)}
+            />
+          </div>
+        }
+        isFullScreen
+        onClose={() => setIsFullScreenModalOpen(false)}
+        open={isFullScreenModalOpen}
+      />
       <div className="basic-gallery">
         <CWText type="h3">Popover Menu</CWText>
         <PopoverMenu

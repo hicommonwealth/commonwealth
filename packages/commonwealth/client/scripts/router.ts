@@ -6,7 +6,7 @@ import {
   APPLICATION_UPDATE_ACTION,
   APPLICATION_UPDATE_MESSAGE,
 } from 'helpers/constants';
-import { getRoute, setRoute, getRouteParam, render } from './mithrilInterop';
+import { getRoute, getRouteParam, setRoute, render } from 'mithrilInterop';
 
 export const pathIsDiscussion = (
   scope: string | null,

@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { redraw, jsx } from 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -21,98 +11,120 @@ import app from 'state';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
-import { getClasses } from '../component_kit/helpers';
+import {
+  getClasses,
+  isWindowMediumSmallInclusive,
+} from '../component_kit/helpers';
 import {
   fetchReactionsByPost,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
+import { LoginModal } from '../../modals/login_modal';
+import { Modal } from '../component_kit/cw_modal';
 
-type CommentReactionButtonAttrs = {
+type CommentReactionButtonProps = {
   comment: Comment<any>;
 };
 
-export class CommentReactionButton extends ClassComponent<CommentReactionButtonAttrs> {
-  private loading: boolean;
-  private reactors: any;
+export const CommentReactionButton = (props: CommentReactionButtonProps) => {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [reactors, setReactors] = React.useState<Array<any>>([]);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-  oninit() {
-    this.loading = false;
-  }
+  const { comment } = props;
+  const reactionCounts = app.reactionCounts.store.getByPost(comment);
+  const { likes = 0, hasReacted } = reactionCounts || {};
 
-  view(vnode: ResultNode<CommentReactionButtonAttrs>) {
-    const { comment } = vnode.attrs;
-    const reactionCounts = app.reactionCounts.store.getByPost(comment);
-    const { likes = 0, hasReacted } = reactionCounts || {};
+  // token balance check if needed
+  const isAdmin =
+    app.user.isSiteAdmin ||
+    app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
-    // token balance check if needed
-    const isAdmin =
-      app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+  // post.rootProposal has typescript typedef number but in practice seems to be a string
+  const parentThread = app.threads.getById(
+    parseInt(comment.rootProposal.toString().split('_')[1], 10)
+  );
 
-    // post.rootProposal has typescript typedef number but in practice seems to be a string
-    const parentThread = app.threads.getById(
-      parseInt(comment.rootProposal.toString().split('_')[1], 10)
-    );
+  const topicName = parentThread?.topic?.name;
 
-    const topicName = parentThread?.topic?.name;
+  setIsLoading(
+    isLoading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName))
+  );
 
-    this.loading =
-      this.loading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
+  const activeAddress = app.user.activeAccount?.address;
 
-    const activeAddress = app.user.activeAccount?.address;
+  const dislike = async (userAddress: string) => {
+    const reaction = (await fetchReactionsByPost(comment)).find((r) => {
+      return r.Address.address === activeAddress;
+    });
 
-    const dislike = async (userAddress: string) => {
-      const reaction = (await fetchReactionsByPost(comment)).find((r) => {
-        return r.Address.address === activeAddress;
+    setIsLoading(true);
+
+    app.reactionCounts
+      .delete(reaction, {
+        ...reactionCounts,
+        likes: likes - 1,
+        hasReacted: false,
+      })
+      .then(() => {
+        setReactors(
+          reactors.filter(({ Address }) => Address.address !== userAddress)
+        );
+
+        setIsLoading(false);
+
+        redraw();
       });
-      this.loading = true;
-      app.reactionCounts
-        .delete(reaction, {
-          ...reactionCounts,
-          likes: likes - 1,
-          hasReacted: false,
-        })
-        .then(() => {
-          this.reactors = this.reactors.filter(
-            ({ Address }) => Address.address !== userAddress
-          );
-          this.loading = false;
-          redraw();
-        });
-    };
+  };
 
-    const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
-      this.loading = true;
-      app.reactionCounts
-        .create(userAddress, comment, 'like', chainId)
-        .then(() => {
-          this.loading = false;
-          this.reactors = [
-            ...this.reactors,
-            {
-              Address: { address: userAddress, chain },
-            },
-          ];
-          redraw();
-        });
-    };
+  const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
+    setIsLoading(true);
 
-    return (
+    app.reactionCounts
+      .create(userAddress, comment, 'like', chainId)
+      .then(() => {
+        setReactors([
+          ...reactors,
+          {
+            Address: { address: userAddress, chain },
+          },
+        ]);
+
+        setIsLoading(false);
+
+        redraw();
+      });
+  };
+
+  return (
+    <React.Fragment>
+      <Modal
+        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
       <div
         className={getClasses<{ disabled?: boolean }>(
-          { disabled: this.loading },
+          { disabled: isLoading },
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
-          this.reactors = await fetchReactionsByPost(comment);
+          setReactors(await fetchReactionsByPost(comment));
         }}
       >
         <CWIconButton
           iconName="upvote"
           iconSize="small"
           selected={hasReacted}
-          onClick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
+          onClick={async (e) => {
+            if (!app.isLoggedIn() || !app.user.activeAccount) {
+              setIsModalOpen(true);
+            } else {
+              onReactionClick(e, hasReacted, dislike, like);
+            }
+          }}
         />
         {likes > 0 ? (
           <CWTooltip
@@ -120,7 +132,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
                   likes,
-                  reactors: this.reactors,
+                  reactors: reactors,
                 })}
               </div>
             }
@@ -145,8 +157,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
             {likes}
           </CWText>
         )}
-        {/* <CWIconButton iconName="downvote" iconSize="small" disabled /> */}
       </div>
-    );
-  }
-}
+    </React.Fragment>
+  );
+};
