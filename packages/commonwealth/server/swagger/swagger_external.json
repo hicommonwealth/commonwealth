@@ -335,8 +335,36 @@
             "description": "A list of communities.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ArrayOfCommunities"
+                "schema": {                  
+                  "communities": {
+                    "name": "string",
+                    "chain_node_id": "number",
+                    "default_symbol": "string",
+                    "network": "ChainNetwork",
+                    "base": "ChainBase",
+                    "icon_url": "string",
+                    "active": true,
+                    "type": "ChainType",
+                    "id": "string",
+                    "description": "string",
+                    "discord": "string",
+                    "element": "string",
+                    "website": "string",
+                    "telegram": "string",
+                    "github": "string",
+                    "ss58_prefix": "string",
+                    "stages_enabled": true,
+                    "custom_stages": "string",
+                    "custom_domain": "string",
+                    "block_explorer_ids": "string",
+                    "collapsed_on_homepage": true,
+                    "substrate_spec": "RegisteredTypes",
+                    "has_chain_events_listener": true,
+                    "default_summary_view": true,
+                    "terms": "string",
+                    "admin_only_poll": "boolean"
+                  },
+                  "count": "number"
                 }
               }
             }
