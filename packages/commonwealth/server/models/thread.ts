@@ -30,7 +30,7 @@ export type ThreadAttributes = {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
-  last_commented_on?: Date;
+  latest_activity?: Date;
 
   // associations
   Chain?: ChainAttributes;
@@ -91,7 +91,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
-      last_commented_on: {
+      latest_activity: {
         type: dataTypes.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,

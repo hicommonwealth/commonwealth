@@ -35,8 +35,8 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
 
     const topSortedThreads = monthlyThreads
       .sort((a, b) => {
-        const aLastUpdated = a.lastCommentedOn || a.createdAt;
-        const bLastUpdated = b.lastCommentedOn || b.createdAt;
+        const aLastUpdated = a.latestActivity || a.createdAt;
+        const bLastUpdated = b.latestActivity || b.createdAt;
         return bLastUpdated.valueOf() - aLastUpdated.valueOf();
       })
       .slice(0, 5 - monthlyThreads.length);

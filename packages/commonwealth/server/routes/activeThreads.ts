@@ -48,7 +48,7 @@ const activeThreads = async (
         limit: threads_per_topic,
         order: [
           ['created_at', 'DESC'],
-          ['last_commented_on', 'DESC'],
+          ['latest_activity', 'DESC'],
         ],
       });
 
@@ -68,7 +68,7 @@ const activeThreads = async (
       //   const commentlessTopicThreads = await models.OffchainThread.findAll({
       //     where: {
       //       topic_id: topic.id,
-      //       last_commented_on: {
+      //       latest_activity: {
       //         [Op.is]: null,
       //       }
       //     },

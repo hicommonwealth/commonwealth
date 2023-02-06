@@ -135,7 +135,7 @@ class ThreadsController {
       has_poll,
       polls = [], // associated Polls
       reactions,
-      last_commented_on,
+      latest_activity,
       linked_threads,
       numberOfComments,
     } = thread;
@@ -239,7 +239,7 @@ class ThreadsController {
       lastEdited: lastEditedProcessed,
       hasPoll: has_poll,
       polls: polls.map((p) => new Poll(p)),
-      lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
+      latestActivity: latest_activity ? moment(latest_activity) : null,
       linkedThreads,
       numberOfComments,
     });
@@ -693,7 +693,7 @@ class ThreadsController {
       const lastThread = modeledThreads.sort(orderDiscussionsbyLastComment)[
         modeledThreads.length - 1
       ];
-      const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
+      const cutoffDate = lastThread.latestActivity || lastThread.createdAt;
       this.listingStore.setCutoffDate(options, cutoffDate);
     }
 

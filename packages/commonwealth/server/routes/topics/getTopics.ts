@@ -30,21 +30,21 @@ export const getTopics = async (
 
   const where = { chain_id: community_id };
 
-  // Join in last_commented_on of thread that is most recently commented on
+  // Join in latest_activity of thread that is most recently commented on
   const include = [
     {
       model: models.Thread,
       as: 'threads',
       where: {
         [Op.and]: [
-          Sequelize.literal(` "threads"."last_commented_on" = (
-      Select MAX(last_commented_on)
+          Sequelize.literal(` "threads"."latest_activity" = (
+      Select MAX(latest_activity)
       FROM "Threads"
       WHERE
       "Threads"."topic_id" = "Topic"."id")`),
         ],
       },
-      attributes: ['last_commented_on'],
+      attributes: ['latest_activity'],
     },
   ];
 
@@ -64,11 +64,11 @@ export const getTopics = async (
     });
   }
 
-  // rename the threads.last_commented_on field
+  // remove the "threads" from threads.latest_activity
   topics.forEach((t) => {
-    if (t['threads.last_commented_on']) {
-      t['latest_activity'] = t['threads.last_commented_on'];
-      delete t['threads.last_commented_on'];
+    if (t['threads.latest_activity']) {
+      t['latest_activity'] = t['threads.latest_activity'];
+      delete t['threads.latest_activity'];
     }
   });
 

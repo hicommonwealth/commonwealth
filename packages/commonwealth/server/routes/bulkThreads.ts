@@ -32,7 +32,7 @@ const bulkThreads = async (
   let threads;
   if (cutoff_date) {
     const query = `
-      SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
+      SELECT addr.id AS addr_id, addr.address AS addr_address, latest_activity,
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
@@ -43,7 +43,7 @@ const bulkThreads = async (
         collaborators, chain_entity_meta, linked_threads
       FROM "Addresses" AS addr
       RIGHT JOIN (
-        SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
+        SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.latest_activity,
           t.created_at AS thread_created,
           t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
           t.has_poll,
@@ -82,10 +82,10 @@ const bulkThreads = async (
         WHERE t.deleted_at IS NULL
           AND t.chain = $chain 
           ${topicOptions}
-          AND COALESCE(t.last_commented_on, t.created_at) < $created_at
+          AND COALESCE(t.latest_activity, t.created_at) < $created_at
           AND t.pinned = false
-          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments)
-          ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
+          GROUP BY (t.id, COALESCE(t.latest_activity, t.created_at), comments.number_of_comments)
+          ORDER BY COALESCE(t.latest_activity, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics
@@ -132,7 +132,7 @@ const bulkThreads = async (
         chain_entity_meta,
         snapshot_proposal: t.snapshot_proposal,
         has_poll: t.has_poll,
-        last_commented_on: t.last_commented_on,
+        latest_activity: t.latest_activity,
         plaintext: t.plaintext,
         Address: {
           id: t.addr_id,
@@ -154,7 +154,7 @@ const bulkThreads = async (
     });
   } else {
     threads =
-      // TODO: May need to include last_commented_on in order, if this else is used
+      // TODO: May need to include latest_activity in order, if this else is used
       (
         await models.Thread.findAll({
           where: { chain: chain.id },

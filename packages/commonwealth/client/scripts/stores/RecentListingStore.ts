@@ -168,7 +168,7 @@ class RecentListingStore extends IdStore<Thread> {
       : stageName
       ? this._fetchState.stageCutoffDate[stageName]
       : this._fetchState.allThreadsCutoffDate;
-    const lastUpdate = thread.lastCommentedOn || thread.createdAt;
+    const lastUpdate = thread.latestActivity || thread.createdAt;
     return (pinned && thread.pinned) || +lastUpdate >= +listingCutoff;
   }
 

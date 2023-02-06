@@ -10,9 +10,24 @@ UPDATE "Threads" SET last_commented_on=created_at WHERE last_commented_on is NUL
       allowNull: false,
       defaultValue: Sequelize.NOW,
     });
+
+    return await queryInterface.renameColumn(
+      'Threads',
+      'last_commented_on',
+      'latest_activity'
+    );
   },
 
   down: async (queryInterface, Sequelize) => {
-    return Promise.resolve();
+    await queryInterface.renameColumn(
+      'Threads',
+      'latest_activity',
+      'last_commented_on'
+    );
+
+    return await queryInterface.changeColumn('Threads', 'last_commented_on', {
+      type: Sequelize.DATE,
+      allowNull: true,
+    });
   },
 };

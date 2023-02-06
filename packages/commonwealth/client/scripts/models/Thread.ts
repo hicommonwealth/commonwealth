@@ -37,7 +37,7 @@ class Thread implements IUniqueId {
   public readonly identifier: string;
   public readonly id: number;
   public readonly createdAt: moment.Moment;
-  public readonly lastCommentedOn: moment.Moment;
+  public readonly latestActivity: moment.Moment;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
@@ -77,7 +77,7 @@ class Thread implements IUniqueId {
     lastEdited,
     snapshotProposal,
     hasPoll,
-    lastCommentedOn,
+    latestActivity,
     linkedThreads,
     numberOfComments,
   }: {
@@ -86,7 +86,7 @@ class Thread implements IUniqueId {
     attachments: Attachment[];
     id: number;
     createdAt: moment.Moment;
-    lastCommentedOn: moment.Moment;
+    latestActivity: moment.Moment;
     topic: Topic;
     kind: ThreadKind;
     stage: ThreadStage;
@@ -125,7 +125,7 @@ class Thread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
-    this.lastCommentedOn = lastCommentedOn;
+    this.latestActivity = latestActivity;
     this.chainEntities = chainEntities
       ? chainEntities.map((ce) => {
           return {
