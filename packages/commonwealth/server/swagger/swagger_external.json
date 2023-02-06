@@ -83,7 +83,7 @@
             "description": "A list of threads.",
             "content": {
               "application/json": {
-                {
+                "schema": {
                   "address_id": "number",
                   "title": "string",
                   "kind": "string",
