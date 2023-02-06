@@ -1,4 +1,3 @@
-import { app } from 'chain-events/services/app/Server';
 import type {
   PostReactionsReq,
   PostRolesReq,
