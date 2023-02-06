@@ -410,7 +410,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
-  '/:scope/council': redirectRoute(() => '/:scope'),
+  '/:scope/council': redirectRoute(() => '/'),
   '/:scope/delegate': redirectRoute(() => '/delegate'),
   '/:scope/proposal/:type/:identifier': redirectRoute(
     (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
@@ -426,7 +426,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/new/proposal': redirectRoute(() => '/new/proposal'),
   '/:scope/treasury': redirectRoute(() => '/treasury'),
-  '/:scope/bounties': redirectRoute(() => '/:scope'),
+  '/:scope/bounties': redirectRoute(() => '/'),
   '/:scope/tips': redirectRoute(() => '/tips'),
   '/:scope/validators': redirectRoute(() => '/validators'),
   '/:scope/login': redirectRoute(() => '/login'),
@@ -579,7 +579,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/:scope/proposals': importRoute(import('views/pages/proposals'), {
     scoped: true,
   }),
-  '/:scope/council': redirectRoute(() => '/:scope'),
+  '/:scope/council': redirectRoute(() => '/'),
   '/:scope/delegate': importRoute(import('views/pages/delegate'), {
     scoped: true,
   }),
@@ -612,7 +612,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/:scope/treasury': importRoute(import('views/pages/treasury'), {
     scoped: true,
   }),
-  '/:scope/bounties': redirectRoute(() => '/:scope'),
+  '/:scope/bounties': redirectRoute(() => '/'),
   '/:scope/tips': importRoute(import('views/pages/tips'), { scoped: true }),
   '/:scope/validators': importRoute(import('views/pages/validators'), {
     scoped: true,
