@@ -18,6 +18,7 @@ describe('getTopics Tests', () => {
     const resp = await get('/api/topics', r);
 
     chai.assert.lengthOf(resp.result.topics, 2);
+    chai.assert.isNotNull(resp.result.topics.latest_activity);
   });
 
   it('should return count only when specified correctly', async () => {

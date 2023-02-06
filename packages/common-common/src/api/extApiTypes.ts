@@ -132,7 +132,7 @@ export type PostTopicsReq = {
   topics: (TopicAttributes & { community_id: string })[];
 };
 
-export type GetTopicsResp = { topics?: TopicAttributes[]; count: number };
+export type GetTopicsResp = { topics?: (TopicAttributes & {latest_activity: string})[]; count: number };
 
 export type GetRolesReq = {
   community_id: string;
