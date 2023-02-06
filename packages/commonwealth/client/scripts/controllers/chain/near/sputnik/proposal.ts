@@ -50,7 +50,21 @@ export default class NearSputnikProposal extends Proposal<
       return `UpgradeRemote: ${this.data.description}`;
     if (this.data.kind === 'SetStakingContract')
       return `SetStakingContract: ${this.data.description}`;
+    if (this.data.kind === 'AddBounty')
+      return `AddBounty: ${this.data.description}`;
+    if (this.data.kind === 'BountyDone')
+      return `BountyDone: ${this.data.description}`;
     if (this.data.kind === 'Vote') return `Vote: ${this.data.description}`;
+    if (
+      isAddMemberToRole(this.data.kind) &&
+      this.data.kind.AddMemberToRole.role === 'council'
+    )
+      return `Add ${this.data.kind.AddMemberToRole.member_id} to the council`;
+    if (
+      isRemoveMemberFromRole(this.data.kind) &&
+      this.data.kind.RemoveMemberFromRole.role === 'council'
+    )
+      return `Remove ${this.data.kind.RemoveMemberFromRole.member_id} from the council`;
     if (isTransfer(this.data.kind) && this.data.kind.Transfer.token_id === '') {
       const amount = this._Chain.coins(this.data.kind.Transfer.amount);
       return `${'Request for payout Ⓝ'}${amount.inDollars

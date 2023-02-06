@@ -63,7 +63,7 @@ export default class NearSputnikDao extends ProposalModule<
       'get_last_proposal_id',
       {}
     ));
-
+    // TODO: support bounties
     this._initialized = true;
   }
 
