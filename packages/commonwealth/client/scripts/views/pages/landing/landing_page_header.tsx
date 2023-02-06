@@ -64,69 +64,74 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
   };
 
   return (
-    <div className="HeaderLandingPage container mx-auto">
-      <header
-        id="landing-page"
-        className={`landing-header ${INITIAL_HEADER_STYLE} mt-8`}
-      >
-        <img
-          src="static/img/commonLogoWithText.svg"
-          alt="Commonwealth"
-          className="logoWithText"
-        />
-        <nav className="lg:block hidden">
-          <ul className="lg:flex lg:flex-row lg:items-center">
-            {props.navs.map((nav: any, i) => {
-              return (
-                <li
-                  className="LandingPageHeaderLinks ml-10 py-8 lg:flex"
-                  key={i}
-                >
-                  <a
-                    className="text-2xl lg:text-base text-gray-500 leading-none"
-                    onClick={() => redirectClick(nav.redirectTo)}
-                  >
-                    {nav.text}
-                  </a>
-                </li>
-              );
-            })}
-            <li className="LandingPageHeaderLoginButton ml-5 md:ml-10 lg:pt-0">
-              <a
-                className="block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline"
-                style={{ padding: '8px 16px' }}
-                onClick={() => setIsModalOpen(true)}
-              >
-                <img
-                  className="inline mr-1.5"
-                  style={{ padding: '0' }}
-                  src="static/img/user.svg"
-                  alt="Login"
-                />{' '}
-                Login
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <button className="menuButton lg:hidden" onClick={() => triggerMenu()}>
-          <img
-            className="inline mr-1.5 menu"
-            src="static/img/menu.svg"
-            alt="Menu icon"
-          />
-          <img
-            className="inline mr-1.5 close"
-            src="static/img/close.svg"
-            alt="Close icon"
-          />
-        </button>
-      </header>
+    <React.Fragment>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </div>
+      <div className="HeaderLandingPage container mx-auto">
+        <header
+          id="landing-page"
+          className={`landing-header ${INITIAL_HEADER_STYLE} mt-8`}
+        >
+          <img
+            src="static/img/commonLogoWithText.svg"
+            alt="Commonwealth"
+            className="logoWithText"
+          />
+          <nav className="lg:block hidden">
+            <ul className="lg:flex lg:flex-row lg:items-center">
+              {props.navs.map((nav: any, i) => {
+                return (
+                  <li
+                    className="LandingPageHeaderLinks ml-10 py-8 lg:flex"
+                    key={i}
+                  >
+                    <a
+                      className="text-2xl lg:text-base text-gray-500 leading-none"
+                      onClick={() => redirectClick(nav.redirectTo)}
+                    >
+                      {nav.text}
+                    </a>
+                  </li>
+                );
+              })}
+              <li className="LandingPageHeaderLoginButton ml-5 md:ml-10 lg:pt-0">
+                <a
+                  className="block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline"
+                  style={{ padding: '8px 16px' }}
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  <img
+                    className="inline mr-1.5"
+                    style={{ padding: '0' }}
+                    src="static/img/user.svg"
+                    alt="Login"
+                  />{' '}
+                  Login
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <button
+            className="menuButton lg:hidden"
+            onClick={() => triggerMenu()}
+          >
+            <img
+              className="inline mr-1.5 menu"
+              src="static/img/menu.svg"
+              alt="Menu icon"
+            />
+            <img
+              className="inline mr-1.5 close"
+              src="static/img/close.svg"
+              alt="Close icon"
+            />
+          </button>
+        </header>
+      </div>
+    </React.Fragment>
   );
 };
