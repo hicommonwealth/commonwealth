@@ -31,7 +31,6 @@ import { TokensCreatorComponent } from './creators_card_section';
 import { TokensChainsComponent } from './chains_slider';
 import { TokenHoldersComponent } from './find_your_community_section';
 import { ChainsCrowdfundingComponent } from './crowdfunding_card_section';
-import { handleEmailInvites } from '../../menus/invites_menu';
 import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
 
@@ -99,10 +98,6 @@ class LandingPage extends ClassComponent {
   }
 
   view() {
-    if (getRouteParam('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(this), 0);
-    }
-
     if (app.loginState !== LoginState.LoggedIn) {
       return (
         <div className="LandingPage bg-primary">
