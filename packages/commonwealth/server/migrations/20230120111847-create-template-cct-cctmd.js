@@ -27,6 +27,7 @@ module.exports = {
       await queryInterface.createTable('CommunityContractTemplateMetadata', {
         id: {
           type: Sequelize.INTEGER,
+          autoIncrement: true,
           primaryKey: true,
         },
         slug: {
