@@ -19,7 +19,6 @@ import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { LoginSelector } from './components/header/login_selector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { HelpMenuPopover } from './menus/help_menu';
-import { InvitesMenuPopover } from './menus/invites_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
 
@@ -83,9 +82,6 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
             <CreateContentPopover />
             {/*<HelpMenuPopover />*/}
             {app.isLoggedIn() && <NotificationsMenuPopover />}
-            {app.isLoggedIn() && app.config.invites?.length > 0 && (
-              <InvitesMenuPopover />
-            )}
           </div>
           <LoginSelector />
         </div>
