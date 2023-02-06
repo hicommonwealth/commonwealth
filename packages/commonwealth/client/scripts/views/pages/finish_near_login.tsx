@@ -6,13 +6,7 @@ import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import {
-  ClassComponent,
-  setRoute,
-  getRouteParam,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { setRoute, getRouteParam, redraw, jsx } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -23,7 +17,6 @@ import {
 import type { NearAccount } from 'controllers/chain/near/account';
 import type Near from 'controllers/chain/near/adapter';
 import $ from 'jquery';
-import type { Account } from 'models';
 import type { WalletConnection } from 'near-api-js';
 import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
@@ -36,16 +29,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
-
-interface IState {
-  validating: boolean;
-  validationCompleted: boolean;
-  validatedAccount: NearAccount | null;
-  validationError: string;
-  exitActionSelected: boolean;
-  isNewAccount: boolean;
-  account: Account;
-}
+import { Modal } from '../components/component_kit/cw_modal';
 
 // TODO:
 //  - figure out how account switching will work
@@ -63,6 +47,7 @@ const redirectToNextPage = () => {
     // handle localStorage-based redirect after Github login (callback must occur within 1 day)
     try {
       const postAuth = JSON.parse(localStorage.getItem('nearPostAuthRedirect'));
+
       if (
         postAuth.path &&
         +new Date() - postAuth.timestamp < 24 * 60 * 60 * 1000
@@ -77,30 +62,32 @@ const redirectToNextPage = () => {
       console.error('Error restoring path from localStorage');
     }
   }
+
   navigateToSubpage('/', { replace: true });
 };
 
-class FinishNearLogin extends ClassComponent<Record<string, never>> {
-  public state: IState = {
-    validating: false,
-    validationCompleted: false,
-    validatedAccount: null,
-    validationError: '',
-    exitActionSelected: false,
-    isNewAccount: false,
-    account: null,
-  };
+const FinishNearLogin = () => {
+  const [validating, setValidating] = React.useState<boolean>(false);
+  const [validationCompleted, setValidationCompleted] =
+    React.useState<boolean>(false);
+  const [validatedAccount, setValidatedAccount] =
+    React.useState<NearAccount | null>(null);
+  const [validationError, setValidationError] = React.useState<string>('');
+  const [isNewAccount, setIsNewAccount] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-  private async _validate(wallet: WalletConnection) {
+  const validate = async (wallet: WalletConnection) => {
     try {
       // TODO: do we need to do this every time, or only on first connect?
       const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
+
       const chain =
         app.user.selectedChain ||
         app.config.chains.getById(app.activeChainId());
 
       // create canvas thing
       const chainId = chain.id;
+
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
         chainId
@@ -123,8 +110,8 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         null
       );
 
-      this.state.isNewAccount = newAcct.newlyCreated;
-      // this.state.account = newAcct.account;
+      setIsNewAccount(newAcct.newlyCreated);
+      // account = newAcct.account;
       acct.setValidationToken(newAcct.account.validationToken);
       acct.setWalletId(WalletId.NearWallet);
       acct.setAddressId(newAcct.account.addressId);
@@ -134,37 +121,45 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       const signature = await acct.signMessage(JSON.stringify(canvasMessage));
 
       await acct.validate(signature, chainId);
+
       if (!app.isLoggedIn()) {
         await initAppState();
         await updateActiveAddresses(chain);
       }
+
       await setActiveAccount(acct);
-      this.state.validatedAccount = acct;
+
+      setValidatedAccount(acct);
     } catch (err) {
-      this.state.validationError = err.responseJSON
-        ? err.responseJSON.error
-        : err.message;
+      setValidationError(
+        err.responseJSON ? err.responseJSON.error : err.message
+      );
       return;
     }
 
     // tx error handling
     const failedTx = getRouteParam('tx_failure');
+
     if (failedTx) {
       console.log(`Login failed: deleting storage key ${failedTx}`);
+
       if (localStorage[failedTx]) {
         delete localStorage[failedTx];
       }
-      this.state.validationError = 'Login failed.';
+
+      setValidationError('Login failed.');
       return;
     }
 
     // tx success handling
     // TODO: ensure that create() calls redirect correctly
     const savedTx = getRouteParam('saved_tx');
+
     if (savedTx && localStorage[savedTx]) {
       try {
         // fetch tx localstorage hash and execute
         const txString = localStorage[savedTx];
+
         delete localStorage[savedTx];
 
         // tx object
@@ -173,12 +168,14 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         if (tx.attachedDeposit) {
           tx.attachedDeposit = new BN(tx.attachedDeposit);
         }
+
         if (tx.gas) {
           tx.gas = new BN(tx.gas);
         }
+
         await wallet.account().functionCall(tx as FunctionCallOptions);
       } catch (err) {
-        this.state.validationError = err.message;
+        setValidationError(err.message);
       }
     }
 
@@ -186,109 +183,113 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
     // TODO: we need to figure out how to clean this localStorage entry up
     //   in the case of transaction failure!!
     const chainName = getRouteParam('chain_name');
+
     if (chainName && localStorage[chainName]) {
       try {
         const chainCreateArgString = localStorage[chainName];
+
         delete localStorage[chainName];
 
         // POST object
         const chainCreateArgs = JSON.parse(chainCreateArgString);
+
         const res = await $.post(
           `${app.serverUrl()}/createChain`,
           chainCreateArgs
         );
+
         await initAppState(false);
+
         setRoute(`${window.location.origin}/${res.result.chain.id}`);
       } catch (err) {
-        this.state.validationError = `Failed to initialize chain node: ${err.message}`;
+        setValidationError(`Failed to initialize chain node: ${err.message}`);
       }
     }
+  };
+
+  if (!app.chain || !app.chain.loaded || validating) {
+    return <PageLoading />;
   }
 
-  public view() {
-    if (!app.chain || !app.chain.loaded || this.state.validating) {
-      return <PageLoading />;
-    }
-    if (app.chain.base !== ChainBase.NEAR) {
-      return <PageNotFound />;
-    }
-    if (this.state.validationError) {
-      return (
-        <Sublayout>
-          <CWText>
-            NEAR account log in error: {this.state.validationError}
-          </CWText>
-          <CWButton
-            onClick={(e) => {
-              e.preventDefault();
-              redirectToNextPage();
-            }}
-            label="Return Home"
-          />
-        </Sublayout>
-      );
-    } else if (this.state.validationCompleted) {
-      return (
-        <Sublayout>
-          <div
-            oncreate={async () => {
-              if (this.state.validatedAccount.profile.name) {
-                redirectToNextPage();
-              } else {
-                if (this.state.isNewAccount) {
-                  if (!app.isLoggedIn()) {
-                    app.modals.create({
-                      modal: LoginModal,
-                      data: {
-                        initialBody: 'welcome',
-                        initialSidebar: 'newOrReturning',
-                        initialAccount: this.state.validatedAccount,
-                        modalType: isWindowMediumSmallInclusive(
-                          window.innerWidth
-                        )
-                          ? 'fullScreen'
-                          : 'centered',
-                        breakpointFn: isWindowMediumSmallInclusive,
-                      },
-                      exitCallback: () => {
-                        redirectToNextPage();
-                      },
-                    });
-                  } else {
-                    await completeClientLogin(this.state.validatedAccount);
-                    redirectToNextPage();
-                  }
-                } else {
-                  redirectToNextPage();
-                }
-              }
-            }}
-          />
-        </Sublayout>
-      );
-    } else if (!this.state.validating) {
-      // chain loaded and on near -- finish login and call lingering txs
-      this.state.validating = true;
-      const wallet = new WalletAccount(
-        (app.chain as Near).chain.api,
-        'commonwealth_near'
-      );
-      if (wallet.isSignedIn()) {
-        this._validate(wallet).then(() => {
-          this.state.validationCompleted = true;
-          this.state.validating = false;
-          redraw();
-        });
-      } else {
-        this.state.validationError = 'Sign-in failed.';
-        this.state.validating = false;
-        this.state.validationCompleted = true;
-        redraw();
-      }
-    } else {
-      // validation in progress
-    }
+  if (app.chain.base !== ChainBase.NEAR) {
+    return <PageNotFound />;
   }
-}
+
+  if (validationError) {
+    return (
+      <Sublayout>
+        <CWText>NEAR account log in error: {validationError}</CWText>
+        <CWButton
+          onClick={(e) => {
+            e.preventDefault();
+            redirectToNextPage();
+          }}
+          label="Return Home"
+        />
+      </Sublayout>
+    );
+  } else if (validationCompleted) {
+    async () => {
+      if (validatedAccount.profile.name) {
+        redirectToNextPage();
+      } else {
+        if (isNewAccount) {
+          if (!app.isLoggedIn()) {
+            setIsModalOpen(true);
+          } else {
+            await completeClientLogin(validatedAccount);
+            redirectToNextPage();
+          }
+        } else {
+          redirectToNextPage();
+        }
+      }
+    };
+    return (
+      <React.Fragment>
+        <Modal
+          content={
+            <LoginModal
+              onModalClose={() => {
+                setIsModalOpen(false);
+                redirectToNextPage();
+              }}
+              initialBody="welcome"
+              initialSidebar="newOrReturning"
+              initialAccount={validatedAccount}
+            />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsModalOpen(false)}
+          open={isModalOpen}
+        />
+        <Sublayout />
+      </React.Fragment>
+    );
+  } else if (!validating) {
+    // chain loaded and on near -- finish login and call lingering txs
+    setValidating(true);
+
+    const wallet = new WalletAccount(
+      (app.chain as Near).chain.api,
+      'commonwealth_near'
+    );
+
+    if (wallet.isSignedIn()) {
+      validate(wallet).then(() => {
+        setValidationCompleted(true);
+        setValidating(false);
+        redraw();
+      });
+    } else {
+      setValidationError('Sign-in failed.');
+      setValidating(false);
+      setValidationCompleted(true);
+      redraw();
+    }
+  } else {
+    // validation in progress
+  }
+};
 
 export default FinishNearLogin;
