@@ -539,7 +539,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ArrayOfRoles"
+                  "roles": [
+                    {
+                      "address_id": "number",
+                      "permission": "Permission",
+                      "id": "number",
+                      "chain_id": "string",
+                      "is_user_default": "boolean",
+                      "created_at": "Date",
+                      "updated_at": "Date"
+                    }
+                  ],
+                  "count": "number"                
                 }
               }
             }
@@ -587,7 +598,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ArrayOfRules"
+                  "rules": [
+                    
+                  ],
+                  "count": "number"           
                 }
               }
             }
@@ -627,7 +641,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ArrayOfChainNodes"
+                  "chainNodes": [
+                    
+                  ],
+                  "count": "number"                           
                 }
               }
             }
@@ -658,8 +675,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ArrayOfBalanceProviders"
-                }
+                  "balanceProviders": [
+                    
+                  ],
+                  "count": "number"         
+                }                  
               }
             }
           },
@@ -702,9 +722,11 @@
             "description": "A list of token balances for provided addresses.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ArrayOfTokenBalances"
-                }
+              "schema": {
+                "tokenBalance": [
+                  
+                ],
+                "count": "number"
               }
             }
           },
