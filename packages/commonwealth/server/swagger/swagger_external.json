@@ -80,7 +80,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of threads."
+            "description": "A list of threads.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfThreads"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -127,7 +134,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of comments."
+            "description": "A list of comments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfComments"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -195,7 +209,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of reactions."
+            "description": "A list of reactions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfReactions"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -262,7 +283,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of communities."
+            "description": "A list of communities.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfCommunities"
+                }
+              }
+            }
           },
           "400": {
             "description": "Please provide a parameter to query by (community_id, network, comment_id, address_ids, addresses)"
@@ -311,7 +339,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of profiles."
+            "description": "A list of profiles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfProfiles"
+                }
+              }
+            }
           },
           "400": {
             "description": "Please provide a parameter to query by (addresses, profile_ids)"
@@ -347,7 +382,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of topics."
+            "description": "A list of topics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfTopics"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -383,7 +425,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of roles."
+            "description": "A list of roles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfRoles"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -424,7 +473,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of rules."
+            "description": "A list of rules.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfRules"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -457,7 +513,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of chain nodes."
+            "description": "A list of chain nodes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfChainNodes"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -481,7 +544,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of balance providers."
+            "description": "A list of balance providers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfBalanceProviders"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -519,7 +589,14 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of token balances for provided addresses."
+            "description": "A list of token balances for provided addresses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfTokenBalances"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
