@@ -1,4 +1,4 @@
-import type * as Sequelize from 'sequelize';
+import * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { AttachmentAttributes } from './attachment';
@@ -91,7 +91,11 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
-      last_commented_on: { type: dataTypes.DATE, allowNull: true },
+      last_commented_on: {
+        type: dataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+      },
     },
     {
       timestamps: true,
