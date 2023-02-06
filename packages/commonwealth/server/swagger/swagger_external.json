@@ -83,8 +83,26 @@
             "description": "A list of threads.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ArrayOfThreads"
+                {
+                  "address_id": "number",
+                  "title": "string",
+                  "kind": "string",
+                  "stage": "string",
+                  "id": "number?",
+                  "body": "string?",
+                  "plaintext": "string?",
+                  "url": "string?",
+                  "topic_id": "number?",
+                  "pinned": "boolean?",
+                  "chain": "string",
+                  "read_only": "boolean?",
+                  "version_history": "string[]?",
+                  "snapshot_proposal": "string?",
+                  "has_poll": "boolean?",
+                  "created_at": "date?",
+                  "updated_at": "date?",
+                  "deleted_at": "date?",
+                  "last_commented_on": "date?"
                 }
               }
             }
