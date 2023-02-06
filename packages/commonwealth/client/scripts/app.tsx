@@ -16,11 +16,7 @@ import $ from 'jquery';
 import './fragment-fix';
 import app, { initAppState, LoginState } from 'state';
 
-import {
-  getRoutes,
-  handleInviteLinkRedirect,
-  handleLoginRedirects,
-} from 'router';
+import { getRoutes, handleLoginRedirects } from 'router';
 import momentUpdateLocale from 'helpers/momentUpdateLocale';
 import injectGoogleTagManagerScript from 'helpers/injectGoogleTagManagerScript';
 import handleWindowError from 'helpers/handleWindowError';

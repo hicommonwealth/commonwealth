@@ -6,11 +6,7 @@ import {
   APPLICATION_UPDATE_ACTION,
   APPLICATION_UPDATE_MESSAGE,
 } from 'helpers/constants';
-import { notifyError, notifyInfo } from 'controllers/app/notifications';
-import { NewLoginModal } from 'views/modals/login_modal';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
-import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
-import { getRoute, getRouteParam, setRoute, render } from 'mithrilInterop';
+import { getRoute, setRoute, getRouteParam, render } from './mithrilInterop';
 
 export const pathIsDiscussion = (
   scope: string | null,
@@ -91,42 +87,6 @@ const redirectRoute = (
     return render(Layout);
   },
 });
-
-const handleInviteLinkRedirect = () => {
-  const inviteMessage = getRouteParam('invitemessage');
-
-  if (!inviteMessage) {
-    return;
-  }
-
-  const isAcceptInviteMessage =
-    getRouteParam['message'] === 'Must be logged in to accept invites';
-
-  if (inviteMessage === 'failure' && isAcceptInviteMessage) {
-    notifyInfo('Log in to join a community with an invite link');
-
-    app.modals.create({
-      modal: NewLoginModal,
-      data: {
-        modalType: isWindowMediumSmallInclusive(window.innerWidth)
-          ? 'fullScreen'
-          : 'centered',
-        breakpointFn: isWindowMediumSmallInclusive,
-      },
-    });
-  } else if (inviteMessage === 'failure') {
-    const message = getRouteParam()['message'];
-    notifyError(message);
-  } else if (inviteMessage === 'success') {
-    if (app.config.invites.length === 0) {
-      return;
-    }
-
-    app.modals.create({ modal: ConfirmInviteModal });
-  } else {
-    notifyError('Unexpected error with invite link');
-  }
-};
 
 const handleLoginRedirects = () => {
   const routeParam = getRouteParam();
@@ -701,9 +661,4 @@ const getRoutes = (customDomain: string) => {
   };
 };
 
-export {
-  getRoutes,
-  navigateToSubpage,
-  handleLoginRedirects,
-  handleInviteLinkRedirect,
-};
+export { getRoutes, navigateToSubpage, handleLoginRedirects };
