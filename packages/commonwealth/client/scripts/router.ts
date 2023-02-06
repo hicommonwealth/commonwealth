@@ -308,7 +308,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/proposals': importRoute(import('views/pages/proposals'), {
     scoped: true,
   }),
-  '/council': redirectRoute(() => '/'),
   '/delegate': importRoute(import('views/pages/delegate'), { scoped: true }),
   '/proposal/:type/:identifier': importRoute(
     import('views/pages/view_proposal/index'),
@@ -338,11 +337,7 @@ const getCustomDomainRoutes = (importRoute) => ({
 
   // Treasury
   '/treasury': importRoute(import('views/pages/treasury'), { scoped: true }),
-  '/bounties': redirectRoute(() => '/'),
   '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
-  '/validators': importRoute(import('views/pages/validators'), {
-    scoped: true,
-  }),
 
   // Admin
   '/admin': importRoute(import('views/pages/admin'), { scoped: true }),
@@ -388,7 +383,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/overview': redirectRoute(() => '/overview'),
   '/:scope/projects': redirectRoute(() => '/projects'),
   '/:scope/backers': redirectRoute(() => '/backers'),
-  '/:scope/collectives': redirectRoute(() => '/collectives'),
   '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
   '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
   '/:scope/home': redirectRoute(() => '/'),
@@ -410,7 +404,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
-  '/:scope/council': redirectRoute(() => '/'),
   '/:scope/delegate': redirectRoute(() => '/delegate'),
   '/:scope/proposal/:type/:identifier': redirectRoute(
     (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
@@ -426,9 +419,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/new/proposal': redirectRoute(() => '/new/proposal'),
   '/:scope/treasury': redirectRoute(() => '/treasury'),
-  '/:scope/bounties': redirectRoute(() => '/'),
   '/:scope/tips': redirectRoute(() => '/tips'),
-  '/:scope/validators': redirectRoute(() => '/validators'),
   '/:scope/login': redirectRoute(() => '/login'),
   '/:scope/settings': redirectRoute(() => '/settings'),
   '/:scope/admin': redirectRoute(() => '/admin'),
@@ -579,7 +570,6 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/:scope/proposals': importRoute(import('views/pages/proposals'), {
     scoped: true,
   }),
-  '/:scope/council': redirectRoute(() => '/'),
   '/:scope/delegate': importRoute(import('views/pages/delegate'), {
     scoped: true,
   }),
@@ -612,11 +602,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/:scope/treasury': importRoute(import('views/pages/treasury'), {
     scoped: true,
   }),
-  '/:scope/bounties': redirectRoute(() => '/'),
   '/:scope/tips': importRoute(import('views/pages/tips'), { scoped: true }),
-  '/:scope/validators': importRoute(import('views/pages/validators'), {
-    scoped: true,
-  }),
 
   // Admin
   '/:scope/admin': importRoute(import('views/pages/admin'), { scoped: true }),

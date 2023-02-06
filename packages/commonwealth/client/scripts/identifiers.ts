@@ -61,7 +61,6 @@ export const proposalSlugToClass = () => {
       ProposalType.SubstrateTreasuryProposal,
       (app.chain as any).treasury
     );
-    mmap.set(ProposalType.SubstrateBountyProposal, (app.chain as any).bounties);
     mmap.set(ProposalType.SubstrateTreasuryTip, (app.chain as any).tips);
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set(ProposalType.CosmosProposal, (app.chain as any).governance);
@@ -177,8 +176,6 @@ export const chainEntityTypeToProposalName = (t: IChainEntityKind): string => {
     return 'Referendum';
   else if (t === SubstrateTypes.EntityKind.DemocracyProposal)
     return 'Democracy Proposal';
-  else if (t === SubstrateTypes.EntityKind.CollectiveProposal)
-    return 'Council Motion';
   else if (t === SubstrateTypes.EntityKind.TipProposal) return 'Treasury Tip';
   else if (t === 'proposal') {
     if (app.chain.network === ChainNetwork.Sputnik) {
