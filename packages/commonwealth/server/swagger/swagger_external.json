@@ -84,25 +84,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "address_id": "number",
-                  "title": "string",
-                  "kind": "string",
-                  "stage": "string",
-                  "id": "number?",
-                  "body": "string?",
-                  "plaintext": "string?",
-                  "url": "string?",
-                  "topic_id": "number?",
-                  "pinned": "boolean?",
-                  "chain": "string",
-                  "read_only": "boolean?",
-                  "version_history": "string[]?",
-                  "snapshot_proposal": "string?",
-                  "has_poll": "boolean?",
-                  "created_at": "date?",
-                  "updated_at": "date?",
-                  "deleted_at": "date?",
-                  "last_commented_on": "date?"
+                  "threads": [
+                    {
+                      "address_id": "number",
+                      "title": "string",
+                      "kind": "string",
+                      "stage": "string",
+                      "id": "number",
+                      "body": "string",
+                      "plaintext": "string",
+                      "url": "string",
+                      "topic_id": "number",
+                      "pinned": "boolean",
+                      "chain": "string",
+                      "read_only": "boolean",
+                      "version_history": ["string"],
+                      "snapshot_proposal": "string",
+                      "has_poll": "boolean",
+                      "created_at": "date",
+                      "updated_at": "date",
+                      "deleted_at": "date",
+                      "last_commented_on": "date"
+                    }
+                  ],
+                  "count": "number"
                 }
               }
             }
@@ -156,7 +161,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                   "comments": {
+                   "comments": [
+                    {
                       "root_id": "string",
                       "address_id": "number",
                       "text": "string",
@@ -168,7 +174,8 @@
                       "created_at": "date",
                       "updated_at": "date",
                       "deleted_at": "date"
-                    },
+                    }
+                  ],
                   "count": "number"
                   }
                 }
@@ -245,23 +252,25 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "reactions": {
-                    "address_id": "number",
-                    "reaction": "string",
-                    "id": "number",
-                    "chain": "string",
-                    "thread_id": "number",
-                    "proposal_id": "number",
-                    "comment_id": "number",
-                    "created_at": "date",
-                    "updated_at": "date",
-                    "Chain": {
-                      "ChainAttributes": { }
-                    },
-                    "Address": {
-                      "AddressAttributes": { }
+                  "reactions": [
+                    {
+                      "address_id": "number",
+                      "reaction": "string",
+                      "id": "number",
+                      "chain": "string",
+                      "thread_id": "number",
+                      "proposal_id": "number",
+                      "comment_id": "number",
+                      "created_at": "date",
+                      "updated_at": "date",
+                      "Chain": {
+                        "ChainAttributes": { }
+                      },
+                      "Address": {
+                        "AddressAttributes": { }
+                      }
                     }
-                  },
+                  ],
                   "count": "number"
               }
             }
@@ -335,35 +344,37 @@
             "description": "A list of communities.",
             "content": {
               "application/json": {
-                "schema": {                  
-                  "communities": {
-                    "name": "string",
-                    "chain_node_id": "number",
-                    "default_symbol": "string",
-                    "network": "ChainNetwork",
-                    "base": "ChainBase",
-                    "icon_url": "string",
-                    "active": true,
-                    "type": "ChainType",
-                    "id": "string",
-                    "description": "string",
-                    "discord": "string",
-                    "element": "string",
-                    "website": "string",
-                    "telegram": "string",
-                    "github": "string",
-                    "ss58_prefix": "string",
-                    "stages_enabled": true,
-                    "custom_stages": "string",
-                    "custom_domain": "string",
-                    "block_explorer_ids": "string",
-                    "collapsed_on_homepage": true,
-                    "substrate_spec": "RegisteredTypes",
-                    "has_chain_events_listener": true,
-                    "default_summary_view": true,
-                    "terms": "string",
-                    "admin_only_poll": "boolean"
-                  },
+                "schema": {                 
+                  "communities": [
+                    {
+                      "name": "string",
+                      "chain_node_id": "number",
+                      "default_symbol": "string",
+                      "network": "ChainNetwork",
+                      "base": "ChainBase",
+                      "icon_url": "string",
+                      "active": true,
+                      "type": "ChainType",
+                      "id": "string",
+                      "description": "string",
+                      "discord": "string",
+                      "element": "string",
+                      "website": "string",
+                      "telegram": "string",
+                      "github": "string",
+                      "ss58_prefix": "string",
+                      "stages_enabled": true,
+                      "custom_stages": "string",
+                      "custom_domain": "string",
+                      "block_explorer_ids": "string",
+                      "collapsed_on_homepage": true,
+                      "substrate_spec": "RegisteredTypes",
+                      "has_chain_events_listener": true,
+                      "default_summary_view": true,
+                      "terms": "string",
+                      "admin_only_poll": "boolean"
+                    }
+                  ],
                   "count": "number"
                 }
               }
@@ -599,7 +610,13 @@
               "application/json": {
                 "schema": {
                   "rules": [
-                    
+                    {
+                    "id": "number",
+                    "chain_id": "string",
+                    "rule": "string",
+                    "created_at": "Date",
+                    "updated_at": "Date"
+                    }
                   ],
                   "count": "number"           
                 }
@@ -641,8 +658,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "chainNodes": [
-                    
+                  "chain_nodes": [                 
+                    {
+                      "id": "number",
+                      "name": "string",
+                      "description": "string",
+                      "base": "BalanceType",
+                      "prefix": "string"
+                    }
                   ],
                   "count": "number"                           
                 }
@@ -675,8 +698,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "balanceProviders": [
-                    
+                  "balance_providers": [
+                    {
+                      "bp": "string",
+                      "opts": "string"
+                    }
                   ],
                   "count": "number"         
                 }                  
@@ -723,10 +749,8 @@
             "content": {
               "application/json": {
               "schema": {
-                "tokenBalance": [
-                  
-                ],
-                "count": "number"
+                "balances": { "[address: string]": "string" },
+                "errors": { "[address: string]": "string" }
               }
             }
           },
