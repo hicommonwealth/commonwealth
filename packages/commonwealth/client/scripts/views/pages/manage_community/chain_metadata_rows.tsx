@@ -12,7 +12,7 @@ import { uuidv4 } from 'lib/util';
 import { ChainBase } from 'common-common/src/types';
 import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputRow, ToggleRow } from 'views/components/metadata_rows';
+import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import type { ChainInfo, RoleInfo } from 'models';
 import {
@@ -80,6 +80,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   selectedSnapshotChannel: { id: string; name: string } | null;
   snapshotNotificationsEnabled: boolean;
   permissionsManager = new PermissionManager();
+  defaultView: string;
 
   oninit(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -114,10 +115,12 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.channelsLoaded = false;
     this.snapshotChannels = [];
     this.snapshotNotificationsEnabled = false;
+    this.defaultView = 'discussions';
   }
 
   view(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
+    if (!this.selectedTags) return;
 
     const getChannels = async () => {
       try {
@@ -225,6 +228,25 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               : "Don't show progress on threads"
           }
         />
+        <SelectRow
+          title="Default view"
+          options={[
+            {
+              label: 'Discussions',
+              value: 'discussions',
+            },
+            {
+              label: 'Overview',
+              value: 'overview',
+            },
+            {
+              label: 'Feed',
+              value: 'feed',
+            }
+          ]}
+          selected={this.defaultView}
+          onChange={(e) => {console.log('CON CHAGNGE', e); this.defaultView = e}}
+        />
         <ToggleRow
           title="Summary view"
           defaultValue={chain.defaultOverview}
@@ -310,6 +332,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             {Object.keys(this.selectedTags).map((key) => {
               return (
                 <CWButton
+                  key={key}
                   label={key}
                   buttonType={
                     this.selectedTags[key] ? 'primary-black' : 'secondary-black'

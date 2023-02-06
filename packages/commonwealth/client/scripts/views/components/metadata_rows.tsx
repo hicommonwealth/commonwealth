@@ -10,6 +10,8 @@ import { CWTextArea } from './component_kit/cw_text_area';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWToggle } from './component_kit/cw_toggle';
+import { CWRadioGroup } from './component_kit/cw_radio_group';
+import type { RadioButtonType } from './component_kit/cw_radio_button';
 
 type InputRowAttrs = {
   value: string | number;
@@ -114,5 +116,30 @@ export class IdRow extends ClassComponent<IdRowAttrs> {
         </div>
       </div>
     );
+  }
+}
+
+type SelectRowAttrs = {
+  options: Array<RadioButtonType>;
+  selected: string;
+  onChange: (e) => void;
+  title: string;
+}
+
+export class SelectRow extends ClassComponent<SelectRowAttrs> {
+  view (vnode: ResultNode<SelectRowAttrs>) {
+    const { options, selected, onChange, title } = vnode.attrs;
+
+    return (
+      <div className="SelectRow">
+        <CWLabel label={title} />
+        <CWRadioGroup
+          name={title}
+          options={options}
+          toggledOption={selected}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+    )
   }
 }

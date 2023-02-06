@@ -42,7 +42,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
       <div className="ManageRoles">
         <CWLabel label={vnode.attrs.label} />
         <div className="roles-container">
-          {vnode.attrs.roledata?.map((role) => {
+          {vnode.attrs.roledata?.map((role, i) => {
             const addr = role.Address;
 
             const isSelf =
@@ -53,7 +53,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
               (addr_) => addr_.id === (role.address_id || role.Address.id)
             ).length;
             return (
-              <div className="role-row">
+              <div className="role-row" key={i}>
                 <User
                   user={
                     new AddressInfo(
