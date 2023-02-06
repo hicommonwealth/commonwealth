@@ -6,7 +6,7 @@ import type { Placement } from '@popperjs/core/lib';
 import { ClassComponent, jsx } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 
-type AnchorType = HTMLElement | SVGSVGElement;
+export type AnchorType = HTMLElement | SVGSVGElement;
 
 type UsePopoverProps = {
   anchorEl: AnchorType;

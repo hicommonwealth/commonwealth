@@ -6,17 +6,9 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+
 import _ from 'lodash';
 
 import 'components/header/login_selector.scss';
@@ -67,9 +59,8 @@ type LoginSelectorMenuLeftAttrs = {
 export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
   const { activeAddressesWithRole, nAccountsWithoutRole } = props;
 
-  const [isLoginModalOpen, setIsLoginModalOpen] = React.useState<boolean>(
-    false
-  );
+  const [isLoginModalOpen, setIsLoginModalOpen] =
+    React.useState<boolean>(false);
 
   return (
     <div className="LoginSelectorMenu">
@@ -253,9 +244,8 @@ class TOSModal extends ClassComponent<TOSModalAttrs> {
 }
 
 export const LoginSelector = () => {
-  const [profileLoadComplete, setProfileLoadComplete] = React.useState<boolean>(
-    false
-  );
+  const [profileLoadComplete, setProfileLoadComplete] =
+    React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   const leftMenuProps = usePopover();
@@ -289,8 +279,9 @@ export const LoginSelector = () => {
 
   const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
-  const nAccountsWithoutRole = activeAccountsByRole.filter(([role]) => !role)
-    .length;
+  const nAccountsWithoutRole = activeAccountsByRole.filter(
+    ([role]) => !role
+  ).length;
 
   if (!profileLoadComplete && app.profiles.allLoaded()) {
     setProfileLoadComplete(true);
