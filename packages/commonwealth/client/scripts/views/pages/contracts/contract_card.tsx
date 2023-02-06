@@ -86,8 +86,6 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
                 <ContractTemplateCard
                   contractId={id}
                   id={template.id}
-                  // TODO missing field in model? In figma Norf’s Favorite Template  or Treasury Spend
-                  // title={template.title}
                   title={template.cctmd.display_name}
                   displayName={template.cctmd.display_name}
                   nickname={template.cctmd.nickname}
