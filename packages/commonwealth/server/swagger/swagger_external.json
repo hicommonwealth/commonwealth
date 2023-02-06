@@ -156,7 +156,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ArrayOfComments"
+                   "comments": {
+                      "root_id": "string",
+                      "address_id": "number",
+                      "text": "string",
+                      "plaintext": "string",
+                      "id": "number",
+                      "chain": "string",
+                      "parent_id": "string",
+                      "version_history": ["string"],
+                      "created_at": "date",
+                      "updated_at": "date",
+                      "deleted_at": "date"
+                    }
+                   },
+                   "count": "number" 
+                  }
                 }
               }
             }
