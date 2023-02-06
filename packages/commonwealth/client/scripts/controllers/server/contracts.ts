@@ -163,10 +163,10 @@ class ContractsController {
       });
       this._store.add(new Contract({ ...currentContractInStore, ccts }));
     } else {
-      const ccts = currentContractInStore.ccts;
+      const ccts = currentContractInStore.ccts || [];
       ccts.push({
         id: cct_id,
-        communityContractId: ccts[0].communityContractId,
+        communityContractId: contract_id,
         templateId: template_id,
         cctmd: { ...cctmd },
       });
@@ -335,7 +335,6 @@ class ContractsController {
     communityContractTemplateAndMetadata: AddCommunityContractTemplateAttributes
   ) {
     try {
-      // TODO add newTemplate to the store when the store will be ready
       const newContract = await $.post(
         `${app.serverUrl()}/contract/community_template_and_metadata`,
         {
@@ -361,7 +360,6 @@ class ContractsController {
     communityContractTemplateMetadata: EditCommunityContractTemplateAttributes
   ) {
     try {
-      // TODO update store with editedTemplate when the store will be ready
       const updateContract = await $.ajax({
         url: `${app.serverUrl()}/contract/community_template`,
         data: {
@@ -380,6 +378,50 @@ class ContractsController {
     } catch (err) {
       console.log(err);
       throw new Error('Failed to save community contract template');
+    }
+  }
+
+  public async deleteCommunityContractTemplate(contract: {
+    contract_id: number;
+    template_id?: number;
+  }) {
+    try {
+      await $.ajax({
+        url: `${app.serverUrl()}/contract/community_template`,
+        data: {
+          ...contract,
+          jwt: app.user.jwt,
+        },
+        type: 'DELETE',
+      });
+
+      // TODO update store
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to delete contract template');
+    }
+  }
+
+  public async deleteCommunityContract(contract: {
+    contract_id: number;
+    template_id?: number;
+  }) {
+    try {
+      const contractToDelete = this._store.getById(contract.contract_id);
+
+      await $.ajax({
+        url: `${app.serverUrl()}/contract/community_template?community_contract=true`,
+        data: {
+          ...contract,
+          jwt: app.user.jwt,
+        },
+        type: 'DELETE',
+      });
+
+      this._store.remove(contractToDelete);
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to delete contract');
     }
   }
 

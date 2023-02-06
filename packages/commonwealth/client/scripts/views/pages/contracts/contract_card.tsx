@@ -20,7 +20,7 @@ type ContractCardAttrs = {
 };
 
 export class ContractCard extends ClassComponent<ContractCardAttrs> {
-  handleDeleteContract(address: string) {
+  handleDeleteContract(address: string, id: number) {
     showConfirmationModal({
       title: 'Delete Contract',
       description: (
@@ -32,8 +32,11 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
       confirmButton: {
         label: 'Delete',
         type: 'mini-red',
-        onConfirm: () => {
-          console.log('delete contract');
+        onConfirm: async () => {
+          await app.contracts.deleteCommunityContract({
+            contract_id: id,
+          });
+          m.redraw();
         },
       },
     });
@@ -70,7 +73,7 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
           <CWIconButton
             className="delete-icon"
             iconName="trash"
-            onclick={() => this.handleDeleteContract(address)}
+            onclick={() => this.handleDeleteContract(address, id)}
           />
         </div>
         <div className="templates">
@@ -83,8 +86,6 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
                 <ContractTemplateCard
                   contractId={id}
                   id={template.id}
-                  // TODO missing field in model? In figma Norf’s Favorite Template  or Treasury Spend
-                  // title={template.title}
                   title={template.cctmd.display_name}
                   displayName={template.cctmd.display_name}
                   nickname={template.cctmd.nickname}

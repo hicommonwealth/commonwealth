@@ -48,7 +48,7 @@ class AddContractAndAbiForm extends ClassComponent {
 
   view() {
     const isAddressValid = isAddress(this.form.address);
-    const isAddingDisabled = this.saving || !isAddressValid;
+    const isAddingDisabled = this.saving || !isAddressValid || !this.form.abi;
 
     return (
       <div class="AddContractAndAbiForm">

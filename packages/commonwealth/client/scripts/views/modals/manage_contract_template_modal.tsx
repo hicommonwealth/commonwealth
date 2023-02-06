@@ -12,7 +12,6 @@ import type { DropdownItemType } from 'views/components/component_kit/cw_dropdow
 import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { notifyError } from 'controllers/app/notifications';
 
-// TODO this should be aligned with display_options
 export const displayOptions = [
   { value: '2', label: 'In Create Dropdown' },
   { value: '1', label: 'In Create Sidebar' },
@@ -133,7 +132,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
   }
 
   oninit(vnode: m.Vnode<ManageContractTemplateModalAttrs>) {
-    const { contractId, templateId, template, templates } = vnode.attrs;
+    const { templateId, template, templates } = vnode.attrs;
     const isEditMode = !!templateId;
 
     if (isEditMode) {
@@ -170,7 +169,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
 
     const initialDisplayOption = isEditMode
       ? displayOptions.find(
-          (option) => +option.value === this.form.displayOption
+          (option) => option.value === this.form.displayOption
         )
       : { label: 'Select display option', value: '' };
 
