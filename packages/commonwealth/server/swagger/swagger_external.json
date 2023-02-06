@@ -420,7 +420,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ArrayOfProfiles"
+                  "profiles": 
+                    [
+                      {
+                      "user_id": "number",
+                      "created_at": "Date",
+                      "updated_at": "Date",
+                      "profile_name": "string",
+                      "email": "string",
+                      "website": "string",
+                      "bio": "string",
+                      "is_default": "boolean",
+                      "avatar_url": "string",
+                      "slug": "string"
+                    }
+                  ],
+                  "count": "number" 
                 }
               }
             }
