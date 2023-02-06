@@ -2,4 +2,8 @@
 
 .FeedPage {
   @include contentPadding;
+
+  .h3 {
+    margin-bottom: 16px;
+  }
 }
