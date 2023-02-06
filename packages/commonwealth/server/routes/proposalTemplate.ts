@@ -233,39 +233,46 @@ export async function deleteCommunityContractTemplate(
       throw new AppError('Must provide contract template');
     }
 
-    const communityContractTemplate =
-      await models.CommunityContractTemplate.findOne({
-        where: { template_id },
-      });
+    // const communityContractTemplate =
+    //   await models.CommunityContractTemplate.findOne({
+    //     where: { template_id },
+    //   });
 
-    if (!communityContractTemplate) {
-      throw new AppError('Contract does not exist');
-    }
+    // console.log('communityContractTemplate', communityContractTemplate);
 
-    const communityContractMetadata =
-      await models.CommunityContractTemplateMetadata.findOne({
-        where: {
-          id: contractTemplate.cctmd_id,
-        },
-      });
+    // if (!communityContractTemplate) {
+    //   throw new AppError('Contract does not exist');
+    // }
 
-    if (!communityContractMetadata) {
-      throw new AppError('Contract metadata does not exist');
-    }
+    // console.log('communityContractTemplate', communityContractTemplate);
+    // const communityContractMetadata =
+    //   await models.CommunityContractTemplateMetadata.findOne({
+    //     where: {
+    //       id: contractTemplate.cctmd_id,
+    //     },
+    //   });
+
+    // if (!communityContractMetadata) {
+    //   throw new AppError('Contract metadata does not exist');
+    // }
+
+    // console.log('communityContractMetadata', communityContractMetadata);
 
     if (shouldDeleteCommunityContract) {
       const communityContract = await models.CommunityContract.findOne({
-        where: { id: contract_id },
+        where: { contract_id },
       });
       await communityContract.destroy();
     }
 
-    await communityContractTemplate.destroy();
-    await communityContractMetadata.destroy();
+    // await communityContractTemplate.destroy();
+    // await communityContractMetadata.destroy();
 
     return success(res, {
-      metadata: communityContractMetadata,
-      cct: communityContractTemplate,
+      // metadata: communityContractMetadata,
+      metadata: {} as any,
+      cct: {} as any,
+      // cct: communityContractTemplate,
     });
   } catch (err) {
     throw new AppError('Error deleting community contract template');
