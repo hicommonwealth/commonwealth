@@ -360,7 +360,6 @@ class ContractsController {
     communityContractTemplateMetadata: EditCommunityContractTemplateAttributes
   ) {
     try {
-      // TODO update store with editedTemplate when the store will be ready
       const updateContract = await $.ajax({
         url: `${app.serverUrl()}/contract/community_template`,
         data: {
@@ -379,6 +378,27 @@ class ContractsController {
     } catch (err) {
       console.log(err);
       throw new Error('Failed to save community contract template');
+    }
+  }
+
+  public async deleteCommunityContractTemplate(contract: {
+    contract_id: number;
+    template_id?: number;
+  }) {
+    try {
+      await $.ajax({
+        url: `${app.serverUrl()}/contract/community_template`,
+        data: {
+          ...contract,
+          jwt: app.user.jwt,
+        },
+        type: 'DELETE',
+      });
+
+      // TODO update store
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to delete contract template');
     }
   }
 

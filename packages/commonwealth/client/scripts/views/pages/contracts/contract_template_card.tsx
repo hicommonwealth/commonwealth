@@ -49,7 +49,7 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
     }
   }
 
-  handleDeleteTemplate(name: string) {
+  handleDeleteTemplate(name: string, contractId: number, templateId: number) {
     showConfirmationModal({
       title: 'Delete Template',
       description: (
@@ -61,8 +61,12 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
       confirmButton: {
         label: 'Delete',
         type: 'mini-red',
-        onConfirm: () => {
-          console.log('delete template');
+        onConfirm: async () => {
+          await app.contracts.deleteCommunityContractTemplate({
+            contract_id: contractId,
+            template_id: templateId,
+          });
+          m.redraw();
         },
       },
     });
@@ -70,7 +74,6 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
 
   view(vnode: m.Vnode<ContractTemplateCardAttrs>) {
     const { title, contractId, id: templateId, ...templateInfo } = vnode.attrs;
-    console.log('templateInfo', templateInfo);
 
     const infosOrder: InfoOrder[] = [
       { key: 'displayName', label: 'Display Name' },
@@ -98,7 +101,11 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
                 label: 'Delete',
                 iconLeft: 'trash',
                 onclick: () =>
-                  this.handleDeleteTemplate(templateInfo.displayName),
+                  this.handleDeleteTemplate(
+                    templateInfo.displayName,
+                    contractId,
+                    templateId
+                  ),
               },
             ]}
           />
