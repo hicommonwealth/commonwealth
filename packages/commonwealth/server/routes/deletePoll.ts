@@ -44,7 +44,7 @@ const deletePoll = async (
     const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
-    if (!userOwnedAddressIds.includes(thread.address_id)) {
+    if (!userOwnedAddressIds.includes(thread.address_id) && !req.user.isAdmin) {
       throw new AppError(Errors.NotAuthor);
     }
 

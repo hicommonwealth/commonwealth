@@ -123,7 +123,6 @@ class PollsController {
         jwt: app.user.jwt,
       },
       success: (response) => {
-        // todo
         this._store.remove(this._store.getById(pollId));
       },
       error: (err) => {
