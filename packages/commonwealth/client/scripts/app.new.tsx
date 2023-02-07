@@ -3,6 +3,13 @@ import { Routes, Route, BrowserRouter, useParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import { Layout } from 'views/layout';
 
+import '../../static/fonts/fonts.css';
+import '../styles/normalize.css'; // reset
+import '../styles/tailwind_reset.css'; // for the landing page
+import '../styles/shared.scss';
+import 'construct.scss';
+import 'lity/dist/lity.min.css';
+
 import { PageLoading } from './views/pages/loading';
 import { initAppState } from 'state';
 

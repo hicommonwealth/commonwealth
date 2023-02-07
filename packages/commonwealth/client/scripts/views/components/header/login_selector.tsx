@@ -6,17 +6,9 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+
 import _ from 'lodash';
 
 import 'components/header/login_selector.scss';
@@ -32,8 +24,8 @@ import { AddressInfo, ITokenAdapter } from 'models';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
+import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import { NewLoginModal } from 'views/modals/login_modal';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -44,6 +36,7 @@ import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { UserBlock } from '../user/user_block';
 import { CWDivider } from '../component_kit/cw_divider';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
+import { Modal } from '../component_kit/cw_modal';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -63,90 +56,91 @@ type LoginSelectorMenuLeftAttrs = {
   nAccountsWithoutRole: number;
 };
 
-export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftAttrs> {
-  view(vnode: ResultNode<LoginSelectorMenuLeftAttrs>) {
-    const { activeAddressesWithRole, nAccountsWithoutRole } = vnode.attrs;
+export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
+  const { activeAddressesWithRole, nAccountsWithoutRole } = props;
 
-    return (
-      <div className="LoginSelectorMenu">
-        {activeAddressesWithRole.map((account) => (
-          <div
-            className="login-menu-item"
-            onClick={async () => {
-              await setActiveAccount(account);
-              redraw();
-            }}
-          >
-            <UserBlock
-              user={account}
-              selected={isSameAccount(account, app.user.activeAccount)}
-              showRole={false}
-              compact
-              avatarSize={16}
-            />
-          </div>
-        ))}
-        {activeAddressesWithRole.length > 0 && <CWDivider />}
-        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
-          <div
-            className="login-menu-item"
-            onClick={() => {
-              const pf = app.user.activeAccount.profile;
-              if (app.chain) {
-                navigateToSubpage(`/account/${pf.address}`);
-              }
-            }}
-          >
-            <CWText type="caption">View profile</CWText>
-          </div>
-        )}
-        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
-          <div
-            className="login-menu-item"
-            onClick={(e) => {
-              e.preventDefault();
-              app.modals.create({
-                modal: EditProfileModal,
-                data: {
-                  account: app.user.activeAccount,
-                  refreshCallback: () => redraw(),
-                },
-              });
-            }}
-          >
-            <CWText type="caption">Edit profile</CWText>
-          </div>
-        )}
+  const [isLoginModalOpen, setIsLoginModalOpen] =
+    React.useState<boolean>(false);
+
+  return (
+    <div className="LoginSelectorMenu">
+      {activeAddressesWithRole.map((account) => (
+        <div
+          className="login-menu-item"
+          onClick={async () => {
+            await setActiveAccount(account);
+            redraw();
+          }}
+        >
+          <UserBlock
+            user={account}
+            selected={isSameAccount(account, app.user.activeAccount)}
+            showRole={false}
+            compact
+            avatarSize={16}
+          />
+        </div>
+      ))}
+      {activeAddressesWithRole.length > 0 && <CWDivider />}
+      {activeAddressesWithRole.length > 0 && app.activeChainId() && (
         <div
           className="login-menu-item"
           onClick={() => {
-            if (nAccountsWithoutRole > 0) {
-              app.modals.create({
-                modal: SelectAddressModal,
-              });
-            } else {
-              app.modals.create({
-                modal: NewLoginModal,
-                data: {
-                  modalType: isWindowMediumSmallInclusive(window.innerWidth)
-                    ? 'fullScreen'
-                    : 'centered',
-                  breakpointFn: isWindowMediumSmallInclusive,
-                },
-              });
+            const pf = app.user.activeAccount.profile;
+            if (app.chain) {
+              navigateToSubpage(`/account/${pf.address}`);
             }
           }}
         >
-          <CWText type="caption">
-            {nAccountsWithoutRole > 0
-              ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-              : 'Connect a new address'}
-          </CWText>
+          <CWText type="caption">View profile</CWText>
         </div>
+      )}
+      {activeAddressesWithRole.length > 0 && app.activeChainId() && (
+        <div
+          className="login-menu-item"
+          onClick={(e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: EditProfileModal,
+              data: {
+                account: app.user.activeAccount,
+                refreshCallback: () => redraw(),
+              },
+            });
+          }}
+        >
+          <CWText type="caption">Edit profile</CWText>
+        </div>
+      )}
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          if (nAccountsWithoutRole > 0) {
+            app.modals.create({
+              modal: SelectAddressModal,
+            });
+          } else {
+            setIsLoginModalOpen(true);
+          }
+        }}
+      >
+        <CWText type="caption">
+          {nAccountsWithoutRole > 0
+            ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+            : 'Connect a new address'}
+        </CWText>
+        <Modal
+          content={
+            <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
+          }
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsLoginModalOpen(false)}
+          open={isLoginModalOpen}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export class LoginSelectorMenuRight extends ClassComponent {
   view() {
@@ -252,6 +246,7 @@ class TOSModal extends ClassComponent<TOSModalAttrs> {
 export const LoginSelector = () => {
   const [profileLoadComplete, setProfileLoadComplete] =
     React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
@@ -263,17 +258,13 @@ export const LoginSelector = () => {
           buttonType="tertiary-black"
           iconLeft="person"
           label="Log in"
-          onClick={() => {
-            app.modals.create({
-              modal: NewLoginModal,
-              data: {
-                modalType: isWindowMediumSmallInclusive(window.innerWidth)
-                  ? 'fullScreen'
-                  : 'centered',
-                breakpointFn: isWindowMediumSmallInclusive,
-              },
-            });
-          }}
+          onClick={() => setIsModalOpen(true)}
+        />
+        <Modal
+          content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+          onClose={() => setIsModalOpen(false)}
+          open={isModalOpen}
         />
       </div>
     );
@@ -457,15 +448,7 @@ export const LoginSelector = () => {
     ) {
       await linkToCommunity(0);
     } else {
-      app.modals.create({
-        modal: NewLoginModal,
-        data: {
-          modalType: isWindowMediumSmallInclusive(window.innerWidth)
-            ? 'fullScreen'
-            : 'centered',
-          breakpointFn: isWindowMediumSmallInclusive,
-        },
-      });
+      setIsModalOpen(true);
     }
   }
 
