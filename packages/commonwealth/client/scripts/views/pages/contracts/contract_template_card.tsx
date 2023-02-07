@@ -22,6 +22,7 @@ type ContractTemplateCardAttrs = {
   nickname: string;
   slug: string;
   display: string;
+  cctmd_id: number;
 };
 
 interface InfoOrder {
@@ -49,7 +50,12 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
     }
   }
 
-  handleDeleteTemplate(name: string, contractId: number, templateId: number) {
+  handleDeleteTemplate(
+    name: string,
+    contractId: number,
+    templateId: number,
+    cctmdId: number
+  ) {
     showConfirmationModal({
       title: 'Delete Template',
       description: (
@@ -65,6 +71,7 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
           await app.contracts.deleteCommunityContractTemplate({
             contract_id: contractId,
             template_id: templateId,
+            cctmd_id: cctmdId,
           });
           m.redraw();
         },
@@ -73,7 +80,13 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
   }
 
   view(vnode: m.Vnode<ContractTemplateCardAttrs>) {
-    const { title, contractId, id: templateId, ...templateInfo } = vnode.attrs;
+    const {
+      title,
+      contractId,
+      cctmd_id,
+      id: templateId,
+      ...templateInfo
+    } = vnode.attrs;
 
     const infosOrder: InfoOrder[] = [
       { key: 'displayName', label: 'Display Name' },
@@ -104,7 +117,8 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
                   this.handleDeleteTemplate(
                     templateInfo.displayName,
                     contractId,
-                    templateId
+                    templateId,
+                    cctmd_id
                   ),
               },
             ]}
