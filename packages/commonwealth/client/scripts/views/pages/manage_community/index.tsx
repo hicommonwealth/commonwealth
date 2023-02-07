@@ -82,10 +82,7 @@ class ManageCommunityPage extends ClassComponent {
 
     const { adminsAndMods } = app.chain.meta;
 
-    if (
-      oldRole.permission === 'admin' ||
-      oldRole.permission === 'moderator'
-    ) {
+    if (oldRole.permission === 'admin' || oldRole.permission === 'moderator') {
       const idx = adminsAndMods.findIndex(predicate);
 
       if (idx !== -1) {
@@ -93,10 +90,7 @@ class ManageCommunityPage extends ClassComponent {
       }
     }
 
-    if (
-      newRole.permission === 'admin' ||
-      newRole.permission === 'moderator'
-    ) {
+    if (newRole.permission === 'admin' || newRole.permission === 'moderator') {
       adminsAndMods.push(
         new RoleInfo(
           newRole.id,
@@ -166,12 +160,16 @@ class ManageCommunityPage extends ClassComponent {
             admins={admins}
             chain={app.config.chains.getById(app.activeChainId())}
             mods={mods}
-            onRoleUpdate={(oldRole, newRole) => this.onRoleUpdate(oldRole, newRole)}
+            onRoleUpdate={(oldRole, newRole) =>
+              this.onRoleUpdate(oldRole, newRole)
+            }
             onSave={() => onSave()}
           />
           <AdminPanelTabs
             defaultTab={1}
-            onRoleUpgrade={(oldRole, newRole) => this.onRoleUpdate(oldRole, newRole)}
+            onRoleUpgrade={(oldRole, newRole) =>
+              this.onRoleUpdate(oldRole, newRole)
+            }
             roleData={this.roleData}
             webhooks={this.webhooks}
           />
