@@ -6,7 +6,7 @@ require('dotenv').config();
 
 module.exports = {
   entry: {
-    app: ['app.new.tsx'],
+    app: ['index.tsx'],
   },
   context: __dirname,
   devServer: {
