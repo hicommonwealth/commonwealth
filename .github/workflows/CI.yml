@@ -154,13 +154,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Master
+      - name: Checkout master
         uses: actions/checkout@v3
         with:
           ref: master
 
-      - name: Checkout current branch
-        uses: actions/checkout@v3
+      - name: Switch branch
+        run: git switch ${{ GITHUB_REF }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
