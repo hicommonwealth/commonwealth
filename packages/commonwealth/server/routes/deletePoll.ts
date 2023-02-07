@@ -10,6 +10,8 @@ import { success } from '../types';
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
   NotLoggedIn: 'Not logged in',
+  NotAuthor: 'Not the Author',
+  NoThread: 'No thread provided'
 };
 
 type DeletePollReq = {
@@ -27,6 +29,7 @@ const deletePoll = async (
 ) => {
   if (!req.user) throw new AppError(Errors.NotLoggedIn);
 
+  const { thread_id, poll_id } = req.body;
   // check chain
   // check if author of thread
   // check if admin?
