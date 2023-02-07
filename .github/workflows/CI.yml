@@ -160,7 +160,7 @@ jobs:
           ref: master
 
       - name: Switch branch
-        run: git checkout ${{ github.ref }}
+        run: git checkout ${{ github.head_ref }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
