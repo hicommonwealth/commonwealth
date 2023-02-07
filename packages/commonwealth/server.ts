@@ -123,14 +123,30 @@ async function main() {
   });
 
   const setupMiddleware = () => {
-    // redirect from commonwealthapp.herokuapp.com to commonwealth.im
+    // configure redirect to proper appname from herokuapp
     app.all(/.*/, (req, res, next) => {
-      const host = req.header('host');
-      if (host.match(/commonwealthapp.herokuapp.com/i)) {
-        res.redirect(301, `https://commonwealth.im${req.url}`);
-      } else {
-        next();
+      // go straight to herokuapp if traffic coming from disabled redirect url
+      if (req.ip.includes(process.env.DISABLE_REDIRECT_URL)) {
+        return next();
       }
+
+      // do not redirect if heroku vars not set
+      const host = req.header('host');
+      const { HEROKU_APP_NAME, SERVER_URL } = process.env;
+      if (
+        !HEROKU_APP_NAME ||
+        !SERVER_URL ||
+        SERVER_URL.includes(`${HEROKU_APP_NAME}.herokuapp.com`)
+      ) {
+        return next();
+      }
+
+      // redirect from appname.herokuapp.com to SERVER_URL (e.g. commonwealth.im) if present
+      if (host.match(`/${process.env.HEROKU_APP_NAME}.herokuapp.com/i`)) {
+        return res.redirect(301, `${process.env.SERVER_URL}${req.url}`);
+      }
+
+      return next();
     });
 
     // redirect to https:// unless we are using a test domain
@@ -140,22 +156,6 @@ async function main() {
 
     // dynamic compression settings used
     app.use(compression());
-
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {
