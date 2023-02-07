@@ -69,6 +69,7 @@ import createThread from '../routes/createThread';
 import editThread from '../routes/editThread';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
+import deletePoll from '../routes/deletePoll';
 import updateThreadStage from '../routes/updateThreadStage';
 import updateThreadPrivacy from '../routes/updateThreadPrivacy';
 import updateThreadPinned from '../routes/updateThreadPinned';
@@ -304,6 +305,11 @@ function setupRouter(
     '/getPolls',
     databaseValidationService.validateChain,
     getPolls.bind(this, models)
+  );
+  router.delete(
+    '/deletePoll',
+    databaseValidationService.validateChain,
+    deletePoll.bind(this, models)
   );
   router.post(
     '/updateThreadStage',
