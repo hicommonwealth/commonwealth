@@ -159,9 +159,6 @@ jobs:
         with:
           ref: master
 
-      - name: Switch branch
-        run: git switch ${{ GITHUB_REF }}
-
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
