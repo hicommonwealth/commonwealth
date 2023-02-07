@@ -50,7 +50,6 @@ export class Layout extends ClassComponent<LayoutAttrs> {
     const { scope, deferChain } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
-    const scopeMatchesChain = app.config.chains.getById(scope);
 
     // Put the survey on a timer so it doesn't immediately appear
     if (!this.surveyDelayTriggered && !this.surveyReadyForDisplay) {
@@ -79,7 +78,10 @@ export class Layout extends ClassComponent<LayoutAttrs> {
     } else if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
       return <LoadingLayout />;
-    } else if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
+    }
+
+    const scopeMatchesChain = app.config.chains.getById(scope);
+    if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
       this.loadingScope = scope;
       initNewTokenChain(scope);
       return <LoadingLayout />;
