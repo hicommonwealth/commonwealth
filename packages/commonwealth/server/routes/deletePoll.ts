@@ -5,7 +5,7 @@ import type { DB } from '../models';
 import { findOneRole } from '../util/roles';
 import type { ValidateChainParams } from '../middleware/validateChain';
 import type { TypedRequestBody, TypedResponse } from '../types';
-
+import { success } from '../types';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -13,6 +13,8 @@ export const Errors = {
 };
 
 type DeletePollReq = {
+  thread_id: number,
+  poll_id: number,
 } & ValidateChainParams;
 
 type DeletePollResp = {
@@ -27,12 +29,37 @@ const deletePoll = async (
 
   // check chain
   // check if author of thread
-  // check if admin
+  // check if admin?
+
   try {
-    return res.json({ status: 'Success', result: finalPoll.toJSON() });
+    const thread = await models.Thread.findOne({
+      where: {
+        id: thread_id,
+      },
+    });
+
+    if (!thread) throw new AppError(Errors.NoThread);
+    const userOwnedAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
+    if (!userOwnedAddressIds.includes(thread.address_id)) {
+      throw AppError(Errors.NotAuthor);
+    }
+
+    const poll = await models.Poll.findOne({
+      where: {
+        thread_id,
+        poll_id,
+      }
+    });
+
+    await poll.destroy();
   } catch (e) {
     throw new ServerError(e);
   }
+
+
+  return success(res, {});
 };
 
 export default deletePoll;
