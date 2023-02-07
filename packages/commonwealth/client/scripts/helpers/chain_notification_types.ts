@@ -1,17 +1,4 @@
 export const EdgewareChainNotificationTypes = {
-  Council: [
-    'edgeware-collective-approved',
-    'edgeware-collective-disapproved',
-    'edgeware-collective-executed',
-    'edgeware-collective-member-executed',
-    'edgeware-collective-proposed',
-    'edgeware-collective-voted',
-    'edgeware-election-candidacy-submitted',
-    'edgeware-election-empty-term',
-    'edgeware-election-member-kicked',
-    'edgeware-election-member-renounced',
-    'edgeware-election-new-term',
-  ],
   Democracy: [
     'edgeware-democracy-cancelled',
     'edgeware-democracy-executed',
@@ -40,19 +27,6 @@ export const EdgewareChainNotificationTypes = {
 };
 
 export const PolkadotChainNotificationTypes = {
-  Council: [
-    'polkadot-collective-approved',
-    'polkadot-collective-disapproved',
-    'polkadot-collective-executed',
-    'polkadot-collective-member-executed',
-    'polkadot-collective-proposed',
-    'polkadot-collective-voted',
-    'polkadot-election-candidacy-submitted',
-    'polkadot-election-empty-term',
-    'polkadot-election-member-kicked',
-    'polkadot-election-member-renounced',
-    'polkadot-election-new-term',
-  ],
   Democracy: [
     'polkadot-democracy-cancelled',
     'polkadot-democracy-executed',
@@ -79,19 +53,6 @@ export const PolkadotChainNotificationTypes = {
 };
 
 export const KusamaChainNotificationTypes = {
-  Council: [
-    'kusama-collective-approved',
-    'kusama-collective-disapproved',
-    'kusama-collective-executed',
-    'kusama-collective-member-executed',
-    'kusama-collective-proposed',
-    'kusama-collective-voted',
-    'kusama-election-candidacy-submitted',
-    'kusama-election-empty-term',
-    'kusama-election-member-kicked',
-    'kusama-election-member-renounced',
-    'kusama-election-new-term',
-  ],
   Democracy: [
     'kusama-democracy-cancelled',
     'kusama-democracy-executed',
@@ -118,19 +79,6 @@ export const KusamaChainNotificationTypes = {
 };
 
 export const KulupuChainNotificationTypes = {
-  Council: [
-    'kulupu-collective-approved',
-    'kulupu-collective-disapproved',
-    'kulupu-collective-executed',
-    'kulupu-collective-member-executed',
-    'kulupu-collective-proposed',
-    'kulupu-collective-voted',
-    'kulupu-election-candidacy-submitted',
-    'kulupu-election-empty-term',
-    'kulupu-election-member-kicked',
-    'kulupu-election-member-renounced',
-    'kulupu-election-new-term',
-  ],
   Democracy: [
     'kulupu-democracy-cancelled',
     'kulupu-democracy-executed',
