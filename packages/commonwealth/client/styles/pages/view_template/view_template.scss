@@ -1,0 +1,28 @@
+@import '../../shared';
+
+.ViewTemplatePage {
+  width: 688px;
+  margin: 16px auto;
+
+  @include mediumSmallInclusive {
+    width: calc(100% - 10%);
+  }
+
+  .header {
+    margin: 32px 0 8px;
+  }
+
+  .divider {
+    margin: 40px 0 20px;
+  }
+
+  .template {
+  }
+
+  .form {
+    textarea {
+      min-height: 400px;
+      resize: vertical;
+    }
+  }
+}
