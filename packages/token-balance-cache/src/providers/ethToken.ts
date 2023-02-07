@@ -4,9 +4,7 @@ import { BalanceType } from 'common-common/src/types';
 import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
 
-export default class EthTokenBalanceProvider extends BalanceProvider<
-  Web3
-> {
+export default class EthTokenBalanceProvider extends BalanceProvider<Web3> {
   public name = 'eth-token';
   public opts = {
     contractType: 'string?',
@@ -14,10 +12,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<
   };
   public validBases = [BalanceType.Ethereum];
 
-  public getCacheKey(
-    node: IChainNode,
-    address: string
-  ): string {
+  public getCacheKey(node: IChainNode, address: string): string {
     return `${node.id}-${address}-${'native'}`;
   }
 

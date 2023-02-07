@@ -8,7 +8,7 @@ import { ERC721__factory } from 'common-common/src/eth/types';
 import type { EthBPOpts, IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
-import { validateOpts } from 'util/validateOpts';
+import { validateOpts } from '../util/validateOpts';
 
 export default class Erc721BalanceProvider extends BalanceProvider<
   ERC721,

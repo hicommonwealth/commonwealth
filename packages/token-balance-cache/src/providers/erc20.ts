@@ -1,4 +1,4 @@
-import { validateOpts } from 'util/validateOpts';
+import { validateOpts } from '../util/validateOpts';
 import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
 import type { ERC20 } from 'common-common/src/eth/types';
