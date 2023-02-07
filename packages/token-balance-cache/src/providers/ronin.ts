@@ -5,10 +5,10 @@ import type { HttpProvider } from 'web3-core';
 import { providers } from 'ethers';
 import type { ERC20 } from 'common-common/src/eth/types';
 import { ERC20__factory } from 'common-common/src/eth/types';
-
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
+import Web3 from 'web3';
 
 export default class RoninBalanceProvider extends BalanceProvider<
   [ERC20, Contract]
@@ -20,7 +20,6 @@ export default class RoninBalanceProvider extends BalanceProvider<
   public async getExternalProvider(
     node: IChainNode
   ): Promise<[api: ERC20, stakingContract: Contract]> {
-    const Web3 = (await import('web3')).default;
     // TODO: make configurable
     const rpcUrl = 'https://api.roninchain.com/rpc';
     const provider = new Web3.providers.HttpProvider(rpcUrl);
@@ -65,7 +64,6 @@ export default class RoninBalanceProvider extends BalanceProvider<
   }
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
-    const Web3 = (await import('web3')).default;
     if (!Web3.utils.isAddress(address)) {
       throw new Error('Invalid address');
     }
