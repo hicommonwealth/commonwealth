@@ -44,6 +44,10 @@ class SidebarComponent extends ClassComponent {
       chain: app.activeChainId(),
     });
 
+    app.sidebarRedraw.on('redraw', () => {
+      this.redraw();
+    });
+
     const currentChainInfo = app.chain?.meta;
 
     const onHomeRoute = getRoute() === `/${app.activeChainId()}/feed`;

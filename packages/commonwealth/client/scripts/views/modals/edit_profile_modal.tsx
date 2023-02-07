@@ -1,18 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-import $ from 'jquery';
+import { redraw, jsx } from 'mithrilInterop';
 
 import 'modals/edit_profile_modal.scss';
 import type { Account } from 'models';
@@ -23,136 +12,133 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-type EditProfileModalAttrs = {
+type EditProfileModalProps = {
   account: Account;
+  onModalClose: () => void;
   refreshCallback: () => void;
 };
 
-export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
-  private avatarUrl: string;
-  private bio: string;
-  private error: string;
-  private headline: string;
-  private name: string;
-  private saving: boolean;
+export const EditProfileModal = (props: EditProfileModalProps) => {
+  const { account, onModalClose, refreshCallback } = props;
 
-  oninit(vnode: ResultNode<EditProfileModalAttrs>) {
-    const { account } = vnode.attrs;
+  const [avatarUrl, setAvatarUrl] = React.useState<string>(
+    account.profile.avatarUrl
+  );
+  const [bio, setBio] = React.useState<string>(account.profile.bio);
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [headline, setHeadline] = React.useState<string>(
+    account.profile.headline
+  );
+  const [name, setName] = React.useState<string>(account.profile.name);
+  const [isSaving, setIsSaving] = React.useState<boolean>(false);
 
-    this.avatarUrl = account.profile.avatarUrl;
-    this.bio = account.profile.bio;
-    this.headline = account.profile.headline;
-    this.name = account.profile.name;
-  }
-
-  view(vnode: ResultNode<EditProfileModalAttrs>) {
-    const { account, refreshCallback } = vnode.attrs;
-
-    return (
-      <div className="EditProfileModal">
-        <div className="compact-modal-title">
-          <h3>Edit profile</h3>
-        </div>
-        <div className="compact-modal-body">
-          <AvatarUpload
-            scope="user"
-            account={account}
-            uploadStartedCallback={() => {
-              redraw();
-            }}
-            uploadCompleteCallback={(files) => {
-              files.forEach((f) => {
-                if (!f.uploadURL) return;
-                const url = f.uploadURL.replace(/\?.*/, '');
-                this.avatarUrl = url.trim();
-              });
-              redraw();
-            }}
-          />
-          <CWTextInput
-            label="Name"
-            name="name"
-            value={this.name}
-            placeholder="Add your name"
-            disabled={account.profile.isOnchain}
-            autoComplete="off"
-            onInput={(e) => {
-              if (account.profile) {
-                this.name = e.target.value;
-              }
-            }}
-          />
-          <CWTextInput
-            label="Headline"
-            name="headline"
-            value={this.headline}
-            placeholder="Add a headline"
-            autoComplete="off"
-            onInput={(e) => {
-              if (account.profile) {
-                this.headline = e.target.value;
-              }
-            }}
-          />
-          <CWTextArea
-            name="bio"
-            label="Bio"
-            value={this.bio}
-            placeholder="Add a bio"
-            onInput={(e) => {
-              if (account.profile) {
-                this.bio = e.target.value;
-              }
-            }}
-          />
-          <div className="buttons-row">
-            <CWButton
-              buttonType="secondary-blue"
-              onClick={(e) => {
-                e.preventDefault();
-                $(vnode.dom).trigger('modalexit');
-              }}
-              label="Cancel"
-            />
-            <CWButton
-              disabled={this.saving}
-              onClick={(e) => {
-                e.preventDefault();
-
-                const data = {
-                  bio: this.bio,
-                  headline: this.headline,
-                  name: this.name,
-                  avatarUrl: this.avatarUrl,
-                };
-
-                this.saving = true;
-
-                app.profiles
-                  .updateProfileForAccount(account, data)
-                  .then(() => {
-                    this.saving = false;
-                    redraw();
-                    refreshCallback();
-                    $(vnode.dom).trigger('modalexit');
-                  })
-                  .catch((error: any) => {
-                    this.saving = false;
-                    this.error = error.responseJSON
-                      ? error.responseJSON.error
-                      : error.responseText;
-                    redraw();
-                  });
-              }}
-              label="Save Changes"
-            />
-          </div>
-          {this.error && (
-            <CWValidationText message={this.error} status="failure" />
-          )}
-        </div>
+  return (
+    <div className="EditProfileModal">
+      <div className="compact-modal-title">
+        <h3>Edit profile</h3>
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
-    );
-  }
-}
+      <div className="compact-modal-body">
+        <AvatarUpload
+          scope="user"
+          account={account}
+          uploadStartedCallback={() => {
+            redraw();
+          }}
+          uploadCompleteCallback={(files) => {
+            files.forEach((f) => {
+              if (!f.uploadURL) return;
+              const url = f.uploadURL.replace(/\?.*/, '').trim();
+              setAvatarUrl(url);
+            });
+
+            redraw();
+          }}
+        />
+        <CWTextInput
+          label="Name"
+          name="name"
+          value={name}
+          placeholder="Add your name"
+          disabled={account.profile.isOnchain}
+          autoComplete="off"
+          onInput={(e) => {
+            if (account.profile) {
+              setName(e.target.value);
+            }
+          }}
+        />
+        <CWTextInput
+          label="Headline"
+          name="headline"
+          value={headline}
+          placeholder="Add a headline"
+          autoComplete="off"
+          onInput={(e) => {
+            if (account.profile) {
+              setHeadline(e.target.value);
+            }
+          }}
+        />
+        <CWTextArea
+          name="bio"
+          label="Bio"
+          value={bio}
+          placeholder="Add a bio"
+          onInput={(e) => {
+            if (account.profile) {
+              setBio(e.target.value);
+            }
+          }}
+        />
+        <div className="buttons-row">
+          <CWButton
+            buttonType="secondary-blue"
+            onClick={(e) => {
+              e.preventDefault();
+              onModalClose();
+            }}
+            label="Cancel"
+          />
+          <CWButton
+            disabled={isSaving}
+            onClick={(e) => {
+              e.preventDefault();
+
+              const data = {
+                bio: bio,
+                headline: headline,
+                name: name,
+                avatarUrl: avatarUrl,
+              };
+
+              setIsSaving(true);
+
+              app.profiles
+                .updateProfileForAccount(account, data)
+                .then(() => {
+                  setIsSaving(false);
+                  redraw();
+                  refreshCallback();
+                  onModalClose();
+                })
+                .catch((error: any) => {
+                  setIsSaving(false);
+                  setErrorMsg(
+                    error.responseJSON
+                      ? error.responseJSON.error
+                      : error.responseText
+                  );
+                  redraw();
+                });
+            }}
+            label="Save Changes"
+          />
+        </div>
+        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
+      </div>
+    </div>
+  );
+};

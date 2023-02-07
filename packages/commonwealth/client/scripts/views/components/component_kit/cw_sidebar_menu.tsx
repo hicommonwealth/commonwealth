@@ -59,6 +59,7 @@ const CWSidebarMenuItemComponent = (props: MenuItem) => {
           e.stopPropagation();
           app.sidebarToggled = false;
           app.sidebarMenu = 'default';
+          app.sidebarRedraw.emit('redraw');
           setRoute(item.id ? `/${item.id}` : '/');
         }}
       >
@@ -144,6 +145,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
             onClick: () => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
+              app.sidebarRedraw.emit('redraw');
               setRoute('/communities');
             },
           },
@@ -154,6 +156,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
             onClick: () => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
+              app.sidebarRedraw.emit('redraw');
               setRoute('/notification-settings');
             },
           },
@@ -167,6 +170,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
               } else {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
+                app.sidebarRedraw.emit('redraw');
                 setRoute('/settings');
               }
             },

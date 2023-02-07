@@ -6,8 +6,7 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
+import { setRoute, redraw, jsx } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -59,94 +58,112 @@ type LoginSelectorMenuLeftAttrs = {
 export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
   const { activeAddressesWithRole, nAccountsWithoutRole } = props;
 
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] =
+    React.useState<boolean>(false);
   const [isLoginModalOpen, setIsLoginModalOpen] =
+    React.useState<boolean>(false);
+  const [isSelectAddressModalOpen, setIsSelectAddressModalOpen] =
     React.useState<boolean>(false);
 
   return (
-    <div className="LoginSelectorMenu">
-      {activeAddressesWithRole.map((account) => (
-        <div
-          className="login-menu-item"
-          onClick={async () => {
-            await setActiveAccount(account);
-            redraw();
-          }}
-        >
-          <UserBlock
-            user={account}
-            selected={isSameAccount(account, app.user.activeAccount)}
-            showRole={false}
-            compact
-            avatarSize={16}
-          />
-        </div>
-      ))}
-      {activeAddressesWithRole.length > 0 && <CWDivider />}
-      {activeAddressesWithRole.length > 0 && app.activeChainId() && (
+    <React.Fragment>
+      <div className="LoginSelectorMenu">
+        {activeAddressesWithRole.map((account) => (
+          <div
+            className="login-menu-item"
+            onClick={async () => {
+              await setActiveAccount(account);
+              redraw();
+            }}
+          >
+            <UserBlock
+              user={account}
+              selected={isSameAccount(account, app.user.activeAccount)}
+              showRole={false}
+              compact
+              avatarSize={16}
+            />
+          </div>
+        ))}
+        {activeAddressesWithRole.length > 0 && <CWDivider />}
+        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
+          <div
+            className="login-menu-item"
+            onClick={() => {
+              const pf = app.user.activeAccount.profile;
+              if (app.chain) {
+                navigateToSubpage(`/account/${pf.address}`);
+              }
+            }}
+          >
+            <CWText type="caption">View profile</CWText>
+          </div>
+        )}
+        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
+          <div
+            className="login-menu-item"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsEditProfileModalOpen(true);
+            }}
+          >
+            <CWText type="caption">Edit profile</CWText>
+          </div>
+        )}
         <div
           className="login-menu-item"
           onClick={() => {
-            const pf = app.user.activeAccount.profile;
-            if (app.chain) {
-              navigateToSubpage(`/account/${pf.address}`);
+            if (nAccountsWithoutRole > 0) {
+              setIsSelectAddressModalOpen(true);
+            } else {
+              setIsLoginModalOpen(true);
             }
           }}
         >
-          <CWText type="caption">View profile</CWText>
+          <CWText type="caption">
+            {nAccountsWithoutRole > 0
+              ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+              : 'Connect a new address'}
+          </CWText>
         </div>
-      )}
-      {activeAddressesWithRole.length > 0 && app.activeChainId() && (
-        <div
-          className="login-menu-item"
-          onClick={(e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: EditProfileModal,
-              data: {
-                account: app.user.activeAccount,
-                refreshCallback: () => redraw(),
-              },
-            });
-          }}
-        >
-          <CWText type="caption">Edit profile</CWText>
-        </div>
-      )}
-      <div
-        className="login-menu-item"
-        onClick={() => {
-          if (nAccountsWithoutRole > 0) {
-            app.modals.create({
-              modal: SelectAddressModal,
-            });
-          } else {
-            setIsLoginModalOpen(true);
-          }
-        }}
-      >
-        <CWText type="caption">
-          {nAccountsWithoutRole > 0
-            ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-            : 'Connect a new address'}
-        </CWText>
-        <Modal
-          content={
-            <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
-          }
-          isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-          onClose={() => setIsLoginModalOpen(false)}
-          open={isLoginModalOpen}
-        />
       </div>
-    </div>
+      <Modal
+        content={
+          <EditProfileModal
+            onModalClose={() => setIsEditProfileModalOpen(false)}
+            account={app.user.activeAccount}
+            refreshCallback={() => redraw()}
+          />
+        }
+        onClose={() => setIsEditProfileModalOpen(false)}
+        open={isEditProfileModalOpen}
+      />
+      <Modal
+        content={
+          <SelectAddressModal
+            onModalClose={() => setIsSelectAddressModalOpen(false)}
+          />
+        }
+        onClose={() => setIsSelectAddressModalOpen(false)}
+        open={isSelectAddressModalOpen}
+      />
+      <Modal
+        content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
+        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        onClose={() => setIsLoginModalOpen(false)}
+        open={isLoginModalOpen}
+      />
+    </React.Fragment>
   );
 };
 
-export class LoginSelectorMenuRight extends ClassComponent {
-  view() {
-    const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
+export const LoginSelectorMenuRight = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-    return (
+  const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
+
+  return (
+    <React.Fragment>
       <div className="LoginSelectorMenu">
         <div
           className="login-menu-item"
@@ -186,10 +203,7 @@ export class LoginSelectorMenuRight extends ClassComponent {
           <CWText type="caption">Dark mode</CWText>
         </div>
         <CWDivider />
-        <div
-          className="login-menu-item"
-          onClick={() => app.modals.create({ modal: FeedbackModal })}
-        >
+        <div className="login-menu-item" onClick={() => setIsModalOpen(true)}>
           <CWText type="caption">Send feedback</CWText>
         </div>
         <div
@@ -210,63 +224,75 @@ export class LoginSelectorMenuRight extends ClassComponent {
           <CWText type="caption">Logout</CWText>
         </div>
       </div>
-    );
-  }
-}
+      <Modal
+        content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};
 
-type TOSModalAttrs = {
+type TOSModalProps = {
   onAccept: () => void;
+  onModalClose: () => void;
 };
 
 // TODO: Replace this with a proper TOS Compoment when we have one
-class TOSModal extends ClassComponent<TOSModalAttrs> {
-  view(vnode: ResultNode<TOSModalAttrs>) {
-    return (
-      <div className="TOSModal">
-        <div className="close-button-wrapper">
-          <CWIconButton
-            iconButtonTheme="primary"
-            iconName="close"
-            iconSize="small"
-            className="close-icon"
-            onClick={() => $('.TOSModal').trigger('modalexit')}
-          />
-        </div>
-        <div className="content-wrapper">
-          <CWText>
-            By clicking accept you agree to the community's Terms of Service
-          </CWText>
-          <CWButton onClick={vnode.attrs.onAccept} label="Accept" />
-        </div>
+const TOSModal = (props: TOSModalProps) => {
+  return (
+    <div className="TOSModal">
+      <div className="close-button-wrapper">
+        <CWIconButton
+          iconButtonTheme="primary"
+          iconName="close"
+          iconSize="small"
+          className="close-icon"
+          onClick={() => props.onModalClose()}
+        />
       </div>
-    );
-  }
-}
+      <div className="content-wrapper">
+        <CWText>
+          By clicking accept you agree to the community's Terms of Service
+        </CWText>
+        <CWButton onClick={props.onAccept} label="Accept" />
+      </div>
+    </div>
+  );
+};
 
 export const LoginSelector = () => {
   const [profileLoadComplete, setProfileLoadComplete] =
     React.useState<boolean>(false);
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] =
+    React.useState<boolean>(false);
+  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
+    React.useState<boolean>(false);
+  const [isTOSModalOpen, setIsTOSModalOpen] = React.useState<boolean>(false);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
 
   if (!app.isLoggedIn()) {
     return (
-      <div className="LoginSelector">
-        <CWButton
-          buttonType="tertiary-black"
-          iconLeft="person"
-          label="Log in"
-          onClick={() => setIsModalOpen(true)}
-        />
+      <React.Fragment>
+        <div className="LoginSelector">
+          <CWButton
+            buttonType="tertiary-black"
+            iconLeft="person"
+            label="Log in"
+            onClick={() => setIsLoginModalOpen(true)}
+          />
+        </div>
         <Modal
-          content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+          content={
+            <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
+          }
           isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
-          onClose={() => setIsModalOpen(false)}
-          open={isModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          open={isLoginModalOpen}
         />
-      </div>
+      </React.Fragment>
     );
   }
 
@@ -428,92 +454,107 @@ export const LoginSelector = () => {
       sameBaseAddressesRemoveDuplicates.length > 1 &&
       app.activeChainId() !== 'axie-infinity'
     ) {
-      app.modals.create({
-        modal: AccountSelector,
-        data: {
-          accounts: sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
-            address: addressInfo.address,
-          })),
-          walletNetwork: activeChainInfo?.network,
-          walletChain: activeChainInfo?.base,
-          onSelect: async (accountIndex) => {
-            await linkToCommunity(accountIndex);
-            $('.AccountSelector').trigger('modalexit');
-          },
-        },
-      });
+      setIsAccountSelectorModalOpen(true);
     } else if (
       sameBaseAddressesRemoveDuplicates.length === 1 &&
       app.activeChainId() !== 'axie-infinity'
     ) {
       await linkToCommunity(0);
     } else {
-      setIsModalOpen(true);
+      setIsLoginModalOpen(true);
     }
   }
 
   return (
-    <div className="LoginSelector">
-      {app.chain &&
-        !app.chainPreloading &&
-        profileLoadComplete &&
-        !app.user.activeAccount && (
-          <div className="join-button-container">
-            <CWButton
-              buttonType="tertiary-black"
-              onClick={async () => {
-                if (hasTermsOfService) {
-                  app.modals.create({
-                    modal: TOSModal,
-                    data: {
-                      onAccept: async () => {
-                        $('.TOSModal').trigger('modalexit');
-                        await performJoinCommunityLinking();
-                      },
-                    },
-                  });
-                } else {
-                  await performJoinCommunityLinking();
+    <React.Fragment>
+      <div className="LoginSelector">
+        {app.chain &&
+          !app.chainPreloading &&
+          profileLoadComplete &&
+          !app.user.activeAccount && (
+            <div className="join-button-container">
+              <CWButton
+                buttonType="tertiary-black"
+                onClick={async () => {
+                  if (hasTermsOfService) {
+                    setIsTOSModalOpen(true);
+                  } else {
+                    await performJoinCommunityLinking();
+                  }
+                }}
+                label={
+                  sameBaseAddressesRemoveDuplicates.length === 0
+                    ? `No ${
+                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                        ''
+                      } address`
+                    : 'Join'
                 }
-              }}
-              label={
-                sameBaseAddressesRemoveDuplicates.length === 0
-                  ? `No ${
-                      CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                      CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                      ''
-                    } address`
-                  : 'Join'
-              }
-            />
-          </div>
-        )}
-      {app.chain &&
-        !app.chainPreloading &&
-        profileLoadComplete &&
-        app.user.activeAccount && (
-          <React.Fragment>
-            <div
-              className="left-button"
-              onClick={leftMenuProps.handleInteraction}
-            >
-              <User user={app.user.activeAccount} hideIdentityIcon />
+              />
             </div>
-            <Popover
-              content={
-                <LoginSelectorMenuLeft
-                  activeAddressesWithRole={activeAddressesWithRole}
-                  nAccountsWithoutRole={nAccountsWithoutRole}
-                />
-              }
-              {...leftMenuProps}
-            />
-          </React.Fragment>
-        )}
-      <div className="right-button" onClick={rightMenuProps.handleInteraction}>
-        <CWIconButton iconName="person" iconButtonTheme="black" />
+          )}
+        {app.chain &&
+          !app.chainPreloading &&
+          profileLoadComplete &&
+          app.user.activeAccount && (
+            <React.Fragment>
+              <div
+                className="left-button"
+                onClick={leftMenuProps.handleInteraction}
+              >
+                <User user={app.user.activeAccount} hideIdentityIcon />
+              </div>
+              <Popover
+                content={
+                  <LoginSelectorMenuLeft
+                    activeAddressesWithRole={activeAddressesWithRole}
+                    nAccountsWithoutRole={nAccountsWithoutRole}
+                  />
+                }
+                {...leftMenuProps}
+              />
+            </React.Fragment>
+          )}
+        <div
+          className="right-button"
+          onClick={rightMenuProps.handleInteraction}
+        >
+          <CWIconButton iconName="person" iconButtonTheme="black" />
+        </div>
+        <Popover content={<LoginSelectorMenuRight />} {...rightMenuProps} />
       </div>
-      <Popover content={<LoginSelectorMenuRight />} {...rightMenuProps} />
-    </div>
+      <Modal
+        content={
+          <AccountSelector
+            accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
+              address: addressInfo.address,
+            }))}
+            walletNetwork={activeChainInfo?.network}
+            walletChain={activeChainInfo?.base}
+            onSelect={async (accountIndex) => {
+              await linkToCommunity(accountIndex);
+              setIsAccountSelectorModalOpen(false);
+            }}
+            onModalClose={() => setIsAccountSelectorModalOpen(false)}
+          />
+        }
+        onClose={() => setIsAccountSelectorModalOpen(false)}
+        open={isAccountSelectorModalOpen}
+      />
+      <Modal
+        content={
+          <TOSModal
+            onAccept={async () => {
+              await performJoinCommunityLinking();
+              setIsTOSModalOpen(false);
+            }}
+            onModalClose={() => setIsTOSModalOpen(false)}
+          />
+        }
+        onClose={() => setIsTOSModalOpen(false)}
+        open={isTOSModalOpen}
+      />
+    </React.Fragment>
   );
 };
