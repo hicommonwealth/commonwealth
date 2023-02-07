@@ -210,26 +210,4 @@ export default class SubstrateIdentity
       `${this.account.address} cleared identity`
     );
   }
-
-  public async requestJudgementTx(regIdx: number, maxFee: SubstrateCoin) {
-    if (!this._judgements) throw new Error('judgements not yet loaded');
-    const txFunc = (api: ApiPromise) =>
-      api.tx.identity.requestJudgement(regIdx, maxFee);
-    return this._Chain.createTXModalData(
-      this.account,
-      txFunc,
-      'requestjudgement',
-      `${this.username} requests judgement from registrar ${regIdx}`
-    );
-  }
-
-  public canceljudgementRequestTx(regIdx: number) {
-    if (!this._judgements) throw new Error('judgements not yet loaded');
-    return this._Chain.createTXModalData(
-      this.account,
-      (api: ApiPromise) => api.tx.identity.cancelRequest(regIdx),
-      'cancelRequest',
-      `${this.username} canceled judgement request from registrar ${regIdx}`
-    );
-  }
 }

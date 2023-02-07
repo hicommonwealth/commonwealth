@@ -23,11 +23,6 @@ export class SubstrateProposalStats extends ClassComponent<SubstrateProposalStat
             statDescription: `can be introduced by anyone. At a regular interval, the \
             top ranked proposal will become a supermajority-required referendum.`,
           },
-          {
-            statName: 'Council Motions',
-            statDescription: `can be introduced by councillors. They can directly \
-            approve/reject treasury proposals, propose simple-majority referenda, or create fast-track referenda.`,
-          },
         ]}
         stats={[
           {
