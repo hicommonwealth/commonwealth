@@ -6,7 +6,7 @@
     "description": "Apis to create or query entities"
   },
   "host": "localhost:3000",
-  "basePath": "/",
+  "basePath": "/external",
   "schemes": ["http"],
   "security": [
     {
