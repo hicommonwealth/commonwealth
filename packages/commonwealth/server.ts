@@ -133,7 +133,11 @@ async function main() {
       // do not redirect if heroku vars not set
       const host = req.header('host');
       const { HEROKU_APP_NAME, SERVER_URL } = process.env;
-      if (!HEROKU_APP_NAME || !SERVER_URL || SERVER_URL.includes(`${HEROKU_APP_NAME}.herokuapp.com`)) {
+      if (
+        !HEROKU_APP_NAME ||
+        !SERVER_URL ||
+        SERVER_URL.includes(`${HEROKU_APP_NAME}.herokuapp.com`)
+      ) {
         return next();
       }
 
