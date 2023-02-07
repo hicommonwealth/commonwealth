@@ -12,7 +12,12 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import isValidJson from 'helpers/validateJson';
-import { MessageRow } from 'views/components/component_kit/cw_text_input';
+import {
+  CWTextInput,
+  MessageRow,
+} from 'views/components/component_kit/cw_text_input';
+import produce from 'immer';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 const jsonExample = {
   form_fields: [
@@ -97,59 +102,17 @@ enum TemplateComponents {
   DROPDOWN = 'dropdown',
 }
 
-const parseJsonToUITemplate = (jsonString) => {
-  if (!jsonString) {
-    return null;
-  }
-
-  let json;
-
-  try {
-    json = JSON.parse(jsonString);
-  } catch (err) {
-    console.log('err');
-    return (
-      <div>
-        <h1>Parsing JSON failed!</h1>
-        <code>{JSON.stringify(err, Object.getOwnPropertyNames(err))}</code>
-      </div>
-    );
-  }
-
-  const { form_fields = [], tx_template } = json;
-  console.log({ form_fields, tx_template });
-
-  return (
-    <div>
-      {form_fields.map((field, index) => {
-        const [component] = Object.keys(form_fields[index]);
-
-        switch (component) {
-          case TemplateComponents.DIVIDER:
-            return <CWDivider />;
-          case TemplateComponents.TEXT:
-            return <div>text</div>;
-          case TemplateComponents.INPUT:
-            return <div>input</div>;
-          case TemplateComponents.DROPDOWN:
-            return <div>dropdown</div>;
-          default:
-            return null;
-        }
-      })}
-    </div>
-  );
-};
-
 class ViewTemplatePage extends ClassComponent {
   private form = {
     abi: '',
     error: false,
   };
+  private formState = {};
+  private json = { form_fields: [], tx_template: {} };
 
   handleInputChange(e) {
     const value = e.target.value;
-    this.form.abi = value;
+    // this.form.abi = value;
 
     try {
       const json = JSON.parse(value);
@@ -161,11 +124,48 @@ class ViewTemplatePage extends ClassComponent {
   }
 
   oncreate() {
-    this.form.abi = JSON.stringify(jsonExample, null, 2);
+    // this.form.abi = JSON.stringify(jsonExample, null, 2); UNCLEAR IF NEEDED
+
+    try {
+      this.json = JSON.parse(JSON.stringify(jsonExample, null, 2));
+    } catch (err) {
+      console.log('err');
+
+      // TODO: Handle errors here- probably have to send some kind of error message to the view
+      return (
+        <div>
+          <h1>Parsing JSON failed!</h1>
+          <code>{JSON.stringify(err, Object.getOwnPropertyNames(err))}</code>
+        </div>
+      );
+    }
+
+    for (const field of this.json.form_fields) {
+      switch (Object.keys(field)[0]) {
+        case TemplateComponents.INPUT:
+          // This is using a small package that makes working with immutable state
+          // much easier to reason about
+          this.formState = produce(this.formState, (draft) => {
+            draft[field.input.field_ref] = null;
+          });
+          break;
+        case TemplateComponents.DROPDOWN:
+          this.formState = produce(this.formState, (draft) => {
+            // Use the default value of the dropdown as the initial state
+            draft[field.dropdown.field_ref] =
+              field.dropdown.field_options[0].value;
+          });
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   view(vnode) {
     const scope = vnode.attrs.scope;
+
+    console.log('this is the current state: ', this.formState);
 
     return (
       <Sublayout>
@@ -198,7 +198,47 @@ class ViewTemplatePage extends ClassComponent {
             />
 
             <div className="template">
-              {parseJsonToUITemplate(this.form.abi)}
+              {/* Render this here so it has easy access to the state object */}
+              {this.json.form_fields.map((field, index) => {
+                const [component] = Object.keys(this.json.form_fields[index]);
+
+                switch (component) {
+                  case TemplateComponents.DIVIDER:
+                    return <CWDivider />;
+                  case TemplateComponents.TEXT:
+                    return (
+                      <CWText fontStyle={field[component].field_type}>
+                        {field[component].field_value}
+                      </CWText>
+                    );
+                  case TemplateComponents.INPUT:
+                    return (
+                      <CWTextInput
+                        label={field[component].field_label}
+                        value={this.formState[field[component].field_ref]}
+                        oninput={(e) => {
+                          this.formState = produce(this.formState, (draft) => {
+                            draft[field[component].field_ref] = e.target.value;
+                          });
+                        }}
+                      />
+                    );
+                  case TemplateComponents.DROPDOWN:
+                    return (
+                      <CWDropdown
+                        label={field[component].field_label}
+                        options={field[component].field_options}
+                        onSelect={(item) => {
+                          this.formState = produce(this.formState, (draft) => {
+                            draft[field[component].field_ref] = item.value;
+                          });
+                        }}
+                      />
+                    );
+                  default:
+                    return null;
+                }
+              })}
             </div>
           </div>
         </div>
