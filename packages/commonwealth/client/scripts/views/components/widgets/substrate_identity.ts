@@ -3,10 +3,7 @@ import 'components/widgets/user.scss';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import type SubstrateIdentity from 'controllers/chain/substrate/identity';
-import {
-  getIdentityQuality,
-  IdentityQuality,
-} from 'controllers/chain/substrate/identity';
+import { IdentityQuality } from 'controllers/chain/substrate/identity';
 import { link } from 'helpers';
 
 import m from 'mithril';
@@ -70,7 +67,6 @@ const SubstrateOnlineIdentityWidget: m.Component<
             m('.id-short', formatAddressShort(profile.address, profile.chain)),
           ]
         : profile.displayName;
-      quality = getIdentityQuality(Object.values(profile.judgements));
     } else if (vnode.state.identity?.exists) {
       // then attempt to use identity fetched from chain
       displayName = showAddressWithDisplayName
@@ -174,10 +170,7 @@ const SubstrateOfflineIdentityWidget: m.Component<
       showAddressWithDisplayName,
     } = vnode.attrs;
 
-    const quality =
-      profile?.isOnchain &&
-      profile?.name &&
-      getIdentityQuality(Object.values(profile.judgements));
+    const quality = profile?.isOnchain && profile?.name;
 
     if (profile?.isOnchain && profile?.name && quality && !hideIdentityIcon) {
       const name = [
