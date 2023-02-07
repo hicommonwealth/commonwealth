@@ -3,8 +3,10 @@
 .ManageContractTemplateOuterModal {
   &.modal-container {
     // necessary to not cut off "Display Option" dropdown list
-    overflow: unset;
+    overflow-y: auto;
   }
+
+  max-height: 95vh;
 
   .ManageContractTemplateModal {
     width: 720px;

@@ -91,6 +91,7 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
                   nickname={template.cctmd.nickname}
                   slug={template.cctmd.slug}
                   display={template.cctmd.display_options}
+                  cctmd_id={template.cctmd.id}
                 />
               ))}
             </div>

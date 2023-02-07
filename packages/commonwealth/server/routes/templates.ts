@@ -85,7 +85,7 @@ export async function getTemplates(
   const abi_id = contract?.abi_id;
 
   if (!abi_id) {
-    throw new AppError('Must provide abi_id');
+    throw new AppError('Missing abi_id');
   }
 
   const abi = await models.ContractAbi.findOne({

@@ -9,6 +9,7 @@ import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
+import type { ContractAbiInstance } from 'server/models/contract_abi';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -68,7 +69,6 @@ const createContract = async (
     address,
     contractType = '',
     abi,
-    abiNickname = '',
     symbol = '',
     token_name = '',
     decimals = 0,
@@ -144,16 +144,25 @@ const createContract = async (
   }
 
   let contract: ContractInstance;
+  let contract_abi: ContractAbiInstance;
   if (abi) {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
-      const contract_abi = await models.ContractAbi.create(
-        {
-          abi: abiAsRecord,
-          nickname: abiNickname,
+      contract_abi = await models.ContractAbi.findOne({
+        where: {
+          abi: JSON.stringify(abiAsRecord),
         },
-        { transaction: t }
-      );
+        transaction: t,
+      });
+
+      if (!contract_abi) {
+        contract_abi = await models.ContractAbi.create(
+          {
+            abi: JSON.stringify(abiAsRecord),
+          },
+          { transaction: t }
+        );
+      }
 
       [contract] = await models.Contract.findOrCreate({
         where: {
@@ -167,6 +176,8 @@ const createContract = async (
         },
         transaction: t,
       });
+
+      console.log('contract', contract);
 
       await models.CommunityContract.create(
         {
