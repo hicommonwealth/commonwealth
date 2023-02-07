@@ -86,7 +86,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
 
   oninit(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
-    console.log('chain', chain);
     this.name = chain.name;
     this.description = chain.description;
     this.website = chain.website;
@@ -146,6 +145,25 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
 
     return (
       <div className="ChainMetadataRows">
+        <div className="AvatarUploadRow">
+          <AvatarUpload
+            scope="community"
+            uploadStartedCallback={() => {
+              this.uploadInProgress = true;
+              redraw();
+            }}
+            uploadCompleteCallback={(files) => {
+              files.forEach((f) => {
+                if (!f.uploadURL) return;
+                const url = f.uploadURL.replace(/\?.*/, '');
+                this.iconUrl = url;
+                $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
+              });
+              this.uploadInProgress = false;
+              redraw();
+            }}
+          />
+        </div>
         <InputRow
           title="Name"
           value={this.name}
@@ -228,7 +246,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         />
         {this.hasHomepage ? (
           <SelectRow
-            title="Default view"
+            title="Default Page"
             options={[
               {
                 label: 'Discussions',
@@ -252,7 +270,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           />
         ) : (
           <SelectRow
-            title="Default view"
+            title="Default Page"
             options={[
               {
                 label: 'Discussions',
@@ -269,7 +287,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 : DefaultPage.Discussions
             }
             onChange={(e) =>
-              (this.defaultOverview = e === DefaultPage.Overview ? true : false)
+              (this.defaultOverview = e === DefaultPage.Overview)
             }
           />
         )}

@@ -92,7 +92,7 @@ class FeedPage extends ClassComponent {
 
     if (!app.chain.meta.hasHomepage) {
       return (
-        <ErrorPage message="The homepage feature has not been enabled for this community." />
+        <ErrorPage message="The Homepage feature has not been enabled for this community." />
       );
     }
 

@@ -149,8 +149,6 @@ class ManageCommunityPage extends ClassComponent {
           mods.push(role);
         }
       });
-    } else {
-      return;
     }
 
     const onSave = () => {
