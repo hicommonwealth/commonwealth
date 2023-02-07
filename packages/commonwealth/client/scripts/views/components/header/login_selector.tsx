@@ -6,8 +6,7 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
+import { setRoute, redraw, jsx } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -142,106 +141,101 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
   );
 };
 
-export class LoginSelectorMenuRight extends ClassComponent {
-  view() {
-    const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
+export const LoginSelectorMenuRight = () => {
+  const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
-    return (
-      <div className="LoginSelectorMenu">
-        <div
-          className="login-menu-item"
-          onClick={() => setRoute('/notification-settings')}
-        >
-          <CWText type="caption">Notification settings</CWText>
-        </div>
-        <div
-          className="login-menu-item"
-          onClick={() =>
-            app.activeChainId()
-              ? navigateToSubpage('/settings')
-              : setRoute('/settings')
-          }
-        >
-          <CWText type="caption">Account settings</CWText>
-        </div>
-        <div className="login-menu-item">
-          <CWToggle
-            checked={isDarkModeOn}
-            onChange={(e) => {
-              if (isDarkModeOn) {
-                localStorage.setItem('dark-mode-state', 'off');
-                document
-                  .getElementsByTagName('html')[0]
-                  .classList.remove('invert');
-              } else {
-                document
-                  .getElementsByTagName('html')[0]
-                  .classList.add('invert');
-                localStorage.setItem('dark-mode-state', 'on');
-              }
-              e.stopPropagation();
-              redraw();
-            }}
-          />
-          <CWText type="caption">Dark mode</CWText>
-        </div>
-        <CWDivider />
-        <div
-          className="login-menu-item"
-          onClick={() => app.modals.create({ modal: FeedbackModal })}
-        >
-          <CWText type="caption">Send feedback</CWText>
-        </div>
-        <div
-          className="login-menu-item"
-          onClick={() => {
-            $.get(`${app.serverUrl()}/logout`)
-              .then(async () => {
-                await initAppState();
-                notifySuccess('Logged out');
-                redraw();
-              })
-              .catch(() => {
-                // eslint-disable-next-line no-restricted-globals
-                location.reload();
-              });
-          }}
-        >
-          <CWText type="caption">Logout</CWText>
-        </div>
+  return (
+    <div className="LoginSelectorMenu">
+      <div
+        className="login-menu-item"
+        onClick={() => setRoute('/notification-settings')}
+      >
+        <CWText type="caption">Notification settings</CWText>
       </div>
-    );
-  }
-}
+      <div
+        className="login-menu-item"
+        onClick={() =>
+          app.activeChainId()
+            ? navigateToSubpage('/settings')
+            : setRoute('/settings')
+        }
+      >
+        <CWText type="caption">Account settings</CWText>
+      </div>
+      <div className="login-menu-item">
+        <CWToggle
+          checked={isDarkModeOn}
+          onChange={(e) => {
+            if (isDarkModeOn) {
+              localStorage.setItem('dark-mode-state', 'off');
+              document
+                .getElementsByTagName('html')[0]
+                .classList.remove('invert');
+            } else {
+              document.getElementsByTagName('html')[0].classList.add('invert');
+              localStorage.setItem('dark-mode-state', 'on');
+            }
+            e.stopPropagation();
+            redraw();
+          }}
+        />
+        <CWText type="caption">Dark mode</CWText>
+      </div>
+      <CWDivider />
+      <div
+        className="login-menu-item"
+        onClick={() => app.modals.create({ modal: FeedbackModal })}
+      >
+        <CWText type="caption">Send feedback</CWText>
+      </div>
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          $.get(`${app.serverUrl()}/logout`)
+            .then(async () => {
+              await initAppState();
+              notifySuccess('Logged out');
+              redraw();
+            })
+            .catch(() => {
+              // eslint-disable-next-line no-restricted-globals
+              location.reload();
+            });
+        }}
+      >
+        <CWText type="caption">Logout</CWText>
+      </div>
+    </div>
+  );
+};
 
-type TOSModalAttrs = {
+type TOSModalProps = {
   onAccept: () => void;
+  onModalClose: () => void;
 };
 
 // TODO: Replace this with a proper TOS Compoment when we have one
-class TOSModal extends ClassComponent<TOSModalAttrs> {
-  view(vnode: ResultNode<TOSModalAttrs>) {
-    return (
-      <div className="TOSModal">
-        <div className="close-button-wrapper">
-          <CWIconButton
-            iconButtonTheme="primary"
-            iconName="close"
-            iconSize="small"
-            className="close-icon"
-            onClick={() => $('.TOSModal').trigger('modalexit')}
-          />
-        </div>
-        <div className="content-wrapper">
-          <CWText>
-            By clicking accept you agree to the community's Terms of Service
-          </CWText>
-          <CWButton onClick={vnode.attrs.onAccept} label="Accept" />
-        </div>
+const TOSModal = (props: TOSModalProps) => {
+  return (
+    <div className="TOSModal">
+      <div className="close-button-wrapper">
+        <CWIconButton
+          iconButtonTheme="primary"
+          iconName="close"
+          iconSize="small"
+          className="close-icon"
+          onClick={() => props.onModalClose()}
+        />
       </div>
-    );
-  }
-}
+      <div className="content-wrapper">
+        <CWText>
+          By clicking accept you agree to the community's Terms of Service
+        </CWText>
+        <CWButton onClick={props.onAccept} label="Accept" />
+      </div>
+    </div>
+  );
+};
 
 export const LoginSelector = () => {
   const [profileLoadComplete, setProfileLoadComplete] =

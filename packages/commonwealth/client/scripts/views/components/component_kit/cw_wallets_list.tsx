@@ -88,13 +88,15 @@ const LinkAccountItem = (props: {
 
 type AccountSelectorProps = {
   accounts: Array<{ address: string; meta?: { name: string } }>;
+  onModalClose: () => void;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
   walletNetwork: ChainNetwork;
 };
 
 export const AccountSelector = (props: AccountSelectorProps) => {
-  const { accounts, walletNetwork, walletChain, onSelect } = props;
+  const { accounts, onModalClose, walletNetwork, walletChain, onSelect } =
+    props;
 
   return (
     <div className="AccountSelector">
@@ -104,7 +106,7 @@ export const AccountSelector = (props: AccountSelectorProps) => {
           iconName="close"
           iconSize="small"
           className="close-icon"
-          onClick={() => $('.AccountSelector').trigger('modalexit')}
+          onClick={() => onModalClose()}
         />
       </div>
 

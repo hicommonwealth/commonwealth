@@ -1,25 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import {
-  PopoverMenu,
-  PopoverMenuItem,
-} from '../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { FeedbackModal } from '../modals/feedback_modal';
 
 const gethelpMenuItems = (): Array<PopoverMenuItem> => {
