@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
         'Chains',
-        'default_view',
+        'default_page',
         {
           type: Sequelize.STRING,
           allowNull: true,
@@ -17,7 +17,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn('Chains', 'default_view', {
+      await queryInterface.removeColumn('Chains', 'default_page', {
         transaction: t,
       });
     });

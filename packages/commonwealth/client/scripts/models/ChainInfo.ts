@@ -3,7 +3,7 @@ import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, AccessLevel } from 'models';
-import type { ChainNetwork, DefaultView } from 'common-common/src/types';
+import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
 
@@ -36,7 +36,7 @@ class ChainInfo {
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public defaultOverview: boolean;
-  public defaultView: DefaultView;
+  public defaultPage: DefaultPage;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
@@ -76,7 +76,7 @@ class ChainInfo {
     blockExplorerIds,
     collapsedOnHomepage,
     defaultOverview,
-    defaultView,
+    defaultPage,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -112,7 +112,7 @@ class ChainInfo {
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultOverview = defaultOverview;
-    this.defaultView = defaultView;
+    this.defaultPage = defaultPage;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.defaultAllowPermissions = defaultAllowPermissions;
@@ -149,7 +149,7 @@ class ChainInfo {
     block_explorer_ids,
     collapsed_on_homepage,
     default_summary_view,
-    default_view,
+    default_page,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -197,7 +197,7 @@ class ChainInfo {
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       defaultOverview: default_summary_view,
-      defaultView: default_view ? default_view : default_summary_view,
+      defaultPage: default_page ? default_page : default_summary_view,
       adminsAndMods,
       base,
       ss58_prefix,
@@ -291,7 +291,7 @@ class ChainInfo {
     snapshot,
     iconUrl,
     defaultOverview,
-    defaultView,
+    defaultPage,
     default_allow_permissions,
     default_deny_permissions,
   }) {
@@ -314,7 +314,7 @@ class ChainInfo {
       terms,
       icon_url: iconUrl,
       default_summary_view: defaultOverview,
-      default_view: defaultView,
+      default_page: defaultPage,
       jwt: app.user.jwt,
     });
     const updatedChain = r.result;
@@ -332,7 +332,7 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultOverview = updatedChain.default_summary_view;
-    this.defaultView = updatedChain.default_view;
+    this.defaultPage = updatedChain.default_page;
     this.defaultAllowPermissions = updatedChain.default_allow_permissions;
     this.defaultDenyPermissions = updatedChain.default_deny_permissions;
   }

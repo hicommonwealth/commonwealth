@@ -4,31 +4,31 @@ import _ from 'underscore';
 import app from 'state';
 import { useNavigate } from 'react-router-dom';
 import { PageLoading } from './loading';
-import { DefaultView } from '../../../../../common-common/src/types';
+import { DefaultPage } from '../../../../../common-common/src/types';
 
 export default function DiscussionsRedirect() {
   const navigate = useNavigate();
   useEffect(() => {
     if (!app.chain) return;
 
-    const { defaultView } = app.chain.meta;
+    const { defaultPage } = app.chain.meta;
     let view;
 
-    // map old defaultOverview to new defaultView
-    if (_.isBoolean(defaultView)) {
-      view = defaultView ? DefaultView.Overview : DefaultView.Discussions;
+    // map old defaultOverview to new defaultPage
+    if (_.isBoolean(defaultPage)) {
+      view = defaultPage ? DefaultPage.Overview : DefaultPage.Discussions;
     } else {
-      view = defaultView;
+      view = defaultPage;
     }
 
     switch (view) {
-      case DefaultView.Overview:
+      case DefaultPage.Overview:
         navigate(`/${app.chain.id}/overview`);
         break;
-      case DefaultView.Discussions:
+      case DefaultPage.Discussions:
         navigate(`/${app.chain.id}/discussions`);
         break;
-      case DefaultView.Feed:
+      case DefaultPage.Feed:
         navigate(`/${app.chain.id}/feed`);
         break;
       default:

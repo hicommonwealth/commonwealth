@@ -83,7 +83,7 @@ const updateChain = async (
     default_allow_permissions,
     default_deny_permissions,
     default_summary_view,
-    default_view,
+    default_page,
     terms,
   } = req.body;
 
@@ -188,7 +188,7 @@ const updateChain = async (
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?
   chain.default_summary_view = default_summary_view || false;
-  chain.default_view = default_view;
+  chain.default_page = default_page;
 
   // Under our current security policy, custom domains must be set by trusted
   // administrators only. Otherwise an attacker could configure a custom domain and
