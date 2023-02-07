@@ -160,7 +160,7 @@ jobs:
           ref: master
 
       - name: Switch branch
-        run: echo ${{ GITHUB_REF_NAME }}
+        run: echo hello
 
       - name: Setup Node
         uses: actions/setup-node@v3
