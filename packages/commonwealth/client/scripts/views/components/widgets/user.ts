@@ -149,15 +149,6 @@ const User: m.Component<
 
     const getRoleTags = (long?) => [
       // 'long' makes role tags show as full length text
-      profile.isCouncillor &&
-        !hideIdentityIcon &&
-        m(
-          '.role-icon.role-icon-councillor',
-          {
-            class: long ? 'long' : '',
-          },
-          long ? `${friendlyChainName} Councillor` : 'C'
-        ),
       profile.isValidator &&
         !hideIdentityIcon &&
         m(

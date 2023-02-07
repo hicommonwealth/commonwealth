@@ -20,7 +20,6 @@ import {
 import type SubstrateAccounts from './account';
 import type { SubstrateAccount } from './account';
 import type Substrate from './adapter';
-import type { SubstrateCollectiveProposal } from './collective_proposal';
 import type SubstrateDemocracy from './democracy';
 import type SubstrateDemocracyProposal from './democracy_proposal';
 import type SubstrateChain from './shared';
@@ -315,11 +314,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
   //   this referendum was created approximately when the found proposal concluded.
   public getProposalOrMotion(
     preimage?
-  ):
-    | SubstrateDemocracyProposal
-    | SubstrateCollectiveProposal
-    | SubstrateTreasuryProposal
-    | undefined {
+  ): SubstrateDemocracyProposal | SubstrateTreasuryProposal | undefined {
     // ensure all modules have loaded
     if (!this._Chain.app.isModuleReady) return;
 
@@ -332,11 +327,6 @@ export class SubstrateDemocracyReferendum extends Proposal<
       });
     if (democracyProposal) return democracyProposal;
 
-    const collectiveProposal = chain.council?.store.getAll().find((p) => {
-      return p.data.hash === this.hash;
-    });
-    if (collectiveProposal) return collectiveProposal;
-
     // search for treasury proposal for approveProposal only (not rejectProposal)
     if (
       preimage?.section === 'treasury' &&
@@ -348,7 +338,6 @@ export class SubstrateDemocracyReferendum extends Proposal<
     console.log(
       'could not find:',
       this.hash,
-      chain.council?.store.getAll().map((c) => c.data.hash),
       chain.democracyProposals?.store.getAll().map((c) => c.hash)
     );
     return undefined;
