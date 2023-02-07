@@ -5,8 +5,7 @@ import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
 
 export default class EthTokenBalanceProvider extends BalanceProvider<
-  Web3,
-  EthBPOpts
+  Web3
 > {
   public name = 'eth-token';
   public opts = {
@@ -17,8 +16,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<
 
   public getCacheKey(
     node: IChainNode,
-    address: string,
-    opts: EthBPOpts
+    address: string
   ): string {
     return `${node.id}-${address}-${'native'}`;
   }
