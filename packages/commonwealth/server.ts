@@ -126,23 +126,31 @@ async function main() {
     // configure redirect to proper appname from herokuapp
     app.all(/.*/, (req, res, next) => {
       // go straight to herokuapp if traffic coming from disabled redirect url
+      console.log(req.ip + " " + "ip");
       if (req.ip.includes(process.env.DISABLE_REDIRECT_URL)) {
+        console.log("early return");
         return next();
       }
 
       // do not redirect if heroku vars not set
       const host = req.header('host');
       const { HEROKU_APP_NAME, SERVER_URL } = process.env;
+      console.log(host + " " + "host");
+      console.log(HEROKU_APP_NAME + " " + "app name");
       if (
         !HEROKU_APP_NAME ||
         !SERVER_URL ||
         SERVER_URL.includes(`${HEROKU_APP_NAME}.herokuapp.com`)
       ) {
+        console.log(host + "early return 2");
         return next();
       }
 
-      // redirect from appname.herokuapp.com to SERVER_URL (e.g. commonwealth.im) if present
+      console.log("app name " + process.env.HEROKU_APP_NAME);
+      console.log("does it match " + host.match(`/${process.env.HEROKU_APP_NAME}.herokuapp.com/i`));
+      console.log(`/${process.env.HEROKU_APP_NAME}.herokuapp.com/i` + " host and app ");
       if (host.match(`/${process.env.HEROKU_APP_NAME}.herokuapp.com/i`)) {
+        console.log(host + "redirect");
         return res.redirect(301, `${process.env.SERVER_URL}${req.url}`);
       }
 
