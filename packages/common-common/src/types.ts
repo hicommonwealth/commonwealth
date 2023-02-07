@@ -157,5 +157,5 @@ export interface ISnapshotNotification {
 export enum DefaultPage {
   Discussions = 'default_all_discussions_view',
   Overview = 'default_summary_view',
-  Feed = 'homepage',
+  Homepage = 'homepage',
 }

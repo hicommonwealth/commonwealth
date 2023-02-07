@@ -43,6 +43,7 @@ export type ChainAttributes = {
   has_chain_events_listener?: boolean;
   default_summary_view?: boolean;
   default_page?: DefaultPage;
+  has_homepage?: boolean;
   terms?: string;
   admin_only_polling?: boolean;
   bech32_prefix?: string;
@@ -131,6 +132,7 @@ export default (
       },
       default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
       default_page: { type: dataTypes.STRING, allowNull: true },
+      has_homepage: { type: dataTypes.BOOLEAN, allowNull: true },
       hide_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },

@@ -37,6 +37,7 @@ class ChainInfo {
   public readonly collapsedOnHomepage: boolean;
   public defaultOverview: boolean;
   public defaultPage: DefaultPage;
+  public hasHomepage: boolean;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
@@ -77,6 +78,7 @@ class ChainInfo {
     collapsedOnHomepage,
     defaultOverview,
     defaultPage,
+    hasHomepage,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -113,6 +115,7 @@ class ChainInfo {
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultOverview = defaultOverview;
     this.defaultPage = defaultPage;
+    this.hasHomepage = hasHomepage;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.defaultAllowPermissions = defaultAllowPermissions;
@@ -150,6 +153,7 @@ class ChainInfo {
     collapsed_on_homepage,
     default_summary_view,
     default_page,
+    has_homepage,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -198,6 +202,7 @@ class ChainInfo {
       collapsedOnHomepage: collapsed_on_homepage,
       defaultOverview: default_summary_view,
       defaultPage: default_page ? default_page : default_summary_view,
+      hasHomepage: has_homepage,
       adminsAndMods,
       base,
       ss58_prefix,
@@ -292,6 +297,7 @@ class ChainInfo {
     iconUrl,
     defaultOverview,
     defaultPage,
+    hasHomepage,
     default_allow_permissions,
     default_deny_permissions,
   }) {
@@ -315,6 +321,7 @@ class ChainInfo {
       icon_url: iconUrl,
       default_summary_view: defaultOverview,
       default_page: defaultPage,
+      has_homepage: hasHomepage,
       jwt: app.user.jwt,
     });
     const updatedChain = r.result;
@@ -333,6 +340,7 @@ class ChainInfo {
     this.iconUrl = updatedChain.icon_url;
     this.defaultOverview = updatedChain.default_summary_view;
     this.defaultPage = updatedChain.default_page;
+    this.hasHomepage = updatedChain.has_homepage;
     this.defaultAllowPermissions = updatedChain.default_allow_permissions;
     this.defaultDenyPermissions = updatedChain.default_deny_permissions;
   }

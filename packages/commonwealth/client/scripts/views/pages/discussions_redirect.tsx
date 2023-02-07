@@ -28,7 +28,7 @@ export default function DiscussionsRedirect() {
       case DefaultPage.Discussions:
         navigate(`/${app.chain.id}/discussions`);
         break;
-      case DefaultPage.Feed:
+      case DefaultPage.Homepage:
         navigate(`/${app.chain.id}/feed`);
         break;
       default:

@@ -12,12 +12,24 @@ module.exports = {
         },
         { transaction: t }
       );
+      await queryInterface.addColumn(
+        'Chains',
+        'has_homepage',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn('Chains', 'default_page', {
+        transaction: t,
+      });
+      await queryInterface.removeColumn('Chains', 'has_homepage', {
         transaction: t,
       });
     });

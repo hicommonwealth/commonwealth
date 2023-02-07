@@ -229,7 +229,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             },
             {
               label: 'Feed',
-              value: DefaultPage.Feed,
+              value: DefaultPage.Homepage,
             }
           ]}
           selected={this.defaultPage}
