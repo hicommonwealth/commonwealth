@@ -154,7 +154,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Master
+        uses: actions/checkout@v3
+        with:
+          ref: master
+
+      - name: Checkout current branch
         uses: actions/checkout@v3
 
       - name: Setup Node
