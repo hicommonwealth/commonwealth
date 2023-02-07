@@ -112,6 +112,30 @@ class PollsController {
     });
   }
 
+  public async deletePoll(args: {threadId: number; pollId: number}) {
+    const { threadId, pollId} = args;
+    await $.ajax({
+      url: `${app.serverUrl()}/deletePoll`,
+      type: 'DELETE',
+      data: {
+        thread_id: threadId,
+        poll_id: pollId,
+        jwt: app.user.jwt,
+      },
+      success: (response) => {
+        // todo
+      },
+      error: (err) => {
+        console.log('Failed to delete poll');
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Failed to delete poll'
+        );
+      },
+    });
+  }
+
   public getByThreadId(threadId) {
     return this._store.getByThreadId(threadId);
   }
