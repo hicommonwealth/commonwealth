@@ -3,6 +3,7 @@ import type {
   ChainBase,
   ChainNetwork,
   ChainType,
+  DefaultView,
 } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
@@ -41,6 +42,7 @@ export type ChainAttributes = {
   substrate_spec?: RegisteredTypes;
   has_chain_events_listener?: boolean;
   default_summary_view?: boolean;
+  default_view?: DefaultView;
   terms?: string;
   admin_only_polling?: boolean;
   bech32_prefix?: string;
@@ -128,6 +130,7 @@ export default (
         defaultValue: false,
       },
       default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
+      default_view: { type: dataTypes.STRING, allowNull: true },
       hide_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },

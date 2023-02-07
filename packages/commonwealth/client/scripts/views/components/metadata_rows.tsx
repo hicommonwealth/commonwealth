@@ -124,10 +124,10 @@ type SelectRowAttrs = {
   selected: string;
   onChange: (e) => void;
   title: string;
-}
+};
 
 export class SelectRow extends ClassComponent<SelectRowAttrs> {
-  view (vnode: ResultNode<SelectRowAttrs>) {
+  view(vnode: ResultNode<SelectRowAttrs>) {
     const { options, selected, onChange, title } = vnode.attrs;
 
     return (
@@ -140,6 +140,6 @@ export class SelectRow extends ClassComponent<SelectRowAttrs> {
           onChange={(e) => onChange(e.target.value)}
         />
       </div>
-    )
+    );
   }
 }

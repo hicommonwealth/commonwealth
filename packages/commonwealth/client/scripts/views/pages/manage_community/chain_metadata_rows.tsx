@@ -6,10 +6,11 @@ import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
+import _ from 'underscore';
 import $ from 'jquery';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, DefaultView } from 'common-common/src/types';
 import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
@@ -107,6 +108,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.snapshot = chain.snapshot;
     this.snapshotString = chain.snapshot.toString();
     this.defaultOverview = chain.defaultOverview;
+    this.defaultView = chain.defaultView;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
     this.discordBotConnected = chain.discordConfigId !== null;
@@ -115,7 +117,11 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.channelsLoaded = false;
     this.snapshotChannels = [];
     this.snapshotNotificationsEnabled = false;
-    this.defaultView = 'discussions';
+
+    // map old defaultOverview to new defaultView
+    if (_.isBoolean(this.defaultView)) {
+      this.defaultView = this.defaultView ? DefaultView.Overview : DefaultView.Discussions;
+    }
   }
 
   view(vnode: ResultNode<ChainMetadataRowsAttrs>) {
@@ -142,25 +148,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
 
     return (
       <div className="ChainMetadataRows">
-        <div className="AvatarUploadRow">
-          <AvatarUpload
-            scope="community"
-            uploadStartedCallback={() => {
-              this.uploadInProgress = true;
-              redraw();
-            }}
-            uploadCompleteCallback={(files) => {
-              files.forEach((f) => {
-                if (!f.uploadURL) return;
-                const url = f.uploadURL.replace(/\?.*/, '');
-                this.iconUrl = url;
-                $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
-              });
-              this.uploadInProgress = false;
-              redraw();
-            }}
-          />
-        </div>
         <InputRow
           title="Name"
           value={this.name}
@@ -245,7 +232,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             }
           ]}
           selected={this.defaultView}
-          onChange={(e) => {console.log('CON CHAGNGE', e); this.defaultView = e}}
+          onChange={(e) => this.defaultView = e}
         />
         <ToggleRow
           title="Summary view"
@@ -382,6 +369,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               terms,
               iconUrl,
               defaultOverview,
+              defaultView,
             } = this;
 
             for (const space of snapshot) {
@@ -452,6 +440,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 terms,
                 iconUrl,
                 defaultOverview,
+                defaultView,
                 default_allow_permissions: this.default_allow_permissions,
                 default_deny_permissions: this.default_deny_permissions,
               });

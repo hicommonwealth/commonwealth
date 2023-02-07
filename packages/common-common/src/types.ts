@@ -153,3 +153,9 @@ export interface ISnapshotNotification {
   start?: string;
   expire?: string;
 }
+
+export enum DefaultView {
+  Discussions = 'discussions',
+  Overview = 'overview',
+  Feed = 'feed',
+}

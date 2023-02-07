@@ -90,9 +90,7 @@ class FeedPage extends ClassComponent {
       return <ErrorPage message="There was an error loading the feed." />;
     }
 
-    if (this.globalFeed?.length === 0 && this.chainEvents?.length === 0) return;
-
-    let sortedFeed;
+    let sortedFeed = [];
     if (this.globalFeed?.length > 0 && this.chainEvents?.length > 0) {
       sortedFeed = this.globalFeed.concat(this.chainEvents).sort((a, b) => {
         return (
@@ -105,15 +103,13 @@ class FeedPage extends ClassComponent {
       sortedFeed = this.chainEvents;
     }
 
-    if (sortedFeed?.length === 0) return;
-
     return (
       <Sublayout>
         <div className="FeedPage">
           <CWText type="h3" fontWeight="semiBold">
             Home
           </CWText>
-          {sortedFeed?.length > 0 &&
+          {sortedFeed.length !== 0 &&
             sortedFeed.map((item, i) => {
               return <UserDashboardRow key={i} notification={item} />;
             })}
