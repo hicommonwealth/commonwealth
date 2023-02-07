@@ -16,12 +16,18 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { UserBlock } from '../components/user/user_block';
 import { getClasses } from '../components/component_kit/helpers';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-export const SelectAddressModal = () => {
+type SelectAddressModalProps = {
+  onModalClose: () => void;
+};
+
+export const SelectAddressModal = (props: SelectAddressModalProps) => {
+  const { onModalClose } = props;
+
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
@@ -118,7 +124,7 @@ export const SelectAddressModal = () => {
     <div className="SelectAddressModal">
       <div className="compact-modal-title">
         <h3>Manage addresses</h3>
-        <ModalExitButton />
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
         {activeAccountsByRole.length === 0 ? (

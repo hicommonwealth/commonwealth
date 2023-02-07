@@ -21,11 +21,12 @@ import {
   CWWalletMissingOptionRow,
   CWWalletOptionRow,
 } from './cw_wallet_option_row';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
+import { getClasses } from './helpers';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { addressSwapper } from 'utils';
+import { Modal } from './cw_modal';
 
 const LinkAccountItem = (props: {
   account: { address: string; meta?: { name: string } };
@@ -87,7 +88,9 @@ const LinkAccountItem = (props: {
 };
 
 type AccountSelectorProps = {
-  accounts: Array<{ address: string; meta?: { name: string } }>;
+  accounts:
+    | Array<{ address: string; meta?: { name: string } }>
+    | readonly any[];
   onModalClose: () => void;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
@@ -153,6 +156,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
     linking,
   } = props;
 
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
   async function handleNormalWalletLogin(
     wallet: IWebWallet<any>,
     address: string
@@ -216,12 +221,6 @@ export const CWWalletsList = (props: WalletsListProps) => {
 
     await wallet.reset();
 
-    if (isWindowMediumSmallInclusive(window.innerWidth)) {
-      $('.LoginMobile').trigger('modalexit');
-    } else {
-      $('.LoginDesktop').trigger('modalexit');
-    }
-
     redraw();
   };
 
@@ -235,101 +234,114 @@ export const CWWalletsList = (props: WalletsListProps) => {
           )}
         >
           {wallets.map((wallet: IWebWallet<any>) => (
-            <CWWalletOptionRow
-              walletName={wallet.name}
-              walletLabel={wallet.label}
-              darkMode={darkMode}
-              onClick={async () => {
-                await wallet.enable();
-                setSelectedWallet(wallet);
+            <React.Fragment>
+              <CWWalletOptionRow
+                walletName={wallet.name}
+                walletLabel={wallet.label}
+                darkMode={darkMode}
+                onClick={async () => {
+                  await wallet.enable();
+                  setSelectedWallet(wallet);
 
-                if (wallet.chain === 'substrate') {
-                  app.modals.create({
-                    modal: AccountSelector,
-                    data: {
-                      accounts: wallet.accounts,
-                      walletNetwork: wallet.defaultNetwork,
-                      walletChain: wallet.chain,
-                      onSelect: async (accountIndex) => {
-                        let address;
-                        if (app.chain) {
-                          address = addressSwapper({
-                            address: wallet.accounts[accountIndex].address,
-                            currentPrefix: (app.chain as Substrate).chain
-                              .ss58Format,
-                          });
-                        } else {
-                          address = wallet.accounts[accountIndex].address;
-                        }
-                        $('.AccountSelector').trigger('modalexit');
-                        await handleNormalWalletLogin(wallet, address);
-                      },
-                    },
-                  });
-                } else {
-                  if (wallet.chain === 'near') {
-                    // Near Redirect Flow
-                    const WalletAccount = (await import('near-api-js'))
-                      .WalletAccount;
-                    if (!app.chain.apiInitialized) {
-                      await app.chain.initApi();
-                    }
-                    const nearWallet = new WalletAccount(
-                      (app.chain as Near).chain.api,
-                      'commonwealth_near'
-                    );
-                    if (nearWallet.isSignedIn()) {
-                      nearWallet.signOut();
-                    }
-                    const redirectUrl = !app.isCustomDomain()
-                      ? `${
-                          window.location.origin
-                        }/${app.activeChainId()}/finishNearLogin`
-                      : `${window.location.origin}/finishNearLogin`;
-                    nearWallet.requestSignIn({
-                      contractId: (app.chain as Near).chain.isMainnet
-                        ? 'commonwealth-login.near'
-                        : 'commonwealth-login.testnet',
-                      successUrl: redirectUrl,
-                      failureUrl: redirectUrl,
-                    });
-                  } else if (wallet.defaultNetwork === 'axie-infinity') {
-                    // Axie Redirect Flow
-                    const result = await $.post(`${app.serverUrl()}/auth/sso`, {
-                      issuer: 'AxieInfinity',
-                    });
-                    if (result.status === 'Success' && result.result.stateId) {
-                      const stateId = result.result.stateId;
-
-                      // redirect to axie page for login
-                      // eslint-disable-next-line max-len
-                      window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
-                    } else {
-                      console.log(result.error || 'Could not login');
-                    }
+                  if (wallet.chain === 'substrate') {
+                    setIsModalOpen(true);
                   } else {
-                    // Normal Wallet Flow
-                    let address;
-                    if (
-                      wallet.chain === 'ethereum' ||
-                      wallet.chain === 'solana'
-                    ) {
-                      address = wallet.accounts[0];
-                    } else if (wallet.defaultNetwork === 'terra') {
-                      address = wallet.accounts[0].address;
-                    } else if (wallet.chain === 'cosmos') {
-                      if (wallet.defaultNetwork === 'injective') {
-                        address = wallet.accounts[0];
-                      } else {
-                        address = wallet.accounts[0].address;
+                    if (wallet.chain === 'near') {
+                      // Near Redirect Flow
+                      const WalletAccount = (await import('near-api-js'))
+                        .WalletAccount;
+                      if (!app.chain.apiInitialized) {
+                        await app.chain.initApi();
                       }
-                    }
+                      const nearWallet = new WalletAccount(
+                        (app.chain as Near).chain.api,
+                        'commonwealth_near'
+                      );
+                      if (nearWallet.isSignedIn()) {
+                        nearWallet.signOut();
+                      }
+                      const redirectUrl = !app.isCustomDomain()
+                        ? `${
+                            window.location.origin
+                          }/${app.activeChainId()}/finishNearLogin`
+                        : `${window.location.origin}/finishNearLogin`;
+                      nearWallet.requestSignIn({
+                        contractId: (app.chain as Near).chain.isMainnet
+                          ? 'commonwealth-login.near'
+                          : 'commonwealth-login.testnet',
+                        successUrl: redirectUrl,
+                        failureUrl: redirectUrl,
+                      });
+                    } else if (wallet.defaultNetwork === 'axie-infinity') {
+                      // Axie Redirect Flow
+                      const result = await $.post(
+                        `${app.serverUrl()}/auth/sso`,
+                        {
+                          issuer: 'AxieInfinity',
+                        }
+                      );
+                      if (
+                        result.status === 'Success' &&
+                        result.result.stateId
+                      ) {
+                        const stateId = result.result.stateId;
 
-                    await handleNormalWalletLogin(wallet, address);
+                        // redirect to axie page for login
+                        // eslint-disable-next-line max-len
+                        window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+                      } else {
+                        console.log(result.error || 'Could not login');
+                      }
+                    } else {
+                      // Normal Wallet Flow
+                      let address;
+                      if (
+                        wallet.chain === 'ethereum' ||
+                        wallet.chain === 'solana'
+                      ) {
+                        address = wallet.accounts[0];
+                      } else if (wallet.defaultNetwork === 'terra') {
+                        address = wallet.accounts[0].address;
+                      } else if (wallet.chain === 'cosmos') {
+                        if (wallet.defaultNetwork === 'injective') {
+                          address = wallet.accounts[0];
+                        } else {
+                          address = wallet.accounts[0].address;
+                        }
+                      }
+
+                      await handleNormalWalletLogin(wallet, address);
+                    }
                   }
+                }}
+              />
+              <Modal
+                content={
+                  <AccountSelector
+                    accounts={wallet.accounts}
+                    walletNetwork={wallet.defaultNetwork}
+                    walletChain={wallet.chain}
+                    onSelect={async (accountIndex) => {
+                      let address;
+                      if (app.chain) {
+                        address = addressSwapper({
+                          address: wallet.accounts[accountIndex].address,
+                          currentPrefix: (app.chain as Substrate).chain
+                            .ss58Format,
+                        });
+                      } else {
+                        address = wallet.accounts[accountIndex].address;
+                      }
+                      await handleNormalWalletLogin(wallet, address);
+                      setIsModalOpen(false);
+                    }}
+                    onModalClose={() => setIsModalOpen(false)}
+                  />
                 }
-              }}
-            />
+                onClose={() => setIsModalOpen(false)}
+                open={isModalOpen}
+              />
+            </React.Fragment>
           ))}
           {wallets.length === 0 && (
             <CWWalletMissingOptionRow darkMode={darkMode} />

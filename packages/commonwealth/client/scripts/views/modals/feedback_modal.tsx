@@ -11,8 +11,15 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-export const FeedbackModal = () => {
+type FeedbackModalProps = {
+  onModalClose: () => void;
+};
+
+export const FeedbackModal = (props: FeedbackModalProps) => {
+  const { onModalClose } = props;
+
   const [feedbackText, setFeedbackText] = React.useState<string | null>(null);
   const [message, setMessage] = React.useState<string | null>(null);
   const [isSending, setIsSending] = React.useState<boolean>(false);
@@ -22,6 +29,7 @@ export const FeedbackModal = () => {
     <div className="FeedbackModal">
       <div className="compact-modal-title">
         <h3>Send feedback</h3>
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
         <CWTextArea
