@@ -142,7 +142,7 @@ async function main() {
       }
 
       // redirect from appname.herokuapp.com to SERVER_URL (e.g. commonwealth.im) if present
-      if (host.match(`/${process.env.HEROKU_APP_NAME}.herokuapp.com/i`)) {
+      if (host.includes(`/${process.env.HEROKU_APP_NAME}.herokuapp.com/i`)) {
         return res.redirect(301, `${process.env.SERVER_URL}${req.url}`);
       }
 
