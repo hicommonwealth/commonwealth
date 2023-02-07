@@ -40,7 +40,6 @@ export class SidebarQuickSwitcher extends ClassComponent {
                 e.preventDefault();
                 app.sidebarMenu = 'createContent';
                 app.sidebarRedraw.emit('redraw');
-                console.log(app.sidebarMenu)
               }}
             />
           )}
@@ -49,6 +48,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
             iconButtonTheme="black"
             onClick={(e) => {
               e.preventDefault();
+              app.sidebarRedraw.emit('redraw');
               app.sidebarMenu = 'exploreCommunities';
             }}
           />

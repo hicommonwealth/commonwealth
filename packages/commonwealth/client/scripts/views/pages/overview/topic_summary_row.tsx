@@ -106,6 +106,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             return (
               <React.Fragment>
                 <div
+                  key={idx}
                   className={getClasses<{ isPinned?: boolean }>(
                     { isPinned: thread.pinned },
                     'recent-thread-row'

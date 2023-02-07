@@ -43,7 +43,7 @@ export class Sidebar extends ClassComponent {
 
     app.sidebarRedraw.on('redraw', () => {
       this.redraw();
-    })
+    });
 
     const currentChainInfo = app.chain?.meta;
 

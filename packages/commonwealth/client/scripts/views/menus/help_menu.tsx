@@ -32,6 +32,7 @@ export class HelpMenu extends ClassComponent {
           label: 'Help',
           onClick: () => {
             app.mobileMenu = 'MainMenu';
+            app.mobileMenuRedraw.emit('redraw');
           },
         }}
         menuItems={gethelpMenuItems()}

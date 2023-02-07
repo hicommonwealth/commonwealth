@@ -74,7 +74,7 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
               onClick={() => {
                 app.sidebarToggled = false;
                 app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
-                redraw();
+                app.mobileMenuRedraw.emit('redraw');
               }}
             />
           </div>
