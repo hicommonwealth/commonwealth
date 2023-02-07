@@ -99,6 +99,8 @@ export interface IApp {
 
   mobileMenu: MobileMenuName;
   sidebarMenu: SidebarMenuName;
+  sidebarRedraw: EventEmitter;
+
   sidebarToggled: boolean;
 
   loginState: LoginState;
@@ -199,6 +201,7 @@ const app: IApp = {
   // Global nav state
   mobileMenu: null,
   sidebarMenu: 'default',
+  sidebarRedraw: new EventEmitter(),
   sidebarToggled: false,
 
   toasts: getToastStore(),
