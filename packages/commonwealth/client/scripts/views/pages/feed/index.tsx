@@ -90,6 +90,12 @@ class FeedPage extends ClassComponent {
       return <ErrorPage message="There was an error loading the feed." />;
     }
 
+    if (!app.chain.meta.hasHomepage) {
+      return (
+        <ErrorPage message="The homepage feature has not been enabled for this community." />
+      );
+    }
+
     let sortedFeed = [];
     if (this.globalFeed?.length > 0 && this.chainEvents?.length > 0) {
       sortedFeed = this.globalFeed.concat(this.chainEvents).sort((a, b) => {

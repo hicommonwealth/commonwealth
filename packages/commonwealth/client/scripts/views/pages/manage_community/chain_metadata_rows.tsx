@@ -241,7 +241,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               {
                 label: 'Homepage',
                 value: DefaultPage.Homepage,
-              }
+              },
             ]}
             selected={this.defaultPage}
             onChange={(e) => {
@@ -263,8 +263,14 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 value: DefaultPage.Overview,
               },
             ]}
-            selected={this.defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions}
-            onChange={(e) => this.defaultOverview = (e === DefaultPage.Overview ? true : false)}
+            selected={
+              this.defaultOverview
+                ? DefaultPage.Overview
+                : DefaultPage.Discussions
+            }
+            onChange={(e) =>
+              (this.defaultOverview = e === DefaultPage.Overview ? true : false)
+            }
           />
         )}
         <ToggleRow
@@ -437,15 +443,17 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             }
             try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.removeDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               } else {
-                this.default_deny_permissions = this.permissionsManager.addDenyPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.addDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               }
               await chain.updateChainData({
                 name,
@@ -519,8 +527,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 <CWText type="h4">Snapshot Notifications</CWText>
                 <CWToggle
                   onChange={() => {
-                    this.snapshotNotificationsEnabled = !this
-                      .snapshotNotificationsEnabled;
+                    this.snapshotNotificationsEnabled =
+                      !this.snapshotNotificationsEnabled;
                     this.redraw();
                   }}
                   checked={this.snapshotNotificationsEnabled}

@@ -65,13 +65,17 @@ class SidebarComponent extends ClassComponent {
             {app.chain && (
               <div className="community-menu">
                 <AdminSection />
-                <div
-                  className={onHomeRoute ? 'home-button active' : 'home-button'}
-                  onClick={() => this.navigateToSubpage('/feed')}
-                >
-                  <CWIcon iconName="home" iconSize="small" />
-                  <CWText>Home</CWText>
-                </div>
+                {app.chain.meta.hasHomepage && (
+                  <div
+                    className={
+                      onHomeRoute ? 'home-button active' : 'home-button'
+                    }
+                    onClick={() => this.navigateToSubpage('/feed')}
+                  >
+                    <CWIcon iconName="home" iconSize="small" />
+                    <CWText>Home</CWText>
+                  </div>
+                )}
                 <DiscussionSection />
                 <GovernanceSection />
                 {/* app.socket && !hideChat && <ChatSection /> */}

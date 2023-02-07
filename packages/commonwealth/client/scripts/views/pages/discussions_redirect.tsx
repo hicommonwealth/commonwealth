@@ -11,14 +11,13 @@ export default function DiscussionsRedirect() {
   useEffect(() => {
     if (!app.chain) return;
 
-    const { defaultPage } = app.chain.meta;
+    const { defaultPage, defaultOverview, hasHomepage } = app.chain.meta;
     let view;
 
-    // map old defaultOverview to new defaultPage
-    if (_.isBoolean(defaultPage)) {
-      view = defaultPage ? DefaultPage.Overview : DefaultPage.Discussions;
-    } else {
+    if (hasHomepage) {
       view = defaultPage;
+    } else {
+      view = defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions;
     }
 
     switch (view) {
