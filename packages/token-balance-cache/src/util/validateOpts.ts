@@ -1,4 +1,4 @@
-import type { EthBPOpts } from 'types';
+import type { EthBPOpts } from '../types';
 import Web3 from 'web3';
 
 export function validateOpts(

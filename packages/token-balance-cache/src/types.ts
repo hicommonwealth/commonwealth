@@ -1,6 +1,4 @@
-import type { ERC1155, ERC20, ERC721 } from 'common-common/src/eth/types';
 import type { BalanceType } from 'common-common/src/types';
-import Web3 from 'web3';
 
 // map of addresses to balances
 export interface ICache {

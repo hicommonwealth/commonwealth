@@ -1,4 +1,3 @@
-import { TerraBalanceFn, StakedBalanceFn } from './terra';
 import BN from 'bn.js';
 import axios from 'axios';
 import { BalanceType } from 'common-common/src/types';
