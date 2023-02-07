@@ -53,6 +53,7 @@ const navigateToSubpage = (...args) => {
     args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   app.sidebarMenu = 'default';
+  // app.sidebarRedraw.emit('redraw');
   setRoute.apply(this, args);
 };
 

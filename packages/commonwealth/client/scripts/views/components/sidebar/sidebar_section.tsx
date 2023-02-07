@@ -179,13 +179,8 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
   }
 
   view(vnode: ResultNode<SidebarSectionAttrs>) {
-    const {
-      displayData,
-      extraComponents,
-      onClick,
-      title,
-      toggleDisabled,
-    } = vnode.attrs;
+    const { displayData, extraComponents, onClick, title, toggleDisabled } =
+      vnode.attrs;
 
     const clickHandler = (e, sectionName: string) => {
       if (toggleDisabled) {

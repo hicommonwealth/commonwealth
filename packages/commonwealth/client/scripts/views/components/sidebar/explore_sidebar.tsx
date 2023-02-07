@@ -92,6 +92,7 @@ export class ExploreCommunitiesSidebar extends ClassComponent {
             setTimeout(() => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
+              app.sidebarRedraw.emit('redraw');
               redraw();
             }, 200);
           },

@@ -323,6 +323,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       //       // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
       //       // array
       //       app.mobileMenu = null;
+      // app.mobileMenuRedraw.emit('redraw');
       //       m.redraw();
       //     },
       //   },

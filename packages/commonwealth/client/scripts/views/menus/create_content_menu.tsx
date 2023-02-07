@@ -191,6 +191,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
         });
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
+        app.sidebarRedraw.emit('redraw');
         setRoute('/createCommunity');
       },
     },
@@ -207,6 +208,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
         });
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
+        app.sidebarRedraw.emit('redraw');
 
         window.open(
           `https://discord.com/oauth2/authorize?client_id=${
@@ -263,6 +265,7 @@ export class CreateContentSidebar extends ClassComponent {
             setTimeout(() => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
+              app.sidebarRedraw.emit('redraw');
               redraw();
             }, 200);
           },
@@ -282,6 +285,7 @@ export class CreateContentMenu extends ClassComponent {
           label: 'Create',
           onClick: () => {
             app.mobileMenu = 'MainMenu';
+            app.mobileMenuRedraw.emit('redraw');
           },
         }}
         menuItems={getCreateContentMenuItems()}

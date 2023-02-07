@@ -55,6 +55,10 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
   view(vnode: ResultNode<SublayoutAttrs>) {
     const { hideFooter = false, hideSearch, onScroll } = vnode.attrs;
 
+    app.mobileMenuRedraw.on('redraw', () => {
+      this.redraw();
+    });
+
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
     const banner = app.chain ? chain.communityBanner : null;
