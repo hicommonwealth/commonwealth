@@ -6,7 +6,6 @@ import type { ModelInstance, ModelStatic } from './types';
 
 export type OffchainProfileAttributes = {
   address_id: number;
-  identity?: string; // display name from chain
   data?: string;
 
   // associations
@@ -29,7 +28,6 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
-      identity: { type: dataTypes.STRING, allowNull: true },
       data: { type: dataTypes.TEXT, allowNull: true },
     },
     {
