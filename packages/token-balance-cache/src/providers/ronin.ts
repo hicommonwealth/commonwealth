@@ -16,7 +16,7 @@ export default class RoninBalanceProvider extends BalanceProvider<
   public name = 'ronin';
   public opts = {};
   public validBases = [BalanceType.AxieInfinity];
-
+  // TODO graceful handling when the provider breaks or throw error
   public async getExternalProvider(
     node: IChainNode
   ): Promise<[api: ERC20, stakingContract: Contract]> {
