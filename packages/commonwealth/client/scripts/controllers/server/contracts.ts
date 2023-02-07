@@ -132,6 +132,7 @@ class ContractsController {
     cctmd,
     isNewCCT,
     template_id,
+    isDeletion = false,
   }: {
     contract_id: number;
     cct_id: number;
@@ -144,6 +145,7 @@ class ContractsController {
     };
     isNewCCT: boolean;
     template_id?: number;
+    isDeletion?: boolean;
   }) {
     const currentContractInStore = this._store.getById(contract_id);
     // TODO: Verify that this is a shallow copy situation
@@ -151,7 +153,7 @@ class ContractsController {
 
     // Update the cctmd in the ccts array
     if (!isNewCCT) {
-      const ccts = currentContractInStore.ccts.map((cct) => {
+      let ccts = currentContractInStore.ccts.map((cct) => {
         if (cct.id === cct_id) {
           return {
             ...cct,
@@ -161,7 +163,15 @@ class ContractsController {
           return cct;
         }
       });
+
+      // reduce the ccts array if we're deleting
+      if (isDeletion) {
+        // remove the cct from the ccts array
+        ccts = ccts.filter((cct) => cct.id !== cct_id);
+      }
+
       this._store.add(new Contract({ ...currentContractInStore, ccts }));
+      console.log('updated cctmd in ccts array', this._store);
     } else {
       const ccts = currentContractInStore.ccts || [];
       ccts.push({
@@ -383,10 +393,11 @@ class ContractsController {
 
   public async deleteCommunityContractTemplate(contract: {
     contract_id: number;
-    template_id?: number;
+    template_id: number;
+    cctmd_id: number;
   }) {
     try {
-      await $.ajax({
+      const res = await $.ajax({
         url: `${app.serverUrl()}/contract/community_template`,
         data: {
           ...contract,
@@ -396,6 +407,20 @@ class ContractsController {
       });
 
       // TODO update store
+
+      console.log('what', res.result);
+
+      if (res.result.deletedContract) {
+        this._store.remove(this._store.getById(contract.contract_id));
+      } else {
+        this.updateTemplate({
+          contract_id: contract.contract_id,
+          cct_id: res.result.cct.id,
+          cctmd: res.result.metadata,
+          isNewCCT: false,
+          isDeletion: true,
+        });
+      }
     } catch (err) {
       console.log(err);
       throw new Error('Failed to delete contract template');
