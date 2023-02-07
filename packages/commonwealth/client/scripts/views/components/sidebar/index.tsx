@@ -41,6 +41,10 @@ export class Sidebar extends ClassComponent {
       chain: app.activeChainId(),
     });
 
+    app.sidebarRedraw.on('redraw', () => {
+      this.redraw();
+    })
+
     const currentChainInfo = app.chain?.meta;
 
     const hideChat =

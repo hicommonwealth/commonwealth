@@ -38,11 +38,9 @@ export class SidebarQuickSwitcher extends ClassComponent {
               iconButtonTheme="black"
               onClick={(e) => {
                 e.preventDefault();
-                mixpanelBrowserTrack({
-                  event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
-                  isCustomDomain: app.isCustomDomain(),
-                });
                 app.sidebarMenu = 'createContent';
+                app.sidebarRedraw.emit('redraw');
+                console.log(app.sidebarMenu)
               }}
             />
           )}
