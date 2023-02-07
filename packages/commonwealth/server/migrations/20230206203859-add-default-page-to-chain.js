@@ -18,6 +18,7 @@ module.exports = {
         {
           type: Sequelize.STRING,
           allowNull: true,
+          defaultValue: false,
         },
         { transaction: t }
       );

@@ -186,11 +186,11 @@ const updateChain = async (
   if (terms) chain.terms = terms;
   if (has_homepage) chain.has_homepage = has_homepage;
   if (default_page) {
-    if (has_homepage === false) {
+    if (!has_homepage) {
       return next(new AppError(Errors.InvalidDefaultPage));
+    } else {
+      chain.default_page = default_page;
     }
-  } else {
-    chain.default_page = default_page;
   }
 
   // Set default allow/deny permissions

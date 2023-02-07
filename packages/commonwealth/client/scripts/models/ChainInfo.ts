@@ -201,7 +201,7 @@ class ChainInfo {
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       defaultOverview: default_summary_view,
-      defaultPage: default_page ? default_page : default_summary_view,
+      defaultPage: default_page,
       hasHomepage: has_homepage,
       adminsAndMods,
       base,

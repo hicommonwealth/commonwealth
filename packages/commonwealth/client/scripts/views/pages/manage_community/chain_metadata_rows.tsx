@@ -82,6 +82,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   snapshotNotificationsEnabled: boolean;
   permissionsManager = new PermissionManager();
   defaultPage: string;
+  hasHomepage: boolean;
 
   oninit(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -110,6 +111,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.snapshotString = chain.snapshot.toString();
     this.defaultOverview = chain.defaultOverview;
     this.defaultPage = chain.defaultPage;
+    this.hasHomepage = chain.hasHomepage;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
     this.discordBotConnected = chain.discordConfigId !== null;
@@ -118,11 +120,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.channelsLoaded = false;
     this.snapshotChannels = [];
     this.snapshotNotificationsEnabled = false;
-
-    // map old defaultOverview to new defaultPage
-    if (_.isBoolean(this.defaultPage)) {
-      this.defaultPage = this.defaultPage ? DefaultPage.Overview : DefaultPage.Discussions;
-    }
   }
 
   view(vnode: ResultNode<ChainMetadataRowsAttrs>) {
@@ -216,25 +213,60 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               : "Don't show progress on threads"
           }
         />
-        <SelectRow
-          title="Default view"
-          options={[
-            {
-              label: 'Discussions',
-              value: DefaultPage.Discussions,
-            },
-            {
-              label: 'Overview',
-              value: DefaultPage.Overview,
-            },
-            {
-              label: 'Feed',
-              value: DefaultPage.Homepage,
-            }
-          ]}
-          selected={this.defaultPage}
-          onChange={(e) => this.defaultPage = e}
+        <ToggleRow
+          title="Homepage"
+          defaultValue={chain.hasHomepage}
+          onToggle={(checked) => {
+            this.hasHomepage = checked;
+            if (checked) this.defaultPage = DefaultPage.Homepage;
+          }}
+          caption={(checked) =>
+            checked
+              ? 'Enable homepage feature for this community'
+              : 'Disable homepage feature for this community'
+          }
         />
+        {this.hasHomepage ? (
+          <SelectRow
+            title="Default view"
+            options={[
+              {
+                label: 'Discussions',
+                value: DefaultPage.Discussions,
+              },
+              {
+                label: 'Overview',
+                value: DefaultPage.Overview,
+              },
+              {
+                label: 'Homepage',
+                value: DefaultPage.Homepage,
+              }
+            ]}
+            selected={this.defaultPage}
+            onChange={(e) => {
+              this.defaultPage = e;
+              if (e === DefaultPage.Discussions) this.defaultOverview = false;
+              if (e === DefaultPage.Overview) this.defaultOverview = true;
+            }}
+          />
+        ) : (
+          <SelectRow
+            title="Default view"
+            options={[
+              {
+                label: 'Discussions',
+                value: DefaultPage.Discussions,
+              },
+              {
+                label: 'Overview',
+                value: DefaultPage.Overview,
+              },
+            ]}
+            selected={this.defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions}
+            onChange={(e) => this.defaultOverview = (e === DefaultPage.Overview ? true : false)}
+          />
+        )}
         <ToggleRow
           title="Chat Enabled"
           defaultValue={this.chatEnabled}
@@ -359,6 +391,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               iconUrl,
               defaultOverview,
               defaultPage,
+              hasHomepage,
             } = this;
 
             for (const space of snapshot) {
@@ -430,6 +463,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 iconUrl,
                 defaultOverview,
                 defaultPage,
+                hasHomepage,
                 default_allow_permissions: this.default_allow_permissions,
                 default_deny_permissions: this.default_deny_permissions,
               });
