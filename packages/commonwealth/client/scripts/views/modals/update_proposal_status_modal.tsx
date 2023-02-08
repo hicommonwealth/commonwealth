@@ -12,7 +12,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/update_proposal_status_modal.scss';

@@ -1,56 +1,51 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/code_block.scss';
 import { CWLabel } from './component_kit/cw_label';
 
 import { getClasses } from './component_kit/helpers';
 
-type CodeBlockAttrs = {
+type CodeBlockProps = {
   clickToSelect: boolean;
-};
+} & React.PropsWithChildren;
 
-export class CodeBlock extends ClassComponent<CodeBlockAttrs> {
-  private readonly codeBlockRef: React.RefObject<HTMLDivElement>;
-  constructor(props) {
-    super(props);
-    this.codeBlockRef = React.createRef();
-  }
+export const CodeBlock = (props: CodeBlockProps) => {
+  const { clickToSelect } = props;
 
-  view(vnode: ResultNode<CodeBlockAttrs>) {
-    const { clickToSelect } = vnode.attrs;
+  const codeBlockRef = React.useRef();
 
-    return (
-      <div
-        ref={this.codeBlockRef}
-        className={getClasses<CodeBlockAttrs>({ clickToSelect }, 'CodeBlock')}
+  return (
+    <div
+      ref={codeBlockRef}
+      className={getClasses<{ clickToSelect: boolean }>(
+        { clickToSelect },
+        'CodeBlock'
+      )}
+    >
+      <CWLabel label="Use subkey to sign this transaction" />
+      <pre
+        onClick={(e) => {
+          e.preventDefault();
+
+          const element = codeBlockRef.current;
+
+          if (window.getSelection) {
+            const sel = window.getSelection();
+
+            sel.removeAllRanges();
+
+            const range = document.createRange();
+
+            range.selectNodeContents(element);
+
+            sel.addRange(range);
+          }
+        }}
       >
-        <CWLabel label="Use subkey to sign this transaction" />
-        <pre
-          onClick={(e) => {
-            e.preventDefault();
-
-            const element = this.codeBlockRef.current;
-
-            if (window.getSelection) {
-              const sel = window.getSelection();
-
-              sel.removeAllRanges();
-
-              const range = document.createRange();
-
-              range.selectNodeContents(element);
-
-              sel.addRange(range);
-            }
-          }}
-        >
-          {vnode.children}
-        </pre>
-      </div>
-    );
-  }
-}
+        {props.children}
+      </pre>
+    </div>
+  );
+};
