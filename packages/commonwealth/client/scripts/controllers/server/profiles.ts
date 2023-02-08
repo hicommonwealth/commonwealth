@@ -1,13 +1,3 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
 import _ from 'lodash';
