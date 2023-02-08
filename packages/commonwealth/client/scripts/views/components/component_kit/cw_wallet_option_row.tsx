@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_wallet_option_row.scss';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';

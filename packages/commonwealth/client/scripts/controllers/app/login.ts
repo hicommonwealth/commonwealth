@@ -15,8 +15,7 @@ import {
   getRoute,
   getRouteParam,
   redraw,
-  Component,
-  jsx,
+  Component
 } from 'mithrilInterop';
 import type { BlockInfo, ChainInfo } from 'models';
 import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';

@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { initAppState } from 'state';
@@ -6,7 +5,9 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import { setRoute, redraw, jsx } from 'mithrilInterop';
+import { setRoute, redraw} from
+
+ 'mithrilInterop';
 
 import _ from 'lodash';
 

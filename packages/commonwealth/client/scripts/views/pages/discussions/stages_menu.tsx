@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
@@ -6,7 +5,6 @@ import { navigateToSubpage } from 'router';
 import { threadStageToLabel } from 'helpers';
 import { ThreadStage } from 'models';
 
-import { jsx } from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 

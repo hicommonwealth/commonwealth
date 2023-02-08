@@ -1,4 +1,3 @@
-/* @jsx jsx */
 /* eslint-disable no-script-url */
 import React from 'react';
 
@@ -9,8 +8,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';

@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -15,8 +14,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import 'pages/validators.scss';
 
 import app from 'state';

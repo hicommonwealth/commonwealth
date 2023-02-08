@@ -1,10 +1,11 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 

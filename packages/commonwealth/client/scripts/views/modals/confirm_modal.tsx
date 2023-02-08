@@ -1,10 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
 import $ from 'jquery';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-import { jsx } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'modals/confirm_modal.scss';

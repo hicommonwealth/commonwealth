@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -15,8 +14,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import app from 'state';
 import { ProposalType } from '../../../../../../common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';

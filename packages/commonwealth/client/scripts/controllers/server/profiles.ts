@@ -7,7 +7,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';

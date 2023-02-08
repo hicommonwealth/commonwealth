@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { formatCoin } from 'adapters/currency';
@@ -14,8 +13,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'pages/treasury.scss';
 

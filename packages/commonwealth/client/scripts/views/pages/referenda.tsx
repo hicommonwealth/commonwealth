@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { ChainBase } from 'common-common/src/types';
@@ -14,8 +13,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'pages/referenda.scss';
 

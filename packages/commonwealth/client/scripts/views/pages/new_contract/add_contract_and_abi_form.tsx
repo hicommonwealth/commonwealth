@@ -1,6 +1,7 @@
-/* @jsx jsx */
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 
 import 'pages/new_contract/add_contract_and_abi_form.scss';
 

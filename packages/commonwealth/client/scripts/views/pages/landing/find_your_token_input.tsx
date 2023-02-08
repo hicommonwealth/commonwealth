@@ -1,4 +1,3 @@
-/* @jsx jsx */
 
 import React from 'react';
 
@@ -11,8 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 type FindYourTokenInputComponentAttrs = {
   onChangeValue: (event: any) => void;

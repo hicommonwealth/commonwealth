@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import 'components/thread_selector.scss';
@@ -10,8 +9,7 @@ import {
   ResultNode,
   render,
   redraw,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import app from 'state';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { CWTextInput } from './component_kit/cw_text_input';
