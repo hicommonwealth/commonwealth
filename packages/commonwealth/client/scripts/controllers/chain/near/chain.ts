@@ -331,7 +331,8 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         failureUrl,
       });
     } else {
-      // TODO this setRoute is not related to react-router => won't work
+      // TODO this setRoute is not related to react-router, it uses backend redirect
+      // TODO find a way to use router outside of react
       setRoute(successUrl);
     }
   }

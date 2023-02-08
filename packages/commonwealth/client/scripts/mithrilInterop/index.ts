@@ -259,7 +259,8 @@ export function setRoute(
   }
   */
 
-  // TODO this redirect is not related to react-router => won't work
+  // TODO this setRoute is not related to react-router, it uses backend redirect
+  // TODO find a way to use router outside of react
   redirect(route);
   // reset scroll position
   const html = document.getElementsByTagName('html')[0];

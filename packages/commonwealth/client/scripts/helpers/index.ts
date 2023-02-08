@@ -41,17 +41,16 @@ export function parseCustomStages(str) {
     .filter((s) => s) as unknown as ThreadStage[];
 }
 
-export const modalRedirectClick = (e, route) => {
+export const modalRedirectClick = (e, redirectCb: () => void) => {
   e.preventDefault();
   $(e.target).trigger('modalexit');
-  // TODO this setRoute is not related to react-router => won't work
-  setRoute(route);
+  redirectCb?.();
 };
 
 /*
  * mithril link helper
  */
-export function externalLink(selector, target, children) {
+export function externalLink(selector, target, children, setRouteCb) {
   return render(
     selector,
     {
@@ -64,8 +63,7 @@ export function externalLink(selector, target, children) {
           // don't open a new window if the link is on Commonwealth
           e.preventDefault();
           e.stopPropagation();
-          // TODO this setRoute is not related to react-router => won't work
-          setRoute(target);
+          setRouteCb?.(target);
         }
       },
     },

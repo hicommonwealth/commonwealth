@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent, jsx } from 'mithrilInterop';
 
 import { modalRedirectClick } from 'helpers';
@@ -9,12 +9,13 @@ import { modalRedirectClick } from 'helpers';
 import 'pages/login/login_boilerplate.scss';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
+import withRouter from 'navigation/helpers';
 
 type LoginBoilerplateAttrs = {
   darkMode?: boolean;
 };
 
-export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
+class LoginBoilerplateComponent extends ClassComponent<LoginBoilerplateAttrs> {
   view(vnode: ResultNode<LoginBoilerplateAttrs>) {
     const { darkMode } = vnode.attrs;
 
@@ -30,7 +31,7 @@ export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
           <a
             className="link"
             onClick={(e) => {
-              modalRedirectClick(e, '/terms');
+              modalRedirectClick(e, () => this.props.router.navigate('/terms'));
             }}
           >
             Terms of Service
@@ -39,7 +40,9 @@ export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
           <a
             className="link"
             onClick={(e) => {
-              modalRedirectClick(e, '/privacy');
+              modalRedirectClick(e, () =>
+                this.props.router.navigate('/privacy')
+              );
             }}
           >
             Privacy Policy
@@ -49,3 +52,5 @@ export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
     );
   }
 }
+
+export const LoginBoilerplate = withRouter(LoginBoilerplateComponent);

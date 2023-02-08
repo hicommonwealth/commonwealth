@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent, jsx } from 'mithrilInterop';
 import { ProposalType } from 'common-common/src/types';
 
@@ -11,44 +11,59 @@ import type { AnyProposal } from 'models';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import withRouter from 'navigation/helpers';
 
 type ProposalHeaderLinkAttrs = {
   proposal: AnyProposal;
 };
 
 // "View in Subscan"
-export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
+class BlockExplorerLinkComponent extends ClassComponent<ProposalHeaderLinkAttrs> {
   view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
       <div className="HeaderLink">
-        {externalLink('a', proposal['blockExplorerLink'], [
-          proposal['blockExplorerLinkLabel'] ||
-            extractDomain(proposal['blockExplorerLink']),
-        ])}
+        {externalLink(
+          'a',
+          proposal['blockExplorerLink'],
+          [
+            proposal['blockExplorerLinkLabel'] ||
+              extractDomain(proposal['blockExplorerLink']),
+          ],
+          this.setRoute
+        )}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
 }
+
+export const BlockExplorerLink = withRouter(BlockExplorerLinkComponent);
 
 // "Vote on polkadot-js"
-export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs> {
+class VotingInterfaceLinkComponent extends ClassComponent<ProposalHeaderLinkAttrs> {
   view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
       <div className="HeaderLink">
-        {externalLink('a', proposal['votingInterfaceLink'], [
-          proposal['votingInterfaceLinkLabel'] ||
-            extractDomain(proposal['votingInterfaceLink']),
-        ])}
+        {externalLink(
+          'a',
+          proposal['votingInterfaceLink'],
+          [
+            proposal['votingInterfaceLinkLabel'] ||
+              extractDomain(proposal['votingInterfaceLink']),
+          ],
+          this.setRoute
+        )}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
 }
+
+export const VotingInterfaceLink = withRouter(VotingInterfaceLinkComponent);
 
 // "Go to discussion"
 export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {

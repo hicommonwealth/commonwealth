@@ -6,7 +6,7 @@ import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { externalLink, pluralize } from 'helpers';
 import { AddressInfo } from 'models';
-import type { ResultNode} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import 'pages/validators.scss';
 
@@ -20,6 +20,7 @@ import { CardsCollection } from '../components/cards_collection';
 import { CWCard } from '../components/component_kit/cw_card';
 import { CWText } from '../components/component_kit/cw_text';
 import { GovExplainer } from '../components/gov_explainer';
+import withRouter from 'navigation/helpers';
 
 type ValidatorType = {
   chain: string;
@@ -66,7 +67,7 @@ class Validator extends ClassComponent<ValidatorAttrs> {
   }
 }
 
-class ValidatorsPage extends ClassComponent {
+class ValidatorsPageComponent extends ClassComponent {
   private validators;
   private totalStaked;
   private validatorsInitialized: boolean;
@@ -167,7 +168,8 @@ class ValidatorsPage extends ClassComponent {
                 `https://polkadot.js.org/apps/?rpc=${encodeURIComponent(
                   app.chain?.meta?.node.url
                 )}#/staking`,
-                'Nominate on polkadot-js'
+                'Nominate on polkadot-js',
+                this.setRoute
               )
             }
           />
@@ -177,5 +179,7 @@ class ValidatorsPage extends ClassComponent {
     );
   }
 }
+
+const ValidatorsPage = withRouter(ValidatorsPageComponent);
 
 export default ValidatorsPage;
