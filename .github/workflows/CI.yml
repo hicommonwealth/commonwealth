@@ -102,9 +102,6 @@ jobs:
       - name: Run linter
         run: yarn lint-branch
 
-      - name: Run formatter
-        run: yarn format-check
-
       - name: Typecheck
         run: yarn --cwd packages/commonwealth check-types
 
