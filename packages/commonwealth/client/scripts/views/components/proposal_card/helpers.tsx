@@ -8,7 +8,6 @@ import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import MolochProposal, {
   MolochProposalState,
 } from 'controllers/chain/ethereum/moloch/proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
@@ -41,25 +40,6 @@ export const getStatusText = (proposal: AnyProposal) => {
     if (proposal.isPassing === ProposalStatus.Passed)
       return 'Passed, moved to referendum';
     return 'Cancelled';
-  } else if (
-    proposal.completed &&
-    proposal instanceof SubstrateCollectiveProposal
-  ) {
-    if (
-      proposal.isPassing === ProposalStatus.Passed &&
-      proposal.call.section === 'treasury' &&
-      proposal.call.method === 'approveProposal'
-    )
-      return 'Passed';
-    if (
-      proposal.isPassing === ProposalStatus.Passed &&
-      proposal.call.section === 'democracy' &&
-      proposal.call.method.startsWith('externalPropose')
-    )
-      return 'Passed, moved to referendum';
-    if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
-    if (proposal.isPassing === ProposalStatus.Failed) return 'Motion closed';
-    return 'Completed';
   } else if (proposal.completed && proposal instanceof AaveProposal) {
     if (proposal.state === AaveTypes.ProposalState.CANCELED) return 'Cancelled';
     if (proposal.state === AaveTypes.ProposalState.EXECUTED) return 'Executed';
@@ -192,8 +172,7 @@ export const getPrimaryTagText = (proposal: AnyProposal) => `
 
 export const getSecondaryTagText = (proposal: AnyProposal) => {
   if (
-    (proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateCollectiveProposal) &&
+    proposal instanceof SubstrateDemocracyProposal &&
     proposal.getReferendum()
   ) {
     return `REF #${proposal.getReferendum().identifier}`;
@@ -204,8 +183,6 @@ export const getSecondaryTagText = (proposal: AnyProposal) => {
 
     return originatingProposalOrMotion instanceof SubstrateDemocracyProposal
       ? `PROP #${originatingProposalOrMotion.identifier}`
-      : originatingProposalOrMotion instanceof SubstrateCollectiveProposal
-      ? `MOT #${originatingProposalOrMotion.identifier}`
       : 'MISSING PROP';
   } else if (
     proposal instanceof SubstrateTreasuryProposal &&
