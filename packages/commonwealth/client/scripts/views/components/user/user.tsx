@@ -35,7 +35,6 @@ type UserAttrs = {
   avatarOnly?: boolean; // overrides most other properties
   avatarSize?: number;
   hideAvatar?: boolean;
-  hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
   linkify?: boolean;
   onclick?: any;
   popover?: boolean;
@@ -49,16 +48,12 @@ export const User = (props: UserAttrs) => {
   const {
     avatarOnly,
     hideAvatar,
-    hideIdentityIcon,
     showAddressWithDisplayName,
     user,
     linkify,
     popover,
     showRole,
   } = props;
-
-  const [identityWidgetLoading, setIdentityWidgetLoading] =
-    React.useState<boolean>(false);
 
   const popoverProps = usePopover();
 
@@ -94,24 +89,6 @@ export const User = (props: UserAttrs) => {
   )?.name;
 
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
-
-  if (
-    app.chain?.base === ChainBase.Substrate &&
-    !identityWidgetLoading &&
-    !app.cachedIdentityWidget
-  ) {
-    setIdentityWidgetLoading(true);
-
-    import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "substrate-identity-widget" */
-      './substrate_identity'
-    ).then((mod) => {
-      app.cachedIdentityWidget = mod.default;
-      setIdentityWidgetLoading(false);
-      redraw();
-    });
-  }
 
   if (props.user instanceof AddressInfo) {
     const chainId = props.user.chain;
@@ -166,17 +143,6 @@ export const User = (props: UserAttrs) => {
 
   const getRoleTags = (long?: boolean) => (
     <>
-      {/* 'long' makes role tags show as full length text */}
-      {profile.isCouncillor && !hideIdentityIcon && (
-        <div className={`role-icon role-icon-councillor${long ? ' long' : ''}`}>
-          {long ? `${friendlyChainName} Councillor` : 'C'}
-        </div>
-      )}
-      {profile.isValidator && !hideIdentityIcon && (
-        <div className={`role-icon role-icon-validator${long ? ' long' : ''}`}>
-          {long ? `${friendlyChainName} Validator` : 'V'}
-        </div>
-      )}
       {/* role in commonwealth forum */}
       {showRole && role && (
         <div className="role-tag-container">
@@ -207,19 +173,7 @@ export const User = (props: UserAttrs) => {
           {profile && profile.getAvatar(avatarSize)}
         </div>
       )}
-      {app.chain &&
-      app.chain.base === ChainBase.Substrate &&
-      app.cachedIdentityWidget ? (
-        // substrate name
-        render(app.cachedIdentityWidget, {
-          account,
-          linkify,
-          profile,
-          hideIdentityIcon,
-          addrShort,
-          showAddressWithDisplayName,
-        })
-      ) : (
+      {
         <>
           {/* non-substrate name */}
           {linkify ? (
@@ -275,7 +229,7 @@ export const User = (props: UserAttrs) => {
               />
             )}
         </>
-      )}
+      }
     </div>
   );
 
@@ -294,18 +248,7 @@ export const User = (props: UserAttrs) => {
           : profile.getAvatar(32)}
       </div>
       <div className="user-name">
-        {app.chain &&
-        app.chain.base === ChainBase.Substrate &&
-        app.cachedIdentityWidget
-          ? render(app.cachedIdentityWidget, {
-              account,
-              linkify: true,
-              profile,
-              hideIdentityIcon,
-              addrShort,
-              showAddressWithDisplayName: false,
-            })
-          : link(
+        {link(
               'a.user-display-name',
               profile
                 ? `/${app.activeChainId() || profile.chain}/account/${

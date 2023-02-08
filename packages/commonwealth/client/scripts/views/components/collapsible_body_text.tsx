@@ -65,7 +65,7 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
 
       return author ? (
         <>
-          <User user={author} hideAvatar hideIdentityIcon /> created this thread
+          <User user={author} hideAvatar /> created this thread
         </>
       ) : (
         'Created this thread'

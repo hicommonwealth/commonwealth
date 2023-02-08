@@ -101,7 +101,6 @@ export enum UserContent {
 
 interface IProfilePageAttrs {
   address: string;
-  setIdentity?: boolean;
 }
 
 interface IProfilePageState {
@@ -184,25 +183,14 @@ const loadProfile = async (
     if (a.OffchainProfile) {
       const profileData = JSON.parse(a.OffchainProfile.data);
       // ignore off-chain name if substrate id exists
-      if (a.OffchainProfile.identity) {
-        profile.initializeWithChain(
-          a.OffchainProfile.identity,
-          profileData?.headline,
-          profileData?.bio,
-          profileData?.avatarUrl,
-          a.last_active,
-          a.is_validator
-        );
-      } else {
-        profile.initialize(
-          profileData?.name,
-          profileData?.headline,
-          profileData?.bio,
-          profileData?.avatarUrl,
-          a.last_active,
-          a.is_validator
-        );
-      }
+      profile.initialize(
+        profileData?.name,
+        profileData?.headline,
+        profileData?.bio,
+        profileData?.avatarUrl,
+        a.last_active,
+        a.is_validator
+      );
     } else {
       profile.initializeEmpty();
     }
@@ -336,7 +324,6 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   oncreate: async () => {},
   view: (vnode) => {
-    const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
       loadProfile(vnode.attrs, vnode.state);
@@ -456,7 +443,6 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
             render('.col-xs-12 .col-md-8', [
               render(ProfileHeader, {
                 account,
-                setIdentity,
                 onOwnProfile,
                 onLinkedProfile,
                 refreshCallback: () => {
@@ -523,7 +509,6 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
             render('.xs-display-none .col-md-4', [
               render(ProfileBio, {
                 account,
-                setIdentity,
                 onOwnProfile,
                 onLinkedProfile,
                 refreshCallback: () => {

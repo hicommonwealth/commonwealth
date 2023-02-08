@@ -65,7 +65,6 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                   popover
                   linkify
                   hideAvatar
-                  hideIdentityIcon
                 />
                 <CWIcon
                   iconName="close"

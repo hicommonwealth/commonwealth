@@ -157,7 +157,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       const author = new AddressInfo(null, author_address, chain_id, null);
 
-      const authorName = <User user={author} hideAvatar hideIdentityIcon />;
+      const authorName = <User user={author} hideAvatar />;
 
       // link(
       //   'a.NotificationRow',
