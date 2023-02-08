@@ -133,7 +133,6 @@ export const CWContentPage = (props: ContentPageProps) => {
     </div>
   );
 
-  console.log('rendering content page', tabSelected, mainBody);
   return (
     <div className={ComponentType.ContentPage}>
       {viewType === 'sidebarView' && (
