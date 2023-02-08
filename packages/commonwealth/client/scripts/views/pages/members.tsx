@@ -25,6 +25,7 @@ import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
+import { useDebounceOnFunction } from 'client/scripts/mithrilInterop/helpers';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -46,7 +47,6 @@ class MembersPage extends ClassComponent {
   private membersLoaded: MemberInfo[];
   private membersRequested: boolean;
   private numProfilesLoaded: number;
-  private onScroll: any;
   private profilesFinishedLoading: boolean;
   private profilesLoaded: ProfileInfo[];
   private totalMembersCount: number;
@@ -55,6 +55,37 @@ class MembersPage extends ClassComponent {
     const activeEntity = app.chain;
 
     if (!activeEntity) return <PageLoading message="Loading members" />;
+
+    function handleScroll() {
+      const scrollHeight = $(document).height();
+
+      const scrollPos = $(window).height() + $(window).scrollTop();
+
+      if (scrollPos > scrollHeight - 400 && !this.profilesFinishedLoading) {
+        const lastLoadedProfileIndex = this.numProfilesLoaded;
+
+        const newBatchSize = Math.min(
+          DEFAULT_MEMBER_REQ_SIZE,
+          this.membersLoaded.length - lastLoadedProfileIndex
+        );
+
+        const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
+
+        for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
+          const member = this.membersLoaded[i];
+          const profileInfo: ProfileInfo = {
+            profile: app.profiles.getProfile(member.chain, member.address),
+            postCount: member.count,
+          };
+          this.profilesLoaded.push(profileInfo);
+        }
+
+        this.numProfilesLoaded += newBatchSize;
+        this.redraw();
+      }
+    }
+
+    const debouncedHandleScroll = useDebounceOnFunction(handleScroll, 400, []);
 
     // get members once
     const activeInfo = app.chain.meta;
@@ -158,35 +189,6 @@ class MembersPage extends ClassComponent {
       }, 100);
     }
 
-    this.onScroll = _.debounce(() => {
-      const scrollHeight = $(document).height();
-
-      const scrollPos = $(window).height() + $(window).scrollTop();
-
-      if (scrollPos > scrollHeight - 400 && !this.profilesFinishedLoading) {
-        const lastLoadedProfileIndex = this.numProfilesLoaded;
-
-        const newBatchSize = Math.min(
-          DEFAULT_MEMBER_REQ_SIZE,
-          this.membersLoaded.length - lastLoadedProfileIndex
-        );
-
-        const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
-
-        for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
-          const member = this.membersLoaded[i];
-          const profileInfo: ProfileInfo = {
-            profile: app.profiles.getProfile(member.chain, member.address),
-            postCount: member.count,
-          };
-          this.profilesLoaded.push(profileInfo);
-        }
-
-        this.numProfilesLoaded += newBatchSize;
-        this.redraw();
-      }
-    }, 400);
-
     const {
       membersLoaded,
       numProfilesLoaded,
@@ -196,7 +198,7 @@ class MembersPage extends ClassComponent {
     } = this;
 
     return (
-      <Sublayout onScroll={this.onScroll}>
+      <Sublayout onScroll={debouncedHandleScroll}>
         <div className="MembersPage">
           <CWText type="h3" fontWeight="medium">
             {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}
