@@ -52,7 +52,7 @@ export class SputnikProposalForm extends ClassComponent {
 
   view() {
     return (
-      <React.Fragment>
+      <>
         <CWDropdown
           label="Proposal Type"
           initialValue={sputnikProposalOptions[0]}
@@ -144,7 +144,7 @@ export class SputnikProposalForm extends ClassComponent {
               .catch((err) => notifyError(err.message));
           }}
         />
-      </React.Fragment>
+      </>
     );
   }
 }

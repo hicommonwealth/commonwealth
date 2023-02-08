@@ -422,17 +422,17 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       );
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       votingActionObj = (
-        <React.Fragment>
+        <>
           <div className="button-row">
             {yesButton}
             {noButton}
           </div>
           <ProposalExtensions proposal={proposal} />
-        </React.Fragment>
+        </>
       );
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       votingActionObj = (
-        <React.Fragment>
+        <>
           <div className="button-row">
             {yesButton}
             {noButton}
@@ -446,11 +446,11 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
               this.amount = c;
             }}
           />
-        </React.Fragment>
+        </>
       );
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
       votingActionObj = (
-        <React.Fragment>
+        <>
           <div className="button-row">{multiDepositApproveButton}</div>
           <ProposalExtensions
             proposal={proposal}
@@ -458,11 +458,11 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
               this.amount = c;
             }}
           />
-        </React.Fragment>
+        </>
       );
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       votingActionObj = (
-        <React.Fragment>
+        <>
           <div className="button-row">
             {yesButton}
             {noButton}
@@ -470,11 +470,11 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             {noWithVetoButton}
           </div>
           <ProposalExtensions proposal={proposal} />
-        </React.Fragment>
+        </>
       );
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       votingActionObj = (
-        <React.Fragment>
+        <>
           <div className="button-row">
             {yesButton}
             {noButton}
@@ -487,7 +487,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             />
           </div>
           <ProposalExtensions proposal={proposal} />
-        </React.Fragment>
+        </>
       );
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
       votingActionObj = (

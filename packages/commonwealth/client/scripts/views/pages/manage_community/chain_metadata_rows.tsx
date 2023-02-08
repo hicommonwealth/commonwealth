@@ -446,7 +446,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="commonbot-section">
           <CWText type="h3">Commonbot Settings</CWText>
           {this.discordBotConnected ? (
-            <React.Fragment>
+            <>
               <div className="connected-line">
                 <CWText type="h4">Connection Status</CWText>
                 <div className="connect-group">
@@ -545,9 +545,9 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   }
                 }}
               />
-            </React.Fragment>
+            </>
           ) : this.discordBotConnecting ? (
-            <React.Fragment>
+            <>
               <div className="settings-row">
                 <div className="spinner-group">
                   <CWSpinner />
@@ -555,7 +555,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 </div>
                 <CWText>Refresh to check if connection succeeded</CWText>
               </div>
-            </React.Fragment>
+            </>
           ) : (
             <div className="settings-row">
               <CWButton

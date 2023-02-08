@@ -50,7 +50,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
     }
 
     return (
-      <React.Fragment>
+      <>
         <CWDropdown
           label="Module"
           options={(app.chain as Substrate).chain
@@ -140,7 +140,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
               : ''
           }
         />
-      </React.Fragment>
+      </>
     );
   }
 }

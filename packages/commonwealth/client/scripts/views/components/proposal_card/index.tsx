@@ -89,10 +89,10 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
             )}
         </div>
         {injectedContent ? (
-          <React.Fragment>
+          <>
             <CWDivider />
             <div className="proposal-injected">{injectedContent}</div>
-          </React.Fragment>
+          </>
         ) : proposal.isPassing !== 'none' ? (
           <CWText
             fontWeight="medium"

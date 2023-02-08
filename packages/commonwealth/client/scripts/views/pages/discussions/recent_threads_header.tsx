@@ -80,7 +80,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
     return (
       <div className="RecentThreadsHeader">
         {isUndefined(topic) && (
-          <React.Fragment>
+          <>
             <div className="header-row">
               <CWText type="h3" fontWeight="semiBold" className="header-text">
                 All Discussions
@@ -118,7 +118,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
               community treasury and spending on contributor grants, community
               initiatives, liquidity mining and other programs.
             </CWText>
-          </React.Fragment>
+          </>
         )}
         {app.chain?.meta && (
           <div className="buttons-row">

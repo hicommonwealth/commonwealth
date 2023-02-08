@@ -134,7 +134,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
   return (
     <div className="CreateComment">
       {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
-        <React.Fragment>
+        <>
           <Modal
             content={
               <EditProfileModal
@@ -160,9 +160,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
               Set a display name.
             </a>
           </CWText>
-        </React.Fragment>
+        </>
       ) : (
-        <React.Fragment>
+        <>
           <div className="attribution-row">
             <div className="attribution-left-content">
               <CWText type="caption">
@@ -194,10 +194,10 @@ export const CreateComment = (props: CreateCommmentProps) => {
               {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
               {app.chain.meta.default_symbol}.{' '}
               {userBalance && app.user.activeAccount && (
-                <React.Fragment>
+                <>
                   You have {weiToTokens(userBalance.toString(), decimals)}{' '}
                   {app.chain.meta.default_symbol}.
-                </React.Fragment>
+                </>
               )}
             </CWText>
           )}
@@ -230,7 +230,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
               />
             </div>
           </div>
-        </React.Fragment>
+        </>
       )}
     </div>
   );
