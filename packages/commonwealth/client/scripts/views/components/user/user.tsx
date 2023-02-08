@@ -2,27 +2,21 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import {
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { render, redraw, jsx } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { Account, AddressInfo, Profile } from 'models';
+import type { Account } from 'models';
+import { AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
+import { Modal } from '../component_kit/cw_modal';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -61,6 +55,7 @@ export const User = (props: UserAttrs) => {
 
   const [identityWidgetLoading, setIdentityWidgetLoading] =
     React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   const popoverProps = usePopover();
 
@@ -282,83 +277,92 @@ export const User = (props: UserAttrs) => {
   );
 
   const userPopover = (
-    <div
-      className="UserPopover"
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    >
-      <div className="user-avatar">
-        {!profile
-          ? null
-          : profile.avatarUrl
-          ? profile.getAvatar(36)
-          : profile.getAvatar(32)}
-      </div>
-      <div className="user-name">
-        {app.chain &&
-        app.chain.base === ChainBase.Substrate &&
-        app.cachedIdentityWidget
-          ? render(app.cachedIdentityWidget, {
-              account,
-              linkify: true,
-              profile,
-              hideIdentityIcon,
-              addrShort,
-              showAddressWithDisplayName: false,
-            })
-          : link(
-              'a.user-display-name',
-              profile
-                ? `/${app.activeChainId() || profile.chain}/account/${
-                    profile.address
-                  }?base=${profile.chain}`
-                : 'javascript:',
-              !profile ? (
-                addrShort
-              ) : !showAddressWithDisplayName ? (
-                profile.displayName
-              ) : (
-                <React.Fragment>
-                  {profile.displayName}
-                  <div className="id-short">
-                    {formatAddressShort(profile.address, profile.chain)}
-                  </div>
-                </React.Fragment>
-              )
+    <React.Fragment>
+      <div
+        className="UserPopover"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <div className="user-avatar">
+          {!profile
+            ? null
+            : profile.avatarUrl
+            ? profile.getAvatar(36)
+            : profile.getAvatar(32)}
+        </div>
+        <div className="user-name">
+          {app.chain &&
+          app.chain.base === ChainBase.Substrate &&
+          app.cachedIdentityWidget
+            ? render(app.cachedIdentityWidget, {
+                account,
+                linkify: true,
+                profile,
+                hideIdentityIcon,
+                addrShort,
+                showAddressWithDisplayName: false,
+              })
+            : link(
+                'a.user-display-name',
+                profile
+                  ? `/${app.activeChainId() || profile.chain}/account/${
+                      profile.address
+                    }?base=${profile.chain}`
+                  : 'javascript:',
+                !profile ? (
+                  addrShort
+                ) : !showAddressWithDisplayName ? (
+                  profile.displayName
+                ) : (
+                  <React.Fragment>
+                    {profile.displayName}
+                    <div className="id-short">
+                      {formatAddressShort(profile.address, profile.chain)}
+                    </div>
+                  </React.Fragment>
+                )
+              )}
+        </div>
+        {profile?.address && (
+          <div className="user-address">
+            {formatAddressShort(
+              profile.address,
+              profile.chain,
+              false,
+              maxCharLength
             )}
+          </div>
+        )}
+        {friendlyChainName && (
+          <div className="user-chain">{friendlyChainName}</div>
+        )}
+        {/* always show roleTags in UserPopover */}
+        {getRoleTags(true)}
+        {/* If Admin Allow Banning */}
+        {loggedInUserIsAdmin && (
+          <div className="ban-wrapper">
+            <CWButton
+              onClick={() => {
+                setIsModalOpen(true);
+              }}
+              label="Ban User"
+              buttonType="primary-red"
+            />
+          </div>
+        )}
       </div>
-      {profile?.address && (
-        <div className="user-address">
-          {formatAddressShort(
-            profile.address,
-            profile.chain,
-            false,
-            maxCharLength
-          )}
-        </div>
-      )}
-      {friendlyChainName && (
-        <div className="user-chain">{friendlyChainName}</div>
-      )}
-      {/* always show roleTags in UserPopover */}
-      {getRoleTags(true)}
-      {/* If Admin Allow Banning */}
-      {loggedInUserIsAdmin && (
-        <div className="ban-wrapper">
-          <CWButton
-            onClick={() => {
-              app.modals.create({
-                modal: BanUserModal,
-                data: { profile },
-              });
-            }}
-            label="Ban User"
-            buttonType="primary-red"
+      <Modal
+        content={
+          <BanUserModal
+            profile={profile}
+            onModalClose={() => setIsModalOpen(false)}
           />
-        </div>
-      )}
-    </div>
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
   );
 
   return popover ? (

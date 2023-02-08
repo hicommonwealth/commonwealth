@@ -4,9 +4,7 @@ import React from 'react';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
-import $ from 'jquery';
+import { jsx } from 'mithrilInterop';
 
 import 'modals/update_proposal_status_modal.scss';
 import type { ChainEntity, Thread } from 'models';
@@ -112,8 +110,8 @@ export const UpdateProposalStatusModal = (
           <CWButton
             label="Cancel"
             buttonType="secondary-blue"
-            onClick={(e) => {
-              $(e.target).trigger('modalexit');
+            onClick={() => {
+              onModalClose();
             }}
           />
           <CWButton
