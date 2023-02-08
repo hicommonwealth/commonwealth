@@ -14,7 +14,7 @@ type CodeBlockProps = {
 export const CodeBlock = (props: CodeBlockProps) => {
   const { clickToSelect } = props;
 
-  const codeBlockRef = React.useRef();
+  const codeBlockRef = React.useRef<HTMLDivElement>();
 
   return (
     <div
