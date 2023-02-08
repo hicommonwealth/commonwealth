@@ -38,7 +38,7 @@ export class CosmosProposalForm extends ClassComponent {
     return !cosmos.governance.initialized ? (
       <CWSpinner />
     ) : (
-      <React.Fragment>
+      <>
         <CWLabel label="Proposal Type" />
         <CWRadioGroup
           name="cosmos-proposal-type"
@@ -130,7 +130,7 @@ export class CosmosProposalForm extends ClassComponent {
               .catch((err) => notifyError(err.message));
           }}
         />
-      </React.Fragment>
+      </>
     );
   }
 }

@@ -196,7 +196,7 @@ class NotificationSettingsPage extends ClassComponent {
                         };
 
                         return (
-                          <React.Fragment>
+                          <>
                             <div className="subscription-row-desktop">
                               <SubscriptionRowTextContainer
                                 subscription={sub}
@@ -231,7 +231,7 @@ class NotificationSettingsPage extends ClassComponent {
                                 </CWText>
                               </div>
                             </div>
-                          </React.Fragment>
+                          </>
                         );
                       })}
                     </div>

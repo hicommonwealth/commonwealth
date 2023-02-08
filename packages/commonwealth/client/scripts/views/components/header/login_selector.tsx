@@ -67,7 +67,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
     React.useState<boolean>(false);
 
   return (
-    <React.Fragment>
+    <>
       <div className="LoginSelectorMenu">
         {activeAddressesWithRole.map((account) => (
           <div
@@ -154,7 +154,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };
 
@@ -164,7 +164,7 @@ export const LoginSelectorMenuRight = () => {
   const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
   return (
-    <React.Fragment>
+    <>
       <div className="LoginSelectorMenu">
         <div
           className="login-menu-item"
@@ -232,7 +232,7 @@ export const LoginSelectorMenuRight = () => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };
 
@@ -278,7 +278,7 @@ export const LoginSelector = () => {
 
   if (!app.isLoggedIn()) {
     return (
-      <React.Fragment>
+      <>
         <div className="LoginSelector">
           <CWButton
             buttonType="tertiary-black"
@@ -295,7 +295,7 @@ export const LoginSelector = () => {
           onClose={() => setIsLoginModalOpen(false)}
           open={isLoginModalOpen}
         />
-      </React.Fragment>
+      </>
     );
   }
 
@@ -469,7 +469,7 @@ export const LoginSelector = () => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <div className="LoginSelector">
         {app.chain &&
           !app.chainPreloading &&
@@ -501,7 +501,7 @@ export const LoginSelector = () => {
           !app.chainPreloading &&
           profileLoadComplete &&
           app.user.activeAccount && (
-            <React.Fragment>
+            <>
               <div
                 className="left-button"
                 onClick={leftMenuProps.handleInteraction}
@@ -517,7 +517,7 @@ export const LoginSelector = () => {
                 }
                 {...leftMenuProps}
               />
-            </React.Fragment>
+            </>
           )}
         <div
           className="right-button"
@@ -558,6 +558,6 @@ export const LoginSelector = () => {
         onClose={() => setIsTOSModalOpen(false)}
         open={isTOSModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

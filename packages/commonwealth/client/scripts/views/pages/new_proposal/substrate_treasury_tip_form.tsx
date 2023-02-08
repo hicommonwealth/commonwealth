@@ -37,7 +37,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
     }
 
     return (
-      <React.Fragment>
+      <>
         <CWLabel label="Finder" />,
         <User user={author} linkify popover showAddressWithDisplayName />
         <CWTextInput
@@ -82,7 +82,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
             );
           }}
         />
-      </React.Fragment>
+      </>
     );
   }
 }

@@ -254,7 +254,7 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
       // );
       return null; // @TODO @REACT Fix me
       // return (
-      //   <React.Fragment>
+      //   <>
       //     {m(Icon, {
       //       name: Icons.EDIT,
       //       onMouseEnter: handleMouseover,
@@ -262,7 +262,7 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
       //     })}
       //     {this.menuToggleTree['children'][category]['toggledState'] &&
       //       menuComponent}
-      //   </React.Fragment>
+      //   </>
       // );
     };
 
@@ -329,7 +329,7 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
 
       return null; // @TODO @REACT FIX ME
       // return (
-      //   <React.Fragment>
+      //   <>
       //     {channel.unread > 0 && (
       //       <div className="unread-icon">{channel.unread}</div>
       //     )}
@@ -341,7 +341,7 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
       //     {this.menuToggleTree['children'][channel.category]['children'][
       //       channel.name
       //     ]['toggledState'] && menuComponent}
-      //   </React.Fragment>
+      //   </>
       // );
     };
 

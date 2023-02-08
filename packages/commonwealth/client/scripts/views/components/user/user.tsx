@@ -142,14 +142,14 @@ export const User = (props: UserAttrs) => {
   }
 
   const getRoleTags = (long?: boolean) => (
-    <React.Fragment>
+    <>
       {/* role in commonwealth forum */}
       {showRole && role && (
         <div className="role-tag-container">
           <CWText className="role-tag-text">{role.permission}</CWText>
         </div>
       )}
-    </React.Fragment>
+    </>
   );
 
   const userFinal = avatarOnly ? (
@@ -174,7 +174,7 @@ export const User = (props: UserAttrs) => {
         </div>
       )}
       {
-        <React.Fragment>
+        <>
           {/* non-substrate name */}
           {linkify ? (
             link(
@@ -184,21 +184,21 @@ export const User = (props: UserAttrs) => {
                     profile.address
                   }?base=${profile.chain}`
                 : 'javascript:',
-              <React.Fragment>
+              <>
                 {!profile ? (
                   addrShort
                 ) : !showAddressWithDisplayName ? (
                   profile.displayName
                 ) : (
-                  <React.Fragment>
+                  <>
                     {profile.displayName}
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
-                  </React.Fragment>
+                  </>
                 )}
                 {getRoleTags(false)}
-              </React.Fragment>
+              </>
             )
           ) : (
             <a className="user-display-name username">
@@ -207,12 +207,12 @@ export const User = (props: UserAttrs) => {
               ) : !showAddressWithDisplayName ? (
                 profile.displayName
               ) : (
-                <React.Fragment>
+                <>
                   {profile.displayName}
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
-                </React.Fragment>
+                </>
               )}
               {getRoleTags(false)}
             </a>
@@ -228,7 +228,7 @@ export const User = (props: UserAttrs) => {
                 style={{ display: 'inline-block' }}
               />
             )}
-        </React.Fragment>
+        </>
       }
     </div>
   );
@@ -260,12 +260,12 @@ export const User = (props: UserAttrs) => {
               ) : !showAddressWithDisplayName ? (
                 profile.displayName
               ) : (
-                <React.Fragment>
+                <>
                   {profile.displayName}
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
-                </React.Fragment>
+                </>
               )
             )}
       </div>

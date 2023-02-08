@@ -75,19 +75,19 @@ export class UserBlock extends ClassComponent<{
           const queryEnd = queryStart + searchTerm.length;
 
           return (
-            <React.Fragment>
+            <>
               <span>{profile.address.slice(0, queryStart)}</span>
               <mark>{profile.address.slice(queryStart, queryEnd)}</mark>
               <span>
                 {profile.address.slice(queryEnd, profile.address.length)}
               </span>
-            </React.Fragment>
+            </>
           );
         })()
       : null;
 
     const children = (
-      <React.Fragment>
+      <>
         <div className="user-block-left">
           <User
             user={user}
@@ -136,7 +136,7 @@ export class UserBlock extends ClassComponent<{
             {selected ? <CWIcon iconName="check" /> : ''}
           </div>
         </div>
-      </React.Fragment>
+      </>
     );
 
     const userLink = profile

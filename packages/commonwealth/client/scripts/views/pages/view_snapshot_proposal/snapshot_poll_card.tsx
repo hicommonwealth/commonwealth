@@ -91,7 +91,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
         </CWText>
         <div className="poll-voting-section">
           {!this.hasVoted && !pollEnded && !isPreview && (
-            <React.Fragment>
+            <>
               <PollOptions
                 multiSelect={false}
                 voteInformation={this.localVoteInformation}
@@ -106,7 +106,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
                 tooltipErrorMessage={tooltipErrorMessage}
                 onVoteCast={castVote}
               />
-            </React.Fragment>
+            </>
           )}
           {((this.hasVoted && !isPreview) || pollEnded) && (
             <VoteDisplay
