@@ -7,6 +7,7 @@ import type { ModelInstance, ModelStatic } from './types';
 export type OffchainProfileAttributes = {
   address_id: number;
   data?: string;
+  identity?: string; // deprecated but keeping to preserve server-side behavior
 
   // associations
   Address?: AddressAttributes;
@@ -28,6 +29,7 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
+      identity: { type: dataTypes.STRING, allowNull: true },
       data: { type: dataTypes.TEXT, allowNull: true },
     },
     {
