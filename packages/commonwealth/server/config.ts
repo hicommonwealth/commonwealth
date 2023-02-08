@@ -62,9 +62,10 @@ export const DISCORD_OAUTH_SCOPES =
   process.env.DISCORD_OAUTH_SCOPES?.split(' ');
 
 export const DATABASE_URI =
-  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+  process.env.USES_DOCKER_DB ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' : // this is because "//" is interpreted strange in yaml file
+    (!process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    : process.env.DATABASE_URL;
+    : process.env.DATABASE_URL);
 
 export const VULTR_IP = process.env.VULTR_IP;
 

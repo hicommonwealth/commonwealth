@@ -13,3 +13,5 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:${PORT})
     attempt_counter=$(($attempt_counter+1))
     sleep 5
 done
+
+echo "Wait-sever script connected successfully"

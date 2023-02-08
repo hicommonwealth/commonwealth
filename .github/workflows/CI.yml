@@ -2,12 +2,13 @@ name: CI
 on: [push]
 
 jobs:
-  commonwealth:
-    name: Commonwealth Tests
-    runs-on: ubuntu-latest
+  # These tests run slowly, so run them in a separate job
+  e2e-tests:
     strategy:
       matrix:
         node: [ 14 ]
+    name: Commonwealth Tests
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -45,30 +46,67 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Init Db
+        run: cd packages/commonwealth && npx sequelize db:migrate
+
+      - name: Cache browsers
+        id: playwright-cache
+        uses: actions/cache@v3
+        with:
+          path: '~/.cache/ms-playwright/chromium-1045'
+          key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
+
+      - name: Install playwright browser drivers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
       - name: Run e2e tests
-        run: DATABASE_URL="postgresql:/""/commonwealth:edgeware@postgres/commonwealth" yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
+        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
+        env:
+          PORT: 8080
+          USES_DOCKER_PGSQL: true
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: coverage
+
+  # These tests run quickly, so run them in a separate job
+  remaining-commonwealth-tests:
+    strategy:
+      matrix:
+        node: [ 14 ]
+    name: Remaining commonwealth tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn --ignore-engines
+
+      - name: Typecheck
+        run: yarn --cwd packages/commonwealth check-types
+
       - name: Run Token Balance Cache Unit Tests
         run: yarn --cwd packages/token-balance-cache test
 
       - name: Run Chain Events Unit Tests
         run: yarn --cwd packages/chain-events unit-test
-
-#      - name: Cache browsers
-#        id: playwright-cache
-#        uses: actions/cache@v3
-#        with:
-#          path: '~/.cache/ms-playwright'
-#          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-#
-#      - name: Install playwright browser drivers
-#        if: steps.playwright-cache.outputs.cache-hit != 'true'
-#        run: npx playwright install --with-deps
-
-#      - name: Run e2e tests
-#        run: DATABASE_URL=postgresql://commonwealth:edgeware@postgres/commonwealth yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
-
-      - name: Typecheck
-        run: yarn --cwd packages/commonwealth check-types
 
       - name: Run unit tests
         run: yarn --cwd packages/commonwealth unit-test
@@ -77,9 +115,3 @@ jobs:
         run: yarn --cwd packages/commonwealth test-api
         env:
           NO_CLIENT: true
-
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v2
-        with:
-          name: code-coverage-report
-          path: coverage
