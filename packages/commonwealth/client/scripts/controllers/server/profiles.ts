@@ -7,7 +7,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
@@ -134,7 +133,6 @@ class ProfilesController {
                 ? JSON.parse(profileData.data)
                 : {};
               const lastActive = profileData.Address.last_active;
-              const isCouncillor = profileData.Address.is_councillor;
               const isValidator = profileData.Address.is_validator;
               // ignore off-chain name if substrate id exists
               if (profileData.identity) {
@@ -143,9 +141,7 @@ class ProfilesController {
                   pInfo.headline,
                   pInfo.bio,
                   pInfo.avatarUrl,
-                  profileData.judgements,
                   lastActive,
-                  isCouncillor,
                   isValidator
                 );
               } else {
@@ -155,7 +151,6 @@ class ProfilesController {
                   pInfo.bio,
                   pInfo.avatarUrl,
                   lastActive,
-                  isCouncillor,
                   isValidator
                 );
               }

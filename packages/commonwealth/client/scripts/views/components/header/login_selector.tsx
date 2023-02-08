@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { initAppState } from 'state';
@@ -6,7 +5,9 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import { setRoute, redraw, jsx } from 'mithrilInterop';
+import { setRoute, redraw} from
+
+ 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -187,6 +188,7 @@ export const LoginSelectorMenuRight = () => {
             onChange={(e) => {
               if (isDarkModeOn) {
                 localStorage.setItem('dark-mode-state', 'off');
+                localStorage.setItem('user-dark-mode-state', 'off');
                 document
                   .getElementsByTagName('html')[0]
                   .classList.remove('invert');
@@ -195,6 +197,7 @@ export const LoginSelectorMenuRight = () => {
                   .getElementsByTagName('html')[0]
                   .classList.add('invert');
                 localStorage.setItem('dark-mode-state', 'on');
+                localStorage.setItem('user-dark-mode-state', 'on');
               }
               e.stopPropagation();
               redraw();

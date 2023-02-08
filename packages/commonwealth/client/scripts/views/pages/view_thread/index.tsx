@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
@@ -10,7 +9,9 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
@@ -554,6 +555,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       ];
     };
 
+    // @ts-ignore
     return (
       <Sublayout
       //  title={headerTitle}

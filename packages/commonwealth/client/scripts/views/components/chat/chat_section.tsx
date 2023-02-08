@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -6,8 +5,7 @@ import {
   getRoute,
   getRouteParam,
   redraw,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
@@ -56,9 +54,8 @@ function setToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
+    JSON.stringify(newTree);
 }
 
 class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {

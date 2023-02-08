@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/discussions/thread_preview.scss';
@@ -101,9 +102,9 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
         }}
         key={thread.id}
       >
-        {!this.isWindowSmallInclusive && (
+        {/* !this.isWindowSmallInclusive && (
           <ThreadPreviewReactionButton thread={thread} />
-        )}
+        )*/ }
         <div className="main-content">
           <div className="top-row">
             <div className="user-and-date">

@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
@@ -39,15 +37,12 @@ import {
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import {
   convictionToWeight,
   SubstrateDemocracyReferendum,
 } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-
 import type { AnyProposal } from 'models';
 import { BinaryVote, DepositVote, VotingType } from 'models';
 
@@ -104,9 +99,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
 
     if (
       proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateDemocracyReferendum ||
-      proposal instanceof SubstratePhragmenElection ||
-      proposal instanceof SubstrateCollectiveProposal
+      proposal instanceof SubstrateDemocracyReferendum
     ) {
       user = app.user.activeAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
@@ -156,10 +149,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             onModalClose
           )
         );
-      } else if (proposal instanceof SubstrateCollectiveProposal) {
-        createTXModal(
-          proposal.submitVoteTx(new BinaryVote(user, true), onModalClose)
-        );
       } else if (proposal instanceof CosmosProposal) {
         if (proposal.status === 'DepositPeriod') {
           // TODO: configure deposit amount
@@ -198,11 +187,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           )
           .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
-      } else if (proposal instanceof SubstratePhragmenElection) {
-        toggleVotingModal(false);
-        return notifyError(
-          'Unimplemented proposal type - use election voting modal'
-        );
       } else {
         toggleVotingModal(false);
         return notifyError('Invalid proposal type');
@@ -234,10 +218,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             ),
             onModalClose
           )
-        );
-      } else if (proposal instanceof SubstrateCollectiveProposal) {
-        createTXModal(
-          proposal.submitVoteTx(new BinaryVote(user, false), onModalClose)
         );
       } else if (proposal instanceof CosmosProposal) {
         proposal

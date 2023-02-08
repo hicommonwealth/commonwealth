@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode} from
+
+ 'mithrilInterop';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';

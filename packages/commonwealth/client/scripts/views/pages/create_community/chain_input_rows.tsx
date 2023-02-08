@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
@@ -13,8 +12,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import app from 'state';
 import { AvatarUpload } from 'views/components/avatar_upload';

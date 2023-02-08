@@ -1,5 +1,11 @@
 import type { Signer } from '@polkadot/api/types';
 
+import {
+  isWeb3Injected,
+  web3Accounts,
+  web3Enable,
+  web3FromAddress,
+} from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
@@ -85,7 +91,7 @@ class PolkadotWebWalletController
     // (this needs to be called first, before other requests)
     this._enabling = true;
     try {
-      await this.polkadot.web3Enable('commonwealth');
+      await web3Enable('commonwealth');
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account

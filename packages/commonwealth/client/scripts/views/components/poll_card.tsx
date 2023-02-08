@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
@@ -141,12 +142,8 @@ export type VoteDisplayAttrs = {
 
 export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
   view(vnode: ResultNode<VoteDisplayAttrs>) {
-    const {
-      voteDirectionString,
-      timeRemaining,
-      pollEnded,
-      voteInformation,
-    } = vnode.attrs;
+    const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
+      vnode.attrs;
 
     const topResponse = voteInformation.sort(
       (option1, option2) => option2.voteCount - option1.voteCount

@@ -1,14 +1,15 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 import BN from 'bn.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/comments/create_comment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { weiToTokens } from 'helpers';
+import { weiToTokens, getDecimals } from 'helpers';
 import type { AnyProposal } from 'models';
 import { Thread } from 'models';
 
@@ -128,13 +129,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
   const disabled =
     quillEditorState?.isBlank() || sendingComment || userFailsThreshold;
 
-  const decimals = app.chain?.meta?.decimals
-    ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
+  const decimals = getDecimals(app.chain);
 
   return (
     <div className="CreateComment">

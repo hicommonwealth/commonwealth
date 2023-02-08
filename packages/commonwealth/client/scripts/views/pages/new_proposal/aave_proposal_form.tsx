@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import { utils } from 'ethers';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
@@ -18,9 +19,9 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
-import { Executor } from 'common-common/src/eth/types';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
-import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
+import type { Executor } from 'common-common/src/eth/types';
+import type Aave from 'controllers/chain/ethereum/aave/adapter';
+import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import { notifyError } from 'controllers/app/notifications';
 
 export class AaveProposalForm extends ClassComponent {

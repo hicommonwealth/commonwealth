@@ -10,7 +10,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import { ChainEventType, Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';

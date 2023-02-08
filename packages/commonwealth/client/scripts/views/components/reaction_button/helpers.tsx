@@ -1,7 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import type { ChainInfo, Comment } from 'models';
 import { AddressInfo, Thread } from 'models';
@@ -9,6 +7,7 @@ import { AddressInfo, Thread } from 'models';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWText } from '../component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 

@@ -1,4 +1,3 @@
-import { jsx } from 'mithrilInterop';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'navigation/helpers';
 import React, { lazy } from 'react';

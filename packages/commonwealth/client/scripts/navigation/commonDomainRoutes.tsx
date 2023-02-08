@@ -1,4 +1,3 @@
-import { jsx } from 'mithrilInterop';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { Navigate, withLayout } from 'navigation/helpers';
@@ -24,7 +23,6 @@ const NotificationSettingsPage = lazy(
 
 const ReferendaPage = lazy(() => import('views/pages/referenda'));
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
-const CouncilPage = lazy(() => import('views/pages/council'));
 const DelegatePage = lazy(() => import('views/pages/delegate'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
@@ -42,9 +40,7 @@ const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
 const SettingsPage = lazy(() => import('views/pages/settings'));
 
 const TreasuryPage = lazy(() => import('views/pages/treasury'));
-const BountiesPage = lazy(() => import('views/pages/bounties'));
 const TipsPage = lazy(() => import('views/pages/tips'));
-const ValidatorsPage = lazy(() => import('views/pages/validators'));
 
 const AdminPage = lazy(() => import('views/pages/admin'));
 const ManageCommunityPage = lazy(
@@ -183,12 +179,6 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
-      path="/:scope/council"
-      element={withLayout(CouncilPage, {
-        scoped: true,
-      })}
-    />
-    <Route
       path="/:scope/delegate"
       element={withLayout(DelegatePage, {
         scoped: true,
@@ -307,20 +297,8 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
-      path="/:scope/bounties"
-      element={withLayout(BountiesPage, {
-        scoped: true,
-      })}
-    />
-    <Route
       path="/:scope/tips"
       element={withLayout(TipsPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/validators"
-      element={withLayout(ValidatorsPage, {
         scoped: true,
       })}
     />

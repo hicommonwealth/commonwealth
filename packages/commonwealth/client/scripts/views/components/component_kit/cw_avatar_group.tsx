@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 import {
   ClassComponent,
@@ -9,8 +8,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import type { Profile } from 'client/scripts/models';
 

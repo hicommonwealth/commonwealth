@@ -7,7 +7,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 
 import type { ITXModalData } from 'models';
@@ -17,15 +16,6 @@ import type { NextFn, StageName } from './types';
 const createProposalTransactionLabels = {
   // substrate: accounts
   balanceTransfer: 'Transfer balance',
-  // substrate: collective
-  createCouncilMotion: 'Create council motion',
-  voteCouncilMotions: 'Vote on council motion',
-  // substrate: elections
-  submitCandidacy: 'Submit candidacy',
-  setApprovals: 'Set election votes',
-  retractVoter: 'Retract election votes',
-  presentWinner: 'Present election winner',
-  reapInactiveVoter: 'Claim inactive voter bond',
   // substrate: democracy
   createDemocracyProposal: 'Create democracy proposal',
   notePreimage: 'Note preimage',

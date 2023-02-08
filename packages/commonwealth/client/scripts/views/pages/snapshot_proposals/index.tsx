@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import moment from 'moment';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { MixpanelSnapshotEvents } from 'analytics/types';

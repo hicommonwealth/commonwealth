@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { parseCustomStages } from 'helpers';
@@ -24,9 +25,7 @@ type RecentThreadsHeaderAttrs = {
   totalThreadCount: number;
 };
 
-export class RecentThreadsHeader extends ClassComponent<
-  RecentThreadsHeaderAttrs
-> {
+export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs> {
   private isWindowExtraSmall: boolean;
 
   onResize() {
