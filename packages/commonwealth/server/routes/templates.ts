@@ -6,6 +6,7 @@ import type {
 import { success } from '../types';
 import type { DB } from '../models';
 import { AppError } from '../../../common-common/src/errors';
+import isValidJson from '../util/validateJson';
 
 type CreateTemplateAndMetadataReq = {
   contract_id: string;
@@ -26,6 +27,12 @@ export async function createTemplate(
 
   if (!contract_id || !name || !template) {
     throw new AppError('Must provide contract_id, name, and template');
+  }
+
+  const templateJson = JSON.parse(template);
+
+  if (!isValidJson(templateJson)) {
+    throw new AppError('Template must be valid JSON');
   }
 
   const contract = await models.Contract.findOne({
