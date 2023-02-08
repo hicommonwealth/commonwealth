@@ -21,7 +21,6 @@ export const iconLookup = {
   commonLogo: Icons.CWCommonLogo,
   compass: Icons.CWCompass,
   copy: Icons.CWCopy,
-  councilProposal: Icons.CWCouncilProposal,
   cow: Icons.CWCow,
   curator: Icons.CWCurator,
   delegate: Icons.CWDelegate,

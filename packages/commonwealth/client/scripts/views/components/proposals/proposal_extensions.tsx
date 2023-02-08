@@ -10,7 +10,6 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
 import type { AnyProposal } from 'models';
 
 import app from 'state';
@@ -64,16 +63,6 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
       );
     } else if (proposal instanceof SubstrateDemocracyProposal) {
       return <CWText>Cost to second: {proposal.deposit.format()}</CWText>;
-    } else if (proposal instanceof SubstratePhragmenElection) {
-      const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
-
-      return (
-        <CWText>
-          Voting on councillor candidacies requires a voting bond of{' '}
-          <strong>{votingBond ? votingBond.format() : '--'}</strong> which is
-          returned when the election is completed.
-        </CWText>
-      );
     } else if (
       proposal instanceof CosmosProposal &&
       proposal.status === 'DepositPeriod'

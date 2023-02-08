@@ -20,9 +20,7 @@ type UserDashboardRowTopAttrs = {
   category: string;
 };
 
-export class UserDashboardRowTop extends ClassComponent<
-  UserDashboardRowTopAttrs
-> {
+export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs> {
   view(vnode: ResultNode<UserDashboardRowTopAttrs>) {
     const {
       created_at,

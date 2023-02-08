@@ -4,7 +4,6 @@ import React from 'react';
 import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'lodash';
-import moment from 'moment';
 
 import 'pages/stats.scss';
 
@@ -17,6 +16,7 @@ import { CWText } from '../components/component_kit/cw_text';
 
 class StatsPage extends ClassComponent {
   private data: any;
+  private batchedData: any;
   private totalData: any;
   private error: string;
   private requested: boolean;
@@ -38,6 +38,65 @@ class StatsPage extends ClassComponent {
               totalRoles: +result.totalRoles[0].new_items,
               totalThreads: +result.totalThreads[0].new_items,
             };
+
+            const { comments, roles, threads, activeAccounts } = result;
+            const batchedComments = {};
+            const batchedRoles = {};
+            const batchedThreads = {};
+            const batchedActiveAccounts = {};
+            const c = comments.map((a) => Number(a.new_items));
+            const r = roles.map((a) => Number(a.new_items));
+            const t = threads.map((a) => Number(a.new_items));
+            const aa = activeAccounts.map((a) => Number(a.new_items));
+
+            // Comments
+            batchedComments['day'] = c.slice(0, 1).reduce((a, b) => a + b, 0);
+            batchedComments['week'] = c.slice(0, 7).reduce((a, b) => a + b, 0);
+            batchedComments['2week'] = c
+              .slice(0, 14)
+              .reduce((a, b) => a + b, 0);
+            batchedComments['month'] = c
+              .slice(0, 28)
+              .reduce((a, b) => a + b, 0);
+
+            // Roles
+            batchedRoles['day'] = r.slice(0, 1).reduce((a, b) => a + b, 0);
+            batchedRoles['week'] = r.slice(0, 7).reduce((a, b) => a + b, 0);
+            batchedRoles['2week'] = r.slice(0, 14).reduce((a, b) => a + b, 0);
+            batchedRoles['month'] = r.slice(0, 28).reduce((a, b) => a + b, 0);
+
+            // Threads
+            batchedThreads['day'] = t.slice(0, 1).reduce((a, b) => a + b, 0);
+            batchedThreads['week'] = t.slice(0, 7).reduce((a, b) => a + b, 0);
+            batchedThreads['2week'] = t.slice(0, 14).reduce((a, b) => a + b, 0);
+            batchedThreads['month'] = t.slice(0, 28).reduce((a, b) => a + b, 0);
+
+            // Active Accounts
+            batchedActiveAccounts['day'] = aa
+              .slice(0, 1)
+              .reduce((a, b) => a + b, 0);
+            batchedActiveAccounts['week'] = aa
+              .slice(0, 7)
+              .reduce((a, b) => a + b, 0);
+            batchedActiveAccounts['2week'] = aa
+              .slice(0, 14)
+              .reduce((a, b) => a + b, 0);
+            batchedActiveAccounts['month'] = aa
+              .slice(0, 28)
+              .reduce((a, b) => a + b, 0);
+
+            this.batchedData = {
+              batchedRoles,
+              batchedComments,
+              batchedThreads,
+              batchedActiveAccounts,
+            };
+            console.log(
+              batchedRoles,
+              batchedThreads,
+              batchedComments,
+              batchedActiveAccounts
+            );
 
             const data = {};
             result.comments.forEach(({ date, new_items }) => {
@@ -77,6 +136,7 @@ class StatsPage extends ClassComponent {
           redraw();
         })
         .catch((error: any) => {
+          console.log(error);
           if (error.responseJSON?.error) {
             this.error = error.responseJSON.error;
           } else if (error.responseText) {
@@ -104,39 +164,57 @@ class StatsPage extends ClassComponent {
         />
       );
 
+    const {
+      batchedRoles,
+      batchedComments,
+      batchedThreads,
+      batchedActiveAccounts,
+    } = this.batchedData;
     return (
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Analytics" />}
       >
         <div className="StatsPage">
           <div className="stat-row">
-            <CWText fontWeight="medium">Date</CWText>
+            <CWText fontWeight="medium">Duration</CWText>
             <CWText fontWeight="medium">New Addresses</CWText>
             <CWText fontWeight="medium">New Comments</CWText>
             <CWText fontWeight="medium">New Threads</CWText>
             <CWText fontWeight="medium">Active Addresses</CWText>
           </div>
-          {_.orderBy(Object.entries(this.data), (o) => o[0])
-            .reverse()
-            .map(([date, row]: [any, any]) => (
-              <div className="stat-row">
-                <CWText>{moment(date).format('l')}</CWText>
-                <CWText>{row.roles || 0}</CWText>
-                <CWText>{row.comments || 0}</CWText>
-                <CWText>{row.threads || 0}</CWText>
-                <CWText>{row.activeAccounts}</CWText>
-              </div>
-            ))}
-
           <div className="stat-row">
-            <CWText fontWeight="medium">Total Addresses</CWText>
-            <CWText fontWeight="medium">Total Comments</CWText>
-            <CWText fontWeight="medium">Total Threads</CWText>
+            <CWText>24 hours</CWText>
+            <CWText>{batchedRoles['day']}</CWText>
+            <CWText>{batchedComments['day']}</CWText>
+            <CWText>{batchedThreads['day']}</CWText>
+            <CWText>{batchedActiveAccounts['day']}</CWText>
           </div>
           <div className="stat-row">
-            <CWText>{this.totalData.totalRoles}</CWText>
-            <CWText>{this.totalData.totalComments}</CWText>
-            <CWText>{this.totalData.totalThreads}</CWText>
+            <CWText>1 week</CWText>
+            <CWText>{batchedRoles['week']}</CWText>
+            <CWText>{batchedComments['week']}</CWText>
+            <CWText>{batchedThreads['week']}</CWText>
+            <CWText>{batchedActiveAccounts['week']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText>2 weeks</CWText>
+            <CWText>{batchedRoles['2week']}</CWText>
+            <CWText>{batchedComments['2week']}</CWText>
+            <CWText>{batchedThreads['2week']}</CWText>
+            <CWText>{batchedActiveAccounts['2week']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText>1 month</CWText>
+            <CWText>{batchedRoles['month']}</CWText>
+            <CWText>{batchedComments['month']}</CWText>
+            <CWText>{batchedThreads['month']}</CWText>
+            <CWText>{batchedActiveAccounts['month']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText fontWeight="medium">{'Total (all time)'}</CWText>
+            <CWText fontWeight="medium">{this.totalData.totalRoles}</CWText>
+            <CWText fontWeight="medium">{this.totalData.totalComments}</CWText>
+            <CWText fontWeight="medium">{this.totalData.totalThreads}</CWText>
           </div>
         </div>
       </Sublayout>

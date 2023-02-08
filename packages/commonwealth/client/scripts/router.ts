@@ -290,7 +290,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/proposals': importRoute(import('views/pages/proposals'), {
     scoped: true,
   }),
-  '/council': importRoute(import('views/pages/council'), { scoped: true }),
   '/delegate': importRoute(import('views/pages/delegate'), { scoped: true }),
   '/proposal/:type/:identifier': importRoute(
     import('views/pages/view_proposal/index'),
@@ -320,11 +319,7 @@ const getCustomDomainRoutes = (importRoute) => ({
 
   // Treasury
   '/treasury': importRoute(import('views/pages/treasury'), { scoped: true }),
-  '/bounties': importRoute(import('views/pages/bounties'), { scoped: true }),
   '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
-  '/validators': importRoute(import('views/pages/validators'), {
-    scoped: true,
-  }),
 
   // Admin
   '/admin': importRoute(import('views/pages/admin'), { scoped: true }),
@@ -392,7 +387,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
-  '/:scope/council': redirectRoute(() => '/council'),
   '/:scope/delegate': redirectRoute(() => '/delegate'),
   '/:scope/proposal/:type/:identifier': redirectRoute(
     (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`

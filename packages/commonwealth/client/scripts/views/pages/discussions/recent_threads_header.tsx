@@ -24,9 +24,7 @@ type RecentThreadsHeaderAttrs = {
   totalThreadCount: number;
 };
 
-export class RecentThreadsHeader extends ClassComponent<
-  RecentThreadsHeaderAttrs
-> {
+export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs> {
   private isWindowExtraSmall: boolean;
 
   onResize() {
