@@ -322,6 +322,10 @@ const NotificationRow: m.Component<
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
+
+    app.user.notifications.isUpdated.on('redraw', () => {
+      m.redraw();
+    });
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');

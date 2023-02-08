@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import m from 'mithril';
 import { ChainEventType, Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
+import { EventEmitter } from 'events';
 
 import app from 'state';
 
@@ -48,6 +48,8 @@ class NotificationsController {
 
   private _numPages = 0;
   private _numUnread = 0;
+
+  public isUpdated = new EventEmitter();
 
   public get numPages(): number {
     return this._numPages;
@@ -260,10 +262,12 @@ class NotificationsController {
   public update(n: Notification) {
     if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
       this._chainEventStore.add(n);
-      m.redraw();
+      console.log('emitting redraw');
+      this.isUpdated.emit('redraw');
     } else if (!n.chainEvent && !this._discussionStore.getById(n.id)) {
       this._discussionStore.add(n);
-      m.redraw();
+      console.log('emitting redraw');
+      this.isUpdated.emit('redraw');
     }
   }
 

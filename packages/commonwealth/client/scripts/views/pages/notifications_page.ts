@@ -113,6 +113,10 @@ const NotificationsPage: m.Component = {
     const chainEventNotifications =
       app.user.notifications.chainEventNotifications;
 
+    app.user.notifications.isUpdated.on('redraw', () => {
+      m.redraw();
+    });
+
     // const sortedNotifications = sortNotifications(app.user.notifications.allNotifications).reverse();
     // console.log("Sorted Notifications:", sortedNotifications);
 

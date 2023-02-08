@@ -86,6 +86,10 @@ export class NotificationsMenu extends ClassComponent {
         this.minChainEventsNotification + MAX_NOTIFS
       );
 
+    app.user.notifications.isUpdated.on('redraw', () => {
+      m.redraw();
+    });
+
     return (
       <div class="NotificationsMenu">
         <div class="NotificationsMenuHeader">
