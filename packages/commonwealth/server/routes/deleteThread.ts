@@ -14,6 +14,10 @@ enum DeleteThreadErrors {
 
 type DeleteThreadReq = {
   thread_id: number;
+  chain_id;
+  canvas_action;
+  canvas_session;
+  canvas_hash;
 };
 
 type DeleteThreadResp = Record<string, never>;

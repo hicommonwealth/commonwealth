@@ -63,14 +63,13 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       }
 
       const commentText = this.quillEditorState.textContentsAsString;
+      const chainId = app.activeChainId();
 
       this.error = null;
 
       this.sendingComment = true;
 
       this.quillEditorState.disable();
-
-      const chainId = app.activeChainId();
 
       try {
         const res = await app.comments.create(
