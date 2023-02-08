@@ -38,13 +38,15 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [submitIsDisabled, setSubmitIsDisabled] =
     React.useState<boolean>(false);
 
-  if (!name || !name.trim()) {
-    setSubmitIsDisabled(true);
-  }
+  React.useEffect(() => {
+    if (!name || !name.trim()) {
+      setSubmitIsDisabled(true);
+    }
 
-  if (featuredInNewPost && quillEditorState && quillEditorState.isBlank()) {
-    setSubmitIsDisabled(true);
-  }
+    if (featuredInNewPost && quillEditorState && quillEditorState.isBlank()) {
+      setSubmitIsDisabled(true);
+    }
+  }, [name, featuredInNewPost, quillEditorState]);
 
   const decimals = app.chain?.meta?.decimals
     ? app.chain.meta.decimals
