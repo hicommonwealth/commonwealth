@@ -44,7 +44,7 @@ export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
                 /
               </CWText>
             )}
-          </>
+          </React.Fragment>
         );
       })}
     </div>

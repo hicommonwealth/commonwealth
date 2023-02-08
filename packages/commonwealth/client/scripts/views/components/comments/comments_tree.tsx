@@ -146,7 +146,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
                   updatedCommentsCallback={updatedCommentsCallback}
                 />
               )}
-            </>
+            </React.Fragment>
           );
         } else {
           return null;
