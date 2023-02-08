@@ -114,7 +114,6 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
                 }
                 linkify
                 showAddressWithDisplayName
-                hideIdentityIcon
               />
               {!this.isWindowSmallInclusive && (
                 <CWText className="last-updated-text">•</CWText>

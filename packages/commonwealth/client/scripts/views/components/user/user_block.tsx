@@ -29,7 +29,6 @@ export class UserBlock extends ClassComponent<{
   addressDisplayOptions?: AddressDisplayOptions;
   avatarSize?: number;
   compact?: boolean;
-  hideIdentityIcon?: boolean;
   hideOnchainRole?: boolean;
   linkify?: boolean;
   popover?: boolean;
@@ -44,7 +43,6 @@ export class UserBlock extends ClassComponent<{
     const {
       addressDisplayOptions,
       compact,
-      hideIdentityIcon,
       linkify,
       popover,
       searchTerm,
@@ -105,7 +103,6 @@ export class UserBlock extends ClassComponent<{
             <User
               user={user}
               hideAvatar
-              hideIdentityIcon={hideIdentityIcon}
               showAddressWithDisplayName={showAddressWithDisplayName}
               addressDisplayOptions={addressDisplayOptions}
               popover={popover}

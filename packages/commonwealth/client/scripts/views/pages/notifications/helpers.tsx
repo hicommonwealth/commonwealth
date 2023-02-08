@@ -127,7 +127,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     <User
       user={new AddressInfo(null, author_address, author_chain, null)}
       hideAvatar
-      hideIdentityIcon
     />
   );
 
@@ -242,7 +241,6 @@ export const getBatchNotificationFields = (
     <User
       user={new AddressInfo(null, author_address, author_chain, null)}
       hideAvatar
-      hideIdentityIcon
     />
   );
 

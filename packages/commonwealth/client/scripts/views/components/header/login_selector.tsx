@@ -505,7 +505,7 @@ export const LoginSelector = () => {
                 className="left-button"
                 onClick={leftMenuProps.handleInteraction}
               >
-                <User user={app.user.activeAccount} hideIdentityIcon />
+                <User user={app.user.activeAccount} />
               </div>
               <Popover
                 content={
