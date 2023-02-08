@@ -49,16 +49,7 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
 
           webhooks.push(newWebhook);
 
-          app.modals.create({
-            modal: WebhookSettingsModal,
-            data: {
-              webhook: newWebhook,
-              updateSuccessCallback: (webhook) => {
-                const idx = webhooks.findIndex((wh) => wh.id === webhook.id);
-                webhooks[idx].categories = wh.categories;
-              },
-            },
-          });
+          setIsModalOpen(true);
 
           setWebhookUrl('');
         } else {
@@ -105,19 +96,7 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
                   iconSize="small"
                   onClick={(e) => {
                     e.preventDefault();
-
-                    app.modals.create({
-                      modal: WebhookSettingsModal,
-                      data: {
-                        webhook,
-                        updateSuccessCallback: (wh) => {
-                          const idx = webhooks.findIndex(
-                            (wh2) => wh2.id === wh.id
-                          );
-                          webhooks[idx].categories = wh.categories;
-                        },
-                      },
-                    });
+                    setIsModalOpen(true);
                   }}
                 />
                 <CWIconButton
