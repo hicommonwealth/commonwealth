@@ -9,7 +9,6 @@ import 'pages/view_proposal/linked_proposals_embed.scss';
 
 import { ProposalType } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';

@@ -9,7 +9,6 @@ import type { ChainInfo } from 'models';
 import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
 import SubstrateIdentities from './identities';
-import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateChain from './shared';
 import SubstrateTreasuryTips from './treasury_tips';
 

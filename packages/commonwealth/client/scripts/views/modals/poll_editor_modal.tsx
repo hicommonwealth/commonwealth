@@ -13,12 +13,6 @@ import moment from 'moment';
 import app from 'state';
 import _ from 'underscore';
 
-import 'modals/poll_editor_modal.scss';
-import type { Thread } from 'models';
-import moment from 'moment';
-import app from 'state';
-import _ from 'underscore';
-
 import { getNextPollEndingTime } from 'utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';

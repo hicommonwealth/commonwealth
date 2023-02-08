@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
 import { ThreadStage } from 'models';
+import type { IChainAdapter, Coin, Account } from 'models';
 import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';

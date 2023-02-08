@@ -25,6 +25,8 @@ import SubstrateChain from './shared';
 type Delegation = [AccountId, Conviction] & Codec;
 
 export class SubstrateAccount extends Account {
+  private polkadot;
+
   // GETTERS AND SETTERS
   // staking
   public get stakedBalance(): Promise<SubstrateCoin> {
