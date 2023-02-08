@@ -155,7 +155,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
               {!comment.deleted && (
                 <div className="comment-footer">
                   <div className="menu-buttons-left">
-                    <CommentReactionButton comment={comment} />
+                    {/* <CommentReactionButton comment={comment} /> */}
                     {canReply && (
                       <div
                         className="reply-button"

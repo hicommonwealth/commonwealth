@@ -67,8 +67,8 @@ export const CWContentPage = (props: ContentPageProps) => {
     viewCount,
   } = props;
 
-  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>();
-  const [tabSelected, setTabSelected] = React.useState<number>();
+  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>('sidebarView');
+  const [tabSelected, setTabSelected] = React.useState<number>(0);
 
   React.useEffect(() => {
     const onResize = () => {
@@ -133,6 +133,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     </div>
   );
 
+  console.log('rendering content page', tabSelected, mainBody);
   return (
     <div className={ComponentType.ContentPage}>
       {viewType === 'sidebarView' && (
