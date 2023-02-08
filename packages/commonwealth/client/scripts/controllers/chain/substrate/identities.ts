@@ -4,7 +4,6 @@ import type {
   AccountId,
   Call,
   IdentityFields,
-  IdentityJudgement,
   RegistrarInfo,
 } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
@@ -251,25 +250,6 @@ class SubstrateIdentities implements StorageModule {
       (api: ApiPromise) => api.tx.identity.setFields(regIdx, fields),
       'setFee',
       `registrar ${regIdx} updates fields`
-    );
-  }
-
-  public providejudgementTx(
-    who: SubstrateAccount,
-    regIdx: number,
-    target: SubstrateIdentity,
-    judgement: IdentityJudgement
-  ) {
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) =>
-        api.tx.identity.provideJudgement(
-          regIdx,
-          target.account.address,
-          judgement as any // PalletIdentityJudgment
-        ),
-      'providejudgement',
-      `registrar ${regIdx} provides judgement for identity ${target.username}`
     );
   }
 
