@@ -36,10 +36,6 @@ const ManageCommunityPage = () => {
     navigateToSubpage(``);
   }
 
-  const handleWebhooksUpdate = (newWebhooksArray: Array<Webhook>) => {
-    setWebhooks(newWebhooksArray);
-  };
-
   const chainOrCommObj = { chain: app.activeChainId() };
 
   const loadRoles = async () => {
@@ -155,7 +151,6 @@ const ManageCommunityPage = () => {
         <AdminPanelTabs
           onRoleUpgrade={(oldRole, newRole) => onRoleUpdate(oldRole, newRole)}
           roleData={roleData}
-          handleWebhooksUpdate={handleWebhooksUpdate}
           webhooks={webhooks}
         />
       </div>

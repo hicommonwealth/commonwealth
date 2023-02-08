@@ -10,14 +10,13 @@ import { WebhooksForm } from './webhooks_form';
 import type { RoleInfo, Webhook } from 'models';
 
 type AdminPanelTabsProps = {
-  handleWebhooksUpdate: (webhooks: Array<Webhook>) => void;
   onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: Array<RoleInfo>;
   webhooks: Array<Webhook>;
 };
 
 export const AdminPanelTabs = (props: AdminPanelTabsProps) => {
-  const { onRoleUpgrade, roleData, handleWebhooksUpdate, webhooks } = props;
+  const { onRoleUpgrade, roleData, webhooks } = props;
 
   const [currentTab, setCurrentTab] = React.useState<number>(1);
 
@@ -45,12 +44,7 @@ export const AdminPanelTabs = (props: AdminPanelTabsProps) => {
           onRoleUpgrade={(x, y) => onRoleUpgrade(x, y)}
         />
       )}
-      {currentTab === 2 && (
-        <WebhooksForm
-          handleWebhooksUpdate={handleWebhooksUpdate}
-          webhooks={webhooks}
-        />
-      )}
+      {currentTab === 2 && <WebhooksForm webhooks={webhooks} />}
     </div>
   );
 };

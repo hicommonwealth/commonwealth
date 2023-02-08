@@ -19,12 +19,11 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { Modal } from '../../components/component_kit/cw_modal';
 
 type WebhooksFormProps = {
-  handleWebhooksUpdate: (webhooks: Array<Webhook>) => void;
   webhooks: Array<Webhook>;
 };
 
 export const WebhooksForm = (props: WebhooksFormProps) => {
-  const { handleWebhooksUpdate, webhooks } = props;
+  const { webhooks } = props;
 
   const [disabled, setDisabled] = React.useState<boolean>(false);
   const [webhookUrl, setWebhookUrl] = React.useState<string>('');
@@ -56,7 +55,7 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
               webhook: newWebhook,
               updateSuccessCallback: (webhook) => {
                 const idx = webhooks.findIndex((wh) => wh.id === webhook.id);
-                webhooks[idx].categories = webhook.categories;
+                webhooks[idx].categories = wh.categories;
               },
             },
           });
