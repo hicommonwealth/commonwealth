@@ -91,8 +91,8 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
             className="login-menu-item"
             onClick={() => {
               const pf = app.user.activeAccount.profile;
-              if (app.chain) {
-                navigateToSubpage(`/account/${pf.address}`);
+              if (pf) {
+                m.route.set(`/profile/${pf.address}`);
               }
             }}
           >

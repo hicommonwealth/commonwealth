@@ -47,7 +47,6 @@ import {
 } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-
 import type { AnyProposal } from 'models';
 import { BinaryVote, DepositVote, VotingType } from 'models';
 

@@ -24,6 +24,13 @@ export const constructTypedCanvasMessage = (message) => {
     ],
   };
 
+  const message = {
+    loginTo: payload.spec,
+    registerSessionAddress: payload.address,
+    registerSessionDuration: payload.duration.toString(),
+    timestamp: payload.timestamp.toString(),
+  };
+
   // canvas uses ethers' signTypedData types while commonwealth uses eth-sig-util's
   // so we have to coerce the types here
   return { types, primaryType: 'Message', domain, message } as any;

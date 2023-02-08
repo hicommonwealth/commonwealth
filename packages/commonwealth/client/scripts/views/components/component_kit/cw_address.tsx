@@ -4,6 +4,7 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_address.scss';
+import m from 'mithril';
 
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';

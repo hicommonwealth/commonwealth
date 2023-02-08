@@ -178,7 +178,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Run linter
-        run: yarn lint-branch
+        run: yarn lint-all
 
       - name: Run formatter
         run: yarn format-check

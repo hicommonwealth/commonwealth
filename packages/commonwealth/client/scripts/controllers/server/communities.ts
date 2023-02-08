@@ -13,6 +13,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 import { StarredCommunity } from 'models';
+import app from 'state';
 
 class CommunitiesController {
   public isStarred(chain: string) {

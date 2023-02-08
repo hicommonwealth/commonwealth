@@ -4,6 +4,7 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_mobile_menu.scss';
+import m from 'mithril';
 
 import app from 'state';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';

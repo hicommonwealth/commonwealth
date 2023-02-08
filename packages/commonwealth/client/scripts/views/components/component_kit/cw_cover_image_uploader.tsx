@@ -14,6 +14,7 @@ import type { ValidationStatus } from './cw_validation_text';
 import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
 import { CWText } from './cw_text';
+import { CWRadioGroup } from './cw_radio_group';
 
 const uploadImage = async (file: File): Promise<[string, ValidationStatus]> => {
   try {
@@ -48,8 +49,21 @@ type CoverImageUploaderProps = {
   subheaderText?: string;
   enableGenerativeAI?: boolean;
   generatedImageCallback?: CallableFunction;
+  defaultImageUrl?: string;
+  defaultImageBehavior?: string;
+  name?: string;
   uploadCompleteCallback: CallableFunction;
 };
+
+export enum ImageAs {
+  Cover = 'cover',
+  Background = 'background',
+}
+
+export enum ImageBehavior {
+  Fill = 'cover',
+  Tiled = 'repeat',
+}
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
 export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
@@ -58,6 +72,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   const [uploadStatus, setUploadStatus] = React.useState<
     ValidationStatus | undefined
   >();
+  const [imageBehavior, setImageBehavior ] = React.useState<ImageBehavior>();
   const [prompt, setPrompt] = React.useState<string>();
   const [isPrompting, setIsPrompting] = React.useState<boolean>();
   const [isGenerating, setIsGenerating] = React.useState<boolean>();
@@ -76,12 +91,13 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
 
       if (isPrompting) {
         setImageURL(res.result.imageUrl);
+        if (!imageBehavior) setImageBehavior(ImageBehavior.Fill);
         setUploadStatus('success');
         attachButton.style.display = 'none';
 
         if (passedProps.generatedImageCallback)
-          passedProps.generatedImageCallback(imageURL);
-        passedProps.uploadCompleteCallback(imageURL);
+          passedProps.generatedImageCallback(imageURL, imageBehavior);
+        passedProps.uploadCompleteCallback(imageURL, imageBehavior);
       }
 
       setIsUploading(false);
@@ -100,10 +116,13 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   };
 
   React.useEffect(() => {
-    const attachZone = document.querySelector('.attach-zone') as HTMLElement;
-    const attachButton = document.querySelector('.attach-btn') as HTMLElement;
-    const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
+    const { name, defaultImageUrl, defaultImageBehavior, uploadCompleteCallback } = props;
+    const attachZone = document.querySelector(`.attach-zone.${name}`) as HTMLElement;
+    const attachButton = document.querySelector(`.attach-btn.${name}`) as HTMLElement;
+    const pseudoInput = document.querySelector(`#pseudo-input-${name}`) as HTMLElement;
 
+    setImageURL(defaultImageUrl);
+    setImageBehavior(defaultImageBehavior as ImageBehavior);
     setIsPrompting(false);
 
     // Drag'n'Drop helper function
@@ -127,8 +146,9 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
 
       if (_imageURL) {
         setImageURL(imageURL);
+        if (!imageBehavior) setImageBehavior(ImageBehavior.Fill);
         attachButton.style.display = 'none';
-        props.uploadCompleteCallback(imageURL);
+        uploadCompleteCallback(imageURL, imageBehavior);
       }
     };
 
@@ -176,11 +196,21 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   }, []);
 
   const {
+    name,
     headerText,
     subheaderText,
     enableGenerativeAI,
-    generatedImageCallback,
+    uploadCompleteCallback,
   } = props;
+
+  const isFillImage = imageBehavior === ImageBehavior.Fill;
+
+  const backgroundStyles = {
+    backgroundImage: imageURL ? `url(${imageURL})` : 'none',
+    backgroundSize: isFillImage ? 'cover' : '100px',
+    backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
+    backgroundPosition: isFillImage ? 'center' : '0 0',
+  };
 
   return (
     <div className="CoverImageUploader">
@@ -228,9 +258,9 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
               isUploading,
               uploadStatus,
             },
-            'attach-zone'
+            `attach-zone ${name}`
           )}
-          style={{ backgroundImage: `url(${imageURL})` }}
+          style={!isPrompting && !isGenerating && backgroundStyles}
         >
           {uploadStatus === 'success' && enableGenerativeAI && (
             <CWButton
@@ -301,17 +331,17 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
             <input
               type="file"
               accept="image/jpeg, image/jpg, image/png"
-              id="pseudo-input"
+              id={`pseudo-input-${name}`}
               className="pseudo-input"
             />
           )}
           {isUploading && <CWSpinner size="large" />}
-          <div className="attach-btn">
+          <div className={`attach-btn ${name}`}>
             {!isUploading && (
               <CWIcon iconName="imageUpload" iconSize="medium" />
             )}
             <CWText type="caption" fontWeight="medium">
-              Drag or upload your image here
+              {headerText}
             </CWText>
             {enableGenerativeAI && !isUploading && (
               <CWButton
@@ -326,6 +356,33 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
               />
             )}
           </div>
+        </div>
+        <div className="options">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="cover-image-title"
+          >
+            Choose Image Behavior
+          </CWText>
+          <CWRadioGroup
+            name="image-behaviour"
+            onchange={(e) => {
+              setImageBehavior(e.target.value);
+              uploadCompleteCallback(imageURL, imageBehavior);
+            }}
+            toggledOption={imageBehavior}
+            options={[
+              {
+                label: 'Fill',
+                value: ImageBehavior.Fill,
+              },
+              {
+                label: 'Tile',
+                value: ImageBehavior.Tiled,
+              },
+            ]}
+          />
         </div>
       </div>
     </div>

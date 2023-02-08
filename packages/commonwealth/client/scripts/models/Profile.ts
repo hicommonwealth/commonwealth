@@ -10,6 +10,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
+import m from 'mithril';
 
 import {
   CWAvatar,

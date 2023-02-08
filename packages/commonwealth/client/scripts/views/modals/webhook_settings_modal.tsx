@@ -22,6 +22,7 @@ import {
   PolkadotChainNotificationTypes,
 } from 'helpers/chain_notification_types';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/webhook_settings_modal.scss';
 import { Webhook } from 'models';

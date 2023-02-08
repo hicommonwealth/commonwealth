@@ -12,7 +12,7 @@ import { CWCard } from '../component_kit/cw_card';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { CWTextInput } from '../component_kit/cw_text_input';
-import { IChannel } from 'controllers/server/socket/chatNs';
+import type { IChannel } from 'controllers/server/socket/chatNs';
 import { MixpanelChatEvents } from 'analytics/types';
 
 type ChannelAttrs = {

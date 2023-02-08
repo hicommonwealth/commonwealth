@@ -2,8 +2,6 @@ import { redraw } from 'mithrilInterop';
 
 import breakpoints from 'mixins/breakpoints.scss';
 
-import { isBoolean, isNotNil } from 'helpers/typeGuards';
-
 export const getClasses = <T>(
   styleAttrs: T,
   componentType?: string

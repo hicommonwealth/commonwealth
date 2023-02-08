@@ -5,6 +5,7 @@
 
   .tab-label-text.Text {
     color: $neutral-500;
+    white-space: nowrap;
   }
 
   &:hover {
@@ -33,6 +34,8 @@
 .TabBar {
   display: flex;
   gap: 16px;
-  flex-wrap: wrap;
   margin-bottom: 8px;
+  overflow-x: auto;
+
+  @include visibleScrollbar(light);
 }

@@ -58,6 +58,7 @@ import bulkAddresses from '../routes/bulkAddresses';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileOld from '../routes/getProfile';
+import getProfileNew from '../routes/getNewProfile';
 
 import createRole from '../routes/createRole';
 import deleteRole from '../routes/deleteRole';
@@ -94,7 +95,8 @@ import getDrafts from '../routes/drafts/getDrafts';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
 import bulkProfiles from '../routes/bulkProfiles';
-import updateProfile from '../routes/updateProfile';
+import updateProfileOld from '../routes/updateProfile';
+import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
@@ -417,6 +419,7 @@ function setupRouter(
   );
 
   router.get('/profile', getProfileOld.bind(this, models));
+  router.get('/profile/v2', getProfileNew.bind(this, models));
 
   // discussion drafts
   router.post(
@@ -647,9 +650,16 @@ function setupRouter(
     '/updateProfile',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
-    updateProfile.bind(this, models)
+    updateProfileOld.bind(this, models)
   );
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
+
+  // new profile
+  router.post(
+    '/updateProfile/v2',
+    passport.authenticate('jwt', { session: false }),
+    updateProfileNew.bind(this, models)
+  );
 
   // social accounts
   router.delete(

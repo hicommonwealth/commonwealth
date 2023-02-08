@@ -14,6 +14,7 @@ import {
 } from 'mithrilInterop';
 
 import 'components/gov_explainer.scss';
+import m from 'mithril';
 import { CWText } from './component_kit/cw_text';
 
 type StatHeader = {

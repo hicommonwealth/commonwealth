@@ -6,6 +6,7 @@ import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
+import m from 'mithril';
 
 import { getClasses } from '../helpers';
 import type { IconProps, IconStyleProps } from './types';

@@ -4,6 +4,7 @@ import React from 'react';
 import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'lodash';
+import m from 'mithril';
 import moment from 'moment';
 
 import 'pages/stats.scss';
