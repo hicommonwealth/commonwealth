@@ -10,7 +10,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import moment from 'moment';

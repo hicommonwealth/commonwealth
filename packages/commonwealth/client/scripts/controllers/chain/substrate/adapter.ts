@@ -8,7 +8,6 @@ import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import type { ChainInfo } from 'models';
 import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
-import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';
 import SubstrateTreasuryTips from './treasury_tips';
 
@@ -18,7 +17,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public democracyProposals: SubstrateDemocracyProposals;
   public democracy: SubstrateDemocracy;
   public treasury: SubstrateTreasury;
-  public identities: SubstrateIdentities;
   public tips: SubstrateTreasuryTips;
 
   public readonly base = ChainBase.Substrate;
@@ -36,7 +34,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.tips = new SubstrateTreasuryTips(this.app);
-    this.identities = new SubstrateIdentities(this.app);
   }
 
   public async initApi(additionalOptions?) {
@@ -47,7 +44,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     );
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    await this.identities.init(this.chain, this.accounts);
     await super.initApi();
   }
 
@@ -61,13 +57,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await super.deinit();
     this.chain.deinitEventLoop();
     await Promise.all(
-      [
-        this.democracyProposals,
-        this.democracy,
-        this.treasury,
-        this.tips,
-        this.identities,
-      ].map((m) => (m.initialized ? m.deinit() : Promise.resolve()))
+      [this.democracyProposals, this.democracy, this.treasury, this.tips].map(
+        (m) => (m.initialized ? m.deinit() : Promise.resolve())
+      )
     );
     this.accounts.deinit();
     this.chain.deinitMetadata();

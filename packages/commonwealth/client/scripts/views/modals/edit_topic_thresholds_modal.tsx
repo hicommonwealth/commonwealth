@@ -1,9 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { jsx } from 'mithrilInterop';
-
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { getDecimals } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
@@ -30,7 +26,7 @@ const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
     setNewTokenThresholdInWei(topic.tokenThreshold?.toString() || '0');
   }
 
-    const decimals = getDecimals(app.chain);
+  const decimals = getDecimals(app.chain);
 
   return (
     <div className="EditTopicThresholdsRow">

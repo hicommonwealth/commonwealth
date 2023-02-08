@@ -1,9 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { link, pluralize } from 'helpers';
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { Webhook } from 'models';
 

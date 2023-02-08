@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { AaveTypes, CompoundTypes } from 'chain-events/src/types';

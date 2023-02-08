@@ -1,9 +1,10 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { link } from 'helpers';
 
-import { getRouteParam, redraw, jsx } from 'mithrilInterop';
+import { getRouteParam, redraw} from
+
+ 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/web3login.scss';
@@ -67,7 +68,7 @@ const Web3LoginPage = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -99,7 +100,7 @@ const Web3LoginPage = () => {
           </div>
         </div>
       </Sublayout>
-    </React.Fragment>
+    </>
   );
 };
 

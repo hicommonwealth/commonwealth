@@ -1,11 +1,12 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { getProposalUrlPath } from 'identifiers';
 import type { Thread } from 'models';
 import type { LinkedThreadRelation } from 'models/Thread';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode} from
+
+ 'mithrilInterop';
 
 import 'pages/view_thread/linked_threads_card.scss';
 

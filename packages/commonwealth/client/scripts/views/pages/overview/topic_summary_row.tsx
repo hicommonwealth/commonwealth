@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { pluralize } from 'helpers';
@@ -14,8 +13,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';

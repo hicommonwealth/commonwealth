@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import { NotificationCategories } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';

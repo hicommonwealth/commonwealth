@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -98,7 +99,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -158,6 +159,6 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
           </CWText>
         )}
       </div>
-    </React.Fragment>
+    </>
   );
 };

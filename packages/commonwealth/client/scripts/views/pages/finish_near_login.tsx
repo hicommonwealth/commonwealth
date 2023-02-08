@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { Chain } from '@canvas-js/interfaces';
@@ -6,7 +5,9 @@ import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import { setRoute, getRouteParam, redraw, jsx } from 'mithrilInterop';
+import { setRoute, getRouteParam, redraw} from
+
+ 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -245,7 +246,7 @@ const FinishNearLogin = () => {
       }
     };
     return (
-      <React.Fragment>
+      <>
         <Modal
           content={
             <LoginModal
@@ -263,7 +264,7 @@ const FinishNearLogin = () => {
           open={isModalOpen}
         />
         <Sublayout />
-      </React.Fragment>
+      </>
     );
   } else if (!validating) {
     // chain loaded and on near -- finish login and call lingering txs

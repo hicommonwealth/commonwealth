@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx, parsePathname } from 'mithrilInterop';
+import { ClassComponent, redraw, parsePathname } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 import { navigateToSubpage } from 'router';
