@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, setRoute, jsx, render } from 'mithrilInterop';
+import { ClassComponent, setRoute } from 'mithrilInterop';
 
 import 'pages/why_commonwealth.scss';
 import { CWButton } from '../components/component_kit/cw_button';

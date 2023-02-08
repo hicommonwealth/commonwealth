@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -6,8 +5,7 @@ import {
   setRoute,
   getRouteParam,
   redraw,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 

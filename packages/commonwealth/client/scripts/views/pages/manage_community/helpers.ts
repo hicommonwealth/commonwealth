@@ -9,7 +9,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import app from 'state';
 import { AccessLevel } from 'models';

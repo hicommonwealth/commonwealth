@@ -1,9 +1,10 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode} from
+
+ 'mithrilInterop';
 
 import 'pages/view_proposal/linked_proposals_embed.scss';
 

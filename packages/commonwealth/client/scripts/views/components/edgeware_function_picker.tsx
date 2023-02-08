@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx, redraw, ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw, ResultNode } from 'mithrilInterop';
 
 import { blake2AsHex } from '@polkadot/util-crypto';
 import type Substrate from 'controllers/chain/substrate/adapter';

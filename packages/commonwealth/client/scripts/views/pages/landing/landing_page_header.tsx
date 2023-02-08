@@ -1,8 +1,9 @@
-/* @jsx jsx */
 
 import React from 'react';
 
-import { setRoute, jsx } from 'mithrilInterop';
+import { setRoute} from
+
+ 'mithrilInterop';
 
 import 'pages/landing/landing_page_header.scss';
 

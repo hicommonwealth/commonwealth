@@ -1,4 +1,3 @@
-/* @jsx jsx */
 /* eslint-disable no-script-url */
 import React from 'react';
 
@@ -11,8 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 

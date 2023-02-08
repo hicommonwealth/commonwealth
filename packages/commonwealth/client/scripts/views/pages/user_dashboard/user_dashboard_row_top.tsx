@@ -1,8 +1,9 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { formatTimestamp } from 'helpers/index';
-import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';
