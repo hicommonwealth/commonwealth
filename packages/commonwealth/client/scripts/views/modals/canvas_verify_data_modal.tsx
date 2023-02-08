@@ -37,8 +37,12 @@ const CanvasVerifyDataModal = {
         const action = JSON.parse(obj.canvasAction) as Action;
 
         import('@canvas-js/interfaces').then((canvas) => {
-          vnode.state.sessionPayload = serializeSessionPayload(session.payload);
-          vnode.state.actionPayload = serializeActionPayload(action.payload);
+          vnode.state.sessionPayload = canvas.serializeSessionPayload(
+            session.payload
+          );
+          vnode.state.actionPayload = canvas.serializeActionPayload(
+            action.payload
+          );
           vnode.state.sessionSignature = session.signature;
           vnode.state.actionSignature = action.signature;
 
@@ -78,7 +82,9 @@ const CanvasVerifyDataModal = {
             ) : (
               <p>❌ Invalid</p>
             )}
-            {vnode.state.action && <pre>{vnode.state.actionPayload}</pre>}
+            {vnode.state.actionPayload && (
+              <pre>{vnode.state.actionPayload}</pre>
+            )}
             <pre>{vnode.state.actionSignature}</pre>
             <h3>Session</h3>
             {vnode.state.verifiedSession ? (
@@ -86,7 +92,9 @@ const CanvasVerifyDataModal = {
             ) : (
               <p>❌ Invalid</p>
             )}
-            {vnode.state.session && <pre>{vnode.state.sessionPayload}</pre>}
+            {vnode.state.sessionPayload && (
+              <pre>{vnode.state.sessionPayload}</pre>
+            )}
             <pre>{vnode.state.sessionSignature}</pre>
           </div>
         </div>
