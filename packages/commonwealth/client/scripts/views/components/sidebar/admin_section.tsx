@@ -175,7 +175,7 @@ const AdminSectionComponent = () => {
       <Modal
         content={
           <EditTopicThresholdsModal
-            onModalClose={() => setIsNewTopicModalOpen(false)}
+            onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}
           />
         }
         onClose={() => setIsEditTopicThresholdsModalOpen(false)}

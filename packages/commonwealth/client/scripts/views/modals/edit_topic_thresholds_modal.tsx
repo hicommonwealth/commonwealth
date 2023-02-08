@@ -73,6 +73,8 @@ type EditTopicThresholdsModalProps = {
 export const EditTopicThresholdsModal = (
   props: EditTopicThresholdsModalProps
 ) => {
+  const { onModalClose } = props;
+
   if (
     !app.user.isSiteAdmin &&
     !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
@@ -86,7 +88,13 @@ export const EditTopicThresholdsModal = (
     <div className="EditTopicThresholdsModal">
       <div className="compact-modal-title">
         <h3>Edit topic thresholds</h3>
-        <CWIconButton iconName="close" onClick={() => props.onModalClose()} />
+        <CWIconButton
+          iconName="close"
+          onClick={() => {
+            console.log('in');
+            return onModalClose();
+          }}
+        />
       </div>
       <div className="compact-modal-body">
         {topics.length > 0 ? (
