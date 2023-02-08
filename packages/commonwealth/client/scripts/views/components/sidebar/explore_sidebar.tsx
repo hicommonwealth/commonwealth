@@ -1,15 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/sidebar/explore_sidebar.scss';
+import { ChainInfo } from 'models';
 
 import app from 'state';
-import { ChainInfo } from 'models';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
-import { MenuItem } from '../component_kit/types';
+import type { MenuItem } from '../component_kit/types';
 
 export class ExploreCommunitiesSidebar extends ClassComponent {
   view() {
@@ -83,6 +92,7 @@ export class ExploreCommunitiesSidebar extends ClassComponent {
             setTimeout(() => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
+              app.sidebarRedraw.emit('redraw');
               redraw();
             }, 200);
           },

@@ -1,16 +1,20 @@
-import { DB } from '../models';
+import type { Profile } from 'client/scripts/models';
+import type { DB } from '../models';
 
 export type GlobalActivity = Array<{
-  category_id: string,
-  comment_count: string,
-  last_activity: string,
-  notification_data: string, // actually object but stringified
-  reaction_count: string,
-  thread_id: string,
-  view_count: number,
+  category_id: string;
+  comment_count: string;
+  last_activity: string;
+  notification_data: string; // actually object but stringified
+  reaction_count: string;
+  thread_id: string;
+  view_count: number;
+  commenters: Profile[];
 }>;
 
-export default async function queryGlobalActivity(models: DB): Promise<GlobalActivity> {
+export default async function queryGlobalActivity(
+  models: DB
+): Promise<GlobalActivity> {
   const query = `
     SELECT nt.thread_id, nts.created_at as last_activity, nts.notification_data, nts.category_id,
       MAX(ovc.view_count) as view_count,
@@ -42,10 +46,49 @@ export default async function queryGlobalActivity(models: DB): Promise<GlobalAct
     ORDER BY nts.created_at DESC;
   `;
 
-  const notifications = await models.sequelize.query(query, {
+  const notifications: any = await models.sequelize.query(query, {
     type: 'SELECT',
     raw: true,
   });
+
+  const comments = await models.Comment.findAll({
+    where: {
+      root_id: notifications.map((n) => `discussion_${n.thread_id}`),
+    },
+  });
+
+  const addresses = await models.Address.findAll({
+    where: {
+      id: comments.map((c) => c.address_id),
+    },
+  });
+
+  const profiles = await models.Profile.findAll({
+    where: {
+      id: addresses.map((a) => a.profile_id),
+    },
+    include: [
+      {
+        model: models.Address,
+      },
+    ],
+  });
+
+  const notificationsWithProfiles = notifications.map((notification) => {
+    const filteredComments = comments.filter(
+      (c) => c.root_id === `discussion_${notification.thread_id}`
+    );
+    const notificationProfiles = filteredComments.map((c) => {
+      const filteredAddress = addresses.find((a) => a.id === c.address_id);
+
+      return profiles.find((p) => p.id === filteredAddress.profile_id);
+    });
+    return {
+      ...notification,
+      commenters: [...new Set(notificationProfiles)],
+    };
+  });
+
   // TODO: verify output type
-  return notifications as GlobalActivity;
+  return notificationsWithProfiles as GlobalActivity;
 }

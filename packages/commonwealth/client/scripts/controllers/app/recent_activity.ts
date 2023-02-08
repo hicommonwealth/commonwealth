@@ -1,8 +1,8 @@
-import moment from 'moment';
-import { Topic, AbridgedThread, Profile, Thread } from 'models';
-import app from 'state';
 import $ from 'jquery';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
+import type { Thread, Topic } from 'models';
+import { AbridgedThread, Profile } from 'models';
+import moment from 'moment';
+import app from 'state';
 
 export interface IAbridgedThreadFromServer {
   id: number;
@@ -86,7 +86,7 @@ class RecentActivityController {
 
     const threads = response.result;
     return threads.map((thread) => {
-      const modeledThread = modelThreadFromServer(thread);
+      const modeledThread = app.threads.modelFromServer(thread);
       if (!thread.Address) {
         console.error('Thread missing address');
       }

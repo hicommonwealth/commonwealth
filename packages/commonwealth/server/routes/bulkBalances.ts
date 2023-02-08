@@ -1,12 +1,13 @@
 import BN from 'bn.js';
-import { TokenBalanceCache } from 'token-balance-cache/src';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { QueryTypes } from 'sequelize';
-import { AddressInstance } from '../models/address';
-import { DB } from '../models';
-import { sequelize } from '../database';
 import { AppError } from 'common-common/src/errors';
-import { success, TypedRequestBody, TypedResponse } from '../types';
+import { QueryTypes } from 'sequelize';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
+import { sequelize } from '../database';
+import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,7 +28,7 @@ type bulkBalanceReq = {
   profileId: number;
   token: string;
   chainNodes: {
-    [nodeId: number]: Array<{ address: string, tokenType: string }>;
+    [nodeId: number]: Array<{ address: string; tokenType: string }>;
   };
 };
 
@@ -86,10 +87,10 @@ const bulkBalances = async (
     SELECT DISTINCT(c.base) FROM "Addresses" addr 
       LEFT JOIN "Chains" c ON addr.chain = c.id 
       WHERE addr.profile_id = ${profileId};`;
-  const basesRaw: string[] = <any>(await sequelize.query(baseQuery, {
+  const basesRaw: string[] = <any>await sequelize.query(baseQuery, {
     raw: true,
     type: QueryTypes.SELECT,
-  }));
+  });
 
   const bases = basesRaw.map((b) => b['base']);
 
@@ -112,13 +113,20 @@ const bulkBalances = async (
     if (!contracts || contracts.length === 0) {
       let balanceTotal = new BN(0);
       try {
-        const balanceResults = await tokenBalanceCache.getBalancesForAddresses(nodeId, profileWalletAddresses, bp, {});
+        const balanceResults = await tokenBalanceCache.getBalancesForAddresses(
+          nodeId,
+          profileWalletAddresses,
+          bp,
+          {}
+        );
         for (const balance of Object.values(balanceResults.balances)) {
           balanceTotal = balanceTotal.add(new BN(balance));
         }
         balances[nodeId] = balanceTotal.toString();
       } catch (e) {
-        log.info(`Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`);
+        log.info(
+          `Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`
+        );
       }
     } else {
       // this is for Ethereum / Solana Bases
@@ -128,10 +136,16 @@ const bulkBalances = async (
       for (const contract of contracts) {
         let balanceTotal = new BN(0);
         try {
-          const balanceResults = await tokenBalanceCache.getBalancesForAddresses(nodeId, profileWalletAddresses, bp, {
-            contractType: contract.tokenType,
-            tokenAddress: contract.address,
-          });
+          const balanceResults =
+            await tokenBalanceCache.getBalancesForAddresses(
+              nodeId,
+              profileWalletAddresses,
+              bp,
+              {
+                contractType: contract.tokenType,
+                tokenAddress: contract.address,
+              }
+            );
           for (const balance of Object.values(balanceResults.balances)) {
             balanceTotal = balanceTotal.add(new BN(balance));
           }
@@ -150,7 +164,7 @@ const bulkBalances = async (
     }
   }
 
-  return success(res, {balances, bases});
+  return success(res, { balances, bases });
 };
 
 export default bulkBalances;

@@ -1,6 +1,10 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { pluralize } from 'helpers';
+import { getProposalUrlPath } from 'identifiers';
+// import { navigateToSubpage } from 'router';
+import type { Thread, Topic } from 'models';
 import {
   ClassComponent,
   ResultNode,
@@ -17,38 +21,35 @@ import moment from 'moment';
 import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
-// import { navigateToSubpage } from 'app';
-import { Thread, Topic } from 'models';
-import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
-import { pluralize } from 'helpers';
-import { CWText } from '../../components/component_kit/cw_text';
-import { User } from '../../components/user/user';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-// import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { getLastUpdated, isHot } from '../discussions/helpers';
-import { SharePopover } from '../../components/share_popover';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
 // import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 // import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { getClasses } from '../../components/component_kit/helpers';
+import { SharePopover } from '../../components/share_popover';
+import { User } from '../../components/user/user';
+// import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { getLastUpdated, isHot } from '../discussions/helpers';
 
 type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
+  pinnedThreads: Array<Thread>;
   topic: Topic;
 };
 
 export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
   view(vnode: ResultNode<TopicSummaryRowAttrs>) {
-    const { monthlyThreads, topic } = vnode.attrs;
+    const { monthlyThreads, pinnedThreads, topic } = vnode.attrs;
 
-    const topFiveSortedThreads = monthlyThreads
+    const topSortedThreads = monthlyThreads
       .sort((a, b) => {
         const aLastUpdated = a.lastCommentedOn || a.createdAt;
         const bLastUpdated = b.lastCommentedOn || b.createdAt;
         return bLastUpdated.valueOf() - aLastUpdated.valueOf();
       })
-      .slice(0, 5);
+      .slice(0, 5 - monthlyThreads.length);
 
     // const isAdmin =
     //   app.roles.isRoleOfCommunity({
@@ -62,6 +63,8 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
     //     role: 'moderator',
     //     chain: app.activeChainId(),
     //   });
+
+    const threadsToDisplay = pinnedThreads.concat(topSortedThreads);
 
     return (
       <div className="TopicSummaryRow">
@@ -91,7 +94,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
           {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
         <div className="recent-threads-column">
-          {topFiveSortedThreads.map((thread, idx) => {
+          {threadsToDisplay.map((thread, idx) => {
             const discussionLink = getProposalUrlPath(
               thread.slug,
               `${thread.identifier}-${slugify(thread.title)}`
@@ -103,6 +106,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             return (
               <React.Fragment>
                 <div
+                  key={idx}
                   className={getClasses<{ isPinned?: boolean }>(
                     { isPinned: thread.pinned },
                     'recent-thread-row'
@@ -231,7 +235,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                     </div>
                   </div>
                 </div>
-                {idx !== topFiveSortedThreads.length - 1 && <CWDivider />}
+                {idx !== threadsToDisplay.length - 1 && <CWDivider />}
               </React.Fragment>
             );
           })}

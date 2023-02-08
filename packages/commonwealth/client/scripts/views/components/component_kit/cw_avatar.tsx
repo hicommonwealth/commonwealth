@@ -1,43 +1,40 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 import Jdenticon from 'react-jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';
 
 import { ComponentType } from './types';
 
-type BaseAvatarAttrs = {
+type BaseAvatarProps = {
   size: number;
 };
 
-type AvatarAttrs = BaseAvatarAttrs & { avatarUrl: string };
+type AvatarProps = BaseAvatarProps & { avatarUrl: string };
 
-export class CWAvatar extends ClassComponent<AvatarAttrs> {
-  view(vnode: ResultNode<AvatarAttrs>) {
-    const { avatarUrl, size } = vnode.attrs;
+export const CWAvatar = (props: AvatarProps) => {
+  const { avatarUrl, size } = props;
 
-    return (
-      <div
-        className={ComponentType.Avatar}
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          backgroundImage: `url("${avatarUrl}")`,
-        }}
-      />
-    );
-  }
-}
+  return (
+    <div
+      className={ComponentType.Avatar}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundImage: `url("${avatarUrl}")`,
+      }}
+    />
+  );
+};
 
-type JdenticonAttrs = BaseAvatarAttrs & { address?: string };
+type JdenticonProps = BaseAvatarProps & { address?: string };
 
-export class CWJdenticon extends ClassComponent<JdenticonAttrs> {
-  view(vnode: ResultNode<JdenticonAttrs>) {
-    const { address, size } = vnode.attrs;
-    if (!address) return null;
+export const CWJdenticon = (props: JdenticonProps) => {
+  const { address, size } = props;
 
-    return <Jdenticon value={address.toString()} height={size} width={size} />;
-  }
-}
+  if (!address) return null;
+
+  return <Jdenticon value={address.toString()} height={size} width={size} />;
+};

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import type moment from 'moment';
 
 class Vote {
   public readonly id: number;

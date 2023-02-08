@@ -1,7 +1,7 @@
 type BlockInfo = {
-  number: number
-  hash: string
-  timestamp: number
+  number: number;
+  hash: string;
+  timestamp: number;
 };
 
 export default BlockInfo;

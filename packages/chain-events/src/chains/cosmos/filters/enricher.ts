@@ -4,8 +4,10 @@ import {
   MsgVote,
 } from 'cosmjs-types/cosmos/gov/v1beta1/tx';
 
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { Api, coinToCoins, EventKind, IEventData, RawEvent } from '../types';
+import type { CWEvent } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { Api, IEventData, RawEvent } from '../types';
+import { coinToCoins, EventKind } from '../types';
 
 export async function Enrich(
   api: Api,

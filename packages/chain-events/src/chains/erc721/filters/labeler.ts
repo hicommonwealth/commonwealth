@@ -1,11 +1,9 @@
 import { BigNumber } from 'ethers';
 
-import {
-  LabelerFilter,
-  IEventLabel,
-  SupportedNetwork,
-} from '../../../interfaces';
-import { IEventData, EventKind } from '../types';
+import type { LabelerFilter, IEventLabel } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { IEventData } from '../types';
+import { EventKind } from '../types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';
@@ -61,6 +59,7 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Transfer',
         label: `Transfer of ${data.tokenId} on ${chainId} from ${data.from} to ${data.to}.`,
+        icon: 'transfer',
       };
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases

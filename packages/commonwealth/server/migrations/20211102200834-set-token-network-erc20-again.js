@@ -9,7 +9,7 @@ module.exports = {
       {
         type: 'token',
         base: 'ethereum',
-      },
+      }
     );
   },
 

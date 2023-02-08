@@ -1,21 +1,10 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-
+import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { navigateToSubpage } from 'router';
+import type { Thread, ThreadStage, Topic } from 'models';
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { Thread, ThreadStage, Topic } from 'models';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';

@@ -1,12 +1,7 @@
-import { IChainEventData, SupportedNetwork } from 'chain-events/src';
-import {
-  NodeInfo,
-  Notification,
-  ChainEvent,
-  NotificationSubscription,
-  ChainEventType,
-} from 'models';
+import type { IChainEventData, SupportedNetwork } from 'chain-events/src';
+import type { ChainEventType } from 'models';
 import moment from 'moment';
+import { ProfileWithAddress } from '../views/components/component_kit/cw_avatar_group';
 
 class DashboardActivityNotification {
   // Thread and Comment Notifications
@@ -17,6 +12,8 @@ class DashboardActivityNotification {
   public readonly createdAt: moment.Moment;
   public readonly notificationData?: string;
   public readonly threadId?: string;
+  public readonly commenters?: ProfileWithAddress[];
+  public readonly chainId?: string;
   private _isRead?: boolean;
 
   public get isRead(): boolean {
@@ -50,6 +47,8 @@ class DashboardActivityNotification {
     eventNetwork,
     chain,
     iconUrl,
+    commenters,
+    chainId,
   }: {
     createdAt: string;
     threadId?: string;
@@ -67,6 +66,8 @@ class DashboardActivityNotification {
     eventNetwork?: SupportedNetwork;
     chain?: string;
     iconUrl?: string;
+    commenters?: ProfileWithAddress[];
+    chainId?: string;
   }) {
     this.categoryId = categoryId || 'chain-event';
     this.threadId = threadId;
@@ -84,6 +85,8 @@ class DashboardActivityNotification {
     this.eventNetwork = eventNetwork;
     this.chain = chain;
     this.iconUrl = iconUrl;
+    this.commenters = commenters;
+    this.chainId = chainId;
   }
 
   public static fromJSON(json) {
@@ -104,6 +107,8 @@ class DashboardActivityNotification {
       eventNetwork: json.event_network,
       chain: json.chain,
       iconUrl: json.icon_url,
+      commenters: json.commenters,
+      chainId: json.chain_id,
     });
   }
 }

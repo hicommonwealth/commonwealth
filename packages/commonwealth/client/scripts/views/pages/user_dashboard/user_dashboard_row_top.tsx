@@ -1,38 +1,29 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-import moment from 'moment';
+import { formatTimestamp } from 'helpers/index';
+import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { capitalize } from 'lodash';
+import { AddressInfo } from 'models';
+import moment from 'moment';
 
 import 'pages/user_dashboard/user_dashboard_row_top.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
 import { User } from 'views/components/user/user';
-import { formatTimestamp } from 'helpers/index';
-import { getCommentPreview } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
+import { getCommentPreview } from './helpers';
 
 type UserDashboardRowTopAttrs = {
   activityData: any;
   category: string;
 };
 
-export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs> {
+export class UserDashboardRowTop extends ClassComponent<
+  UserDashboardRowTopAttrs
+> {
   view(vnode: ResultNode<UserDashboardRowTopAttrs>) {
-    const { commentCount } = vnode.attrs.activityData;
-
     const {
       created_at,
       chain_id,
@@ -44,10 +35,10 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
       root_type,
     } = JSON.parse(vnode.attrs.activityData.notificationData);
 
-    const numericalCommentCount = Number(commentCount);
-
     const communityName =
       app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+
+    const communityIcon = app.config.chains.getById(chain_id)?.iconUrl;
 
     let decodedTitle;
 
@@ -75,62 +66,44 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         onclick={(e: any) => {
           e.preventDefault();
           e.stopPropagation();
-          m.route.set(`/${author_chain}/account/${author_address}`);
+          setRoute(`/${author_chain}/account/${author_address}`);
         }}
       />
     );
 
-    if (vnode.attrs.category === 'new-comment-creation') {
-      return (
-        <div className="UserDashboardRowTop">
-          <CWText className="row-top-text">
-            {actorName}
-            <span>
-              {numericalCommentCount > 1 &&
-                `and ${numericalCommentCount - 1} others `}
-              commented on
-            </span>
-            <b>{titleText}</b>
-            <span>in</span>
-            <a
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setRoute(`/${chain_id}`);
-              }}
-            >
-              {communityName}
-            </a>
-            <span>({formatTimestamp(moment(created_at))})</span>
-          </CWText>
-          <div className="comment-preview-container">
-            {getCommentPreview(comment_text)}
-          </div>
-        </div>
-      );
-    } else if (vnode.attrs.category === 'new-thread-creation') {
-      return (
-        <div className="UserDashboardRowTop">
-          <CWText className="row-top-text">
-            {actorName}
-            <span>created new thread</span>
-            <b>{titleText}</b>
-            <span>in</span>
-            <a
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setRoute(`/${chain_id}`);
-              }}
-            >
-              {communityName}
-            </a>
-            <span>{formatTimestamp(moment(created_at))}</span>
-          </CWText>
-        </div>
-      );
-    }
+    const isComment = vnode.attrs.category === 'new-comment-creation';
 
-    return <div className="UserDashboardRowTop">{actorName}</div>;
+    return (
+      <div className="UserDashboardRowTop">
+        <div className="community-info">
+          <img className="icon" src={communityIcon} />
+          <CWText type="caption" fontWeight="medium">
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setRoute(`/${chain_id}`);
+              }}
+            >
+              {communityName}
+            </a>
+          </CWText>
+          <div className="dot">.</div>
+          <CWText type="caption" fontWeight="medium" className="gray-text">
+            {moment(created_at).format('MM/DD/YY')}
+          </CWText>
+        </div>
+        <div className="comment-thread-info">
+          <CWText noWrap fontWeight="semiBold">
+            {actorName}&nbsp;
+            <span className="info-type">
+              {isComment ? 'commented on the thread' : 'created a thread'}&nbsp;
+            </span>
+            <span className="thread-title">{titleText}</span>
+          </CWText>
+        </div>
+        <div className="comment-preview">{getCommentPreview(comment_text)}</div>
+      </div>
+    );
   }
 }

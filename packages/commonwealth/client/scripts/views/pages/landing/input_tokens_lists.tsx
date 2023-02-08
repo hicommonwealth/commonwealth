@@ -1,18 +1,7 @@
 /* @jsx jsx */
-
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import { InputTokenOptionComponent } from './input_token_option';
 import { Chain, Token } from './index';

@@ -1,35 +1,26 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
+import { navigateToSubpage } from 'router';
 
 import 'modals/edit_topic_modal.scss';
-
-import app from 'state';
-import { navigateToSubpage } from 'app';
 import { Topic } from 'models';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
+import app from 'state';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { pluralizeWithoutNumberPrefix } from 'helpers';
-import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
+
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../components/component_kit/cw_button';
-import { QuillEditor } from '../components/quill/quill_editor';
-import { QuillTextContents } from '../components/quill/types';
+import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import type { QuillEditor } from '../components/quill/quill_editor';
+import type { QuillTextContents } from '../components/quill/types';
 
 type EditTopicModalAttrs = {
   defaultOffchainTemplate: string;
@@ -137,7 +128,6 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
         <div className="compact-modal-body">
           <CWTextInput
             label="Name"
-            name="name"
             value={this?.form?.name}
             onInput={(e) => {
               this.form.name = (e.target as HTMLInputElement).value;
@@ -162,10 +152,10 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
               return ['success', 'Valid topic name'];
             }}
             tabIndex={1}
-            oncreate={(vvnode) => {
-              // use oncreate to focus because autoFocus: true fails when component is recycled in a modal
-              setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
-            }}
+            // oncreate={(vvnode) => {
+            //   // use oncreate to focus because autoFocus: true fails when component is recycled in a modal
+            //   setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
+            // }}
           />
           <CWTextInput
             label="Description"

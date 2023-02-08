@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
 
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
 
 import domain from '../routes/domain';
@@ -35,6 +35,8 @@ import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
 import updateBanner from '../routes/updateBanner';
 import communityStats from '../routes/communityStats';
+import fetchEtherscanContract from '../routes/etherscanAPI';
+import createContractAbi from '../routes/contractAbis/createContractAbi';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -53,9 +55,6 @@ import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import bulkMembers from '../routes/bulkMembers';
 import bulkAddresses from '../routes/bulkAddresses';
-import createInvite from '../routes/createInvite';
-import acceptInvite from '../routes/acceptInvite';
-import addMember from '../routes/addMember';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileOld from '../routes/getProfile';
@@ -123,7 +122,7 @@ import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
 import getWebhooks from '../routes/webhooks/getWebhooks';
-import ViewCountCache from '../util/viewCountCache';
+import type ViewCountCache from '../util/viewCountCache';
 import updateChainCategory from '../routes/updateChainCategory';
 import updateChainCustomDomain from '../routes/updateChainCustomDomain';
 import updateChainPriority from '../routes/updateChainPriority';
@@ -138,30 +137,33 @@ import bulkBalances from '../routes/bulkBalances';
 import getSupportedEthChains from '../routes/getSupportedEthChains';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import updateAddress from '../routes/updateAddress';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { sendMessage } from '../routes/snapshotAPI';
 import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
 import setProjectChain from '../routes/setProjectChain';
-import RuleCache from '../util/rules/ruleCache';
+import type RuleCache from '../util/rules/ruleCache';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
-import BanCache from '../util/banCheckCache';
+import type BanCache from '../util/banCheckCache';
 import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
 import { addExternalRoutes } from './external';
+import generateImage from '../routes/generateImage';
 import { getChainEventServiceData } from '../routes/getChainEventServiceData';
 import { getChain } from '../routes/getChain';
 import { getChainNode } from '../routes/getChainNode';
 import { getChainContracts } from '../routes/getChainContracts';
 import { getSubscribedChains } from '../routes/getSubscribedChains';
-import GlobalActivityCache from '../util/globalActivityCache';
-import DatabaseValidationService from '../middleware/databaseValidationService';
+import type GlobalActivityCache from '../util/globalActivityCache';
+import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import { addSwagger } from './addSwagger';
+import * as controllers from '../controller';
 
 function setupRouter(
   app: Express,
@@ -242,9 +244,15 @@ function setupRouter(
   );
 
   router.post(
-    '/createContract',
+    '/contract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
+  );
+
+  router.post(
+    '/etherscanAPI/fetchEtherscanContract',
+    passport.authenticate('jwt', { session: false }),
+    fetchEtherscanContract.bind(this, models)
   );
 
   router.post(
@@ -345,6 +353,12 @@ function setupRouter(
   );
 
   router.post(
+    '/contractAbi',
+    passport.authenticate('jwt', { session: false }),
+    createContractAbi.bind(this, models)
+  );
+
+  router.post(
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
@@ -357,11 +371,12 @@ function setupRouter(
     databaseValidationService.validateChain,
     updateLinkedThreads.bind(this, models)
   );
-  router.post('/addEditors',
+  router.post(
+    '/addEditors',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    addEditors.bind(this, models),
+    addEditors.bind(this, models)
   );
   router.post(
     '/deleteEditors',
@@ -530,28 +545,19 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models)
   );
 
-  // roles + permissions
+  // roles
+  router.get('/roles', controllers.getRoles.bind(this, models));
+  router.post('/roles', controllers.createRole.bind(this, models));
+  router.patch('/roles', controllers.updateRole.bind(this, models));
+  // permissions
+  router.get('/permissions', controllers.getPermissions.bind(this, models));
+  router.post('/permissions', controllers.createPermission.bind(this, models));
+  router.patch('/permissions', controllers.updatePermission.bind(this, models));
+
   router.get(
     '/bulkMembers',
     databaseValidationService.validateChain,
     bulkMembers.bind(this, models)
-  );
-  router.post(
-    '/createInvite',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createInvite.bind(this, models)
-  );
-  router.post(
-    '/acceptInvite',
-    passport.authenticate('jwt', { session: false }),
-    acceptInvite.bind(this, models)
-  );
-  router.post(
-    '/addMember',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    addMember.bind(this, models)
   );
   router.post(
     '/upgradeMember',
@@ -859,6 +865,12 @@ function setupRouter(
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
 
+  router.post(
+    '/generateImage',
+    passport.authenticate('jwt', { session: false }),
+    generateImage.bind(this, models)
+  );
+
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -956,6 +968,7 @@ function setupRouter(
 
   // new API
   addExternalRoutes(router, app, models, tokenBalanceCache);
+  addSwagger(app);
 
   app.use('/api', router);
 }

@@ -201,7 +201,7 @@ export const renderQuillDelta = (
             result = render(
               'span.mention',
               {
-                onClick: (e) => {
+                onClick: () => {
                   // alert(child.insert.mention.id)
                 },
               },

@@ -14,9 +14,9 @@ import {
 } from 'mithrilInterop';
 
 import 'components/topic_selector.scss';
+import { isNotUndefined } from 'helpers/typeGuards';
 
 import { Topic } from 'models';
-import { isNotUndefined } from 'helpers/typeGuards';
 import { CWButton } from './component_kit/cw_button';
 
 type TopicSelectorAttrs = {

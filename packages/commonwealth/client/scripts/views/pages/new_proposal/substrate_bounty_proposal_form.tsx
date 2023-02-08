@@ -12,17 +12,17 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { proposalSlugToClass } from 'identifiers';
+import type { ITXModalData, ProposalModule } from 'models';
 
 import app from 'state';
-import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ProposalType } from '../../../../../../common-common/src/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { createTXModal } from '../../modals/tx_signing_modal';
+import ErrorPage from '../error';
 
 export class SubstrateBountyProposalForm extends ClassComponent {
   private title: string;
@@ -72,14 +72,15 @@ export class SubstrateBountyProposalForm extends ClassComponent {
               throw new Error('Invalid value');
             }
 
-            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-              (a) => {
-                return (
-                  proposalSlugToClass().get(
-                    ProposalType.SubstrateBountyProposal
-                  ) as ProposalModule<any, any, any>
-                ).createTx(...a);
-              };
+            let createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.SubstrateBountyProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
 
             const args = [author, this.value, this.title];
 

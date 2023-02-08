@@ -1,23 +1,20 @@
+import { redraw } from 'mithrilInterop';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-
-import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { AnyProposal, IVote, VotingUnit, ProposalStatus } from 'models';
+import { CompoundTypes } from 'chain-events/src/types';
+import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
-import MolochProposal, {
-  MolochProposalState,
-  MolochVote,
-} from 'controllers/chain/ethereum/moloch/proposal';
 import CompoundProposal, {
   BravoVote,
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import { notifyError } from 'controllers/app/notifications';
-import { CompoundTypes } from 'chain-events/src/types';
+import MolochProposal, {
+  MolochProposalState,
+  MolochVote,
+} from 'controllers/chain/ethereum/moloch/proposal';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
   NearSputnikProposalStatus,
@@ -26,6 +23,10 @@ import {
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
+import type { AnyProposal, IVote } from 'models';
+import { ProposalStatus, VotingUnit } from 'models';
+
+import app from 'state';
 
 export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
   const balancesCache = {};
@@ -72,7 +73,7 @@ export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
 };
 
 export const cancelProposal = (
-  e: Event,
+  e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   toggleVotingModal: (newModalState: boolean) => void,
   proposal: AnyProposal,
   onModalClose?: () => void

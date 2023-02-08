@@ -1,53 +1,39 @@
 /* @jsx jsx */
 import React from 'react';
 
-import $ from 'jquery';
-
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
+import $ from 'jquery';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
-
-import {
-  ChainBase,
-  ChainCategoryType,
-  ChainNetwork,
-} from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo, RoleInfo } from 'models';
+import type { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
-  addPermission,
-  isPermitted,
-  removePermission,
-} from 'common-common/src/permissions';
+  PermissionManager,
+  ToCheck,
+} from 'commonwealth/shared/permissions';
+
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ManageRoles } from './manage_roles';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
 import {
-  setSelectedTags,
   buildCategoryMap,
   setChainCategories,
+  setSelectedTags,
 } from './helpers';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { ManageRoles } from './manage_roles';
 
 type ChainMetadataRowsAttrs = {
   admins: Array<RoleInfo>;
@@ -93,6 +79,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   snapshotChannels: { id: string; name: string }[];
   selectedSnapshotChannel: { id: string; name: string } | null;
   snapshotNotificationsEnabled: boolean;
+  permissionsManager = new PermissionManager();
 
   oninit(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -105,9 +92,10 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !isPermitted(
+    this.chatEnabled = !this.permissionsManager.hasPermission(
       chain.defaultDenyPermissions,
-      Action.VIEW_CHAT_CHANNELS
+      Action.VIEW_CHAT_CHANNELS,
+      ToCheck.Allow
     );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
@@ -309,16 +297,12 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         />
         <InputRow
           title="Banner"
-          name="Banner Text"
-          label="Banner"
           maxLength={512}
           placeholder="Text for across the top of your community"
           value={this.communityBanner}
           onChangeHandler={(v) => {
             this.communityBanner = v;
           }}
-          tabIndex={1}
-          editorNamespace="new-banner"
         />
         <div className="tag-row">
           <CWLabel label="Community Tags" />
@@ -418,15 +402,14 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               console.log(err);
             }
-
             try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = removePermission(
+                this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
                   default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );
               } else {
-                this.default_deny_permissions = addPermission(
+                this.default_deny_permissions = this.permissionsManager.addDenyPermission(
                   default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );
@@ -454,7 +437,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               notifyError(err || 'Chain update failed');
             }
-
             redraw();
           }}
         />
@@ -502,8 +484,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 <CWText type="h4">Snapshot Notifications</CWText>
                 <CWToggle
                   onChange={() => {
-                    this.snapshotNotificationsEnabled =
-                      !this.snapshotNotificationsEnabled;
+                    this.snapshotNotificationsEnabled = !this
+                      .snapshotNotificationsEnabled;
                     this.redraw();
                   }}
                   checked={this.snapshotNotificationsEnabled}

@@ -19,18 +19,18 @@ import { CWAddress } from '../../components/component_kit/cw_address';
 import { CWAvatarUsernameInput } from '../../components/component_kit/cw_avatar_username_input';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ModalExitButton } from '../../components/component_kit/cw_modal';
 import {
-  CWProfilesList,
   CWProfileRow,
+  CWProfilesList,
 } from '../../components/component_kit/cw_profiles_list';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
-import { LoginAttrs } from './types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import type { LoginAttrs } from './types';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 export class LoginDesktop extends ClassComponent<LoginAttrs> {
   view(vnode: ResultNode<LoginAttrs>) {
@@ -57,6 +57,7 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
       setSelectedLinkingWallet,
       magicLoading,
       showResetWalletConnect,
+      onModalClose,
     } = vnode.attrs;
 
     return (
@@ -68,18 +69,16 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
           wallets={wallets}
         />
         <div className="body">
-          <ModalExitButton />
+          <CWIconButton iconName="close" onClick={() => onModalClose()} />
           {bodyType === 'walletList' && (
             <div className="inner-body-container centered">
               <LoginBoilerplate />
               <CWWalletsList
-                connectAnotherWayonClick={() => {
+                connectAnotherWayOnclick={() => {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
                 setSelectedWallet={setSelectedWallet}
-                setProfiles={setProfiles}
-                setSidebarType={setSidebarType}
                 setBodyType={setBodyType}
                 accountVerifiedCallback={accountVerifiedCallback}
                 linking={false}
@@ -216,16 +215,14 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 </CWText>
               </div>
               <CWWalletsList
-                connectAnotherWayonClick={() => {
+                connectAnotherWayOnclick={() => {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
-                setProfiles={setProfiles}
-                setSidebarType={setSidebarType}
                 setSelectedWallet={setSelectedLinkingWallet}
                 setBodyType={setBodyType}
                 accountVerifiedCallback={accountVerifiedCallback}
-                linking={true}
+                linking
                 showResetWalletConnect={showResetWalletConnect}
               />
             </div>

@@ -1,11 +1,9 @@
 import BN from 'bn.js';
 
-import {
-  IEventLabel,
-  LabelerFilter,
-  SupportedNetwork,
-} from '../../../interfaces';
-import { BalanceString, EventKind, IEventData } from '../types';
+import type { IEventLabel, LabelerFilter } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { BalanceString, IEventData } from '../types';
+import { EventKind } from '../types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';
@@ -117,6 +115,7 @@ export const Label: LabelerFilter = (
         label: `${fmtAddr(sender)} transferred ${balanceFormatter(
           value
         )} to ${fmtAddr(dest)}.`,
+        icon: 'transfer',
       };
     }
     /**
@@ -240,6 +239,7 @@ export const Label: LabelerFilter = (
           who
         )}.`,
         linkUrl: chainId ? `/${chainId}/account/${who}` : null,
+        icon: 'delegate',
       };
     }
     case EventKind.DemocracyProposed: {
@@ -593,6 +593,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/councilmotion/${proposalHash}`
           : null,
+        icon: 'vote',
       };
     }
     case EventKind.CollectiveApproved: {
@@ -724,6 +725,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/tip/${data.proposalHash}`
           : null,
+        icon: 'vote',
       };
     }
     case EventKind.TipClosing: {

@@ -1,17 +1,26 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-
-import 'modals/edit_topic_thresholds_modal.scss';
-
-import app from 'state';
-import { Topic } from 'models';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
+
+import 'modals/edit_topic_thresholds_modal.scss';
+import type { Topic } from 'models';
+
+import app from 'state';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 

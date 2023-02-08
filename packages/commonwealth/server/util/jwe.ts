@@ -1,4 +1,4 @@
-import { JWE, JWK } from 'node-jose'
+import { JWE, JWK } from 'node-jose';
 
 // This utility is taken from discord-bot-ui and is used to encode/decode
 // discord user data for login/validation purposes.
@@ -13,13 +13,13 @@ export const encryptWithJWE = async (raw: Record<string, unknown>) => {
   const buffer = Buffer.from(JSON.stringify(raw));
   const encrypted = await JWE.createEncrypt(
     { format: 'compact', contentAlg: 'A256GCM', fields: { alg: 'RSA-OAEP' } },
-    publicKey,
+    publicKey
   )
     .update(buffer)
     .final();
 
   return encrypted;
-}
+};
 
 export const decryptWithJWE = async (encryptedBody: string) => {
   const _privateKey = process.env.NEXT_PUBLIC_RSA_PRIVATE_KEY
@@ -32,4 +32,4 @@ export const decryptWithJWE = async (encryptedBody: string) => {
   const claims = Buffer.from(output.plaintext).toString();
 
   return claims;
-}
+};

@@ -1,9 +1,7 @@
-import {
-  LabelerFilter,
-  IEventLabel,
-  SupportedNetwork,
-} from '../../../interfaces';
-import { IEventData, EventKind } from '../types';
+import type { LabelerFilter, IEventLabel } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { IEventData } from '../types';
+import { EventKind } from '../types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';
@@ -40,6 +38,7 @@ export const Label: LabelerFilter = (
         heading: 'Vote',
         label: `${fmtAddr(data.voter)} voted on proposal ${data.id}.`,
         linkUrl: chainId ? `/${chainId}/proposal/${data.id}` : null,
+        icon: 'vote',
       };
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases

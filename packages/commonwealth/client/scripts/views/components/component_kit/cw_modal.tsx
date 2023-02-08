@@ -1,16 +1,25 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import $ from 'jquery';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_modal.scss';
+import $ from 'jquery';
+import { CWIconButton } from './cw_icon_button';
+import type { IconButtonTheme } from './cw_icons/types';
+import { breakpointFnValidator, getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { CWIconButton } from './cw_icon_button';
-import { breakpointFnValidator, getClasses } from './helpers';
-import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
   onClick: (
@@ -131,3 +140,39 @@ export class ModalExitButton extends ClassComponent<ModalExitButtonAttrs> {
     );
   }
 }
+
+import ModalUnstyled from '@mui/base/ModalUnstyled';
+
+// Backdrop is needed for modal clickaway events
+const Backdrop = React.forwardRef<
+  HTMLDivElement,
+  { className: string; ownerState: any }
+>((props, ref) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { ownerState, ...other } = props;
+  // pull out ownerState per https://github.com/mui/material-ui/issues/32882
+
+  return <div ref={ref} {...other} />;
+});
+
+export const Modal = (props: {
+  content: React.ReactNode;
+  isFullScreen?: boolean;
+  onClose: () => void;
+  open: boolean;
+}) => {
+  const { content, isFullScreen, onClose, open } = props;
+
+  return (
+    <ModalUnstyled open={open} onClose={onClose} slots={{ backdrop: Backdrop }}>
+      <div
+        className={getClasses<{ isFullScreen?: boolean }>(
+          { isFullScreen },
+          'modal-container'
+        )}
+      >
+        {content}
+      </div>
+    </ModalUnstyled>
+  );
+};

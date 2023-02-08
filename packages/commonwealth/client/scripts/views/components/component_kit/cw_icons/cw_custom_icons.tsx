@@ -8,7 +8,7 @@ import { jsx } from 'mithrilInterop';
 import 'components/component_kit/cw_icon.scss';
 
 import { getClasses } from '../helpers';
-import { CustomIconProps, CustomIconStyleProps } from './types';
+import type { CustomIconProps, CustomIconStyleProps } from './types';
 
 // ADDING CUSTOM ICONS: INSTRUCTIONS
 //
@@ -35,30 +35,6 @@ export const CWCosmosEvmMetamask = (props: CustomIconProps) => {
         fill="#000"
         d="M12.892 7.862c-4.84 1.865-5.283 6.642-6.67 8.873-1.404 2.258-4.62 3.503-4.181 4.654.44 1.15 3.66-.086 6.208.648 2.518.726 6.03 3.978 10.87 2.113a8.683 8.683 0 005.07-5.223.403.403 0 00-.338-.539.397.397 0 00-.393.217 6.866 6.866 0 01-12.358-.121 6.894 6.894 0 01-.217-.504 6.995 6.995 0 01-.174-.521 78.534 78.534 0 015.035-2.135 78.77 78.77 0 015.076-1.77 57.357 57.357 0 012.806-.791l.182-.046a.26.26 0 01.306.16l.001.003c.028.073.052.146.078.22.168.476.293.956.376 1.438.036.21.265.325.454.224.694-.375 1.33-.74 1.898-1.092 2.116-1.308 3.289-2.418 3.048-3.047-.24-.629-1.852-.665-4.296-.216a38.586 38.586 0 00-3.054.7c-.781.207-1.605.446-2.463.712a81.5 81.5 0 00-5.074 1.772 82.328 82.328 0 00-4.657 1.957c-.017-2.795 1.665-5.437 4.417-6.498a6.83 6.83 0 014.97.016c.152.06.325.018.436-.103a.404.404 0 00-.108-.628 8.637 8.637 0 00-7.248-.473z"
       ></path>
-    </svg>
-  );
-};
-
-export const CWInvites = (props: CustomIconProps) => {
-  const { componentType, iconSize, ...otherProps } = props;
-  return (
-    <svg
-      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      fill="none"
-      viewBox="0 0 32 32"
-      {...otherProps}
-    >
-      {' '}
-      <path
-        fill="#342E37"
-        fillRule="evenodd"
-        d="M5 5a3 3 0 00-3 3v16a3 3 0 003 3h22a3 3 0 003-3V8a3 3 0 00-3-3H5zM4 8.414V24a1 1 0 001 1h22a1 1 0 001-1V8.414l-9.879 9.879a3 3 0 01-4.242 0L4 8.414zM26.586 7H5.414l9.879 9.879a1 1 0 001.414 0L26.586 7z"
-        clipRule="evenodd"
-      ></path>
-      <circle cx="28" cy="9.333" r="4" fill="#EC79DE"></circle>
     </svg>
   );
 };

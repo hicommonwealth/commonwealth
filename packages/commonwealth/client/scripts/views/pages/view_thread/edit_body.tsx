@@ -1,21 +1,28 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
+import type { Thread } from 'models';
 import 'pages/view_thread/edit_body.scss';
-
-import app from 'state';
-import { navigateToSubpage } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
-import { Thread } from 'models';
+import app from 'state';
 import { ContentType } from 'types';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
-import { QuillEditor } from '../../components/quill/quill_editor';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
+import type { QuillEditor } from '../../components/quill/quill_editor';
+import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { navigateToSubpage } from 'router';
 
 type EditBodyAttrs = {
   savedEdits: string;

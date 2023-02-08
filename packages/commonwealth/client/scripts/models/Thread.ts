@@ -1,23 +1,11 @@
-import $ from 'jquery';
-
-import app from 'state';
-import moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
-import { IChainEntityKind } from 'chain-events/src';
-import { IUniqueId } from './interfaces';
-import { ThreadKind, ThreadStage } from './types';
-import Attachment from './Attachment';
-import Topic from './Topic';
-import Vote from './Vote';
-import { VersionHistory } from '../controllers/server/threads';
-import { ChainEntity } from '.';
-import Poll from './Poll';
-
-// field names copied from snapshot
-interface IOffchainVotingOptions {
-  name: string;
-  choices: string[];
-}
+import type moment from 'moment';
+import type { VersionHistory } from '../controllers/server/threads';
+import type Attachment from './Attachment';
+import type { IUniqueId } from './interfaces';
+import type Poll from './Poll';
+import type Topic from './Topic';
+import type { ThreadKind, ThreadStage } from './types';
 
 export interface LinkedThreadRelation {
   id: string;
@@ -29,6 +17,7 @@ interface IThreadCollaborator {
   address: string;
   chain: string;
 }
+
 class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];

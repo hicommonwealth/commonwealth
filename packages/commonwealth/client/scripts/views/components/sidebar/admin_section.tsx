@@ -1,17 +1,30 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import app from 'state';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
-import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
-import { SidebarSectionGroup } from './sidebar_section';
-import { OrderTopicsModal } from '../../modals/order_topics_modal';
-import { NewTopicModal } from '../../modals/new_topic_modal';
+import app from 'state';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
+import { NewTopicModal } from '../../modals/new_topic_modal';
+import { OrderTopicsModal } from '../../modals/order_topics_modal';
 import { verifyCachedToggleTree } from './helpers';
+import { SidebarSectionGroup } from './sidebar_section';
+import type {
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+  ToggleTree,
+} from './types';
 
 function setAdminToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -76,9 +89,15 @@ class AdminSectionComponent extends ClassComponent<SidebarSectionAttrs> {
         isUpdated: false,
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(this, e, `/analytics`, app.activeChainId(), () => {
-            setAdminToggleTree(`children.analytics.toggledState`, toggle);
-          });
+          handleRedirectClicks(
+            this,
+            e,
+            `/analytics`,
+            app.activeChainId(),
+            () => {
+              setAdminToggleTree(`children.analytics.toggledState`, toggle);
+            }
+          );
         },
       },
       {

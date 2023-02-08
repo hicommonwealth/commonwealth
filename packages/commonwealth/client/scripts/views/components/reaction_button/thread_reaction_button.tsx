@@ -1,117 +1,128 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { redraw, jsx } from 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import type { ChainInfo } from 'models';
+import { Thread } from 'models';
 
 import app from 'state';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { Thread, ChainInfo } from 'models';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import { CWText } from '../component_kit/cw_text';
+import {
+  getClasses,
+  isWindowMediumSmallInclusive,
+} from '../component_kit/helpers';
 import {
   fetchReactionsByPost,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
-import { CWText } from '../component_kit/cw_text';
-import { getClasses } from '../component_kit/helpers';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import { LoginModal } from '../../modals/login_modal';
+import { Modal } from '../component_kit/cw_modal';
 
-type ThreadReactionButtonAttrs = {
+type ThreadReactionButtonProps = {
   thread: Thread;
 };
 
-export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAttrs> {
-  private loading: boolean;
-  private reactors: any;
+export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [reactors, setReactors] = React.useState<Array<any>>([]);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-  oninit() {
-    this.loading = false;
+  const { thread } = props;
+  const reactionCounts = app.reactionCounts.store.getByPost(thread);
+  const { likes = 0, hasReacted } = reactionCounts || {};
+
+  // token balance check if needed
+  const isAdmin =
+    app.user.isSiteAdmin ||
+    app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+
+  let topicName = '';
+
+  if (thread instanceof Thread && thread.topic && app.topics) {
+    topicName = thread.topic.name;
   }
 
-  view(vnode: ResultNode<ThreadReactionButtonAttrs>) {
-    const { thread } = vnode.attrs;
-    const reactionCounts = app.reactionCounts.store.getByPost(thread);
-    const { likes = 0, hasReacted } = reactionCounts || {};
+  setIsLoading(
+    isLoading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName))
+  );
 
-    // token balance check if needed
-    const isAdmin =
-      app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+  const activeAddress = app.user.activeAccount?.address;
 
-    let topicName = '';
+  const dislike = async (userAddress: string) => {
+    const reaction = (await fetchReactionsByPost(thread)).find((r) => {
+      return r.Address.address === activeAddress;
+    });
 
-    if (thread instanceof Thread && thread.topic && app.topics) {
-      topicName = thread.topic.name;
-    }
+    setIsLoading(true);
 
-    this.loading =
-      this.loading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
+    app.reactionCounts
+      .delete(reaction, {
+        ...reactionCounts,
+        likes: likes - 1,
+        hasReacted: false,
+      })
+      .then(() => {
+        setReactors(
+          reactors.filter(({ Address }) => Address.address !== userAddress)
+        );
 
-    const activeAddress = app.user.activeAccount?.address;
+        setIsLoading(false);
 
-    const dislike = async (userAddress: string) => {
-      const reaction = (await fetchReactionsByPost(thread)).find((r) => {
-        return r.Address.address === activeAddress;
+        redraw();
       });
-      this.loading = true;
-      app.reactionCounts
-        .delete(reaction, {
-          ...reactionCounts,
-          likes: likes - 1,
-          hasReacted: false,
-        })
-        .then(() => {
-          this.reactors = this.reactors.filter(
-            ({ Address }) => Address.address !== userAddress
-          );
-          this.loading = false;
-          redraw();
-        });
-    };
+  };
 
-    const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
-      this.loading = true;
-      app.reactionCounts
-        .create(userAddress, thread, 'like', chainId)
-        .then(() => {
-          this.loading = false;
-          this.reactors = [
-            ...this.reactors,
-            {
-              Address: { address: userAddress, chain },
-            },
-          ];
-          redraw();
-        });
-    };
+  const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
+    setIsLoading(true);
 
-    return (
+    app.reactionCounts.create(userAddress, thread, 'like', chainId).then(() => {
+      setReactors([
+        ...reactors,
+        {
+          Address: { address: userAddress, chain },
+        },
+      ]);
+
+      setIsLoading(false);
+
+      redraw();
+    });
+  };
+
+  return (
+    <React.Fragment>
+      <Modal
+        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
       <div
         className={getClasses<{ disabled?: boolean }>(
-          { disabled: this.loading },
+          { disabled: isLoading },
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
-          this.reactors = await fetchReactionsByPost(thread);
+          setReactors(await fetchReactionsByPost(thread));
         }}
       >
         <CWIconButton
           iconName="upvote"
           iconSize="small"
           selected={hasReacted}
-          onClick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
+          onClick={async (e) => {
+            if (!app.isLoggedIn() || !app.user.activeAccount) {
+              setIsModalOpen(true);
+            } else {
+              onReactionClick(e, hasReacted, dislike, like);
+            }
+          }}
         />
         {likes > 0 ? (
           <CWTooltip
@@ -119,7 +130,7 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
                   likes,
-                  reactors: this.reactors,
+                  reactors: reactors,
                 })}
               </div>
             }
@@ -144,8 +155,7 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
             {likes}
           </CWText>
         )}
-        {/* <CWIconButton iconName="downvote" iconSize="small" disabled /> */}
       </div>
-    );
-  }
-}
+    </React.Fragment>
+  );
+};

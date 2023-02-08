@@ -1,47 +1,31 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
 import moment from 'moment';
-
+import { AddressInfo } from 'models';
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
 import Sublayout from 'views/sublayout';
-import { PageLoading } from '../loading';
-import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
+import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
-import { User } from '../../components/user/user';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { User } from '../../components/user/user';
+import { PageLoading } from '../loading';
 import {
-  SubscriptionRowTextContainer,
   SubscriptionRowMenu,
+  SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs } from './helpers';
 
 class NotificationSettingsPage extends ClassComponent {
   view() {
     if (!app.loginStatusLoaded()) {
-      return (
-        <PageLoading
-          title={<BreadcrumbsTitleTag title="Notification Settings" />}
-        />
-      );
+      return <PageLoading />;
     } else if (!app.isLoggedIn()) {
       setRoute('/', {}, { replace: true });
       return <PageLoading />;

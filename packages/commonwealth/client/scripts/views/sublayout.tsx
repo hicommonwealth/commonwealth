@@ -9,15 +9,14 @@ import {
   jsx,
 } from 'mithrilInterop';
 
-import 'sublayout.scss';
-
 import app from 'state';
-import { handleEmailInvites } from 'views/menus/invites_menu';
+
+import 'sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
+import { AppMobileMenus } from './app_mobile_menus';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import { isWindowSmallInclusive } from './components/component_kit/helpers';
-import { AppMobileMenus } from './app_mobile_menus';
 import { SublayoutHeader } from './sublayout_header';
 
 // Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs
@@ -56,16 +55,16 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
   view(vnode: ResultNode<SublayoutAttrs>) {
     const { hideFooter = false, hideSearch, onScroll } = vnode.attrs;
 
+    app.mobileMenuRedraw.on('redraw', () => {
+      this.redraw();
+    });
+
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
     const banner = app.chain ? chain.communityBanner : null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
     const showSidebar = app.sidebarToggled || !this.isWindowSmallInclusive;
-
-    if (getRouteParam('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(this), 0);
-    }
 
     return (
       <div className="Sublayout">

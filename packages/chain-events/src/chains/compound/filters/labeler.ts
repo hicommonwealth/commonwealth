@@ -1,9 +1,7 @@
-import {
-  LabelerFilter,
-  IEventLabel,
-  SupportedNetwork,
-} from '../../../interfaces';
-import { IEventData, EventKind } from '../types';
+import type { LabelerFilter, IEventLabel } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { IEventData } from '../types';
+import { EventKind } from '../types';
 
 /**
  * This a labeler function, which takes event data and describes it in "plain english",
@@ -61,6 +59,7 @@ export const Label: LabelerFilter = (
         linkUrl: chainId
           ? `/${chainId}/proposal/compoundproposal/${data.id}`
           : null,
+        icon: 'vote',
       };
     }
     default: {

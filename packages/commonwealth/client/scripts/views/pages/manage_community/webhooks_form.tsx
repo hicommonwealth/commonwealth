@@ -1,6 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { link, pluralize } from 'helpers';
 import {
   ClassComponent,
   ResultNode,
@@ -13,19 +15,17 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
-import smartTruncate from 'smart-truncate';
+import { Webhook } from 'models';
 
 import 'pages/manage_community/webhooks_form.scss';
+import smartTruncate from 'smart-truncate';
 
 import app from 'state';
-import { Webhook } from 'models';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
-import { link, pluralize } from 'helpers';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
 type WebhooksFormAttrs = {
   webhooks: Array<Webhook>;

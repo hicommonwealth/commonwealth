@@ -1,12 +1,13 @@
-import { Logger } from 'typescript-logging';
-import { NotificationCategories } from 'common-common/src/types';
+import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import {
-  RascalPublications, RmqCENotificationCUD
+  RascalPublications,
+  RmqCENotificationCUD,
 } from 'common-common/src/rabbitmq/types';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import { ChainEventNotification } from 'types';
-import { DB } from '../../models';
-import { NotificationInstance } from '../../models/notification';
+import { NotificationCategories } from 'common-common/src/types';
+import type { ChainEventNotification } from 'types';
+import type { Logger } from 'typescript-logging';
+import type { DB } from '../../models';
+import type { NotificationInstance } from '../../models/notification';
 import emitNotifications from '../../util/emitNotifications';
 
 export type Ithis = {
@@ -46,7 +47,8 @@ export async function processChainEventNotificationsCUD(
     this.log.error(
       `Failed to generate notification: ${e.message}\nevent: ${JSON.stringify(
         data.event
-      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`, e
+      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`,
+      e
     );
     return;
   }
@@ -67,7 +69,8 @@ export async function processChainEventNotificationsCUD(
     this.log.error(
       `Failed to publish notification: ${e.message}\nevent: ${JSON.stringify(
         data.event
-      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`, e
+      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`,
+      e
     );
   }
 }

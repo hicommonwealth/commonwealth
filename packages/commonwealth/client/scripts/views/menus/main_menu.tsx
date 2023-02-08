@@ -1,12 +1,21 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { MenuItem } from '../components/component_kit/types';
+import type { MenuItem } from '../components/component_kit/types';
 
 export const getMainMenuItems = (): Array<MenuItem> => {
   return [
@@ -28,6 +37,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             iconRight: 'chevronRight',
             onClick: () => {
               app.mobileMenu = 'CreateContentMenu';
+              app.mobileMenuRedraw.emit('redraw');
             },
           },
         ]
@@ -38,6 +48,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       iconRight: 'chevronRight',
       onClick: () => {
         app.mobileMenu = 'HelpMenu';
+        app.mobileMenuRedraw.emit('redraw');
       },
     },
     ...((app.isLoggedIn()
@@ -50,6 +61,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             hasUnreads: !!app.user?.notifications.numUnread,
             onClick: () => {
               app.mobileMenu = 'NotificationsMenu';
+              app.mobileMenuRedraw.emit('redraw');
             },
           },
         ]

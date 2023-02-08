@@ -1,11 +1,10 @@
-
+import { setActiveAccount } from 'controllers/app/login';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import type { Account, AddressInfo } from 'models';
 import app from 'state';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { render, redraw, Component } from 'mithrilInterop';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setActiveAccount } from 'controllers/app/login';
-import { Account, AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 

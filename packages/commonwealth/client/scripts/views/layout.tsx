@@ -1,41 +1,25 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
 
 import {
+  deinitChainOrCommunity,
   initChain,
   initNewTokenChain,
-  deinitChainOrCommunity,
   selectChain,
-} from 'app';
-import app from 'state';
-import { AppToasts } from 'views/toast';
-import PageNotFound from 'views/pages/404';
-import { AppModals } from './app_modals';
-import { UserSurveyPopup } from './components/user_survey_popup';
-import { CWSpinner } from './components/component_kit/cw_spinner';
-import { CWEmptyState } from './components/component_kit/cw_empty_state';
-import { CWText } from './components/component_kit/cw_text';
-import { useParams } from 'react-router-dom';
+} from 'helpers/chain';
 
-export const withRouter = (WrappedComponent) => (props) => {
-  const params = useParams();
-  return <WrappedComponent {...props} params={params} />;
-};
+import app from 'state';
+import PageNotFound from 'views/pages/404';
+import { AppToasts } from 'views/toast';
+import { CWEmptyState } from './components/component_kit/cw_empty_state';
+import { CWSpinner } from './components/component_kit/cw_spinner';
+import { CWText } from './components/component_kit/cw_text';
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -166,4 +150,3 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
 }
 
 export const Layout = LayoutComponent;
-// export const Layout = withRouter(LayoutComponent);

@@ -1,51 +1,46 @@
 /* @jsx jsx */
 import React from 'react';
-import { ClickAwayListener } from '@mui/base';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWButton } from './cw_button';
-import { CWRadioGroup } from './cw_radio_group';
-import { CWCard } from './cw_card';
-import { CWTextInput } from './cw_text_input';
-import { iconLookup, IconName } from './cw_icons/cw_icon_lookup';
-import { CWIconButton } from './cw_icon_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import { CheckboxType, CWCheckbox } from './cw_checkbox';
-import { CWTooltip } from './cw_popover/cw_tooltip';
+import { CWButton } from './cw_button';
+import { CWCard } from './cw_card';
+import type { CheckboxType } from './cw_checkbox';
+import { CWCheckbox } from './cw_checkbox';
+import { CWIconButton } from './cw_icon_button';
+import type { IconName } from './cw_icons/cw_icon_lookup';
+import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import { ValidationStatus } from './cw_validation_text';
-import { CWTextArea } from './cw_text_area';
-import { CWTab, CWTabBar } from './cw_tabs';
+import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWProgressBar } from './cw_progress_bar';
+import { CWRadioGroup } from './cw_radio_group';
+import { CWTab, CWTabBar } from './cw_tabs';
+import { CWTextArea } from './cw_text_area';
+import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
-import { PopoverMenu, PopoverMenuItem } from './cw_popover/cw_popover_menu';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
-import { RadioButtonType, CWRadioButton } from './cw_radio_button';
+import { CWRadioButton } from './cw_radio_button';
+import type { RadioButtonType } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
-import CWCoverImageUploader from './cw_cover_image_uploader';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
+import { CWCoverImageUploader } from './cw_cover_image_uploader';
+import { Modal } from './cw_modal';
+import type { ValidationStatus } from './cw_validation_text';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -140,9 +135,52 @@ export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = React.useState<
     number | undefined
   >(undefined);
+  const [checkboxGroupSelected, setCheckboxGroupSelected] = React.useState<
+    Array<string>
+  >([]);
+  const [isToggled, setIsToggled] = React.useState<boolean>(false);
+  const [voteCount, setVoteCount] = React.useState<number>(0);
+  const [selectedTab, setSelectedTab] = React.useState<number>(1);
+  const [isRadioButtonChecked, setIsRadioButtonChecked] = React.useState<
+    boolean
+  >(false);
+  const [isCheckboxChecked, setIsCheckboxChecked] = React.useState<boolean>(
+    false
+  );
+  const [radioGroupSelection, setRadioGroupSelection] = React.useState<string>(
+    radioGroupOptions[2].value
+  );
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = React.useState<
+    boolean
+  >(false);
 
   return (
     <div className="ComponentShowcase">
+      <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
+      <Modal
+        content={<div>hi</div>}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+      <CWButton
+        label="Full Screen Modal"
+        onClick={() => setIsFullScreenModalOpen(true)}
+      />
+      <Modal
+        content={
+          <div>
+            <CWText>hi</CWText>
+            <CWIconButton
+              iconName="close"
+              onClick={() => setIsFullScreenModalOpen(false)}
+            />
+          </div>
+        }
+        isFullScreen
+        onClose={() => setIsFullScreenModalOpen(false)}
+        open={isFullScreenModalOpen}
+      />
       <div className="basic-gallery">
         <CWText type="h3">Popover Menu</CWText>
         <PopoverMenu
@@ -150,6 +188,24 @@ export const ComponentShowcase = () => {
           renderTrigger={(onclick) => (
             <CWIconButton iconName="plusCircle" onClick={onclick} />
           )}
+        />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Filter Menu</CWText>
+        <CWFilterMenu
+          header="Stages"
+          filterMenuItems={checkboxGroupOptions}
+          selectedItems={checkboxGroupSelected}
+          onChange={(e) => {
+            const itemValue = e.target.value;
+            if (checkboxGroupSelected.indexOf(itemValue) === -1) {
+              checkboxGroupSelected.push(itemValue);
+            } else {
+              setCheckboxGroupSelected(
+                checkboxGroupSelected.filter((item) => item !== itemValue)
+              );
+            }
+          }}
         />
       </div>
       <div className="tooltip-gallery">
@@ -545,361 +601,289 @@ export const ComponentShowcase = () => {
           />
         </div>
       </div>
-    </div>
-  );
-};
-
-export class _ComponentShowcase extends ClassComponent {
-  private checkboxChecked: boolean;
-  private checkboxGroupSelected: Array<string>;
-  private radioButtonChecked: boolean;
-  private radioGroupSelection: string;
-  private selectedIconButton: number;
-  private selectedTab: number;
-  private toggleToggled: boolean;
-  private voteCount: number;
-
-  oncreate() {
-    this.radioGroupSelection = radioGroupOptions[2].value;
-    this.selectedTab = 1;
-    this.voteCount = 0;
-    this.checkboxGroupSelected = [];
-  }
-
-  view() {
-    // console.log(this.checkboxGroupSelected);
-
-    return (
-      <div className="ComponentShowcase">
-        {/* <div className="basic-gallery">
-          <CWText type="h4">Filter Menu</CWText>
-          <CWFilterMenu
-            header="Stages"
-            filterMenuItems={checkboxGroupOptions}
-            selectedItems={this.checkboxGroupSelected}
-            onChange={(e) => {
-              const itemValue = e.target.value;
-              // console.log(itemValue);
-              if (this.checkboxGroupSelected.indexOf(itemValue) === -1) {
-                this.checkboxGroupSelected.push(itemValue);
-                // redraw();
-              } else {
-                this.checkboxGroupSelected = this.checkboxGroupSelected.filter(
-                  (item) => item !== itemValue
-                );
-                // redraw();
-              }
+      <div className="basic-gallery">
+        <CWText type="h4">Content Page Card</CWText>
+        <CWContentPageCard
+          header="Information"
+          content={
+            <div style={{ padding: '16px' }}>
+              <CWText>Content page card content</CWText>
+            </div>
+          }
+        />
+      </div>
+      <div className="form-gallery">
+        <CWText type="h4">Dropdown</CWText>
+        <CWDropdown
+          label="Dropdown"
+          options={[
+            { label: 'Dropdown Option 1', value: 'dropdownOption1' },
+            { label: 'Dropdown Option 2', value: 'dropdownOption2' },
+            { label: 'Dropdown Option 3', value: 'dropdownOption3' },
+          ]}
+          onSelect={(item) => console.log('Selected option: ', item.label)}
+        />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Spinner</CWText>
+        <CWSpinner />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Breadcrumbs</CWText>
+        <CWBreadcrumbs
+          breadcrumbs={[
+            { label: 'Page', path: '' },
+            { label: 'Page', path: '' },
+            { label: 'Page', path: '' },
+            { label: 'Current', path: '' },
+          ]}
+        />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Tag</CWText>
+        <CWTag label="Ref #90" />
+        <CWTag label="Passed" type="passed" />
+        <CWTag label="Failed" type="failed" />
+        <CWTag label="Active" type="active" />
+        <CWTag label="Poll" type="poll" />
+        <CWTag label="Prop #52" type="proposal" />
+        <CWTag label="Ref #90" type="referendum" />
+        <CWTag label="12 days" iconName="clock" />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Collapsible</CWText>
+        <CWCollapsible
+          headerContent={<CWText>Header content</CWText>}
+          collapsibleContent={<CWText>Body content</CWText>}
+        />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Toggle</CWText>
+        <CWToggle
+          checked={isToggled}
+          onChange={() => {
+            setIsToggled(!isToggled);
+          }}
+        />
+        <CWToggle disabled />
+        <CWToggle checked disabled />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Vote Button</CWText>
+        <CWThreadVoteButton
+          updateVoteCount={(newCount: number) => {
+            setVoteCount(newCount);
+          }}
+          voteCount={voteCount}
+        />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Tabs</CWText>
+        <CWTabBar>
+          <CWTab
+            label="A tab"
+            onClick={() => {
+              setSelectedTab(1);
             }}
+            isSelected={selectedTab === 1}
           />
-        </div> */}
-        <div className="basic-gallery">
-          <CWText type="h4">Content Page Card</CWText>
-          <CWContentPageCard
-            header="Information"
-            content={
-              <div style={{ padding: '16px' }}>
-                <CWText>Content page card content</CWText>
-              </div>
+          <CWTab
+            label="Another tab"
+            onClick={() => {
+              setSelectedTab(2);
+            }}
+            isSelected={selectedTab === 2}
+          />
+          <CWTab
+            label="Yet another tab"
+            onClick={() => {
+              setSelectedTab(3);
+            }}
+            isSelected={selectedTab === 3}
+          />
+        </CWTabBar>
+      </div>
+      <div className="progress-gallery">
+        <CWText type="h3">Progress Bars</CWText>
+        <CWProgressBar
+          progress={75}
+          label="Progress Bar (Success)"
+          progressStatus="passed"
+        />
+        <CWProgressBar
+          progress={75}
+          label="Progress Bar (Success) with Check"
+          progressStatus="passed"
+          iconName="check"
+        />
+        <CWProgressBar
+          progress={100}
+          label="Progress Bar (Selected)"
+          progressStatus="selected"
+        />
+        <CWProgressBar
+          progress={150}
+          label="Progress Bar (Neutral) With Token"
+          progressStatus="neutral"
+          subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
+        />
+        <CWProgressBar
+          progress={75}
+          label="Progress Bar (Ongoing) With Token"
+          progressStatus="ongoing"
+          subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
+        />
+      </div>
+      <div className="card-gallery">
+        <CWText type="h3">Account Creation Button</CWText>
+        <CWAccountCreationButton
+          onClick={() => notifySuccess('Account creation button clicked!')}
+        />
+      </div>
+      <div className="basic-gallery">
+        <CWText type="h3">Wallet Row Card</CWText>
+        <CWWalletOptionRow
+          walletName="metamask"
+          onClick={() => notifySuccess('MetaMask clicked!')}
+        />
+        <CWWalletOptionRow
+          darkMode
+          walletName="metamask"
+          onClick={() => notifySuccess('MetaMask clicked!')}
+        />
+      </div>
+      <div className="form-gallery">
+        <CWText type="h3">Form fields</CWText>
+        <CWTextInput name="Text field" label="Large" placeholder="Type here" />
+        <CWTextInput
+          name="Text field"
+          label="Small"
+          placeholder="Type here"
+          size="small"
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
             }
-          />
-        </div>
-        <div className="form-gallery">
-          <CWText type="h4">Dropdown</CWText>
-          <CWDropdown
-            label="Dropdown"
-            options={[
-              { label: 'Dropdown Option 1', value: 'dropdownOption1' },
-              { label: 'Dropdown Option 2', value: 'dropdownOption2' },
-              { label: 'Dropdown Option 3', value: 'dropdownOption3' },
-            ]}
-            onSelect={(item) => console.log('Selected option: ', item.label)}
-          />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Spinner</CWText>
-          <CWSpinner />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Breadcrumbs</CWText>
-          <CWBreadcrumbs
-            breadcrumbs={[
-              { label: 'Page', path: '' },
-              { label: 'Page', path: '' },
-              { label: 'Page', path: '' },
-              { label: 'Current', path: '' },
-            ]}
-          />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Tag</CWText>
-          <CWTag label="Ref #90" />
-          <CWTag label="Passed" type="passed" />
-          <CWTag label="Failed" type="failed" />
-          <CWTag label="Active" type="active" />
-          <CWTag label="Poll" type="poll" />
-          <CWTag label="Prop #52" type="proposal" />
-          <CWTag label="Ref #90" type="referendum" />
-          <CWTag label="12 days" iconName="clock" />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Collapsible</CWText>
-          <CWCollapsible
-            headerContent={<CWText>Header content</CWText>}
-            collapsibleContent={<CWText>Body content</CWText>}
-          />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Toggle</CWText>
-          <CWToggle
-            checked={this.toggleToggled}
-            onChange={() => {
-              this.toggleToggled = !this.toggleToggled;
-            }}
-          />
-          <CWToggle
-            disabled
-            onChange={() => {
-              this.toggleToggled = !this.toggleToggled;
-            }}
-          />
-          <CWToggle
-            checked
-            disabled
-            onChange={() => {
-              this.toggleToggled = !this.toggleToggled;
-            }}
-          />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Vote Button</CWText>
-          <CWThreadVoteButton
-            updateVoteCount={(newCount: number) => {
-              // TODO Gabe 7/27/22 - Add real db update
-              this.voteCount = newCount;
-            }}
-            voteCount={this.voteCount}
-          />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Tabs</CWText>
-          <CWTabBar>
-            <CWTab
-              label="A tab"
-              onClick={() => {
-                this.selectedTab = 1;
-              }}
-              isSelected={this.selectedTab === 1}
-            />
-            <CWTab
-              label="Another tab"
-              onClick={() => {
-                this.selectedTab = 2;
-              }}
-              isSelected={this.selectedTab === 2}
-            />
-            <CWTab
-              label="Yet another tab"
-              onClick={() => {
-                this.selectedTab = 3;
-              }}
-              isSelected={this.selectedTab === 3}
-            />
-          </CWTabBar>
-        </div>
-        <div className="progress-gallery">
-          <CWText type="h3">Progress Bars</CWText>
-          <CWProgressBar
-            progress={75}
-            label="Progress Bar (Success)"
-            progressStatus="passed"
-          />
-          <CWProgressBar
-            progress={75}
-            label="Progress Bar (Success) with Check"
-            progressStatus="passed"
-            iconName="check"
-          />
-          <CWProgressBar
-            progress={100}
-            label="Progress Bar (Selected)"
-            progressStatus="selected"
-          />
-          <CWProgressBar
-            progress={150}
-            label="Progress Bar (Neutral) With Token"
-            progressStatus="neutral"
-            subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
-          />
-          <CWProgressBar
-            progress={75}
-            label="Progress Bar (Ongoing) With Token"
-            progressStatus="ongoing"
-            subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
-          />
-        </div>
-        <div className="card-gallery">
-          <CWText type="h3">Account Creation Button</CWText>
-          <CWAccountCreationButton
-            onClick={() => notifySuccess('Account creation button clicked!')}
-          />
-        </div>
-        <div className="basic-gallery">
-          <CWText type="h3">Wallet Row Card</CWText>
-          <CWWalletOptionRow
-            walletName="metamask"
-            onClick={() => notifySuccess('MetaMask clicked!')}
-          />
-          <CWWalletOptionRow
-            darkMode
-            walletName="metamask"
-            onClick={() => notifySuccess('MetaMask clicked!')}
-          />
-        </div>
-        <div className="form-gallery">
-          <CWText type="h3">Form fields</CWText>
-          <CWTextInput
-            name="Text field"
-            label="Large"
-            placeholder="Type here"
-          />
-          <CWTextInput
-            name="Text field"
-            label="Small"
-            placeholder="Type here"
-            size="small"
-          />
-          <CWTextInput
-            name="Form field"
-            inputValidationFn={(val: string): [ValidationStatus, string] => {
-              if (val.match(/[^A-Za-z]/)) {
-                return ['failure', 'Must enter characters A-Z'];
-              } else {
-                return ['success', 'Input validated'];
-              }
-            }}
-            label="This input only accepts A-Z"
-            placeholder="Type here"
-          />
-          <CWTextInput
-            label="Text field with icons"
-            name="Text field with icons"
-            placeholder="Type here"
-            iconRight="write"
-          />
-          <CWTextInput
-            name="Text field"
-            label="Disabled"
-            disabled
-            value="Some disabled text"
-          />
-          <CWTextInput
-            name="Text field dark mode"
-            label="Dark mode"
-            darkMode
-            placeholder="Type here"
-          />
-          <CWTextArea
-            name="Textarea"
-            label="Text area"
-            placeholder="Type here"
-          />
-          {/* <CWCoverImageUploader
-            uploadCompleteCallback={(url: string) => {
-              notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
-            }}
-          /> */}
-        </div>
-        <div className="choice-gallery">
-          <CWText type="h3">Radio Button</CWText>
-          <CWRadioButton
-            value="Radio Button"
-            label="Radio Button"
-            checked={this.radioButtonChecked === true}
-            onChange={() => {
-              this.radioButtonChecked = true;
-            }}
-          />
-          <CWRadioButton
-            value="Disabled Radio Button"
-            label="Disabled Radio Button"
-            disabled
-          />
-          <CWRadioButton
-            value="Checked and Disabled Radio Button"
-            label="Checked and Disabled Radio Button"
-            disabled
-            checked
-          />
-        </div>
-        <div className="button-gallery">
-          <CWText type="h3">Radio Group</CWText>
-          <CWRadioGroup
-            options={radioGroupOptions}
-            name="RadioGroup"
-            toggledOption={this.radioGroupSelection}
-            onChange={(e) => {
-              this.radioGroupSelection = e.target.value;
-              notifySuccess(`"${e.target.value}" selected`);
-            }}
-          />
-        </div>
-        <div className="choice-gallery">
-          <CWText type="h3">Checkbox</CWText>
-          <CWCheckbox
-            checked={this.checkboxChecked}
-            label="Click me"
-            onChange={() => {
-              this.checkboxChecked = !this.checkboxChecked;
-            }}
-          />
-          <CWCheckbox label="Disabled" disabled />
-          <CWCheckbox label="Checked and disabled" disabled checked />
-          <CWCheckbox label="Indeterminate" indeterminate />
-          <CWCheckbox
-            label="Indeterminate and disabled"
-            disabled
-            indeterminate
-          />
-        </div>
-        <div className="card-gallery">
-          <CWText type="h3">Cards</CWText>
-          <div className="top-card-row">
-            <CWCard
-              elevation="elevation-1"
-              interactive={true}
-              onClick={() => notifySuccess('Card clicked!')}
-            >
-              <CWText fontWeight="semiBold">Card title</CWText>
-              <CWText>Elevation: 1</CWText>
-            </CWCard>
-            <CWCard
-              elevation="elevation-2"
-              interactive={true}
-              onClick={() => notifySuccess('Card clicked!')}
-            >
-              <CWText fontWeight="semiBold">Card title</CWText>
-              <CWText>Elevation: 2</CWText>
-            </CWCard>
-            <CWCard
-              elevation="elevation-3"
-              interactive={true}
-              onClick={() => notifySuccess('Card clicked!')}
-            >
-              <CWText fontWeight="semiBold">Card title</CWText>
-              <CWText>Elevation: 3</CWText>
-            </CWCard>
-          </div>
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight="write"
+        />
+        <CWTextInput
+          name="Text field"
+          label="Disabled"
+          disabled
+          value="Some disabled text"
+        />
+        <CWTextInput
+          name="Text field dark mode"
+          label="Dark mode"
+          darkMode
+          placeholder="Type here"
+        />
+        <CWTextArea name="Textarea" label="Text area" placeholder="Type here" />
+        <CWCoverImageUploader
+          uploadCompleteCallback={(url: string) => {
+            notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
+          }}
+        />
+      </div>
+      <div className="choice-gallery">
+        <CWText type="h3">Radio Button</CWText>
+        <CWRadioButton
+          value="Radio Button"
+          label="Radio Button"
+          checked={isRadioButtonChecked === true}
+          onChange={() => {
+            setIsRadioButtonChecked(true);
+          }}
+        />
+        <CWRadioButton
+          value="Disabled Radio Button"
+          label="Disabled Radio Button"
+          disabled
+        />
+        <CWRadioButton
+          value="Checked and Disabled Radio Button"
+          label="Checked and Disabled Radio Button"
+          disabled
+          checked
+        />
+      </div>
+      <div className="button-gallery">
+        <CWText type="h3">Radio Group</CWText>
+        <CWRadioGroup
+          options={radioGroupOptions}
+          name="RadioGroup"
+          toggledOption={radioGroupSelection}
+          onChange={(e) => {
+            setRadioGroupSelection(e.target.value);
+            notifySuccess(`"${e.target.value}" selected`);
+          }}
+        />
+      </div>
+      <div className="choice-gallery">
+        <CWText type="h3">Checkbox</CWText>
+        <CWCheckbox
+          checked={isCheckboxChecked}
+          label="Click me"
+          onChange={() => {
+            setIsCheckboxChecked(!isCheckboxChecked);
+          }}
+        />
+        <CWCheckbox label="Disabled" disabled />
+        <CWCheckbox label="Checked and disabled" disabled checked />
+        <CWCheckbox label="Indeterminate" indeterminate />
+        <CWCheckbox label="Indeterminate and disabled" disabled indeterminate />
+      </div>
+      <div className="card-gallery">
+        <CWText type="h3">Cards</CWText>
+        <div className="top-card-row">
           <CWCard
             elevation="elevation-1"
-            interactive={true}
-            fullWidth={true}
+            interactive
             onClick={() => notifySuccess('Card clicked!')}
           >
             <CWText fontWeight="semiBold">Card title</CWText>
-            <CWText>Full width</CWText>
+            <CWText>Elevation: 1</CWText>
+          </CWCard>
+          <CWCard
+            elevation="elevation-2"
+            interactive
+            onClick={() => notifySuccess('Card clicked!')}
+          >
+            <CWText fontWeight="semiBold">Card title</CWText>
+            <CWText>Elevation: 2</CWText>
+          </CWCard>
+          <CWCard
+            elevation="elevation-3"
+            interactive
+            onClick={() => notifySuccess('Card clicked!')}
+          >
+            <CWText fontWeight="semiBold">Card title</CWText>
+            <CWText>Elevation: 3</CWText>
           </CWCard>
         </div>
+        <CWCard
+          elevation="elevation-1"
+          interactive
+          fullWidth
+          onClick={() => notifySuccess('Card clicked!')}
+        >
+          <CWText fontWeight="semiBold">Card title</CWText>
+          <CWText>Full width</CWText>
+        </CWCard>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

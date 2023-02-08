@@ -1,9 +1,11 @@
-import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { DataTypes } from 'sequelize';
-import { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
-import { CommunityContractAttributes, CommunityContractInstance } from './community_contract';
-import { ModelStatic, ModelInstance } from './types';
-
+import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import type { DataTypes } from 'sequelize';
+import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
+import type {
+  CommunityContractAttributes,
+  CommunityContractInstance,
+} from './community_contract';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ContractAttributes = {
   id: number;
@@ -14,6 +16,10 @@ export type ContractAttributes = {
   token_name?: string;
   symbol?: string;
   type: string;
+  is_factory?: boolean;
+  nickname?: string;
+  created_at?: Date;
+  updated_at?: Date;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -21,9 +27,8 @@ export type ContractAttributes = {
 };
 
 export type ContractInstance = ModelInstance<ContractAttributes> & {
-    // add mixins as needed
-    getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
-    getCommunityContract: Sequelize.BelongsToGetAssociationMixin<CommunityContractInstance>;
+  getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
+  getCommunityContract: Sequelize.BelongsToGetAssociationMixin<CommunityContractInstance>;
 };
 
 export type ContractModelStatic = ModelStatic<ContractInstance>;
@@ -45,12 +50,20 @@ export default (
       abi_id: { type: dataTypes.INTEGER, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
+      is_factory: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      nickname: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'Contracts',
-      indexes: [{
-        fields: ['address'],
-      }],
+      indexes: [
+        {
+          fields: ['address'],
+        },
+      ],
       timestamps: true,
       underscored: true,
       createdAt: 'created_at',
@@ -59,9 +72,17 @@ export default (
   );
 
   Contract.associate = (models) => {
-    models.Contract.belongsToMany(models.Chain, { through: models.CommunityContract });
-    models.Contract.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id', targetKey: 'id' });
-    models.Contract.belongsTo(models.ContractAbi, { foreignKey: 'abi_id', targetKey: 'id'  });
+    models.Contract.belongsToMany(models.Chain, {
+      through: models.CommunityContract,
+    });
+    models.Contract.belongsTo(models.ChainNode, {
+      foreignKey: 'chain_node_id',
+      targetKey: 'id',
+    });
+    models.Contract.belongsTo(models.ContractAbi, {
+      foreignKey: 'abi_id',
+      targetKey: 'id',
+    });
   };
 
   return Contract;

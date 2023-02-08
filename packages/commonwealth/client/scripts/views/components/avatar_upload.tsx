@@ -1,8 +1,6 @@
 /* @jsx jsx */
 import React from 'react';
 
-import $ from 'jquery';
-
 import {
   ClassComponent,
   ResultNode,
@@ -14,13 +12,14 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
-import Dropzone from 'dropzone';
 
 import 'components/avatar_upload.scss';
+import Dropzone from 'dropzone';
+import { isUndefined } from 'helpers/typeGuards';
+import $ from 'jquery';
+import type { Account } from 'models';
 
 import app from 'state';
-import { Account } from 'models';
-import { isUndefined } from 'helpers/typeGuards';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
@@ -42,10 +41,11 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
   private uploaded: boolean;
 
   oncreate(vnode: ResultNode<AvatarUploadAttrs>) {
+    // TODO: @ZAK @REACT
     $(vnode.dom).on('cleardropzone', () => {
       this.dropzone.files.map((file) => this.dropzone.removeFile(file));
     });
-
+    // TODO: @ZAK @REACT
     this.dropzone = new Dropzone(vnode.dom, {
       clickable: '.icon-button-container',
       previewsContainer: '.AvatarUpload .dropzone-preview-container',

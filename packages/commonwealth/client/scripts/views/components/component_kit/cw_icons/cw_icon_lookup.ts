@@ -1,5 +1,5 @@
-import * as Icons from './cw_icons';
 import * as CustomIcons from './cw_custom_icons';
+import * as Icons from './cw_icons';
 
 export const iconLookup = {
   arrowLeft: Icons.CWArrowLeft,
@@ -24,6 +24,7 @@ export const iconLookup = {
   councilProposal: Icons.CWCouncilProposal,
   cow: Icons.CWCow,
   curator: Icons.CWCurator,
+  delegate: Icons.CWDelegate,
   democraticProposal: Icons.CWDemocraticProposal,
   discord: Icons.CWDiscord,
   dots: Icons.CWDots,
@@ -68,11 +69,13 @@ export const iconLookup = {
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,
+  transfer: Icons.CWTransfer,
   trash: Icons.CWTrash,
   treasuryProposal: Icons.CWTreasuryProposal,
   twitter: Icons.CWTwitter,
   unsubscribe: Icons.CWUnsubscribe,
   upvote: Icons.CWUpvote,
+  vote: Icons.CWVote,
   views: Icons.CWViews,
   wallet: Icons.CWWallet,
   website: Icons.CWWebsite,
@@ -82,7 +85,6 @@ export const iconLookup = {
 export const customIconLookup = {
   'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
-  invites: CustomIcons.CWInvites,
   keplr: CustomIcons.CWKeplr,
   magic: CustomIcons.CWMagic,
   metamask: CustomIcons.CWMetaMask,

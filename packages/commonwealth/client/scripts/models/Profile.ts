@@ -1,4 +1,14 @@
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import jdenticon from 'jdenticon';
 
 import {
@@ -23,36 +33,47 @@ class Profile {
   get name() {
     return this._name;
   }
+
   get headline() {
     return this._headline;
   }
+
   get bio() {
     return this._bio;
   }
+
   get avatarUrl() {
     return this._avatarUrl;
   }
+
   get initialized() {
     return this._initialized;
   }
+
   get judgements() {
     return this._judgements;
   }
+
   get isOnchain() {
     return this._isOnchain;
   }
+
   get lastActive() {
     return this._lastActive;
   }
+
   get isCouncillor() {
     return this._isCouncillor;
   }
+
   get isValidator() {
     return this._isValidator;
   }
+
   get isEmpty() {
     return this._isEmpty;
   }
+
   get isNameInvalid() {
     return this._isNameInvalid;
   }

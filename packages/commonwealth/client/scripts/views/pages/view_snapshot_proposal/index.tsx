@@ -1,6 +1,14 @@
 /* @jsx jsx */
 import React from 'react';
 
+import { MixpanelSnapshotEvents } from 'analytics/types';
+import type {
+  SnapshotProposal,
+  SnapshotProposalVote,
+  SnapshotSpace,
+} from 'helpers/snapshot_utils';
+import { getPower, getResults } from 'helpers/snapshot_utils';
+import { AddressInfo } from 'models';
 import {
   ClassComponent,
   ResultNode,
@@ -14,31 +22,21 @@ import {
 } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
-
 import app from 'state';
-import { AddressInfo } from 'models';
-import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
-import {
-  SnapshotSpace,
-  SnapshotProposal,
-  SnapshotProposalVote,
-  getResults,
-  getPower,
-} from 'helpers/snapshot_utils';
-import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import { SnapshotInformationCard } from './snapshot_information_card';
-import { renderQuillTextBody } from '../../components/quill/helpers';
-import { SnapshotVotesTable } from './snapshot_votes_table';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
-import { CWText } from '../../components/component_kit/cw_text';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
+import { PageLoading } from '../loading';
+import { SnapshotInformationCard } from './snapshot_information_card';
+import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
+import { SnapshotVotesTable } from './snapshot_votes_table';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -94,12 +92,14 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       });
 
       try {
-        app.threads
-          .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
-          .then((res) => {
-            this.threads = res;
-            redraw();
-          });
+        if (app.activeChainId()) {
+          app.threads
+            .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
+            .then((res) => {
+              this.threads = res;
+              redraw();
+            });
+        }
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);
       }
@@ -140,19 +140,21 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={
             <CWText>
-              <User
-                user={
-                  new AddressInfo(
-                    null,
-                    this.proposal.author,
-                    app.activeChainId(),
-                    null
-                  )
-                }
-                showAddressWithDisplayName
-                linkify
-                popover
-              />
+              {!!app.activeChainId() && (
+                <User
+                  user={
+                    new AddressInfo(
+                      null,
+                      this.proposal.author,
+                      app.activeChainId(),
+                      null
+                    )
+                  }
+                  showAddressWithDisplayName
+                  linkify
+                  popover
+                />
+              )}
             </CWText>
           }
           createdAt={this.proposal.created}
