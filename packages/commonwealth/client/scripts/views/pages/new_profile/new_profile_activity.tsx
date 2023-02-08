@@ -23,7 +23,7 @@ import type Comment from 'client/scripts/models/Comment';
 import type AddressInfo from 'client/scripts/models/AddressInfo';
 import type { IUniqueId } from 'client/scripts/models/interfaces';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { NewProfileActivityContent } from './new_profile_activity_content';
+import NewProfileActivityContent from './new_profile_activity_content';
 
 enum ProfileActivity {
   Addresses,
@@ -43,7 +43,7 @@ type NewProfileActivityAttrs = {
   threads: Thread[];
 };
 
-export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
+class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
   private address: string;
   private selectedActivity: ProfileActivity;
 
@@ -107,3 +107,5 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
     );
   }
 }
+
+export default NewProfileActivity;

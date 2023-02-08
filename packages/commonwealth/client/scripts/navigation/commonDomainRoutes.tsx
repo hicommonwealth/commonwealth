@@ -66,6 +66,8 @@ const NewSnapshotProposalPage = lazy(
 );
 
 const ProfilePage = lazy(() => import('views/pages/profile'));
+const NewProfilePage = lazy(() => import('views/pages/new_profile'));
+const NewEditProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 
 const getCommonDomainsRoutes = () => (
   <React.Fragment>
@@ -459,6 +461,22 @@ const getCommonDomainsRoutes = () => (
       }
     />
     {/* PROFILES END*/}
+    {/* NEW PROFILES */}
+    <Route
+      path="/profile/:address"
+      element={withLayout(NewProfilePage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />
+    <Route
+      path="/profile/:address/edit"
+      element={withLayout(NewEditProfilePage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />
+    {/* NEW PROFILES END*/}
     {/*  LEGACY REDIRECTS */}
     {/*//here for compatibility only*/}
     <Route path="/discussions" element={<Navigate to="/" />} />

@@ -17,7 +17,7 @@ import {
 
 import type Thread from 'client/scripts/models/Thread';
 import type { ChainInfo } from 'client/scripts/models';
-import { NewProfileActivityRow } from './new_profile_activity_row';
+import NewProfileActivityRow from './new_profile_activity_row';
 import type { CommentWithAssociatedThread } from './new_profile_activity';
 
 enum ProfileActivity {
@@ -35,7 +35,7 @@ type NewProfileActivityContentAttrs = {
   chains: ChainInfo[];
 };
 
-export class NewProfileActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
+class NewProfileActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
   view(vnode: ResultNode<NewProfileActivityContentAttrs>) {
     const { option, address, comments, threads, chains } = vnode.attrs;
 
@@ -67,3 +67,5 @@ export class NewProfileActivityContent extends ClassComponent<NewProfileActivity
     });
   }
 }
+
+export default NewProfileActivityContent;

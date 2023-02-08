@@ -30,7 +30,7 @@ type NewProfileHeaderAttrs = {
   profile: Profile;
 };
 
-export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
+class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
   private defaultAvatar: string;
 
   oninit(vnode: ResultNode<NewProfileHeaderAttrs>) {
@@ -100,3 +100,5 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
     );
   }
 }
+
+export default NewProfileHeader;

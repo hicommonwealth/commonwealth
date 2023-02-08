@@ -21,12 +21,10 @@ import type { Thread} from 'models';
 import { ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
-import { NewProfileHeader } from './new_profile_header';
+import NewProfileHeader from './new_profile_header';
 import type {
   CommentWithAssociatedThread} from './new_profile_activity';
-import {
-  NewProfileActivity,
-} from './new_profile_activity';
+import NewProfileActivity from './new_profile_activity';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
@@ -106,8 +104,9 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
     redraw();
   };
 
-  oninit() {
+  oncreate() {
     this.address = getRouteParam('address');
+    console.log('getRouteParam', getRouteParam('address'));
     this.loading = true;
     this.error = ProfileError.None;
     this.comments = [];

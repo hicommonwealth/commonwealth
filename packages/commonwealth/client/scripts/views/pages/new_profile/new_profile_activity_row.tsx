@@ -34,7 +34,7 @@ type NewProfileActivityRowAttrs = {
   chains: ChainInfo[];
 };
 
-export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
+class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: ResultNode<NewProfileActivityRowAttrs>) {
     const { activity, chains } = vnode.attrs;
     const { chain, createdAt, author, title, id, body } = activity;
@@ -44,7 +44,7 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
     const domain = document.location.origin;
     const renderTrigger = (onclick) => (
       <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
-    ),
+    );
 
     return (
       <div className="ProfileActivityRow">
@@ -113,3 +113,5 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
     );
   }
 }
+
+export default NewProfileActivityRow;
