@@ -102,9 +102,9 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
         }}
         key={thread.id}
       >
-        {/* !this.isWindowSmallInclusive && (
+        {!this.isWindowSmallInclusive && (
           <ThreadPreviewReactionButton thread={thread} />
-        )*/ }
+        )}
         <div className="main-content">
           <div className="top-row">
             <div className="user-and-date">
