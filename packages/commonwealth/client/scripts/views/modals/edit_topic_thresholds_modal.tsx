@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { getDecimals } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';

@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { getProposalUrlPath } from 'identifiers';
 import type { NotificationSubscription } from 'models';
 import { AddressInfo } from 'models';

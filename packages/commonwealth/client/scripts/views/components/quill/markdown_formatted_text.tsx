@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 /* eslint-disable no-useless-escape */
 
@@ -11,8 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-  rootRender,
+    rootRender,
 } from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';
