@@ -134,15 +134,3 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
     );
   }
 }
-
-//  linked treasury proposals
-//   proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
-//      && proposal.preimage?.method === 'approveProposal'
-//     && render('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-//    proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
-//     && proposal.preimage?.method === 'approveProposal'
-//     && render('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-//    proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
-//      && proposal.call?.method === 'approveProposal'
-//      && render('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
-//    linked referenda

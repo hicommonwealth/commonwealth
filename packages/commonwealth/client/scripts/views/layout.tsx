@@ -21,6 +21,7 @@ import { AppToasts } from 'views/toast';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
+import { UserSurveyPopup } from './components/user_survey_popup';
 
 class LoadingLayout extends ClassComponent {
   view() {

@@ -133,8 +133,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             const chain = app.chain as Substrate;
 
             app.chain.loadModules([
-              chain.council,
-              chain.technicalCommittee,
               chain.treasury,
               chain.democracyProposals,
               chain.democracy,

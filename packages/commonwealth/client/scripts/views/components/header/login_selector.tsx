@@ -188,6 +188,7 @@ export const LoginSelectorMenuRight = () => {
             onChange={(e) => {
               if (isDarkModeOn) {
                 localStorage.setItem('dark-mode-state', 'off');
+                localStorage.setItem('user-dark-mode-state', 'off');
                 document
                   .getElementsByTagName('html')[0]
                   .classList.remove('invert');
@@ -196,6 +197,7 @@ export const LoginSelectorMenuRight = () => {
                   .getElementsByTagName('html')[0]
                   .classList.add('invert');
                 localStorage.setItem('dark-mode-state', 'on');
+                localStorage.setItem('user-dark-mode-state', 'on');
               }
               e.stopPropagation();
               redraw();

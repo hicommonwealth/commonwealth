@@ -555,6 +555,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       ];
     };
 
+    // @ts-ignore
     return (
       <Sublayout
       //  title={headerTitle}

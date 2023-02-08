@@ -154,9 +154,8 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
                   </div>
                   <div className="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
-                      const fnOutputArray = this.functionNameToFunctionOutput.get(
-                        fn.name
-                      );
+                      const fnOutputArray =
+                        this.functionNameToFunctionOutput.get(fn.name);
                       return (
                         <div>
                           <div className="function-outputs">

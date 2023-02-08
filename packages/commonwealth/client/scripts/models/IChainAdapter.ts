@@ -72,6 +72,17 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     //   return false;
     // }
 
+    if (this.meta.id === '1inch') {
+      if (localStorage.getItem('user-dark-mode-state') !== 'off') {
+        localStorage.setItem('dark-mode-state', 'on');
+        document.getElementsByTagName('html')[0].classList.add('invert');
+      }
+    } else {
+      if (localStorage.getItem('user-dark-mode-state') !== 'on') {
+        document.getElementsByTagName('html')[0].classList.remove('invert');
+      }
+    }
+
     const {
       pinnedThreads,
       topics,

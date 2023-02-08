@@ -190,9 +190,7 @@ const loadProfile = async (
           profileData?.headline,
           profileData?.bio,
           profileData?.avatarUrl,
-          a.OffchainProfile.judgements,
           a.last_active,
-          a.is_councillor,
           a.is_validator
         );
       } else {
@@ -202,7 +200,6 @@ const loadProfile = async (
           profileData?.bio,
           profileData?.avatarUrl,
           a.last_active,
-          a.is_councillor,
           a.is_validator
         );
       }

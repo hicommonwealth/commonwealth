@@ -6,6 +6,8 @@ import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
+import { CWBreadcrumbs } from './cw_breadcrumbs';
+
 import { CWButton } from './cw_button';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
@@ -25,7 +27,6 @@ import { CWToggle } from './cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
-import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
@@ -138,19 +139,16 @@ export const ComponentShowcase = () => {
   const [isToggled, setIsToggled] = React.useState<boolean>(false);
   const [voteCount, setVoteCount] = React.useState<number>(0);
   const [selectedTab, setSelectedTab] = React.useState<number>(1);
-  const [isRadioButtonChecked, setIsRadioButtonChecked] = React.useState<
-    boolean
-  >(false);
-  const [isCheckboxChecked, setIsCheckboxChecked] = React.useState<boolean>(
-    false
-  );
+  const [isRadioButtonChecked, setIsRadioButtonChecked] =
+    React.useState<boolean>(false);
+  const [isCheckboxChecked, setIsCheckboxChecked] =
+    React.useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = React.useState<string>(
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = React.useState<
-    boolean
-  >(false);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
+    React.useState<boolean>(false);
 
   return (
     <div className="ComponentShowcase">

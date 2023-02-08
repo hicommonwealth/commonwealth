@@ -117,26 +117,6 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
               }),
             iconLeft: 'democraticProposal',
           },
-          ...(((activeAccount as SubstrateAccount)?.isCouncillor
-            ? [
-                {
-                  label: 'New council motion',
-                  onClick: () =>
-                    navigateToSubpage('/new/proposal/:type', {
-                      type: ProposalType.SubstrateCollectiveProposal,
-                    }),
-                  iconLeft: 'councilProposal',
-                },
-              ]
-            : []) as PopoverMenuItem[]),
-          {
-            label: 'New bounty proposal',
-            onClick: () =>
-              navigateToSubpage('/new/proposal/:type', {
-                type: ProposalType.SubstrateBountyProposal,
-              }),
-            iconLeft: 'badge',
-          },
           {
             label: 'New tip',
             onClick: () =>
