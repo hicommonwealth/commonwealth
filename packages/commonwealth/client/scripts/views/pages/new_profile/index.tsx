@@ -11,6 +11,7 @@ import {
   redraw,
   Component,
   jsx,
+  parsePathname,
 } from 'mithrilInterop';
 import $ from 'jquery';
 
@@ -37,46 +38,45 @@ enum ProfileError {
 }
 
 type NewProfileAttrs = {
-  placeholder?: string;
+  address: string;
 };
 
 const NoAddressFoundError = 'No address found';
 const NoProfileFoundError = 'No profile found';
 
-export default class NewProfile extends ClassComponent<NewProfileAttrs> {
-  private address: string;
-  private addresses: AddressInfo[];
-  private chains: ChainInfo[];
-  private content: React.ReactNode;
-  private comments: CommentWithAssociatedThread[];
-  private error: ProfileError;
-  private loading: boolean;
-  private profile: Profile;
-  private threads: Thread[];
+const NewProfile = (props: NewProfileAttrs) => {
+  const [addresses, setAddresses] = React.useState<AddressInfo[]>();
+  const [chains, setChains] = React.useState<ChainInfo[]>();
+  const [comments, setComments] = React.useState<CommentWithAssociatedThread[]>([]);
+  const [error, setError] = React.useState<ProfileError>();
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [profile, setProfile] = React.useState<Profile>();
+  const [threads, setThreads] = React.useState<Thread[]>([]);
 
-  private getProfileData = async (address: string) => {
+  const getProfileData = async (address: string) => {
+    setLoading(true);
     try {
       const response = await $.get(`${app.serverUrl()}/profile/v2`, {
         address,
         jwt: app.user.jwt,
       });
 
-      this.profile = new Profile(response.profile);
-      this.threads = response.threads.map((t) => app.threads.modelFromServer(t));
-      const comments = response.comments.map((c) => modelCommentFromServer(c));
-      const commentsWithAssociatedThread = comments.map((c) => {
+      setProfile(new Profile(response.profile));
+      setThreads(response.threads.map((t) => app.threads.modelFromServer(t)));
+      const responseComments = response.comments.map((c) => modelCommentFromServer(c));
+      const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = response.commentThreads.find(
           (t) =>
             t.id === parseInt(c.rootProposal.replace('discussion_', ''), 10)
         );
         return { ...c, thread };
       });
-      this.comments = commentsWithAssociatedThread;
-      this.chains = response.chains.map((c) => ({
+      setComments(commentsWithAssociatedThread);
+      setChains(response.chains.map((c) => ({
         ...new ChainInfo(c),
         iconUrl: c.icon_url,
-      }));
-      this.addresses = response.addresses.map(
+      })));
+      setAddresses(response.addresses.map(
         (a) =>
           new AddressInfo(
             a.id,
@@ -86,76 +86,72 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
             a.wallet_id,
             a.ghost_address
           )
-      );
+      ));
     } catch (err) {
       if (
         err.status === 500 &&
         err.responseJSON.error === NoAddressFoundError
       ) {
-        this.error = ProfileError.NoAddressFound;
+        setError(ProfileError.NoAddressFound);
       }
       if (
         err.status === 500 &&
         err.responseJSON.error === NoProfileFoundError
       ) {
-        this.error = ProfileError.NoProfileFound;
+        setError(ProfileError.NoProfileFound);
       }
     }
-    redraw();
+    setLoading(false);
   };
 
-  oncreate() {
-    this.address = getRouteParam('address');
-    console.log('getRouteParam', getRouteParam('address'));
-    this.loading = true;
-    this.error = ProfileError.None;
-    this.comments = [];
-    this.threads = [];
-    this.getProfileData(this.address);
-    this.loading = false;
-  }
+  React.useEffect(() => {
+    console.log('props.address', props.address);
+    getProfileData(props.address);
+  }, []);
 
-  view() {
-    if (this.loading)
-      this.content = (
+  if (loading)
+    return (
+      <Sublayout>
         <div className="ProfilePage">
           <div className="loading-spinner">
             <CWSpinner />
           </div>
         </div>
-      );
+      </Sublayout>
+    );
 
-    if (this.error === ProfileError.NoAddressFound)
-      return <PageNotFound message="We cannot find this profile." />;
+  if (error === ProfileError.NoAddressFound)
+    return <PageNotFound message="We cannot find this profile." />;
 
-    if (this.error === ProfileError.NoProfileFound)
-      return <PageNotFound message="We cannot find this profile." />;
+  if (error === ProfileError.NoProfileFound)
+    return <PageNotFound message="We cannot find this profile." />;
 
-    if (this.error === ProfileError.None) {
-      if (!this.profile) return;
+  if (error === ProfileError.None) {
+    if (!profile) return;
 
-      let coverUrl;
-      let coverImageBehavior;
-      let backgroundUrl;
-      let backgroundImageBehavior;
+    let coverUrl;
+    let coverImageBehavior;
+    let backgroundUrl;
+    let backgroundImageBehavior;
 
-      if (this.profile.coverImage) {
-        const { url, imageBehavior } = this.profile.coverImage;
-        coverUrl = url;
-        coverImageBehavior = imageBehavior;
-      }
+    if (profile.coverImage) {
+      const { url, imageBehavior } = profile.coverImage;
+      coverUrl = url;
+      coverImageBehavior = imageBehavior;
+    }
 
-      if (this.profile.backgroundImage) {
-        const { url, imageBehavior } = this.profile.backgroundImage;
-        backgroundUrl = url;
-        backgroundImageBehavior = imageBehavior;
-      }
+    if (profile.backgroundImage) {
+      const { url, imageBehavior } = profile.backgroundImage;
+      backgroundUrl = url;
+      backgroundImageBehavior = imageBehavior;
+    }
 
-      this.content = (
+    return (
+      <Sublayout>
         <div
           className="ProfilePage"
           style={
-            this.profile.backgroundImage
+            profile.backgroundImage
               ? {
                   backgroundImage: `url(${backgroundUrl})`,
                   backgroundRepeat: `${
@@ -176,7 +172,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
               : {}
           }
         >
-          {this.profile.coverImage && (
+          {profile.coverImage && (
             <div
               style={{
                 backgroundImage: `url(${coverUrl})`,
@@ -195,37 +191,39 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
           )}
           <div
             className={
-              this.profile.backgroundImage
+              profile.backgroundImage
                 ? 'ProfilePageContainer'
                 : 'ProfilePageContainer smaller-margins'
             }
           >
-            <NewProfileHeader profile={this.profile} address={this.address} />
+            <NewProfileHeader profile={profile} address={props.address} />
             <NewProfileActivity
-              threads={this.threads}
-              comments={this.comments}
-              chains={this.chains}
-              addresses={this.addresses}
+              threads={threads}
+              comments={comments}
+              chains={chains}
+              addresses={addresses}
             />
           </div>
         </div>
-      );
-    } else {
-      this.content = (
+      </Sublayout>
+    );
+  } else {
+    return (
+      <Sublayout>
         <div className="ProfilePage">
           <div className="ProfilePageContainer">
-            <NewProfileHeader profile={this.profile} address={this.address} />
+            <NewProfileHeader profile={profile} address={props.address} />
             <NewProfileActivity
-              threads={this.threads}
-              comments={this.comments}
-              chains={this.chains}
-              addresses={this.addresses}
+              threads={threads}
+              comments={comments}
+              chains={chains}
+              addresses={addresses}
             />
           </div>
         </div>
-      );
-    }
-
-    return <Sublayout>{this.content}</Sublayout>;
+      </Sublayout>
+    );
   }
 }
+
+export default NewProfile;
