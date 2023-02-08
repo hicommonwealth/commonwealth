@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 export function notifySuccess(message: string, allowDuplicates?: boolean) {
   toast(message, {
     type: 'success',
-    autoClose: 30000,
+    autoClose: 3000,
     position: toast.POSITION.BOTTOM_RIGHT,
   });
 }
