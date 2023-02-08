@@ -49,9 +49,7 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
     topicName = thread.topic.name;
   }
 
-  setIsLoading(
-    isLoading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName))
-  );
+  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
 
   const activeAddress = app.user.activeAccount?.address;
 
@@ -106,7 +104,7 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
       />
       <div
         className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading },
+          { disabled: isLoading || isUserForbidden },
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
