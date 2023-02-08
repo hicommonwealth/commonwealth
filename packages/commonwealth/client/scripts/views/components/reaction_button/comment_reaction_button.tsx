@@ -49,9 +49,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
 
   const topicName = parentThread?.topic?.name;
 
-  setIsLoading(
-    isLoading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName))
-  );
+  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
 
   const activeAddress = app.user.activeAccount?.address;
 
@@ -108,7 +106,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
       />
       <div
         className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading },
+          { disabled: isLoading || isUserForbidden },
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
