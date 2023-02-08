@@ -370,7 +370,7 @@ section.LandingPageTokenHolders {
 }
 
 .bg-footer {
-  background-image: url('/static/img/footer.png');
+  background: linear-gradient(92deg, #FBFAFD 0%, #C4D0E6 50%, #E7DEE0 75%, #C6D5DD 100%);
 }
 
 .bg-cover {
