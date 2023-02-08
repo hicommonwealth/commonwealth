@@ -2,7 +2,7 @@ import type {
   ConnectedWallet,
   WalletController,
 } from '@terra-money/wallet-controller';
-import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { Account, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
@@ -71,9 +71,10 @@ class TerraWalletConnectWebWalletController
     account: Account,
     canvasMessage: SessionPayload
   ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
     try {
       const result = await this._wallet.signBytes(
-        Buffer.from(serializeSessionPayload(canvasMessage))
+        Buffer.from(canvas.serializeSessionPayload(canvasMessage))
       );
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');

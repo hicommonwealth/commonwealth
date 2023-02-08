@@ -1,7 +1,7 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
 
-import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 
@@ -93,6 +93,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
     canvasMessage: SessionPayload
   ): Promise<string> {
     // timeout?
+    const canvas = await import('@canvas-js/interfaces');
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
         if (payload.result?.signature) resolve(payload.result);
@@ -100,7 +101,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(serializeSessionPayload(canvasMessage)),
+          bytes: Buffer.from(canvas.serializeSessionPayload(canvasMessage)),
         });
       } catch (error) {
         console.error(error);

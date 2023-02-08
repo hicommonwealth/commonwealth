@@ -1,10 +1,9 @@
-import type { ChainId } from '@canvas-js/interfaces';
+import type { ChainId, SessionPayload } from '@canvas-js/interfaces';
 import type {
   ChainBase,
   ChainNetwork,
   WalletId,
 } from 'common-common/src/types';
-import type { SessionPayload } from '@canvas-js/interfaces';
 
 import type Account from './Account';
 import type BlockInfo from './BlockInfo';

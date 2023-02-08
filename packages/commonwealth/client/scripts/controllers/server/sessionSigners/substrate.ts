@@ -1,9 +1,7 @@
 import { Keyring } from '@polkadot/api';
 import { IKeyringPair } from '@polkadot/types/types';
-import { mnemonicGenerate, signatureVerify } from '@polkadot/util-crypto';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { addressSwapper } from '../../../../../shared/utils';
-import { serializeActionPayload, getActionHash } from '@canvas-js/interfaces';
 import type {
   Action,
   ActionPayload,
@@ -12,10 +10,6 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-
-const getSubstrateSignatureData = (payload: ActionPayload) => {
-  return new TextEncoder().encode(serializeActionPayload(payload));
-};
 
 export class SubstrateSessionController implements ISessionController {
   keyring: Keyring = new Keyring({ ss58Format: 42 });
@@ -105,8 +99,9 @@ export class SubstrateSessionController implements ISessionController {
         }
       }
     } catch (err) {
+      const polkadotUtilCrypto = await import('@polkadot/util-crypto');
       console.log('Could not restore previous session', err);
-      const mnemonic = mnemonicGenerate();
+      const mnemonic = polkadotUtilCrypto.mnemonicGenerate();
       const pair = this.keyring.addFromMnemonic(mnemonic);
       this.signers[chainId] = { pair, privateKey: mnemonic };
       delete this.auths[chainId];
@@ -144,11 +139,20 @@ export class SubstrateSessionController implements ISessionController {
       callArgs,
     };
 
-    const message = getSubstrateSignatureData(actionPayload);
+    const canvas = await import('@canvas-js/interfaces');
+    const polkadotUtilCrypto = await import('@polkadot/util-crypto');
+    const message = new TextEncoder().encode(
+      canvas.serializeActionPayload(actionPayload)
+    );
+
     const signatureBytes = signer.pair.sign(message);
     const signature = new Buffer(signatureBytes).toString('hex');
     if (
-      !signatureVerify(message, signatureBytes, signer.pair.publicKey).isValid
+      !polkadotUtilCrypto.signatureVerify(
+        message,
+        signatureBytes,
+        signer.pair.publicKey
+      ).isValid
     ) {
       throw new Error('Invalid signature!');
     }
@@ -164,7 +168,8 @@ export class SubstrateSessionController implements ISessionController {
       session: sessionPayload.from,
       signature,
     };
-    const hash = getActionHash(action);
+
+    const hash = canvas.getActionHash(action);
 
     return { session, action, hash };
   }

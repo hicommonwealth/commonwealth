@@ -1,4 +1,4 @@
-import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
@@ -73,10 +73,11 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     canvasMessage: SessionPayload
   ): Promise<string> {
     const keplr = await import('@keplr-wallet/types');
+    const canvas = await import('@canvas-js/interfaces');
     const signature = await window.keplr.signEthereum(
       this._chainId,
       account.address,
-      serializeSessionPayload(canvasMessage),
+      canvas.serializeSessionPayload(canvasMessage),
       keplr.EthSignType.MESSAGE
     );
     return `0x${Buffer.from(signature).toString('hex')}`;

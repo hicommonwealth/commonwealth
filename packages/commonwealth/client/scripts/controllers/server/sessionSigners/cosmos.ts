@@ -7,13 +7,12 @@ import type {
 } from '@cosmjs/amino';
 import type { Secp256k1 } from '@cosmjs/crypto';
 
-import {
+import type {
   Action,
   Session,
   ActionArgument,
   ActionPayload,
   SessionPayload,
-  getActionHash,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
 
@@ -218,7 +217,8 @@ export class CosmosSDKSessionController implements ISessionController {
       signature,
     };
 
-    const hash = getActionHash(action);
+    const canvas = await import('@canvas-js/interfaces');
+    const hash = canvas.getActionHash(action);
 
     return { session, action, hash };
   }

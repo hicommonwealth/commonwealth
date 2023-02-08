@@ -2,7 +2,7 @@
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import { SessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
 // is handled through redirects involving the `/finishNearLogin` page.

@@ -1,8 +1,7 @@
 import type * as solw3 from '@solana/web3.js';
-import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
-import { serializeActionPayload, getActionHash } from '@canvas-js/interfaces';
+
 import type {
   Action,
   ActionArgument,
@@ -11,10 +10,6 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-
-const getSolanaSignatureData = (payload: ActionPayload) => {
-  return new TextEncoder().encode(serializeActionPayload(payload));
-};
 
 export class SolanaSessionController implements ISessionController {
   signers: Record<string, solw3.Keypair> = {};
@@ -133,7 +128,12 @@ export class SolanaSessionController implements ISessionController {
       from: sessionPayload.from,
     };
 
-    const message = getSolanaSignatureData(actionPayload);
+    const canvas = await import('@canvas-js/interfaces');
+    const nacl = await import('tweetnacl');
+
+    const message = new TextEncoder().encode(
+      canvas.serializeActionPayload(actionPayload)
+    );
     const signatureBytes = nacl.sign.detached(message, signer.secretKey);
     const signature = bs58.encode(signatureBytes);
     if (
@@ -157,7 +157,8 @@ export class SolanaSessionController implements ISessionController {
       session: sessionPayload.from,
       signature,
     };
-    const hash = getActionHash(action);
+
+    const hash = canvas.getActionHash(action);
 
     return { session, action, hash };
   }

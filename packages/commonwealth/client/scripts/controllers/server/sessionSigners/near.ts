@@ -1,20 +1,15 @@
 import bs58 from 'bs58';
-import { KeyPairEd25519 } from 'near-api-js/lib/utils';
+import type { KeyPairEd25519 } from 'near-api-js/lib/utils';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
-import { serializeActionPayload } from '@canvas-js/interfaces';
-import {
+
+import type {
   Action,
   ActionPayload,
   Session,
   ActionArgument,
   SessionPayload,
-  getActionHash,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-
-const getNearSignatureData = (payload: ActionPayload) => {
-  return new TextEncoder().encode(serializeActionPayload(payload));
-};
 
 export class NEARSessionController implements ISessionController {
   private signers: Record<string, KeyPairEd25519> = {};
@@ -70,9 +65,10 @@ export class NEARSessionController implements ISessionController {
     const authStorageKey = `CW_SESSIONS-near-${chainId}-auth`;
     // TODO: test session restoration on NEAR
     try {
+      const nearApiUtils = await import('near-api-js/lib/utils');
       const storage = localStorage.getItem(storageKey);
       const { secretKey } = JSON.parse(storage);
-      this.signers[chainId] = new KeyPairEd25519(secretKey);
+      this.signers[chainId] = new nearApiUtils.KeyPairEd25519(secretKey);
 
       const auth = localStorage.getItem(authStorageKey);
       if (auth !== null) {
@@ -97,6 +93,7 @@ export class NEARSessionController implements ISessionController {
       }
     } catch (err) {
       console.log('Could not restore previous session', err);
+      const nearApiUtils = await import('near-api-js/lib/utils');
       this.signers[chainId] = KeyPairEd25519.fromRandom();
       delete this.auths[chainId];
       const secretKey: string = this.signers[chainId].secretKey;
@@ -131,7 +128,11 @@ export class NEARSessionController implements ISessionController {
       callArgs,
     };
 
-    const message = getNearSignatureData(actionPayload);
+    const canvas = await import('@canvas-js/interfaces');
+    const message = new TextEncoder().encode(
+      canvas.serializeActionPayload(actionPayload)
+    );
+
     const { signature: signatureBytes } = signer.sign(message); // publicKey?
     const signature = bs58.encode(signatureBytes);
     if (!signer.verify(message, signatureBytes)) {
@@ -149,7 +150,8 @@ export class NEARSessionController implements ISessionController {
       session: sessionPayload.from,
       signature,
     };
-    const hash = getActionHash(action);
+
+    const hash = canvas.getActionHash(action);
 
     return { session, action, hash };
   }

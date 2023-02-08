@@ -10,7 +10,7 @@ import type {
   TransactionConfig,
   RLPEncodedTransaction,
 } from 'web3-core';
-import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
@@ -87,8 +87,9 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     account: Account,
     canvasMessage: SessionPayload
   ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
     const signature = await this._web3.eth.personal.sign(
-      serializeSessionPayload(canvasMessage),
+      canvas.serializeSessionPayload(canvasMessage),
       this._ethAccounts[0],
       ''
     );

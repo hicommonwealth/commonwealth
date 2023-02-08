@@ -1,13 +1,11 @@
 import { ethers, utils } from 'ethers';
-import {
+import type {
   Action,
   ActionArgument,
   ActionPayload,
   Session,
   SessionPayload,
-  getActionHash,
 } from '@canvas-js/interfaces';
-import { getActionSignatureData as getActionSignatureDataEIP712 } from '@canvas-js/chain-ethereum';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { ISessionController } from '.';
 
@@ -135,7 +133,9 @@ export class EthereumSessionController implements ISessionController {
       callArgs,
     };
 
-    const [domain, types, value] = getActionSignatureDataEIP712(actionPayload);
+    const canvasEthereum = await import('@canvas-js/chain-ethereum');
+    const [domain, types, value] =
+      canvasEthereum.getActionSignatureData(actionPayload);
     const signature = await actionSigner._signTypedData(domain, types, value);
     const recoveredAddr = utils.verifyTypedData(
       domain,
@@ -157,7 +157,9 @@ export class EthereumSessionController implements ISessionController {
       session: sessionPayload.from,
       signature,
     };
-    const hash = getActionHash(action);
+
+    const canvas = await import('@canvas-js/interfaces');
+    const hash = canvas.getActionHash(action);
 
     return { session, action, hash };
   }

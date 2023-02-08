@@ -8,7 +8,7 @@ import type Web3 from 'web3';
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 
-import { SessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';

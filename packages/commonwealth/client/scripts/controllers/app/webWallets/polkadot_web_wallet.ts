@@ -10,7 +10,7 @@ import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
 
-import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
@@ -72,7 +72,8 @@ class PolkadotWebWalletController
     account: Account,
     canvasMessage: SessionPayload
   ): Promise<string> {
-    const message = stringToHex(serializeSessionPayload(canvasMessage));
+    const canvas = await import('@canvas-js/interfaces');
+    const message = stringToHex(canvas.serializeSessionPayload(canvasMessage));
 
     const signer = await this.getSigner(account.address);
     const payload: SignerPayloadRaw = {

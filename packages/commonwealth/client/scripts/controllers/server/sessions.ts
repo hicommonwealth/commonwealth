@@ -7,7 +7,7 @@ import {
   chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
 } from 'adapters/shared';
-import { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
+import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase } from '../../../../../common-common/src/types';

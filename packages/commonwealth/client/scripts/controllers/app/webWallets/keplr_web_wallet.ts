@@ -3,7 +3,7 @@ import app from 'state';
 import type { AccountData } from '@cosmjs/proto-signing';
 import type { OfflineDirectSigner } from '@cosmjs/proto-signing';
 import type { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
-import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
@@ -74,11 +74,12 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     account: Account,
     canvasMessage: SessionPayload
   ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
     const chainId = this.getChainId();
     const stdSignature = await window.keplr.signArbitrary(
       chainId,
       account.address,
-      serializeSessionPayload(canvasMessage)
+      canvas.serializeSessionPayload(canvasMessage)
     );
     return JSON.stringify(stdSignature);
   }
