@@ -8,7 +8,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import type { NotificationSubscription, Thread } from 'models';
 import moment from 'moment';

@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode} from
+
+ 'mithrilInterop';
 
 import 'modals/offchain_voting_modal.scss';
 
@@ -61,7 +62,6 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
                       null
                     )
                   }
-                  hideIdentityIcon
                 />
               </div>
               <div className="offchain-poll-voter-choice">{vote.option}</div>

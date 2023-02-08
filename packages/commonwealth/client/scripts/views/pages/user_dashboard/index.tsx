@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import { notifyInfo } from 'controllers/app/notifications';
@@ -198,7 +199,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
             </div>
             {loadingData && <CWSpinner />}
             {!loadingData && (
-              <React.Fragment>
+              <>
                 {/* TODO: add filter functionality */}
                 {/* <CWPopover
                   trigger={
@@ -247,9 +248,9 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                 />
                 <CWDivider /> */}
                 {activePage === DashboardViews.ForYou && (
-                  <React.Fragment>
+                  <>
                     {fyNotifications && fyNotifications.length > 0 ? (
-                      <React.Fragment>
+                      <>
                         {fyNotifications
                           .slice(0, this.fyCount)
                           .map((data, i) => (
@@ -259,15 +260,15 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                           fyNotifications.length,
                           this.fyCount
                         ) && <CWSpinner />}
-                      </React.Fragment>
+                      </>
                     ) : (
                       <CWText>Join some communities to see Activity!</CWText>
                     )}
-                  </React.Fragment>
+                  </>
                 )}
                 {activePage === DashboardViews.Global && [
                   globalNotifications && globalNotifications.length > 0 ? (
-                    <React.Fragment>
+                    <>
                       {globalNotifications
                         .slice(0, this.globalCount)
                         .map((data, i) => (
@@ -277,15 +278,15 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                         globalNotifications.length,
                         this.globalCount
                       ) && <CWSpinner />}
-                    </React.Fragment>
+                    </>
                   ) : (
                     <CWText>No Activity</CWText>
                   ),
                 ]}
                 {activePage === DashboardViews.Chain && (
-                  <React.Fragment>
+                  <>
                     {chainEvents && chainEvents.length > 0 ? (
-                      <React.Fragment>
+                      <>
                         {chainEvents
                           .slice(0, this.chainEventCount)
                           .map((data, i) => {
@@ -297,16 +298,16 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                           chainEvents.length,
                           this.chainEventCount
                         ) && <CWSpinner />}
-                      </React.Fragment>
+                      </>
                     ) : (
                       <CWText>
                         Join some communities that have governance to see Chain
                         Events!
                       </CWText>
                     )}
-                  </React.Fragment>
+                  </>
                 )}
-              </React.Fragment>
+              </>
             )}
           </div>
           <DashboardCommunitiesPreview />

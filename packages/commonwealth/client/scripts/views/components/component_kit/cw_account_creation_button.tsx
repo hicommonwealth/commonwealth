@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_account_creation_button.scss';
 import { CWCard } from './cw_card';

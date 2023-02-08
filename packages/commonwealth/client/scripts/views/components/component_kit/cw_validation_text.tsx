@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_validation_text.scss';
 import { CWText } from './cw_text';

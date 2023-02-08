@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -6,8 +5,7 @@ import {
   ResultNode,
   render,
   redraw,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'components/snapshot_proposal_selector.scss';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';

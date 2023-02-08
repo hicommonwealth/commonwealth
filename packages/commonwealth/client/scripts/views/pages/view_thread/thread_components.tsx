@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
@@ -38,7 +37,7 @@ export const ThreadAuthor = (props: ThreadComponentAttrs) => {
     <div className="ThreadAuthor">
       <User avatarSize={24} user={author} popover linkify />
       {thread.collaborators?.length > 0 && (
-        <React.Fragment>
+        <>
           <CWText type="caption">and</CWText>
           <Popover
             content={
@@ -60,7 +59,7 @@ export const ThreadAuthor = (props: ThreadComponentAttrs) => {
           >
             {pluralize(thread.collaborators?.length, 'other')}
           </CWText>
-        </React.Fragment>
+        </>
       )}
     </div>
   );

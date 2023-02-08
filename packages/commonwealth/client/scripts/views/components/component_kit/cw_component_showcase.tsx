@@ -1,12 +1,13 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
 import app from 'state';
-import { notifySuccess } from 'controllers/app/notifications';
+import {
+  notifyError,
+  notifyInfo,
+  notifySuccess,
+} from 'controllers/app/notifications';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
@@ -158,9 +159,10 @@ export const ComponentShowcase = () => {
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
       <Modal
         content={<div>hi</div>}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen('Message')}
         open={isModalOpen}
       />
+      <CWButton label="Toast" onClick={() => notifySuccess('message')} />
       <CWButton
         label="Full Screen Modal"
         onClick={() => setIsFullScreenModalOpen(true)}

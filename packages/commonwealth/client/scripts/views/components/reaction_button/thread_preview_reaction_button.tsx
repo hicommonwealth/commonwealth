@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -42,13 +43,11 @@ export const ThreadPreviewReactionButton = (
 
   let topicName = '';
 
+  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
+
   if (thread.topic && app.topics) {
     topicName = thread.topic.name;
   }
-
-  setIsLoading(
-    isLoading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName))
-  );
 
   const activeAddress = app.user.activeAccount?.address;
 
@@ -95,7 +94,7 @@ export const ThreadPreviewReactionButton = (
     handleInteraction?: (e: React.MouseEvent<AnchorType>) => void;
   }) => {
     return (
-      <React.Fragment>
+      <>
         <Modal
           content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
           isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -116,7 +115,7 @@ export const ThreadPreviewReactionButton = (
             }
           }}
           className={`ThreadPreviewReactionButton${
-            isLoading ? ' disabled' : ''
+            isLoading || isUserForbidden ? ' disabled' : ''
           }${hasReacted ? ' has-reacted' : ''}`}
         >
           <CWIcon
@@ -125,7 +124,7 @@ export const ThreadPreviewReactionButton = (
           />
           <div className="reactions-count">{likes}</div>
         </div>
-      </React.Fragment>
+      </>
     );
   };
 

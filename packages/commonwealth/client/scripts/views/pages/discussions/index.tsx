@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { debounce } from 'lodash';
 import { pluralize } from 'helpers';
 import { isNotUndefined } from 'helpers/typeGuards';

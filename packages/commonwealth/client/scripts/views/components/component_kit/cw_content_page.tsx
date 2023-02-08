@@ -1,7 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
@@ -67,8 +65,9 @@ export const CWContentPage = (props: ContentPageProps) => {
     viewCount,
   } = props;
 
-  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>();
-  const [tabSelected, setTabSelected] = React.useState<number>();
+  // @REACT TODO: this needs to be aware of which view to default to
+  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>('sidebarView');
+  const [tabSelected, setTabSelected] = React.useState<number>(0);
 
   React.useEffect(() => {
     const onResize = () => {

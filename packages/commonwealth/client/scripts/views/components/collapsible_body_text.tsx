@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import type { AnyProposal, Thread } from 'models';
 
 import app from 'state';
@@ -66,9 +64,9 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
         : null;
 
       return author ? (
-        <React.Fragment>
-          <User user={author} hideAvatar hideIdentityIcon /> created this thread
-        </React.Fragment>
+        <>
+          <User user={author} hideAvatar /> created this thread
+        </>
       ) : (
         'Created this thread'
       );

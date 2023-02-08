@@ -80,9 +80,6 @@ render.trust = (html: string, wrapper?: string) => {
 // Mithril component type, maps to FC
 export type Component<Props = unknown> = FunctionComponent<Props>;
 
-// jsx shim for pragma -- unused
-export const jsx = createElement;
-
 // corresponds to Mithril's Vnode type with attrs only (no state)
 export type ResultNode<A = unknown> = { attrs: A; children: Children };
 

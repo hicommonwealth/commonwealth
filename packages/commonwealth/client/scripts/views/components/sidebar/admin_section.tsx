@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
