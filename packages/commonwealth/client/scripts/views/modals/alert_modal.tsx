@@ -4,7 +4,6 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
-import m from 'mithril';
 
 import 'modals/alert_modal.scss';
 

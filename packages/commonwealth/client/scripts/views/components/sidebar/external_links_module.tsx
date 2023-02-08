@@ -14,7 +14,6 @@ import {
 } from 'mithrilInterop';
 
 import 'components/sidebar/external_links_module.scss';
-import m from 'mithril';
 
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';

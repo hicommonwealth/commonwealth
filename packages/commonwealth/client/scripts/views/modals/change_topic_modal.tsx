@@ -3,7 +3,6 @@ import React from 'react';
 
 import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import m from 'mithril';
 
 import 'modals/change_topic_modal.scss';
 import type { Thread, Topic } from 'models';

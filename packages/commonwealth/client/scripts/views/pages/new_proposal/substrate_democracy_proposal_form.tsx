@@ -7,7 +7,6 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import { ClassComponent, render, jsx } from 'mithrilInterop';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { proposalSlugToClass } from 'identifiers';
-import m from 'mithril';
 import type { ITXModalData, ProposalModule } from 'models';
 
 import app from 'state';

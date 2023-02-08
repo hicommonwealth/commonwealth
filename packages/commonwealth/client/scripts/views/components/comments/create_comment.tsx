@@ -119,17 +119,16 @@ export const CreateComment = (props: CreateCommmentProps) => {
   const tokenPostingThreshold: BN =
     TopicGateCheck.getTopicThreshold(activeTopicName);
 
-    const userBalance: BN = TopicGateCheck.getUserBalance();
-    const userFailsThreshold =
-      tokenPostingThreshold?.gtn(0) &&
-      userBalance?.gtn(0) &&
-      userBalance.lt(tokenPostingThreshold);
+  const userBalance: BN = TopicGateCheck.getUserBalance();
+  const userFailsThreshold =
+    tokenPostingThreshold?.gtn(0) &&
+    userBalance?.gtn(0) &&
+    userBalance.lt(tokenPostingThreshold);
 
   const disabled =
     quillEditorState?.isBlank() || sendingComment || userFailsThreshold;
 
   const decimals = getDecimals(app.chain);
-
 
   return (
     <div className="CreateComment">

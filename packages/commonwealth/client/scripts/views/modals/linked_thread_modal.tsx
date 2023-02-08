@@ -13,7 +13,6 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
-import m from 'mithril';
 
 import 'modals/linked_thread_modal.scss';
 

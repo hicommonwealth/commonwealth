@@ -21,7 +21,6 @@ import {
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import m from 'mithril';
 import type { AnyProposal, IVote } from 'models';
 import { ProposalStatus, VotingUnit } from 'models';
 

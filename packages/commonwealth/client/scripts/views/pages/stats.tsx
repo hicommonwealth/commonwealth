@@ -4,8 +4,6 @@ import React from 'react';
 import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'lodash';
-import m from 'mithril';
-import moment from 'moment';
 
 import 'pages/stats.scss';
 
@@ -176,43 +174,43 @@ class StatsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Analytics" />}
       >
-        <div class="StatsPage">
-          <div class="stat-row">
+        <div className="StatsPage">
+          <div className="stat-row">
             <CWText fontWeight="medium">Duration</CWText>
             <CWText fontWeight="medium">New Addresses</CWText>
             <CWText fontWeight="medium">New Comments</CWText>
             <CWText fontWeight="medium">New Threads</CWText>
             <CWText fontWeight="medium">Active Addresses</CWText>
           </div>
-          <div class="stat-row">
+          <div className="stat-row">
             <CWText>24 hours</CWText>
             <CWText>{batchedRoles['day']}</CWText>
             <CWText>{batchedComments['day']}</CWText>
             <CWText>{batchedThreads['day']}</CWText>
             <CWText>{batchedActiveAccounts['day']}</CWText>
           </div>
-          <div class="stat-row">
+          <div className="stat-row">
             <CWText>1 week</CWText>
             <CWText>{batchedRoles['week']}</CWText>
             <CWText>{batchedComments['week']}</CWText>
             <CWText>{batchedThreads['week']}</CWText>
             <CWText>{batchedActiveAccounts['week']}</CWText>
           </div>
-          <div class="stat-row">
+          <div className="stat-row">
             <CWText>2 weeks</CWText>
             <CWText>{batchedRoles['2week']}</CWText>
             <CWText>{batchedComments['2week']}</CWText>
             <CWText>{batchedThreads['2week']}</CWText>
             <CWText>{batchedActiveAccounts['2week']}</CWText>
           </div>
-          <div class="stat-row">
+          <div className="stat-row">
             <CWText>1 month</CWText>
             <CWText>{batchedRoles['month']}</CWText>
             <CWText>{batchedComments['month']}</CWText>
             <CWText>{batchedThreads['month']}</CWText>
             <CWText>{batchedActiveAccounts['month']}</CWText>
           </div>
-          <div class="stat-row">
+          <div className="stat-row">
             <CWText fontWeight="medium">{'Total (all time)'}</CWText>
             <CWText fontWeight="medium">{this.totalData.totalRoles}</CWText>
             <CWText fontWeight="medium">{this.totalData.totalComments}</CWText>

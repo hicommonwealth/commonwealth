@@ -36,9 +36,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return (arr
+  return arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown) as ThreadStage[];
+    .filter((s) => s) as unknown as ThreadStage[];
 }
 
 export const modalRedirectClick = (e, route) => {

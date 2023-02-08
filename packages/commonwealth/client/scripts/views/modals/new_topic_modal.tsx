@@ -170,8 +170,8 @@ export class NewTopicModal extends ClassComponent {
                 let defaultOffchainTemplate;
                 if (this.quillEditorState) {
                   this.quillEditorState.disable();
-                  defaultOffchainTemplate = this.quillEditorState
-                    .textContentsAsString;
+                  defaultOffchainTemplate =
+                    this.quillEditorState.textContentsAsString;
                 }
                 await app.topics.add(
                   form.name,

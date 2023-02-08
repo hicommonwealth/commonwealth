@@ -3,7 +3,6 @@ import React from 'react';
 
 import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import { utils } from 'ethers';
-import m from 'mithril';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
 

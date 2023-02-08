@@ -15,7 +15,6 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import dragula from 'dragula';
 import $ from 'jquery';
-import m from 'mithril';
 
 import 'modals/order_topics_modal.scss';
 import type { Topic } from 'models';

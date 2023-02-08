@@ -3,7 +3,6 @@ import React from 'react';
 
 import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import m from 'mithril';
 
 import 'pages/create_community.scss';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';

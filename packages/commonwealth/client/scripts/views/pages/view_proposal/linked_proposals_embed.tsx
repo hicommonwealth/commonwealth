@@ -77,7 +77,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
       }
 
       return (
-        <div class="LinkedProposalsEmbed">
+        <div className="LinkedProposalsEmbed">
           {proposal instanceof SubstrateDemocracyProposal &&
             proposal.getReferendum() && (
               <React.Fragment>

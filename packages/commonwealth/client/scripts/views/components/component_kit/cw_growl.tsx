@@ -4,7 +4,6 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_growl.scss';
-import m from 'mithril';
 
 import { CWCard } from './cw_card';
 import { getClasses } from './helpers';
