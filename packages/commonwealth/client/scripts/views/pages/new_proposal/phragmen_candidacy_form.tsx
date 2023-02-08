@@ -40,7 +40,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
     }
 
     return (
-      <React.Fragment>
+      <>
         <CWText>
           Becoming a candidate requires a deposit of
           {formatCoin(substrate.phragmenElections.candidacyBond)}. It will be
@@ -71,7 +71,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
             );
           }}
         />
-      </React.Fragment>
+      </>
     );
   }
 }

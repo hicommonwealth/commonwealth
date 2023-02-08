@@ -76,12 +76,12 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
     if (profile.isOnchain && !profile.isNameInvalid) {
       // first try to use identity fetched from server
       displayName = showAddressWithDisplayName ? (
-        <React.Fragment>
+        <>
           {profile.displayName}
           <div className="id-short">
             {formatAddressShort(profile.address, profile.chain)}
           </div>
-        </React.Fragment>
+        </>
       ) : (
         profile.displayName
       );
@@ -89,12 +89,12 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
     } else if (this.identity?.exists) {
       // then attempt to use identity fetched from chain
       displayName = showAddressWithDisplayName ? (
-        <React.Fragment>
+        <>
           {this.identity.username}
           <div className="id-short">
             {formatAddressShort(profile.address, profile.chain)}
           </div>
-        </React.Fragment>
+        </>
       ) : (
         this.identity.username
       );
@@ -103,7 +103,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
 
     if (displayName && quality) {
       const name = (
-        <React.Fragment>
+        <>
           {displayName}
           {!hideIdentityIcon && (
             <span
@@ -122,7 +122,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
                 : '-'}
             </span>
           )}
-        </React.Fragment>
+        </>
       );
 
       return linkify ? (
@@ -162,12 +162,12 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
         ) : !showAddressWithDisplayName ? (
           profile.displayName
         ) : (
-          <React.Fragment>
+          <>
             {profile.displayName}
             <div className="id-short">
               {formatAddressShort(profile.address, profile.chain)}
             </div>
-          </React.Fragment>
+          </>
         )
       )
     ) : (
@@ -177,12 +177,12 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
         ) : !showAddressWithDisplayName ? (
           profile.displayName
         ) : (
-          <React.Fragment>
+          <>
             {profile.displayName}
             <div className="id-short">
               {formatAddressShort(profile.address, profile.chain)}
             </div>
-          </React.Fragment>
+          </>
         )}
       </a>
     );
@@ -208,14 +208,14 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
 
     if (profile?.isOnchain && profile?.name && quality && !hideIdentityIcon) {
       const name = (
-        <React.Fragment>
+        <>
           {showAddressWithDisplayName ? (
-            <React.Fragment>
+            <>
               {profile.name}
               <div className="id-short">
                 {formatAddressShort(profile.address, profile.chain)}
               </div>
-            </React.Fragment>
+            </>
           ) : (
             profile.name
           )}
@@ -234,7 +234,7 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
               ? '✗'
               : '-'}
           </span>
-        </React.Fragment>
+        </>
       );
 
       return linkify ? (
@@ -274,12 +274,12 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
         ) : !showAddressWithDisplayName ? (
           profile.displayName
         ) : (
-          <React.Fragment>
+          <>
             {profile.displayName}
             <div className="id-short">
               {formatAddressShort(profile.address, profile.chain)}
             </div>
-          </React.Fragment>
+          </>
         )
       )
     ) : (
@@ -289,12 +289,12 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
         ) : !showAddressWithDisplayName ? (
           profile.displayName
         ) : (
-          <React.Fragment>
+          <>
             {profile.displayName}
             <div className="id-short">
               {formatAddressShort(profile.address, profile.chain)}
             </div>
-          </React.Fragment>
+          </>
         )}
       </a>
     );

@@ -234,7 +234,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
           )}
         >
           {wallets.map((wallet: IWebWallet<any>) => (
-            <React.Fragment>
+            <>
               <CWWalletOptionRow
                 walletName={wallet.name}
                 walletLabel={wallet.label}
@@ -341,7 +341,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 onClose={() => setIsModalOpen(false)}
                 open={isModalOpen}
               />
-            </React.Fragment>
+            </>
           ))}
           {wallets.length === 0 && (
             <CWWalletMissingOptionRow darkMode={darkMode} />
@@ -367,7 +367,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
           {hasNoWalletsLink && (
             <CWTooltip
               content={
-                <React.Fragment>
+                <>
                   <CWText type="caption">
                     If you don’t see your wallet then make sure:
                   </CWText>
@@ -377,7 +377,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                   <CWText type="caption">
                     • Your wallet chrome extension active?
                   </CWText>
-                </React.Fragment>
+                </>
               }
               renderTrigger={(handleInteraction) => (
                 <CWText

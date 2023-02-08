@@ -22,10 +22,10 @@ export class BreadcrumbsTitleTag extends ClassComponent<BreadcrumbsTitleTagAttrs
     const { title } = vnode.attrs;
 
     return (
-      <React.Fragment>
+      <>
         {title}
         {/* something will eventually go here once we get breadcrumbs working */}
-      </React.Fragment>
+      </>
     );
   }
 }

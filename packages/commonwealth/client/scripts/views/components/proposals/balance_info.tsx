@@ -33,7 +33,7 @@ export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
 
   view() {
     return (
-      <React.Fragment>
+      <>
         <CWText>
           Free: {this.freeBalance ? formatCoin(this.freeBalance) : '--'}
         </CWText>
@@ -41,7 +41,7 @@ export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
           Locked: {this.lockedBalance ? formatCoin(this.lockedBalance) : '--'}
         </CWText>
         <CWText>Total: {this.balance ? formatCoin(this.balance) : '--'}</CWText>
-      </React.Fragment>
+      </>
     );
   }
 }

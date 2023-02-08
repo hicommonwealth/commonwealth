@@ -110,7 +110,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
               </div>
             )}
             {contributors.length > 0 && (
-              <React.Fragment>
+              <>
                 <div className="contributors title">Contributors</div>
                 {contributors.map(({ account, deposit }) => (
                   <div className="contributors-row">
@@ -126,7 +126,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                     />
                   </div>
                 ))}
-              </React.Fragment>
+              </>
             )}
           </div>
         </div>

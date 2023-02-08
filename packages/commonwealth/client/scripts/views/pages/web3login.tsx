@@ -67,7 +67,7 @@ const Web3LoginPage = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -99,7 +99,7 @@ const Web3LoginPage = () => {
           </div>
         </div>
       </Sublayout>
-    </React.Fragment>
+    </>
   );
 };
 

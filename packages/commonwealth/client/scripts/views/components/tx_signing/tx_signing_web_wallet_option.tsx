@@ -69,7 +69,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
       });
 
     return (
-      <React.Fragment>
+      <>
         <CWText>
           {/* extra div is for the link to flow with the text */}
           <div>
@@ -102,7 +102,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
               : 'Sign and send transaction'
           }
         />
-      </React.Fragment>
+      </>
     );
   }
 }

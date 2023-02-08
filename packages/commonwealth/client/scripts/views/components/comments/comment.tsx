@@ -148,7 +148,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
               updatedCommentsCallback={updatedCommentsCallback}
             />
           ) : (
-            <React.Fragment>
+            <>
               <CWText className="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
@@ -222,7 +222,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                   </div>
                 </div>
               )}
-            </React.Fragment>
+            </>
           )}
         </div>
       </div>

@@ -294,7 +294,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             )
           }
           subBody={
-            <React.Fragment>
+            <>
               <LinkedProposalsEmbed
                 proposal={this.proposal as LinkedSubstrateProposal}
               />
@@ -308,7 +308,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
                 toggleVotingModal={toggleVotingModal}
                 votingModalOpen={this.votingModalOpen}
               />
-            </React.Fragment>
+            </>
           }
           comments={
             <CommentsTree

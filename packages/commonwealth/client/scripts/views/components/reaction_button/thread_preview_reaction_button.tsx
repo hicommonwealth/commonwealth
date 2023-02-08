@@ -95,7 +95,7 @@ export const ThreadPreviewReactionButton = (
     handleInteraction?: (e: React.MouseEvent<AnchorType>) => void;
   }) => {
     return (
-      <React.Fragment>
+      <>
         <Modal
           content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
           isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -125,7 +125,7 @@ export const ThreadPreviewReactionButton = (
           />
           <div className="reactions-count">{likes}</div>
         </div>
-      </React.Fragment>
+      </>
     );
   };
 

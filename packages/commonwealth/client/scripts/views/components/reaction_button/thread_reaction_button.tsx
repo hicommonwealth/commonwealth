@@ -96,7 +96,7 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -156,6 +156,6 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
           </CWText>
         )}
       </div>
-    </React.Fragment>
+    </>
   );
 };

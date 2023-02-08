@@ -86,7 +86,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
           {(proposal instanceof SubstrateDemocracyProposal ||
             proposal instanceof SubstrateCollectiveProposal) &&
             proposal.getReferendum() && (
-              <React.Fragment>
+              <>
                 <CWText>
                   Became referendum {proposal.getReferendum().identifier}
                 </CWText>
@@ -104,12 +104,12 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                     label="Go to referendum"
                   />
                 )}
-              </React.Fragment>
+              </>
             )}
           {proposal instanceof SubstrateDemocracyReferendum &&
             proposal.preimage &&
             proposal.getProposalOrMotion(proposal.preimage) && (
-              <React.Fragment>
+              <>
                 <CWText>
                   Via {proposal.getProposalOrMotion(proposal.preimage).slug}{' '}
                   {proposal.getProposalOrMotion(proposal.preimage).identifier}
@@ -131,7 +131,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                     label="Go to proposal"
                   />
                 )}
-              </React.Fragment>
+              </>
             )}
         </div>
       );
@@ -177,7 +177,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
       return (
         <div className="LinkedProposalsEmbed">
           {democracyProposals.map((p) => (
-            <React.Fragment>
+            <>
               <CWText fontWeight="semiBold">
                 Democracy Proposal ${p.shortIdentifier}
               </CWText>
@@ -199,10 +199,10 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                   label="Go to democracy proposal"
                 />
               )}
-            </React.Fragment>
+            </>
           ))}
           {referenda.map((r) => (
-            <React.Fragment>
+            <>
               <CWText fontWeight="semiBold">Referendum {r.identifier}</CWText>
               <CWText>
                 {r.preimage?.method === 'approveProposal' &&
@@ -222,10 +222,10 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                   label="Go to referendum"
                 />
               )}
-            </React.Fragment>
+            </>
           ))}
           {councilMotions.map((mo) => (
-            <React.Fragment>
+            <>
               <CWText fontWeight="semiBold">
                 Council Motion {mo.shortIdentifier}
               </CWText>
@@ -247,7 +247,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                   label="Go to motion"
                 />
               )}
-            </React.Fragment>
+            </>
           ))}
         </div>
       );

@@ -33,7 +33,7 @@ export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
     };
 
     return (
-      <React.Fragment>
+      <>
         <div className="compact-modal-title ban-user">
           <h3>Are You Sure?</h3>
         </div>
@@ -66,7 +66,7 @@ export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
             />
           </div>
         </div>
-      </React.Fragment>
+      </>
     );
   }
 }

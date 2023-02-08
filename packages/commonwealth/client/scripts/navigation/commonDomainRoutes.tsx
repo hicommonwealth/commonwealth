@@ -68,7 +68,7 @@ const NewSnapshotProposalPage = lazy(
 const ProfilePage = lazy(() => import('views/pages/profile'));
 
 const getCommonDomainsRoutes = () => (
-  <React.Fragment>
+  <>
     <Route
       path="/whyCommonwealth"
       element={withLayout(WhyCommonwealthPage, { hideSidebar: true })}
@@ -468,7 +468,7 @@ const getCommonDomainsRoutes = () => (
       element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
     />
     {/*  LEGACY REDIRECTS END */}
-  </React.Fragment>
+  </>
 );
 
 export default getCommonDomainsRoutes;

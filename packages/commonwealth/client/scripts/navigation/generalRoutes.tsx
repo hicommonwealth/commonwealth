@@ -10,7 +10,7 @@ const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const ComponentsPage = lazy(() => import('views/pages/components'));
 
 const getGeneralRoutes = () => (
-  <React.Fragment>
+  <>
     <Route
       index
       element={withLayout(LandingPage, {
@@ -28,7 +28,7 @@ const getGeneralRoutes = () => (
       path="/components"
       element={withLayout(ComponentsPage, { hideSidebar: true })}
     />
-  </React.Fragment>
+  </>
 );
 
 export default getGeneralRoutes;

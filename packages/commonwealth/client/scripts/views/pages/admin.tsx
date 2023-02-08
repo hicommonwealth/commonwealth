@@ -295,11 +295,11 @@ class AdminPage extends ClassComponent {
         <Sublayout>
           <div className="AdminPage">
             {app.chain ? (
-              <React.Fragment>
+              <>
                 <AdminActions />
                 <SudoForm />
                 <ChainStats />
-              </React.Fragment>
+              </>
             ) : null}
           </div>
         </Sublayout>

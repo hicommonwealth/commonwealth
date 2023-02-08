@@ -42,7 +42,7 @@ export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntro
     const { author, next, polkaWallet, txData, txType } = vnode.attrs;
 
     return (
-      <React.Fragment>
+      <>
         <CWTabBar>
           <CWTab
             label="Web wallet"
@@ -76,7 +76,7 @@ export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntro
             next={next}
           />
         )}
-      </React.Fragment>
+      </>
     );
   }
 }
@@ -120,13 +120,13 @@ export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
 
   view() {
     return (
-      <React.Fragment>
+      <>
         <CWText>
           Waiting for your transaction to be confirmed by the network...
         </CWText>
         <CWSpinner />
         <CWText>`Waiting ${this.timer || 0}s...</CWText>
-      </React.Fragment>
+      </>
     );
   }
 }
@@ -136,7 +136,7 @@ export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
     const { blocknum, hash, timestamp } = vnode.attrs;
 
     return (
-      <React.Fragment>
+      <>
         <TXSigningTransactionBox
           success
           status="Success"
@@ -151,7 +151,7 @@ export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
           }}
           label="Done"
         />
-      </React.Fragment>
+      </>
     );
   }
 }
@@ -163,7 +163,7 @@ export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRe
     const { blocknum, error, hash, timestamp, next } = vnode.attrs;
 
     return (
-      <React.Fragment>
+      <>
         <TXSigningTransactionBox
           success={false}
           status={error.toString()}
@@ -186,7 +186,7 @@ export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRe
             label="Try again"
           />
         </div>
-      </React.Fragment>
+      </>
     );
   }
 }

@@ -22,7 +22,7 @@ export const CWAddressTooltip = (props: AddressTooltipProps) => {
   const popoverProps = usePopover();
 
   return (
-    <React.Fragment>
+    <>
       {renderTrigger(popoverProps.handleInteraction)}
       <Popover
         placement="top-start"
@@ -47,6 +47,6 @@ export const CWAddressTooltip = (props: AddressTooltipProps) => {
         }
         {...popoverProps}
       />
-    </React.Fragment>
+    </>
   );
 };

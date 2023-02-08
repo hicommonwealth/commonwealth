@@ -22,7 +22,7 @@ export const CWTooltip = (props: TooltipProps) => {
   const popoverProps = usePopover();
 
   return (
-    <React.Fragment>
+    <>
       {renderTrigger(popoverProps.handleInteraction)}
       <Popover
         content={
@@ -48,6 +48,6 @@ export const CWTooltip = (props: TooltipProps) => {
         }
         {...popoverProps}
       />
-    </React.Fragment>
+    </>
   );
 };

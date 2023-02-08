@@ -51,7 +51,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
     const formState = { module: '', function: '', args: [] };
 
     return (
-      <React.Fragment>
+      <>
         <CWRadioGroup
           name="democracy-tx-switcher"
           onChange={(value) => {
@@ -148,7 +148,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
             );
           }}
         />
-      </React.Fragment>
+      </>
     );
   }
 }

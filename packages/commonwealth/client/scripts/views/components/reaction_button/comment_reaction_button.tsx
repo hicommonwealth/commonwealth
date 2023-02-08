@@ -98,7 +98,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -158,6 +158,6 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
           </CWText>
         )}
       </div>
-    </React.Fragment>
+    </>
   );
 };

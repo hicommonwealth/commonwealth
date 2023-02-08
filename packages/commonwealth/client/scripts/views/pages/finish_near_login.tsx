@@ -246,7 +246,7 @@ const FinishNearLogin = () => {
       }
     };
     return (
-      <React.Fragment>
+      <>
         <Modal
           content={
             <LoginModal
@@ -264,7 +264,7 @@ const FinishNearLogin = () => {
           open={isModalOpen}
         />
         <Sublayout />
-      </React.Fragment>
+      </>
     );
   } else if (!validating) {
     // chain loaded and on near -- finish login and call lingering txs

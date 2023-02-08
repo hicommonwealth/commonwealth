@@ -64,7 +64,7 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -132,6 +132,6 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
           </button>
         </header>
       </div>
-    </React.Fragment>
+    </>
   );
 };

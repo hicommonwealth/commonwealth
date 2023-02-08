@@ -215,7 +215,7 @@ class CouncilPage extends ClassComponent {
               app.user.activeAccount &&
               app.user.activeAccount instanceof SubstrateAccount &&
               app.chain.networkStatus === ApiStatus.Connected && (
-                <React.Fragment>
+                <>
                   <CWButton
                     onClick={(e) => {
                       e.preventDefault();
@@ -243,7 +243,7 @@ class CouncilPage extends ClassComponent {
                         : 'Run for council'
                     }
                   />
-                </React.Fragment>
+                </>
               )
             }
           />
