@@ -9,7 +9,7 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import 'modals/select_address_modal.scss';
-import type { Account, RoleInfo } from 'models';
+import type { RoleInfo } from 'models';
 
 import app from 'state';
 import { UserBlock } from 'views/components/widgets/user';
@@ -20,13 +20,14 @@ import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';
+import AddressAccount from "models/Address";
 
 export class SelectAddressModal extends ClassComponent {
   private loading: boolean;
   private selectedIndex: number;
 
   view() {
-    const activeAccountsByRole: Array<[Account, RoleInfo]> =
+    const activeAccountsByRole: Array<[AddressAccount, RoleInfo]> =
       app.roles.getActiveAccountsByRole();
 
     const activeEntityInfo = app.chain?.meta;
@@ -36,13 +37,13 @@ export class SelectAddressModal extends ClassComponent {
 
       const [account] = activeAccountsByRole[this.selectedIndex];
 
-      const addressInfo = app.user.addresses.find(
+      const addressAccount = app.user.addresses.find(
         (a) => a.address === account.address && a.chain.id === account.chain.id
       );
 
       app.roles
         .createRole({
-          address: addressInfo,
+          address: addressAccount,
           chain: app.activeChainId(),
         })
         .then(() => {
@@ -52,8 +53,8 @@ export class SelectAddressModal extends ClassComponent {
           // select the address, and close the form
           notifySuccess(
             `Joined with ${formatAddressShort(
-              addressInfo.address,
-              addressInfo.chain.id,
+              addressAccount.address,
+              addressAccount.chain.id,
               true
             )}`
           );
@@ -74,7 +75,7 @@ export class SelectAddressModal extends ClassComponent {
 
       const [account] = activeAccountsByRole[index];
 
-      const addressInfo = app.user.addresses.find(
+      const addressAccount = app.user.addresses.find(
         (a) => a.address === account.address && a.chain.id === account.chain.id
       );
 
@@ -91,7 +92,7 @@ export class SelectAddressModal extends ClassComponent {
 
       app.roles
         .deleteRole({
-          address: addressInfo,
+          address: addressAccount,
           chain: app.activeChainId(),
         })
         .then(() => {
@@ -99,7 +100,7 @@ export class SelectAddressModal extends ClassComponent {
           m.redraw();
           this.selectedIndex = null;
           // unset activeAccount, or set it to the next activeAccount
-          if (isSameAccount(app.user.activeAccount, account)) {
+          if (isSameAccount(app.user.activeAddressAccount, account)) {
             app.user.ephemerallySetActiveAccount(null);
           }
         })

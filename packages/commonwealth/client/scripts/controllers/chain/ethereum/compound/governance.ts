@@ -79,10 +79,10 @@ export default class CompoundGovernance extends ProposalModule<
   }
 
   public async propose(args: CompoundProposalArgs): Promise<string> {
-    const address = this.app.user.activeAccount.address;
+    const address = this.app.user.activeAddressAccount.address;
     const contract = await attachSigner(
       this.app.wallets,
-      this.app.user.activeAccount,
+      this.app.user.activeAddressAccount,
       this._api.Contract
     );
 

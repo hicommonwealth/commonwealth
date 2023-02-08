@@ -41,6 +41,6 @@ export default class Token extends Solana implements ITokenAdapter {
 
   public async initData() {
     await super.initData();
-    await this.activeAddressHasToken(this.app.user?.activeAccount?.address);
+    await this.activeAddressHasToken(this.app.user?.activeAddressAccount?.address);
   }
 }

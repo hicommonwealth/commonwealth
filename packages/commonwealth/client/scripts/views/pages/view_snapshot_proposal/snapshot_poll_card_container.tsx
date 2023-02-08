@@ -66,7 +66,7 @@ export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCa
     const userVote =
       proposal.choices[
         votes.find((vote) => {
-          return vote.voter === app.user?.activeAccount?.address;
+          return vote.voter === app.user?.activeAddressAccount?.address;
         })?.choice - 1
       ];
     const hasVoted = userVote !== undefined;

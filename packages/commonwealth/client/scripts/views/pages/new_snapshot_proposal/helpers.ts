@@ -1,16 +1,16 @@
-import type { SnapshotSpace } from 'helpers/snapshot_utils';
-import { createProposal, getSpaceBlockNumber } from 'helpers/snapshot_utils';
-import type { Account } from 'models';
+import type {SnapshotSpace} from 'helpers/snapshot_utils';
+import {createProposal, getSpaceBlockNumber} from 'helpers/snapshot_utils';
 import app from 'state';
-import type { QuillEditor } from '../../components/quill/quill_editor';
-import type { ThreadForm } from './types';
-import { NewThreadErrors } from './types';
+import type {QuillEditor} from '../../components/quill/quill_editor';
+import type {ThreadForm} from './types';
+import {NewThreadErrors} from './types';
+import AddressAccount from "models/Address";
 
 // Don't call it a new thread if it ain't a new thread.
 const newThread = async (
   form: ThreadForm,
   quillEditorState: QuillEditor,
-  author: Account,
+  author: AddressAccount,
   space: SnapshotSpace
 ) => {
   if (!form.name) {
@@ -35,9 +35,7 @@ const newThread = async (
 
   quillEditorState.disable();
 
-  const bodyText = quillEditorState.textContentsAsString;
-
-  form.body = bodyText;
+  form.body = quillEditorState.textContentsAsString;
 
   form.snapshot = await getSpaceBlockNumber(space.network);
   form.metadata.network = space.network;
@@ -77,7 +75,7 @@ const newThread = async (
 export const newLink = async (
   form: ThreadForm,
   quillEditorState: QuillEditor,
-  author: Account,
+  author: AddressAccount,
   space: SnapshotSpace
 ) => {
   const errors = await newThread(form, quillEditorState, author, space);

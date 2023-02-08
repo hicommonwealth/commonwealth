@@ -47,7 +47,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
     this.loading =
       this.loading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
 
-    const activeAddress = app.user.activeAccount?.address;
+    const activeAddress = app.user.activeAddressAccount?.address;
 
     const dislike = async (userAddress: string) => {
       const reaction = (await fetchReactionsByPost(thread)).find((r) => {

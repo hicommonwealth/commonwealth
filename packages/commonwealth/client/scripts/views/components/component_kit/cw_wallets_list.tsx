@@ -15,8 +15,7 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import $ from 'jquery';
 import m from 'mithril';
 
-import type { Account, IWebWallet } from 'models';
-import { AddressInfo } from 'models';
+import type { IWebWallet } from 'models';
 import app from 'state';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
@@ -28,6 +27,7 @@ import {
   CWWalletOptionRow,
 } from './cw_wallet_option_row';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
+import AddressAccount from "models/Address";
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
@@ -75,11 +75,10 @@ const LinkAccountItem: m.Component<
           m(
             '.account-user',
             m(User, {
-              user: new AddressInfo(
-                null,
+              user: new AddressAccount({
                 address,
-                app.chain?.id || walletNetwork
-              ),
+                chain: app.config.chains.getById(app.chain?.id || walletNetwork)
+              }),
               avatarOnly: true,
               avatarSize: 40,
             })
@@ -91,11 +90,10 @@ const LinkAccountItem: m.Component<
             m(
               '.account-user',
               m(User, {
-                user: new AddressInfo(
-                  null,
+                user: new AddressAccount({
                   address,
-                  app.chain?.id || walletNetwork
-                ),
+                  chain: app.config.chains.getById(app.chain?.id || walletNetwork)
+                }),
                 hideAvatar: true,
               })
             ),
@@ -160,7 +158,7 @@ type WalletsListAttrs = {
   wallets: Array<IWebWallet<any>>;
   setBodyType?: (bodyType: string) => void;
   accountVerifiedCallback?: (
-    account: Account,
+    account: AddressAccount,
     newlyCreated: boolean,
     linked: boolean
   ) => void;
@@ -220,7 +218,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
         const validationBlockInfo =
           wallet.getRecentBlock &&
           (await wallet.getRecentBlock(chainIdentifier));
-        const { account: signerAccount, newlyCreated } =
+        const { addressAccount, newlyCreated } =
           await createUserWithAddress(
             address,
             wallet.name,
@@ -228,7 +226,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
             sessionPublicAddress,
             validationBlockInfo
           );
-        accountVerifiedCallback(signerAccount, newlyCreated, linking);
+        accountVerifiedCallback(addressAccount, newlyCreated, linking);
       } catch (err) {
         console.log(err);
       }

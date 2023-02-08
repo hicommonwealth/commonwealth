@@ -444,7 +444,7 @@ export default class MolochProposal extends Proposal<
     // TODO: is this the correct user to process?
     const contract = await attachSigner(
       this._Members.app.wallets,
-      this._Members.app.user.activeAccount,
+      this._Members.app.user.activeAddressAccount,
       this._Members.api.Contract
     );
 
@@ -464,7 +464,7 @@ export default class MolochProposal extends Proposal<
 
   public async abortTx() {
     const address = this.applicantAddress;
-    if (this._Members.app.user.activeAccount.address !== address) {
+    if (this._Members.app.user.activeAddressAccount.address !== address) {
       throw new Error('only applicant can abort');
     }
     if (this.isAborted) {
@@ -477,7 +477,7 @@ export default class MolochProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Members.app.wallets,
-      this._Members.app.user.activeAccount,
+      this._Members.app.user.activeAddressAccount,
       this._Members.api.Contract
     );
 

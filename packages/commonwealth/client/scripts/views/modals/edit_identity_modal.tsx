@@ -99,7 +99,7 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
       try {
         await createTXModal(
           (app.chain as Substrate).identities.setIdentityTx(
-            app.user.activeAccount as SubstrateAccount,
+            app.user.activeAddressAccount as SubstrateAccount,
             idData
           )
         );
@@ -116,14 +116,14 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
       // force creation and update of the user's on-chain identity, guaranteeing that the identity
       // component has immediate access to the new identity.
       await (app.chain as Substrate).identities.load(
-        app.user.activeAccount as SubstrateAccount
+        app.user.activeAddressAccount as SubstrateAccount
       );
 
       // temporarily mark the user's profile as invalid, since they've potentially updated their
       // display name. this ensures that any identity display will fall back to the loaded identity.
       const profile = app.profiles.getProfile(
         app.chain.id,
-        app.user.activeAccount.address
+        app.user.activeAddressAccount.address
       );
 
       if (profile) {

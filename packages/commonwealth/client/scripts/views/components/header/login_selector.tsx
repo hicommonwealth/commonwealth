@@ -16,8 +16,7 @@ import { isSameAccount, pluralize } from 'helpers';
 import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
-import type { Account } from 'models';
-import { AddressInfo, ITokenAdapter } from 'models';
+import { ITokenAdapter } from 'models';
 
 import app from 'state';
 import User, { UserBlock } from 'views/components/widgets/user';
@@ -33,6 +32,7 @@ import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWPopover } from '../component_kit/cw_popover/cw_popover';
+import AddressAccount from "models/Address";
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -48,7 +48,7 @@ const CHAINNETWORK_SHORT = {
 };
 
 type LoginSelectorMenuLeftAttrs = {
-  activeAddressesWithRole: Array<Account>;
+  activeAddressesWithRole: Array<AddressAccount>;
   nAccountsWithoutRole: number;
 };
 
@@ -68,7 +68,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
           >
             {m(UserBlock, {
               user: account,
-              selected: isSameAccount(account, app.user.activeAccount),
+              selected: isSameAccount(account, app.user.activeAddressAccount),
               showRole: false,
               compact: true,
               avatarSize: 16,
@@ -80,7 +80,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
           <div
             class="login-menu-item"
             onclick={() => {
-              const pf = app.user.activeAccount.profile;
+              const pf = app.user.activeAddressAccount.profile;
               if (app.chain) {
                 navigateToSubpage(`/account/${pf.address}`);
               }
@@ -97,7 +97,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               app.modals.create({
                 modal: EditProfileModal,
                 data: {
-                  account: app.user.activeAccount,
+                  account: app.user.activeAddressAccount,
                   refreshCallback: () => m.redraw(),
                 },
               });
@@ -365,22 +365,22 @@ export class LoginSelector extends ClassComponent {
               res.result;
             app.user.setAddresses(
               addresses.map((a) => {
-                return new AddressInfo(
-                  a.id,
-                  a.address,
-                  a.chain,
-                  a.keytype,
-                  a.wallet_id
-                );
+                return new AddressAccount({
+                  addressId: a.id,
+                  address: a.address,
+                  chain: app.config.chains.getById(a.chain),
+                  keytype: a.keytype,
+                  walletId: a.wallet_id
+                })
               })
             );
-            const addressInfo = app.user.addresses.find(
+            const addressAccount = app.user.addresses.find(
               (a) => a.address === encodedAddress && a.chain.id === targetChain
             );
 
             const account = app.chain.accounts.get(
               encodedAddress,
-              addressInfo.keytype
+              addressAccount.keytype
             );
             if (app.chain) {
               account.setValidationToken(verification_token);
@@ -394,7 +394,7 @@ export class LoginSelector extends ClassComponent {
               })
             ) {
               await app.roles.createRole({
-                address: _.omit(addressInfo, 'chain'),
+                address: _.omit(addressAccount, 'chain'),
                 chain: activeChainId,
               });
             }
@@ -414,7 +414,7 @@ export class LoginSelector extends ClassComponent {
           // If token forum make sure has token and add to app.chain obj
           if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
             await app.chain.activeAddressHasToken(
-              app.user.activeAccount.address
+              app.user.activeAddressAccount.address
             );
           }
           m.redraw();
@@ -468,7 +468,7 @@ export class LoginSelector extends ClassComponent {
         {app.chain &&
           !app.chainPreloading &&
           this.profileLoadComplete &&
-          !app.user.activeAccount && (
+          !app.user.activeAddressAccount && (
             <div class="join-button-container">
               <CWButton
                 buttonType="tertiary-black"
@@ -502,12 +502,12 @@ export class LoginSelector extends ClassComponent {
         {app.chain &&
           !app.chainPreloading &&
           this.profileLoadComplete &&
-          app.user.activeAccount && (
+          app.user.activeAddressAccount && (
             <CWPopover
               trigger={
                 <div class="left-button">
                   {m(User, {
-                    user: app.user.activeAccount,
+                    user: app.user.activeAddressAccount,
                     hideIdentityIcon: true,
                   })}
                 </div>

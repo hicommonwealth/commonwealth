@@ -11,7 +11,7 @@ import { detectURL } from 'helpers/threads';
 import $ from 'jquery';
 import { capitalize } from 'lodash';
 import m from 'mithril';
-import type { Account, DiscussionDraft, Topic } from 'models';
+import type { DiscussionDraft, Topic } from 'models';
 import { ThreadKind, ThreadStage } from 'models';
 
 import app from 'state';
@@ -30,6 +30,7 @@ import { TopicSelector } from '../topic_selector';
 import { checkNewThreadErrors, updateTopicList } from './helpers';
 import type { NewThreadFormType } from './types';
 import { NewDraftErrors } from './types';
+import AddressAccount from "models/Address";
 
 type NewThreadFormAttrs = {
   hasTopics: boolean;
@@ -50,7 +51,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
   private async _newThread(
     form: NewThreadFormType,
     quillEditorState: QuillEditor,
-    author: Account,
+    author: AddressAccount,
     stage = ThreadStage.Discussion
   ) {
     const body = quillEditorState.textContentsAsString;
@@ -257,7 +258,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     const { isModal, hasTopics } = vnode.attrs;
     const { fromDraft, saving, form } = this;
     const chainId = app.activeChainId();
-    const author = app.user.activeAccount;
+    const author = app.user.activeAddressAccount;
     const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
     const discussionDrafts =

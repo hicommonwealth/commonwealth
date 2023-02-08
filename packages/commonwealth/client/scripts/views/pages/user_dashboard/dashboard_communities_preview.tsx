@@ -27,7 +27,7 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
       chain.id
     );
     const isMember = app.roles.isMember({
-      account: app.user.activeAccount,
+      addressAccount: app.user.activeAddressAccount,
       chain: chain.id,
     });
 

@@ -77,7 +77,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
           </div>
           <div class="tip-contributions">
             {proposal.canVoteFrom(
-              app.user.activeAccount as SubstrateAccount
+              app.user.activeAddressAccount as SubstrateAccount
             ) && (
               <div class="contribute">
                 <div class="title">Contribute</div>
@@ -105,7 +105,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                     createTXModal(
                       proposal.submitVoteTx(
                         new DepositVote(
-                          app.user.activeAccount as IBalanceAccount<any>,
+                          app.user.activeAddressAccount as IBalanceAccount<any>,
                           app.chain.chain.coins(tipAmount)
                         )
                       )

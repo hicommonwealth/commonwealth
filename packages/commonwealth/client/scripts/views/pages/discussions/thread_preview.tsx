@@ -35,6 +35,7 @@ import {
   isHot,
 } from './helpers';
 import { ThreadPreviewMenu } from './thread_preview_menu';
+import AddressAccount from "models/Address";
 
 type ThreadPreviewAttrs = {
   thread: Thread;
@@ -105,12 +106,10 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
             <div class="user-and-date">
               {m(User, {
                 avatarSize: 24,
-                user: new AddressInfo(
-                  null,
-                  thread.author,
-                  thread.authorChain,
-                  null
-                ),
+                user: new AddressAccount({
+                  address: thread.author,
+                  chain: app.config.chains.getById(thread.authorChain)
+                }),
                 linkify: true,
                 popover: false,
                 showAddressWithDisplayName: true,

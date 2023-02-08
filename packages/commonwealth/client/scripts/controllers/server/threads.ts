@@ -264,8 +264,8 @@ class ThreadsController {
     try {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
-        author_chain: app.user.activeAccount.chain.id,
-        author: JSON.stringify(app.user.activeAccount.profile),
+        author_chain: app.user.activeAddressAccount.chain.id,
+        author: JSON.stringify(app.user.activeAddressAccount.profile),
         chain: chainId,
         address,
         title: encodeURIComponent(title),
@@ -327,9 +327,9 @@ class ThreadsController {
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
       data: {
-        author_chain: app.user.activeAccount.chain.id,
-        author: JSON.stringify(app.user.activeAccount.profile),
-        address: app.user.activeAccount.address,
+        author_chain: app.user.activeAddressAccount.chain.id,
+        author: JSON.stringify(app.user.activeAddressAccount.profile),
+        address: app.user.activeAddressAccount.address,
         chain: app.activeChainId(),
         thread_id: proposal.id,
         kind: proposal.kind,
@@ -538,8 +538,8 @@ class ThreadsController {
         chain: app.activeChainId(),
         linking_thread_id: linkingThreadId,
         linked_thread_id: linkedThreadId,
-        address: app.user.activeAccount.address,
-        author_chain: app.user.activeAccount.chain.id,
+        address: app.user.activeAddressAccount.address,
+        author_chain: app.user.activeAddressAccount.chain.id,
         jwt: app.user.jwt,
       }),
     ]);
@@ -558,8 +558,8 @@ class ThreadsController {
         chain: app.activeChainId(),
         linking_thread_id: linkingThreadId,
         linked_thread_id: linkedThreadId,
-        address: app.user.activeAccount.address,
-        author_chain: app.user.activeAccount.chain.id,
+        address: app.user.activeAddressAccount.address,
+        author_chain: app.user.activeAddressAccount.chain.id,
         remove_link: true,
         jwt: app.user.jwt,
       }),
@@ -622,7 +622,7 @@ class ThreadsController {
       },
       data: JSON.stringify({
         thread_ids: threads.map((thread) => thread.id),
-        active_address: app.user.activeAccount?.address,
+        active_address: app.user.activeAddressAccount?.address,
       }),
     });
     for (const rc of reactionCounts) {

@@ -8,9 +8,10 @@ import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 import m from 'mithril';
 import type { BlockInfo, ChainInfo } from 'models';
-import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';
+import { ITokenAdapter, SocialAccount } from 'models';
 import moment from 'moment';
 import app from 'state';
+import AddressAccount from "models/Address";
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -25,7 +26,7 @@ export function linkExistingAddressToChainOrCommunity(
   });
 }
 
-export async function setActiveAccount(account: Account): Promise<void> {
+export async function setActiveAccount(account: AddressAccount): Promise<void> {
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
 
@@ -74,20 +75,15 @@ export async function setActiveAccount(account: Account): Promise<void> {
   }
 }
 
-export async function completeClientLogin(account: Account) {
+export async function completeClientLogin(addressAccount: AddressAccount) {
   try {
-    let addressInfo = app.user.addresses.find(
-      (a) => a.address === account.address && a.chain.id === account.chain.id
+    let existingAddressAccount = app.user.addresses.find(
+      (a) => a.address === addressAccount.address && a.chain.id === addressAccount.chain.id
     );
 
-    if (!addressInfo && account.addressId) {
-      addressInfo = new AddressInfo(
-        account.addressId,
-        account.address,
-        account.chain.id,
-        account.walletId
-      );
-      app.user.addresses.push(addressInfo);
+    if (!existingAddressAccount && addressAccount.addressId) {
+      existingAddressAccount = addressAccount;
+      app.user.addresses.push(addressAccount);
     }
 
     // link the address to the community
@@ -95,12 +91,12 @@ export async function completeClientLogin(account: Account) {
       try {
         if (
           !app.roles.getRoleInCommunity({
-            account,
+            account: addressAccount,
             chain: app.activeChainId(),
           })
         ) {
           await app.roles.createRole({
-            address: addressInfo,
+            address: existingAddressAccount,
             chain: app.activeChainId(),
           });
         }
@@ -111,12 +107,12 @@ export async function completeClientLogin(account: Account) {
     }
 
     // set the address as active
-    await setActiveAccount(account);
+    await setActiveAccount(addressAccount);
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+      app.user.activeAccounts.filter((a) => isSameAccount(a, addressAccount))
         .length === 0
     ) {
-      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      app.user.setActiveAccounts(app.user.activeAccounts.concat([addressAccount]));
     }
     m.redraw();
   } catch (e) {
@@ -158,7 +154,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.roles.isMember({ chain: chain.id, account });
+    return app.roles.isMember({ chain: chain.id, addressAccount: account });
   });
 
   if (memberAddresses.length === 1) {
@@ -211,14 +207,14 @@ export function updateActiveUser(data) {
     app.user.setAddresses(
       data.addresses.map(
         (a) =>
-          new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          )
+          new AddressAccount({
+            addressId: a.id,
+            address: a.address,
+            chain: app.config.chains.getById(a.chain),
+            keytype: a.keytype,
+            walletId: a.wallet_id,
+            ghostAddress: a.ghost_address
+          })
       )
     );
     app.user.setSocialAccounts(
@@ -240,7 +236,7 @@ export async function createUserWithAddress(
   chain: string,
   sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo
-): Promise<{ account: Account; newlyCreated: boolean }> {
+): Promise<{ addressAccount: AddressAccount; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
@@ -250,7 +246,7 @@ export async function createUserWithAddress(
   });
   const id = response.result.id;
   const chainInfo = app.config.chains.getById(chain);
-  const account = new Account({
+  const addressAccount = new AddressAccount({
     addressId: id,
     address,
     chain: chainInfo,
@@ -259,11 +255,11 @@ export async function createUserWithAddress(
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
   });
-  return { account, newlyCreated: response.result.newly_created };
+  return { addressAccount, newlyCreated: response.result.newly_created };
 }
 
-export async function unlinkLogin(account: AddressInfo) {
-  const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
+export async function unlinkLogin(account: AddressAccount) {
+  const unlinkingCurrentlyActiveAccount = app.user.activeAddressAccount === account;
   // TODO: Change to DELETE /address
   await $.post(`${app.serverUrl()}/deleteAddress`, {
     address: account.address,

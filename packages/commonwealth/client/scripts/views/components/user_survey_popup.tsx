@@ -128,8 +128,8 @@ export class UserSurveyPopup extends ClassComponent<UserSurveyPopupAttrs> {
 
     const handleRedirect = () => {
       const address =
-        app.user.activeAccount?.address ?? app.user.addresses[0].address;
-      const name = app.user.activeAccount?.profile.name ?? 'there';
+        app.user.activeAddressAccount?.address ?? app.user.addresses[0].address;
+      const name = app.user.activeAddressAccount?.profile.name ?? 'there';
 
       openTypeform('https://hicommonwealth.typeform.com/to/dS5q7cM2', {
         address,
@@ -142,7 +142,7 @@ export class UserSurveyPopup extends ClassComponent<UserSurveyPopupAttrs> {
     };
 
     const hasAnAddress =
-      (app.user.activeAccount?.address ?? app.user.addresses[0]?.address) !==
+      (app.user.activeAddressAccount?.address ?? app.user.addresses[0]?.address) !==
       undefined;
 
     return (

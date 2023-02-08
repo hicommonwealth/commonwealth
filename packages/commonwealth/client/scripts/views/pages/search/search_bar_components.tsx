@@ -2,7 +2,6 @@
 
 import ClassComponent from 'class_component';
 import m from 'mithril';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
@@ -13,6 +12,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import User from '../../components/widgets/user';
+import AddressAccount from "models/Address";
 
 type SearchChipAttrs = {
   isActive: boolean;
@@ -62,12 +62,11 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
       >
         <div class="header-row">
           {m(User, {
-            user: new AddressInfo(
-              searchResult.address_id,
-              searchResult.address,
-              searchResult.address_chain,
-              null
-            ),
+            user: new AddressAccount({
+              address: searchResult.address,
+              addressId: searchResult.address_id,
+              chain: app.config.chains.getById(searchResult.address_chain)
+            })
           })}
           <CWText className="last-updated-text">•</CWText>
           <CWText type="caption" className="last-updated-text">

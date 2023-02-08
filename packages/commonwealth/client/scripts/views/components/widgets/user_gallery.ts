@@ -3,9 +3,9 @@ import 'components/widgets/user_gallery.scss';
 
 import m from 'mithril';
 
-import type { Account, AddressInfo } from 'models';
 import app from 'state';
 import User, { AnonymousUser } from './user';
+import AddressAccount from "models/Address";
 
 // The UserGallery does not perform uniqueness checks.
 // The list of passed users must be unique to begin with, if one
@@ -13,7 +13,7 @@ import User, { AnonymousUser } from './user';
 
 const UserGallery: m.Component<
   {
-    users: Account[] | AddressInfo[];
+    users: AddressAccount[];
     addressesCount?: number;
     class?: string;
     avatarSize: number;
@@ -32,7 +32,7 @@ const UserGallery: m.Component<
     return m('.UserGallery', { class: vnode.attrs.class }, [
       users
         .slice(0, Math.min(userCount, maxUsers))
-        .map((user: Account | AddressInfo) => {
+        .map((user) => {
           if (
             user.chain.id !== app.chain?.id &&
             user.chain.id !== app.chain?.base

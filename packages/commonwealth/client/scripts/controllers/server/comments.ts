@@ -163,7 +163,7 @@ class CommentsController {
     }
     try {
       const res = await $.post(`${app.serverUrl()}/createComment`, {
-        author_chain: app.user.activeAccount.chain.id,
+        author_chain: app.user.activeAddressAccount.chain.id,
         chain,
         address,
         parent_id: parentCommentId,
@@ -198,8 +198,8 @@ class CommentsController {
     try {
       // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
-        address: app.user.activeAccount.address,
-        author_chain: app.user.activeAccount.chain.id,
+        address: app.user.activeAddressAccount.address,
+        author_chain: app.user.activeAddressAccount.chain.id,
         id: comment.id,
         chain: comment.chain,
         body: encodeURIComponent(newBody),

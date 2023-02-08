@@ -23,7 +23,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
     const { thread } = vnode.attrs;
 
     const hasAdminPermissions =
-      app.user.activeAccount &&
+      app.user.activeAddressAccount &&
       (app.roles.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
@@ -34,8 +34,8 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
         }));
 
     const isAuthor =
-      app.user.activeAccount &&
-      thread.author === app.user.activeAccount.address;
+      app.user.activeAddressAccount &&
+      thread.author === app.user.activeAddressAccount.address;
 
     if (!isAuthor && !hasAdminPermissions) return;
 

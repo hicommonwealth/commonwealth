@@ -227,7 +227,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               comment_ids: app.comments
                 .getByProposal(thread)
                 .map((comment) => comment.id),
-              active_address: app.user.activeAccount?.address,
+              active_address: app.user.activeAddressAccount?.address,
             }),
           });
 
@@ -343,17 +343,17 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
-    const { activeAccount } = app.user;
+    const { activeAddressAccount } = app.user;
 
     const isAuthor =
-      activeAccount?.address === thread.author &&
-      activeAccount?.chain.id === thread.authorChain;
+      activeAddressAccount?.address === thread.author &&
+      activeAddressAccount?.chain.id === thread.authorChain;
 
     const isEditor =
       thread.collaborators?.filter((c) => {
         return (
-          c.address === activeAccount?.address &&
-          c.chain === activeAccount?.chain.id
+          c.address === activeAddressAccount?.address &&
+          c.chain === activeAddressAccount?.chain.id
         );
       }).length > 0;
 
@@ -380,7 +380,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
 
     const canComment =
-      app.user.activeAccount ||
+      app.user.activeAddressAccount ||
       (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
 
     const setIsGloballyEditing = (status: boolean) => {
@@ -577,7 +577,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           }
           subHeader={!!thread.url && <ExternalLink thread={thread} />}
           actions={
-            app.user.activeAccount &&
+            app.user.activeAddressAccount &&
             !this.isGloballyEditing &&
             getActionMenuItems()
           }

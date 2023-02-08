@@ -4,7 +4,6 @@ import ClassComponent from 'class_component';
 import { formatTimestamp } from 'helpers/index';
 import { capitalize } from 'lodash';
 import m from 'mithril';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/user_dashboard/user_dashboard_row_top.scss';
@@ -13,6 +12,7 @@ import app from 'state';
 import User from 'views/components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getCommentPreview } from './helpers';
+import AddressAccount from "models/Address";
 
 type UserDashboardRowTopAttrs = {
   activityData: any;
@@ -55,12 +55,10 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         : decodedTitle;
 
     const actorName = m(User, {
-      user: new AddressInfo(
-        null,
-        author_address,
-        author_chain ?? chain_id,
-        null
-      ),
+      user: new AddressAccount({
+        address: author_address,
+        chain: app.config.chains.getById(author_chain ?? chain_id)
+      }),
       hideIdentityIcon: false,
       linkify: true,
       avatarSize: 16,

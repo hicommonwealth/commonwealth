@@ -7,7 +7,7 @@ import { pluralize } from 'helpers';
 import _, { capitalize } from 'lodash';
 import m from 'mithril';
 import type { Profile } from 'models';
-import { AddressInfo, SearchQuery } from 'models';
+import { SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
 import moment from 'moment';
 
@@ -27,6 +27,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { PageNotFound } from '../404';
 import ErrorPage from '../error';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import AddressAccount from "models/Address";
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -51,12 +52,11 @@ const getDiscussionResult = (thread, searchTerm) => {
         <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
         <div class="search-results-thread-subtitle">
           {m(User, {
-            user: new AddressInfo(
-              thread.address_id,
-              thread.address,
-              thread.address_chain,
-              null
-            ),
+            user: new AddressAccount({
+              address: thread.address,
+              addressId: thread.address_id,
+              chain: app.config.chains.getById(thread.address_chain)
+            })
           })}
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -101,12 +101,11 @@ const getCommentResult = (comment, searchTerm) => {
         </div> */}
         <div class="search-results-thread-subtitle">
           {m(User, {
-            user: new AddressInfo(
-              comment.address_id,
-              comment.address,
-              comment.address_chain,
-              null
-            ),
+            user: new AddressAccount({
+              address: comment.address,
+              addressId: comment.address_id,
+              chain: app.config.chains.getById(comment.address_chain)
+            })
           })}
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}

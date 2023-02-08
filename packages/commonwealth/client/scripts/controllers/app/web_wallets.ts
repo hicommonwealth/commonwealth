@@ -49,7 +49,7 @@ export default class WebWalletController {
     account: Account,
     wallet: WalletId
   ): Promise<void> {
-    if (app.user.activeAccount.address !== account.address) {
+    if (app.user.activeAddressAccount.address !== account.address) {
       console.error('account must be active to set wallet id');
       return;
     }

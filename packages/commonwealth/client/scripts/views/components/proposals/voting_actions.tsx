@@ -81,9 +81,9 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       return;
     } else if (!app.isLoggedIn()) {
       return <CannotVote label="Log in to vote" />;
-    } else if (!app.user.activeAccount) {
+    } else if (!app.user.activeAddressAccount) {
       return <CannotVote label="Connect an address to vote" />;
-    } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
+    } else if (!proposal.canVoteFrom(app.user.activeAddressAccount)) {
       return <CannotVote label="Cannot vote from this address" />;
     }
 
@@ -93,17 +93,17 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       proposal instanceof SubstrateDemocracyProposal ||
       proposal instanceof SubstrateDemocracyReferendum
     ) {
-      user = app.user.activeAccount as SubstrateAccount;
+      user = app.user.activeAddressAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
-      user = app.user.activeAccount as CosmosAccount;
+      user = app.user.activeAddressAccount as CosmosAccount;
     } else if (
       proposal instanceof MolochProposal ||
       proposal instanceof CompoundProposal ||
       proposal instanceof AaveProposal
     ) {
-      user = app.user.activeAccount as EthereumAccount;
+      user = app.user.activeAddressAccount as EthereumAccount;
     } else if (proposal instanceof NearSputnikProposal) {
-      user = app.user.activeAccount as NearAccount;
+      user = app.user.activeAddressAccount as NearAccount;
     } else {
       return <CannotVote label="Unrecognized proposal type" />;
     }

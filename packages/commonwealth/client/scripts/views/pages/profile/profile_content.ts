@@ -1,6 +1,5 @@
 import { pluralize } from 'helpers';
 import m from 'mithril';
-import type { Account } from 'models';
 import { Thread } from 'models';
 
 import app from 'state';
@@ -9,6 +8,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import type { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
 import ProfileProposal from './profile_proposal';
+import AddressAccount from "models/Address";
 
 const postsRemaining = (contentLength, count) => {
   return contentLength > 10 && count < contentLength;
@@ -16,7 +16,7 @@ const postsRemaining = (contentLength, count) => {
 
 const ProfileContent: m.Component<
   {
-    account: Account;
+    account: AddressAccount;
     type: UserContent;
     content: any[];
     localStorageScrollYKey: string;

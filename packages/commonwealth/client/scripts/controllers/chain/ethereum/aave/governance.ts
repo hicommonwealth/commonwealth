@@ -49,7 +49,7 @@ export default class AaveGovernance extends ProposalModule<
 
   // METHODS
   public async propose(args: AaveProposalArgs) {
-    const address = this.app.user.activeAccount.address;
+    const address = this.app.user.activeAddressAccount.address;
     const {
       executor,
       targets,
@@ -103,7 +103,7 @@ export default class AaveGovernance extends ProposalModule<
     // send transaction
     const contract = await attachSigner(
       this.app.wallets,
-      this.app.user.activeAccount,
+      this.app.user.activeAddressAccount,
       this._api.Governance
     );
     const tx = await contract.create(

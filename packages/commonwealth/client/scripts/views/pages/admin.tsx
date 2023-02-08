@@ -27,7 +27,7 @@ class SudoForm extends ClassComponent {
   private txProcessing: boolean;
 
   view() {
-    const author = app.user.activeAccount as SubstrateAccount;
+    const author = app.user.activeAddressAccount as SubstrateAccount;
     const substrate = app.chain as Substrate;
 
     if (!substrate.chain.sudoKey) {
@@ -240,7 +240,7 @@ class AdminActions extends ClassComponent {
             this.inprogress = true;
             // TODO: Change to PUT /adminStatus
             $.post(`${app.serverUrl()}/updateAdminStatus`, {
-              admin: app.user.activeAccount.address,
+              admin: app.user.activeAddressAccount.address,
               address: this.selectedProfile, // the address to be changed
               role: this.role,
               jwt: app.user.jwt,

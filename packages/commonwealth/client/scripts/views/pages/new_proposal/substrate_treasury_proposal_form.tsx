@@ -20,7 +20,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
   private beneficiary: string;
 
   view() {
-    const author = app.user.activeAccount;
+    const author = app.user.activeAddressAccount;
     const substrate = app.chain as Substrate;
 
     if (!substrate.treasury.initialized) {

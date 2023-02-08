@@ -196,13 +196,13 @@ export class ChatNamespace {
   }
 
   public async getChatMessages() {
-    if (!app.user.activeAccount) {
+    if (!app.user.activeAddressAccount) {
       throw new Error(ChatErrors.NOT_LOGGED_IN);
     }
     try {
       const res = await $.get(`${app.serverUrl()}/getChatMessages`, {
         jwt: app.user.jwt,
-        address: app.user.activeAccount.address,
+        address: app.user.activeAddressAccount.address,
         chain_id: app.activeChainId(),
       });
 

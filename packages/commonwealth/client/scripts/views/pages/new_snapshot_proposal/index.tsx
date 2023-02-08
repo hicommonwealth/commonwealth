@@ -96,7 +96,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
 
       const space = app.snapshot.space;
 
-      getScore(space, app.user.activeAccount.address).then((response) => {
+      getScore(space, app.user.activeAddressAccount.address).then((response) => {
         const scores = response
           .map((score) =>
             Object.values(score).reduce(
@@ -119,7 +119,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
 
     if (!this.snapshotScoresFetched) return <PageLoading />;
 
-    const author = app.user.activeAccount;
+    const author = app.user.activeAddressAccount;
 
     const clearLocalStorage = () => {
       localStorage.removeItem(

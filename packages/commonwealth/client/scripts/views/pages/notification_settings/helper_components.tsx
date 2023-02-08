@@ -4,7 +4,6 @@ import ClassComponent from 'class_component';
 import { getProposalUrlPath } from 'identifiers';
 import m from 'mithril';
 import type { NotificationSubscription } from 'models';
-import { AddressInfo } from 'models';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -18,6 +17,7 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import User from '../../components/widgets/user';
 import { getNotificationTypeText } from './helpers';
+import AddressAccount from "models/Address";
 
 const getTextRows = (subscription: NotificationSubscription) => {
   if (subscription.Thread) {
@@ -83,12 +83,10 @@ const getTextRows = (subscription: NotificationSubscription) => {
           >
             {m(User, {
               hideAvatar: true,
-              user: new AddressInfo(
-                null,
-                subscription.Comment.author,
-                subscription.Comment.chain,
-                null
-              ),
+              user: new AddressAccount({
+                address: subscription.Comment.author,
+                chain: app.config.chains.getById(subscription.Comment.chain)
+              })
             })}
             's
           </CWText>

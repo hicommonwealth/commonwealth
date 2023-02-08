@@ -38,7 +38,7 @@ export class AaveProposalForm extends ClassComponent {
   }
 
   view() {
-    const author = app.user.activeAccount;
+    const author = app.user.activeAddressAccount;
     const aave = app.chain as Aave;
     const { activeTabIndex, aaveProposalState } = this;
 
@@ -171,7 +171,7 @@ export class AaveProposalForm extends ClassComponent {
           onclick={(e) => {
             e.preventDefault();
 
-            this.proposer = app.user?.activeAccount?.address;
+            this.proposer = app.user?.activeAddressAccount?.address;
 
             if (!this.proposer) {
               throw new Error('Invalid address / not logged in');

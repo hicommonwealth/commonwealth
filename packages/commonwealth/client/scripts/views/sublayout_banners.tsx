@@ -37,7 +37,7 @@ export class SublayoutBanners extends ClassComponent<SublayoutBannersAttrs> {
         )}
         {app.isLoggedIn() &&
           ITokenAdapter.instanceOf(app.chain) &&
-          !app.user.activeAccount && (
+          !app.user.activeAddressAccount && (
             <CWBanner
               bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
             />

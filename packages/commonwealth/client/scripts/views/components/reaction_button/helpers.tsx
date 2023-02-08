@@ -3,13 +3,14 @@
 import $ from 'jquery';
 import m from 'mithril';
 import type { ChainInfo, Comment } from 'models';
-import { AddressInfo, Thread } from 'models';
+import { Thread } from 'models';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { NewLoginModal } from '../../modals/login_modal';
 import { CWText } from '../component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import AddressAccount from "models/Address";
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -34,7 +35,10 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
         <div style="display: flex; width: 120px;">
           <CWText noWrap>
             {m(User, {
-              user: new AddressInfo(null, address, chain?.id || chain, null),
+              user: new AddressAccount({
+                address,
+                chain: app.config.chains.getById(chain?.id || chain)
+              }),
               linkify: true,
             })}
           </CWText>
@@ -80,7 +84,7 @@ export const onReactionClick = (
   e.preventDefault();
   e.stopPropagation();
 
-  if (!app.isLoggedIn() || !app.user.activeAccount) {
+  if (!app.isLoggedIn() || !app.user.activeAddressAccount) {
     app.modals.create({
       modal: NewLoginModal,
       data: {
@@ -91,7 +95,7 @@ export const onReactionClick = (
       },
     });
   } else {
-    const { address: userAddress, chain } = app.user.activeAccount;
+    const { address: userAddress, chain } = app.user.activeAddressAccount;
 
     // if it's a community use the app.user.activeAccount.chain.id instead of author chain
     const chainId = app.activeChainId();

@@ -9,9 +9,7 @@ import type {
 } from 'helpers/snapshot_utils';
 import { getPower, getResults } from 'helpers/snapshot_utils';
 import m from 'mithril';
-import { AddressInfo } from 'models';
 
-// import 'pages/snapshot/index.scss';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
@@ -27,6 +25,7 @@ import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
+import AddressAccount from "models/Address";
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -73,7 +72,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       getPower(
         this.space,
         this.proposal,
-        app.user?.activeAccount?.address
+        app.user?.activeAddressAccount?.address
       ).then((vals) => {
         this.validatedAgainstStrategies = vals.totalScore > 0;
         this.totalScore = vals.totalScore;
@@ -132,12 +131,10 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             <CWText>
               {!!app.activeChainId() &&
                 m(User, {
-                  user: new AddressInfo(
-                    null,
-                    this.proposal.author,
-                    app.activeChainId(),
-                    null
-                  ),
+                  user: new AddressAccount({
+                    address: this.proposal.author,
+                    chain: app.config.chains.getById(app.activeChainId())
+                  }),
                   showAddressWithDisplayName: true,
                   linkify: true,
                   popover: true,

@@ -173,8 +173,8 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                     prompt: this.prompt,
                     options: this.options,
                     customDuration: this.customDuration,
-                    address: app.user.activeAccount.address,
-                    authorChain: app.user.activeAccount.chain.id,
+                    address: app.user.activeAddressAccount.address,
+                    authorChain: app.user.activeAddressAccount.chain.id,
                   });
                   notifySuccess('Poll creation succeeded');
                 } catch (err) {

@@ -102,11 +102,11 @@ export class Comment extends ClassComponent<CommentAttrs> {
       });
 
     const canReply =
-      !isLast && !isLocked && app.isLoggedIn() && app.user.activeAccount;
+      !isLast && !isLocked && app.isLoggedIn() && app.user.activeAddressAccount;
 
     const canEditAndDelete =
       !isLocked &&
-      (comment.author === app.user.activeAccount?.address || isAdminOrMod);
+      (comment.author === app.user.activeAddressAccount?.address || isAdminOrMod);
 
     return (
       <div class={`Comment comment-${comment.id}`}>

@@ -38,7 +38,7 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
     if (proposal instanceof SubstrateDemocracyReferendum) {
       if (!setDemocracyVoteConviction) return 'Misconfigured';
       if (!setDemocracyVoteAmount) return 'Misconfigured';
-      if (!app.user.activeAccount) return 'Misconfigured';
+      if (!app.user.activeAddressAccount) return 'Misconfigured';
 
       return (
         <div class="ProposalExtensions">
@@ -56,8 +56,8 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
               setDemocracyVoteAmount(parseFloat(e.target.value));
             }}
           />
-          {app.user.activeAccount instanceof SubstrateAccount && (
-            <BalanceInfo account={app.user.activeAccount} />
+          {app.user.activeAddressAccount instanceof SubstrateAccount && (
+            <BalanceInfo account={app.user.activeAddressAccount} />
           )}
         </div>
       );

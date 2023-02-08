@@ -1,22 +1,22 @@
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
-import type { Account, AddressInfo } from 'models';
 import app from 'state';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
+import AddressAccount from "models/Address";
 
 const ProfileBanner: m.Component<
-  { account: Account; addressInfo: AddressInfo },
+  { addressAccount: AddressAccount },
   { loading: boolean }
 > = {
   view: (vnode) => {
-    const { account, addressInfo } = vnode.attrs;
+    const { addressAccount } = vnode.attrs;
     const addrShort = formatAddressShort(
-      addressInfo.address,
-      addressInfo.chain.id
+      addressAccount.address,
+      addressAccount.chain.id
     );
 
     const createRole = async (e) => {
@@ -34,14 +34,14 @@ const ProfileBanner: m.Component<
 
       app.roles
         .createRole({
-          address: addressInfo,
+          address: addressAccount,
           chain: app.activeChainId(),
         })
         .then(() => {
           vnode.state.loading = false;
           m.redraw();
           notifySuccess(`Joined with ${addrShort}`); // ${addrShort} is now a member of the [Edgeware] community!
-          setActiveAccount(account).then(() => {
+          setActiveAccount(addressAccount).then(() => {
             m.redraw();
             $(e.target).trigger('modalexit');
           });

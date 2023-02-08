@@ -83,7 +83,7 @@ function getModules() {
 
 class TipsPage extends ClassComponent {
   view() {
-    const activeAccount = app.user.activeAccount;
+    const activeAccount = app.user.activeAddressAccount;
 
     if (!app.chain || !app.chain.loaded) {
       if (

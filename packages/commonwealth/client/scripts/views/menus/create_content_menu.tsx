@@ -16,7 +16,7 @@ import type { MenuItem } from '../components/component_kit/types';
 
 const getCreateContentMenuItems = (): MenuItem[] => {
   const showSnapshotOptions =
-    app.user.activeAccount && !!app.chain?.meta.snapshot.length;
+    app.user.activeAddressAccount && !!app.chain?.meta.snapshot.length;
 
   const topics = app.topics
     .getByCommunity(app.activeChainId())
@@ -259,7 +259,7 @@ export class CreateContentPopover extends ClassComponent {
       !app.isLoggedIn() ||
       !app.chain ||
       !app.activeChainId() ||
-      !app.user.activeAccount
+      !app.user.activeAddressAccount
     ) {
       return;
     }

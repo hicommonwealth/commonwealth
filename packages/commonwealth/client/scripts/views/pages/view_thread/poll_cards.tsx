@@ -65,17 +65,17 @@ export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
         multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={
-          app.user.activeAccount &&
+          app.user.activeAddressAccount &&
           !!poll.getUserVote(
-            app.user.activeAccount?.chain?.id,
-            app.user.activeAccount?.address
+            app.user.activeAddressAccount?.chain?.id,
+            app.user.activeAddressAccount?.address
           )
         }
-        disableVoteButton={!app.user.activeAccount}
+        disableVoteButton={!app.user.activeAddressAccount}
         votedFor={
           poll.getUserVote(
-            app.user.activeAccount?.chain?.id,
-            app.user.activeAccount?.address
+            app.user.activeAddressAccount?.chain?.id,
+            app.user.activeAddressAccount?.address
           )?.option
         }
         proposalTitle={poll.prompt}
@@ -94,7 +94,7 @@ export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
         incrementalVoteCast={1}
         isPreview={false}
         tooltipErrorMessage={
-          app.user.activeAccount
+          app.user.activeAddressAccount
             ? null
             : 'You must join this community to vote.'
         }

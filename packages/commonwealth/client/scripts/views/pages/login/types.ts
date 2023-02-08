@@ -1,5 +1,6 @@
-import type { Account, IWebWallet } from 'models';
+import type { IWebWallet } from 'models';
 import type { ProfileRowAttrs } from '../../components/component_kit/cw_profiles_list';
+import AddressAccount from "models/Address";
 
 export type LoginSidebarType =
   | 'connectWallet'
@@ -39,7 +40,7 @@ export type LoginAttrs = {
   linkExistingAccountCallback: () => void;
   createNewAccountCallback: () => void;
   accountVerifiedCallback: (
-    account: Account,
+    account: AddressAccount,
     newlyCreated: boolean,
     linking: boolean
   ) => Promise<void>;

@@ -35,7 +35,7 @@ export class CompoundProposalForm extends ClassComponent {
   }
 
   view() {
-    const author = app.user.activeAccount;
+    const author = app.user.activeAddressAccount;
     const { activeTabIndex, aaveProposalState } = this;
 
     return (
@@ -136,7 +136,7 @@ export class CompoundProposalForm extends ClassComponent {
           onclick={(e) => {
             e.preventDefault();
 
-            this.proposer = app.user?.activeAccount?.address;
+            this.proposer = app.user?.activeAddressAccount?.address;
 
             if (!this.proposer) {
               throw new Error('Invalid address / not logged in');

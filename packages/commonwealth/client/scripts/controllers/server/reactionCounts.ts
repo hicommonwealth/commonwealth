@@ -39,7 +39,7 @@ class ReactionCountController {
     chainId: string
   ) {
     const options = {
-      author_chain: app.user.activeAccount.chain.id,
+      author_chain: app.user.activeAddressAccount.chain.id,
       chain: chainId,
       address,
       reaction,

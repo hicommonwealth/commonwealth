@@ -1,16 +1,17 @@
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import m from 'mithril';
-import type { Account, Comment } from 'models';
+import type { Comment } from 'models';
 import type { Thread } from 'models';
 
 import app from 'state';
 import { renderQuillTextBody } from '../../components/quill/helpers';
+import AddressAccount from "models/Address";
 
 interface IProfileCommentGroupAttrs {
   proposal: Thread | any;
   comments: Array<Comment<any>>;
-  account: Account;
+  account: AddressAccount;
 }
 
 const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {

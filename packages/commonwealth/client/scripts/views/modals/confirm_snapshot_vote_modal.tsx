@@ -32,7 +32,7 @@ export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVote
   private saving: boolean;
 
   view(vnode: m.Vnode<ConfirmSnapshotVoteModalAttrs>) {
-    const author = app.user.activeAccount;
+    const author = app.user.activeAddressAccount;
 
     const { proposal, space, id, selectedChoice, totalScore, successCallback } =
       vnode.attrs;

@@ -50,7 +50,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
     this.loading =
       this.loading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
 
-    const activeAddress = app.user.activeAccount?.address;
+    const activeAddress = app.user.activeAddressAccount?.address;
 
     const dislike = async (userAddress: string) => {
       const reaction = (await fetchReactionsByPost(comment)).find((r) => {

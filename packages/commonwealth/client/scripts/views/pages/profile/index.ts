@@ -1,38 +1,35 @@
-import {
-  checkAddress,
-  decodeAddress,
-  encodeAddress,
-} from '@polkadot/util-crypto';
-import { navigateToSubpage } from 'router';
-import { bech32 } from 'bech32';
+import {checkAddress, decodeAddress, encodeAddress,} from '@polkadot/util-crypto';
+import {navigateToSubpage} from 'router';
+import {bech32} from 'bech32';
 import bs58 from 'bs58';
-import { ChainBase } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import {ChainBase} from 'common-common/src/types';
+import {setActiveAccount} from 'controllers/app/login';
+import {modelFromServer as modelCommentFromServer} from 'controllers/server/comments';
 import $ from 'jquery';
 import _ from 'lodash';
 
 import m from 'mithril';
-import type { Comment, Thread } from 'models';
-import { Profile } from 'models';
+import type {Comment, Thread} from 'models';
+import {Profile} from 'models';
 import 'pages/profile.scss';
 
 import app from 'state';
-import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
-import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
+import {CWTab, CWTabBar} from 'views/components/component_kit/cw_tabs';
+import {PageNotFound} from 'views/pages/404';
+import {PageLoading} from 'views/pages/loading';
 
 import Sublayout from 'views/sublayout';
-import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
+import {checkAddressChecksum, toChecksumAddress} from 'web3-utils';
 import ProfileBanner from './profile_banner';
 import ProfileBio from './profile_bio';
 import ProfileContent from './profile_content';
 import ProfileHeader from './profile_header';
+import AddressAccount from "models/Address";
 
 const getProfileStatus = (account) => {
   const onOwnProfile =
-    account.chain.id === app.user.activeAccount?.chain?.id &&
-    account.address === app.user.activeAccount?.address;
+    account.chain.id === app.user.activeAddressAccount?.chain?.id &&
+    account.address === app.user.activeAddressAccount?.address;
   const onLinkedProfile =
     !onOwnProfile &&
     app.user.activeAccounts.length > 0 &&
@@ -62,13 +59,13 @@ const getProfileStatus = (account) => {
         ? joinableAddresses.filter((addr) => {
             return (
               communityRoles.filter((role) => {
-                return role.address_id === addr.id;
+                return role.address_id === addr.addressId;
               }).length === 0
             );
           })
         : [];
     const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
-      return addr.id === account.id;
+      return addr.addressId === account.id;
     });
     isUnjoinedJoinableAddress = currentAddressInfoArray.length > 0;
     if (isUnjoinedJoinableAddress) {
@@ -96,7 +93,7 @@ interface IProfilePageAttrs {
 }
 
 interface IProfilePageState {
-  account;
+  account: AddressAccount;
   threads: Thread[];
   comments: Comment<any>[];
   initialized: boolean;
@@ -197,16 +194,14 @@ const loadProfile = async (
     } else {
       profile.initializeEmpty();
     }
-    const account = {
+    state.account = new AddressAccount({
       profile,
-      chain: a.chain,
+      chain: app.config.chains.getById(a.chain),
       address: a.address,
-      id: a.id,
-      name: a.name,
-      user_id: a.user_id,
-      ghost_address: a.ghost_address,
-    };
-    state.account = account;
+      addressId: a.id,
+      ghostAddress: a.ghost_address,
+      userId: a.user_id
+    });
     state.threads = result.threads.map((t) => app.threads.modelFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
     m.redraw();
@@ -215,49 +210,33 @@ const loadProfile = async (
     if (chainInfo?.base === ChainBase.Substrate) {
       try {
         decodeAddress(address);
-        state.account = {
-          profile: null,
-          chain,
+        state.account = new AddressAccount({
+          chain: chainInfo,
           address,
-          id: null,
-          name: null,
-          user_id: null,
-        };
+        })
       } catch (e) {
         // do nothing if can't decode
       }
     } else if (chainInfo?.base === ChainBase.Ethereum) {
       if (checkAddressChecksum(address)) {
-        state.account = {
-          profile: null,
-          chain,
+        state.account = new AddressAccount({
+          chain: chainInfo,
           address,
-          id: null,
-          name: null,
-          user_id: null,
-        };
+        })
       }
     } else if (chainInfo?.base === ChainBase.CosmosSDK) {
       if (checkCosmosAddress(address)) {
-        state.account = {
-          profile: null,
-          chain,
+        state.account = new AddressAccount({
+          chain: chainInfo,
           address,
-          id: null,
-          name: null,
-          user_id: null,
-        };
+        })
       }
     } else if (chainInfo?.base === ChainBase.Solana) {
       if (checkSolanaAddress(address)) {
-        state.account = {
-          profile: null,
-          chain,
+        state.account = new AddressAccount({
+          chain: chainInfo,
           address,
-          id: null,
-          name: null,
-          user_id: null,
-        };
+        })
       }
     }
     state.loaded = true;
@@ -440,8 +419,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
         m('.ProfilePage', [
           displayBanner &&
             m(ProfileBanner, {
-              account,
-              addressInfo: currentAddressInfo,
+              addressAccount: account
             }),
           m('.row.row-narrow.forum-row', [
             m('.col-xs-12 .col-md-8', [

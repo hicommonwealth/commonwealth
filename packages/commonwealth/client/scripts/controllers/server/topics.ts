@@ -46,7 +46,7 @@ class TopicsController {
         featured_in_new_post: topic.featuredInNewPost,
         default_offchain_template: topic.defaultOffchainTemplate,
         featured_order: featuredOrder,
-        address: app.user.activeAccount.address,
+        address: app.user.activeAddressAccount.address,
         jwt: app.user.jwt,
       });
       const result = new Topic(response.result);
@@ -94,7 +94,7 @@ class TopicsController {
         thread_id: threadId,
         topic_id: topicId,
         topic_name: topicName,
-        address: app.user.activeAccount.address,
+        address: app.user.activeAddressAccount.address,
       });
       const result = new Topic(response.result);
       if (this._store.getById(result.id)) {

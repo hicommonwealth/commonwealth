@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
-import type { Account } from 'models';
 import { initChain } from 'helpers/chain';
 import { setActiveAccount } from '../../../controllers/app/login';
 import type SubstrateIdentity from '../../../controllers/chain/substrate/identity';
@@ -12,9 +11,10 @@ import User from '../../components/widgets/user';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditIdentityModal } from '../../modals/edit_identity_modal';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
+import AddressAccount from "models/Address";
 
 const editIdentityAction = (
-  account: Account,
+  account: AddressAccount,
   currentIdentity: SubstrateIdentity,
   vnode
 ) => {
@@ -64,7 +64,7 @@ const editIdentityAction = (
 };
 
 export interface IProfileHeaderAttrs {
-  account: Account;
+  account: AddressAccount;
   setIdentity: boolean;
   refreshCallback: Function;
   onLinkedProfile: boolean;

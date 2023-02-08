@@ -45,7 +45,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       updatedCommentsCallback,
     } = vnode.attrs;
 
-    const author = app.user.activeAccount;
+    const author = app.user.activeAddressAccount;
 
     const parentType = parentCommentId
       ? ContentType.Comment
@@ -138,19 +138,19 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
 
     return (
       <div class="CreateComment">
-        {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
+        {app.user.activeAddressAccount && !app.user.activeAddressAccount?.profile.name ? (
           <CWText type="h5" className="callout-text">
             You haven't set a display name yet.
             <a
               href={`/${app.activeChainId()}/account/${
-                app.user.activeAccount.address
-              }?base=${app.user.activeAccount.chain.id}`}
+                app.user.activeAddressAccount.address
+              }?base=${app.user.activeAddressAccount.chain.id}`}
               onclick={(e) => {
                 e.preventDefault();
                 app.modals.create({
                   modal: EditProfileModal,
                   data: {
-                    account: app.user.activeAccount,
+                    account: app.user.activeAddressAccount,
                     refreshCallback: () => m.redraw(),
                   },
                 });
@@ -191,7 +191,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                 Commenting in {activeTopicName} requires{' '}
                 {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
                 {app.chain.meta.default_symbol}.{' '}
-                {userBalance && app.user.activeAccount && (
+                {userBalance && app.user.activeAddressAccount && (
                   <>
                     You have {weiToTokens(userBalance.toString(), decimals)}{' '}
                     {app.chain.meta.default_symbol}.

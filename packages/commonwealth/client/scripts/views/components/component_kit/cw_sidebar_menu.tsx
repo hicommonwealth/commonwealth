@@ -4,10 +4,8 @@ import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
-import { Icon, Icons, ListItem } from 'construct-ui';
 import m from 'mithril';
-import type { ChainInfo, RoleInfo } from 'models';
-import { AddressInfo } from 'models';
+import type { ChainInfo } from 'models';
 
 import app from 'state';
 import { CommunityLabel } from '../community_label';
@@ -17,6 +15,7 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
+import AddressAccount from "models/Address";
 
 // TODO: Switch to new component kit system, migrate to more native setup
 const renderCommunity = (item: ChainInfo) => {
@@ -43,12 +42,11 @@ const renderCommunity = (item: ChainInfo) => {
             return m(User, {
               avatarSize: 18,
               avatarOnly: true,
-              user: new AddressInfo(
-                role.address_id,
-                role.address,
-                role.address_chain || role.chain_id,
-                null
-              ),
+              user: new AddressAccount({
+                addressId: role.address_id,
+                address: role.address,
+                chain: app.config.chains.getById(role.address_chain || role.chain_id)
+              })
             });
           })}
           <div

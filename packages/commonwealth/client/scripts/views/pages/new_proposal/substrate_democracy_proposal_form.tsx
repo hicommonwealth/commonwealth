@@ -26,7 +26,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
   }
 
   view() {
-    const author = app.user.activeAccount as SubstrateAccount;
+    const author = app.user.activeAddressAccount as SubstrateAccount;
     const substrate = app.chain as Substrate;
     const formState = { module: '', function: '', args: [] };
 

@@ -97,7 +97,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
     };
 
     const getBody = () => {
-      if (!app.user.activeAccount) {
+      if (!app.user.activeAddressAccount) {
         return <CWText>Must be logged in</CWText>;
       } else if (app.chain?.network === ChainNetwork.Plasm) {
         return <CWText>Unsupported network</CWText>;

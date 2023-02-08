@@ -177,7 +177,7 @@ class SpecSettingsPage extends ClassComponent {
                   `${app.serverUrl()}/editSubstrateSpec`,
                   {
                     jwt: app.user.jwt,
-                    address: app.user.activeAccount.address,
+                    address: app.user.activeAddressAccount.address,
                     chain: this.chain,
                     spec: JSON.stringify(this.spec),
                   }

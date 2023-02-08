@@ -119,9 +119,9 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
 
       this.state.isNewAccount = newAcct.newlyCreated;
       // this.state.account = newAcct.account;
-      acct.setValidationToken(newAcct.account.validationToken);
+      acct.setValidationToken(newAcct.addressAccount.validationToken);
       acct.setWalletId(WalletId.NearWallet);
-      acct.setAddressId(newAcct.account.addressId);
+      acct.setAddressId(newAcct.addressAccount.addressId);
       acct.setSessionPublicAddress(sessionPublicAddress);
       acct.setValidationBlockInfo(null);
 

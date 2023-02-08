@@ -1,19 +1,19 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import { notifyError } from 'controllers/app/notifications';
+import {notifyError} from 'controllers/app/notifications';
 import $ from 'jquery';
 import m from 'mithril';
-import type { RoleInfo } from 'models';
-import { AddressInfo } from 'models';
+import type {RoleInfo} from 'models';
 
 import 'pages/manage_community/manage_roles.scss';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
+import {CWIcon} from '../../components/component_kit/cw_icons/cw_icon';
+import {CWLabel} from '../../components/component_kit/cw_label';
+import {confirmationModalWithText} from '../../modals/confirm_modal';
+import AddressAccount from "models/Address";
 
 type ManageRoleRowAttrs = {
   label: string;
@@ -36,22 +36,21 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
             const addr = role.Address;
 
             const isSelf =
-              role.Address.address === app.user.activeAccount?.address &&
-              role.chain_id === app.user.activeAccount?.chain.id;
+              role.Address.address === app.user.activeAddressAccount?.address &&
+              role.chain_id === app.user.activeAddressAccount?.chain.id;
 
             const roleBelongsToUser = !!app.user.addresses.filter(
-              (addr_) => addr_.id === (role.address_id || role.Address.id)
+              (addr_) => addr_.addressId === (role.address_id || role.Address.id)
             ).length;
             return (
               <div class="role-row">
                 {m(User, {
-                  user: new AddressInfo(
-                    addr.id,
-                    addr.address,
-                    role.chain_id,
-                    null,
-                    addr.walletId
-                  ), // role.Address, // make AddressInfo?
+                  user: new AddressAccount({
+                    addressId: addr.id,
+                    address: addr.address,
+                    chain: app.config.chains.getById(role.chain_id),
+                    walletId: addr.walletId
+                  }),
                   popover: true,
                   linkify: false,
                   hideAvatar: false,
@@ -66,10 +65,9 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                     );
 
                     const userAdminsAndMods = adminsAndMods.filter((role_) => {
-                      const belongsToUser = !!app.user.addresses.filter(
-                        (addr_) => addr_.id === role_.address_id
+                      return !!app.user.addresses.filter(
+                        (addr_) => addr_.addressId === role_.address_id
                       ).length;
-                      return belongsToUser;
                     });
 
                     // if (role.permission === 'admin') {

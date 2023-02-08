@@ -435,14 +435,14 @@ export default class AaveProposal extends Proposal<
     );
     if (!isCancellable) {
       const guardian = await this._Gov.api.Governance.getGuardian();
-      if (this._Gov.app.user.activeAccount.address !== guardian) {
+      if (this._Gov.app.user.activeAddressAccount.address !== guardian) {
         throw new Error('proposal cannot be cancelled');
       }
     }
 
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
+      this._Gov.app.user.activeAddressAccount,
       this._Gov.api.Governance
     );
     const tx = await contract.cancel(this.data.identifier, {
@@ -464,7 +464,7 @@ export default class AaveProposal extends Proposal<
     // no user validation needed
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
+      this._Gov.app.user.activeAddressAccount,
       this._Gov.api.Governance
     );
     const tx = await contract.queue(this.data.id);
@@ -491,7 +491,7 @@ export default class AaveProposal extends Proposal<
     // no user validation needed
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
+      this._Gov.app.user.activeAddressAccount,
       this._Gov.api.Governance
     );
     const tx = await contract.execute(this.data.id);
@@ -503,7 +503,7 @@ export default class AaveProposal extends Proposal<
 
   // web wallet TX only
   public async submitVoteWebTx(vote: AaveProposalVote) {
-    const address = this._Gov.app.user.activeAccount.address;
+    const address = this._Gov.app.user.activeAddressAccount.address;
 
     // validate proposal state
     if (this.state !== AaveTypes.ProposalState.ACTIVE) {
@@ -521,7 +521,7 @@ export default class AaveProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
+      this._Gov.app.user.activeAddressAccount,
       this._Gov.api.Governance
     );
     const tx = await contract.submitVote(this.data.id, vote.choice);

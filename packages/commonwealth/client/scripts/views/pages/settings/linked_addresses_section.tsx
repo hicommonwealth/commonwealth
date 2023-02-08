@@ -7,7 +7,6 @@ import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { formatAddressShort, link, orderAccountsByAddress } from 'helpers';
 import _ from 'lodash';
 import m from 'mithril';
-import type { AddressInfo } from 'models';
 
 import 'pages/settings/linked_addresses_section.scss';
 
@@ -17,9 +16,10 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
+import AddressAccount from "models/Address";
 
 type AccountRowAttrs = {
-  account: AddressInfo;
+  account: AddressAccount;
   onclick?: (e: Event) => any;
 };
 
@@ -29,9 +29,9 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
   view(vnode: m.Vnode<AccountRowAttrs>) {
     const { account } = vnode.attrs;
     const isActiveAccount =
-      app.user.activeAccount &&
-      app.user.activeAccount.chain.id === account.chain.id &&
-      app.user.activeAccount.address === account.address;
+      app.user.activeAddressAccount &&
+      app.user.activeAddressAccount.chain.id === account.chain.id &&
+      app.user.activeAddressAccount.address === account.address;
 
     return (
       <div
@@ -89,8 +89,8 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
             if (confirmed) {
               this.removing = true;
               if (
-                app.user.activeAccount?.address === account.address &&
-                app.user.activeAccount?.chain.id === account.chain.id
+                app.user.activeAddressAccount?.address === account.address &&
+                app.user.activeAddressAccount?.chain.id === account.chain.id
               ) {
                 app.user.ephemerallySetActiveAccount(null);
               }

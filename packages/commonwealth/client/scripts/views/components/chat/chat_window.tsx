@@ -23,6 +23,7 @@ import { renderQuillTextBody } from '../quill/helpers';
 import type { QuillEditor } from '../quill/quill_editor';
 
 import { QuillEditorComponent } from '../quill/quill_editor_component';
+import AddressAccount from "models/Address";
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -63,7 +64,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     const message = {
       message: bodyText,
       chat_channel_id: this.channel.id,
-      address: app.user.activeAccount.address,
+      address: app.user.activeAddressAccount.address,
     };
     app.socket.chatNs.sendMessage(message);
     this.quillEditorState.enable();
@@ -168,12 +169,10 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
             >
               <div class="user-and-timestamp-container">
                 {m(User, {
-                  user: new AddressInfo(
-                    null,
-                    grp.address,
-                    app.activeChainId(),
-                    null
-                  ),
+                  user: new AddressAccount({
+                    address: grp.address,
+                    chain: app.config.chains.getById(app.activeChainId())
+                  }),
                   linkify: true,
                   avatarSize: 24,
                 })}
@@ -217,7 +216,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
 
         {!app.isLoggedIn() ? (
           <div class="chat-composer-unavailable">Log in to join chat</div>
-        ) : !app.user.activeAccount ? (
+        ) : !app.user.activeAddressAccount ? (
           <div class="chat-composer-unavailable">
             Set up an account to join chat
           </div>

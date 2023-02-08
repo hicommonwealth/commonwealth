@@ -45,7 +45,7 @@ class DelegateForm extends ClassComponent {
     } else if (app.chain.network === ChainNetwork.Aave) {
       // TODO: switch on delegation type
       this.currentDelegate = await (app.chain as Aave).chain.getDelegate(
-        app.user.activeAccount.address,
+        app.user.activeAddressAccount.address,
         'voting'
       );
     }
@@ -92,7 +92,7 @@ class DelegateForm extends ClassComponent {
           stats={[
             {
               statHeading: 'Your address:',
-              stat: app.user.activeAccount.address || '--',
+              stat: app.user.activeAddressAccount.address || '--',
             },
           ]}
         />

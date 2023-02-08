@@ -4,7 +4,6 @@ import ClassComponent from 'class_component';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { capitalize } from 'lodash';
 import m from 'mithril';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
@@ -15,6 +14,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
 import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
+import AddressAccount from "models/Address";
 
 type SnapshotInfoRowAttrs = {
   label: string;
@@ -82,12 +82,10 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
                 value={
                   app.chain
                     ? m(User, {
-                        user: new AddressInfo(
-                          null,
-                          proposal.author,
-                          app.activeChainId(),
-                          null
-                        ),
+                        user: new AddressAccount({
+                          address: proposal.author,
+                          chain: app.config.chains.getById(app.activeChainId())
+                        }),
                         hideAvatar: true,
                         linkify: true,
                         popover: true,

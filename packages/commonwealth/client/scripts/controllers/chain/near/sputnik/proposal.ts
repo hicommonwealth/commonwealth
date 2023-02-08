@@ -252,7 +252,7 @@ export default class NearSputnikProposal extends Proposal<
   }
 
   public async submitVoteWebTx(vote: NearSputnikVote) {
-    const account = this._Dao.app.user.activeAccount as NearAccount;
+    const account = this._Dao.app.user.activeAddressAccount as NearAccount;
     if (account.address !== vote.account.address) {
       throw new Error('Invalid vote address!');
     }

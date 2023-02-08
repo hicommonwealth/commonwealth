@@ -57,7 +57,7 @@ export async function callContractFunction(
   fn: AbiItem,
   formInputMap: Map<string, Map<number, string>>
 ): Promise<Result> {
-  const sender = app.user.activeAccount;
+  const sender = app.user.activeAddressAccount;
   // get querying wallet
   const signingWallet = await app.wallets.locateWallet(
     sender,

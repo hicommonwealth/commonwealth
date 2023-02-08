@@ -12,11 +12,11 @@ export const handlePollVote = async (
   isSelected: boolean,
   callback: () => any
 ) => {
-  const { activeAccount } = app.user;
+  const { activeAddressAccount } = app.user;
 
-  if (!app.isLoggedIn() || !activeAccount || isSelected) return;
+  if (!app.isLoggedIn() || !activeAddressAccount || isSelected) return;
 
-  const userInfo = [activeAccount.chain.id, activeAccount.address] as const;
+  const userInfo = [activeAddressAccount.chain.id, activeAddressAccount.address] as const;
 
   let confirmationText;
 

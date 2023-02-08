@@ -49,7 +49,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
           if (response.status !== 'Success')
             throw new Error('Could not fetch members');
           this.items = response.result.filter((role) => {
-            return role.Address.address !== app.user.activeAccount?.address;
+            return role.Address.address !== app.user.activeAddressAccount?.address;
           });
 
           m.redraw();
@@ -202,8 +202,8 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                     const response = await $.post(
                       `${app.serverUrl()}/addEditors`,
                       {
-                        address: app.user.activeAccount.address,
-                        author_chain: app.user.activeAccount.chain.id,
+                        address: app.user.activeAddressAccount.address,
+                        author_chain: app.user.activeAddressAccount.chain.id,
                         chain: app.activeChainId(),
                         thread_id: thread.id,
                         editors: JSON.stringify(this.addedEditors),
@@ -231,8 +231,8 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                     const response = await $.post(
                       `${app.serverUrl()}/deleteEditors`,
                       {
-                        address: app.user.activeAccount.address,
-                        author_chain: app.user.activeAccount.chain.id,
+                        address: app.user.activeAddressAccount.address,
+                        author_chain: app.user.activeAddressAccount.chain.id,
                         chain: app.activeChainId(),
                         thread_id: thread.id,
                         editors: JSON.stringify(this.removedEditors),

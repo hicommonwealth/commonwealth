@@ -298,7 +298,7 @@ const getCustomDomainRoutes = (importRoute) => ({
     deferChain: true,
   }),
   '/account': redirectRoute(() =>
-    app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
+    app.user.activeAddressAccount ? `/account/${app.user.activeAddressAccount.address}` : '/'
   ),
 
   // Governance
@@ -400,7 +400,7 @@ const getCustomDomainRoutes = (importRoute) => ({
     (attrs) => `/account/${attrs.address}/`
   ),
   '/:scope/account': redirectRoute(() =>
-    app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
+    app.user.activeAddressAccount ? `/account/${app.user.activeAddressAccount.address}` : '/'
   ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
@@ -558,8 +558,8 @@ const getCommonDomainRoutes = (importRoute) => ({
     deferChain: true,
   }),
   '/:scope/account': redirectRoute((a) =>
-    app.user.activeAccount
-      ? `/${a.scope}/account/${app.user.activeAccount.address}`
+    app.user.activeAddressAccount
+      ? `/${a.scope}/account/${app.user.activeAddressAccount.address}`
       : `/${a.scope}/`
   ),
 

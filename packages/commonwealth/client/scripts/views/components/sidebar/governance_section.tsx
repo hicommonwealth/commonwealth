@@ -63,7 +63,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
 
     const showCompoundOptions =
       isNotOffchain &&
-      app.user.activeAccount &&
+      app.user.activeAddressAccount &&
       app.chain?.network === ChainNetwork.Compound;
 
     const showSnapshotOptions =

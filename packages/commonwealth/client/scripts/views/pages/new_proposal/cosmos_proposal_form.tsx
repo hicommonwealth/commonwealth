@@ -30,7 +30,7 @@ export class CosmosProposalForm extends ClassComponent {
   }
 
   view() {
-    const author = app.user.activeAccount as CosmosAccount;
+    const author = app.user.activeAddressAccount as CosmosAccount;
     const cosmos = app.chain as Cosmos;
 
     return !cosmos.governance.initialized ? (
@@ -74,7 +74,7 @@ export class CosmosProposalForm extends ClassComponent {
         {this.cosmosProposalType !== 'textProposal' && (
           <CWTextInput
             label="Recipient"
-            placeholder={app.user.activeAccount.address}
+            placeholder={app.user.activeAddressAccount.address}
             defaultValue=""
             oninput={(e) => {
               this.recipient = e.target.value;

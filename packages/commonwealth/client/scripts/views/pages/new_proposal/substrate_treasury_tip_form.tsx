@@ -22,7 +22,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
   private description: string;
 
   view() {
-    const author = app.user.activeAccount;
+    const author = app.user.activeAddressAccount;
     const substrate = app.chain as Substrate;
 
     // TODO: this is only true if the proposer is doing reportAwesome()

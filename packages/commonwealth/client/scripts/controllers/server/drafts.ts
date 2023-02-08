@@ -46,8 +46,8 @@ class DraftsController {
     const { title, body, topicName, attachments } = params;
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
-        address: app.user.activeAccount.address,
-        author_chain: app.user.activeAccount.chain.id,
+        address: app.user.activeAddressAccount.address,
+        author_chain: app.user.activeAddressAccount.chain.id,
         chain: app.activeChainId(),
         title,
         body,
@@ -77,8 +77,8 @@ class DraftsController {
       const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'PATCH',
         data: {
-          address: app.user.activeAccount.address,
-          author_chain: app.user.activeAccount.chain.id,
+          address: app.user.activeAddressAccount.address,
+          author_chain: app.user.activeAddressAccount.chain.id,
           chain: app.activeChainId(),
           id: existingDraftId,
           title,
@@ -108,8 +108,8 @@ class DraftsController {
       const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'DELETE',
         data: {
-          address: app.user.activeAccount.address,
-          author_chain: app.user.activeAccount.chain.id,
+          address: app.user.activeAddressAccount.address,
+          author_chain: app.user.activeAddressAccount.chain.id,
           chain: app.activeChainId(),
           id,
           jwt: app.user.jwt,

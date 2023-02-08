@@ -379,7 +379,7 @@ export default class CompoundProposal extends Proposal<
     let tx: ContractTransaction;
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
+      this._Gov.app.user.activeAddressAccount,
       this._Gov.api.Contract
     );
     try {
@@ -398,7 +398,7 @@ export default class CompoundProposal extends Proposal<
       );
       const ozContract = await attachSigner(
         this._Gov.app.wallets,
-        this._Gov.app.user.activeAccount,
+        this._Gov.app.user.activeAddressAccount,
         contractNoSigner
       );
       const descriptionHash = utils.keccak256(
@@ -438,7 +438,7 @@ export default class CompoundProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
+      this._Gov.app.user.activeAddressAccount,
       this._Gov.api.Contract
     );
 
@@ -484,7 +484,7 @@ export default class CompoundProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
+      this._Gov.app.user.activeAddressAccount,
       this._Gov.api.Contract
     );
 

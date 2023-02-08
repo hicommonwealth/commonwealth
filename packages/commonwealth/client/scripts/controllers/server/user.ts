@@ -4,8 +4,6 @@
 import $ from 'jquery';
 
 import type {
-  Account,
-  AddressInfo,
   ChainInfo,
   SocialAccount,
   StarredCommunity,
@@ -15,15 +13,16 @@ import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
+import AddressAccount from "models/Address";
 
 export class UserController {
-  private _activeAccount: Account;
-  public get activeAccount(): Account {
-    return this._activeAccount;
+  private _activeAddressAccount: AddressAccount;
+  public get activeAddressAccount(): AddressAccount {
+    return this._activeAddressAccount;
   }
 
-  private _setActiveAccount(account: Account): void {
-    this._activeAccount = account;
+  private _setActiveAddressAccount(addressAccount: AddressAccount): void {
+    this._activeAddressAccount = addressAccount;
   }
 
   private _email: string;
@@ -62,21 +61,21 @@ export class UserController {
     this._jwt = JWT;
   }
 
-  private _addresses: AddressInfo[] = [];
-  public get addresses(): AddressInfo[] {
+  private _addresses: AddressAccount[] = [];
+  public get addresses(): AddressAccount[] {
     return this._addresses;
   }
 
-  private _setAddresses(addresses: AddressInfo[]): void {
+  private _setAddresses(addresses: AddressAccount[]): void {
     this._addresses = addresses;
   }
 
-  private _activeAccounts: Account[] = [];
-  public get activeAccounts(): Account[] {
+  private _activeAccounts: AddressAccount[] = [];
+  public get activeAccounts(): AddressAccount[] {
     return this._activeAccounts;
   }
 
-  private _setActiveAccounts(activeAccounts: Account[]): void {
+  private _setActiveAccounts(activeAccounts: AddressAccount[]): void {
     this._activeAccounts = activeAccounts;
   }
 
@@ -165,8 +164,8 @@ export class UserController {
   constructor() {}
 
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
-  public ephemerallySetActiveAccount(account: Account): void {
-    this._setActiveAccount(account);
+  public ephemerallySetActiveAccount(account: AddressAccount): void {
+    this._setActiveAddressAccount(account);
   }
 
   public setEmail(email: string): void {
@@ -185,30 +184,30 @@ export class UserController {
     this._setJWT(JWT);
   }
 
-  public setAddresses(addresses: AddressInfo[]): void {
+  public setAddresses(addresses: AddressAccount[]): void {
     this._setAddresses(addresses);
   }
 
-  public addAddress(address: AddressInfo): void {
+  public addAddress(address: AddressAccount): void {
     this._addresses.push(address);
   }
 
-  public removeAddress(address: AddressInfo): void {
+  public removeAddress(address: AddressAccount): void {
     this._addresses.splice(
       this._addresses.findIndex((a) => a.address === address.address),
       1
     );
   }
 
-  public setActiveAccounts(activeAccounts: Account[]): void {
+  public setActiveAccounts(activeAccounts: AddressAccount[]): void {
     this._setActiveAccounts(activeAccounts);
   }
 
-  public addActiveAddress(address: Account): void {
+  public addActiveAddress(address: AddressAccount): void {
     this._activeAccounts.push(address);
   }
 
-  public removeActiveAddress(address: Account): void {
+  public removeActiveAddress(address: AddressAccount): void {
     this._activeAccounts.splice(
       this._activeAccounts.findIndex((a) => a.address === address.address),
       1

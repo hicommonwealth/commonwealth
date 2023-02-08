@@ -7,14 +7,14 @@ import jdenticon from 'jdenticon';
 import { capitalize } from 'lodash';
 
 import m from 'mithril';
-import type { Account } from 'models';
-import { AddressInfo, Profile } from 'models';
+import { Profile } from 'models';
 
 import app from 'state';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import AddressAccount from "models/Address";
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -26,7 +26,7 @@ export interface IAddressDisplayOptions {
 
 const User: m.Component<
   {
-    user: Account | AddressInfo | Profile;
+    user: AddressAccount | Profile;
     avatarSize?: number;
     avatarOnly?: boolean; // overrides most other properties
     hideAvatar?: boolean;
@@ -63,7 +63,7 @@ const User: m.Component<
 
     if (!user) return;
 
-    let account: Account;
+    let addressAccount: AddressAccount;
     let profile: Profile;
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
@@ -102,48 +102,30 @@ const User: m.Component<
       });
     }
 
-    if (vnode.attrs.user instanceof AddressInfo) {
-      const chainId = vnode.attrs.user.chain;
-      const address = vnode.attrs.user.address;
-      if (!chainId || !address) return;
-      // only load account if it's possible to, using the current chain
-      if (app.chain && app.chain.id === chainId.id) {
-        try {
-          account = app.chain.accounts.get(address);
-        } catch (e) {
-          console.log('legacy account error, carry on');
-          account = null;
-        }
-      }
+    if (user instanceof AddressAccount) {
+      if (!user.chain || !user.address) return;
+      addressAccount = user;
 
-      profile = app.profiles.getProfile(chainId.id, address);
+      if (user.profile) profile = user.profile;
+      else  profile = app.profiles.getProfile(user.chain.id, user.address);
 
       role = adminsAndMods.find(
-        (r) => r.address === address && r.address_chain === chainId.id
-      );
+        (r) => r.address === user.address && r.address_chain === user.chain.id
+      )
     } else if (vnode.attrs.user instanceof Profile) {
       profile = vnode.attrs.user;
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
         try {
-          account = app.chain.accounts.get(profile.address);
+          addressAccount = app.chain.accounts.get(profile.address);
         } catch (e) {
           console.error(e);
-          account = null;
+          addressAccount = null;
         }
       }
       role = adminsAndMods.find(
         (r) =>
           r.address === profile.address && r.address_chain === profile.chain
-      );
-    } else {
-      account = vnode.attrs.user;
-      // TODO: we should remove this, since account should always be of type Account,
-      // but we currently inject objects of type 'any' on the profile page
-      const chainId = account.chain.id;
-      profile = account.profile;
-      role = adminsAndMods.find(
-        (r) => r.address === account.address && r.address_chain === chainId
       );
     }
 
@@ -172,7 +154,7 @@ const User: m.Component<
     const ghostAddress = app.user.addresses.some(
       // eslint-disable-next-line
       ({ address, ghostAddress }) => {
-        if (this !== undefined) account.address === address && ghostAddress;
+        if (this !== undefined) addressAccount.address === address && ghostAddress;
       }
     );
 
@@ -208,7 +190,7 @@ const User: m.Component<
             app.cachedIdentityWidget
               ? // substrate name
                 m(app.cachedIdentityWidget, {
-                  account,
+                  account: addressAccount,
                   linkify,
                   profile,
                   hideIdentityIcon,
@@ -290,7 +272,7 @@ const User: m.Component<
           app.chain.base === ChainBase.Substrate &&
           app.cachedIdentityWidget
             ? m(app.cachedIdentityWidget, {
-                account,
+                account: addressAccount,
                 linkify: true,
                 profile,
                 hideIdentityIcon,
@@ -362,7 +344,7 @@ const User: m.Component<
 };
 
 export const UserBlock: m.Component<{
-  user: Account | AddressInfo | Profile;
+  user: AddressAccount | Profile;
   hideIdentityIcon?: boolean;
   popover?: boolean;
   showRole?: boolean;
@@ -395,13 +377,12 @@ export const UserBlock: m.Component<{
 
     let profile;
 
-    if (user instanceof AddressInfo) {
+    if (user instanceof AddressAccount) {
       if (!user.chain || !user.address) return;
-      profile = app.profiles.getProfile(user.chain.id, user.address);
+      if (user.profile) profile = user.profile;
+      else  profile = app.profiles.getProfile(user.chain.id, user.address);
     } else if (user instanceof Profile) {
       profile = user;
-    } else {
-      profile = app.profiles.getProfile(user.chain.id, user.address);
     }
 
     const highlightSearchTerm =
