@@ -16,12 +16,10 @@ type ThreadVoteButtonProps = {
 };
 
 export const CWThreadVoteButton = (props: ThreadVoteButtonProps) => {
-  const [isHoveringUpvote, setIsHoveringUpvote] = React.useState<boolean>(
-    false
-  );
-  const [isHoveringDownvote, setIsHoveringDownvote] = React.useState<boolean>(
-    false
-  );
+  const [isHoveringUpvote, setIsHoveringUpvote] =
+    React.useState<boolean>(false);
+  const [isHoveringDownvote, setIsHoveringDownvote] =
+    React.useState<boolean>(false);
 
   const { updateVoteCount, voteCount } = props;
 
