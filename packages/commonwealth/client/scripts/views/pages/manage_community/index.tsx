@@ -13,6 +13,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/manage_community/index.scss';
 

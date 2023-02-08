@@ -24,7 +24,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 export type LinkedSubstrateProposal =
   | SubstrateDemocracyProposal
   | SubstrateDemocracyReferendum
-  | SubstrateCollectiveProposal
   | SubstrateTreasuryProposal;
 
 type LinkedProposalsEmbedAttrs = {
@@ -38,8 +37,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
     // show link to treasury proposal if this is a proposal that passes a treasury spend
     if (
       proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateDemocracyReferendum ||
-      proposal instanceof SubstrateCollectiveProposal
+      proposal instanceof SubstrateDemocracyReferendum
     ) {
       let treasuryProposalIndex;
 
@@ -48,8 +46,6 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
           ? proposal.preimage
           : proposal instanceof SubstrateDemocracyReferendum
           ? proposal.preimage
-          : proposal instanceof SubstrateCollectiveProposal
-          ? proposal.call
           : null;
 
       if (
@@ -70,8 +66,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
 
       if (
         !(
-          ((proposal instanceof SubstrateDemocracyProposal ||
-            proposal instanceof SubstrateCollectiveProposal) &&
+          (proposal instanceof SubstrateDemocracyProposal &&
             proposal.getReferendum()) ||
           (proposal instanceof SubstrateDemocracyReferendum &&
             proposal.preimage &&
@@ -82,9 +77,14 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
       }
 
       return (
+<<<<<<< HEAD
         <div className="LinkedProposalsEmbed">
           {(proposal instanceof SubstrateDemocracyProposal ||
             proposal instanceof SubstrateCollectiveProposal) &&
+=======
+        <div class="LinkedProposalsEmbed">
+          {proposal instanceof SubstrateDemocracyProposal &&
+>>>>>>> master
             proposal.getReferendum() && (
               <React.Fragment>
                 <CWText>
@@ -156,21 +156,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
           r.preimage?.args[0] === proposal.identifier
       );
 
-      const councilMotions = (
-        (app.chain as Substrate).council?.store?.getAll() || []
-      ).filter(
-        (mo) =>
-          mo.call.section === 'treasury' &&
-          (mo.call.method === 'approveProposal' ||
-            mo.call.method === 'rejectProposal') &&
-          mo.call.args[0] === proposal.identifier
-      );
-
-      if (
-        democracyProposals.length === 0 &&
-        referenda.length === 0 &&
-        councilMotions.length === 0
-      ) {
+      if (democracyProposals.length === 0 && referenda.length === 0) {
         return;
       }
 
@@ -224,6 +210,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
               )}
             </React.Fragment>
           ))}
+<<<<<<< HEAD
           {councilMotions.map((mo) => (
             <React.Fragment>
               <CWText fontWeight="semiBold">
@@ -249,6 +236,8 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
               )}
             </React.Fragment>
           ))}
+=======
+>>>>>>> master
         </div>
       );
     }

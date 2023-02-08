@@ -16,6 +16,9 @@ import {
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/header/notifications_menu.scss';
+import { Button, PopoverMenu } from 'construct-ui';
+import m from 'mithril';
+import Infinite from 'mithril-infinite';
 
 import app from 'state';
 import { navigateToSubpage } from 'router';

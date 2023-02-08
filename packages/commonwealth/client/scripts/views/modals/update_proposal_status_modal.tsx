@@ -16,6 +16,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/update_proposal_status_modal.scss';
 import type { ChainEntity, Thread } from 'models';

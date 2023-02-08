@@ -4,7 +4,6 @@ import type {
   AccountId,
   Call,
   IdentityFields,
-  IdentityJudgement,
   RegistrarInfo,
 } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
@@ -251,6 +250,7 @@ class SubstrateIdentities implements StorageModule {
       (api: ApiPromise) => api.tx.identity.setFields(regIdx, fields),
       'setFee',
       `registrar ${regIdx} updates fields`
+<<<<<<< HEAD
     );
   }
 
@@ -270,6 +270,8 @@ class SubstrateIdentities implements StorageModule {
         ),
       'providejudgement',
       `registrar ${regIdx} provides judgement for identity ${target.username}`
+=======
+>>>>>>> master
     );
   }
 

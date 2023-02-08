@@ -1,6 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import type { ITXModalData, IWebWallet } from 'models';
 

@@ -14,6 +14,7 @@ import {
 } from 'mithrilInterop';
 
 import 'components/proposal_card/proposal_tag.scss';
+import m from 'mithril';
 
 import { CWText } from '../component_kit/cw_text';
 

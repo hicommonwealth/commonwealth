@@ -8,7 +8,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import 'components/comments/create_comment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { weiToTokens } from 'helpers';
+import { weiToTokens, getDecimals } from 'helpers';
 import type { AnyProposal } from 'models';
 import { Thread } from 'models';
 
@@ -119,22 +119,17 @@ export const CreateComment = (props: CreateCommmentProps) => {
   const tokenPostingThreshold: BN =
     TopicGateCheck.getTopicThreshold(activeTopicName);
 
-  const userBalance: BN = TopicGateCheck.getUserBalance();
-  const userFailsThreshold =
-    tokenPostingThreshold?.gtn(0) &&
-    userBalance?.gtn(0) &&
-    userBalance.lt(tokenPostingThreshold);
+    const userBalance: BN = TopicGateCheck.getUserBalance();
+    const userFailsThreshold =
+      tokenPostingThreshold?.gtn(0) &&
+      userBalance?.gtn(0) &&
+      userBalance.lt(tokenPostingThreshold);
 
   const disabled =
     quillEditorState?.isBlank() || sendingComment || userFailsThreshold;
 
-  const decimals = app.chain?.meta?.decimals
-    ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
+  const decimals = getDecimals(app.chain);
+
 
   return (
     <div className="CreateComment">

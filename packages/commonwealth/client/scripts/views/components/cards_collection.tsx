@@ -5,6 +5,7 @@ import { ClassComponent, jsx } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'components/cards_collection.scss';
+import m from 'mithril';
 
 import { CWText } from './component_kit/cw_text';
 

@@ -16,6 +16,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/create_community.scss';
 

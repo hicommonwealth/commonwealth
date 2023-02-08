@@ -1,12 +1,20 @@
 /* @jsx jsx */
 import React from 'react';
 
+<<<<<<< HEAD
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import type { Thread } from 'models';
 
 import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
+=======
+import ClassComponent from 'class_component';
+import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
+import m from 'mithril';
+import type { Thread } from 'models';
+>>>>>>> master
 
 import 'pages/snapshot/multiple_snapshots_page.scss';
 

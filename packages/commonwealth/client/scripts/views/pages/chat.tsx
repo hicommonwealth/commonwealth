@@ -20,8 +20,6 @@ import { navigateToSubpage } from 'router';
 import { ChatWindow } from 'views/components/chat/chat_window';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { MixpanelChatEvents } from 'analytics/types';
 
 class ChatPage extends ClassComponent {
   oncreate() {

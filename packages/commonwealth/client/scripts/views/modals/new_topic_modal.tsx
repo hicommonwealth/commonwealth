@@ -55,13 +55,7 @@ export class NewTopicModal extends ClassComponent {
       disabled = true;
     }
 
-    const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+    const decimals = getDecimals(app.chain);
 
     return (
       <div className="NewTopicModal">

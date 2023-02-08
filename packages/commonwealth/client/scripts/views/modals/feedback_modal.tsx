@@ -3,6 +3,7 @@ import React from 'react';
 
 import { redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/feedback_modal.scss';
 

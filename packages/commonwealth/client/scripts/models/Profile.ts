@@ -10,6 +10,7 @@ import {
   jsx,
 } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
+import m from 'mithril';
 
 import {
   CWAvatar,
@@ -22,10 +23,8 @@ class Profile {
   private _bio: string;
   private _avatarUrl: string;
   private _initialized: boolean;
-  private _judgements: { [registrar: string]: string } = {};
   private _isOnchain = false;
   private _lastActive: Date;
-  private _isCouncillor = false;
   private _isValidator = false;
   private _isEmpty = false;
   private _isNameInvalid = false;
@@ -50,10 +49,13 @@ class Profile {
     return this._initialized;
   }
 
+<<<<<<< HEAD
   get judgements() {
     return this._judgements;
   }
 
+=======
+>>>>>>> master
   get isOnchain() {
     return this._isOnchain;
   }
@@ -62,10 +64,13 @@ class Profile {
     return this._lastActive;
   }
 
+<<<<<<< HEAD
   get isCouncillor() {
     return this._isCouncillor;
   }
 
+=======
+>>>>>>> master
   get isValidator() {
     return this._isValidator;
   }
@@ -104,9 +109,7 @@ class Profile {
     headline,
     bio,
     avatarUrl,
-    judgements,
     lastActive,
-    isCouncillor = false,
     isValidator = false
   ) {
     this._initialized = true;
@@ -116,9 +119,7 @@ class Profile {
     this._headline = headline;
     this._bio = bio;
     this._avatarUrl = avatarUrl;
-    this._judgements = judgements;
     this._lastActive = lastActive;
-    this._isCouncillor = isCouncillor;
     this._isValidator = isValidator;
   }
 
@@ -128,7 +129,6 @@ class Profile {
     bio,
     avatarUrl,
     lastActive,
-    isCouncillor = false,
     isValidator = false
   ) {
     this._initialized = true;
@@ -138,7 +138,6 @@ class Profile {
     this._bio = bio;
     this._avatarUrl = avatarUrl;
     this._lastActive = lastActive;
-    this._isCouncillor = isCouncillor;
     this._isValidator = isValidator;
   }
 
