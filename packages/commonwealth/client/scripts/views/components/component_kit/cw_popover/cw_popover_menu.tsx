@@ -54,13 +54,8 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                 } else if (item.type === 'divider') {
                   return <div className="menu-section-divider" key={i} />;
                 } else {
-                  const {
-                    disabled,
-                    isSecondary,
-                    iconLeft,
-                    label,
-                    onClick,
-                  } = item;
+                  const { disabled, isSecondary, iconLeft, label, onClick } =
+                    item;
                   return (
                     <div
                       className={getClasses<{
