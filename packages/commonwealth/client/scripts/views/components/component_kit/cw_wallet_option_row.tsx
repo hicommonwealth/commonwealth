@@ -55,7 +55,6 @@ export const CWWalletOptionRow = (props: WalletOptionRowProps) => {
   );
 };
 
-<<<<<<< HEAD
 export const CWWalletMissingOptionRow = (props: { darkMode?: boolean }) => {
   return (
     <div
@@ -78,31 +77,3 @@ export const CWWalletMissingOptionRow = (props: { darkMode?: boolean }) => {
     </div>
   );
 };
-=======
-export class CWWalletMissingOptionRow extends ClassComponent<{
-  darkMode?: boolean;
-}> {
-  view(vnode: m.Vnode<{ darkMode }>) {
-    return (
-      <div
-        class={getClasses<WalletOptionRowStyleAttrs>(
-          {
-            disabled: true,
-            darkMode: vnode.attrs.darkMode,
-          },
-          ComponentType.WalletOptionRow
-        )}
-      >
-        <CWText
-          type="h5"
-          fontWeight="semiBold"
-          className="wallet-option-text"
-          noWrap
-        >
-          No wallet found
-        </CWText>
-      </div>
-    );
-  }
-}
->>>>>>> master

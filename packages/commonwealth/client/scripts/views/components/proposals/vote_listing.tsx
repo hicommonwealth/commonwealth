@@ -172,17 +172,6 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                         </div>
                       </div>
                     );
-<<<<<<< HEAD
-
-                  case vote instanceof SubstrateCollectiveVote:
-                    return (
-                      <div className="vote">
-                        <User user={vote.account} linkify popover />
-                      </div>
-                    );
-
-=======
->>>>>>> master
                   default:
                     return (
                       <div className="vote">

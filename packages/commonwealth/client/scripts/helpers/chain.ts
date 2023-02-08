@@ -51,11 +51,7 @@ export const selectChain = async (
   await deinitChainOrCommunity();
   app.chainPreloading = true;
   document.title = `Commonwealth – ${chain.name}`;
-<<<<<<< HEAD
   setTimeout(() => redraw()); // redraw to show API status indicator
-=======
-  setTimeout(() => m.redraw()); // redraw to show API status indicator
->>>>>>> master
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
@@ -229,11 +225,7 @@ export const selectChain = async (
 
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
-<<<<<<< HEAD
   redraw();
-=======
-  m.redraw();
->>>>>>> master
   return true;
 };
 
@@ -261,11 +253,7 @@ export const initChain = async (): Promise<void> => {
   await updateActiveAddresses(chain);
 
   // Finish redraw to remove loading dialog
-<<<<<<< HEAD
   redraw();
-=======
-  m.redraw();
->>>>>>> master
 };
 
 export const initNewTokenChain = async (address: string) => {
@@ -278,11 +266,7 @@ export const initNewTokenChain = async (address: string) => {
 
   if (response.status !== 'Success') {
     // TODO: better custom 404
-<<<<<<< HEAD
     setRoute('/404');
-=======
-    m.route.set('/404');
->>>>>>> master
   }
 
   // TODO: check if this is valid

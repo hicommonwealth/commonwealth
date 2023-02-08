@@ -87,10 +87,6 @@ const FinishNearLogin = () => {
 
       // create canvas thing
       const chainId = chain.id;
-<<<<<<< HEAD
-
-=======
->>>>>>> master
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
         chainId

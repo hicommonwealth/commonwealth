@@ -49,13 +49,6 @@ class Profile {
     return this._initialized;
   }
 
-<<<<<<< HEAD
-  get judgements() {
-    return this._judgements;
-  }
-
-=======
->>>>>>> master
   get isOnchain() {
     return this._isOnchain;
   }
@@ -64,13 +57,6 @@ class Profile {
     return this._lastActive;
   }
 
-<<<<<<< HEAD
-  get isCouncillor() {
-    return this._isCouncillor;
-  }
-
-=======
->>>>>>> master
   get isValidator() {
     return this._isValidator;
   }

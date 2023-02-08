@@ -77,14 +77,8 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
       }
 
       return (
-<<<<<<< HEAD
-        <div className="LinkedProposalsEmbed">
-          {(proposal instanceof SubstrateDemocracyProposal ||
-            proposal instanceof SubstrateCollectiveProposal) &&
-=======
         <div class="LinkedProposalsEmbed">
           {proposal instanceof SubstrateDemocracyProposal &&
->>>>>>> master
             proposal.getReferendum() && (
               <React.Fragment>
                 <CWText>
@@ -210,34 +204,6 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
               )}
             </React.Fragment>
           ))}
-<<<<<<< HEAD
-          {councilMotions.map((mo) => (
-            <React.Fragment>
-              <CWText fontWeight="semiBold">
-                Council Motion {mo.shortIdentifier}
-              </CWText>
-              <CWText>
-                {mo.call?.method === 'approveProposal' &&
-                  'Approves this proposal'}
-                {mo.call?.method === 'rejectProposal' &&
-                  'Rejects this proposal'}
-              </CWText>
-              {app.activeChainId() && (
-                <CWButton
-                  buttonType="tertiary-blue"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigateToSubpage(
-                      `/proposal/${ProposalType.SubstrateCollectiveProposal}/${mo.identifier}`
-                    );
-                  }}
-                  label="Go to motion"
-                />
-              )}
-            </React.Fragment>
-          ))}
-=======
->>>>>>> master
         </div>
       );
     }
