@@ -13,7 +13,6 @@ type AppNavigatorProps = {
 };
 
 const AppNavigator = ({ customDomain }: AppNavigatorProps) => {
-  console.log('customDomain', customDomain);
   return (
     <Routes>
       {getGeneralRoutes()}

@@ -10,7 +10,11 @@
 
 import type { FunctionComponent, ReactNode } from 'react';
 import { createElement, Component as ReactComponent } from 'react';
-import type { NavigateFunction, Location } from 'react-router-dom';
+import type {
+  NavigateFunction,
+  Location,
+  NavigateOptions,
+} from 'react-router-dom';
 import { redirect } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
@@ -178,11 +182,10 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
   }
 
   // replicates `m.route.set()` functionality via react-router
-  // TODO add additional params like "replace", see AdminPageComponent
-  public setRoute(route: string) {
+  public setRoute(route: string, options?: NavigateOptions) {
     if (this.props.router.navigate) {
-      console.log('setting route', route);
-      this.props.router.navigate(route);
+      console.log('setting route: ', route, ' with options: ', options);
+      this.props.router.navigate(route, options);
     } else {
       console.error('Prop "navigate" is not defined!');
     }

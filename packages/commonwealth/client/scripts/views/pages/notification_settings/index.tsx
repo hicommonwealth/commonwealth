@@ -28,8 +28,7 @@ class NotificationSettingsPageComponent extends ClassComponent {
     if (!app.loginStatusLoaded()) {
       return <PageLoading />;
     } else if (!app.isLoggedIn()) {
-      // TODO add additional params like "replace"
-      this.setRoute('/', {}, { replace: true });
+      this.setRoute('/', { replace: true });
       return <PageLoading />;
     }
 
