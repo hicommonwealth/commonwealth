@@ -117,9 +117,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
     const subpage = topicName || stageName;
 
     return this.initializing ? (
-      <div>
-        <h1>loading</h1>
-      </div>
+      <PageLoading />
     ) : (
       <Sublayout
       // onScroll={() => debounce(this.onScroll.bind(this), 400)}
