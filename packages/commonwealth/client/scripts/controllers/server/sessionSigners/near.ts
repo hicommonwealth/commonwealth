@@ -1,5 +1,5 @@
 import bs58 from 'bs58';
-import type { KeyPairEd25519 } from 'near-api-js/lib/utils';
+import { KeyPairEd25519 } from 'near-api-js/lib/utils';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 
 import type {
