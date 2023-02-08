@@ -7,17 +7,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import type { ConnectConfig } from 'near-api-js';
 import { connect as nearConnect, keyStores } from 'near-api-js';
@@ -34,12 +24,13 @@ import { CWButton } from '../../components/component_kit/cw_button';
 
 import { defaultChainRows, initChainForm } from './chain_input_rows';
 import type { ChainFormFields, ChainFormState } from './types';
+import withRouter from 'navigation/helpers';
 
 type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 
 type CreateSputnikState = ChainFormState & { form: CreateSputnikForm };
 
-export class SputnikForm extends ClassComponent {
+class SputnikFormComponent extends ClassComponent {
   public state: CreateSputnikState = {
     saving: false,
     form: {
@@ -164,7 +155,7 @@ export class SputnikForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              setRoute(`${window.location.origin}/${res.result.chain.id}`);
+              this.setRoute(`${window.location.origin}/${res.result.chain.id}`);
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Adding DAO failed.');
               console.error(err.responseJSON?.error || err.message);
@@ -176,3 +167,5 @@ export class SputnikForm extends ClassComponent {
     );
   }
 }
+
+export const SputnikForm = withRouter(SputnikFormComponent);

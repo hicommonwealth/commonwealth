@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import { pluralize } from 'helpers';
 import type { ChainInfo } from 'models';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
@@ -21,12 +12,13 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
+import withRouter from 'navigation/helpers';
 
 type CommunityPreviewCardAttrs = {
   chain: ChainInfo;
 };
 
-class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
+class CommunityPreviewCardComponent extends ClassComponent<CommunityPreviewCardAttrs> {
   view(vnode: ResultNode<CommunityPreviewCardAttrs>) {
     const { chain } = vnode.attrs;
     const { unseenPosts } = app.user;
@@ -47,7 +39,7 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
         interactive
         onClick={(e) => {
           e.preventDefault();
-          setRoute(`/${chain.id}`);
+          this.setRoute(`/${chain.id}`);
         }}
       >
         <div className="card-top">
@@ -84,7 +76,9 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
   }
 }
 
-export class DashboardCommunitiesPreview extends ClassComponent {
+const CommunityPreviewCard = withRouter(CommunityPreviewCardComponent);
+
+class DashboardCommunitiesPreviewComponent extends ClassComponent {
   view() {
     const sortedChains = app.config.chains
       .getAll()
@@ -106,7 +100,7 @@ export class DashboardCommunitiesPreview extends ClassComponent {
         <div className="buttons">
           <CWButton
             onClick={() => {
-              setRoute('/communities');
+              this.setRoute('/communities');
               redraw();
             }}
             label="Explore communities"
@@ -117,3 +111,6 @@ export class DashboardCommunitiesPreview extends ClassComponent {
     );
   }
 }
+export const DashboardCommunitiesPreview = withRouter(
+  DashboardCommunitiesPreviewComponent
+);

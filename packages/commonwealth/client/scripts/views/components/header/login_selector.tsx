@@ -167,6 +167,7 @@ export const LoginSelectorMenuRight = () => {
       <div className="LoginSelectorMenu">
         <div
           className="login-menu-item"
+          // TODO this setRoute is not related to react-router => won't work
           onClick={() => setRoute('/notification-settings')}
         >
           <CWText type="caption">Notification settings</CWText>
@@ -176,7 +177,8 @@ export const LoginSelectorMenuRight = () => {
           onClick={() =>
             app.activeChainId()
               ? navigateToSubpage('/settings')
-              : setRoute('/settings')
+              : // TODO this setRoute is not related to react-router => won't work
+                setRoute('/settings')
           }
         >
           <CWText type="caption">Account settings</CWText>

@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, getRouteParam, jsx } from 'mithrilInterop';
 import { debounce } from 'lodash';
 import { pluralize } from 'helpers';
 import { isNotUndefined } from 'helpers/typeGuards';

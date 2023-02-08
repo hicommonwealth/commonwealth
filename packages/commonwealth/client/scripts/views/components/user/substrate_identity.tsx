@@ -2,17 +2,8 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 
 import 'components/user/user.scss';
 

@@ -53,6 +53,7 @@ const redirectToNextPage = () => {
         +new Date() - postAuth.timestamp < 24 * 60 * 60 * 1000
       ) {
         localStorage.removeItem('nearPostAuthRedirect');
+        // TODO this setRoute is not related to react-router => won't work
         setRoute(postAuth.path, {}, { replace: true });
       } else {
         navigateToSubpage('/', { replace: true });
@@ -199,7 +200,7 @@ const FinishNearLogin = () => {
         );
 
         await initAppState(false);
-
+        // TODO this setRoute is not related to react-router => won't work
         setRoute(`${window.location.origin}/${res.result.chain.id}`);
       } catch (err) {
         setValidationError(`Failed to initialize chain node: ${err.message}`);

@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import { notifyInfo } from 'controllers/app/notifications';
@@ -18,6 +18,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity, notificationsRemaining } from './helpers';
 import { UserDashboardRow } from './user_dashboard_row';
+import withRouter from 'navigation/helpers';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -29,7 +30,7 @@ type UserDashboardAttrs = {
   type?: string;
 };
 
-class UserDashboard extends ClassComponent<UserDashboardAttrs> {
+class UserDashboardComponent extends ClassComponent<UserDashboardAttrs> {
   private activePage: DashboardViews;
   private chainEventCount: number;
   private chainEvents: DashboardActivityNotification[];
@@ -102,9 +103,9 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     const loggedIn = app.loginState === LoginState.LoggedIn;
 
     if (!vnode.attrs.type) {
-      setRoute(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+      this.setRoute(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
     } else if (vnode.attrs.type === 'for-you' && !loggedIn) {
-      setRoute('/dashboard/global');
+      this.setRoute('/dashboard/global');
     }
 
     const subpage: DashboardViews =
@@ -174,7 +175,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                       );
                       return;
                     }
-                    setRoute('/dashboard/for-you');
+                    this.setRoute('/dashboard/for-you');
                     redraw();
                   }}
                 />
@@ -182,7 +183,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   label={DashboardViews.Global}
                   isSelected={activePage === DashboardViews.Global}
                   onClick={() => {
-                    setRoute('/dashboard/global');
+                    this.setRoute('/dashboard/global');
                     redraw();
                   }}
                 />
@@ -190,7 +191,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   label={DashboardViews.Chain}
                   isSelected={activePage === DashboardViews.Chain}
                   onClick={() => {
-                    setRoute('/dashboard/chain-events');
+                    this.setRoute('/dashboard/chain-events');
                     redraw();
                   }}
                 />
@@ -315,5 +316,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     );
   }
 }
+
+const UserDashboard = withRouter(UserDashboardComponent);
 
 export default UserDashboard;

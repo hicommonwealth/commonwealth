@@ -31,6 +31,7 @@ export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
               type="caption"
               fontWeight="medium"
               className={isCurrent ? 'current-text' : 'parent-text'}
+              // TODO this setRoute is not related to react-router => won't work
               onClick={isCurrent ? undefined : () => setRoute(b.path)}
             >
               {b.label}

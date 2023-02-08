@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import type { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';

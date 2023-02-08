@@ -1,13 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  setRoute,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 
 import 'sublayout_header.scss';
 
@@ -18,16 +13,16 @@ import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { LoginSelector } from './components/header/login_selector';
 import { CreateContentPopover } from './menus/create_content_menu';
-import { HelpMenuPopover } from './menus/help_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
+import withRouter from 'navigation/helpers';
 
 type SublayoutHeaderAttrs = {
   hideSearch?: boolean;
   onMobile: boolean;
 };
 
-export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
+class SublayoutHeaderComponent extends ClassComponent<SublayoutHeaderAttrs> {
   view(vnode: ResultNode<SublayoutHeaderAttrs>) {
     const { hideSearch, onMobile } = vnode.attrs;
 
@@ -40,9 +35,9 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
             iconSize="xl"
             onClick={() => {
               if (app.isCustomDomain()) {
-                setRoute('/');
+                this.setRoute('/');
               } else {
-                setRoute('/dashboard/for-you');
+                this.setRoute('/dashboard/for-you');
               }
             }}
           />
@@ -89,3 +84,5 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
     );
   }
 }
+
+export const SublayoutHeader = withRouter(SublayoutHeaderComponent);

@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import moment from 'moment';
 import { AddressInfo } from 'models';
 import 'pages/notification_settings/index.scss';
@@ -21,13 +21,15 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs } from './helpers';
+import withRouter from 'navigation/helpers';
 
-class NotificationSettingsPage extends ClassComponent {
+class NotificationSettingsPageComponent extends ClassComponent {
   view() {
     if (!app.loginStatusLoaded()) {
       return <PageLoading />;
     } else if (!app.isLoggedIn()) {
-      setRoute('/', {}, { replace: true });
+      // TODO add additional params like "replace"
+      this.setRoute('/', {}, { replace: true });
       return <PageLoading />;
     }
 
@@ -244,5 +246,7 @@ class NotificationSettingsPage extends ClassComponent {
     );
   }
 }
+
+const NotificationSettingsPage = withRouter(NotificationSettingsPageComponent);
 
 export default NotificationSettingsPage;

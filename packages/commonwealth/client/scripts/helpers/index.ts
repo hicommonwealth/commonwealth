@@ -36,14 +36,15 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return (arr
+  return arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown) as ThreadStage[];
+    .filter((s) => s) as unknown as ThreadStage[];
 }
 
 export const modalRedirectClick = (e, route) => {
   e.preventDefault();
   $(e.target).trigger('modalexit');
+  // TODO this setRoute is not related to react-router => won't work
   setRoute(route);
 };
 
@@ -63,6 +64,7 @@ export function externalLink(selector, target, children) {
           // don't open a new window if the link is on Commonwealth
           e.preventDefault();
           e.stopPropagation();
+          // TODO this setRoute is not related to react-router => won't work
           setRoute(target);
         }
       },
@@ -99,10 +101,12 @@ export function link(
           : [target];
       if (afterRouteSet) {
         (async () => {
+          // TODO this setRoute is not related to react-router => won't work
           await setRoute(...routeArgs);
           afterRouteSet();
         })();
       } else {
+        // TODO this setRoute is not related to react-router => won't work
         setRoute(...routeArgs);
       }
     },

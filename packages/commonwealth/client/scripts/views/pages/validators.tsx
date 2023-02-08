@@ -6,17 +6,8 @@ import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { externalLink, pluralize } from 'helpers';
 import { AddressInfo } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import 'pages/validators.scss';
 
 import app from 'state';

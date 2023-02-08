@@ -3,17 +3,8 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import _ from 'lodash';
 import type { Account } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { Component } from 'mithrilInterop';
+import { render, setRoute, redraw } from 'mithrilInterop';
 import { initChain } from 'helpers/chain';
 import { setActiveAccount } from '../../../controllers/app/login';
 import type SubstrateIdentity from '../../../controllers/chain/substrate/identity';
@@ -46,6 +37,7 @@ const editIdentityAction = (
           const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
           confirmed = await confirmationModalWithText(msg)();
           if (confirmed) {
+            // TODO this setRoute is not related to react-router => won't work
             setRoute(`/${chainObj.id}/account/${account.address}`, {
               setIdentity: true,
             });

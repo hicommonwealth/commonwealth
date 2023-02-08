@@ -23,13 +23,14 @@ import Sublayout from 'views/sublayout';
 // import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';
+import withRouter from 'navigation/helpers';
 
 type SputnikDaoRowAttrs = {
   clickable: boolean;
   dao: IDaoInfo;
 };
 
-class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
+class SputnikDaoRowComponent extends ClassComponent<SputnikDaoRowAttrs> {
   view(vnode: ResultNode<SputnikDaoRowAttrs>) {
     const { dao, clickable } = vnode.attrs;
 
@@ -60,7 +61,7 @@ class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
         onClick={(e) => {
           if (clickable) {
             e.preventDefault();
-            setRoute(`/${dao.contractId}`);
+            this.setRoute(`/${dao.contractId}`);
           }
         }}
       >
@@ -76,13 +77,15 @@ class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
   }
 }
 
-class SputnikDAOsPage extends ClassComponent {
+const SputnikDaoRow = withRouter(SputnikDaoRowComponent);
+
+class SputnikDAOsPageComponent extends ClassComponent {
   private daosList: IDaoInfo[];
   private daosRequested: boolean;
 
   view() {
     if (app.activeChainId() && app.activeChainId() !== 'near')
-      setRoute(`/${app.activeChainId()}`);
+      this.setRoute(`/${app.activeChainId()}`);
 
     const activeEntity = app.chain;
     const allCommunities = app.config.chains.getAll();
@@ -167,5 +170,7 @@ class SputnikDAOsPage extends ClassComponent {
     );
   }
 }
+
+const SputnikDAOsPage = withRouter(SputnikDAOsPageComponent);
 
 export default SputnikDAOsPage;

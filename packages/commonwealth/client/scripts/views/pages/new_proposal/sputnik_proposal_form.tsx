@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 
 import { notifyError } from 'controllers/app/notifications';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';

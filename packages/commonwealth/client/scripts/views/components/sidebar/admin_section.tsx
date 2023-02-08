@@ -1,19 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, getRoute, jsx } from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
@@ -199,4 +188,4 @@ class AdminSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const AdminSection = NavigationWrapper(AdminSectionComponent);
+export const AdminSection = AdminSectionComponent;

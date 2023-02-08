@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

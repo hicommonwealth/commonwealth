@@ -8,17 +8,7 @@ import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -30,6 +20,7 @@ import { InputRow } from 'views/components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { defaultChainRows, initChainForm } from './chain_input_rows';
 import type { ChainFormFields, ChainFormState } from './types';
+import withRouter from 'navigation/helpers';
 
 type SubstrateFormFields = {
   nodeUrl: string;
@@ -40,7 +31,7 @@ type CreateSubstrateForm = ChainFormFields & SubstrateFormFields;
 
 type CreateSubstrateState = ChainFormState & { form: CreateSubstrateForm };
 
-export class SubstrateForm extends ClassComponent {
+class SubstrateFormComponent extends ClassComponent {
   public state: CreateSubstrateState = {
     saving: false,
     form: {
@@ -124,13 +115,8 @@ export class SubstrateForm extends ClassComponent {
           label="Save changes"
           disabled={this.state.saving}
           onClick={async () => {
-            const {
-              name,
-              nodeUrl,
-              iconUrl,
-              substrateSpec,
-              symbol,
-            } = this.state.form;
+            const { name, nodeUrl, iconUrl, substrateSpec, symbol } =
+              this.state.form;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
@@ -165,7 +151,7 @@ export class SubstrateForm extends ClassComponent {
                   );
                 }
                 await initAppState(false);
-                setRoute(`/${res.result.chain.id}`);
+                this.setRoute(`/${res.result.chain.id}`);
               })
               .catch((err: any) => {
                 notifyError(
@@ -181,3 +167,4 @@ export class SubstrateForm extends ClassComponent {
     );
   }
 }
+export const SubstrateForm = withRouter(SubstrateFormComponent);

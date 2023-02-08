@@ -8,14 +8,10 @@
  * as we do not want to expose its imports and features until we are prepared to migrate to react.
  */
 
-import {
-  createElement,
-  FunctionComponent,
-  ReactNode,
-  // eslint-disable-next-line import/no-unresolved
-  Component as ReactComponent,
-} from 'react';
-import { redirect, NavigateFunction } from 'react-router-dom';
+import type { FunctionComponent, ReactNode } from 'react';
+import { createElement, Component as ReactComponent } from 'react';
+import type { NavigateFunction, Location } from 'react-router-dom';
+import { redirect } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
@@ -86,13 +82,18 @@ export const jsx = createElement;
 // corresponds to Mithril's Vnode type with attrs only (no state)
 export type ResultNode<A = unknown> = { attrs: A; children: Children };
 
+export type ClassComponentRouter = {
+  location: Location;
+  navigate: NavigateFunction;
+  params: Readonly<Record<string, string | undefined>>;
+};
 // Additions to base React Component attrs
 type AdditionalAttrs = {
   // simulate mithril's vnode.children
   children?: Children;
 
-  // optionally used navigation for NavigationWrapper, see `./helpers.tsx`
-  navigate?: NavigateFunction;
+  // optionally used navigation for withRouter, see `navigation/helpers.tsx`
+  router?: ClassComponentRouter;
 };
 
 // Replicates Mithril's ClassComponent functionality with support for JSX syntax.
@@ -177,10 +178,13 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
   }
 
   // replicates `m.route.set()` functionality via react-router
+  // TODO add additional params like "replace", see AdminPageComponent
   public setRoute(route: string) {
-    if (this.props.navigate) {
+    if (this.props.router.navigate) {
       console.log('setting route', route);
-      this.props.navigate(route);
+      this.props.router.navigate(route);
+    } else {
+      console.error('Prop "navigate" is not defined!');
     }
   }
 
@@ -252,6 +256,7 @@ export function setRoute(
   }
   */
 
+  // TODO this redirect is not related to react-router => won't work
   redirect(route);
   // reset scroll position
   const html = document.getElementsByTagName('html')[0];

@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -192,6 +182,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
         app.sidebarRedraw.emit('redraw');
+        // TODO this setRoute is not related to react-router => won't work
         setRoute('/createCommunity');
       },
     },

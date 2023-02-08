@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, getRoute, jsx } from 'mithrilInterop';
 import {
   ChainBase,
   ChainNetwork,
@@ -21,7 +11,6 @@ import {
 
 import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import app from 'state';
 import { verifyCachedToggleTree } from './helpers';
@@ -506,4 +495,4 @@ class GovernanceSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const GovernanceSection = NavigationWrapper(GovernanceSectionComponent);
+export const GovernanceSection = GovernanceSectionComponent;

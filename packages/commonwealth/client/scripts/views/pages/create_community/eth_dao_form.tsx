@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
@@ -42,6 +42,7 @@ import type {
 } from 'views/pages/create_community/types';
 import { isAddress } from 'web3-utils';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import withRouter from 'navigation/helpers';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
@@ -52,7 +53,7 @@ type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
 
 type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
 
-export class EthDaoForm extends ClassComponent<EthChainAttrs> {
+class EthDaoFormComponent extends ClassComponent<EthChainAttrs> {
   public state: CreateEthDaoState = {
     message: '',
     loaded: false,
@@ -245,7 +246,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
               }
               await initAppState(false);
               // TODO: notify about needing to run event migration
-              setRoute(`/${res.result.chain?.id}`);
+              this.setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error ||
@@ -260,3 +261,5 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
     );
   }
 }
+
+export const EthDaoForm = withRouter(EthDaoFormComponent);

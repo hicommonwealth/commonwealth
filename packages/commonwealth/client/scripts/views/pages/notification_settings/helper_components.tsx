@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
 import { getProposalUrlPath } from 'identifiers';
 import type { NotificationSubscription } from 'models';
 import { AddressInfo } from 'models';
@@ -40,6 +31,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
 
     return (
       <React.Fragment>
+        {/*// TODO this setRoute is not related to react-router => won't work*/}
         <div className="header-row" onClick={() => setRoute(threadUrl)}>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -127,6 +119,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
     return (
       <div
         className="header-row"
+        // TODO this setRoute is not related to react-router => won't work
         onClick={() => setRoute(subscription.Chain.id)}
       >
         <CWText

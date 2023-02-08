@@ -2,17 +2,8 @@
 
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 
 import 'pages/landing/creators_card_section.scss';
 

@@ -1,16 +1,6 @@
 import $ from 'jquery';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import app from 'state';
 import { AccessLevel } from 'models';
 import { ChainCategoryType } from 'common-common/src/types';

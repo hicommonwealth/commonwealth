@@ -2,17 +2,7 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 

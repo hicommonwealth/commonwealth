@@ -1,14 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { render, setRoute } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
@@ -128,6 +118,7 @@ export const renderQuillDelta = (
                           // don't open a new window if the link is on Commonwealth
                           e.preventDefault();
                           e.stopPropagation();
+                          // TODO this setRoute is not related to react-router => won't work
                           setRoute(child.attributes.link);
                         }
                       },
@@ -225,6 +216,7 @@ export const renderQuillDelta = (
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
+                    // TODO this setRoute is not related to react-router => won't work
                     setRoute(child.attributes.link);
                   }
                 },

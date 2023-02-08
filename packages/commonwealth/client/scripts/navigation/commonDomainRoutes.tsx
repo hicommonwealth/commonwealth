@@ -1,8 +1,9 @@
 import { jsx } from 'mithrilInterop';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { Navigate, withLayout } from 'navigation/helpers';
+import { Navigate } from 'navigation/helpers';
 import app from 'state';
+import { withLayout } from 'views/layout';
 
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));

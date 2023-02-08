@@ -14,15 +14,14 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getCommentPreview } from './helpers';
+import withRouter from 'navigation/helpers';
 
 type UserDashboardRowTopAttrs = {
   activityData: any;
   category: string;
 };
 
-export class UserDashboardRowTop extends ClassComponent<
-  UserDashboardRowTopAttrs
-> {
+export class UserDashboardRowTopComponent extends ClassComponent<UserDashboardRowTopAttrs> {
   view(vnode: ResultNode<UserDashboardRowTopAttrs>) {
     const {
       created_at,
@@ -66,7 +65,7 @@ export class UserDashboardRowTop extends ClassComponent<
         onclick={(e: any) => {
           e.preventDefault();
           e.stopPropagation();
-          setRoute(`/${author_chain}/account/${author_address}`);
+          this.setRoute(`/${author_chain}/account/${author_address}`);
         }}
       />
     );
@@ -82,7 +81,7 @@ export class UserDashboardRowTop extends ClassComponent<
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setRoute(`/${chain_id}`);
+                this.setRoute(`/${chain_id}`);
               }}
             >
               {communityName}
@@ -107,3 +106,5 @@ export class UserDashboardRowTop extends ClassComponent<
     );
   }
 }
+
+export const UserDashboardRowTop = withRouter(UserDashboardRowTopComponent);

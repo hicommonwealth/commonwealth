@@ -2,13 +2,8 @@
 import React from 'react';
 
 import { AddressInfo } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
@@ -19,6 +14,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
+import withRouter from 'navigation/helpers';
 
 type SearchChipAttrs = {
   isActive: boolean;
@@ -53,7 +49,7 @@ type SearchBarPreviewRowAttrs = {
   searchTerm?: string;
 };
 
-export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
+export class SearchBarThreadPreviewRowComponent extends ClassComponent<SearchBarPreviewRowAttrs> {
   view(vnode: ResultNode<SearchBarPreviewRowAttrs>) {
     const { searchResult, searchTerm } = vnode.attrs;
 
@@ -61,7 +57,7 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
       <div
         className="SearchBarThreadPreviewRow"
         onClick={() =>
-          setRoute(
+          this.setRoute(
             `/${searchResult.chain}/discussion/${searchResult.proposalid}`
           )
         }
@@ -98,7 +94,11 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
   }
 }
 
-export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
+export const SearchBarThreadPreviewRow = withRouter(
+  SearchBarThreadPreviewRowComponent
+);
+
+class SearchBarCommentPreviewRowComponent extends ClassComponent<SearchBarPreviewRowAttrs> {
   view(vnode: ResultNode<SearchBarPreviewRowAttrs>) {
     const { searchResult, searchTerm } = vnode.attrs;
 
@@ -106,7 +106,7 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
       <div
         className="SearchBarCommentPreviewRow"
         onClick={() => {
-          setRoute(
+          this.setRoute(
             `/${searchResult.chain}/proposal/${
               searchResult.proposalid.split('_')[0]
             }/${searchResult.proposalid.split('_')[1]}`
@@ -132,7 +132,11 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
   }
 }
 
-export class SearchBarCommunityPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
+export const SearchBarCommentPreviewRow = withRouter(
+  SearchBarCommentPreviewRowComponent
+);
+
+class SearchBarCommunityPreviewRowComponent extends ClassComponent<SearchBarPreviewRowAttrs> {
   view(vnode: ResultNode<SearchBarPreviewRowAttrs>) {
     const { searchResult } = vnode.attrs;
 
@@ -140,7 +144,7 @@ export class SearchBarCommunityPreviewRow extends ClassComponent<SearchBarPrevie
       <div
         className="SearchBarCommunityPreviewRow"
         onClick={() => {
-          setRoute(
+          this.setRoute(
             searchResult.address
               ? `/${searchResult.address}`
               : searchResult.id
@@ -154,6 +158,10 @@ export class SearchBarCommunityPreviewRow extends ClassComponent<SearchBarPrevie
     );
   }
 }
+
+export const SearchBarCommunityPreviewRow = withRouter(
+  SearchBarCommunityPreviewRowComponent
+);
 
 export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
   view(vnode: ResultNode<SearchBarPreviewRowAttrs>) {

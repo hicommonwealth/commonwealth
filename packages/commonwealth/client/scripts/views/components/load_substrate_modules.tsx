@@ -2,17 +2,7 @@
 import React from 'react';
 
 import { ChainBase } from 'common-common/src/types';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 import type { ProposalModule } from 'models';
 
 import app from 'state';

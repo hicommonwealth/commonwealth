@@ -5,7 +5,6 @@ import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/discussions/thread_preview.scss';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import {
   chainEntityTypeToProposalShortName,
   getProposalUrlPath,
@@ -223,4 +222,4 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
   }
 }
 
-export const ThreadPreview = NavigationWrapper(ThreadPreviewComponent);
+export const ThreadPreview = ThreadPreviewComponent;

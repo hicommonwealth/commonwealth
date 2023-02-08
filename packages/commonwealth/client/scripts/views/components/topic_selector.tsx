@@ -1,23 +1,12 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, render, jsx } from 'mithrilInterop';
 
 import 'components/topic_selector.scss';
-import { isNotUndefined } from 'helpers/typeGuards';
 
 import { Topic } from 'models';
-import { CWButton } from './component_kit/cw_button';
 
 type TopicSelectorAttrs = {
   defaultTopic?: Topic | string | boolean;

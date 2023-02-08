@@ -1,21 +1,10 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, getRoute, getRouteParam, jsx } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import app from 'state';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { handleRedirectClicks } from '../../../helpers';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
@@ -264,4 +253,4 @@ class DiscussionSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const DiscussionSection = NavigationWrapper(DiscussionSectionComponent);
+export const DiscussionSection = DiscussionSectionComponent;

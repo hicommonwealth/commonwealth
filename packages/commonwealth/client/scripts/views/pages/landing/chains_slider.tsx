@@ -2,17 +2,8 @@
 
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
 
 import 'pages/landing/chains_slider.scss';
 
@@ -27,6 +18,7 @@ const chainToTag = (chain, index: number) => {
       className="glide__slide mt-4 pb-8"
       onClick={(e) => {
         e.preventDefault();
+        // TODO this setRoute is not related to react-router => won't work
         setRoute(`/${chain.id}`);
         localStorage['home-scrollY'] = window.scrollY;
       }}

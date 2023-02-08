@@ -2,17 +2,8 @@
 
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
 
 import 'pages/landing/tokens_community_hero.scss';
 
@@ -35,6 +26,7 @@ const initiateFullSearch = (searchTerm) => {
   const params = `q=${encodeURIComponent(
     searchTerm.toString().trim()
   )}&scope[]=Communities`;
+  // TODO this setRoute is not related to react-router => won't work
   setRoute(`/search?${params}`);
 };
 

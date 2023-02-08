@@ -20,17 +20,7 @@ import { ApiStatus } from 'state';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { setRoute, redraw } from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;
@@ -341,6 +331,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         failureUrl,
       });
     } else {
+      // TODO this setRoute is not related to react-router => won't work
       setRoute(successUrl);
     }
   }

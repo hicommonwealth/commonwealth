@@ -33,6 +33,7 @@ import PageNotFound from '../404';
 import ErrorPage from '../error';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { User } from '../../components/user/user';
+import withRouter from 'navigation/helpers';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -46,6 +47,7 @@ const getDiscussionResult = (thread, searchTerm) => {
     <div
       className="search-result-row"
       onClick={() => {
+        // TODO this setRoute is not related to react-router => won't work
         setRoute(`/${chain}/discussion/${proposalId}`);
       }}
     >
@@ -92,6 +94,7 @@ const getCommentResult = (comment, searchTerm) => {
     <div
       className="search-result-row"
       onClick={() => {
+        // TODO this setRoute is not related to react-router => won't work
         setRoute(
           `/${chain}/discussion/${proposalId.split('_')[0]}/${
             proposalId.split('_')[1]
@@ -144,8 +147,10 @@ const getCommunityResult = (community) => {
 
   const onSelect = () => {
     if (params.community) {
+      // TODO this setRoute is not related to react-router => won't work
       setRoute(params.community.id ? `/${params.community.id}` : '/');
     } else {
+      // TODO this setRoute is not related to react-router => won't work
       setRoute(community.id ? `/${community.id}` : '/');
     }
   };
@@ -221,7 +226,7 @@ type SearchPageAttrs = {
   results: any[];
 };
 
-class SearchPage extends ClassComponent<SearchPageAttrs> {
+class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
   private activeTab: SearchScope;
   private errorText: string;
   private pageCount: number;
@@ -333,7 +338,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                       className="search-all-communities"
                       onClick={() => {
                         searchQuery.chainScope = undefined;
-                        setRoute(`/search?${searchQuery.toUrlParams()}`);
+                        this.setRoute(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);
@@ -359,7 +364,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                       ]}
                       onSelect={(o) => {
                         searchQuery.sort = SearchSort[o.value];
-                        setRoute(`/search?${searchQuery.toUrlParams()}`);
+                        this.setRoute(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);
@@ -376,5 +381,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
     );
   }
 }
+
+const SearchPage = withRouter(SearchPageComponent);
 
 export default SearchPage;

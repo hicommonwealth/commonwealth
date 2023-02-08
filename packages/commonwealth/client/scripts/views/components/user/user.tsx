@@ -2,15 +2,7 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import {
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { render, redraw, jsx } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';

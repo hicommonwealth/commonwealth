@@ -2,15 +2,11 @@
 import React from 'react';
 /* eslint-disable no-useless-escape */
 
+import type { ResultNode } from 'mithrilInterop';
 import {
   ClassComponent,
-  ResultNode,
   render,
-  setRoute,
-  getRoute,
-  getRouteParam,
   redraw,
-  Component,
   jsx,
   rootRender,
 } from 'mithrilInterop';

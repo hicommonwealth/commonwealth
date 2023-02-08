@@ -19,7 +19,6 @@ import app from 'state';
 import { WebsocketMessageNames } from 'types';
 import { CWSpinner } from '../component_kit/cw_spinner';
 import { verifyCachedToggleTree } from '../sidebar/helpers';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import type {
   SectionGroupAttrs,
@@ -56,9 +55,8 @@ function setToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
+    JSON.stringify(newTree);
 }
 
 class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
@@ -449,4 +447,4 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const ChatSection = NavigationWrapper(ChatSectionComponent);
+export const ChatSection = ChatSectionComponent;

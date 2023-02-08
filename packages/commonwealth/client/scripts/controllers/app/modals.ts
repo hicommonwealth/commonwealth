@@ -1,14 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 
 export class ModalStore {

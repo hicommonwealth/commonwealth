@@ -4,17 +4,8 @@ import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import type SubstrateIdentity from 'controllers/chain/substrate/identity';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { Component } from 'mithrilInterop';
+import { render, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { User } from 'views/components/user/user';

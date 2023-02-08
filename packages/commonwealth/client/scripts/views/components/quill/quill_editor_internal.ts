@@ -1,14 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import { loadScript } from 'helpers';
 import { detectURL } from 'helpers/threads';

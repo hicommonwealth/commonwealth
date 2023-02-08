@@ -7,7 +7,7 @@ import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import $ from 'jquery';
-import { ClassComponent, render, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, render, redraw, jsx } from 'mithrilInterop';
 
 import 'pages/admin.scss';
 
@@ -21,6 +21,7 @@ import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
 import { CWLabel } from '../components/component_kit/cw_label';
+import withRouter from 'navigation/helpers';
 
 class SudoForm extends ClassComponent {
   private resultText: string;
@@ -285,10 +286,11 @@ class AdminActions extends ClassComponent {
   }
 }
 
-class AdminPage extends ClassComponent {
+class AdminPageComponent extends ClassComponent {
   view() {
     if (!app.chain) {
-      setRoute('/', {}, { replace: true });
+      // TODO fix additional prop
+      this.setRoute('/', {}, { replace: true });
       return <PageLoading />;
     } else if (app.chain && app.user.isSiteAdmin) {
       return (
@@ -309,5 +311,7 @@ class AdminPage extends ClassComponent {
     }
   }
 }
+
+const AdminPage = withRouter(AdminPageComponent);
 
 export default AdminPage;

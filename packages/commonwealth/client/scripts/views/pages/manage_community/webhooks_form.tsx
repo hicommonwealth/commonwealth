@@ -3,17 +3,8 @@ import React from 'react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { link, pluralize } from 'helpers';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import { Webhook } from 'models';
 

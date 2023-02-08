@@ -7,13 +7,9 @@ import $ from 'jquery';
 import app from 'state';
 import {
   ClassComponent,
-  ResultNode,
-  render,
   setRoute,
-  getRoute,
   getRouteParam,
   redraw,
-  Component,
   jsx,
 } from 'mithrilInterop';
 
@@ -48,6 +44,7 @@ const validate = async (
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
     await updateActiveAddresses(selectedChainMeta);
     console.log('Navigating to axie infinite community');
+    // TODO this setRoute is not related to react-router => won't work
     setRoute('/axie-infinity');
   } else {
     console.error(`Got login error: ${JSON.stringify(result)}`);

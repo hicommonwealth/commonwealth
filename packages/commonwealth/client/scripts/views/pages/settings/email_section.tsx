@@ -1,17 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, getRoute, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import type { SocialAccount } from 'models';
 import { navigateToSubpage } from 'router';

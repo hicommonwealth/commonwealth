@@ -12,8 +12,9 @@ import app from 'state';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import withRouter from 'navigation/helpers';
 
-export class SidebarQuickSwitcher extends ClassComponent {
+class SidebarQuickSwitcherComponent extends ClassComponent {
   view() {
     const allCommunities = app.config.chains
       .getAll()
@@ -60,7 +61,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
               key={item.id}
               size="large"
               community={item}
-              onClick={link ? () => setRoute(`/${item.id}`) : undefined}
+              onClick={link ? () => this.setRoute(`/${item.id}`) : undefined}
             />
           ))}
         </div>
@@ -68,3 +69,5 @@ export class SidebarQuickSwitcher extends ClassComponent {
     );
   }
 }
+
+export const SidebarQuickSwitcher = withRouter(SidebarQuickSwitcherComponent);

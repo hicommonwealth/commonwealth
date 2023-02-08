@@ -9,7 +9,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { providers } from 'ethers';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import $ from 'jquery';
@@ -34,12 +34,13 @@ import type {
   EthChainAttrs,
   EthFormFields,
 } from './types';
+import withRouter from 'navigation/helpers';
 
 type CreateERC721Form = ChainFormFields & EthFormFields;
 
 type CreateERC721State = ChainFormState & { form: CreateERC721Form };
 
-export class ERC721Form extends ClassComponent<EthChainAttrs> {
+class ERC721FormComponent extends ClassComponent<EthChainAttrs> {
   public state: CreateERC721State = {
     message: '',
     loaded: false,
@@ -232,7 +233,7 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
                 );
               }
               await initAppState(false);
-              setRoute(`/${res.result.chain?.id}`);
+              this.setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error ||
@@ -247,3 +248,5 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
     );
   }
 }
+
+export const ERC721Form = withRouter(ERC721FormComponent);

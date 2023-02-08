@@ -5,17 +5,8 @@ import { pluralize } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 // import { navigateToSubpage } from 'router';
 import type { Thread, Topic } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
@@ -32,6 +23,7 @@ import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 // import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
+import withRouter from 'navigation/helpers';
 
 type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
@@ -39,7 +31,7 @@ type TopicSummaryRowAttrs = {
   topic: Topic;
 };
 
-export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
+class TopicSummaryRowComponent extends ClassComponent<TopicSummaryRowAttrs> {
   view(vnode: ResultNode<TopicSummaryRowAttrs>) {
     const { monthlyThreads, pinnedThreads, topic } = vnode.attrs;
 
@@ -76,7 +68,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
               className="topic-name-text"
               onClick={(e) => {
                 e.preventDefault();
-                setRoute(
+                this.setRoute(
                   `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
                 );
               }}
@@ -113,7 +105,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
-                    setRoute(discussionLink);
+                    this.setRoute(discussionLink);
                   }}
                 >
                   <div className="row-top">
@@ -244,3 +236,5 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
     );
   }
 }
+
+export const TopicSummaryRow = withRouter(TopicSummaryRowComponent);

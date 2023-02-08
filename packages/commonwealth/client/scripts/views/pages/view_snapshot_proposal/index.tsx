@@ -9,17 +9,8 @@ import type {
 } from 'helpers/snapshot_utils';
 import { getPower, getResults } from 'helpers/snapshot_utils';
 import { AddressInfo } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 import app from 'state';

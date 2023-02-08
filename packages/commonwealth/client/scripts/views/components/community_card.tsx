@@ -1,17 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
 
 import 'components/community_card.scss';
 
@@ -22,10 +13,11 @@ import { CWCard } from './component_kit/cw_card';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWText } from './component_kit/cw_text';
+import withRouter from 'navigation/helpers';
 
 type CommunityCardAttrs = { chain: ChainInfo };
 
-export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
+class CommunityCardComponent extends ClassComponent<CommunityCardAttrs> {
   view(vnode: ResultNode<CommunityCardAttrs>) {
     const { chain } = vnode.attrs as CommunityCardAttrs;
 
@@ -36,7 +28,7 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
         return;
       }
       localStorage['home-scrollY'] = window.scrollY;
-      setRoute(`/${chain.id}`);
+      this.setRoute(`/${chain.id}`);
     };
 
     // Potentially Temporary (could be built into create community flow)
@@ -88,6 +80,8 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
     );
   }
 }
+
+export const CommunityCard = withRouter(CommunityCardComponent);
 
 export class NewCommunityCard extends ClassComponent {
   view() {

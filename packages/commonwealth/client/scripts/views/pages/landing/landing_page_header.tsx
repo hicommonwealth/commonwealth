@@ -60,6 +60,7 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
   }, []);
 
   const redirectClick = (route) => {
+    // TODO this setRoute is not related to react-router => won't work
     setRoute(route);
   };
 

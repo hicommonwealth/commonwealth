@@ -32,6 +32,7 @@ const goToSearchPage = (query: SearchQuery) => {
 
   app.search.addToHistory(query);
 
+  // TODO this setRoute is not related to react-router => won't work
   setRoute(`/search?${query.toUrlParams()}`);
 };
 
