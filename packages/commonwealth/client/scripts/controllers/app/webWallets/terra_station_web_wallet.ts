@@ -21,7 +21,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   public readonly specificChains = ['terra'];
 
   public get available() {
-    return this._extension && this._extension.isAvailable;
+    return window.terraWallets && window.terraWallets.length > 0;
   }
 
   public get enabled() {
