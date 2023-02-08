@@ -7,23 +7,27 @@ import { ChainBase } from 'common-common/src/types';
 import type { ChainNetwork } from 'common-common/src/types';
 
 import 'components/component_kit/cw_wallets_list.scss';
+
+import { signSessionWithAccount } from 'controllers/server/sessions';
 import { createUserWithAddress } from 'controllers/app/login';
 import { notifyInfo } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import type Near from 'controllers/chain/near/adapter';
+import type Substrate from 'controllers/chain/substrate/adapter';
+
 import { User } from '../user/user';
 import { CWIconButton } from './cw_icon_button';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
 import type { Account, IWebWallet } from 'models';
 import { AddressInfo } from 'models';
+
 import {
-  CWWalletMissingOptionRow,
   CWWalletOptionRow,
+  CWWalletMissingOptionRow,
 } from './cw_wallet_option_row';
 import { getClasses } from './helpers';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import type Near from 'controllers/chain/near/adapter';
-import type Substrate from 'controllers/chain/substrate/adapter';
 import { addressSwapper } from 'utils';
 import { Modal } from './cw_modal';
 
@@ -142,6 +146,8 @@ type WalletsListProps = {
   ) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   linking?: boolean;
+  useSessionKeyLoginFlow?: boolean;
+  hideConnectAnotherWayLink?: boolean;
 };
 
 export const CWWalletsList = (props: WalletsListProps) => {
@@ -154,9 +160,55 @@ export const CWWalletsList = (props: WalletsListProps) => {
     setSelectedWallet,
     accountVerifiedCallback,
     linking,
+      useSessionKeyLoginFlow,
+      hideConnectAnotherWayLink,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+
+    // We call handleNormalWalletLogin if we're using connecting a new wallet, and
+    // handleSessionKeyRevalidation if we're regenerating a session key.
+    async function handleSessionKeyRevalidation(
+      wallet: IWebWallet<any>,
+      address: string
+    ) {
+      const timestamp = +new Date();
+      const sessionAddress = await app.sessions.getOrCreateAddress(
+        wallet.chain,
+        wallet.getChainId().toString()
+      );
+      const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
+      const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+
+      // Start the create-user flow, so validationBlockInfo gets saved to the backend
+      // This creates a new `Account` object with fields set up to be validated by verifyAddress.
+      const { account } = await createUserWithAddress(
+        address,
+        wallet.name,
+        chainIdentifier,
+        sessionAddress,
+        validationBlockInfo
+      );
+      account.setValidationBlockInfo(
+        validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
+      );
+
+      const { chainId, sessionPayload, signature } =
+        await signSessionWithAccount(wallet, account, timestamp);
+      await account.validate(signature, timestamp, chainId);
+      await app.sessions.authSession(
+        wallet.chain,
+        chainId,
+        sessionPayload,
+        signature
+      );
+      console.log('Started new session for', wallet.chain, chainId);
+
+      const newlyCreated = false;
+      const linking = false;
+      accountVerifiedCallback(account, newlyCreated, linking);
+    }
 
   async function handleNormalWalletLogin(
     wallet: IWebWallet<any>,
@@ -191,7 +243,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
     try {
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         wallet.chain,
-        wallet.getChainId()
+        wallet.getChainId().toString()
       );
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
       const validationBlockInfo =
@@ -310,7 +362,11 @@ export const CWWalletsList = (props: WalletsListProps) => {
                         }
                       }
 
-                      await handleNormalWalletLogin(wallet, address);
+                      if (useSessionKeyLoginFlow) {
+                        await handleSessionKeyRevalidation(wallet, address);
+                      } else {
+                        await handleNormalWalletLogin(wallet, address);
+                      }
                     }
                   }
                 }}
@@ -332,7 +388,11 @@ export const CWWalletsList = (props: WalletsListProps) => {
                       } else {
                         address = wallet.accounts[accountIndex].address;
                       }
-                      await handleNormalWalletLogin(wallet, address);
+                          if (useSessionKeyLoginFlow) {
+                            await handleSessionKeyRevalidation(wallet, address);
+                          } else {
+                            await handleNormalWalletLogin(wallet, address);
+                          }
                       setIsModalOpen(false);
                     }}
                     onModalClose={() => setIsModalOpen(false)}
@@ -394,6 +454,17 @@ export const CWWalletsList = (props: WalletsListProps) => {
               )}
             />
           )}
+        {!hideConnectAnotherWayLink && (
+          <CWText
+            type="b2"
+            className={getClasses<{ darkMode?: boolean }>(
+              { darkMode },
+              'connect-another-way-link'
+            )}
+          >
+            <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
+          </CWText>
+        )}
         </div>
       </div>
       <CWText

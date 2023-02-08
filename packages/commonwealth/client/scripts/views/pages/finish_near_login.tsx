@@ -86,7 +86,7 @@ const FinishNearLogin = () => {
         app.config.chains.getById(app.activeChainId());
 
       // create canvas thing
-      const chainId = chain.id;
+      const chainId = 'mainnet';
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
         chainId
@@ -106,7 +106,8 @@ const FinishNearLogin = () => {
         chainId,
         acct.address,
         sessionPublicAddress,
-        null
+        +new Date(),
+        null // no blockhash
       );
 
       setIsNewAccount(newAcct.newlyCreated);
@@ -117,7 +118,16 @@ const FinishNearLogin = () => {
       acct.setSessionPublicAddress(sessionPublicAddress);
       acct.setValidationBlockInfo(null);
 
-      const signature = await acct.signMessage(JSON.stringify(canvasMessage));
+      const canvas = await import('@canvas-js/interfaces');
+      const signature = await acct.signMessage(
+        canvas.serializeSessionPayload(canvasMessage)
+      );
+
+      await acct.validate(signature, canvasMessage.sessionIssued, chainId);
+
+      app.sessions
+        .getSessionController(ChainBase.NEAR)
+        .authSession(chainId, canvasMessage, signature);
 
       await acct.validate(signature, chainId);
 

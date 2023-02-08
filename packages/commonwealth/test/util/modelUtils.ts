@@ -9,6 +9,7 @@ import { BalanceType, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
+
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
 import { constructCanvasMessage } from 'shared/adapters/shared';
@@ -19,9 +20,11 @@ import app from '../../server-test';
 import models from '../../server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { Permission } from '../../server/models/role';
+
 import {
-  constructTypedMessage,
+  constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
+  TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -85,14 +88,18 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     console.log('createAndVerifyAddress res', res.body);
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
+    const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
-    const data = await constructTypedMessage(
-      address,
+    const timestamp = 1665083987891;
+    const message = constructCanvasMessage(
+      'ethereum',
       chain_id,
+      address,
       sessionWallet.address,
-      TEST_BLOCK_INFO_STRING
+      timestamp,
+      TEST_BLOCK_INFO_BLOCKHASH
     );
+    const data = constructTypedCanvasMessage(message);
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -106,12 +113,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({
         address,
         chain,
+        chain_id,
         signature,
         wallet_id,
         session_public_address: sessionWallet.address,
+        session_timestamp: timestamp,
         session_block_data: TEST_BLOCK_INFO_STRING,
       });
-    console.log(JSON.stringify(res.body));
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email };
@@ -137,12 +145,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       'ed25519'
     );
     const chain_id = ChainNetwork.Edgeware;
+    const timestamp = 1665083987891;
     const message = constructCanvasMessage(
-      'eth',
+      'ethereum',
       chain_id,
       address,
       sessionWallet.address,
-      TEST_BLOCK_INFO_STRING
+      timestamp,
+      TEST_BLOCK_INFO_BLOCKHASH
     );
 
     const signature = keyPair.sign(stringToU8a(JSON.stringify(message)));

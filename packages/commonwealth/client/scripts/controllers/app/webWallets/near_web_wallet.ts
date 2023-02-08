@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
 // is handled through redirects involving the `/finishNearLogin` page.
@@ -34,7 +34,7 @@ class NearWebWalletController implements IWebWallet<any> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
     throw new Error('not implemented');
   }

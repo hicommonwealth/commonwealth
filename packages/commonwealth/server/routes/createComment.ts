@@ -57,7 +57,14 @@ const createComment = async (
 
   const author = req.address;
 
-  const { parent_id, root_id, text } = req.body;
+  const {
+    parent_id,
+    root_id,
+    text,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
 
   if (!root_id || root_id.indexOf('_') === -1) {
     return next(new AppError(Errors.MissingRootId));
@@ -197,6 +204,9 @@ const createComment = async (
     address_id: author.id,
     chain: chain.id,
     parent_id: null,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
   };
   if (parent_id) Object.assign(commentContent, { parent_id });
 

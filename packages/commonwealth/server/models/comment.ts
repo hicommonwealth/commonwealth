@@ -15,6 +15,11 @@ export type CommentAttributes = {
   chain: string;
   parent_id?: string;
   version_history?: string[];
+
+  canvas_action: string;
+  canvas_session: string;
+  canvas_hash: string;
+
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -48,6 +53,11 @@ export default (
         defaultValue: [],
         allowNull: false,
       },
+      // signed data
+      canvas_action: { type: dataTypes.JSONB, allowNull: true },
+      canvas_session: { type: dataTypes.JSONB, allowNull: true },
+      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -67,6 +77,7 @@ export default (
         { fields: ['chain', 'created_at'] },
         { fields: ['chain', 'updated_at'] },
         { fields: ['root_id'] },
+        { fields: ['canvas_hash'] },
       ],
     }
   );

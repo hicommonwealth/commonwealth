@@ -247,7 +247,9 @@ export async function createUserWithAddress(
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
-    block_info: JSON.stringify(validationBlockInfo),
+    block_info: validationBlockInfo
+      ? JSON.stringify(validationBlockInfo)
+      : null,
   });
   const id = response.result.id;
   const chainInfo = app.config.chains.getById(chain);
