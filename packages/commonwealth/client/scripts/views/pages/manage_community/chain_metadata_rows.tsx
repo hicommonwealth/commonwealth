@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
@@ -404,15 +405,17 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             }
             try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.removeDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               } else {
-                this.default_deny_permissions = this.permissionsManager.addDenyPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.addDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               }
               await chain.updateChainData({
                 name,
@@ -443,7 +446,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="commonbot-section">
           <CWText type="h3">Commonbot Settings</CWText>
           {this.discordBotConnected ? (
-            <React.Fragment>
+            <>
               <div className="connected-line">
                 <CWText type="h4">Connection Status</CWText>
                 <div className="connect-group">
@@ -484,8 +487,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 <CWText type="h4">Snapshot Notifications</CWText>
                 <CWToggle
                   onChange={() => {
-                    this.snapshotNotificationsEnabled = !this
-                      .snapshotNotificationsEnabled;
+                    this.snapshotNotificationsEnabled =
+                      !this.snapshotNotificationsEnabled;
                     this.redraw();
                   }}
                   checked={this.snapshotNotificationsEnabled}
@@ -542,9 +545,9 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   }
                 }}
               />
-            </React.Fragment>
+            </>
           ) : this.discordBotConnecting ? (
-            <React.Fragment>
+            <>
               <div className="settings-row">
                 <div className="spinner-group">
                   <CWSpinner />
@@ -552,7 +555,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 </div>
                 <CWText>Refresh to check if connection succeeded</CWText>
               </div>
-            </React.Fragment>
+            </>
           ) : (
             <div className="settings-row">
               <CWButton

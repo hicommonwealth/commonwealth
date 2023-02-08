@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
@@ -55,13 +56,7 @@ export class NewTopicModal extends ClassComponent {
       disabled = true;
     }
 
-    const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+    const decimals = getDecimals(app.chain);
 
     return (
       <div className="NewTopicModal">
@@ -125,7 +120,7 @@ export class NewTopicModal extends ClassComponent {
             }}
           />
           {app.activeChainId() && (
-            <React.Fragment>
+            <>
               <CWLabel
                 label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
               />
@@ -136,7 +131,7 @@ export class NewTopicModal extends ClassComponent {
                   this.form.tokenThreshold = newValue;
                 }}
               />
-            </React.Fragment>
+            </>
           )}
           <div className="checkboxes">
             <CWCheckbox
@@ -176,8 +171,8 @@ export class NewTopicModal extends ClassComponent {
                 let defaultOffchainTemplate;
                 if (this.quillEditorState) {
                   this.quillEditorState.disable();
-                  defaultOffchainTemplate = this.quillEditorState
-                    .textContentsAsString;
+                  defaultOffchainTemplate =
+                    this.quillEditorState.textContentsAsString;
                 }
                 await app.topics.add(
                   form.name,

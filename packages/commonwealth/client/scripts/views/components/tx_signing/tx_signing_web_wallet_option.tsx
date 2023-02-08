@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import type PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import type Substrate from 'controllers/chain/substrate/adapter';
@@ -69,7 +67,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
       });
 
     return (
-      <React.Fragment>
+      <>
         <CWText>
           {/* extra div is for the link to flow with the text */}
           <div>
@@ -102,7 +100,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
               : 'Sign and send transaction'
           }
         />
-      </React.Fragment>
+      </>
     );
   }
 }

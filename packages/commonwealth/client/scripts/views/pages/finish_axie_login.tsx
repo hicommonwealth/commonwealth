@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { initAppState } from 'state';
@@ -14,8 +13,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';

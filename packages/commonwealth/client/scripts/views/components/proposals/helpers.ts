@@ -20,9 +20,7 @@ import {
   NearSputnikProposalStatus,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
 import type { AnyProposal, IVote } from 'models';
 import { ProposalStatus, VotingUnit } from 'models';
 
@@ -151,11 +149,7 @@ export const getCanVote = (
     canVote = false;
   } else if (hasVotedForAnyChoice) {
     // enable re-voting for particular types
-    if (
-      proposal instanceof SubstratePhragmenElection ||
-      proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateCollectiveProposal
-    ) {
+    if (proposal instanceof SubstrateDemocracyProposal) {
       canVote = true;
     } else {
       canVote = false;

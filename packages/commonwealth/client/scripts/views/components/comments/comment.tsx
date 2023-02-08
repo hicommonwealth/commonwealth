@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'components/comments/comment.scss';
 import type { Account, Comment as CommentType } from 'models';
@@ -148,7 +146,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
               updatedCommentsCallback={updatedCommentsCallback}
             />
           ) : (
-            <React.Fragment>
+            <>
               <CWText className="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
@@ -222,7 +220,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                   </div>
                 </div>
               )}
-            </React.Fragment>
+            </>
           )}
         </div>
       </div>

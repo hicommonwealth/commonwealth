@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { setRoute, jsx, redraw } from 'mithrilInterop';
+import { setRoute, redraw } from 'mithrilInterop';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { navigateToSubpage } from 'router';
 

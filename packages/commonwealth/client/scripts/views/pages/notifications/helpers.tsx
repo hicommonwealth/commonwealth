@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -127,7 +125,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     <User
       user={new AddressInfo(null, author_address, author_chain, null)}
       hideAvatar
-      hideIdentityIcon
     />
   );
 
@@ -242,7 +239,6 @@ export const getBatchNotificationFields = (
     <User
       user={new AddressInfo(null, author_address, author_chain, null)}
       hideAvatar
-      hideIdentityIcon
     />
   );
 

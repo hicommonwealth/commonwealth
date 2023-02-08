@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode} from
+
+ 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
@@ -22,11 +23,6 @@ export class SubstrateProposalStats extends ClassComponent<SubstrateProposalStat
             statName: 'Democracy Proposals',
             statDescription: `can be introduced by anyone. At a regular interval, the \
             top ranked proposal will become a supermajority-required referendum.`,
-          },
-          {
-            statName: 'Council Motions',
-            statDescription: `can be introduced by councillors. They can directly \
-            approve/reject treasury proposals, propose simple-majority referenda, or create fast-track referenda.`,
           },
         ]}
         stats={[

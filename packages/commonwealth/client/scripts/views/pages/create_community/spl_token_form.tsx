@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type * as solanaWeb3 from '@solana/web3.js';
@@ -17,8 +16,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';

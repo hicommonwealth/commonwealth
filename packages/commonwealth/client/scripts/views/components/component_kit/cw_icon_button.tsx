@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconComponentProps } from './cw_icons/types';
