@@ -262,11 +262,9 @@ class NotificationsController {
   public update(n: Notification) {
     if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
       this._chainEventStore.add(n);
-      console.log('emitting redraw');
       this.isUpdated.emit('redraw');
     } else if (!n.chainEvent && !this._discussionStore.getById(n.id)) {
       this._discussionStore.add(n);
-      console.log('emitting redraw');
       this.isUpdated.emit('redraw');
     }
   }
