@@ -1,7 +1,6 @@
 /* @jsx jsx */
 import React from 'react';
 
-<<<<<<< HEAD
 import {
   ClassComponent,
   ResultNode,
@@ -13,10 +12,6 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
-=======
-import ClassComponent from 'class_component';
-import m from 'mithril';
->>>>>>> bonnie.new-profiles
 
 import 'pages/login/login_desktop.scss';
 
@@ -35,10 +30,7 @@ import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
 import type { LoginAttrs } from './types';
-<<<<<<< HEAD
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-=======
->>>>>>> bonnie.new-profiles
 
 export class LoginDesktop extends ClassComponent<LoginAttrs> {
   view(vnode: ResultNode<LoginAttrs>) {

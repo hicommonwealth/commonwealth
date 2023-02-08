@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_socials.scss';
 
@@ -9,7 +19,7 @@ import { ComponentType } from './types';
 import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
 import { CWIconButton } from './cw_icon_button';
-import { IconName } from './cw_icons/cw_icon_lookup';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
 
 type SocialsAttrs = {
@@ -80,7 +90,7 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
             }}
             iconRight={icon}
             placeholder={placeholder}
-            oninput={(e) => {
+            onInput={(e) => {
               this.socials[i] = e.target.value;
               handleInputChange(this.socials);
             }}
@@ -88,7 +98,7 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
           <CWIconButton
             iconButtonTheme="primary"
             iconName="trash"
-            onclick={() => this.deleteInputRow(i, handleInputChange)}
+            onClick={() => this.deleteInputRow(i, handleInputChange)}
           />
         </div>
       );

@@ -1,12 +1,24 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
-import Thread from 'client/scripts/models/Thread';
-import { ChainInfo } from 'client/scripts/models';
+import type Thread from 'client/scripts/models/Thread';
+import type { ChainInfo } from 'client/scripts/models';
 import { NewProfileActivityRow } from './new_profile_activity_row';
-import { CommentWithAssociatedThread } from './new_profile_activity';
+import type { CommentWithAssociatedThread } from './new_profile_activity';
 
 enum ProfileActivity {
   Addresses,
@@ -24,7 +36,7 @@ type NewProfileActivityContentAttrs = {
 };
 
 export class NewProfileActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
-  view(vnode: m.Vnode<NewProfileActivityContentAttrs>) {
+  view(vnode: ResultNode<NewProfileActivityContentAttrs>) {
     const { option, address, comments, threads, chains } = vnode.attrs;
 
     if (option === ProfileActivity.Threads) {

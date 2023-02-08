@@ -1,19 +1,31 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
-import ClassComponent from 'class_component';
 
 import 'pages/new_profile/new_profile_activity_row.scss';
 
 import { link } from 'helpers';
-import Thread from 'client/scripts/models/Thread';
-import { ChainInfo } from 'client/scripts/models';
+import type Thread from 'client/scripts/models/Thread';
+import type { ChainInfo } from 'client/scripts/models';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import { CommentWithAssociatedThread } from './new_profile_activity';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import type { CommentWithAssociatedThread } from './new_profile_activity';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 type NewProfileActivityRowAttrs = {
@@ -23,13 +35,16 @@ type NewProfileActivityRowAttrs = {
 };
 
 export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
-  view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
+  view(vnode: ResultNode<NewProfileActivityRowAttrs>) {
     const { activity, chains } = vnode.attrs;
     const { chain, createdAt, author, title, id, body } = activity;
     const isThread = !!(activity as Thread).kind;
     const comment = activity as CommentWithAssociatedThread;
     const chainInfo = chains.find((c) => c.id === chain);
     const domain = document.location.origin;
+    const renderTrigger = (onclick) => (
+      <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
+    ),
 
     return (
       <div className="ProfileActivityRow">
@@ -67,13 +82,13 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
               : renderQuillTextBody(comment.text, { collapse: true })}
           </CWText>
           <div className="actions">
-            <CWPopoverMenu
-              trigger={<CWIconButton iconName="share" iconSize="small" />}
+            <PopoverMenu
+              renderTrigger={renderTrigger}
               menuItems={[
                 {
                   iconLeft: 'copy',
                   label: 'Copy URL',
-                  onclick: async () => {
+                  onClick: async () => {
                     await navigator.clipboard.writeText(
                       `${domain}/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`
                     );
@@ -82,7 +97,7 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
                 {
                   iconLeft: 'twitter',
                   label: 'Share on Twitter',
-                  onclick: async () => {
+                  onClick: async () => {
                     await window.open(
                       `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${comment.thread?.id}
                         ?comment=${comment.id}`,

@@ -1,25 +1,36 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
-import ClassComponent from 'class_component';
 
 import 'pages/new_profile/index.scss';
 
 import app from 'state';
-import { Thread, ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
+import type { Thread} from 'models';
+import { ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import { NewProfileHeader } from './new_profile_header';
+import type {
+  CommentWithAssociatedThread} from './new_profile_activity';
 import {
-  CommentWithAssociatedThread,
   NewProfileActivity,
 } from './new_profile_activity';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
-import { PageNotFound } from '../404';
+import PageNotFound from '../404';
 
 enum ProfileError {
   None,
@@ -38,7 +49,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
   private address: string;
   private addresses: AddressInfo[];
   private chains: ChainInfo[];
-  private content: m.Vnode;
+  private content: React.ReactNode;
   private comments: CommentWithAssociatedThread[];
   private error: ProfileError;
   private loading: boolean;
@@ -53,7 +64,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       });
 
       this.profile = new Profile(response.profile);
-      this.threads = response.threads.map((t) => modelThreadFromServer(t));
+      this.threads = response.threads.map((t) => app.threads.modelFromServer(t));
       const comments = response.comments.map((c) => modelCommentFromServer(c));
       const commentsWithAssociatedThread = comments.map((c) => {
         const thread = response.commentThreads.find(
@@ -92,11 +103,11 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
         this.error = ProfileError.NoProfileFound;
       }
     }
-    m.redraw();
+    redraw();
   };
 
   oninit() {
-    this.address = m.route.param('address');
+    this.address = getRouteParam('address');
     this.loading = true;
     this.error = ProfileError.None;
     this.comments = [];
@@ -108,8 +119,8 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
   view() {
     if (this.loading)
       this.content = (
-        <div class="ProfilePage">
-          <div class="loading-spinner">
+        <div className="ProfilePage">
+          <div className="loading-spinner">
             <CWSpinner />
           </div>
         </div>

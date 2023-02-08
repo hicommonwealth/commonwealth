@@ -1,13 +1,25 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import jdenticon from 'jdenticon';
 
 import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
-import { NewProfile as Profile } from 'client/scripts/models';
+import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
@@ -21,11 +33,11 @@ type NewProfileHeaderAttrs = {
 export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
   private defaultAvatar: string;
 
-  oninit(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+  oninit(vnode: ResultNode<NewProfileHeaderAttrs>) {
     this.defaultAvatar = jdenticon.toSvg(vnode.attrs.address, 90);
   }
 
-  view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+  view(vnode: ResultNode<NewProfileHeaderAttrs>) {
     const { profile, address } = vnode.attrs;
 
     if (!profile) return;
@@ -38,20 +50,20 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
         .includes(address);
 
     return (
-      <div class="ProfileHeader">
+      <div className="ProfileHeader">
         <div className="edit">
           {isCurrentUser && (
             <CWButton
               label="Edit"
               buttonType="mini-white"
               iconLeft="write"
-              onclick={() =>
-                m.route.set(`/profile/${m.route.param('address')}/edit`)
+              onClick={() =>
+                setRoute(`/profile/${getRouteParam('address')}/edit`)
               }
             />
           )}
         </div>
-        <div class="profile-image">
+        <div className="profile-image">
           {profile.avatarUrl ? (
             <img src={profile.avatarUrl} />
           ) : (
@@ -62,7 +74,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
             />
           )}
         </div>
-        <div class="profile-name-and-bio">
+        <div className="profile-name-and-bio">
           <CWText
             type="h3"
             className={profile.name ? 'name hasMargin' : 'name'}
@@ -71,7 +83,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
               ? profile.name
               : `Anonymous (${address.slice(0, 5)}...)`}
           </CWText>
-          <div class="buttons">
+          <div className="buttons">
             {/* TODO: Add delegate and follow buttons */}
             {/* <CWButton label="Delegate" buttonType="mini-black" onClick={() => {}} />
             <CWButton label="Follow" buttonType="mini-black" onClick={() => {}} /> */}

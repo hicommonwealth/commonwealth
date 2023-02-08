@@ -1,27 +1,19 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { notifyError } from 'controllers/app/notifications';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { ClassComponent, render, jsx } from 'mithrilInterop';
-import { blake2AsHex } from '@polkadot/util-crypto';
-import ClassComponent from 'class_component';
-import { notifyError } from 'controllers/app/notifications';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import type Substrate from 'controllers/chain/substrate/adapter';
-import { proposalSlugToClass } from 'identifiers';
-import m from 'mithril';
-import type { ITXModalData, ProposalModule } from 'models';
+import { ClassComponent, render} from
 
+ 'mithrilInterop';
+import { blake2AsHex } from '@polkadot/util-crypto';
 import { proposalSlugToClass } from 'identifiers';
 import type { ITXModalData, ProposalModule } from 'models';
 
 import app from 'state';
-import { ProposalType } from 'common-common/src/types';
+import { ProposalType } from '../../../../../../common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
 import { createTXModal } from '../../modals/tx_signing_modal';
@@ -38,23 +30,6 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
   view() {
     const author = app.user.activeAccount as SubstrateAccount;
     const substrate = app.chain as Substrate;
-
-    let dataLoaded;
-
-    if (!author.isCouncillor) {
-      dataLoaded = false;
-    } else {
-      dataLoaded = !!substrate.democracyProposals?.initialized;
-    }
-
-    if (!dataLoaded) {
-      if (substrate.chain?.timedOut) {
-        return <ErrorPage message="Could not connect to chain" />;
-      } else {
-        return <CWSpinner />;
-      }
-    }
-
     const formState = { module: '', function: '', args: [] };
 
     return (

@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type Near from 'controllers/chain/near/adapter';
@@ -10,14 +9,8 @@ import {
   ResultNode,
   setRoute,
   redraw,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import BN from 'bn.js';
-import ClassComponent from 'class_component';
-import type Near from 'controllers/chain/near/adapter';
-import type { IDaoInfo } from 'controllers/chain/near/chain';
-import { formatDuration } from 'helpers';
-import m from 'mithril';
 import moment from 'moment';
 
 import 'pages/sputnikdaos.scss';

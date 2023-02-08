@@ -1,15 +1,27 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/new_profile/new_profile_activity.scss';
 
-import Thread from 'client/scripts/models/Thread';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import Comment from 'client/scripts/models/Comment';
-import AddressInfo from 'client/scripts/models/AddressInfo';
-import { IUniqueId } from 'client/scripts/models/interfaces';
+import type Thread from 'client/scripts/models/Thread';
+import type ChainInfo from 'client/scripts/models/ChainInfo';
+import type Comment from 'client/scripts/models/Comment';
+import type AddressInfo from 'client/scripts/models/AddressInfo';
+import type { IUniqueId } from 'client/scripts/models/interfaces';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { NewProfileActivityContent } from './new_profile_activity_content';
 
@@ -36,18 +48,18 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
   private selectedActivity: ProfileActivity;
 
   oninit() {
-    this.address = m.route.param('address');
+    this.address = getRouteParam('address');
     this.selectedActivity = ProfileActivity.Comments;
   }
 
-  view(vnode: m.Vnode<NewProfileActivityAttrs>) {
+  view(vnode: ResultNode<NewProfileActivityAttrs>) {
     return (
       <div className="ProfileActivity">
         <div className="activity-nav">
           <CWTabBar>
             <CWTab
               label="All Activity"
-              onclick={() => {
+              onClick={() => {
                 this.selectedActivity = ProfileActivity.Comments;
               }}
               isSelected={this.selectedActivity === ProfileActivity.Comments}
@@ -59,7 +71,7 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
                   <div className="count">{vnode.attrs.threads.length}</div>
                 </div>
               }
-              onclick={() => {
+              onClick={() => {
                 this.selectedActivity = ProfileActivity.Threads;
               }}
               isSelected={this.selectedActivity === ProfileActivity.Threads}

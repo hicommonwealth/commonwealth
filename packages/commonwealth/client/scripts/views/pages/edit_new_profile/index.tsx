@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'underscore';
 
@@ -10,7 +20,7 @@ import 'pages/edit_new_profile.scss';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
 import {
   NewProfile as Profile,
   Account,
@@ -25,9 +35,10 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWForm } from '../../components/component_kit/cw_form';
 import { CWFormSection } from '../../components/component_kit/cw_form_section';
 import { CWSocials } from '../../components/component_kit/cw_socials';
-import CWCoverImageUploader, {
+import type {
   ImageBehavior,
 } from '../../components/component_kit/cw_cover_image_uploader';
+import { CWCoverImageUploader } from '../../components/component_kit/cw_cover_image_uploader';
 
 enum EditProfileError {
   None,
@@ -72,9 +83,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
           err.responseJSON.error === NoProfileFoundError)
       ) {
         this.error = EditProfileError.NoProfileFound;
-        m.route.set(`/profile/${this.address}`); // display error page
+        setRoute(`/profile/${this.address}`); // display error page
       }
-      m.redraw();
+      redraw();
     });
     this.profile = new Profile(response.profile);
     this.username = this.profile.name;
@@ -84,7 +95,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     this.coverImage = this.profile.coverImage;
     this.backgroundImage = this.profile.backgroundImage;
     this.loading = false;
-    m.redraw();
+    redraw();
   };
 
   private updateProfile = async () => {
@@ -97,20 +108,20 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       this.failed = true;
       setTimeout(() => {
         this.failed = false;
-        m.redraw();
+        redraw();
       }, 2500);
     });
 
     if (response?.status === 'Success') {
       // Redirect
       setTimeout(() => {
-        m.route.set(`/profile/${this.address}`);
+       setRoute(`/profile/${this.address}`);
       }, 1500);
     } else {
       this.failed = true;
       setTimeout(() => {
         this.failed = false;
-        m.redraw();
+        redraw();
       }, 2500);
     }
   };
@@ -151,7 +162,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       setTimeout(
         () => {
           this.failed = false;
-          m.redraw();
+          redraw();
         },
         2500,
         vnode
@@ -160,7 +171,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   };
 
   oninit() {
-    this.address = m.route.param('address');
+    this.address = getRouteParam('address');
     this.error = EditProfileError.None;
     this.getProfile(this.address);
 
@@ -171,20 +182,20 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
         .map((addressInfo) => addressInfo.address)
         .includes(this.address)
     ) {
-      m.route.set(`/profile/${this.address}`);
+      setRoute(`/profile/${this.address}`);
     }
 
     this.profileUpdate = {};
     this.failed = false;
   }
 
-  view(vnode: m.Vnode<EditNewProfileAttrs>) {
+  view(vnode: ResultNode<EditNewProfileAttrs>) {
     if (this.error !== EditProfileError.None) return;
 
     if (this.loading) {
       return (
-        <div class="EditProfilePage full-height">
-          <div class="loading-spinner">
+        <div className="EditProfilePage full-height">
+          <div className="loading-spinner">
             <CWSpinner />
           </div>
         </div>
@@ -205,8 +216,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     });
 
     return (
-      <Sublayout class="Homepage">
-        <div class="EditProfilePage">
+      <Sublayout>
+        <div className="EditProfilePage">
           <CWForm
             title="Edit Profile"
             description="Create and edit profiles and manage your connected addresses."
@@ -215,7 +226,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <div className="buttons">
                   <CWButton
                     label="Delete profile"
-                    onclick={() => {
+                    onClick={() => {
                       // TODO: implement delete profile
                     }}
                     buttonType="tertiary-black"
@@ -223,10 +234,10 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   <div className="buttons-right">
                     <CWButton
                       label="Cancel Edits"
-                      onclick={() => {
+                      onClick={() => {
                         this.loading = true;
                         setTimeout(() => {
-                          m.route.set(`/profile/${this.address}`);
+                          setRoute(`/profile/${this.address}`);
                         }, 1000);
                       }}
                       className="save-button"
@@ -234,7 +245,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                     />
                     <CWButton
                       label="Save"
-                      onclick={() => {
+                      onClick={() => {
                         this.handleSaveProfile(vnode);
                       }}
                       className="save-button"
@@ -277,7 +288,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                         const url = f.uploadURL.replace(/\?.*/, '').trim();
                         this.avatarUrl = url;
                       });
-                      m.redraw();
+                      redraw();
                     }}
                   />
                 </div>
@@ -296,7 +307,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   label="Username"
                   value={this.username}
                   placeholder="username"
-                  oninput={(e) => {
+                  onInput={(e) => {
                     this.username = e.target.value;
                   }}
                 />
@@ -312,7 +323,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   label="Email"
                   value={this.email}
                   placeholder="email"
-                  oninput={(e) => {
+                  onInput={(e) => {
                     this.email = e.target.value;
                   }}
                 />
