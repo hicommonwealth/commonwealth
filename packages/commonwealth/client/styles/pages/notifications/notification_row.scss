@@ -5,13 +5,18 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 17px 22px;
+  margin: 0;
+  cursor: pointer;
+  border-bottom: 1px solid $neutral-50;
+  text-decoration: none !important;
+  color: $black !important;
 
   &:hover {
     background: $neutral-50;
   }
 
-  &.isUnread {
+  &.unread {
     background: $yellow-100;
   }
 
@@ -39,6 +44,10 @@
     .chain-event-notification-top {
       display: flex;
       justify-content: space-between;
+
+      .cui-icon-action svg:hover {
+        color: $rorange-500;
+      }
     }
   }
 

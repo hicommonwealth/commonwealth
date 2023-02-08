@@ -1,6 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
+import ClassComponent from 'class_component';
 import 'components/sidebar/sidebar_section.scss';
 import { isNotUndefined } from 'helpers/typeGuards';
 

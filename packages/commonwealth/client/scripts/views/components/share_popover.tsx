@@ -29,9 +29,8 @@ export class SharePopover extends ClassComponent<SharePopoverAttrs> {
             iconLeft: 'copy',
             label: 'Copy URL',
             onClick: async () => {
-              const currentRouteSansCommentParam = getRoute().split(
-                '?comment='
-              )[0];
+              const currentRouteSansCommentParam =
+                getRoute().split('?comment=')[0];
               if (!commentId) {
                 await navigator.clipboard.writeText(
                   `${domain}${currentRouteSansCommentParam}`

@@ -36,12 +36,7 @@ function getModules() {
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
-    return [
-      chain.council,
-      chain.treasury,
-      chain.democracyProposals,
-      chain.democracy,
-    ];
+    return [chain.treasury, chain.democracyProposals, chain.democracy];
   } else {
     throw new Error('invalid chain');
   }
@@ -130,7 +125,7 @@ class TreasuryPage extends ClassComponent {
                 {
                   statName: 'Treasury Proposals',
                   statDescription: `are used to request funds from the on-chain \
-                  treasury. They are approved/rejected by referendum or council.`,
+                  treasury. They are approved/rejected by referendum.`,
                 },
               ]}
               stats={[

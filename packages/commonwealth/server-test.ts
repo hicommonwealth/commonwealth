@@ -372,6 +372,7 @@ globalActivityCache.start();
 setupPassport(models);
 // TODO: mock RabbitMQController
 setupAPI(
+  '/api',
   app,
   models,
   viewCountCache,

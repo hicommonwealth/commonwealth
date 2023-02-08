@@ -4,6 +4,7 @@ import React from 'react';
 import { jsx } from 'mithrilInterop';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { getDecimals } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import 'modals/edit_topic_thresholds_modal.scss';
@@ -29,13 +30,7 @@ const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
     setNewTokenThresholdInWei(topic.tokenThreshold?.toString() || '0');
   }
 
-  const decimals = app.chain?.meta?.decimals
-    ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
+    const decimals = getDecimals(app.chain);
 
   return (
     <div className="EditTopicThresholdsRow">

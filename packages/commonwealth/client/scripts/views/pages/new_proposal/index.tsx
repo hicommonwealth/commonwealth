@@ -20,10 +20,7 @@ import PageNotFound from '../404';
 import { AaveProposalForm } from './aave_proposal_form';
 import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
-import { PhragmenCandidacyForm } from './phragmen_candidacy_form';
 import { SputnikProposalForm } from './sputnik_proposal_form';
-import { SubstrateBountyProposalForm } from './substrate_bounty_proposal_form';
-import { SubstrateCollectiveProposalForm } from './substrate_collective_proposal_form';
 import { SubstrateDemocracyProposalForm } from './substrate_democracy_proposal_form';
 import { SubstrateTreasuryProposalForm } from './substrate_treasury_proposal_form';
 import { SubstrateTreasuryTipForm } from './substrate_treasury_tip_form';
@@ -86,14 +83,8 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
           return <CompoundProposalForm />;
         case ProposalType.CosmosProposal:
           return <CosmosProposalForm />;
-        case ProposalType.PhragmenCandidacy:
-          return <PhragmenCandidacyForm />;
         case ProposalType.SputnikProposal:
           return <SputnikProposalForm />;
-        case ProposalType.SubstrateBountyProposal:
-          return <SubstrateBountyProposalForm />;
-        case ProposalType.SubstrateCollectiveProposal:
-          return <SubstrateCollectiveProposalForm />;
         case ProposalType.SubstrateDemocracyProposal:
           return <SubstrateDemocracyProposalForm />;
         case ProposalType.SubstrateTreasuryProposal:

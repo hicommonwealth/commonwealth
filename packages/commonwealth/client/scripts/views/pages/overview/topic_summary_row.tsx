@@ -104,9 +104,8 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             // const commentsCount = app.comments.nComments(thread);
 
             return (
-              <React.Fragment>
+              <div key={idx}>
                 <div
-                  key={idx}
                   className={getClasses<{ isPinned?: boolean }>(
                     { isPinned: thread.pinned },
                     'recent-thread-row'
@@ -236,7 +235,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                   </div>
                 </div>
                 {idx !== threadsToDisplay.length - 1 && <CWDivider />}
-              </React.Fragment>
+              </div>
             );
           })}
         </div>
