@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { jsx, redraw } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_input.scss';
 import { CWIconButton } from './cw_icon_button';

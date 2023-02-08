@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_thread_vote_button.scss';
 import { CWIcon } from './cw_icons/cw_icon';

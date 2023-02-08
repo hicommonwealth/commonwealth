@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -95,7 +96,7 @@ export const ThreadPreviewReactionButton = (
     handleInteraction?: (e: React.MouseEvent<AnchorType>) => void;
   }) => {
     return (
-      <React.Fragment>
+      <>
         <Modal
           content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
           isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -125,7 +126,7 @@ export const ThreadPreviewReactionButton = (
           />
           <div className="reactions-count">{likes}</div>
         </div>
-      </React.Fragment>
+      </>
     );
   };
 

@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -12,8 +11,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import $ from 'jquery';
 import { Webhook } from 'models';
 

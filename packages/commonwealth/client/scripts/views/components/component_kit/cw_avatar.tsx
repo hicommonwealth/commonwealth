@@ -1,7 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { jsx } from 'mithrilInterop';
 import Jdenticon from 'react-jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';

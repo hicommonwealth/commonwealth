@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type Substrate from 'controllers/chain/substrate/adapter';
 
 import { proposalSlugToClass } from 'identifiers';
@@ -33,7 +34,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
     }
 
     return (
-      <React.Fragment>
+      <>
         <CWTextInput
           title="Beneficiary"
           placeholder="Beneficiary of proposal"
@@ -94,7 +95,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
             );
           }}
         />
-      </React.Fragment>
+      </>
     );
   }
 }

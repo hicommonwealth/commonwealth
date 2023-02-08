@@ -1,4 +1,3 @@
-import { jsx } from 'mithrilInterop';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { Navigate, withLayout } from 'navigation/helpers';
@@ -65,7 +64,7 @@ const NewSnapshotProposalPage = lazy(
 const ProfilePage = lazy(() => import('views/pages/profile'));
 
 const getCommonDomainsRoutes = () => (
-  <React.Fragment>
+  <>
     <Route
       path="/whyCommonwealth"
       element={withLayout(WhyCommonwealthPage, { hideSidebar: true })}
@@ -447,7 +446,7 @@ const getCommonDomainsRoutes = () => (
       element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
     />
     {/*  LEGACY REDIRECTS END */}
-  </React.Fragment>
+  </>
 );
 
 export default getCommonDomainsRoutes;

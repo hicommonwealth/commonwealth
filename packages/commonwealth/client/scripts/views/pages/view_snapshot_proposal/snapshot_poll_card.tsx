@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw} from
+
+ 'mithrilInterop';
 
 import 'components/poll_card.scss';
 import { CWCard } from '../../components/component_kit/cw_card';
@@ -90,7 +91,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
         </CWText>
         <div className="poll-voting-section">
           {!this.hasVoted && !pollEnded && !isPreview && (
-            <React.Fragment>
+            <>
               <PollOptions
                 multiSelect={false}
                 voteInformation={this.localVoteInformation}
@@ -105,7 +106,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
                 tooltipErrorMessage={tooltipErrorMessage}
                 onVoteCast={castVote}
               />
-            </React.Fragment>
+            </>
           )}
           {((this.hasVoted && !isPreview) || pollEnded) && (
             <VoteDisplay

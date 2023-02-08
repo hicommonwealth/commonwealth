@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 
 import { proposalSlugToClass } from 'identifiers';
 import type { ITXModalData, ProposalModule } from 'models';
@@ -36,7 +37,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
     }
 
     return (
-      <React.Fragment>
+      <>
         <CWLabel label="Finder" />,
         <User user={author} linkify popover showAddressWithDisplayName />
         <CWTextInput
@@ -81,7 +82,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
             );
           }}
         />
-      </React.Fragment>
+      </>
     );
   }
 }

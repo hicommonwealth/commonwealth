@@ -1,10 +1,11 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
 import { ProposalType } from 'common-common/src/types';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
@@ -88,10 +89,10 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
             )}
         </div>
         {injectedContent ? (
-          <React.Fragment>
+          <>
             <CWDivider />
             <div className="proposal-injected">{injectedContent}</div>
-          </React.Fragment>
+          </>
         ) : proposal.isPassing !== 'none' ? (
           <CWText
             fontWeight="medium"

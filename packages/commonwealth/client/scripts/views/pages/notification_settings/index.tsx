@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw} from
+
+ 'mithrilInterop';
 import moment from 'moment';
 import { AddressInfo } from 'models';
 import 'pages/notification_settings/index.scss';
@@ -195,7 +196,7 @@ class NotificationSettingsPage extends ClassComponent {
                         };
 
                         return (
-                          <React.Fragment>
+                          <>
                             <div className="subscription-row-desktop">
                               <SubscriptionRowTextContainer
                                 subscription={sub}
@@ -230,7 +231,7 @@ class NotificationSettingsPage extends ClassComponent {
                                 </CWText>
                               </div>
                             </div>
-                          </React.Fragment>
+                          </>
                         );
                       })}
                     </div>

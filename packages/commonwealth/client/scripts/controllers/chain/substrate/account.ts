@@ -291,6 +291,8 @@ class SubstrateAccounts
 
   private _Chain: SubstrateChain;
 
+  private polkadot;
+
   public get(address: string, keytype?: string) {
     if (keytype && keytype !== 'ed25519' && keytype !== 'sr25519') {
       throw new Error(`invalid keytype: ${keytype}`);

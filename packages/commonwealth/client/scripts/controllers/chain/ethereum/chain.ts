@@ -10,7 +10,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';

@@ -1,11 +1,11 @@
-/* @jsx jsx */
 import React from 'react';
 
-import ClassComponent from 'class_component';
 import 'components/sidebar/sidebar_section.scss';
 import { isNotUndefined } from 'helpers/typeGuards';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
