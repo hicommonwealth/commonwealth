@@ -18,6 +18,8 @@ import {
 } from 'views/components/component_kit/cw_text_input';
 import produce from 'immer';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 const jsonExample = {
   form_fields: [
@@ -103,12 +105,12 @@ enum TemplateComponents {
 }
 
 class ViewTemplatePage extends ClassComponent {
-  private form = {
-    abi: '',
-    error: false,
-  };
   private formState = {};
   private json = { form_fields: [], tx_template: {} };
+  private isLoaded;
+  private templateNickname = '';
+  private formError = false;
+  private txReady = false;
 
   handleInputChange(e) {
     const value = e.target.value;
@@ -116,56 +118,84 @@ class ViewTemplatePage extends ClassComponent {
 
     try {
       const json = JSON.parse(value);
-      this.form.error = !isValidJson(json);
+      this.formError = !isValidJson(json);
     } catch (err) {
       console.log('err', err);
-      this.form.error = true;
+      this.formError = true;
     }
   }
 
-  oncreate() {
+  loadData(vnode) {
     // this.form.abi = JSON.stringify(jsonExample, null, 2); UNCLEAR IF NEEDED
+    const contract_address = vnode.attrs.contract_address;
+    const slug = vnode.attrs.slug;
 
-    try {
-      this.json = JSON.parse(JSON.stringify(jsonExample, null, 2));
-    } catch (err) {
-      console.log('err');
+    if (Object.keys(app.contracts.store._storeAddress).length < 1) {
+      return;
+    }
+    // Make sure this contract and slug exists in the store
+    const contractInStore = app.contracts.getByAddress(contract_address);
+    const templateMetadata = contractInStore?.ccts?.find((cct) => {
+      return cct.cctmd.slug === slug || cct.cctmd.slug === `/${slug}`;
+    });
 
-      // TODO: Handle errors here- probably have to send some kind of error message to the view
-      return (
-        <div>
-          <h1>Parsing JSON failed!</h1>
-          <code>{JSON.stringify(err, Object.getOwnPropertyNames(err))}</code>
-        </div>
-      );
+    if (!contractInStore || !templateMetadata) {
+      m.route.set('/404');
     }
 
-    for (const field of this.json.form_fields) {
-      switch (Object.keys(field)[0]) {
-        case TemplateComponents.INPUT:
-          // This is using a small package that makes working with immutable state
-          // much easier to reason about
-          this.formState = produce(this.formState, (draft) => {
-            draft[field.input.field_ref] = null;
-          });
-          break;
-        case TemplateComponents.DROPDOWN:
-          this.formState = produce(this.formState, (draft) => {
-            // Use the default value of the dropdown as the initial state
-            draft[field.dropdown.field_ref] =
-              field.dropdown.field_options[0].value;
-          });
-          break;
-        default:
-          break;
-      }
-    }
+    this.templateNickname = templateMetadata.cctmd.nickname;
+
+    app.contracts
+      .getTemplatesForContract(contractInStore.id)
+      .then((templates) => {
+        console.log({ templates });
+
+        const template = templates.find((t) => {
+          return t.id === templateMetadata.cctmd.id;
+        });
+
+        try {
+          this.json = JSON.parse(template.template);
+        } catch (err) {
+          console.log('err');
+
+          // TODO: Handle errors here- probably have to send some kind of error message to the view
+          return;
+        }
+
+        for (const field of this.json.form_fields) {
+          switch (Object.keys(field)[0]) {
+            case TemplateComponents.INPUT:
+              // This is using a small package that makes working with immutable state
+              // much easier to reason about
+              this.formState = produce(this.formState, (draft) => {
+                draft[field.input.field_ref] = null;
+              });
+              break;
+            case TemplateComponents.DROPDOWN:
+              this.formState = produce(this.formState, (draft) => {
+                // Use the default value of the dropdown as the initial state
+                draft[field.dropdown.field_ref] =
+                  field.dropdown.field_options[0].value;
+              });
+              break;
+            default:
+              break;
+          }
+        }
+
+        this.isLoaded = true;
+        m.redraw();
+      });
   }
 
   view(vnode) {
     const scope = vnode.attrs.scope;
 
-    console.log('this is the current state: ', this.formState);
+    if (!this.isLoaded) {
+      this.loadData(vnode);
+      return;
+    }
 
     return (
       <Sublayout>
@@ -173,16 +203,17 @@ class ViewTemplatePage extends ClassComponent {
           <CWBreadcrumbs
             breadcrumbs={[
               { label: 'Contracts', path: `/${scope}/contracts` },
-              { label: 'Add Contract and ABI', path: '' },
+              { label: 'Create Proposal', path: '' },
             ]}
           />
           <CWText type="h3" className="header">
-            View Template Page
+            {this.templateNickname}
           </CWText>
-          <CWDivider className="divider" />
 
           <div class="form">
-            {this.form.error && (
+            <CWDivider className="divider" />
+
+            {this.formError && (
               <MessageRow
                 label="error"
                 hasFeedback
@@ -190,12 +221,6 @@ class ViewTemplatePage extends ClassComponent {
                 statusMessage="message here"
               />
             )}
-            <CWTextArea
-              label="Contract ABI File"
-              value={this.form.abi}
-              placeholder="Enter contract's ABI file"
-              oninput={(e) => this.handleInputChange(e)}
-            />
 
             <div className="template">
               {/* Render this here so it has easy access to the state object */}
@@ -216,6 +241,7 @@ class ViewTemplatePage extends ClassComponent {
                       <CWTextInput
                         label={field[component].field_label}
                         value={this.formState[field[component].field_ref]}
+                        placeholder={field[component].field_name}
                         oninput={(e) => {
                           this.formState = produce(this.formState, (draft) => {
                             draft[field[component].field_ref] = e.target.value;
@@ -239,6 +265,15 @@ class ViewTemplatePage extends ClassComponent {
                     return null;
                 }
               })}
+            </div>
+            <CWDivider />
+            <div className="bottom-row">
+              <CWButton label="Cancel" buttonType="secondary-black" />
+              <CWButton
+                label="Create"
+                buttonType="primary-black"
+                disabled={!this.txReady}
+              />
             </div>
           </div>
         </div>

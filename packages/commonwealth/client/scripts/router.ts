@@ -559,9 +559,12 @@ const getCommonDomainRoutes = (importRoute) => ({
     { scoped: true }
   ),
   // TODO temporary route name
-  '/:scope/view_template': importRoute(import('views/pages/view_template'), {
-    scoped: true,
-  }),
+  '/:scope/:contract_address/:slug': importRoute(
+    import('views/pages/view_template'),
+    {
+      scoped: true,
+    }
+  ),
   '/:scope/discussions/:topic': importRoute(import('views/pages/discussions'), {
     scoped: true,
     deferChain: true,

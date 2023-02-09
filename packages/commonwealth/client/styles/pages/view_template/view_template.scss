@@ -17,6 +17,16 @@
   }
 
   .template {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .bottom-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
   }
 
   .form {
@@ -24,5 +34,9 @@
       min-height: 400px;
       resize: vertical;
     }
+    gap: 32px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 32px;
   }
 }
