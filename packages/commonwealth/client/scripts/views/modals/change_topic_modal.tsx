@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'modals/change_topic_modal.scss';
 import type { Thread, Topic } from 'models';

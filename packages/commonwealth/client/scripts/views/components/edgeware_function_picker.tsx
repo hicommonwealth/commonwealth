@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx, redraw, ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw, ResultNode } from 'mithrilInterop';
 
 import { blake2AsHex } from '@polkadot/util-crypto';
 import type Substrate from 'controllers/chain/substrate/adapter';
@@ -51,7 +50,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
     }
 
     return (
-      <React.Fragment>
+      <>
         <CWDropdown
           label="Module"
           options={(app.chain as Substrate).chain
@@ -141,7 +140,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
               : ''
           }
         />
-      </React.Fragment>
+      </>
     );
   }
 }

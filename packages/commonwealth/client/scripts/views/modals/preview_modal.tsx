@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { render, jsx } from 'mithrilInterop';
 
 import 'modals/preview_modal.scss';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
@@ -45,7 +42,7 @@ export const PreviewModal = (props: PreviewModalProps) => {
                 </div>
               );
             }
-            return render(QuillFormattedText, { doc: internalDoc });
+            return <QuillFormattedText doc={internalDoc} />;
           } catch (e) {
             if (doc.trim() === '') {
               return (

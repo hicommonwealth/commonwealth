@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { initAppState } from 'state';
@@ -6,7 +5,9 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import { setRoute, redraw, jsx } from 'mithrilInterop';
+import { setRoute, redraw} from
+
+ 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -66,7 +67,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
     React.useState<boolean>(false);
 
   return (
-    <React.Fragment>
+    <>
       <div className="LoginSelectorMenu">
         {activeAddressesWithRole.map((account) => (
           <div
@@ -153,7 +154,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };
 
@@ -163,7 +164,7 @@ export const LoginSelectorMenuRight = () => {
   const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
   return (
-    <React.Fragment>
+    <>
       <div className="LoginSelectorMenu">
         <div
           className="login-menu-item"
@@ -187,6 +188,7 @@ export const LoginSelectorMenuRight = () => {
             onChange={(e) => {
               if (isDarkModeOn) {
                 localStorage.setItem('dark-mode-state', 'off');
+                localStorage.setItem('user-dark-mode-state', 'off');
                 document
                   .getElementsByTagName('html')[0]
                   .classList.remove('invert');
@@ -195,6 +197,7 @@ export const LoginSelectorMenuRight = () => {
                   .getElementsByTagName('html')[0]
                   .classList.add('invert');
                 localStorage.setItem('dark-mode-state', 'on');
+                localStorage.setItem('user-dark-mode-state', 'on');
               }
               e.stopPropagation();
               redraw();
@@ -229,7 +232,7 @@ export const LoginSelectorMenuRight = () => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };
 
@@ -275,7 +278,7 @@ export const LoginSelector = () => {
 
   if (!app.isLoggedIn()) {
     return (
-      <React.Fragment>
+      <>
         <div className="LoginSelector">
           <CWButton
             buttonType="tertiary-black"
@@ -292,7 +295,7 @@ export const LoginSelector = () => {
           onClose={() => setIsLoginModalOpen(false)}
           open={isLoginModalOpen}
         />
-      </React.Fragment>
+      </>
     );
   }
 
@@ -466,7 +469,7 @@ export const LoginSelector = () => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <div className="LoginSelector">
         {app.chain &&
           !app.chainPreloading &&
@@ -498,12 +501,12 @@ export const LoginSelector = () => {
           !app.chainPreloading &&
           profileLoadComplete &&
           app.user.activeAccount && (
-            <React.Fragment>
+            <>
               <div
                 className="left-button"
                 onClick={leftMenuProps.handleInteraction}
               >
-                <User user={app.user.activeAccount} hideIdentityIcon />
+                <User user={app.user.activeAccount} />
               </div>
               <Popover
                 content={
@@ -514,7 +517,7 @@ export const LoginSelector = () => {
                 }
                 {...leftMenuProps}
               />
-            </React.Fragment>
+            </>
           )}
         <div
           className="right-button"
@@ -555,6 +558,6 @@ export const LoginSelector = () => {
         onClose={() => setIsTOSModalOpen(false)}
         open={isTOSModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

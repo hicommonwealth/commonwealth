@@ -1,11 +1,12 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { DepositVote } from 'models';
 import type { IBalanceAccount } from 'models/interfaces';
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw} from
+
+ 'mithrilInterop';
 
 import 'pages/tip_detail.scss';
 
@@ -110,7 +111,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
               </div>
             )}
             {contributors.length > 0 && (
-              <React.Fragment>
+              <>
                 <div className="contributors title">Contributors</div>
                 {contributors.map(({ account, deposit }) => (
                   <div className="contributors-row">
@@ -126,7 +127,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                     />
                   </div>
                 ))}
-              </React.Fragment>
+              </>
             )}
           </div>
         </div>

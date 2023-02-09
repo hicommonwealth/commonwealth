@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { MixpanelSnapshotEvents } from 'analytics/types';
@@ -18,13 +17,12 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
+// import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -105,23 +103,23 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       }
     };
 
-    const mixpanelTrack = () => {
-      mixpanelBrowserTrack({
-        event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
-        isCustomDomain: app.isCustomDomain(),
-        space: app.snapshot.space.id,
-      });
-    };
+    // const mixpanelTrack = () => {
+    //   mixpanelBrowserTrack({
+    //     event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
+    //     isCustomDomain: app.isCustomDomain(),
+    //     space: app.snapshot.space.id,
+    //   });
+    // };
 
     const snapshotId = vnode.attrs.snapshotId;
 
     if (!app.snapshot.initialized) {
       app.snapshot.init(snapshotId).then(() => {
-        mixpanelTrack();
+        // mixpanelTrack();
         loadVotes();
       });
     } else {
-      mixpanelTrack();
+      // mixpanelTrack();
       loadVotes();
     }
   }

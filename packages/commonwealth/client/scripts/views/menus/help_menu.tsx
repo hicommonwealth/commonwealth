@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';

@@ -1,8 +1,6 @@
-/* @jsx jsx */
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import { render, redraw, jsx } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
@@ -31,7 +29,6 @@ type UserAttrs = {
   avatarOnly?: boolean; // overrides most other properties
   avatarSize?: number;
   hideAvatar?: boolean;
-  hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
   linkify?: boolean;
   onclick?: any;
   popover?: boolean;
@@ -45,7 +42,6 @@ export const User = (props: UserAttrs) => {
   const {
     avatarOnly,
     hideAvatar,
-    hideIdentityIcon,
     showAddressWithDisplayName,
     user,
     linkify,
@@ -53,8 +49,6 @@ export const User = (props: UserAttrs) => {
     showRole,
   } = props;
 
-  const [identityWidgetLoading, setIdentityWidgetLoading] =
-    React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   const popoverProps = usePopover();
@@ -91,24 +85,6 @@ export const User = (props: UserAttrs) => {
   )?.name;
 
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
-
-  if (
-    app.chain?.base === ChainBase.Substrate &&
-    !identityWidgetLoading &&
-    !app.cachedIdentityWidget
-  ) {
-    setIdentityWidgetLoading(true);
-
-    import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "substrate-identity-widget" */
-      './substrate_identity'
-    ).then((mod) => {
-      app.cachedIdentityWidget = mod.default;
-      setIdentityWidgetLoading(false);
-      redraw();
-    });
-  }
 
   if (props.user instanceof AddressInfo) {
     const chainId = props.user.chain;
@@ -162,25 +138,14 @@ export const User = (props: UserAttrs) => {
   }
 
   const getRoleTags = (long?: boolean) => (
-    <React.Fragment>
-      {/* 'long' makes role tags show as full length text */}
-      {profile.isCouncillor && !hideIdentityIcon && (
-        <div className={`role-icon role-icon-councillor${long ? ' long' : ''}`}>
-          {long ? `${friendlyChainName} Councillor` : 'C'}
-        </div>
-      )}
-      {profile.isValidator && !hideIdentityIcon && (
-        <div className={`role-icon role-icon-validator${long ? ' long' : ''}`}>
-          {long ? `${friendlyChainName} Validator` : 'V'}
-        </div>
-      )}
+    <>
       {/* role in commonwealth forum */}
       {showRole && role && (
         <div className="role-tag-container">
           <CWText className="role-tag-text">{role.permission}</CWText>
         </div>
       )}
-    </React.Fragment>
+    </>
   );
 
   const userFinal = avatarOnly ? (
@@ -204,20 +169,8 @@ export const User = (props: UserAttrs) => {
           {profile && profile.getAvatar(avatarSize)}
         </div>
       )}
-      {app.chain &&
-      app.chain.base === ChainBase.Substrate &&
-      app.cachedIdentityWidget ? (
-        // substrate name
-        render(app.cachedIdentityWidget, {
-          account,
-          linkify,
-          profile,
-          hideIdentityIcon,
-          addrShort,
-          showAddressWithDisplayName,
-        })
-      ) : (
-        <React.Fragment>
+      {
+        <>
           {/* non-substrate name */}
           {linkify ? (
             link(
@@ -227,21 +180,21 @@ export const User = (props: UserAttrs) => {
                     profile.address
                   }?base=${profile.chain}`
                 : 'javascript:',
-              <React.Fragment>
+              <>
                 {!profile ? (
                   addrShort
                 ) : !showAddressWithDisplayName ? (
                   profile.displayName
                 ) : (
-                  <React.Fragment>
+                  <>
                     {profile.displayName}
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
-                  </React.Fragment>
+                  </>
                 )}
                 {getRoleTags(false)}
-              </React.Fragment>
+              </>
             )
           ) : (
             <a className="user-display-name username">
@@ -250,12 +203,12 @@ export const User = (props: UserAttrs) => {
               ) : !showAddressWithDisplayName ? (
                 profile.displayName
               ) : (
-                <React.Fragment>
+                <>
                   {profile.displayName}
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
-                </React.Fragment>
+                </>
               )}
               {getRoleTags(false)}
             </a>
@@ -271,8 +224,8 @@ export const User = (props: UserAttrs) => {
                 style={{ display: 'inline-block' }}
               />
             )}
-        </React.Fragment>
-      )}
+        </>
+      }
     </div>
   );
 
@@ -293,36 +246,27 @@ export const User = (props: UserAttrs) => {
         </div>
         <div className="user-name">
           {app.chain &&
-          app.chain.base === ChainBase.Substrate &&
-          app.cachedIdentityWidget
-            ? render(app.cachedIdentityWidget, {
-                account,
-                linkify: true,
-                profile,
-                hideIdentityIcon,
-                addrShort,
-                showAddressWithDisplayName: false,
-              })
-            : link(
-                'a.user-display-name',
-                profile
-                  ? `/${app.activeChainId() || profile.chain}/account/${
-                      profile.address
-                    }?base=${profile.chain}`
-                  : 'javascript:',
-                !profile ? (
-                  addrShort
-                ) : !showAddressWithDisplayName ? (
-                  profile.displayName
-                ) : (
-                  <React.Fragment>
-                    {profile.displayName}
-                    <div className="id-short">
-                      {formatAddressShort(profile.address, profile.chain)}
-                    </div>
-                  </React.Fragment>
-                )
-              )}
+            app.chain.base === ChainBase.Substrate &&
+            link(
+              'a.user-display-name',
+              profile
+                ? `/${app.activeChainId() || profile.chain}/account/${
+                    profile.address
+                  }?base=${profile.chain}`
+                : 'javascript:',
+              !profile ? (
+                addrShort
+              ) : !showAddressWithDisplayName ? (
+                profile.displayName
+              ) : (
+                <React.Fragment>
+                  {profile.displayName}
+                  <div className="id-short">
+                    {formatAddressShort(profile.address, profile.chain)}
+                  </div>
+                </React.Fragment>
+              )
+            )}
         </div>
         {profile?.address && (
           <div className="user-address">

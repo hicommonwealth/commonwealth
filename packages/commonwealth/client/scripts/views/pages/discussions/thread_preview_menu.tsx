@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import type { Thread, ThreadStage, Topic } from 'models';
 import app from 'state';

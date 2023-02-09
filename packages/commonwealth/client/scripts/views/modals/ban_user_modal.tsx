@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';

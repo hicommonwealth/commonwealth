@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { navigateToSubpage } from 'router';

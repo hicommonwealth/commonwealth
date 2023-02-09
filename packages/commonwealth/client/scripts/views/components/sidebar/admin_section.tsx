@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { getRoute, jsx } from 'mithrilInterop';
+import { getRoute } from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
@@ -176,7 +175,7 @@ const AdminSectionComponent = () => {
       <Modal
         content={
           <EditTopicThresholdsModal
-            onModalClose={() => setIsNewTopicModalOpen(false)}
+            onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}
           />
         }
         onClose={() => setIsEditTopicThresholdsModalOpen(false)}

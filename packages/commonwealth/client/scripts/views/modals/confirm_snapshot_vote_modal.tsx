@@ -1,13 +1,12 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import { notifyError } from 'controllers/app/notifications';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { castVote } from 'helpers/snapshot_utils';
 import { formatNumberShort } from 'adapters/currency';
-import { MixpanelSnapshotEvents } from 'analytics/types';
+// import { MixpanelSnapshotEvents } from 'analytics/types';
 
 import 'modals/confirm_snapshot_vote_modal.scss';
 
@@ -103,11 +102,11 @@ export const ConfirmSnapshotVoteModal = (
                   successCallback();
                   redraw();
                 });
-                mixpanelBrowserTrack({
-                  event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
-                  isCustomDomain: app.isCustomDomain(),
-                  space: app.snapshot.space.id,
-                });
+                // mixpanelBrowserTrack({
+                //   event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+                //   isCustomDomain: app.isCustomDomain(),
+                //   space: app.snapshot.space.id,
+                // });
               } catch (err) {
                 console.log(err);
                 const errorMessage = err.message;

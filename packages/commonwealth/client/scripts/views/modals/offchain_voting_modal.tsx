@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'modals/offchain_voting_modal.scss';
 
@@ -61,7 +58,6 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
                     null
                   )
                 }
-                hideIdentityIcon
               />
             </div>
             <div className="offchain-poll-voter-choice">{vote.option}</div>

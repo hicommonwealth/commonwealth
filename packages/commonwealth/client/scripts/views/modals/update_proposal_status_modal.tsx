@@ -1,10 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-
-import { jsx } from 'mithrilInterop';
 
 import 'modals/update_proposal_status_modal.scss';
 import type { ChainEntity, Thread } from 'models';
