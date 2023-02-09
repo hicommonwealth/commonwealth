@@ -12,12 +12,12 @@ import {
   redraw,
   Component,
 } from 'mithrilInterop';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import jdenticon from 'jdenticon';
 
 import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -29,14 +29,14 @@ type NewProfileHeaderAttrs = {
   isOwner: boolean;
 };
 
-class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
+class NewProfileHeaderComponent extends ClassComponent<NewProfileHeaderAttrs> {
   private defaultAvatar: string;
 
-  oninit(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+  oninit(vnode: ResultNode<NewProfileHeaderAttrs>) {
     this.defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
   }
 
-  view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+  view(vnode: ResultNode<NewProfileHeaderAttrs>) {
     const { profile, isOwner } = vnode.attrs;
 
     if (!profile) return;
@@ -52,7 +52,7 @@ class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
               label="Edit"
               buttonType="mini-white"
               iconLeft="write"
-              onClick={() => navigateToSubpage(`/profile/${username}/edit`)}
+              onClick={() => this.navigateToSubpage(`/${username}/edit`)}
             />
           )}
         </div>
@@ -89,4 +89,4 @@ class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
   }
 }
 
-export default NewProfileHeader;
+export const NewProfileHeader = NavigationWrapper(NewProfileHeaderComponent);

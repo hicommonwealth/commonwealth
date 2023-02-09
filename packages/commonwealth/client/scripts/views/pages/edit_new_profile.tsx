@@ -1,17 +1,27 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import $ from 'jquery';
 import _ from 'underscore';
 
 import 'pages/edit_new_profile.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
 import { notifyError } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
@@ -28,10 +38,11 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
-import CWCoverImageUploader, {
+import type {
   ImageBehavior,
 } from '../components/component_kit/cw_cover_image_uploader';
-import { PageNotFound } from './404';
+import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
+import PageNotFound from './404';
 
 enum EditProfileError {
   None,
@@ -40,14 +51,14 @@ enum EditProfileError {
 
 const NoProfileFoundError = 'No profile found';
 
-type EditNewProfileAttrs = { placeholder?: string };
+type EditNewProfileAttrs = { username: string };
 
 export type Image = {
   url: string;
   imageBehavior: ImageBehavior;
 };
 
-export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
+class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
   private email: string;
   private error: EditProfileError;
   private failed: boolean;
@@ -100,7 +111,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       }
     }
     this.loading = false;
-    m.redraw();
   };
 
   private updateProfile = async () => {
@@ -117,7 +127,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       if (response?.status === 'Success') {
         setTimeout(() => {
           this.loading = false;
-          navigateToSubpage(`/profile/${this.username}`);
+          this.navigateToSubpage(`/profile/${this.username}`);
         }, 1500);
       }
     } catch (err) {
@@ -140,8 +150,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     if (!_.isEqual(this.email, this.profile?.email))
       this.profileUpdate.email = this.email;
 
-    if (!_.isEqual(this.bio.textContentsAsString, this.profile?.bio))
-      this.profileUpdate.bio = this.bio.textContentsAsString;
+    // if (!_.isEqual(this.bio.textContentsAsString, this.profile?.bio))
+    //   this.profileUpdate.bio = this.bio.textContentsAsString;
 
     if (!_.isEqual(this.avatarUrl, this.profile?.avatarUrl))
       this.profileUpdate.avatarUrl = this.avatarUrl;
@@ -188,8 +198,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
         // Redirect
         setTimeout(() => {
           this.loading = false;
-          navigateToSubpage('/profile/manage');
-          m.redraw();
+          this.navigateToSubpage('/profile/manage');
         }, 1500);
       }
     } catch (err) {
@@ -200,13 +209,13 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
   };
 
-  oninit() {
-    this.username = m.route.param('username');
+  oninit(vnode: ResultNode<EditNewProfileAttrs>) {
+    this.username = vnode.attrs.username;
     this.error = EditProfileError.None;
     this.getProfile(this.username);
 
     if (!app.isLoggedIn()) {
-      navigateToSubpage(`/profile/${this.username}`);
+      this.navigateToSubpage(`/profile/${this.username}`);
     }
 
     this.profileUpdate = {};
@@ -216,8 +225,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   view() {
     if (this.loading) {
       return (
-        <div class="EditProfilePage full-height">
-          <div class="loading-spinner">
+        <div className="EditProfilePage full-height">
+          <div className="loading-spinner">
             <CWSpinner />
           </div>
         </div>
@@ -229,7 +238,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
     if (this.error === EditProfileError.None) {
       if (!this.isOwner) {
-        navigateToSubpage(`/profile/${this.username}`);
+        this.navigateToSubpage(`/profile/${this.username}`);
       }
 
       // need to create an account to pass to AvatarUpload to see last upload
@@ -260,8 +269,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       }
 
       return (
-        <Sublayout class="Homepage">
-          <div class="EditProfilePage">
+        <Sublayout>
+          <div className="EditProfilePage">
             <CWForm
               title="Edit Profile"
               description="Create and edit profiles and manage your connected addresses."
@@ -270,16 +279,16 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   <div className="buttons">
                     <CWButton
                       label="Delete profile"
-                      onclick={() => this.handleDeleteProfile()}
+                      onClick={() => this.handleDeleteProfile()}
                       buttonType="tertiary-black"
                     />
                     <div className="buttons-right">
                       <CWButton
                         label="Cancel Edits"
-                        onclick={() => {
+                        onClick={() => {
                           this.loading = true;
                           setTimeout(() => {
-                            navigateToSubpage(`/profile/${this.username}`);
+                            this.navigateToSubpage(`/${this.username}`);
                           }, 1000);
                         }}
                         className="save-button"
@@ -287,7 +296,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                       />
                       <CWButton
                         label="Save"
-                        onclick={() => {
+                        onClick={() => {
                           this.handleSaveProfile();
                         }}
                         className="save-button"
@@ -330,7 +339,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                           const url = f.uploadURL.replace(/\?.*/, '').trim();
                           this.avatarUrl = url;
                         });
-                        m.redraw();
                       }}
                     />
                   </div>
@@ -348,7 +356,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                     label="Username"
                     value={this.username}
                     placeholder="username"
-                    oninput={(e) => {
+                    onInput={(e) => {
                       this.username = e.target.value;
                     }}
                   />
@@ -364,7 +372,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                     label="Display Name"
                     value={this.name}
                     placeholder="display name"
-                    oninput={(e) => {
+                    onInput={(e) => {
                       this.name = e.target.value;
                     }}
                   />
@@ -380,7 +388,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                     label="Email"
                     value={this.email}
                     placeholder="email"
-                    oninput={(e) => {
+                    onInput={(e) => {
                       this.email = e.target.value;
                     }}
                   />
@@ -417,7 +425,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
               >
                 <CWText fontWeight="medium">Cover Image</CWText>
                 <CWCoverImageUploader
-                  name="cover-image-uploader"
                   uploadCompleteCallback={(
                     url: string,
                     imageBehavior: ImageBehavior
@@ -443,7 +450,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <CWDivider />
                 <CWText fontWeight="medium">Background Image</CWText>
                 <CWCoverImageUploader
-                  name="background-image-uploader"
                   uploadCompleteCallback={(
                     url: string,
                     imageBehavior: ImageBehavior
@@ -474,3 +480,5 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
   }
 }
+
+export default NavigationWrapper(EditNewProfile);
