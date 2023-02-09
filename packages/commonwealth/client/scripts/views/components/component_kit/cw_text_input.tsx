@@ -24,7 +24,7 @@ export type BaseTextInputProps = {
   iconRight?: IconName;
   iconRightonClick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
-  label?: string;
+  label?: string | React.ReactNode;
   maxLength?: number;
   name?: string;
   onInput?: (e) => void;
@@ -50,7 +50,7 @@ type InputInternalStyleProps = {
 
 type MessageRowProps = {
   hasFeedback?: boolean;
-  label: string;
+  label: string | m.Vnode;
   statusMessage?: string;
   validationStatus?: ValidationStatus;
 };

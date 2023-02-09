@@ -93,7 +93,8 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
             onClick={() => {
               const pf = app.user.activeAccount.profile;
               if (pf) {
-                m.route.set(`/profile/${pf.address}`);
+                // TODO: switch to profile.username once PR4 is merged
+                m.route.set(`/profile/a/${pf.address}`);
               }
             }}
           >
@@ -103,14 +104,25 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
         {activeAddressesWithRole.length > 0 && app.activeChainId() && (
           <div
             className="login-menu-item"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsEditProfileModalOpen(true);
+            onClick={() => {
+              const pf = app.user.activeAccount.profile;
+              if (pf) {
+                // TODO: switch to profile.username once PR4 is merged
+                setRoute(`/profile/a/${pf.address}/edit`);
+              }
             }}
           >
             <CWText type="caption">Edit profile</CWText>
           </div>
         )}
+        <div
+          className="login-menu-item"
+          onClick={() => {
+            setRoute(`/profile/manage`);
+          }}
+        >
+          <CWText type="caption">Manage profiles</CWText>
+        </div>
         <div
           className="login-menu-item"
           onClick={() => {

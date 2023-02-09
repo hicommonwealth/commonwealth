@@ -3,8 +3,7 @@ import { Op } from 'sequelize';
 import { DB } from '../models';
 
 export const Errors = {
-  NoAddressProvided: 'No address provided in query',
-  NoAddressFound: 'No address found',
+  NoIdentifierProvided: 'No username or address provided in query',
   NoProfileFound: 'No profile found',
 };
 
@@ -14,29 +13,40 @@ const getNewProfile = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { address } = req.query;
-  if (!address) return next(new Error(Errors.NoAddressProvided));
+  const { username, address } = req.query;
+  if (!username && !address)
+    return next(new Error(Errors.NoIdentifierProvided));
 
-  const addressModel = await models.Address.findOne({
-    where: {
-      address,
-    },
-    include: [models.Profile],
-  });
-  if (!addressModel) return next(new Error(Errors.NoAddressFound));
+  let profile;
 
-  const profile = await models.Profile.findOne({
-    where: {
-      id: addressModel.profile_id,
-    },
-  });
+  if (username) {
+    profile = await models.Profile.findOne({
+      where: {
+        username,
+      },
+    });
+  }
+
+  if (address) {
+    const addressModel = await models.Address.findOne({
+      where: {
+        address,
+      },
+      include: [models.Profile],
+    });
+
+    if (!addressModel) return next(new Error(Errors.NoProfileFound));
+
+    profile = await models.Profile.findOne({
+      where: {
+        id: addressModel.profile_id,
+      },
+    });
+  }
+
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const addresses = await models.Address.findAll({
-    where: {
-      profile_id: profile.id,
-    },
-  });
+  const addresses = await profile.getAddresses();
 
   const chainIds = [...new Set<string>(addresses.map((a) => a.chain))];
   const chains = await models.Chain.findAll({
@@ -86,6 +96,7 @@ const getNewProfile = async (
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
     chains: chains.map((c) => c.toJSON()),
+    isOwner: req.user.id === profile.user_id,
   });
 };
 

@@ -59,6 +59,10 @@ import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileOld from '../routes/getProfile';
 import getProfileNew from '../routes/getNewProfile';
+import getNewProfiles from '../routes/getNewProfiles';
+import createProfile from '../routes/createProfile';
+import deleteProfile from '../routes/deleteProfile';
+import moveAddress from '../routes/moveAddress';
 
 import createRole from '../routes/createRole';
 import deleteRole from '../routes/deleteRole';
@@ -421,6 +425,11 @@ function setupRouter(
 
   router.get('/profile', getProfileOld.bind(this, models));
   router.get('/profile/v2', getProfileNew.bind(this, models));
+  router.post(
+    '/newProfiles',
+    passport.authenticate('jwt', { session: false }),
+    getNewProfiles.bind(this, models)
+  );
 
   // discussion drafts
   router.post(
@@ -660,6 +669,24 @@ function setupRouter(
     '/updateProfile/v2',
     passport.authenticate('jwt', { session: false }),
     updateProfileNew.bind(this, models)
+  );
+
+  router.post(
+    '/createProfile',
+    passport.authenticate('jwt', { session: false }),
+    createProfile.bind(this, models)
+  );
+
+  router.post(
+    '/deleteProfile',
+    passport.authenticate('jwt', { session: false }),
+    deleteProfile.bind(this, models)
+  );
+
+  router.post(
+    '/moveAddress',
+    passport.authenticate('jwt', { session: false }),
+    moveAddress.bind(this, models)
   );
 
   // social accounts

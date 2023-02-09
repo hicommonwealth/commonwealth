@@ -17,35 +17,32 @@ import jdenticon from 'jdenticon';
 import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'router';
 import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import { SocialAccounts } from './new_profile_social_accounts';
+import { SocialAccounts } from '../../components/social_accounts';
 
 type NewProfileHeaderAttrs = {
-  address: string;
   profile: Profile;
+  isOwner: boolean;
 };
 
 class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
   private defaultAvatar: string;
 
-  oninit(vnode: ResultNode<NewProfileHeaderAttrs>) {
-    this.defaultAvatar = jdenticon.toSvg(vnode.attrs.address, 90);
+  oninit(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+    this.defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
   }
 
-  view(vnode: ResultNode<NewProfileHeaderAttrs>) {
-    const { profile, address } = vnode.attrs;
+  view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+    const { profile, isOwner } = vnode.attrs;
 
     if (!profile) return;
-    const bio = profile.bio;
+    const { bio, name, username } = profile;
 
-    const isCurrentUser =
-      app.isLoggedIn() &&
-      app.user.addresses
-        .map((addressInfo) => addressInfo.address)
-        .includes(address);
+    const isCurrentUser = app.isLoggedIn() && isOwner;
 
     return (
       <div className="ProfileHeader">
@@ -55,9 +52,7 @@ class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
               label="Edit"
               buttonType="mini-white"
               iconLeft="write"
-              onClick={() =>
-                setRoute(`/profile/${getRouteParam('address')}/edit`)
-              }
+              onClick={() => navigateToSubpage(`/profile/${username}/edit`)}
             />
           )}
         </div>
@@ -73,13 +68,8 @@ class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
           )}
         </div>
         <div className="profile-name-and-bio">
-          <CWText
-            type="h3"
-            className={profile.name ? 'name hasMargin' : 'name'}
-          >
-            {profile.name
-              ? profile.name
-              : `Anonymous (${address.slice(0, 5)}...)`}
+          <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
+            {name || username}
           </CWText>
           <div className="buttons">
             {/* TODO: Add delegate and follow buttons */}

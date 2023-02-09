@@ -204,12 +204,13 @@ class MembersPage extends ClassComponent {
             <CWText type="h5">Posts / Month</CWText>
           </div>
           <div className="members-container">
-            {profilesLoaded.map((profileInfo, i) => {
-              const { address, chain } = profileInfo.profile;
+            {profilesLoaded.map((profileInfo) => {
+              const { address } = profileInfo.profile;
               return (
                 <div className="member-row" key={i}>
                   <a
-                    href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
+                    // TODO: switch to profile.username once PR4 is merged
+                    href={`/profile/a/${address}`}
                     onClick={(e) => {
                       e.preventDefault();
                       localStorage[`${app.activeChainId()}-members-scrollY`] =
@@ -217,7 +218,8 @@ class MembersPage extends ClassComponent {
                       localStorage[
                         `${app.activeChainId()}-members-numProfilesLoaded`
                       ] = numProfilesLoaded;
-                      navigateToSubpage(`/account/${address}?base=${chain}`);
+                      // TODO: switch to profile.username once PR4 is merged
+                      setRoute(`/profile/a/${address}`);
                     }}
                   >
                     <User user={profileInfo.profile} showRole />

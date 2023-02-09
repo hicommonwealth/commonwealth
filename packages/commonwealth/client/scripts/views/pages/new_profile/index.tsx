@@ -36,26 +36,26 @@ enum ProfileError {
 }
 
 type NewProfileAttrs = {
-  address: string;
+  username: string;
 };
 
-const NoAddressFoundError = 'No address found';
 const NoProfileFoundError = 'No profile found';
 
 const NewProfile = (props: NewProfileAttrs) => {
   const [addresses, setAddresses] = React.useState<AddressInfo[]>();
   const [chains, setChains] = React.useState<ChainInfo[]>();
   const [comments, setComments] = React.useState<CommentWithAssociatedThread[]>([]);
-  const [error, setError] = React.useState<ProfileError>();
+  const [error, setError] = React.useState<ProfileError>(ProfileError.None);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [profile, setProfile] = React.useState<Profile>();
   const [threads, setThreads] = React.useState<Thread[]>([]);
+  const [isOwner, setIsOwner] = React.useState<boolean>();
 
-  const getProfileData = async (address: string) => {
+  const getProfileData = async (username: string) => {
     setLoading(true);
     try {
       const response = await $.get(`${app.serverUrl()}/profile/v2`, {
-        address,
+        username,
         jwt: app.user.jwt,
       });
 
@@ -85,13 +85,8 @@ const NewProfile = (props: NewProfileAttrs) => {
             a.ghost_address
           )
       ));
+      setIsOwner(response.isOwner);
     } catch (err) {
-      if (
-        err.status === 500 &&
-        err.responseJSON.error === NoAddressFoundError
-      ) {
-        setError(ProfileError.NoAddressFound);
-      }
       if (
         err.status === 500 &&
         err.responseJSON.error === NoProfileFoundError
@@ -103,8 +98,7 @@ const NewProfile = (props: NewProfileAttrs) => {
   };
 
   React.useEffect(() => {
-    console.log('props.address', props.address);
-    getProfileData(props.address);
+    getProfileData(props.username);
   }, []);
 
   if (loading)
@@ -194,7 +188,7 @@ const NewProfile = (props: NewProfileAttrs) => {
                 : 'ProfilePageContainer smaller-margins'
             }
           >
-            <NewProfileHeader profile={profile} address={props.address} />
+            <NewProfileHeader profile={profile} isOwner={isOwner} />
             <NewProfileActivity
               threads={threads}
               comments={comments}
@@ -210,7 +204,7 @@ const NewProfile = (props: NewProfileAttrs) => {
       <Sublayout>
         <div className="ProfilePage">
           <div className="ProfilePageContainer">
-            <NewProfileHeader profile={profile} address={props.address} />
+            <NewProfileHeader profile={profile} isOwner={isOwner} />
             <NewProfileActivity
               threads={threads}
               comments={comments}

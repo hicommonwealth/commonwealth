@@ -13,24 +13,23 @@ import {
   Component,
 } from 'mithrilInterop';
 
-import 'pages/new_profile/new_profile_social_accounts.scss';
+import 'components/social_accounts.scss';
 
 import type { NewProfile as Profile } from 'client/scripts/models';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import type { IconName } from './component_kit/cw_icons/cw_icon_lookup';
 
-import type { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
-
-type NewProfileSocialAccountsAttrs = {
-  profile: Profile;
-};
-
-type NewProfileSocialAccountAttrs = {
+type SocialAccountAttrs = {
   iconName: IconName;
   link: string;
 };
 
-class SocialAccount extends ClassComponent<NewProfileSocialAccountAttrs> {
-  view(vnode: ResultNode<NewProfileSocialAccountAttrs>) {
+type SocialAccountsAttrs = {
+  profile: Profile;
+}
+
+class SocialAccount extends ClassComponent<SocialAccountAttrs> {
+  view(vnode: ResultNode<SocialAccountAttrs>) {
     const { iconName, link } = vnode.attrs;
     const formattedLink = link.includes('http') ? link : `https://${link}`;
 
@@ -42,8 +41,8 @@ class SocialAccount extends ClassComponent<NewProfileSocialAccountAttrs> {
   }
 }
 
-export class SocialAccounts extends ClassComponent<NewProfileSocialAccountsAttrs> {
-  view(vnode: ResultNode<NewProfileSocialAccountsAttrs>) {
+export class SocialAccounts extends ClassComponent<SocialAccountsAttrs> {
+  view(vnode: ResultNode<SocialAccountsAttrs>) {
     const { profile } = vnode.attrs;
 
     if (!profile) return;

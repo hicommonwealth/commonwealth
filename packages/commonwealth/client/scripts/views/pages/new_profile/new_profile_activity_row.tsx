@@ -87,6 +87,12 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
                   iconLeft: 'copy',
                   label: 'Copy URL',
                   onClick: async () => {
+                    if (isThread) {
+                      await navigator.clipboard.writeText(
+                        `${domain}/${chain}/discussion/${id}`
+                      );
+                      return;
+                    }
                     await navigator.clipboard.writeText(
                       `${domain}/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`
                     );
@@ -96,6 +102,13 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
                   iconLeft: 'twitter',
                   label: 'Share on Twitter',
                   onClick: async () => {
+                    if (isThread) {
+                      await window.open(
+                        `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${id}`,
+                        '_blank'
+                      );
+                      return;
+                    }
                     await window.open(
                       `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${comment.thread?.id}
                         ?comment=${comment.id}`,

@@ -1,13 +1,13 @@
 @import '../../shared';
 
 .ProfileHeader {
-  margin: 0 24px 0 0;
   border: 1px solid $neutral-200;
   border-radius: 16px;
   padding: 24px;
   height: fit-content;
   flex: 1;
   background-color: $white;
+  margin: 0;
 
   @include smallInclusive {
     margin-bottom: 16px;
