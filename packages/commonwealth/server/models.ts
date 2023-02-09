@@ -20,7 +20,6 @@ import type { ContractModelStatic } from './models/contract';
 import type { ContractAbiModelStatic } from './models/contract_abi';
 import type { DiscordBotConfigModelStatic } from './models/discord_bot_config';
 import type { DiscussionDraftModelStatic } from './models/discussion_draft';
-import type { IdentityCacheStatic } from './models/identity_cache';
 import type { LinkedThreadModelStatic } from './models/linked_thread';
 import type { LoginTokenModelStatic } from './models/login_token';
 import type { NotificationModelStatic } from './models/notification';
@@ -67,7 +66,6 @@ export type Models = {
   CommunityBanner: CommunityBannerModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
   DiscordBotConfig: DiscordBotConfigModelStatic;
-  IdentityCache: IdentityCacheStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
