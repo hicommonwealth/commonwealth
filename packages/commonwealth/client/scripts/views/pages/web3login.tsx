@@ -17,8 +17,10 @@ import PageNotFound from './404';
 import { PageLoading } from './loading';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import { Modal } from '../components/component_kit/cw_modal';
+import { useNavigate } from 'react-router-dom';
 
 const Web3LoginPage = () => {
+  const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -89,11 +91,17 @@ const Web3LoginPage = () => {
               }}
             />
             {getRouteParam('prev')
-              ? link('a.web3login-go-home', getRouteParam('prev'), 'Go back')
+              ? link(
+                  'a.web3login-go-home',
+                  getRouteParam('prev'),
+                  'Go back',
+                  navigate
+                )
               : link(
                   'a.web3login-go-home',
                   app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,
-                  'Go home'
+                  'Go home',
+                  navigate
                 )}
             {isNonEmptyString(errorMsg) && <CWText>{errorMsg}</CWText>}
           </div>

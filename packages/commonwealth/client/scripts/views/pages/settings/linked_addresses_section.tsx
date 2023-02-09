@@ -18,13 +18,14 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
+import withRouter from 'navigation/helpers';
 
 type AccountRowAttrs = {
   account: AddressInfo;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => any;
 };
 
-class AccountRow extends ClassComponent<AccountRowAttrs> {
+class AccountRowComponent extends ClassComponent<AccountRowAttrs> {
   private removing: boolean;
 
   view(vnode: ResultNode<AccountRowAttrs>) {
@@ -64,7 +65,8 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
                   ? link(
                       'a',
                       `/${account.chain.id}/account/${account.delegateKey}`,
-                      account.delegateKey
+                      account.delegateKey,
+                      this.setRoute.bind(this)
                     )
                   : 'N/A'}
               </CWText>
@@ -100,6 +102,8 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
     );
   }
 }
+
+const AccountRow = withRouter(AccountRowComponent);
 
 export class LinkedAddressesSection extends ClassComponent {
   view() {

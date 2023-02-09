@@ -5,13 +5,15 @@ import app from 'state';
 import type { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, render } from 'mithrilInterop';
+import withRouter from 'navigation/helpers';
 
 type ProfileProposalAttr = {
   proposal: Thread;
 };
 
-export class ProfileProposal extends ClassComponent<ProfileProposalAttr> {
+export class ProfileProposalComponent extends ClassComponent<ProfileProposalAttr> {
   constructor(props) {
     super(props);
   }
@@ -35,11 +37,17 @@ export class ProfileProposal extends ClassComponent<ProfileProposalAttr> {
               true
             )}`,
             'thread',
+            this.setRoute.bind(this),
             {},
             `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
           ),
           ' in ',
-          link('a.link-bold', `/${chain}`, `${chain}`),
+          link(
+            'a.link-bold',
+            `/${chain}`,
+            `${chain}`,
+            this.setRoute.bind(this)
+          ),
         ]),
         createdAt && createdAt.fromNow(),
       ]),
@@ -54,6 +62,7 @@ export class ProfileProposal extends ClassComponent<ProfileProposalAttr> {
               true
             )}`,
             title,
+            this.setRoute.bind(this),
             {},
             `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
           ),
@@ -88,5 +97,7 @@ export class ProfileProposal extends ClassComponent<ProfileProposalAttr> {
     ]);
   }
 }
+
+const ProfileProposal = withRouter(ProfileProposalComponent);
 
 export default ProfileProposal;

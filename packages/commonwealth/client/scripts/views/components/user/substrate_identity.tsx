@@ -2,7 +2,7 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 
 import 'components/user/user.scss';
@@ -17,6 +17,7 @@ import SubstrateIdentity, {
   getIdentityQuality,
 } from 'controllers/chain/substrate/identity';
 import { formatAddressShort } from '../../../../../shared/utils';
+import withRouter from 'navigation/helpers';
 
 type SubstrateIdentityAttrs = {
   account: Account;
@@ -126,7 +127,8 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
                 profile.chain
               }`
             : 'javascript:',
-          name
+          name,
+          this.setRoute.bind(this)
         )
       ) : (
         <a
@@ -159,7 +161,8 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
               {formatAddressShort(profile.address, profile.chain)}
             </div>
           </React.Fragment>
-        )
+        ),
+        this.setRoute.bind(this)
       )
     ) : (
       <a className="user-display-name username">
@@ -180,7 +183,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
   }
 }
 
-class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAttrs> {
+class SubstrateOfflineIdentityWidgetComponent extends ClassComponent<SubstrateIdentityAttrs> {
   private identity: SubstrateIdentity | null;
 
   view(vnode: ResultNode<SubstrateIdentityAttrs>) {
@@ -238,7 +241,8 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
                 profile.chain
               }`
             : 'javascript:',
-          name
+          name,
+          this.setRoute.bind(this)
         )
       ) : (
         <a
@@ -271,7 +275,8 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
               {formatAddressShort(profile.address, profile.chain)}
             </div>
           </React.Fragment>
-        )
+        ),
+        this.setRoute.bind(this)
       )
     ) : (
       <a className="user-display-name username">
@@ -291,6 +296,10 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
     );
   }
 }
+
+const SubstrateOfflineIdentityWidget = withRouter(
+  SubstrateOfflineIdentityWidgetComponent
+);
 
 class SubstrateIdentityWidget extends ClassComponent<SubstrateIdentityAttrs> {
   private identity: SubstrateIdentity | null;

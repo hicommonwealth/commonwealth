@@ -3,7 +3,7 @@ import React from 'react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { link, pluralize } from 'helpers';
-import type { ResultNode} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import { Webhook } from 'models';
@@ -17,12 +17,13 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import withRouter from 'navigation/helpers';
 
 type WebhooksFormAttrs = {
   webhooks: Array<Webhook>;
 };
 
-export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
+class WebhooksFormComponent extends ClassComponent<WebhooksFormAttrs> {
   private disabled: boolean;
   private failure: boolean;
   private success: boolean;
@@ -189,7 +190,12 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
             No webhooks yet. Slack, Discord, and Telegram webhooks are
             supported. For more information and examples for setting these up,
             please view our
-            {link('a', 'https://docs.commonwealth.im', [' documentation.'])}
+            {link(
+              'a',
+              'https://docs.commonwealth.im',
+              [' documentation.'],
+              this.setRoute.bind(this)
+            )}
           </CWText>
         )}
         <CWTextInput
@@ -208,3 +214,5 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
     );
   }
 }
+
+export const WebhooksForm = withRouter(WebhooksFormComponent);

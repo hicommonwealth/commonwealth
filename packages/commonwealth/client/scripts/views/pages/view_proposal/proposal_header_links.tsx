@@ -66,7 +66,7 @@ class VotingInterfaceLinkComponent extends ClassComponent<ProposalHeaderLinkAttr
 export const VotingInterfaceLink = withRouter(VotingInterfaceLinkComponent);
 
 // "Go to discussion"
-export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {
+class ThreadLinkComponent extends ClassComponent<ProposalHeaderLinkAttrs> {
   view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
@@ -79,18 +79,20 @@ export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {
 
     return (
       <div className="HeaderLink">
-        {link('a', path, ['Go to discussion'])}
+        {link('a', path, ['Go to discussion'], this.setRoute.bind(this))}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
 }
 
+export const ThreadLink = withRouter(ThreadLinkComponent);
+
 type SnapshotThreadLinkAttrs = {
   thread: { id: string; title: string };
 };
 
-export class SnapshotThreadLink extends ClassComponent<SnapshotThreadLinkAttrs> {
+class SnapshotThreadLinkComponent extends ClassComponent<SnapshotThreadLinkAttrs> {
   view(vnode: ResultNode<SnapshotThreadLinkAttrs>) {
     const { id, title } = vnode.attrs.thread;
 
@@ -98,9 +100,16 @@ export class SnapshotThreadLink extends ClassComponent<SnapshotThreadLinkAttrs> 
 
     return (
       <div className="HeaderLink">
-        {link('a', proposalLink, [decodeURIComponent(title)])}
+        {link(
+          'a',
+          proposalLink,
+          [decodeURIComponent(title)],
+          this.setRoute.bind(this)
+        )}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
 }
+
+export const SnapshotThreadLink = withRouter(SnapshotThreadLinkComponent);
