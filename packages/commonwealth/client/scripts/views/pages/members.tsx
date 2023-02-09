@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   ClassComponent,
@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 import type { Profile } from 'models';
@@ -23,7 +23,7 @@ import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
-import { useDebounceOnFunction } from 'client/scripts/mithrilInterop/helpers';
+import { useDebounceOnFunction } from 'mithrilInterop/helpers';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -38,64 +38,62 @@ type ProfileInfo = {
   postCount: number;
   profile: Profile;
 };
+const MembersPage = () => {
+  const [initialProfilesLoaded, setInitialProfilesLoaded] = useState(false);
+  const [initialScrollFinished, setInitialScrollFinished] = useState(false);
+  const [membersLoaded, setMembersLoaded] = useState<MemberInfo[] | null>(null);
+  const [membersRequested, setMembersRequested] = useState(false);
+  const [numProfilesLoaded, setNumProfilesLoaded] = useState(0);
+  const [profilesFinishedLoading, setProfilesFinishedLoading] = useState(false);
+  const [profilesLoaded, setProfilesLoaded] = useState<ProfileInfo[]>([]);
+  const [totalMembersCount, setTotalMembersCount] = useState(0);
 
-class MembersPage extends ClassComponent {
-  private initialProfilesLoaded: boolean;
-  private initialScrollFinished: boolean;
-  private membersLoaded: MemberInfo[];
-  private membersRequested: boolean;
-  private numProfilesLoaded: number;
-  private profilesFinishedLoading: boolean;
-  private profilesLoaded: ProfileInfo[];
-  private totalMembersCount: number;
+  // handleScroll = () => {
+  //   const scrollHeight = $(document).height();
 
-  view() {
-    const activeEntity = app.chain;
+  //   const scrollPos = $(window).height() + $(window).scrollTop();
 
-    if (!activeEntity) return <PageLoading message="Loading members" />;
+  //   if (scrollPos > scrollHeight - 400 && !profilesFinishedLoading) {
+  //     const lastLoadedProfileIndex = numProfilesLoaded;
 
-    function handleScroll() {
-      const scrollHeight = $(document).height();
+  //     const newBatchSize = Math.min(
+  //       DEFAULT_MEMBER_REQ_SIZE,
+  //       membersLoaded.length - lastLoadedProfileIndex
+  //     );
 
-      const scrollPos = $(window).height() + $(window).scrollTop();
+  //     const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
 
-      if (scrollPos > scrollHeight - 400 && !this.profilesFinishedLoading) {
-        const lastLoadedProfileIndex = this.numProfilesLoaded;
+  //     for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
+  //       const member = membersLoaded[i];
+  //       const profileInfo: ProfileInfo = {
+  //         profile: app.profiles.getProfile(member.chain, member.address),
+  //         postCount: member.count,
+  //       };
+  //       profilesLoaded.push(profileInfo);
+  //     }
 
-        const newBatchSize = Math.min(
-          DEFAULT_MEMBER_REQ_SIZE,
-          this.membersLoaded.length - lastLoadedProfileIndex
-        );
+  //     numProfilesLoaded += newBatchSize;
+  //     redraw();
+  //   }
+  // };
 
-        const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
+  // debouncedHandleScroll = useDebounceOnFunction(this.handleScroll, 400, []);
 
-        for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
-          const member = this.membersLoaded[i];
-          const profileInfo: ProfileInfo = {
-            profile: app.profiles.getProfile(member.chain, member.address),
-            postCount: member.count,
-          };
-          this.profilesLoaded.push(profileInfo);
-        }
+  const activeEntity = app.chain;
+  if (!activeEntity) return <PageLoading message="Loading members" />;
+  const activeInfo = app.chain.meta;
 
-        this.numProfilesLoaded += newBatchSize;
-        this.redraw();
-      }
-    }
-
-    const debouncedHandleScroll = useDebounceOnFunction(handleScroll, 400, []);
-
+  useEffect(() => {
     // get members once
-    const activeInfo = app.chain.meta;
-
-    if (!this.membersRequested) {
-      this.membersRequested = true;
+    console.log('activeInfo: ', activeInfo);
+    if (!membersRequested) {
+      setMembersRequested(true);
 
       activeInfo.getMembers(activeInfo.id).then(() => {
         const activeMembersHash = {};
 
-        this.totalMembersCount = activeInfo.members.length;
-
+        setTotalMembersCount(activeInfo.members.length);
+        console.log('total members count: ', activeInfo.members.length);
         const membersActive: MemberInfo[] = app.recentActivity
           .getMostActiveUsers()
           .map((user) => {
@@ -117,131 +115,124 @@ class MembersPage extends ClassComponent {
             return !activeMembersHash[`${chain}##${address}`];
           });
 
-        this.membersLoaded = membersActive
-          .concat(membersInactive)
-          .sort((a, b) => b.count - a.count);
-        this.redraw();
+        setMembersLoaded(
+          membersActive
+            .concat(membersInactive)
+            .sort((a, b) => b.count - a.count)
+        );
+        redraw();
+        console.log('Members loaded: ', membersLoaded);
       });
     }
+  }, [activeInfo]);
 
-    if (!this.membersLoaded) return <PageLoading message="Loading members" />;
+  if (!membersLoaded) return <PageLoading message="Loading members" />;
 
-    const navigatedFromAccount =
-      app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes(`/${app.activeChainId()}/account/`) &&
-      localStorage[`${app.activeChainId()}-members-scrollY`];
+  const navigatedFromAccount =
+    app.lastNavigatedBack() &&
+    app.lastNavigatedFrom().includes(`/${app.activeChainId()}/account/`) &&
+    localStorage[`${app.activeChainId()}-members-scrollY`];
 
-    // Load default number of profiles on mount
-    if (!this.initialProfilesLoaded) {
-      this.initialScrollFinished = false;
-      this.initialProfilesLoaded = true;
+  // Load default number of profiles on mount
+  if (!initialProfilesLoaded) {
+    setInitialScrollFinished(false);
+    setInitialProfilesLoaded(true);
 
-      // TODO: expand into controller
-      app.profiles.isFetched.on('redraw', () => {
-        this.redraw();
+    // TODO: expand into controller
+    app.profiles.isFetched.on('redraw', () => {
+      redraw();
+    });
+
+    // Set initial number loaded (contingent on navigation)
+    if (navigatedFromAccount) {
+      setNumProfilesLoaded(
+        Number(localStorage[`${app.activeChainId()}-members-numProfilesLoaded`])
+      );
+    } else {
+      setNumProfilesLoaded(
+        Math.min(DEFAULT_MEMBER_REQ_SIZE, membersLoaded.length)
+      );
+    }
+
+    setProfilesFinishedLoading(numProfilesLoaded >= membersLoaded.length);
+
+    const profileInfos: ProfileInfo[] = membersLoaded
+      .slice(0, numProfilesLoaded)
+      .map((member) => {
+        return {
+          profile: app.profiles.getProfile(member.chain, member.address),
+          postCount: member.count,
+        };
       });
 
-      // Set initial number loaded (contingent on navigation)
-      if (navigatedFromAccount) {
-        this.numProfilesLoaded = Number(
-          localStorage[`${app.activeChainId()}-members-numProfilesLoaded`]
-        );
-      } else {
-        this.numProfilesLoaded = Math.min(
-          DEFAULT_MEMBER_REQ_SIZE,
-          this.membersLoaded.length
-        );
-      }
-
-      this.profilesFinishedLoading =
-        this.numProfilesLoaded >= this.membersLoaded.length;
-
-      const profileInfos: ProfileInfo[] = this.membersLoaded
-        .slice(0, this.numProfilesLoaded)
-        .map((member) => {
-          return {
-            profile: app.profiles.getProfile(member.chain, member.address),
-            postCount: member.count,
-          };
-        });
-
-      this.profilesLoaded = profileInfos;
-    }
-
-    // Check if all profiles have been loaded
-    if (!this.profilesFinishedLoading) {
-      if (this.profilesLoaded.length >= this.membersLoaded.length) {
-        this.profilesFinishedLoading = true;
-      }
-    }
-
-    // Return to correct scroll position upon redirect from accounts page
-    if (navigatedFromAccount && !this.initialScrollFinished) {
-      this.initialScrollFinished = true;
-
-      setTimeout(() => {
-        window.scrollTo(
-          0,
-          Number(localStorage[`${app.activeChainId()}-members-scrollY`])
-        );
-      }, 100);
-    }
-
-    const {
-      membersLoaded,
-      numProfilesLoaded,
-      profilesFinishedLoading,
-      profilesLoaded,
-      totalMembersCount,
-    } = this;
-
-    return (
-      <Sublayout onScroll={debouncedHandleScroll}>
-        <div className="MembersPage">
-          <CWText type="h3" fontWeight="medium">
-            {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}
-          </CWText>
-          <div className="header-row">
-            <CWText type="h5">Member</CWText>
-            <CWText type="h5">Posts / Month</CWText>
-          </div>
-          <div className="members-container">
-            {profilesLoaded.map((profileInfo, i) => {
-              const { address, chain } = profileInfo.profile;
-              return (
-                <div className="member-row" key={i}>
-                  <a
-                    href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      localStorage[`${app.activeChainId()}-members-scrollY`] =
-                        window.scrollY;
-                      localStorage[
-                        `${app.activeChainId()}-members-numProfilesLoaded`
-                      ] = numProfilesLoaded;
-                      navigateToSubpage(`/account/${address}?base=${chain}`);
-                    }}
-                  >
-                    <User user={profileInfo.profile} showRole />
-                  </a>
-                  <CWText>{profileInfo.postCount}</CWText>
-                </div>
-              );
-            })}
-          </div>
-          <div className="infinite-scroll-wrapper">
-            {profilesFinishedLoading ? (
-              <CWText className="infinite-scroll-reached-end-text">
-                Showing all {membersLoaded.length} community members
-              </CWText>
-            ) : (
-              <CWSpinner size="large" />
-            )}
-          </div>
-        </div>
-      </Sublayout>
-    );
+    setProfilesLoaded(profileInfos);
   }
-}
+
+  // Check if all profiles have been loaded
+  if (!profilesFinishedLoading) {
+    if (profilesLoaded.length >= membersLoaded.length) {
+      setProfilesFinishedLoading(true);
+    }
+  }
+
+  // Return to correct scroll position upon redirect from accounts page
+  if (navigatedFromAccount && initialScrollFinished) {
+    setInitialScrollFinished(true);
+
+    setTimeout(() => {
+      window.scrollTo(
+        0,
+        Number(localStorage[`${app.activeChainId()}-members-scrollY`])
+      );
+    }, 100);
+  }
+
+  return (
+    <Sublayout>
+      <div className="MembersPage">
+        <CWText type="h3" fontWeight="medium">
+          {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}
+        </CWText>
+        <div className="header-row">
+          <CWText type="h5">Member</CWText>
+          <CWText type="h5">Posts / Month</CWText>
+        </div>
+        <div className="members-container">
+          {profilesLoaded.map((profileInfo, i) => {
+            const { address, chain } = profileInfo.profile;
+            return (
+              <div className="member-row" key={i}>
+                <a
+                  href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    localStorage[`${app.activeChainId()}-members-scrollY`] =
+                      window.scrollY;
+                    localStorage[
+                      `${app.activeChainId()}-members-numProfilesLoaded`
+                    ] = numProfilesLoaded;
+                    navigateToSubpage(`/account/${address}?base=${chain}`);
+                  }}
+                >
+                  <User user={profileInfo.profile} showRole />
+                </a>
+                <CWText>{profileInfo.postCount}</CWText>
+              </div>
+            );
+          })}
+        </div>
+        <div className="infinite-scroll-wrapper">
+          {profilesFinishedLoading ? (
+            <CWText className="infinite-scroll-reached-end-text">
+              Showing all {membersLoaded.length} community members
+            </CWText>
+          ) : (
+            <CWSpinner size="large" />
+          )}
+        </div>
+      </div>
+    </Sublayout>
+  );
+};
 
 export default MembersPage;
