@@ -1,28 +1,20 @@
-/* @jsx jsx */
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import {
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { Account, AddressInfo, Profile } from 'models';
+import type { Account } from 'models';
+import { AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
+import { Modal } from '../component_kit/cw_modal';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -37,7 +29,6 @@ type UserAttrs = {
   avatarOnly?: boolean; // overrides most other properties
   avatarSize?: number;
   hideAvatar?: boolean;
-  hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
   linkify?: boolean;
   onclick?: any;
   popover?: boolean;
@@ -51,7 +42,6 @@ export const User = (props: UserAttrs) => {
   const {
     avatarOnly,
     hideAvatar,
-    hideIdentityIcon,
     showAddressWithDisplayName,
     user,
     linkify,
@@ -59,8 +49,7 @@ export const User = (props: UserAttrs) => {
     showRole,
   } = props;
 
-  const [identityWidgetLoading, setIdentityWidgetLoading] =
-    React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   const popoverProps = usePopover();
 
@@ -96,24 +85,6 @@ export const User = (props: UserAttrs) => {
   )?.name;
 
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
-
-  if (
-    app.chain?.base === ChainBase.Substrate &&
-    !identityWidgetLoading &&
-    !app.cachedIdentityWidget
-  ) {
-    setIdentityWidgetLoading(true);
-
-    import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "substrate-identity-widget" */
-      './substrate_identity'
-    ).then((mod) => {
-      app.cachedIdentityWidget = mod.default;
-      setIdentityWidgetLoading(false);
-      redraw();
-    });
-  }
 
   if (props.user instanceof AddressInfo) {
     const chainId = props.user.chain;
@@ -167,25 +138,14 @@ export const User = (props: UserAttrs) => {
   }
 
   const getRoleTags = (long?: boolean) => (
-    <React.Fragment>
-      {/* 'long' makes role tags show as full length text */}
-      {profile.isCouncillor && !hideIdentityIcon && (
-        <div className={`role-icon role-icon-councillor${long ? ' long' : ''}`}>
-          {long ? `${friendlyChainName} Councillor` : 'C'}
-        </div>
-      )}
-      {profile.isValidator && !hideIdentityIcon && (
-        <div className={`role-icon role-icon-validator${long ? ' long' : ''}`}>
-          {long ? `${friendlyChainName} Validator` : 'V'}
-        </div>
-      )}
+    <>
       {/* role in commonwealth forum */}
       {showRole && role && (
         <div className="role-tag-container">
           <CWText className="role-tag-text">{role.permission}</CWText>
         </div>
       )}
-    </React.Fragment>
+    </>
   );
 
   const userFinal = avatarOnly ? (
@@ -209,20 +169,8 @@ export const User = (props: UserAttrs) => {
           {profile && profile.getAvatar(avatarSize)}
         </div>
       )}
-      {app.chain &&
-      app.chain.base === ChainBase.Substrate &&
-      app.cachedIdentityWidget ? (
-        // substrate name
-        render(app.cachedIdentityWidget, {
-          account,
-          linkify,
-          profile,
-          hideIdentityIcon,
-          addrShort,
-          showAddressWithDisplayName,
-        })
-      ) : (
-        <React.Fragment>
+      {
+        <>
           {/* non-substrate name */}
           {linkify ? (
             link(
@@ -232,21 +180,21 @@ export const User = (props: UserAttrs) => {
                     profile.address
                   }?base=${profile.chain}`
                 : 'javascript:',
-              <React.Fragment>
+              <>
                 {!profile ? (
                   addrShort
                 ) : !showAddressWithDisplayName ? (
                   profile.displayName
                 ) : (
-                  <React.Fragment>
+                  <>
                     {profile.displayName}
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
-                  </React.Fragment>
+                  </>
                 )}
                 {getRoleTags(false)}
-              </React.Fragment>
+              </>
             )
           ) : (
             <a className="user-display-name username">
@@ -255,12 +203,12 @@ export const User = (props: UserAttrs) => {
               ) : !showAddressWithDisplayName ? (
                 profile.displayName
               ) : (
-                <React.Fragment>
+                <>
                   {profile.displayName}
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
-                </React.Fragment>
+                </>
               )}
               {getRoleTags(false)}
             </a>
@@ -276,38 +224,30 @@ export const User = (props: UserAttrs) => {
                 style={{ display: 'inline-block' }}
               />
             )}
-        </React.Fragment>
-      )}
+        </>
+      }
     </div>
   );
 
   const userPopover = (
-    <div
-      className="UserPopover"
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    >
-      <div className="user-avatar">
-        {!profile
-          ? null
-          : profile.avatarUrl
-          ? profile.getAvatar(36)
-          : profile.getAvatar(32)}
-      </div>
-      <div className="user-name">
-        {app.chain &&
-        app.chain.base === ChainBase.Substrate &&
-        app.cachedIdentityWidget
-          ? render(app.cachedIdentityWidget, {
-              account,
-              linkify: true,
-              profile,
-              hideIdentityIcon,
-              addrShort,
-              showAddressWithDisplayName: false,
-            })
-          : link(
+    <React.Fragment>
+      <div
+        className="UserPopover"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <div className="user-avatar">
+          {!profile
+            ? null
+            : profile.avatarUrl
+            ? profile.getAvatar(36)
+            : profile.getAvatar(32)}
+        </div>
+        <div className="user-name">
+          {app.chain &&
+            app.chain.base === ChainBase.Substrate &&
+            link(
               'a.user-display-name',
               profile
                 ? `/${app.activeChainId() || profile.chain}/account/${
@@ -327,38 +267,46 @@ export const User = (props: UserAttrs) => {
                 </React.Fragment>
               )
             )}
+        </div>
+        {profile?.address && (
+          <div className="user-address">
+            {formatAddressShort(
+              profile.address,
+              profile.chain,
+              false,
+              maxCharLength
+            )}
+          </div>
+        )}
+        {friendlyChainName && (
+          <div className="user-chain">{friendlyChainName}</div>
+        )}
+        {/* always show roleTags in UserPopover */}
+        {getRoleTags(true)}
+        {/* If Admin Allow Banning */}
+        {loggedInUserIsAdmin && (
+          <div className="ban-wrapper">
+            <CWButton
+              onClick={() => {
+                setIsModalOpen(true);
+              }}
+              label="Ban User"
+              buttonType="primary-red"
+            />
+          </div>
+        )}
       </div>
-      {profile?.address && (
-        <div className="user-address">
-          {formatAddressShort(
-            profile.address,
-            profile.chain,
-            false,
-            maxCharLength
-          )}
-        </div>
-      )}
-      {friendlyChainName && (
-        <div className="user-chain">{friendlyChainName}</div>
-      )}
-      {/* always show roleTags in UserPopover */}
-      {getRoleTags(true)}
-      {/* If Admin Allow Banning */}
-      {loggedInUserIsAdmin && (
-        <div className="ban-wrapper">
-          <CWButton
-            onClick={() => {
-              app.modals.create({
-                modal: BanUserModal,
-                data: { profile },
-              });
-            }}
-            label="Ban User"
-            buttonType="primary-red"
+      <Modal
+        content={
+          <BanUserModal
+            profile={profile}
+            onModalClose={() => setIsModalOpen(false)}
           />
-        </div>
-      )}
-    </div>
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
   );
 
   return popover ? (

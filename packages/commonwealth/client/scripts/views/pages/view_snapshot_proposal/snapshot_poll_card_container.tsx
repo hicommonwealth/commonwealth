@@ -1,18 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
-import { notifyError } from 'controllers/app/notifications';
+import { redraw } from 'mithrilInterop';
 import type {
   SnapshotProposal,
   SnapshotProposalVote,
@@ -23,8 +11,9 @@ import moment from 'moment';
 import app from 'state';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
+import { Modal } from '../../components/component_kit/cw_modal';
 
-type SnapshotProposalCardsAttrs = {
+type SnapshotProposalCardsProps = {
   identifier: string;
   proposal: SnapshotProposal;
   scores: number[];
@@ -54,86 +43,66 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
   return timeRemainingString;
 }
 
-export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCardsAttrs> {
-  view(vnode: ResultNode<SnapshotProposalCardsAttrs>) {
-    const {
-      identifier,
-      proposal,
-      scores,
-      space,
-      totals,
-      votes,
-      validatedAgainstStrategies,
-      fetchedPower,
-      totalScore,
-    } = vnode.attrs;
+export const SnapshotPollCardContainer = (
+  props: SnapshotProposalCardsProps
+) => {
+  const {
+    identifier,
+    proposal,
+    scores,
+    space,
+    totals,
+    votes,
+    validatedAgainstStrategies,
+    fetchedPower,
+    totalScore,
+  } = props;
 
-    const isActive =
-      proposal &&
-      moment(+proposal.start * 1000) <= moment() &&
-      moment(+proposal.end * 1000) > moment();
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [choice, setChoice] = React.useState<string>();
+  const [callback, setCallback] = React.useState<() => any>();
 
-    const userVote =
-      proposal.choices[
-        votes.find((vote) => {
-          return vote.voter === app.user?.activeAccount?.address;
-        })?.choice - 1
-      ];
-    const hasVoted = userVote !== undefined;
+  const isActive =
+    proposal &&
+    moment(+proposal.start * 1000) <= moment() &&
+    moment(+proposal.end * 1000) > moment();
 
-    const voteErrorText = !validatedAgainstStrategies
-      ? VotingError.NOT_VALIDATED
-      : hasVoted
-      ? VotingError.ALREADY_VOTED
-      : null;
+  const userVote =
+    proposal.choices[
+      votes.find((vote) => {
+        return vote.voter === app.user?.activeAccount?.address;
+      })?.choice - 1
+    ];
+  const hasVoted = userVote !== undefined;
 
-    const buildVoteInformation = (
-      choices,
-      snapshotVotes: SnapshotProposalVote[]
-    ) => {
-      const voteInfo = [];
+  const voteErrorText = !validatedAgainstStrategies
+    ? VotingError.NOT_VALIDATED
+    : hasVoted
+    ? VotingError.ALREADY_VOTED
+    : null;
 
-      for (let i = 0; i < choices.length; i++) {
-        const totalVotes = snapshotVotes
-          .filter((vote) => vote.choice === i + 1)
-          .reduce((sum, vote) => sum + vote.balance, 0);
-        voteInfo.push({
-          label: choices[i],
-          value: choices[i],
-          voteCount: totalVotes,
-        });
-      }
+  const buildVoteInformation = (
+    choices,
+    snapshotVotes: SnapshotProposalVote[]
+  ) => {
+    const voteInfo = [];
 
-      return voteInfo;
-    };
+    for (let i = 0; i < choices.length; i++) {
+      const totalVotes = snapshotVotes
+        .filter((vote) => vote.choice === i + 1)
+        .reduce((sum, vote) => sum + vote.balance, 0);
+      voteInfo.push({
+        label: choices[i],
+        value: choices[i],
+        voteCount: totalVotes,
+      });
+    }
 
-    const castSnapshotVote = async (
-      selectedChoice: string,
-      callback: () => any
-    ) => {
-      const choiceNumber = proposal?.choices.indexOf(selectedChoice);
-      try {
-        app.modals.create({
-          modal: ConfirmSnapshotVoteModal,
-          data: {
-            space,
-            proposal,
-            id: identifier,
-            selectedChoice: choiceNumber,
-            totalScore,
-            scores,
-            snapshot: proposal.snapshot,
-            successCallback: callback,
-          },
-        });
-        // vnode.state.votingModalOpen = true;
-      } catch (err) {
-        console.error(err);
-        notifyError('Voting failed');
-      }
-    };
+    return voteInfo;
+  };
 
-    return (
+  return (
+    <React.Fragment>
       <SnapshotPollCard
         pollEnded={!isActive}
         hasVoted={hasVoted}
@@ -144,14 +113,37 @@ export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCa
         tokenSymbol={space.symbol}
         totalVoteCount={totals.sumOfResultsBalance}
         voteInformation={buildVoteInformation(proposal?.choices, votes)}
-        onVoteCast={(choice, callback) => {
-          castSnapshotVote(choice, callback);
+        onVoteCast={(_choice, _callback) => {
+          setChoice(_choice);
+          setCallback(_callback);
+
+          if (choice && callback) {
+            setIsModalOpen(true);
+          }
+
           redraw();
         }}
         incrementalVoteCast={totalScore}
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
       />
-    );
-  }
-}
+      <Modal
+        content={
+          <ConfirmSnapshotVoteModal
+            space={space}
+            proposal={proposal}
+            id={identifier}
+            selectedChoice={proposal?.choices.indexOf(choice).toString()}
+            totalScore={totalScore}
+            scores={scores}
+            snapshot={proposal.snapshot}
+            successCallback={callback}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};

@@ -7,7 +7,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 
 import { MarkdownFormattedText } from './markdown_formatted_text';

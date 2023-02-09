@@ -1,13 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  setRoute,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'sublayout_header.scss';
 
@@ -80,7 +74,7 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
           </div>
           <div className="DesktopMenuContainer">
             <CreateContentPopover />
-            {/*<HelpMenuPopover />*/}
+            <HelpMenuPopover />
             {app.isLoggedIn() && <NotificationsMenuPopover />}
           </div>
           <LoginSelector />

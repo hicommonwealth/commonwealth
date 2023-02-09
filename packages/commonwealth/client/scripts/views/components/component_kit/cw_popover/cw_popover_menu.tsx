@@ -1,7 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { jsx } from 'mithrilInterop';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
@@ -54,13 +52,8 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                 } else if (item.type === 'divider') {
                   return <div className="menu-section-divider" key={i} />;
                 } else {
-                  const {
-                    disabled,
-                    isSecondary,
-                    iconLeft,
-                    label,
-                    onClick,
-                  } = item;
+                  const { disabled, isSecondary, iconLeft, label, onClick } =
+                    item;
                   return (
                     <div
                       className={getClasses<{

@@ -194,7 +194,7 @@ const listenerOptions = {
   },
 };
 
-// clears the IdentityCaches, OffchainProfiles, and Addresses tables of the test data
+// clears OffchainProfiles, and Addresses tables of the test data
 async function clearDB(pool) {
   const addresses = Object.values(fetchedIdentities).map(
     (value) => value.address
@@ -202,13 +202,6 @@ async function clearDB(pool) {
 
   let query;
   try {
-    // clear identity cache
-    query = format(
-      'DELETE FROM "IdentityCaches" WHERE "address" IN (%L)',
-      addresses
-    );
-    await pool.query(query);
-
     // clear OffchainProfiles
     query = format(
       'SELECT "id" FROM "Addresses" WHERE "address" IN (%L)',
@@ -253,7 +246,7 @@ async function clearQueues(queueNames: string[]): Promise<void> {
   }
 }
 
-// populates the Address, OffchainProfiles, and IdentityCaches tables with test data
+// populates the Address and OffchainProfiles tables with test data
 // TODO: this should set to true has_chain_events_listener for chains in supportedChains - and revert when done
 async function prepareDB(client): Promise<void> {
   let query;
@@ -268,13 +261,6 @@ async function prepareDB(client): Promise<void> {
       await client.query(query);
 
       query = 'INSERT INTO "OffchainProfiles" (address_id) VALUES (lastval())';
-      await client.query(query);
-
-      query = format(
-        'INSERT INTO "IdentityCaches" (chain, address) VALUES (%L, %L)',
-        chain,
-        data.address
-      );
       await client.query(query);
     }
   } catch (error) {
@@ -437,64 +423,6 @@ setTimeout(async () => {
             }
           });
         }).timeout(30000);
-
-        // only substrate chains use the identity cache
-        if (
-          chain.base === 'substrate' &&
-          chain.id !== 'stafi' &&
-          chain.id !== 'clover'
-        ) {
-          // check publish functionality
-          it('Should clear the identity cache', async () => {
-            // check identity cache is empty
-            const query =
-              'SELECT * FROM "IdentityCaches" WHERE "chain"=\'polkadot\';';
-            assert((await pool.query(query)).rows.length === 0);
-          });
-
-          // delay briefly due to message latency
-          delay(10000);
-
-          it('Should publish a message to the identity queue', async () => {
-            // check the proper number of messages have been queued in the identity queue
-            const res = await fetch('http://127.0.0.1:15672/api/queues/', {
-              method: 'GET',
-              headers: {
-                Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q=',
-              },
-            });
-            const data = await res.json();
-            const identityQueue = data.filter(
-              (obj) => obj.name === 'identityQueue'
-            )[0];
-            assert.equal(identityQueue.messages, 1);
-          });
-
-          // check handle functionality
-          it.skip('Should handle identity events and clear the identity cache', async () => {
-            // check identity cache is empty
-            const query = format(
-              'SELECT * FROM "IdentityCaches" WHERE "chain"=%L;',
-              chain
-            );
-            assert((await pool.query(query)).rows.length === 0);
-
-            // check that no identity events are queued in the identity queue
-            const res = await fetch('http://127.0.0.1:15672/api/queues/', {
-              method: 'GET',
-              headers: {
-                Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q=',
-              },
-            });
-            const data = await res.json();
-            const identityQueue = data.filter(
-              (obj) => obj.name === 'identityQueue'
-            );
-            assert.equal(identityQueue.messages, 0);
-
-            assert.isTrue(await verifyIdentityChanges(pool, chain.id));
-          });
-        }
       });
 
       describe('Tests for the chain-events consumer', () => {

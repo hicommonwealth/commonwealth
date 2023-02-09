@@ -7,7 +7,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import type { Poll } from 'models';
 import moment from 'moment';

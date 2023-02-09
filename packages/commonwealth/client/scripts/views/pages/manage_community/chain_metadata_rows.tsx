@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
@@ -146,23 +147,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     return (
       <div className="ChainMetadataRows">
         <div className="AvatarUploadRow">
-          <AvatarUpload
-            scope="community"
-            uploadStartedCallback={() => {
-              this.uploadInProgress = true;
-              redraw();
-            }}
-            uploadCompleteCallback={(files) => {
-              files.forEach((f) => {
-                if (!f.uploadURL) return;
-                const url = f.uploadURL.replace(/\?.*/, '');
-                this.iconUrl = url;
-                $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
-              });
-              this.uploadInProgress = false;
-              redraw();
-            }}
-          />
+          {/* @TODO Replace AvatarUploader here */}
         </div>
         <InputRow
           title="Name"
@@ -295,7 +280,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           title="Chat Enabled"
           defaultValue={this.chatEnabled}
           onToggle={(checked) => {
-            this.chatEnabled = checked;
+            this.chatEnabled = !!checked;
           }}
           caption={(checked) =>
             checked
@@ -361,7 +346,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="tag-row">
           <CWLabel label="Community Tags" />
           <div className="tag-group">
-            {Object.keys(this.selectedTags).map((key) => {
+            {this.selectedTags && Object.keys(this.selectedTags).map((key) => {
               return (
                 <CWButton
                   key={key}
@@ -504,7 +489,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="commonbot-section">
           <CWText type="h3">Commonbot Settings</CWText>
           {this.discordBotConnected ? (
-            <React.Fragment>
+            <>
               <div className="connected-line">
                 <CWText type="h4">Connection Status</CWText>
                 <div className="connect-group">
@@ -603,9 +588,9 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   }
                 }}
               />
-            </React.Fragment>
+            </>
           ) : this.discordBotConnecting ? (
-            <React.Fragment>
+            <>
               <div className="settings-row">
                 <div className="spinner-group">
                   <CWSpinner />
@@ -613,7 +598,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 </div>
                 <CWText>Refresh to check if connection succeeded</CWText>
               </div>
-            </React.Fragment>
+            </>
           ) : (
             <div className="settings-row">
               <CWButton

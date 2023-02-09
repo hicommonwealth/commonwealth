@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/discussions/thread_preview.scss';
@@ -73,6 +74,21 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
       getCommentSubscription(thread)?.isActive &&
       getReactionSubscription(thread)?.isActive;
 
+    const hasAdminPermissions =
+      app.user.activeAccount &&
+      (app.roles.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+      }) ||
+        app.roles.isRoleOfCommunity({
+          role: 'moderator',
+          chain: app.activeChainId(),
+        }));
+
+    const isAuthor =
+      app.user.activeAccount &&
+      thread.author === app.user.activeAccount.address;
+
     return (
       <div
         className={getClasses<{ isPinned?: boolean }>(
@@ -114,7 +130,6 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
                 }
                 linkify
                 showAddressWithDisplayName
-                hideIdentityIcon
               />
               {!this.isWindowSmallInclusive && (
                 <CWText className="last-updated-text">•</CWText>
@@ -214,7 +229,9 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
                   )}
                 />
               </div>
-              {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}
+              {app.isLoggedIn() && (isAuthor || hasAdminPermissions) && (
+                <ThreadPreviewMenu thread={thread} />
+              )}
             </div>
           </div>
         </div>

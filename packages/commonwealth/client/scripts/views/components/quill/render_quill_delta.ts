@@ -7,7 +7,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
@@ -92,17 +91,18 @@ export const renderQuillDelta = (
   };
 
   return hideFormatting || collapse
-    ? groups.map((group) => {
+    ? groups.map((group, i) => {
         const wrapGroupForHiddenFormatting = (content) => {
-          return render(`${getGroupTag(group)}.hidden-formatting`, content);
+          return render(`${getGroupTag(group)}.hidden-formatting`, { key: i }, content);
         };
         return wrapGroupForHiddenFormatting(
-          group.parents.map((parent) => {
-            return render(`${getParentTag(parent)}.hidden-formatting-inner`, [
-              parent.children.map((child) => {
+          group.parents.map((parent, ii) => {
+            return render(`${getParentTag(parent)}.hidden-formatting-inner`, { key: ii }, [
+              parent.children.map((child, iii) => {
                 if (child.insert?.mention)
                   return render(
                     'span.mention',
+                    { key: iii },
                     child.insert.mention.denotationChar +
                       child.insert.mention.value
                   );
@@ -113,6 +113,7 @@ export const renderQuillDelta = (
                   return render(
                     'a',
                     {
+                      key: iii,
                       href: child.attributes.link,
                       target: openLinksInNewTab ? '_blank' : '',
                       noreferrer: 'noreferrer',
@@ -137,26 +138,29 @@ export const renderQuillDelta = (
                 if (child.insert.match(/[A-Za-z0-9]$/)) {
                   // add a period and space after lines that end on a word or
                   // number, like Google does in search previews
-                  return render('span', `${child.insert}. `);
+                  return render('span', { key: iii }, `${child.insert}. `);
                 } else {
-                  return render('span', `${child.insert}`);
+                  return render('span', { key: iii }, `${child.insert}`);
                 }
               }),
             ]);
           })
         );
       })
-    : consolidateOrderedLists(groups).map((group) => {
+    : consolidateOrderedLists(groups).map((group, i) => {
         const renderChild = (child) => {
           // handle images
           if (child.insert?.image) {
             return render('img', {
+              key: i,
               src: child.insert?.image,
             });
           }
           // handle video
           if (child.insert?.video) {
-            return render('div', [
+            return render('div', {
+              key: i,
+            }, [
               render('iframe', {
                 frameborder: 0,
                 allowfullscreen: true,
@@ -185,6 +189,7 @@ export const renderQuillDelta = (
             return render(
               'blockquote',
               {
+                key: i,
                 class: 'twitter-tweet',
               },
               [

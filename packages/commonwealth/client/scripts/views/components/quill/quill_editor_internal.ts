@@ -7,7 +7,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import { loadScript } from 'helpers';

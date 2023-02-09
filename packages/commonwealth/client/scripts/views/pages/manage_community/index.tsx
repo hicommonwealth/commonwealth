@@ -1,17 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/index.scss';
@@ -166,7 +155,6 @@ class ManageCommunityPage extends ClassComponent {
             onSave={() => onSave()}
           />
           <AdminPanelTabs
-            defaultTab={1}
             onRoleUpgrade={(oldRole, newRole) =>
               this.onRoleUpdate(oldRole, newRole)
             }

@@ -1,7 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 import type { Poll, Thread } from 'models';
 
 import moment from 'moment';
@@ -15,17 +13,20 @@ import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 import { getPollTimestamp, handlePollVote } from './helpers';
+import { Modal } from '../../components/component_kit/cw_modal';
 
-type ThreadPollEditorCardAttrs = {
+type ThreadPollEditorCardProps = {
   thread: Thread;
   threadAlreadyHasPolling: boolean;
 };
 
-export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAttrs> {
-  view(vnode: ResultNode<ThreadPollEditorCardAttrs>) {
-    const { thread, threadAlreadyHasPolling } = vnode.attrs;
+export const ThreadPollEditorCard = (props: ThreadPollEditorCardProps) => {
+  const { thread, threadAlreadyHasPolling } = props;
 
-    return (
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+  return (
+    <React.Fragment>
       <CWContentPageCard
         header={`Add ${
           threadAlreadyHasPolling ? 'an' : 'another'
@@ -38,30 +39,37 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
               label="Create poll"
               onClick={(e) => {
                 e.preventDefault();
-                app.modals.create({
-                  modal: PollEditorModal,
-                  data: {
-                    thread,
-                  },
-                });
+                setIsModalOpen(true);
               }}
             />
           </div>
         }
       />
-    );
-  }
-}
+      <Modal
+        content={
+          <PollEditorModal
+            thread={thread}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};
 
-type ThreadPollCardAttrs = {
+type ThreadPollCardProps = {
   poll: Poll;
 };
 
-export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
-  view(vnode: ResultNode<ThreadPollCardAttrs>) {
-    const { poll } = vnode.attrs;
+export const ThreadPollCard = (props: ThreadPollCardProps) => {
+  const { poll } = props;
 
-    return (
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+  return (
+    <React.Fragment>
       <PollCard
         multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
@@ -105,13 +113,20 @@ export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
         onResultsClick={(e) => {
           e.preventDefault();
           if (poll.votes.length > 0) {
-            app.modals.create({
-              modal: OffchainVotingModal,
-              data: { votes: poll.votes },
-            });
+            setIsModalOpen(true);
           }
         }}
       />
-    );
-  }
-}
+      <Modal
+        content={
+          <OffchainVotingModal
+            votes={poll.votes}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};

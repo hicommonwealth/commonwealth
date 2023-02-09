@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
@@ -17,8 +16,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -124,13 +122,8 @@ export class SubstrateForm extends ClassComponent {
           label="Save changes"
           disabled={this.state.saving}
           onClick={async () => {
-            const {
-              name,
-              nodeUrl,
-              iconUrl,
-              substrateSpec,
-              symbol,
-            } = this.state.form;
+            const { name, nodeUrl, iconUrl, substrateSpec, symbol } =
+              this.state.form;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
