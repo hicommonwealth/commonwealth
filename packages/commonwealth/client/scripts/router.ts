@@ -5,7 +5,7 @@ import {
   APPLICATION_UPDATE_ACTION,
   APPLICATION_UPDATE_MESSAGE,
 } from 'helpers/constants';
-import { getRoute, getRouteParam, setRoute } from 'mithrilInterop';
+import { getRoute, getRouteParam } from 'mithrilInterop';
 
 export const pathIsDiscussion = (
   scope: string | null,
@@ -53,8 +53,8 @@ const navigateToSubpage = (...args) => {
   }
   app.sidebarMenu = 'default';
   // app.sidebarRedraw.emit('redraw');
-  // TODO setRoute outside of react router, might not work properly
-  setRoute.apply(this, args);
+  // TODO navigate should be passed as argument
+  // setRoute.apply(this, args);
 };
 
 const shouldDeferChain = ({
@@ -123,7 +123,7 @@ const handleLoginRedirects = () => {
     }
 
     // TODO setRoute outside of react router, might not work properly
-    setRoute(getRouteParam['path'], {}, { replace: true });
+    // setRoute(getRouteParam['path'], {}, { replace: true });
   } else if (
     localStorage &&
     localStorage.getItem &&
@@ -136,7 +136,7 @@ const handleLoginRedirects = () => {
       );
       if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
         // TODO setRoute outside of react router, might not work properly
-        setRoute(postAuth.path, {}, { replace: true });
+        // setRoute(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('githubPostAuthRedirect');
     } catch (e) {
@@ -153,7 +153,7 @@ const handleLoginRedirects = () => {
       );
       if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
         // TODO setRoute outside of react router, might not work properly
-        setRoute(postAuth.path, {}, { replace: true });
+        // setRoute(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('discordPostAuthRedirect');
     } catch (e) {
