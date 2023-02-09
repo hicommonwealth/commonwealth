@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 /* eslint-disable no-useless-escape */
 
@@ -11,8 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-  rootRender,
+    rootRender,
 } from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';
@@ -167,14 +165,14 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
         </div>
       );
     } else {
-      if (!doc) return <React.Fragment></React.Fragment>;
+      if (!doc) return <></>;
       if (this.isTruncated) {
         this.truncatedDoc = doc.slice(
           0,
           doc.split('\n', cutoffLines).join('\n').length
         );
       }
-      if (!this.truncatedDoc) return <React.Fragment></React.Fragment>;
+      if (!this.truncatedDoc) return <></>;
 
       const unsanitized = marked.parse(this.truncatedDoc.toString());
 
@@ -191,7 +189,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
       const results = render.trust(sanitized);
 
       return (
-        <React.Fragment>
+        <>
           <div
             className={getClasses<{ collapsed?: boolean }>(
               { collapsed: !!collapse },
@@ -208,7 +206,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
               </div>
             </div>
           )}
-        </React.Fragment>
+        </>
       );
     }
   }

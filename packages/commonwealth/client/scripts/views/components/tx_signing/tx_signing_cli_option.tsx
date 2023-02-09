@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { ChainBase } from 'common-common/src/types';
@@ -11,8 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 import type { ISubstrateTXData } from 'controllers/chain/substrate/shared';
@@ -50,7 +48,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
         {this.calldata &&
         app.chain &&
         app.chain.base === ChainBase.Substrate ? (
-          <React.Fragment>
+          <>
             <CodeBlock clickToSelect>
               {`subkey ${
                 this.calldata.isEd25519 ? '-e ' : ''
@@ -83,7 +81,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
               }}
               label="Send transaction"
             />
-          </React.Fragment>
+          </>
         ) : (
           <CodeBlock clickToSelect>Loading transaction data...</CodeBlock>
         )}

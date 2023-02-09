@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -6,8 +5,7 @@ import {
   ResultNode,
   getRouteParam,
   redraw,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
@@ -163,7 +161,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       const author = new AddressInfo(null, author_address, chain_id, null);
 
-      const authorName = <User user={author} hideAvatar hideIdentityIcon />;
+      const authorName = <User user={author} hideAvatar />;
 
       // link(
       //   'a.NotificationRow',

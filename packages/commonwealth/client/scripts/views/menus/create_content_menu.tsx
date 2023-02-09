@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -118,26 +116,6 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
             iconLeft: 'democraticProposal',
-          },
-          ...(((activeAccount as SubstrateAccount)?.isCouncillor
-            ? [
-                {
-                  label: 'New council motion',
-                  onClick: () =>
-                    navigateToSubpage('/new/proposal/:type', {
-                      type: ProposalType.SubstrateCollectiveProposal,
-                    }),
-                  iconLeft: 'councilProposal',
-                },
-              ]
-            : []) as PopoverMenuItem[]),
-          {
-            label: 'New bounty proposal',
-            onClick: () =>
-              navigateToSubpage('/new/proposal/:type', {
-                type: ProposalType.SubstrateBountyProposal,
-              }),
-            iconLeft: 'badge',
           },
           {
             label: 'New tip',

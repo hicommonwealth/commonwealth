@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -6,8 +5,7 @@ import {
   getRoute,
   getRouteParam,
   redraw,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 
@@ -226,12 +224,8 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
   }
 
   async onremove() {
-    const {
-      fromDraft,
-      form,
-      quillEditorState,
-      overwriteConfirmationModal,
-    } = this;
+    const { fromDraft, form, quillEditorState, overwriteConfirmationModal } =
+      this;
     if (
       this.form.kind === ThreadKind.Discussion &&
       !overwriteConfirmationModal
@@ -271,9 +265,8 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     const author = app.user.activeAccount;
     const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
-    const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(
-      chainId
-    );
+    const discussionDrafts =
+      app.user.discussionDrafts.store.getByCommunity(chainId);
 
     const defaultTemplate = localStorage.getItem(
       `${chainId}-active-topic-default-template`
@@ -366,7 +359,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
               </div>
             )}
             {this.form.kind === ThreadKind.Discussion && (
-              <React.Fragment>
+              <>
                 {!!fromDraft && <CWText className="draft-text">Draft</CWText>}
                 <div className="topics-and-title-row">
                   {hasTopics && (
@@ -476,11 +469,10 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                       // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
                       this.saving = true;
 
-                      const existingDraftId = this.recentlyDeletedDrafts.includes(
-                        this.fromDraft
-                      )
-                        ? undefined
-                        : this.fromDraft;
+                      const existingDraftId =
+                        this.recentlyDeletedDrafts.includes(this.fromDraft)
+                          ? undefined
+                          : this.fromDraft;
 
                       try {
                         await this._saveDraft(
@@ -502,10 +494,10 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                     tabIndex={5}
                   />
                 </div>
-              </React.Fragment>
+              </>
             )}
             {this.form.kind === ThreadKind.Link && hasTopics && (
-              <React.Fragment>
+              <>
                 <div className="topics-and-title-row">
                   <TopicSelector
                     defaultTopic={
@@ -604,7 +596,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                     }
                   }}
                 />
-              </React.Fragment>
+              </>
             )}
           </div>
           {!!discussionDrafts.length &&
@@ -645,7 +637,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         >
                           <div className="draft-title">
                             {fromDraft === draft.id ? (
-                              <React.Fragment>
+                              <>
                                 <CWIcon iconName="write" iconSize="small" />
                                 <CWText
                                   fontWeight="semiBold"
@@ -654,7 +646,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                                 >
                                   {title}
                                 </CWText>
-                              </React.Fragment>
+                              </>
                             ) : (
                               <CWText
                                 fontWeight="semiBold"

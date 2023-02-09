@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_tooltip.scss';
 
@@ -22,7 +19,7 @@ export const CWTooltip = (props: TooltipProps) => {
   const popoverProps = usePopover();
 
   return (
-    <React.Fragment>
+    <>
       {renderTrigger(popoverProps.handleInteraction)}
       <Popover
         content={
@@ -48,6 +45,6 @@ export const CWTooltip = (props: TooltipProps) => {
         }
         {...popoverProps}
       />
-    </React.Fragment>
+    </>
   );
 };

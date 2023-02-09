@@ -58,18 +58,9 @@ export const proposalSlugToClass = () => {
       (app.chain as any).democracyProposals
     );
     mmap.set(
-      ProposalType.SubstrateCollectiveProposal,
-      (app.chain as any).council
-    );
-    mmap.set(
-      ProposalType.PhragmenCandidacy,
-      (app.chain as any).phragmenElections
-    );
-    mmap.set(
       ProposalType.SubstrateTreasuryProposal,
       (app.chain as any).treasury
     );
-    mmap.set(ProposalType.SubstrateBountyProposal, (app.chain as any).bounties);
     mmap.set(ProposalType.SubstrateTreasuryTip, (app.chain as any).tips);
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set(ProposalType.CosmosProposal, (app.chain as any).governance);
@@ -109,10 +100,7 @@ export const proposalSlugToFriendlyName = new Map<ProposalType, string>([
   [ProposalType.SubstrateDemocracyReferendum, 'Democracy Referendum'],
   [ProposalType.SubstrateDemocracyProposal, 'Democracy Proposal'],
   [ProposalType.SubstratePreimage, 'Democracy Preimage'],
-  [ProposalType.SubstrateBountyProposal, 'Bounty Proposal'],
   [ProposalType.SubstrateImminentPreimage, 'Democracy Imminent Preimage'],
-  [ProposalType.SubstrateCollectiveProposal, 'Council Motion'],
-  [ProposalType.PhragmenCandidacy, 'Phragmen Council Candidacy'],
   [ProposalType.SubstrateTreasuryProposal, 'Treasury Proposal'],
   [ProposalType.SubstrateTreasuryTip, 'Treasury Tip'],
   [ProposalType.Thread, 'Discussion Thread'],
@@ -147,10 +135,6 @@ export const chainEntityTypeToProposalSlug = (
     return ProposalType.SubstrateDemocracyReferendum;
   else if (t === SubstrateTypes.EntityKind.DemocracyProposal)
     return ProposalType.SubstrateDemocracyProposal;
-  else if (t === SubstrateTypes.EntityKind.CollectiveProposal)
-    return ProposalType.SubstrateCollectiveProposal;
-  else if (t === SubstrateTypes.EntityKind.TreasuryBounty)
-    return ProposalType.SubstrateBountyProposal;
   else if (t === SubstrateTypes.EntityKind.TipProposal)
     return ProposalType.SubstrateTreasuryTip;
   else if (t === 'proposal') {
@@ -181,10 +165,6 @@ export const proposalSlugToChainEntityType = (
     return SubstrateTypes.EntityKind.DemocracyReferendum;
   else if (t === ProposalType.SubstrateDemocracyProposal)
     return SubstrateTypes.EntityKind.DemocracyProposal;
-  else if (t === ProposalType.SubstrateCollectiveProposal)
-    return SubstrateTypes.EntityKind.CollectiveProposal;
-  else if (t === ProposalType.SubstrateBountyProposal)
-    return SubstrateTypes.EntityKind.TreasuryBounty;
   else if (t === ProposalType.SubstrateTreasuryTip)
     return SubstrateTypes.EntityKind.TipProposal;
 };
@@ -196,10 +176,6 @@ export const chainEntityTypeToProposalName = (t: IChainEntityKind): string => {
     return 'Referendum';
   else if (t === SubstrateTypes.EntityKind.DemocracyProposal)
     return 'Democracy Proposal';
-  else if (t === SubstrateTypes.EntityKind.CollectiveProposal)
-    return 'Council Motion';
-  else if (t === SubstrateTypes.EntityKind.TreasuryBounty)
-    return 'Bounty Proposal';
   else if (t === SubstrateTypes.EntityKind.TipProposal) return 'Treasury Tip';
   else if (t === 'proposal') {
     if (app.chain.network === ChainNetwork.Sputnik) {
@@ -226,8 +202,6 @@ export const chainEntityTypeToProposalShortName = (
   if (t === SubstrateTypes.EntityKind.TreasuryProposal) return 'Tres';
   else if (t === SubstrateTypes.EntityKind.DemocracyReferendum) return 'Ref';
   else if (t === SubstrateTypes.EntityKind.DemocracyProposal) return 'Prop';
-  else if (t === SubstrateTypes.EntityKind.CollectiveProposal) return 'Mot';
   else if (t === SubstrateTypes.EntityKind.TipProposal) return 'Tip';
-  else if (t === SubstrateTypes.EntityKind.TreasuryBounty) return 'Bounty';
   else return 'Prop';
 };

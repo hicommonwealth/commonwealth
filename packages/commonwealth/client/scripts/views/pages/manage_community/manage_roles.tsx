@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import $ from 'jquery';
 import type { RoleInfo } from 'models';
@@ -53,7 +51,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
               (addr_) => addr_.id === (role.address_id || role.Address.id)
             ).length;
             return (
-              <div className="role-row">
+              <div className="role-row" key={role.id}>
                 <User
                   user={
                     new AddressInfo(
@@ -67,7 +65,6 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                   popover
                   linkify
                   hideAvatar
-                  hideIdentityIcon
                 />
                 <CWIcon
                   iconName="close"

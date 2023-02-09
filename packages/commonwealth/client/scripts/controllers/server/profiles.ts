@@ -123,31 +123,16 @@ class ProfilesController {
                 ? JSON.parse(profileData.data)
                 : {};
               const lastActive = profileData.Address.last_active;
-              const isCouncillor = profileData.Address.is_councillor;
               const isValidator = profileData.Address.is_validator;
               // ignore off-chain name if substrate id exists
-              if (profileData.identity) {
-                profile.initializeWithChain(
-                  profileData.identity,
-                  pInfo.headline,
-                  pInfo.bio,
-                  pInfo.avatarUrl,
-                  profileData.judgements,
-                  lastActive,
-                  isCouncillor,
-                  isValidator
-                );
-              } else {
-                profile.initialize(
-                  pInfo.name,
-                  pInfo.headline,
-                  pInfo.bio,
-                  pInfo.avatarUrl,
-                  lastActive,
-                  isCouncillor,
-                  isValidator
-                );
-              }
+              profile.initialize(
+                pInfo.name,
+                pInfo.headline,
+                pInfo.bio,
+                pInfo.avatarUrl,
+                lastActive,
+                isValidator
+              );
               return profile;
             })
             .filter((p) => p !== null);

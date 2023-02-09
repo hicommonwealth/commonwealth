@@ -1,9 +1,8 @@
-/* @jsx jsx */
 
 import 'pages/general_contract/index.scss';
 import app from 'state';
 import type { Contract } from 'models';
-import { ClassComponent, jsx, redraw } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -155,9 +154,8 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
                   </div>
                   <div className="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
-                      const fnOutputArray = this.functionNameToFunctionOutput.get(
-                        fn.name
-                      );
+                      const fnOutputArray =
+                        this.functionNameToFunctionOutput.get(fn.name);
                       return (
                         <div>
                           <div className="function-outputs">
