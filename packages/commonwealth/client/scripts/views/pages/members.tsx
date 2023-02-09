@@ -23,7 +23,7 @@ import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
-import { useDebounceOnFunction } from 'mithrilInterop/helpers';
+import { useDebounceOnFunction } from 'hooks/debouncer';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -47,37 +47,6 @@ const MembersPage = () => {
   const [profilesFinishedLoading, setProfilesFinishedLoading] = useState(false);
   const [profilesLoaded, setProfilesLoaded] = useState<ProfileInfo[]>([]);
   const [totalMembersCount, setTotalMembersCount] = useState(0);
-
-  // handleScroll = () => {
-  //   const scrollHeight = $(document).height();
-
-  //   const scrollPos = $(window).height() + $(window).scrollTop();
-
-  //   if (scrollPos > scrollHeight - 400 && !profilesFinishedLoading) {
-  //     const lastLoadedProfileIndex = numProfilesLoaded;
-
-  //     const newBatchSize = Math.min(
-  //       DEFAULT_MEMBER_REQ_SIZE,
-  //       membersLoaded.length - lastLoadedProfileIndex
-  //     );
-
-  //     const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
-
-  //     for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
-  //       const member = membersLoaded[i];
-  //       const profileInfo: ProfileInfo = {
-  //         profile: app.profiles.getProfile(member.chain, member.address),
-  //         postCount: member.count,
-  //       };
-  //       profilesLoaded.push(profileInfo);
-  //     }
-
-  //     numProfilesLoaded += newBatchSize;
-  //     redraw();
-  //   }
-  // };
-
-  // debouncedHandleScroll = useDebounceOnFunction(this.handleScroll, 400, []);
 
   const activeEntity = app.chain;
   if (!activeEntity) return <PageLoading message="Loading members" />;
@@ -187,6 +156,43 @@ const MembersPage = () => {
       }, 100);
     }
   }, [navigatedFromAccount, initialScrollFinished]);
+
+  const handleScroll = () => {
+    const scrollHeight = $(document).height();
+
+    const scrollPos = $(window).height() + $(window).scrollTop();
+
+    if (scrollPos > scrollHeight - 400 && !profilesFinishedLoading) {
+      const lastLoadedProfileIndex = numProfilesLoaded;
+
+      const newBatchSize = Math.min(
+        DEFAULT_MEMBER_REQ_SIZE,
+        membersLoaded.length - lastLoadedProfileIndex
+      );
+
+      const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
+
+      for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
+        const member = membersLoaded[i];
+        const profileInfo: ProfileInfo = {
+          profile: app.profiles.getProfile(member.chain, member.address),
+          postCount: member.count,
+        };
+        setProfilesLoaded([...profilesLoaded, profileInfo]);
+      }
+      console.log(profilesLoaded);
+      setNumProfilesLoaded(numProfilesLoaded + newBatchSize);
+    }
+  };
+
+  const debouncedHandleScroll = useDebounceOnFunction(handleScroll, 400, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', debouncedHandleScroll);
+    return () => {
+      window.removeEventListener('scroll', debouncedHandleScroll);
+    };
+  }, []);
 
   if (!membersLoaded) return <PageLoading message="Loading members" />;
 
