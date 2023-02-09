@@ -7,7 +7,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import type { ConnectConfig } from 'near-api-js';
 import { connect as nearConnect, keyStores } from 'near-api-js';

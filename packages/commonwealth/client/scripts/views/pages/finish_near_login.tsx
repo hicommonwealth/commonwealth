@@ -7,7 +7,7 @@ import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import { setRoute, getRouteParam, redraw, jsx } from 'mithrilInterop';
+import { getRouteParam, redraw, jsx } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,

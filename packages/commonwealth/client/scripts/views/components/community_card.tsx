@@ -2,7 +2,7 @@
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 
 import 'components/community_card.scss';
 

@@ -3,7 +3,7 @@ import React from 'react';
 
 import { AddressInfo } from 'models';
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
+import { ClassComponent, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
