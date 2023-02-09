@@ -1,18 +1,28 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
 import $ from 'jquery';
-import ClassComponent from 'class_component';
 
 import 'pages/manage_profiles.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { AddressInfo, NewProfile as Profile } from 'models';
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
 import { ProfilePreview } from '../components/profile_preview';
-import { PageNotFound } from './404';
+import PageNotFound from './404';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWButton } from '../components/component_kit/cw_button';
 
@@ -49,7 +59,6 @@ export class ManageProfiles extends ClassComponent {
       this.error = true;
     }
     this.loading = false;
-    m.redraw();
   };
 
   oninit() {
@@ -60,7 +69,7 @@ export class ManageProfiles extends ClassComponent {
   view() {
     if (this.loading)
       return (
-        <div class="ManageProfiles full-height">
+        <div className="ManageProfiles full-height">
           <div className="loading-spinner">
             <CWSpinner />
           </div>
@@ -74,7 +83,7 @@ export class ManageProfiles extends ClassComponent {
 
     return (
       <Sublayout>
-        <div class="ManageProfiles">
+        <div className="ManageProfiles">
           <div className="title-container">
             <div>
               <CWText type="h3" className="title">
@@ -88,7 +97,7 @@ export class ManageProfiles extends ClassComponent {
               label="Create Profile"
               iconLeft="plus"
               buttonType="mini-white"
-              onclick={() => {
+              onClick={() => {
                 this.loading = true;
                 setTimeout(() => {
                   navigateToSubpage('/profile/new');
@@ -96,8 +105,9 @@ export class ManageProfiles extends ClassComponent {
               }}
             />
           </div>
-          {this.profiles.map((profile) => (
+          {this.profiles.map((profile, i) => (
             <ProfilePreview
+              key={i}
               profiles={this.profiles}
               profile={profile}
               addresses={this.addresses?.filter(

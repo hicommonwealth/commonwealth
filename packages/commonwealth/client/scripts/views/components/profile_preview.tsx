@@ -1,20 +1,30 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
 import jdenticon from 'jdenticon';
 
 import 'components/profile_preview.scss';
 
 import app from 'state';
-import { AddressInfo, NewProfile as Profile } from 'models';
-import { navigateToSubpage } from 'app';
+import type { AddressInfo, NewProfile as Profile } from 'models';
+import { navigateToSubpage } from 'router';
 import { CWText } from './component_kit/cw_text';
 import { renderQuillTextBody } from './quill/helpers';
 import { SocialAccounts } from './social_accounts';
 import { CWButton } from './component_kit/cw_button';
 import { LinkedAddresses } from './linked_addresses';
-import { NewLoginModal } from '../modals/login_modal';
+import { LoginModal } from '../modals/login_modal';
 
 type ProfilePreviewAttrs = {
   profiles: Profile[];
@@ -26,11 +36,11 @@ type ProfilePreviewAttrs = {
 export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
   private defaultAvatar: string;
 
-  oninit(vnode: m.Vnode<ProfilePreviewAttrs>) {
+  oninit(vnode: ResultNode<ProfilePreviewAttrs>) {
     this.defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
   }
 
-  view(vnode: m.Vnode<ProfilePreviewAttrs>) {
+  view(vnode: ResultNode<ProfilePreviewAttrs>) {
     const { profiles, profile, addresses, refreshProfiles } = vnode.attrs;
     const { bio, avatarUrl, username, name } = profile;
 
@@ -55,13 +65,13 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
                 label="View"
                 buttonType="mini-white"
                 iconLeft="views"
-                onclick={() => navigateToSubpage(`/profile/${username}`)}
+                onClick={() => navigateToSubpage(`/profile/${username}`)}
               />
               <CWButton
                 label="Edit"
                 buttonType="mini-white"
                 iconLeft="write"
-                onclick={() => navigateToSubpage(`/profile/${username}/edit`)}
+                onClick={() => navigateToSubpage(`/profile/${username}/edit`)}
               />
             </div>
             {bio && <CWText>{renderQuillTextBody(bio)}</CWText>}
@@ -72,13 +82,13 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               label="View"
               buttonType="mini-white"
               iconLeft="views"
-              onclick={() => navigateToSubpage(`/profile/${username}`)}
+              onClick={() => navigateToSubpage(`/profile/${username}`)}
             />
             <CWButton
               label="Edit"
               buttonType="mini-white"
               iconLeft="write"
-              onclick={() => navigateToSubpage(`/profile/${username}/edit`)}
+              onClick={() => navigateToSubpage(`/profile/${username}/edit`)}
             />
           </div>
         </div>
@@ -88,9 +98,9 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
             <CWButton
               label="Connect Address"
               buttonType="mini-white"
-              onclick={() => {
+              onClick={() => {
                 app.modals.create({
-                  modal: NewLoginModal,
+                  modal: LoginModal,
                   exitCallback: () => {
                     refreshProfiles();
                   },

@@ -1,7 +1,17 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_truncated_address.scss';
 
@@ -12,7 +22,7 @@ type TruncatedAddressAttrs = {
 };
 
 export class CWTruncatedAddress extends ClassComponent<TruncatedAddressAttrs> {
-  view(vnode: m.Vnode<TruncatedAddressAttrs>) {
+  view(vnode: ResultNode<TruncatedAddressAttrs>) {
     const { address } = vnode.attrs;
 
     return (

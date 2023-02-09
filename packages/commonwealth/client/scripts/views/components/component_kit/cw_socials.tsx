@@ -25,7 +25,7 @@ type SocialsAttrs = {
   handleInputChange?: (value: string[]) => void;
 };
 
-const CWSocials = (props: SocialsAttrs) => {
+export const CWSocials = (props: SocialsAttrs) => {
   const [socials, setSocials] = React.useState<string[]>(props.socials ? [...props.socials] : []);
 
   const addInputRow = () => {
@@ -107,5 +107,3 @@ const CWSocials = (props: SocialsAttrs) => {
     </div>
   );
 }
-
-export default CWSocials;

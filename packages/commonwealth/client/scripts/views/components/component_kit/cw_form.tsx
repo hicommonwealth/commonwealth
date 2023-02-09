@@ -23,12 +23,12 @@ export const CWForm = (props: FormProps) => {
           </CWText>
           <CWText type="b1">{description}</CWText>
         </div>
-        {actions && (
-          <div className="actions">{actions}</div>
-        )}
       </div>
       <CWDivider />
       <div className="content">{props.children}</div>
+      {actions && (
+        <div className="actions">{actions}</div>
+      )}
     </div>
   );
 };

@@ -1,14 +1,24 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
 
 import 'modals/move_address_modal.scss';
 
 import app from 'state';
-import { NewProfile as Profile } from 'client/scripts/models';
+import type { NewProfile as Profile } from 'client/scripts/models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
@@ -28,15 +38,15 @@ type MoveAddressRowAttrs = {
 };
 
 export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
-  view(vnode: m.Vnode<MoveAddressRowAttrs>) {
+  view(vnode: ResultNode<MoveAddressRowAttrs>) {
     const { profile, selected, onclick } = vnode.attrs;
     const { name, username } = profile;
     const defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
 
     return (
       <div
-        class={selected ? 'MoveAddressRow selected' : 'MoveAddressRow'}
-        onclick={onclick}
+        className={selected ? 'MoveAddressRow selected' : 'MoveAddressRow'}
+        onClick={onclick}
       >
         {profile.avatarUrl ? (
           <img src={profile.avatarUrl} />
@@ -56,7 +66,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
 
   private onMoveAddress = async (
     e: Event,
-    vnode: m.Vnode<MoveAddressModalAttrs>
+    vnode: ResultNode<MoveAddressModalAttrs>
   ) => {
     const { address, profile } = vnode.attrs;
 
@@ -97,8 +107,8 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
     });
 
     return (
-      <div class="MoveAddressModal">
-        <div class="title">
+      <div className="MoveAddressModal">
+        <div className="title">
           <CWText type="h4">Transfer Address</CWText>
           <CWIconButton
             iconName="close"
@@ -108,7 +118,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
             }}
           />
         </div>
-        <div class="body">
+        <div className="body">
           <CWText type="caption">Address to be moved</CWText>
           <CWTruncatedAddress address={address} />
           <CWText type="caption">Currently In</CWText>
@@ -129,7 +139,6 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
                   onclick={(e) => {
                     e.preventDefault();
                     this.selectedProfile = option;
-                    m.redraw();
                   }}
                 />
               ))
@@ -139,7 +148,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
             <CWButton
               label="Cancel"
               buttonType="secondary-black"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 $(e.target).trigger('modalexit');
               }}
@@ -147,7 +156,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
             <CWButton
               label="Save"
               buttonType="primary-black"
-              onclick={(e) => this.onMoveAddress(e, vnode)}
+              onClick={(e) => this.onMoveAddress(e, vnode)}
             />
           </div>
         </div>

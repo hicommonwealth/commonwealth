@@ -1,14 +1,24 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
 
 import 'modals/delete_address_modal.scss';
 
 import app from 'state';
-import { NewProfile as Profile } from 'client/scripts/models';
+import type { NewProfile as Profile } from 'client/scripts/models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
@@ -24,7 +34,7 @@ type DeleteAddressModalAttrs = {
 export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> {
   private onDeleteAddress = async (
     e: Event,
-    vnode: m.Vnode<DeleteAddressModalAttrs>
+    vnode: ResultNode<DeleteAddressModalAttrs>
   ) => {
     const { address, chain, profile } = vnode.attrs;
 
@@ -56,26 +66,26 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
     $(e.target).trigger('modalexit');
   };
 
-  view(vnode: m.Vnode<DeleteAddressModalAttrs>) {
+  view(vnode: ResultNode<DeleteAddressModalAttrs>) {
     const { profile, address } = vnode.attrs;
     const { name, username } = profile;
     const defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
 
     return (
-      <div class="DeleteAddressModal">
-        <div class="title">
+      <div className="DeleteAddressModal">
+        <div className="title">
           <CWText type="h4" fontWeight="semiBold">
             Delete Address
           </CWText>
           <CWIconButton
             iconName="close"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
             }}
           />
         </div>
-        <div class="body">
+        <div className="body">
           <CWText>
             Address will be removed from the following linked profile.
           </CWText>
@@ -99,12 +109,12 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
             <CWButton
               label="Delete"
               buttonType="secondary-red"
-              onclick={(e) => this.onDeleteAddress(e, vnode)}
+              onClick={(e) => this.onDeleteAddress(e, vnode)}
             />
             <CWButton
               label="Cancel"
               buttonType="primary-black"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 $(e.target).trigger('modalexit');
               }}

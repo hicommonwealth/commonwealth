@@ -1,13 +1,23 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
 
 import 'components/linked_addresses.scss';
 
 import app from 'state';
-import { AddressInfo, NewProfile as Profile } from 'models';
-import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
+import type { AddressInfo, NewProfile as Profile } from 'models';
+import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { MoveAddressModal } from '../modals/move_address_modal';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
@@ -29,7 +39,7 @@ type LinkedAddressesAttrs = {
 };
 
 class Address extends ClassComponent<AddressAttrs> {
-  view(vnode: m.Vnode<AddressAttrs>) {
+  view(vnode: ResultNode<AddressAttrs>) {
     const { profiles, profile, addressInfo, refreshProfiles } = vnode.attrs;
     const { address, chain } = addressInfo;
 
@@ -37,14 +47,14 @@ class Address extends ClassComponent<AddressAttrs> {
       <div className="AddressContainer">
         <CWAddressTooltip
           address={address}
-          trigger={<CWTruncatedAddress address={address} />}
+          renderTrigger={() => <CWTruncatedAddress address={address} />}
         />
-        <CWPopoverMenu
+        <PopoverMenu
           menuItems={[
             {
               label: 'Transfer to another Profile',
               iconLeft: 'externalLink',
-              onclick: (e) => {
+              onClick: (e) => {
                 e.preventDefault();
                 app.modals.create({
                   modal: MoveAddressModal,
@@ -62,7 +72,7 @@ class Address extends ClassComponent<AddressAttrs> {
             {
               label: 'Remove',
               iconLeft: 'trash',
-              onclick: (e) => {
+              onClick: (e) => {
                 e.preventDefault();
                 app.modals.create({
                   modal: DeleteAddressModal,
@@ -78,7 +88,7 @@ class Address extends ClassComponent<AddressAttrs> {
               },
             },
           ]}
-          trigger={<CWIconButton iconName="dotsVertical" />}
+          renderTrigger={() => <CWIconButton iconName="dotsVertical" />}
         />
       </div>
     );
@@ -86,14 +96,15 @@ class Address extends ClassComponent<AddressAttrs> {
 }
 
 export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
-  view(vnode: m.Vnode<LinkedAddressesAttrs>) {
+  view(vnode: ResultNode<LinkedAddressesAttrs>) {
     const { profiles, profile, addresses, refreshProfiles } = vnode.attrs;
 
     return (
       <div className="LinkedAddresses">
-        {addresses.map((address) => {
+        {addresses.map((address, i) => {
           return (
             <Address
+              key={i}
               profiles={profiles}
               profile={profile}
               addressInfo={address}
