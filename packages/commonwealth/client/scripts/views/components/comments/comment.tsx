@@ -116,8 +116,8 @@ export class Comment extends ClassComponent<CommentAttrs> {
           <div className="thread-connectors-container">
             {Array(threadLevel)
               .fill(undefined)
-              .map(() => (
-                <div className="thread-connector" />
+              .map((_, i) => (
+                <div key={i} className="thread-connector" />
               ))}
           </div>
         )}

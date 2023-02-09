@@ -29,7 +29,7 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       } = rxn;
 
       return (
-        <div style={{ display: 'flex', width: '120px' }}>
+        <div key={address + "#" + (chain?.id || chain)} style={{ display: 'flex', width: '120px' }}>
           <CWText noWrap>
             <User
               user={new AddressInfo(null, address, chain?.id || chain, null)}
@@ -43,7 +43,7 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
   if (slicedReactors.length < likes) {
     const diff = likes - slicedReactors.length;
 
-    slicedReactors.push(<CWText>{`and ${diff} more`}</CWText>);
+    slicedReactors.push(<CWText key="final">{`and ${diff} more`}</CWText>);
   }
 
   return (
