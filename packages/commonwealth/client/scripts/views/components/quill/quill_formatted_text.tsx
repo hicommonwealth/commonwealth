@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import {
   ClassComponent,
@@ -8,7 +8,7 @@ import {
   getRoute,
   getRouteParam,
   redraw,
-    Component,
+  Component,
   rootRender,
 } from 'mithrilInterop';
 
@@ -34,142 +34,124 @@ type QuillFormattedTextAttrs = {
   doc;
 } & QuillTextParams;
 
-export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> {
-  private cachedDocWithHighlights: string;
-  private cachedResultWithHighlights;
-  private isTruncated: boolean;
-  private truncatedDoc;
+export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, collapse, hideFormatting, cutoffLines, openLinksInNewTab, searchTerm }) => {
 
-  oninit(vnode: ResultNode<QuillFormattedTextAttrs>) {
-    this.isTruncated =
-      vnode.attrs.cutoffLines &&
-      vnode.attrs.cutoffLines < countLinesQuill(vnode.attrs.doc.ops);
+  const [cachedDocWithHighlights, setCachedDocWithHighlights] = useState();
+  const [cachedResultWithHighlights, setCachedResultWithHighlights] = useState();;
+  const [isTruncated, setIsTruncated] = useState<boolean>();
+  const [truncatedDoc, setTruncatedDoc] = useState();
 
-    if (this.isTruncated) {
-      this.truncatedDoc = {
-        ops: [...vnode.attrs.doc.ops.slice(0, vnode.attrs.cutoffLines)],
-      };
+  useEffect(() => {
+    const isTruncated = cutoffLines && cutoffLines < countLinesQuill(doc.ops);
+    const truncatedDoc = isTruncated ? {
+      ops: [...doc.ops.slice(0, cutoffLines)],
+    } : doc;
+    setTruncatedDoc(truncatedDoc);
+    setIsTruncated(isTruncated);
+  }, [doc, cutoffLines]);
+
+  const toggleDisplay = useCallback(() => {
+    if (isTruncated) {
+      setTruncatedDoc(doc); // set to full doc
     } else {
-      this.truncatedDoc = vnode.attrs.doc;
+      setTruncatedDoc({ ops: [...doc.ops.slice(0, cutoffLines)] }); // set to truncated doc
     }
-  }
+    setIsTruncated(!isTruncated);
+  }, [isTruncated, cutoffLines, doc]);
 
-  view(vnode: ResultNode<QuillFormattedTextAttrs>) {
-    const {
-      doc,
-      hideFormatting,
-      collapse,
-      searchTerm,
-      openLinksInNewTab,
-      cutoffLines,
-    } = vnode.attrs;
+  // if we're showing highlighted search terms, render the doc once, and cache the result
+  if (searchTerm) {
+    if (truncatedDoc && JSON.stringify(truncatedDoc) !== cachedDocWithHighlights) {
+      const vnodes = truncatedDoc
+        ? renderQuillDelta(truncatedDoc, hideFormatting, true)
+        : []; // collapse = true, to inline blocks
 
-    const toggleDisplay = () => {
-      this.isTruncated = !this.isTruncated;
+      const root = document.createElement('div');
 
-      if (this.isTruncated) {
-        this.truncatedDoc = { ops: [...doc.ops.slice(0, cutoffLines)] };
-      } else {
-        this.truncatedDoc = doc;
-      }
+      rootRender(root, vnodes);
 
-      this.redraw();
-    };
+      const textToHighlight = root.innerText
+        .replace(/\n/g, ' ')
+        .replace(/\+/g, ' ');
 
-    // if we're showing highlighted search terms, render the doc once, and cache the result
-    if (searchTerm) {
-      if (JSON.stringify(this.truncatedDoc) !== this.cachedDocWithHighlights) {
-        const vnodes = this.truncatedDoc
-          ? renderQuillDelta(this.truncatedDoc, hideFormatting, true)
-          : []; // collapse = true, to inline blocks
+      const chunks = findAll({
+        searchWords: [searchTerm.trim()],
+        textToHighlight,
+      });
 
-        const root = document.createElement('div');
+      setCachedDocWithHighlights(JSON.stringify(truncatedDoc));
 
-        rootRender(root, vnodes);
+      setCachedResultWithHighlights(chunks.map(
+        ({ end, highlight, start }, index) => {
+          const middle = 15;
 
-        const textToHighlight = root.innerText
-          .replace(/\n/g, ' ')
-          .replace(/\+/g, ' ');
+          const subString = textToHighlight.substr(start, end - start);
 
-        const chunks = findAll({
-          searchWords: [searchTerm.trim()],
-          textToHighlight,
-        });
+          let text = smartTruncate(
+            subString,
+            chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
+            chunks.length <= 1
+              ? {}
+              : index === 0
+              ? { position: 0 }
+              : index === chunks.length - 1
+              ? {}
+              : { position: middle }
+          );
 
-        this.cachedDocWithHighlights = JSON.stringify(this.truncatedDoc);
-
-        this.cachedResultWithHighlights = chunks.map(
-          ({ end, highlight, start }, index) => {
-            const middle = 15;
-
-            const subString = textToHighlight.substr(start, end - start);
-
-            let text = smartTruncate(
-              subString,
-              chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
-              chunks.length <= 1
-                ? {}
-                : index === 0
-                ? { position: 0 }
-                : index === chunks.length - 1
-                ? {}
-                : { position: middle }
-            );
-
-            if (subString[subString.length - 1] === ' ') {
-              text += ' ';
-            }
-
-            if (subString[0] === ' ') {
-              text = ` ${text}`;
-            }
-
-            return highlight ? <mark>{text}</mark> : <span>{text}</span>;
+          if (subString[subString.length - 1] === ' ') {
+            text += ' ';
           }
-        );
-      }
 
-      return (
-        <div
-          className={getClasses<{ collapsed?: boolean }>(
-            { collapsed: collapse },
-            'QuillFormattedText'
-          )}
-        >
-          {this.cachedResultWithHighlights}
-        </div>
-      );
-    } else {
-      return (
-        <div
-          className={getClasses<{ collapsed?: boolean }>(
-            { collapsed: collapse },
-            'QuillFormattedText'
-          )}
-          // oncreate={() => {
-          // if (!(<any>window).twttr) {
-          //   loadScript('//platform.twitter.com/widgets.js').then(() => {
-          //     console.log('Twitter Widgets loaded');
-          //   })
-          // }}
-        >
-          {this.truncatedDoc &&
-            renderQuillDelta(
-              this.truncatedDoc,
-              hideFormatting,
-              collapse,
-              openLinksInNewTab
-            )}
-          {this.isTruncated && (
-            <div className="show-more-button-wrapper">
-              <div className="show-more-button" onClick={toggleDisplay}>
-                <CWIcon iconName="plus" iconSize="small" />
-                <div className="show-more-text">Show More</div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
+          if (subString[0] === ' ') {
+            text = ` ${text}`;
+          }
+
+          return highlight ? <mark>{text}</mark> : <span>{text}</span>;
+        }
+      ));
     }
+
+    return (
+      <div
+      className={getClasses<{ collapsed?: boolean }>(
+        { collapsed: collapse },
+        'QuillFormattedText'
+      )}
+        >
+        {cachedResultWithHighlights}
+      </div>
+    );
+  } else {
+    return (
+      <div
+      className={getClasses<{ collapsed?: boolean }>(
+        { collapsed: collapse },
+        'QuillFormattedText'
+      )}
+      // oncreate={() => {
+      // if (!(<any>window).twttr) {
+      //   loadScript('//platform.twitter.com/widgets.js').then(() => {
+      //     console.log('Twitter Widgets loaded');
+      //   })
+      // }}
+        >
+        {truncatedDoc &&
+          renderQuillDelta(
+            truncatedDoc,
+            hideFormatting,
+            collapse,
+            openLinksInNewTab
+          )}
+      {isTruncated && (
+        <div className="show-more-button-wrapper">
+          <div className="show-more-button" onClick={toggleDisplay}>
+          <CWIcon iconName="plus" iconSize="small" />
+          <div className="show-more-text">Show More</div>
+          </div>
+          </div>
+      )}
+      </div>
+    );
   }
-}
+};
