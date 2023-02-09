@@ -13,6 +13,7 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
   NotAuthor: 'Not the Author or Admin',
   NoThread: 'No thread provided',
+  NoPoll: 'No poll found',
 };
 
 type DeletePollReq = {
@@ -36,10 +37,12 @@ const deletePoll = async (
     const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
+        chain: chain_id
       },
     });
 
     if (!thread) throw new AppError(Errors.NoThread);
+
     const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
@@ -47,13 +50,14 @@ const deletePoll = async (
     const userMembership = await findOneRole(
       models,
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-      chain_id,
+      thread.chain,
       ['admin']
     );
+
     if (
-      !userOwnedAddressIds.includes(thread.address_id) &&
-      !req.user.isAdmin &&
-      !userMembership
+      !userOwnedAddressIds.includes(thread.address_id) && // if not author
+      !req.user.isAdmin && // if not site admin
+      !userMembership // if not community admin
     ) {
       throw new AppError(Errors.NotAuthor);
     }
@@ -64,6 +68,7 @@ const deletePoll = async (
         id: poll_id,
       },
     });
+    if (!poll) throw new AppError(Errors.NoPoll);
 
     await poll.destroy();
   } catch (e) {
