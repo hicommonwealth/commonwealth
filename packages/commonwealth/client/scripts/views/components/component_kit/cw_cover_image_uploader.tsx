@@ -361,7 +361,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
           name="image-behaviour"
           onChange={(e) => {
             setImageBehavior(e.target.value);
-            uploadCompleteCallback(imageURL, imageBehavior);
+            uploadCompleteCallback(imageURL, e.target.value);
           }}
           toggledOption={imageBehavior}
           options={[

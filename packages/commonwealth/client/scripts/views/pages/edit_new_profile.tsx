@@ -84,8 +84,8 @@ class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
       });
 
       this.profile = new Profile(response.profile);
-      this.name = this.profile.name;
-      this.email = this.profile.email;
+      this.name = this.profile.name || '';
+      this.email = this.profile.email || '';
       this.socials = this.profile.socials;
       this.avatarUrl = this.profile.avatarUrl;
       this.coverImage = this.profile.coverImage;
@@ -127,7 +127,7 @@ class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
       if (response?.status === 'Success') {
         setTimeout(() => {
           this.loading = false;
-          this.navigateToSubpage(`/profile/${this.username}`);
+          this.navigateToSubpage(`/${this.username}`);
         }, 1500);
       }
     } catch (err) {
@@ -198,7 +198,7 @@ class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
         // Redirect
         setTimeout(() => {
           this.loading = false;
-          this.navigateToSubpage('/profile/manage');
+          this.navigateToSubpage('/manage');
         }, 1500);
       }
     } catch (err) {
@@ -210,12 +210,12 @@ class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
   };
 
   oninit(vnode: ResultNode<EditNewProfileAttrs>) {
-    this.username = vnode.attrs.username;
+    this.username = vnode.attrs.username || '';
     this.error = EditProfileError.None;
     this.getProfile(this.username);
 
     if (!app.isLoggedIn()) {
-      this.navigateToSubpage(`/profile/${this.username}`);
+      this.navigateToSubpage(`/${this.username}`);
     }
 
     this.profileUpdate = {};
@@ -238,7 +238,7 @@ class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
 
     if (this.error === EditProfileError.None) {
       if (!this.isOwner) {
-        this.navigateToSubpage(`/profile/${this.username}`);
+        this.navigateToSubpage(`/${this.username}`);
       }
 
       // need to create an account to pass to AvatarUpload to see last upload
