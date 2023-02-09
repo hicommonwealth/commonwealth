@@ -6,12 +6,12 @@ import { notifyError } from 'controllers/app/notifications';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { castVote } from 'helpers/snapshot_utils';
 import { formatNumberShort } from 'adapters/currency';
-import { MixpanelSnapshotEvents } from 'analytics/types';
+// import { MixpanelSnapshotEvents } from 'analytics/types';
 
 import 'modals/confirm_snapshot_vote_modal.scss';
 
 import app from 'state';
-import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
+// import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -102,11 +102,11 @@ export const ConfirmSnapshotVoteModal = (
                   successCallback();
                   redraw();
                 });
-                mixpanelBrowserTrack({
-                  event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
-                  isCustomDomain: app.isCustomDomain(),
-                  space: app.snapshot.space.id,
-                });
+                // mixpanelBrowserTrack({
+                //   event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+                //   isCustomDomain: app.isCustomDomain(),
+                //   space: app.snapshot.space.id,
+                // });
               } catch (err) {
                 console.log(err);
                 const errorMessage = err.message;
