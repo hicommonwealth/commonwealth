@@ -459,10 +459,13 @@ export const createCommunity = async (args: CommunityArgs) => {
 };
 
 // always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<{
-  tokenAddress: string;
-  contractType: string;
-}> {
+export class MockTokenBalanceProvider extends BalanceProvider<
+  any,
+  {
+    tokenAddress: string;
+    contractType: string;
+  }
+> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
@@ -470,6 +473,13 @@ export class MockTokenBalanceProvider extends BalanceProvider<{
   };
   public validBases = [BalanceType.Ethereum];
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
+
+  public async getExternalProvider(
+    node: IChainNode,
+    opts: { tokenAddress: string; contractType: string }
+  ): Promise<any> {
+    return;
+  }
 
   public async getBalance(
     node: IChainNode,

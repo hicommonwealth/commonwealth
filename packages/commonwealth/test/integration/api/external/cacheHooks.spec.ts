@@ -3,10 +3,13 @@ import { BalanceType } from 'common-common/src/types';
 import type { IChainNode } from 'token-balance-cache/src';
 import { BalanceProvider, TokenBalanceCache } from 'token-balance-cache/src';
 
-class MockTokenBalanceProvider extends BalanceProvider<{
-  tokenAddress: string;
-  contractType: string;
-}> {
+class MockTokenBalanceProvider extends BalanceProvider<
+  any,
+  {
+    tokenAddress: string;
+    contractType: string;
+  }
+> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
@@ -14,6 +17,13 @@ class MockTokenBalanceProvider extends BalanceProvider<{
   };
   public validBases = [BalanceType.Ethereum];
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
+
+  public getExternalProvider(
+    node: IChainNode,
+    opts: { tokenAddress: string; contractType: string }
+  ): Promise<any> {
+    return;
+  }
 
   public async getBalance(
     node: IChainNode,

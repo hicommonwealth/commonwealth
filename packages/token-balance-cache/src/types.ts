@@ -35,6 +35,7 @@ export type ChainNodeResp = {
 };
 
 export abstract class BalanceProvider<
+  ExternalProviderT,
   OptT extends Record<string, unknown> = Record<string, unknown>
 > {
   public readonly name: string;
@@ -51,6 +52,11 @@ export abstract class BalanceProvider<
     address: string,
     opts: OptT
   ): Promise<string>;
+
+  public abstract getExternalProvider(
+    node: IChainNode,
+    opts: OptT
+  ): Promise<ExternalProviderT>;
 }
 
 export type BalanceProviderResp = {
@@ -74,10 +80,15 @@ export type ITokenBalanceCache = {
   ): Promise<TokenBalanceResp>;
 };
 
-const ContractTypes = ['erc20', 'erc721', 'spl-token'] as const;
-export type ContractType = typeof ContractTypes[number];
+const ContractTypes = ['erc20', 'erc721', 'erc1155', 'spl-token'] as const;
+export type ContractType = (typeof ContractTypes)[number];
 export function parseContractType(arg: string): ContractType {
   const ct = ContractTypes.find((validName) => validName === arg);
   if (ct) return ct;
   throw new Error('Invalid contract type');
 }
+
+export type EthBPOpts = {
+  tokenAddress?: string;
+  contractType?: string;
+};
