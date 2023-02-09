@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -48,9 +49,7 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
     topicName = thread.topic.name;
   }
 
-  setIsLoading(
-    isLoading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName))
-  );
+  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
 
   const activeAddress = app.user.activeAccount?.address;
 
@@ -96,7 +95,7 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -105,7 +104,7 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
       />
       <div
         className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading },
+          { disabled: isLoading || isUserForbidden },
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
@@ -156,6 +155,6 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
           </CWText>
         )}
       </div>
-    </React.Fragment>
+    </>
   );
 };

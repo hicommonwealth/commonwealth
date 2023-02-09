@@ -7,7 +7,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 import m from 'mithril';

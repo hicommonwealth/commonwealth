@@ -10,7 +10,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import { StarredCommunity } from 'models';
 import app from 'state';

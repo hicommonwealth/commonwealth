@@ -168,6 +168,7 @@ import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
 
 function setupRouter(
+  endpoint: string,
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
@@ -976,11 +977,7 @@ function setupRouter(
   router.post('/getChainContracts', getChainContracts.bind(this, models));
   router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
 
-  // new API
-  addExternalRoutes(router, app, models, tokenBalanceCache);
-  addSwagger(app);
-
-  app.use('/api', router);
+  app.use(endpoint, router);
 }
 
 export default setupRouter;

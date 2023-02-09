@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
@@ -13,8 +12,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import $ from 'jquery';
 import m from 'mithril';
 

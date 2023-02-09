@@ -29,7 +29,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 
 export interface IDaoInfo {

@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_group.scss';
 import m from 'mithril';

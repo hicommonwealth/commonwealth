@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx, parsePathname } from 'mithrilInterop';
+import { ClassComponent, redraw, parsePathname } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 import { navigateToSubpage } from 'router';
@@ -30,9 +29,7 @@ type NewSnapshotProposalPageAttrs = {
   snapshotId: string;
 };
 
-export class NewSnapshotProposalPage extends ClassComponent<
-  NewSnapshotProposalPageAttrs
-> {
+export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalPageAttrs> {
   private form: ThreadForm;
   private initialized: boolean;
   private isFromExistingProposal: boolean;

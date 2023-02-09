@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import { notifyError } from 'controllers/app/notifications';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
@@ -54,7 +52,7 @@ export class SputnikProposalForm extends ClassComponent {
 
   view() {
     return (
-      <React.Fragment>
+      <>
         <CWDropdown
           label="Proposal Type"
           initialValue={sputnikProposalOptions[0]}
@@ -146,7 +144,7 @@ export class SputnikProposalForm extends ClassComponent {
               .catch((err) => notifyError(err.message));
           }}
         />
-      </React.Fragment>
+      </>
     );
   }
 }

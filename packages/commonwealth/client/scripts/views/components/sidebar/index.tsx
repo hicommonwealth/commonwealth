@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import { Action } from 'commonwealth/shared/permissions';
@@ -56,6 +54,19 @@ export class Sidebar extends ClassComponent {
         Action.VIEW_CHAT_CHANNELS
       );
 
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.roles.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
+
+    const isMod = app.roles.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+    });
+
+    const showAdmin = app.user && (isAdmin || isMod);
+
     return (
       <div className="Sidebar">
         {app.sidebarMenu === 'default' && (
@@ -63,7 +74,7 @@ export class Sidebar extends ClassComponent {
             <SidebarQuickSwitcher />
             {app.chain && (
               <div className="community-menu">
-                <AdminSection />
+                {showAdmin && <AdminSection />}
                 <DiscussionSection />
                 <GovernanceSection />
                 {/* app.socket && !hideChat && <ChatSection /> */}

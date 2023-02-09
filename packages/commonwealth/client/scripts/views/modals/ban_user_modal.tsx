@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';
 
@@ -33,7 +31,7 @@ export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
     };
 
     return (
-      <React.Fragment>
+      <>
         <div className="compact-modal-title ban-user">
           <h3>Are You Sure?</h3>
         </div>
@@ -66,7 +64,7 @@ export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
             />
           </div>
         </div>
-      </React.Fragment>
+      </>
     );
   }
 }

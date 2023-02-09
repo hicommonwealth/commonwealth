@@ -1,8 +1,9 @@
 /* eslint-disable max-classes-per-file */
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode} from
+
+ 'mithrilInterop';
 
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 

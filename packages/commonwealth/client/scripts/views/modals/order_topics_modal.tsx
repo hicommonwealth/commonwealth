@@ -1,17 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+
 import { notifyError } from 'controllers/app/notifications';
 import dragula from 'dragula';
 import $ from 'jquery';
@@ -24,8 +15,13 @@ import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-export class OrderTopicsModal extends ClassComponent {
+type OrderTopicsModalProps = {
+  onModalClose: () => void;
+};
+
+export class OrderTopicsModal extends ClassComponent<OrderTopicsModalProps> {
   private topics: Array<Topic>;
 
   private _getTopicFromElement = (
@@ -71,10 +67,16 @@ export class OrderTopicsModal extends ClassComponent {
     );
   }
 
-  view() {
+  view(vnode: ResultNode<OrderTopicsModalProps>) {
     return (
       <div className="OrderTopicsModal">
-        <h3 className="compact-modal-title">Reorder Topics</h3>
+        <div className="compact-modal-title">
+          <h3>Reorder Topics</h3>
+          <CWIconButton
+            iconName="close"
+            onClick={() => vnode.attrs.onModalClose()}
+          />
+        </div>
         <div className="compact-modal-body">
           <div className="featured-topic-list">
             {this.topics.map((t) => (

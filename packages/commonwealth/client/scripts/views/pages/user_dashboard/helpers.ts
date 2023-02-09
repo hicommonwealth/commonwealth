@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
@@ -14,7 +13,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import type { NotificationSubscription } from 'models';
 

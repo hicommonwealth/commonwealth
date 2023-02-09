@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw} from
+
+ 'mithrilInterop';
 import $ from 'jquery';
 import m from 'mithril';
 

@@ -116,11 +116,6 @@
     text-decoration: underline;
   }
 
-  // role icons and identity icons
-  span.identity-icon {
-    @include roleIcon();
-  }
-
   .role-icon {
     @include roleIcon();
   }
@@ -168,10 +163,6 @@
 
     a:hover {
       text-decoration: underline !important;
-    }
-
-    span.identity-icon {
-      @include roleIcon();
     }
   }
 

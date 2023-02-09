@@ -1,8 +1,9 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw} from
+
+ 'mithrilInterop';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -132,8 +133,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             const chain = app.chain as Substrate;
 
             app.chain.loadModules([
-              chain.council,
-              chain.technicalCommittee,
               chain.treasury,
               chain.democracyProposals,
               chain.democracy,
@@ -294,7 +293,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             )
           }
           subBody={
-            <React.Fragment>
+            <>
               <LinkedProposalsEmbed
                 proposal={this.proposal as LinkedSubstrateProposal}
               />
@@ -308,7 +307,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
                 toggleVotingModal={toggleVotingModal}
                 votingModalOpen={this.votingModalOpen}
               />
-            </React.Fragment>
+            </>
           }
           comments={
             <CommentsTree
