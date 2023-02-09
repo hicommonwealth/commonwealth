@@ -141,23 +141,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     return (
       <div className="ChainMetadataRows">
         <div className="AvatarUploadRow">
-          <AvatarUpload
-            scope="community"
-            uploadStartedCallback={() => {
-              this.uploadInProgress = true;
-              redraw();
-            }}
-            uploadCompleteCallback={(files) => {
-              files.forEach((f) => {
-                if (!f.uploadURL) return;
-                const url = f.uploadURL.replace(/\?.*/, '');
-                this.iconUrl = url;
-                $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
-              });
-              this.uploadInProgress = false;
-              redraw();
-            }}
-          />
+          {/* @TODO Replace AvatarUploader here */}
         </div>
         <InputRow
           title="Name"
@@ -242,7 +226,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           title="Chat Enabled"
           defaultValue={this.chatEnabled}
           onToggle={(checked) => {
-            this.chatEnabled = checked;
+            this.chatEnabled = !!checked;
           }}
           caption={(checked) =>
             checked
@@ -308,7 +292,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="tag-row">
           <CWLabel label="Community Tags" />
           <div className="tag-group">
-            {Object.keys(this.selectedTags).map((key) => {
+            {this.selectedTags && Object.keys(this.selectedTags).map((key) => {
               return (
                 <CWButton
                   label={key}

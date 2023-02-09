@@ -77,7 +77,7 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
               : null;
 
           return (
-            <div className="webhook-row">
+            <div className="webhook-row" key={webhook.id}>
               <div className="webhook-info">
                 <CWText>{smartTruncate(webhook.url, 25)}</CWText>
                 {label && (

@@ -60,6 +60,7 @@ export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
 
     return (
       <CWCheckbox
+        key={label}
         value=""
         checked={allValuesPresent}
         label={label}
