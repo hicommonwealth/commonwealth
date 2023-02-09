@@ -333,12 +333,10 @@ class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
                     <AvatarUpload
                       scope="user"
                       account={account}
-                      uploadCompleteCallback={(files) => {
-                        files.forEach((f) => {
-                          if (!f.uploadURL) return;
-                          const url = f.uploadURL.replace(/\?.*/, '').trim();
-                          this.avatarUrl = url;
-                        });
+                      uploadCompleteCallback={(file) => {
+                        if (!file.uploadURL) return;
+                        const url = file.uploadURL.replace(/\?.*/, '').trim();
+                        this.avatarUrl = url;
                       }}
                     />
                   </div>

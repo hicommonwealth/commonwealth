@@ -51,12 +51,10 @@ export const CWAvatarUsernameInput = (props: AvatarUsernameInputProps) => {
         uploadStartedCallback={() => {
           redraw();
         }}
-        uploadCompleteCallback={(files) => {
-          files.forEach((f) => {
-            if (!f.uploadURL) return;
-            const url = f.uploadURL.replace(/\?.*/, '');
-            onAvatarChangeHandler(url.trim);
-          });
+        uploadCompleteCallback={(file) => {
+          if (!file.uploadURL) return;
+          const url = file.uploadURL.replace(/\?.*/, '');
+          onAvatarChangeHandler(url.trim);
           redraw();
         }}
       />

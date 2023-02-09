@@ -48,13 +48,10 @@ export const EditProfileModal = (props: EditProfileModalProps) => {
           uploadStartedCallback={() => {
             redraw();
           }}
-          uploadCompleteCallback={(files) => {
-            files.forEach((f) => {
-              if (!f.uploadURL) return;
-              const url = f.uploadURL.replace(/\?.*/, '').trim();
-              setAvatarUrl(url);
-            });
-
+          uploadCompleteCallback={(file) => {
+            if (!file.uploadURL) return;
+            const url = file.uploadURL.replace(/\?.*/, '').trim();
+            setAvatarUrl(url);
             redraw();
           }}
         />

@@ -63,6 +63,7 @@ export const AvatarUpload = (props: AvatarUploadAttrs) => {
       maxFilesize: 10, // MB
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
+        if (props.uploadStartedCallback) props.uploadStartedCallback(file);
         $.post(`${app.serverUrl()}/getUploadSignature`, {
           name: file.name, // imageName.png
           mimetype: file.type, // image/png
@@ -70,7 +71,6 @@ export const AvatarUpload = (props: AvatarUploadAttrs) => {
           jwt: app.user.jwt,
         })
           .then((response) => {
-            console.log(response);
             if (response.status !== 'Success') {
               return done(
                 'Failed to get an S3 signed upload URL',
@@ -80,6 +80,7 @@ export const AvatarUpload = (props: AvatarUploadAttrs) => {
             file.uploadURL = response.result;
             setUploaded(true);
             done();
+            if (props.uploadCompleteCallback) props.uploadCompleteCallback(file);
           })
           .catch((err: any) => {
             done(
@@ -94,18 +95,6 @@ export const AvatarUpload = (props: AvatarUploadAttrs) => {
           _send.call(xhr, file);
         };
       },
-    });
-
-    newDropzone.on('processing', (file) => {
-      dropzone.options.url = file.uploadURL;
-      if (props.uploadStartedCallback) {
-        props.uploadStartedCallback();
-      }
-    });
-    newDropzone.on('complete', () => {
-      if (props.uploadCompleteCallback) {
-        props.uploadCompleteCallback(dropzone.files);
-      }
     });
 
     setDropzone(newDropzone);

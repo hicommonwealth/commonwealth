@@ -82,9 +82,9 @@ class CreateNewProfile extends ClassComponent {
   private populateNewProfileFields = () => {
     this.newProfile = {};
 
-    if (this.username) this.newProfile.username = this.username;
-    if (this.name) this.newProfile.name = this.name;
-    if (this.email) this.newProfile.email = this.email;
+    if (this.username && this.username == '') this.newProfile.username = this.username;
+    if (this.name && this.name == '') this.newProfile.name = this.name;
+    if (this.email && this.email == '') this.newProfile.email = this.email;
     if (this.avatarUrl) this.newProfile.avatarUrl = this.avatarUrl;
     if (this.socials) this.newProfile.socials = JSON.stringify(this.socials);
     // if (this.bio.textContentsAsString)
@@ -163,14 +163,13 @@ class CreateNewProfile extends ClassComponent {
                 </CWText>
                 <div className="image-upload">
                   <AvatarUpload
+                    name="new-profile"
                     scope="user"
-                    uploadCompleteCallback={(files) => {
-                      files.forEach((f) => {
-                        if (!f.uploadURL) return;
-                        const url = f.uploadURL.replace(/\?.*/, '').trim();
-                        this.avatarUrl = url;
-                      });
-                      this.redraw();
+                    account={null}
+                    uploadCompleteCallback={(file) => {
+                      if (!file.uploadURL) return;
+                      const url = file.uploadURL.replace(/\?.*/, '').trim();
+                      this.avatarUrl = url;
                     }}
                   />
                 </div>

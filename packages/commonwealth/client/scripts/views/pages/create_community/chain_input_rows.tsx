@@ -64,12 +64,10 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
           state.uploadInProgress = true;
           redraw();
         }}
-        uploadCompleteCallback={(files) => {
-          files.forEach((f) => {
-            if (!f.uploadURL) return;
-            const url = f.uploadURL.replace(/\?.*/, '');
-            state.iconUrl = url;
-          });
+        uploadCompleteCallback={(file) => {
+          if (!file.uploadURL) return;
+          const url = file.uploadURL.replace(/\?.*/, '');
+          state.iconUrl = url;
           state.uploadInProgress = false;
           redraw();
         }}
