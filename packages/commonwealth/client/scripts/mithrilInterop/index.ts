@@ -15,7 +15,6 @@ import type {
   Location,
   NavigateOptions,
 } from 'react-router-dom';
-import { redirect } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
@@ -241,28 +240,19 @@ type RouteOptions = {
   replace?: boolean;
 };
 
-// attempt to replicate global m.route.set(), currently a no-op.
-export function setRoute(
+// This should not be used for setting the route, because it does not use react-router.
+// Instead it uses native history API, and because react router does not recognize the
+// path change, the page has to be reloaded programmatically.
+// This is only for legacy code, where react router is not accessible (eg in controllers or JS classes).
+// Always use "withRouter" for react class components or "useNavigate" for functional components.
+export function dangerouslySetRoute(
   route: string,
   data?: Record<string, unknown>,
   options?: RouteOptions
 ) {
-  // app._lastNavigatedBack = false;
-  // app._lastNavigatedFrom = getRoute();
-  /*
-  if (route !== getRoute()) {
-    if (options?.replace) {
-      window.history.replaceState(data, null, route);
-    } else {
-      window.history.pushState(data, null, route);
-    }
-  }
-  */
+  window.history.pushState('', '', route);
+  window.location.reload();
 
-  // TODO this setRoute is not related to react-router, it uses backend redirect
-  // TODO find a way to use router outside of react
-  redirect(route);
-  // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];

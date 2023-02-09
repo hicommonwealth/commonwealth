@@ -1,4 +1,4 @@
-import { render, setRoute } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
@@ -99,13 +99,13 @@ export function link(
           : [target];
       if (afterRouteSet) {
         (async () => {
-          // TODO this setRoute is not related to react-router => won't work
-          await setRoute(...routeArgs);
+          // TODO refactor to <Link/> component
+          // await setRoute(...routeArgs);
           afterRouteSet();
         })();
       } else {
-        // TODO this setRoute is not related to react-router => won't work
-        setRoute(...routeArgs);
+        // TODO refactor to <Link/> component
+        // setRoute(...routeArgs);
       }
     },
   };

@@ -289,8 +289,7 @@ class AdminActions extends ClassComponent {
 class AdminPageComponent extends ClassComponent {
   view() {
     if (!app.chain) {
-      // TODO fix additional prop
-      this.setRoute('/', {}, { replace: true });
+      this.setRoute('/', { replace: true });
       return <PageLoading />;
     } else if (app.chain && app.user.isSiteAdmin) {
       return (
