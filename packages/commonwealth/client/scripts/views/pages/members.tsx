@@ -41,7 +41,7 @@ type ProfileInfo = {
 const MembersPage = () => {
   const [initialProfilesLoaded, setInitialProfilesLoaded] = useState(false);
   const [initialScrollFinished, setInitialScrollFinished] = useState(false);
-  const [membersLoaded, setMembersLoaded] = useState<MemberInfo[] | null>(null);
+  const [membersLoaded, setMembersLoaded] = useState<MemberInfo[]>([]);
   const [membersRequested, setMembersRequested] = useState(false);
   const [numProfilesLoaded, setNumProfilesLoaded] = useState(0);
   const [profilesFinishedLoading, setProfilesFinishedLoading] = useState(false);
@@ -85,7 +85,6 @@ const MembersPage = () => {
 
   useEffect(() => {
     // get members once
-    console.log('activeInfo: ', activeInfo);
     if (!membersRequested) {
       setMembersRequested(true);
 
@@ -93,7 +92,6 @@ const MembersPage = () => {
         const activeMembersHash = {};
 
         setTotalMembersCount(activeInfo.members.length);
-        console.log('total members count: ', activeInfo.members.length);
         const membersActive: MemberInfo[] = app.recentActivity
           .getMostActiveUsers()
           .map((user) => {
@@ -101,7 +99,6 @@ const MembersPage = () => {
             activeMembersHash[`${chain}##${address}`] = true;
             return { chain, address, count: user.count };
           });
-
         const membersInactive: MemberInfo[] = activeInfo.members
           .map((role) => {
             return {
@@ -120,72 +117,78 @@ const MembersPage = () => {
             .concat(membersInactive)
             .sort((a, b) => b.count - a.count)
         );
-        redraw();
-        console.log('Members loaded: ', membersLoaded);
       });
     }
-  }, [activeInfo]);
-
-  if (!membersLoaded) return <PageLoading message="Loading members" />;
+  }, [activeInfo, membersRequested]);
 
   const navigatedFromAccount =
     app.lastNavigatedBack() &&
     app.lastNavigatedFrom().includes(`/${app.activeChainId()}/account/`) &&
     localStorage[`${app.activeChainId()}-members-scrollY`];
 
-  // Load default number of profiles on mount
-  if (!initialProfilesLoaded) {
-    setInitialScrollFinished(false);
-    setInitialProfilesLoaded(true);
+  useEffect(() => {
+    // Load default number of profiles on mount
+    if (!initialProfilesLoaded) {
+      setInitialScrollFinished(false);
+      setInitialProfilesLoaded(true);
 
-    // TODO: expand into controller
-    app.profiles.isFetched.on('redraw', () => {
-      redraw();
-    });
-
-    // Set initial number loaded (contingent on navigation)
-    if (navigatedFromAccount) {
-      setNumProfilesLoaded(
-        Number(localStorage[`${app.activeChainId()}-members-numProfilesLoaded`])
-      );
-    } else {
-      setNumProfilesLoaded(
-        Math.min(DEFAULT_MEMBER_REQ_SIZE, membersLoaded.length)
-      );
-    }
-
-    setProfilesFinishedLoading(numProfilesLoaded >= membersLoaded.length);
-
-    const profileInfos: ProfileInfo[] = membersLoaded
-      .slice(0, numProfilesLoaded)
-      .map((member) => {
-        return {
-          profile: app.profiles.getProfile(member.chain, member.address),
-          postCount: member.count,
-        };
+      // TODO: expand into controller
+      app.profiles.isFetched.on('redraw', () => {
+        redraw();
       });
 
-    setProfilesLoaded(profileInfos);
-  }
+      // Set initial number loaded (contingent on navigation)
+      if (navigatedFromAccount) {
+        setNumProfilesLoaded(
+          Number(
+            localStorage[`${app.activeChainId()}-members-numProfilesLoaded`]
+          )
+        );
+      } else {
+        setNumProfilesLoaded(
+          Math.min(DEFAULT_MEMBER_REQ_SIZE, membersLoaded.length)
+        );
+      }
 
-  // Check if all profiles have been loaded
-  if (!profilesFinishedLoading) {
-    if (profilesLoaded.length >= membersLoaded.length) {
-      setProfilesFinishedLoading(true);
+      setProfilesFinishedLoading(numProfilesLoaded >= membersLoaded.length);
+
+      const profileInfos: ProfileInfo[] = membersLoaded
+        .slice(0, numProfilesLoaded)
+        .map((member) => {
+          return {
+            profile: app.profiles.getProfile(member.chain, member.address),
+            postCount: member.count,
+          };
+        });
+
+      setProfilesLoaded(profileInfos);
     }
-  }
+  }, [initialProfilesLoaded, membersLoaded, navigatedFromAccount]);
 
-  // Return to correct scroll position upon redirect from accounts page
-  if (navigatedFromAccount && initialScrollFinished) {
-    setInitialScrollFinished(true);
+  useEffect(() => {
+    // Check if all profiles have been loaded
+    if (!profilesFinishedLoading) {
+      if (profilesLoaded.length >= membersLoaded.length) {
+        setProfilesFinishedLoading(true);
+      }
+    }
+  }, [profilesFinishedLoading, profilesLoaded, membersLoaded]);
 
-    setTimeout(() => {
-      window.scrollTo(
-        0,
-        Number(localStorage[`${app.activeChainId()}-members-scrollY`])
-      );
-    }, 100);
-  }
+  useEffect(() => {
+    // Return to correct scroll position upon redirect from accounts page
+    if (navigatedFromAccount && initialScrollFinished) {
+      setInitialScrollFinished(true);
+
+      setTimeout(() => {
+        window.scrollTo(
+          0,
+          Number(localStorage[`${app.activeChainId()}-members-scrollY`])
+        );
+      }, 100);
+    }
+  }, [navigatedFromAccount, initialScrollFinished]);
+
+  if (!membersLoaded) return <PageLoading message="Loading members" />;
 
   return (
     <Sublayout>
