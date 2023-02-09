@@ -32,6 +32,10 @@ class Thread implements IUniqueId {
   public readonly attachments: Attachment[];
   public readonly readOnly: boolean;
 
+  public readonly canvasAction: string;
+  public readonly canvasSession: string;
+  public readonly canvasHash: string;
+
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
   //  we should remove the number to allow the store to work.
   public readonly identifier: string;
@@ -80,6 +84,9 @@ class Thread implements IUniqueId {
     lastCommentedOn,
     linkedThreads,
     numberOfComments,
+    canvasAction,
+    canvasSession,
+    canvasHash,
   }: {
     author: string;
     title: string;
@@ -106,6 +113,9 @@ class Thread implements IUniqueId {
     linkedThreads: LinkedThreadRelation[];
     polls?: Poll[];
     numberOfComments?: number;
+    canvasAction?: string;
+    canvasSession?: string;
+    canvasHash?: string;
   }) {
     this.author = author;
     this.title = title;
@@ -143,6 +153,9 @@ class Thread implements IUniqueId {
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
     this.numberOfComments = numberOfComments || 0;
+    this.canvasAction = canvasAction;
+    this.canvasSession = canvasSession;
+    this.canvasHash = canvasHash;
   }
 }
 
