@@ -28,13 +28,13 @@ import {
 } from '../../../models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { AvatarUpload } from '../../components/avatar_upload';
+import AvatarUpload from '../../components/avatar_upload';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWForm } from '../../components/component_kit/cw_form';
 import { CWFormSection } from '../../components/component_kit/cw_form_section';
-import { CWSocials } from '../../components/component_kit/cw_socials';
+import CWSocials from '../../components/component_kit/cw_socials';
 import type {
   ImageBehavior,
 } from '../../components/component_kit/cw_cover_image_uploader';
@@ -49,7 +49,7 @@ enum EditProfileError {
 const NoAddressFoundError = 'No address found';
 const NoProfileFoundError = 'No profile found';
 
-type EditNewProfileAttrs = { placeholder?: string };
+type EditNewProfileAttrs = { address: string };
 
 export type Image = {
   url: string;
@@ -151,7 +151,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       this.profileUpdate.backgroundImage = JSON.stringify(this.backgroundImage);
   };
 
-  private handleSaveProfile = (vnode: m.Vnode<EditNewProfileAttrs>) => {
+  private handleSaveProfile = (vnode: ResultNode<EditNewProfileAttrs>) => {
     this.loading = true;
     this.checkForUpdates();
     if (Object.keys(this.profileUpdate).length > 0) {
@@ -170,8 +170,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
   };
 
-  oninit() {
-    this.address = getRouteParam('address');
+  oninit(vnode: ResultNode<EditNewProfileAttrs>) {
+    this.address = vnode.attrs.address;
     this.error = EditProfileError.None;
     this.getProfile(this.address);
 
@@ -280,6 +280,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 </CWText>
                 <div className="image-upload">
                   <AvatarUpload
+                    name="edit-new-profile"
                     scope="user"
                     account={account}
                     uploadCompleteCallback={(files) => {
@@ -352,6 +353,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   socials={this.profile?.socials}
                   handleInputChange={(e) => {
                     this.socials = e;
+                    console.log('e', e)
                   }}
                 />
               </div>
