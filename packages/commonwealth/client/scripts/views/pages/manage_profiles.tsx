@@ -12,21 +12,21 @@ import {
   redraw,
   Component,
 } from 'mithrilInterop';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import $ from 'jquery';
 
 import 'pages/manage_profiles.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import { AddressInfo, NewProfile as Profile } from 'models';
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
-import { ProfilePreview } from '../components/profile_preview';
+import ProfilePreview from '../components/profile_preview';
 import PageNotFound from './404';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWButton } from '../components/component_kit/cw_button';
 
-export class ManageProfiles extends ClassComponent {
+class ManageProfiles extends ClassComponent {
   private error: boolean;
   private loading: boolean;
   private profiles: Profile[];
@@ -100,7 +100,7 @@ export class ManageProfiles extends ClassComponent {
               onClick={() => {
                 this.loading = true;
                 setTimeout(() => {
-                  navigateToSubpage('/profile/new');
+                  this.navigateToSubpage('/new');
                 }, 1000);
               }}
             />
@@ -122,4 +122,4 @@ export class ManageProfiles extends ClassComponent {
   }
 }
 
-export default ManageProfiles;
+export default NavigationWrapper(ManageProfiles);

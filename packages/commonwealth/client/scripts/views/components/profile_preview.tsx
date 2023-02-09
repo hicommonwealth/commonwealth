@@ -12,13 +12,13 @@ import {
   redraw,
   Component,
 } from 'mithrilInterop';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import jdenticon from 'jdenticon';
 
 import 'components/profile_preview.scss';
 
 import app from 'state';
 import type { AddressInfo, NewProfile as Profile } from 'models';
-import { navigateToSubpage } from 'router';
 import { CWText } from './component_kit/cw_text';
 import { renderQuillTextBody } from './quill/helpers';
 import { SocialAccounts } from './social_accounts';
@@ -33,7 +33,7 @@ type ProfilePreviewAttrs = {
   refreshProfiles: () => Promise<void>;
 };
 
-export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
+class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
   private defaultAvatar: string;
 
   oninit(vnode: ResultNode<ProfilePreviewAttrs>) {
@@ -65,13 +65,13 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
                 label="View"
                 buttonType="mini-white"
                 iconLeft="views"
-                onClick={() => navigateToSubpage(`/profile/${username}`)}
+                onClick={() => this.navigateToSubpage(`/${username}`)}
               />
               <CWButton
                 label="Edit"
                 buttonType="mini-white"
                 iconLeft="write"
-                onClick={() => navigateToSubpage(`/profile/${username}/edit`)}
+                onClick={() => this.navigateToSubpage(`/${username}/edit`)}
               />
             </div>
             {bio && <CWText>{renderQuillTextBody(bio)}</CWText>}
@@ -82,13 +82,13 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               label="View"
               buttonType="mini-white"
               iconLeft="views"
-              onClick={() => navigateToSubpage(`/profile/${username}`)}
+              onClick={() => this.navigateToSubpage(`/${username}`)}
             />
             <CWButton
               label="Edit"
               buttonType="mini-white"
               iconLeft="write"
-              onClick={() => navigateToSubpage(`/profile/${username}/edit`)}
+              onClick={() => this.navigateToSubpage(`/${username}/edit`)}
             />
           </div>
         </div>
@@ -122,3 +122,5 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
     );
   }
 }
+
+export default NavigationWrapper(ProfilePreview);

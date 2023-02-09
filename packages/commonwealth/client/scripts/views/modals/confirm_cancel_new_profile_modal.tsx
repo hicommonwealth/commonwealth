@@ -1,7 +1,18 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type {
+  ResultNode
+} from 'mithrilInterop';
+import {
+  ClassComponent,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import $ from 'jquery';
 
 import 'modals/confirm_cancel_new_profile_modal.scss';
@@ -10,26 +21,26 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-export class ConfirmCancelNewProfileModal extends ClassComponent {
+class ConfirmCancelNewProfileModal extends ClassComponent {
   view() {
     return (
-      <div class="ConfirmCancelNewProfileModal">
-        <div class="title">
+      <div className="ConfirmCancelNewProfileModal">
+        <div className="title">
           <CWText type="h4">Are You Sure You Want To Leave?</CWText>
           <CWIconButton
             iconName="close"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
             }}
           />
         </div>
         <CWText>Leaving this page will delete all profile information.</CWText>
-        <div class="buttons">
+        <div className="buttons">
           <CWButton
             label="Leave"
             buttonType="secondary-black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
             }}
@@ -37,11 +48,11 @@ export class ConfirmCancelNewProfileModal extends ClassComponent {
           <CWButton
             label="Delete"
             buttonType="primary-black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               $(e.target).trigger('modalexit');
-              m.route.set('/profile/manage');
+              this.navigateToSubpage('/manage');
             }}
           />
         </div>
@@ -49,3 +60,5 @@ export class ConfirmCancelNewProfileModal extends ClassComponent {
     );
   }
 }
+
+export default NavigationWrapper(ConfirmCancelNewProfileModal);
