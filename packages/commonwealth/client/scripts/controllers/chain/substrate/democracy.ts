@@ -8,10 +8,10 @@ import { SubstrateTypes } from 'chain-events/src/types';
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
 import type SubstrateChain from './shared';
+import AddressAccount from "models/Address";
 
 class SubstrateDemocracy extends ProposalModule<
   ApiPromise,
@@ -110,7 +110,7 @@ class SubstrateDemocracy extends ProposalModule<
     this._initializing = false;
   }
 
-  public reapPreimage(author: SubstrateAccount, hash: string) {
+  public reapPreimage(author: AddressAccount, hash: string) {
     // TODO: verify that hash corresponds to an actual preimage & is in a reap-able state
     return this._Chain.createTXModalData(
       author,

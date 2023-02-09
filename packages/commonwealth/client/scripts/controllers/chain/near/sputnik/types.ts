@@ -1,8 +1,8 @@
 import type { NearToken } from 'adapters/chain/near/types';
 import type { IIdentifiable } from 'adapters/shared';
 import BN from 'bn.js';
-import type { NearAccount } from 'controllers/chain/near/account';
 import type { IVote } from 'models';
+import AddressAccount from "models/Address";
 
 export interface NearSputnikConfig {
   metadata: string;
@@ -252,12 +252,12 @@ export type INearSputnikProposal = IIdentifiable &
   NearSputnikGetProposalResponse;
 
 export class NearSputnikVote implements IVote<NearToken> {
-  public readonly account: NearAccount;
+  public readonly account: AddressAccount;
   public readonly choice: NearSputnikVoteString;
   public readonly balance: BN;
 
   constructor(
-    member: NearAccount,
+    member: AddressAccount,
     choice: NearSputnikVoteString,
     balance = new BN(1)
   ) {

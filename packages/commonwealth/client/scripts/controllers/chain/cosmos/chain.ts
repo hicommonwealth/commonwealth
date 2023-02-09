@@ -18,7 +18,7 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
-import type CosmosAccount from './account';
+import AddressAccount from "models/Address";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -36,7 +36,7 @@ export type CosmosApiType = QueryClient &
   GovExtension &
   BankExtension;
 
-class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
+class CosmosChain implements IChainModule<CosmosToken, AddressAccount> {
   private _api: CosmosApiType;
   public get api() {
     return this._api;
@@ -116,7 +116,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   public async sendTx(
-    account: CosmosAccount,
+    account: AddressAccount,
     tx: EncodeObject
   ): Promise<readonly Event[]> {
     // TODO: error handling
@@ -172,7 +172,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   public createTXModalData(
-    author: CosmosAccount,
+    author: AddressAccount,
     txFunc,
     txName: string,
     objName: string,

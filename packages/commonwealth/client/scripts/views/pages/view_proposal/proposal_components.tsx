@@ -3,7 +3,6 @@
 import ClassComponent from 'class_component';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import type MolochMember from 'controllers/chain/ethereum/moloch/member';
 
 import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
 import m from 'mithril';

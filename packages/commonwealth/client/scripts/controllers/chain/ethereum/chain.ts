@@ -6,15 +6,15 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type Web3 from 'web3';
-import type EthereumAccount from './account';
+import AddressAccount from "models/Address";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 const ETHEREUM_BLOCK_TIME = 13;
 
-class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
+class EthereumChain implements IChainModule<EthereumCoin, AddressAccount> {
   public createTXModalData(
-    author: EthereumAccount,
+    author: AddressAccount,
     txFunc: any,
     txName: string,
     objName: string

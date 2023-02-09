@@ -21,6 +21,7 @@ import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover'
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import User from '../../components/widgets/user';
+import AddressAccount from "models/Address";
 
 type ThreadComponentAttrs = {
   thread: Thread;
@@ -30,7 +31,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
   view(vnode: m.Vnode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
-    const author: Account = app.chain.accounts.get(thread.author);
+    const author = app.chain.accounts.get(thread.author);
 
     return (
       <div class="ThreadAuthor">
@@ -50,7 +51,10 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
                 <div class="collaborators">
                   {thread.collaborators.map(({ address, chain }) => {
                     return m(User, {
-                      user: new AddressInfo(null, address, chain, null),
+                      user: new AddressAccount({
+                        address,
+                        chain: app.config.chains.getById(chain)
+                      })
                     });
                   })}
                 </div>

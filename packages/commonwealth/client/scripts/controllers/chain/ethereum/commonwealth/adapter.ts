@@ -1,7 +1,6 @@
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { ChainBase, ContractType } from 'common-common/src/types';
 
-import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import type { ChainInfo } from 'models';
 import { IChainAdapter } from 'models';
@@ -11,10 +10,7 @@ import CommonwealthAPI from './api';
 import CommonwealthChain from './chain';
 import CommonwealthGovernance from './governance';
 
-export default class Commonwealth extends IChainAdapter<
-  EthereumCoin,
-  EthereumAccount
-> {
+export default class Commonwealth extends IChainAdapter<EthereumCoin> {
   public readonly base = ChainBase.Ethereum;
   public chain: CommonwealthChain;
   public accounts: EthereumAccounts;

@@ -13,10 +13,10 @@ import type {
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import SubstrateDemocracyProposal from './democracy_proposal';
 import type SubstrateChain from './shared';
+import AddressAccount from "models/Address";
 
 class SubstrateDemocracyProposals extends ProposalModule<
   ApiPromise,
@@ -127,7 +127,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
   }
 
   public async createTx(
-    author: SubstrateAccount,
+    author: AddressAccount,
     action: Call,
     proposalHash: Hash,
     deposit: SubstrateCoin
@@ -144,7 +144,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
   }
 
   public notePreimage(
-    author: SubstrateAccount,
+    author: AddressAccount,
     action: Call,
     encodedProposal: string
   ) {
@@ -158,7 +158,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
   }
 
   public noteImminentPreimage(
-    author: SubstrateAccount,
+    author: AddressAccount,
     action: Call,
     encodedProposal: string
   ) {

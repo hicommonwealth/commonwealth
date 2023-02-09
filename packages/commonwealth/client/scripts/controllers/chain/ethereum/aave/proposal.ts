@@ -18,7 +18,6 @@ import type {
 import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import moment from 'moment';
 import Web3 from 'web3-utils';
-import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 
@@ -26,13 +25,14 @@ import type AaveAPI from './api';
 import type { AaveExecutor } from './api';
 import type AaveChain from './chain';
 import type AaveGovernance from './governance';
+import AddressAccount from "models/Address";
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
-  public readonly account: EthereumAccount;
+  public readonly account: AddressAccount;
   public readonly choice: boolean;
   public readonly power: BN;
 
-  constructor(member: EthereumAccount, choice: boolean, power?: BN) {
+  constructor(member: AddressAccount, choice: boolean, power?: BN) {
     this.account = member;
     this.choice = choice;
     this.power = power || new BN(0);
@@ -391,7 +391,7 @@ export default class AaveProposal extends Proposal<
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public canVoteFrom(account: EthereumAccount) {
+  public canVoteFrom(account: AddressAccount) {
     // TODO
     // We need to check the delegate of account to perform voting checks. Delegates must
     // be fetched from chain, which requires async calls, making this impossible to implement.

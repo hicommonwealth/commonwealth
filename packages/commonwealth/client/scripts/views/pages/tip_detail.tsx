@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import m from 'mithril';
 import { DepositVote } from 'models';
@@ -77,7 +76,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
           </div>
           <div class="tip-contributions">
             {proposal.canVoteFrom(
-              app.user.activeAddressAccount as SubstrateAccount
+              app.user.activeAddressAccount
             ) && (
               <div class="contribute">
                 <div class="title">Contribute</div>

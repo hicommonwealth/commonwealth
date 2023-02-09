@@ -47,7 +47,7 @@ import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { chainToEventNetwork } from '../../server/chain_entities';
-import type { SubstrateAccount } from './account';
+import AddressAccount from "models/Address";
 
 export interface ISubstrateTXData extends ITXData {
   nonce: string;
@@ -56,7 +56,7 @@ export interface ISubstrateTXData extends ITXData {
 }
 
 /* eslint-disable no-restricted-syntax */
-class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
+class SubstrateChain implements IChainModule<SubstrateCoin, AddressAccount> {
   // balances
   private _totalbalance: SubstrateCoin;
   public get totalbalance() {
@@ -467,7 +467,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   // TODO: refactor fee computation into a more standard form that can be used throughout
   //   and shown at TX creation time
   public async canPayFee(
-    sender: SubstrateAccount,
+    sender: AddressAccount,
     txFunc: (api: ApiPromise) => SubmittableExtrinsic<'promise'>,
     additionalDeposit?: SubstrateCoin
   ): Promise<boolean> {
@@ -504,7 +504,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public createTXModalData(
-    author: SubstrateAccount,
+    author: AddressAccount,
     txFunc: (api: ApiPromise) => SubmittableExtrinsic<'promise'>,
     txName: string,
     objName: string,

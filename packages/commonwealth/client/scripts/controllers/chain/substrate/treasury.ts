@@ -13,10 +13,10 @@ import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import { formatAddressShort } from '../../../../../shared/utils';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
+import AddressAccount from "models/Address";
 
 class SubstrateTreasury extends ProposalModule<
   ApiPromise,
@@ -123,9 +123,9 @@ class SubstrateTreasury extends ProposalModule<
   }
 
   public createTx(
-    author: SubstrateAccount,
+    author: AddressAccount,
     value: SubstrateCoin,
-    beneficiary: SubstrateAccount
+    beneficiary: AddressAccount
   ) {
     return this._Chain.createTXModalData(
       author,

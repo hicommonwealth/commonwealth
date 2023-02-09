@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import type { NearAccounts } from 'controllers/chain/near/account';
+import type { NearAccounts } from 'controllers/chain/near/accounts';
 import type NearChain from 'controllers/chain/near/chain';
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';

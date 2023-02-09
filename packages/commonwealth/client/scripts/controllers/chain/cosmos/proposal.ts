@@ -24,12 +24,12 @@ import {
   VotingUnit,
 } from 'models';
 import moment from 'moment';
-import CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
 import type CosmosChain from './chain';
 import type { CosmosApiType } from './chain';
 import type CosmosGovernance from './governance';
 import { marshalTally } from './governance';
+import AddressAccount from "models/Address";
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
   if (typeof voteOption === 'number') {
@@ -52,10 +52,10 @@ export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
 
 // TODO: add staking amount to this?
 export class CosmosVote implements IVote<CosmosToken> {
-  public readonly account: CosmosAccount;
+  public readonly account: AddressAccount;
   public readonly choice: CosmosVoteChoice;
 
-  constructor(account: CosmosAccount, choice: CosmosVoteChoice) {
+  constructor(account: AddressAccount, choice: CosmosVoteChoice) {
     this.account = account;
     this.choice = choice;
   }
@@ -113,7 +113,7 @@ export class CosmosProposal extends Proposal<
 
   public canVoteFrom(account) {
     // TODO: balance check
-    return account instanceof CosmosAccount;
+    return account instanceof AddressAccount;
   }
 
   public get status(): CosmosProposalState {
@@ -293,7 +293,7 @@ export class CosmosProposal extends Proposal<
   }
 
   // TRANSACTIONS
-  public async submitDepositTx(depositor: CosmosAccount, amount: CosmosToken) {
+  public async submitDepositTx(depositor: AddressAccount, amount: CosmosToken) {
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }

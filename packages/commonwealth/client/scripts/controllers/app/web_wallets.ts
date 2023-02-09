@@ -1,6 +1,6 @@
 import type { ChainBase, WalletId } from 'common-common/src/types';
 import $ from 'jquery';
-import type { Account, IWebWallet } from 'models';
+import type { IWebWallet } from 'models';
 import app from 'state';
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
@@ -13,6 +13,7 @@ import RoninWebWalletController from './webWallets/ronin_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
+import AddressAccount from "models/Address";
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
@@ -46,7 +47,7 @@ export default class WebWalletController {
 
   // sets a WalletId on the backend for an account whose walletId has not already been set
   private async _setWalletId(
-    account: Account,
+    account: AddressAccount,
     wallet: WalletId
   ): Promise<void> {
     if (app.user.activeAddressAccount.address !== account.address) {
@@ -67,7 +68,7 @@ export default class WebWalletController {
   }
 
   public async locateWallet(
-    account: Account,
+    account: AddressAccount,
     chain?: ChainBase
   ): Promise<IWebWallet<any>> {
     if (chain && account.chain.base !== chain) {

@@ -3,13 +3,13 @@ import assert from 'assert';
 import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import EthereumAccount from './account';
 import type EthereumChain from './chain';
+import AddressAccount from "models/Address";
 
 // NOTE: this is just a boilerplate class; not verified to work yet.
 // TODO: hook this up to rest of the application and verify that it works
 class EthereumAccounts
-  implements IAccountsModule<EthereumCoin, EthereumAccount>
+  implements IAccountsModule<EthereumCoin, AddressAccount>
 {
   private _initialized = false;
   public get initialized() {
@@ -17,14 +17,14 @@ class EthereumAccounts
   }
 
   // STORAGE
-  protected _store: AccountsStore<EthereumAccount> = new AccountsStore();
+  protected _store: AccountsStore<AddressAccount> = new AccountsStore();
   public get store() {
     return this._store;
   }
 
   private _Chain: EthereumChain;
 
-  public get(address: string) {
+  public get(address: string): AddressAccount {
     return this.fromAddress(address);
   }
 
@@ -37,7 +37,7 @@ class EthereumAccounts
     this._app = app;
   }
 
-  public fromAddress(address: string): EthereumAccount {
+  public fromAddress(address: string): AddressAccount {
     if (address.indexOf('0x') !== -1) {
       assert(address.length === 42);
     } else {
@@ -47,7 +47,12 @@ class EthereumAccounts
     try {
       return this._store.getByAddress(address);
     } catch (e) {
-      return new EthereumAccount(this.app, this._Chain, this, address);
+      const addressAccount = new AddressAccount({
+        address,
+        chain: this.app.config.chains.getById(this.app.activeChainId())
+      })
+      this._store.add(addressAccount)
+      return addressAccount;
     }
   }
 

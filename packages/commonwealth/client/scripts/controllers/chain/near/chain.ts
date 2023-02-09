@@ -18,9 +18,10 @@ import type {
 import type { Action, FunctionCall } from 'near-api-js/lib/transaction';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import type { NearAccount, NearAccounts } from './account';
+import type { NearAccounts } from './accounts';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
+import AddressAccount from "models/Address";
 
 export interface IDaoInfo {
   contractId: string;
@@ -43,7 +44,7 @@ export type SerializableFunctionCallOptions = Omit<
   walletCallbackUrl: string;
 };
 
-class NearChain implements IChainModule<NearToken, NearAccount> {
+class NearChain implements IChainModule<NearToken, AddressAccount> {
   private _api: NearApi;
   public get api(): NearApi {
     return this._api;
@@ -210,7 +211,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public async createDaoTx(
-    creator: NearAccount,
+    creator: AddressAccount,
     name: string,
     purpose: string,
     value: BN

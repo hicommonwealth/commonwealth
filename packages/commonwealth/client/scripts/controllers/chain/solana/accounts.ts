@@ -2,12 +2,12 @@ import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 
-import SolanaAccount from './account';
 import type SolanaChain from './chain';
 import type { SolanaToken } from './types';
+import AddressAccount from "models/Address";
 
 export default class SolanaAccounts
-  implements IAccountsModule<SolanaToken, SolanaAccount>
+  implements IAccountsModule<SolanaToken, AddressAccount>
 {
   private _initialized = false;
   public get initialized() {
@@ -15,7 +15,7 @@ export default class SolanaAccounts
   }
 
   // STORAGE
-  private _store: AccountsStore<SolanaAccount> = new AccountsStore();
+  private _store: AccountsStore<AddressAccount> = new AccountsStore();
   public get store() {
     return this._store;
   }
@@ -35,22 +35,17 @@ export default class SolanaAccounts
     this._app = app;
   }
 
-  public fromAddress(address: string): SolanaAccount {
+  public fromAddress(address: string): AddressAccount {
     let acct;
     try {
       acct = this._store.getByAddress(address);
     } catch (e) {
-      acct = new SolanaAccount(this.app, this._Chain, this, address);
+      acct = new AddressAccount({
+        address,
+        chain: this.app.config.chains.getById(this.app.activeChainId())
+      })
     }
     return acct;
-  }
-
-  public fromAddressIfExists(address: string): SolanaAccount | null {
-    try {
-      return this._store.getByAddress(address);
-    } catch (e) {
-      return null;
-    }
   }
 
   public deinit() {

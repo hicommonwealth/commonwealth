@@ -19,11 +19,11 @@ import { Any } from 'cosmjs-types/google/protobuf/any';
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import moment from 'moment';
-import type CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
 import type CosmosChain from './chain';
 import type { CosmosApiType } from './chain';
 import { CosmosProposal } from './proposal';
+import AddressAccount from "models/Address";
 
 const stateEnumToString = (status: ProposalStatus): CosmosProposalState => {
   switch (status) {
@@ -207,7 +207,7 @@ class CosmosGovernance extends ProposalModule<
   }
 
   public createTx(
-    sender: CosmosAccount,
+    sender: AddressAccount,
     title: string,
     description: string,
     initialDeposit: CosmosToken,
@@ -249,7 +249,7 @@ class CosmosGovernance extends ProposalModule<
 
   // TODO: support multiple deposit types
   public async submitProposalTx(
-    sender: CosmosAccount,
+    sender: AddressAccount,
     initialDeposit: CosmosToken,
     content: Any
   ): Promise<number> {

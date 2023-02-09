@@ -3,10 +3,10 @@ import type { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import CosmosAccount from './account';
+import AddressAccount from "models/Address";
 
 export default class CosmosAccounts
-  implements IAccountsModule<CosmosToken, CosmosAccount>
+  implements IAccountsModule<CosmosToken, AddressAccount>
 {
   private _initialized = false;
   public get initialized() {
@@ -14,14 +14,14 @@ export default class CosmosAccounts
   }
 
   // STORAGE
-  private _store: AccountsStore<CosmosAccount> = new AccountsStore();
+  private _store: AccountsStore<AddressAccount> = new AccountsStore();
   public get store() {
     return this._store;
   }
 
   private _Chain: CosmosChain;
 
-  public get(address: string) {
+  public get(address: string): AddressAccount {
     return this.fromAddress(address);
   }
 
@@ -34,23 +34,18 @@ export default class CosmosAccounts
     this._app = app;
   }
 
-  public fromAddress(address: string): CosmosAccount {
+  public fromAddress(address: string): AddressAccount {
     // accepts bech32 encoded cosmosxxxxx addresses and not cosmospubxxx
     let acct;
     try {
       acct = this._store.getByAddress(address);
     } catch (e) {
-      acct = new CosmosAccount(this.app, this._Chain, this, address);
+      acct = new AddressAccount({
+        address,
+        chain: this.app.config.chains.getById(this.app.activeChainId())
+      })
     }
     return acct;
-  }
-
-  public fromAddressIfExists(address: string): CosmosAccount | null {
-    try {
-      return this._store.getByAddress(address);
-    } catch (e) {
-      return null;
-    }
   }
 
   public deinit() {

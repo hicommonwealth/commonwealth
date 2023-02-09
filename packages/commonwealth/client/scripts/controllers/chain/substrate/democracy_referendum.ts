@@ -9,7 +9,7 @@ import { Coin } from 'adapters/currency';
 import BN from 'bn.js';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ProposalType } from 'common-common/src/types';
-import type { Account, ChainEntity, ChainEvent, ProposalEndTime } from 'models';
+import type { ChainEntity, ChainEvent, ProposalEndTime } from 'models';
 import {
   BinaryVote,
   Proposal,
@@ -17,13 +17,13 @@ import {
   VotingType,
   VotingUnit,
 } from 'models';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import type Substrate from './adapter';
 import type SubstrateDemocracy from './democracy';
 import type SubstrateDemocracyProposal from './democracy_proposal';
 import type SubstrateChain from './shared';
 import type { SubstrateTreasuryProposal } from './treasury_proposal';
+import AddressAccount from "models/Address";
 
 export enum DemocracyConviction {
   None = 0,
@@ -122,7 +122,7 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
 
   constructor(
     proposal: SubstrateDemocracyReferendum,
-    account: SubstrateAccount,
+    account: AddressAccount,
     choice: boolean,
     balance: SubstrateCoin,
     weight: number
@@ -183,7 +183,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
     return VotingUnit.CoinVote;
   }
 
-  public canVoteFrom(account: Account) {
+  public canVoteFrom(account: AddressAccount) {
     return account.chain.base === ChainBase.Substrate;
   }
 
@@ -562,7 +562,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
     srmlVote.Standard.balance = balance.toString();
 
     return this._Chain.createTXModalData(
-      vote.account as SubstrateAccount,
+      vote.account,
       (api: ApiPromise) => api.tx.democracy.vote(this.data.index, srmlVote),
       'submitDemocracyVote',
       this.title,
@@ -570,7 +570,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
     );
   }
 
-  public unvote(who: SubstrateAccount, target?: SubstrateAccount) {
+  public unvote(who: AddressAccount, target?: AddressAccount) {
     // you can remove someone else's vote if their unvote scope is set properly,
     // but we don't support that in the UI right now (it requires their vote
     // to be "expired", or for the proxy configuration to allow removing their vote)
@@ -603,7 +603,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
   //   );
   // }
 
-  public async notePreimage(author: SubstrateAccount, action: Call) {
+  public async notePreimage(author: AddressAccount, action: Call) {
     const txFunc = (api: ApiPromise) =>
       api.tx.democracy.notePreimage(action.toHex());
     return this._Chain.createTXModalData(
@@ -614,7 +614,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
     );
   }
 
-  public noteImminentPreimage(author: SubstrateAccount, action: Call) {
+  public noteImminentPreimage(author: AddressAccount, action: Call) {
     return this._Chain.createTXModalData(
       author,
       (api: ApiPromise) =>

@@ -3,7 +3,6 @@ import { ChainBase } from 'common-common/src/types';
 
 import { notifyError } from 'controllers/app/notifications';
 
-import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import type { ChainInfo } from 'models';
 import { IChainAdapter } from 'models';
@@ -12,10 +11,7 @@ import type { IApp } from 'state';
 import CompoundChain from './chain';
 import CompoundGovernance from './governance';
 
-export default class Compound extends IChainAdapter<
-  EthereumCoin,
-  EthereumAccount
-> {
+export default class Compound extends IChainAdapter<EthereumCoin> {
   public readonly base = ChainBase.Ethereum;
   public chain: CompoundChain;
   public accounts: EthereumAccounts;

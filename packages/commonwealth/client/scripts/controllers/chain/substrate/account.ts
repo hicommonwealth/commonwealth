@@ -1,28 +1,10 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable consistent-return */
-import type { ApiPromise } from '@polkadot/api';
-import { decodeAddress } from '@polkadot/keyring';
-import type { Vec } from '@polkadot/types';
-import type {
-  AccountId,
-  Balance,
-  BalanceLock,
-  BalanceLockTo212,
-  Conviction,
-  EraIndex,
-  Exposure,
-  StakingLedger,
-} from '@polkadot/types/interfaces';
-import type { Codec } from '@polkadot/types/types';
-import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import type { IAccountsModule } from 'models';
-import { Account } from 'models';
-
-import type { IApp } from 'state';
-import { AccountsStore } from 'stores';
-import SubstrateChain from './shared';
-
-type Delegation = [AccountId, Conviction] & Codec;
+import {Account} from "models";
+import {SubstrateCoin} from "adapters/chain/substrate/types";
+import {Balance, BalanceLock, BalanceLockTo212, EraIndex, Exposure, StakingLedger} from "@polkadot/types/interfaces";
+import SubstrateChain from "controllers/chain/substrate/shared";
+import {IApp} from "state";
+import {ApiPromise} from "@polkadot/api";
+import SubstrateAccounts from "controllers/chain/substrate/accounts";
 
 export class SubstrateAccount extends Account {
   // GETTERS AND SETTERS
@@ -271,87 +253,3 @@ export class SubstrateAccount extends Account {
     );
   }
 }
-
-class SubstrateAccounts
-  implements IAccountsModule<SubstrateCoin, SubstrateAccount>
-{
-  private _initialized = false;
-
-  public get initialized() {
-    return this._initialized;
-  }
-
-  // STORAGE
-  private _store: AccountsStore<SubstrateAccount> = new AccountsStore();
-  public get store() {
-    return this._store;
-  }
-
-  private _Chain: SubstrateChain;
-
-  public get(address: string, keytype?: string) {
-    if (keytype && keytype !== 'ed25519' && keytype !== 'sr25519') {
-      throw new Error(`invalid keytype: ${keytype}`);
-    }
-    return this.fromAddress(address, keytype && keytype === 'ed25519');
-  }
-
-  private _app: IApp;
-  public get app() {
-    return this._app;
-  }
-
-  constructor(app: IApp) {
-    this._app = app;
-  }
-
-  public isZero(address: string) {
-    const decoded = decodeAddress(address);
-    return decoded.every((v) => v === 0);
-  }
-
-  public fromAddress(address: string, isEd25519 = false): SubstrateAccount {
-    try {
-      decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
-    } catch (e) {
-      console.error(`Decoded invalid address: ${address}`);
-      return;
-    }
-    try {
-      const acct = this._store.getByAddress(address);
-      // update account key type if created with incorrect settings
-      if (acct.isEd25519 !== isEd25519) {
-        return new SubstrateAccount(
-          this.app,
-          this._Chain,
-          this,
-          address,
-          isEd25519
-        );
-      } else {
-        return acct;
-      }
-    } catch (e) {
-      return new SubstrateAccount(
-        this.app,
-        this._Chain,
-        this,
-        address,
-        isEd25519
-      );
-    }
-  }
-
-  // TODO: can we remove these functions?
-  public deinit() {
-    this._initialized = false;
-    this.store.clear();
-  }
-
-  public async init(ChainInfo: SubstrateChain): Promise<void> {
-    this._Chain = ChainInfo;
-    this._initialized = true;
-  }
-}
-
-export default SubstrateAccounts;

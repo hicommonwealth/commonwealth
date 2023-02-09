@@ -3,7 +3,6 @@ import type { IIdentifiable } from 'adapters/shared';
 import type { ProposalType } from 'common-common/src/types';
 import type moment from 'moment';
 import type { ProposalStore } from '../stores';
-import type Account from './Account';
 import type ChainEvent from './ChainEvent';
 import type { ITXModalData, IUniqueId, IVote } from './interfaces';
 import type {
@@ -12,6 +11,7 @@ import type {
   VotingType,
   VotingUnit,
 } from './types';
+import AddressAccount from "models/Address";
 
 abstract class Proposal<
   ApiT,
@@ -43,14 +43,14 @@ abstract class Proposal<
 
   public abstract get description(): string;
 
-  public abstract get author(): Account;
+  public abstract get author(): AddressAccount;
 
   // voting
   public abstract get votingType(): VotingType;
 
   public abstract get votingUnit(): VotingUnit;
 
-  public abstract canVoteFrom(account: Account): boolean;
+  public abstract canVoteFrom(account: AddressAccount): boolean;
 
   protected votes: { [account: string]: VoteT } = {};
 
@@ -110,7 +110,7 @@ abstract class Proposal<
     this.votes[vote.account.address] = vote;
   }
 
-  public removeVote(account: Account) {
+  public removeVote(account: AddressAccount) {
     if (this.hasVoted(account)) {
       delete this.votes[account.address];
     }
@@ -121,11 +121,11 @@ abstract class Proposal<
   }
 
   // TODO: these can be observables, if we want
-  public hasVoted(account: Account) {
+  public hasVoted(account: AddressAccount) {
     return this.votes[account.address] !== undefined;
   }
 
-  public getVotes(fromAccount?: Account) {
+  public getVotes(fromAccount?: AddressAccount) {
     if (fromAccount) {
       return this.votes[fromAccount.address] !== undefined
         ? [this.votes[fromAccount.address]]

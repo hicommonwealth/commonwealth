@@ -13,7 +13,7 @@ import {
   setActiveAccount,
   updateActiveAddresses,
 } from 'controllers/app/login';
-import type { NearAccount } from 'controllers/chain/near/account';
+import type { NearAccount } from 'controllers/chain/near/accounts';
 import type Near from 'controllers/chain/near/adapter';
 import $ from 'jquery';
 import m from 'mithril';

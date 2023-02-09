@@ -13,14 +13,14 @@ import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
 import { Identity } from 'models';
 import type { IHasId, ISerializable } from 'stores';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import type SubstrateIdentities from './identities';
 import type { SuperCodec } from './identities';
 import type SubstrateChain from './shared';
+import AddressAccount from "models/Address";
 
 export interface IIdentitySubs {
-  subs: SubstrateAccount[];
+  subs: AddressAccount[];
   deposit: SubstrateCoin;
 }
 
@@ -62,7 +62,7 @@ export function getIdentityQuality(judgements: string[]): IdentityQuality {
 }
 
 export default class SubstrateIdentity
-  extends Identity<SubstrateCoin, SubstrateAccount>
+  extends Identity<SubstrateCoin, AddressAccount>
   implements ISerializable<ISubstrateIdentity>
 {
   private _judgements: RegistrationJudgement[];
@@ -163,7 +163,7 @@ export default class SubstrateIdentity
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Identities: SubstrateIdentities,
-    who: SubstrateAccount
+    who: AddressAccount
   ) {
     // we use the address of the identity's owner as its identifier
     super(who, who.address);
@@ -173,7 +173,7 @@ export default class SubstrateIdentity
     this._Identities = Identities;
   }
 
-  public subName(sub: SubstrateAccount): Promise<string> {
+  public subName(sub: AddressAccount): Promise<string> {
     return this._Chain.api.query.identity
       .superOf(sub.address)
       .then((dataOpt: Option<SuperCodec>) => {

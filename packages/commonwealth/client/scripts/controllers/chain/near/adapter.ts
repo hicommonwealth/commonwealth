@@ -3,10 +3,10 @@ import { ChainBase } from 'common-common/src/types';
 import type { ChainInfo } from 'models';
 import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
-import { NearAccounts } from './account';
+import { NearAccounts } from './accounts';
 import NearChain from './chain';
 
-export default class Near extends IChainAdapter<NearToken, any> {
+export default class Near extends IChainAdapter<NearToken> {
   public base = ChainBase.NEAR;
   public chain: NearChain;
   public accounts: NearAccounts;

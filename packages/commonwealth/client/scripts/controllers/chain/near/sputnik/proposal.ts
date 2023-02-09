@@ -1,7 +1,7 @@
 import type { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ProposalType } from 'common-common/src/types';
-import type { NearAccount, NearAccounts } from 'controllers/chain/near/account';
+import type { NearAccounts } from 'controllers/chain/near/accounts';
 import type NearChain from 'controllers/chain/near/chain';
 import type { ITXModalData, ProposalEndTime } from 'models';
 import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
@@ -24,6 +24,7 @@ import {
   NearSputnikVote,
   WeightKind,
 } from './types';
+import AddressAccount from "models/Address";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -110,7 +111,7 @@ export default class NearSputnikProposal extends Proposal<
       : VotingUnit.CoinVote;
   }
 
-  public canVoteFrom(account: NearAccount) {
+  public canVoteFrom(account: AddressAccount) {
     // technically we should check on each role separately, but for now we
     // confirm they have all 3 voting roles
     const permissions = getUserRoles(this._Dao.policy, account.address);
@@ -252,7 +253,7 @@ export default class NearSputnikProposal extends Proposal<
   }
 
   public async submitVoteWebTx(vote: NearSputnikVote) {
-    const account = this._Dao.app.user.activeAddressAccount as NearAccount;
+    const account = this._Dao.app.user.activeAddressAccount;
     if (account.address !== vote.account.address) {
       throw new Error('Invalid vote address!');
     }

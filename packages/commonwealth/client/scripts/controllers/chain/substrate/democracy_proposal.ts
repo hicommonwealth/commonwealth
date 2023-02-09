@@ -14,7 +14,7 @@ import BN from 'bn.js';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import { formatProposalHashShort } from 'helpers';
-import type { Account, ChainEntity, ChainEvent, ProposalEndTime } from 'models';
+import type { ChainEntity, ChainEvent, ProposalEndTime } from 'models';
 import {
   DepositVote,
   Proposal,
@@ -22,13 +22,13 @@ import {
   VotingType,
   VotingUnit,
 } from 'models';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import type Substrate from './adapter';
 import type SubstrateDemocracyProposals from './democracy_proposals';
 import type { SubstrateDemocracyReferendum } from './democracy_referendum';
 
 import type SubstrateChain from './shared';
+import AddressAccount from "models/Address";
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -39,6 +39,7 @@ const backportEventToAdapter = (
     identifier: event.proposalIndex.toString(),
     index: event.proposalIndex,
     hash: enc.encode(event.proposalHash),
+    //@ts-ignore
     deposit: ChainInfo.createType('u128', event.deposit),
     author: event.proposer,
   };
@@ -60,7 +61,7 @@ class SubstrateDemocracyProposal extends Proposal<
     return null;
   }
 
-  private readonly _author: SubstrateAccount;
+  private readonly _author: AddressAccount;
   public get author() {
     return this._author;
   }
@@ -80,7 +81,7 @@ class SubstrateDemocracyProposal extends Proposal<
     return VotingUnit.CoinVote;
   }
 
-  public canVoteFrom(account: Account) {
+  public canVoteFrom(account: AddressAccount) {
     return account.chain.base === ChainBase.Substrate;
   }
 

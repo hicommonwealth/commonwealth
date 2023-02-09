@@ -4,7 +4,7 @@ import type { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
 import ClassComponent from 'class_component';
 import { notifyError } from 'controllers/app/notifications';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import type { IdentityInfoProps } from 'controllers/chain/substrate/identities';
 import type SubstrateIdentity from 'controllers/chain/substrate/identity';

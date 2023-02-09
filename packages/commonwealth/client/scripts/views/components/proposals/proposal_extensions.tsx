@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 import 'components/proposals/proposal_extensions.scss';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';

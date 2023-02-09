@@ -1,6 +1,6 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import type SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { IdentityQuality } from 'controllers/chain/substrate/identity';

@@ -6,14 +6,15 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
-import type { Account, ProposalModule } from '.';
+import type { ProposalModule } from '.';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
+import AddressAccount from "models/Address";
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
 // TODO: move this from `app.chain` or else rename `chain`?
-abstract class IChainAdapter<C extends Coin, A extends Account> {
+abstract class IChainAdapter<C extends Coin> {
   protected _apiInitialized = false;
   public get apiInitialized() {
     return this._apiInitialized;
@@ -29,8 +30,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     return this._failed;
   }
 
-  public abstract chain: IChainModule<C, A>;
-  public abstract accounts: IAccountsModule<C, A>;
+  public abstract chain: IChainModule<C, AddressAccount>;
+  public abstract accounts: IAccountsModule<C, AddressAccount>;
   public readonly communityBanner?: string;
 
   public deferred: boolean;

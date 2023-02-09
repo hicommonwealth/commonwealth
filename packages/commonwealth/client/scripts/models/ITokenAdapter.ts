@@ -1,13 +1,13 @@
 import type { Coin } from 'adapters/currency';
 import BN from 'bn.js';
-import type { Account } from '.';
 import { IChainAdapter } from '.';
+import AddressAccount from "models/Address";
 
 // Extension of IChainAdapter to support Token functionality
 // See controller/ethereum/tokenAdapter for example usage
 export default abstract class ITokenAdapter extends IChainAdapter<
   Coin,
-  Account
+  AddressAccount
 > {
   public readonly contractAddress: string;
   public contractApi?: unknown; // type-specific by implementation
@@ -19,7 +19,7 @@ export default abstract class ITokenAdapter extends IChainAdapter<
   ): Promise<boolean>;
 
   public static instanceOf(
-    adapter: IChainAdapter<Coin, Account>
+    adapter: IChainAdapter<Coin, AddressAccount>
   ): adapter is ITokenAdapter {
     return !!adapter && 'hasToken' in adapter;
   }

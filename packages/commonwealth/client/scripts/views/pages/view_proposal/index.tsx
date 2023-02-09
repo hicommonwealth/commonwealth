@@ -34,6 +34,7 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
+import AddressAccount from "models/Address";
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -210,7 +211,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
 
     // load profiles
     if (this.prefetch[proposalIdAndType]['profilesStarted'] === undefined) {
-      if (this.proposal.author instanceof Account) {
+      if (this.proposal.author instanceof AddressAccount) {
         // AnyProposal
         app.profiles.getProfile(
           this.proposal.author.chain.id,

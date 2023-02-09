@@ -21,13 +21,13 @@ import MolochProposal, {
   MolochProposalVote,
   MolochVote,
 } from 'controllers/chain/ethereum/moloch/proposal';
-import type { NearAccount } from 'controllers/chain/near/account';
+import type { NearAccount } from 'controllers/chain/near/accounts';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import {
   convictionToWeight,

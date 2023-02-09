@@ -19,10 +19,10 @@ import {
   VotingType,
   VotingUnit,
 } from 'models';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import type SubstrateTreasuryTips from './treasury_tips';
+import {SubstrateAccount} from "controllers/chain/substrate/account";
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -67,7 +67,7 @@ export class SubstrateTreasuryTip extends Proposal<
     return this._description;
   }
 
-  private readonly _author: SubstrateAccount;
+  private readonly _author: AddressAccount;
   public get author() {
     return this._author;
   }
@@ -97,7 +97,7 @@ export class SubstrateTreasuryTip extends Proposal<
   public readonly votingType = VotingType.SimpleYesApprovalVoting;
   public readonly votingUnit = VotingUnit.CoinVote;
 
-  public canVoteFrom(account: SubstrateAccount) {
+  public canVoteFrom(account: AddressAccount) {
     return this._Tips.isMember(account);
   }
 
@@ -243,11 +243,11 @@ export class SubstrateTreasuryTip extends Proposal<
 
   // TRANSACTIONS
   public submitVoteTx(vote: DepositVote<SubstrateCoin>): ITXModalData {
-    if (!this.canVoteFrom(vote.account as SubstrateAccount)) {
+    if (!this.canVoteFrom(vote.account as AddressAccount)) {
       throw new Error('Voter not in Tippers list.');
     }
     return this._Chain.createTXModalData(
-      vote.account as SubstrateAccount,
+      vote.account as AddressAccount,
       (api: ApiPromise) => api.tx.tips.tip(this.data.hash, vote.deposit.asBN),
       'tip',
       this.title
@@ -259,7 +259,7 @@ export class SubstrateTreasuryTip extends Proposal<
     );
   }
 
-  public closeTx(who: SubstrateAccount): ITXModalData {
+  public closeTx(who: AddressAccount): ITXModalData {
     if (
       !this.data.closing ||
       this.data.closing > this._Tips.app.chain.block.height
@@ -275,7 +275,7 @@ export class SubstrateTreasuryTip extends Proposal<
     );
   }
 
-  public retractTx(who: SubstrateAccount): ITXModalData {
+  public retractTx(who: AddressAccount): ITXModalData {
     if (this.data.finder !== who.address) {
       throw new Error('Only finder can retract tip.');
     }

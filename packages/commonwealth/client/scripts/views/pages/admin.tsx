@@ -3,7 +3,7 @@
 import type { ISubmittableResult } from '@polkadot/types/types';
 import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import $ from 'jquery';

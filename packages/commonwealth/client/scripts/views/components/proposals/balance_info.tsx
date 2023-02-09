@@ -2,7 +2,7 @@
 
 import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import m from 'mithril';
 import app from 'state';
 import { CWText } from '../component_kit/cw_text';

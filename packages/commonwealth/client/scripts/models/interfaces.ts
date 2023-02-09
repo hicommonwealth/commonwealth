@@ -3,9 +3,9 @@ import type { IIdentifiable } from 'adapters/shared';
 import type BN from 'bn.js';
 import type { EventEmitter } from 'events';
 import type moment from 'moment';
-import type Account from './Account';
 import type StorageModule from './StorageModule';
 import type { TransactionStatus } from './types';
+import AddressAccount from "models/Address";
 
 /* eslint-disable */
 
@@ -23,7 +23,7 @@ export interface ITXData {
 
 // TODO: figure out how to abstract this to make the tx_signing_modal work with cosmos
 export type ITXModalData = {
-  author: Account;
+  author: AddressAccount;
   txType: string;
   txData: {
     // subscribe to transaction events
@@ -42,7 +42,7 @@ export type ITXModalData = {
 
 // Implemented by a chain's top-level module. Responsible for high-level
 // metadata, API, and event-handling functionality.
-export interface IChainModule<C extends Coin, A extends Account> {
+export interface IChainModule<C extends Coin, A extends AddressAccount> {
   coins(n: number | BN, inDollars?: boolean): C;
 
   denom: string;
@@ -59,7 +59,7 @@ export interface IChainModule<C extends Coin, A extends Account> {
 }
 
 // Implemented by a chain's account module. Store for account objects.
-export interface IAccountsModule<C extends Coin, A extends Account>
+export interface IAccountsModule<C extends Coin, A extends AddressAccount>
   extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
@@ -67,7 +67,7 @@ export interface IAccountsModule<C extends Coin, A extends Account>
 }
 
 // Offchain stores and management for discussion features.
-export interface IOffchainAccountsModule<C extends Coin, A extends Account>
+export interface IOffchainAccountsModule<C extends Coin, A extends AddressAccount>
   extends StorageModule {
   get(address: string, chain?: string): A;
 }
@@ -80,10 +80,12 @@ export interface ITransactionResult {
   timestamp?: moment.Moment;
 }
 
-export type IBalanceAccount<C extends Coin> = Account & { balance: Promise<C> };
+export type IBalanceAccount<C extends Coin> = AddressAccount & { balance: Promise<C> };
 
 export interface IVote<C extends Coin> {
-  account: IBalanceAccount<C>;
+  account: AddressAccount;
+  // TODO: Tim -- should we have a get balance value/function here considering that previously this
+  //  account was an IBalanceAccount instance which does include the promise for balance
 }
 
 export interface IUniqueId extends IIdentifiable {

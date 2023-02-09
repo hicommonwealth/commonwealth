@@ -4,14 +4,13 @@ import $ from 'jquery';
 import type { ChainInfo, ITokenAdapter } from 'models';
 import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
-import type CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
 import type { CosmosToken } from './types';
 
 class Cosmos
-  extends IChainAdapter<CosmosToken, CosmosAccount>
+  extends IChainAdapter<CosmosToken>
   implements ITokenAdapter
 {
   public chain: CosmosChain;

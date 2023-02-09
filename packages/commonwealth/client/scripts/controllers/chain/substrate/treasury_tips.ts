@@ -9,22 +9,22 @@ import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import { formatAddressShort } from 'utils';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import { SubstrateTreasuryTip } from './treasury_tip';
+import AddressAccount from "models/Address";
 
 class SubstrateTreasuryTips extends ProposalModule<
   ApiPromise,
   ISubstrateTreasuryTip,
   SubstrateTreasuryTip
 > {
-  private _members: SubstrateAccount[];
+  private _members: AddressAccount[];
   public get members() {
     return this._members;
   }
 
-  public isMember(account: SubstrateAccount): boolean {
+  public isMember(account: AddressAccount): boolean {
     return (
       account &&
       this._members.find((m) => m.address === account.address) !== undefined
@@ -77,9 +77,9 @@ class SubstrateTreasuryTips extends ProposalModule<
   }
 
   public createTx(
-    author: SubstrateAccount,
+    author: AddressAccount,
     reason: string,
-    who: SubstrateAccount
+    who: AddressAccount
   ) {
     return this._Chain.createTXModalData(
       author,
@@ -90,9 +90,9 @@ class SubstrateTreasuryTips extends ProposalModule<
   }
 
   public createTxAsTipper(
-    author: SubstrateAccount,
+    author: AddressAccount,
     reason: string,
-    who: SubstrateAccount,
+    who: AddressAccount,
     value: SubstrateCoin
   ) {
     if (!this.isMember(author)) {

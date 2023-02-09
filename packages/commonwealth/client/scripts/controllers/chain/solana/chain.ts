@@ -5,14 +5,14 @@ import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import type SolanaAccount from './account';
 
 import { SolanaToken } from './types';
+import AddressAccount from "models/Address";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default class SolanaChain
-  implements IChainModule<SolanaToken, SolanaAccount>
+  implements IChainModule<SolanaToken, AddressAccount>
 {
   private _denom: string;
   public get denom(): string {
@@ -73,7 +73,7 @@ export default class SolanaChain
   }
 
   public createTXModalData(
-    author: SolanaAccount,
+    author: AddressAccount,
     txFunc,
     txName: string,
     objName: string,

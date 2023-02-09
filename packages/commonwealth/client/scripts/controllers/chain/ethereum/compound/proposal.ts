@@ -21,7 +21,6 @@ import type {
 } from 'models';
 import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import moment from 'moment';
-import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 
@@ -29,6 +28,7 @@ import type CompoundAPI from './api';
 import { GovernorType } from './api';
 import type CompoundChain from './chain';
 import type CompoundGovernance from './governance';
+import AddressAccount from "models/Address";
 
 export enum BravoVote {
   NO = 0,
@@ -37,11 +37,11 @@ export enum BravoVote {
 }
 
 export class CompoundProposalVote implements IVote<EthereumCoin> {
-  public readonly account: EthereumAccount;
+  public readonly account: AddressAccount;
   public readonly choice: BravoVote;
   public readonly power: BN;
 
-  constructor(member: EthereumAccount, choice: BravoVote, power?: BN) {
+  constructor(member: AddressAccount, choice: BravoVote, power?: BN) {
     this.account = member;
     this.choice = choice;
     this.power = power || new BN(0);
@@ -364,7 +364,7 @@ export default class CompoundProposal extends Proposal<
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public canVoteFrom(account: EthereumAccount) {
+  public canVoteFrom(account: AddressAccount) {
     // We need to check the delegate of account to perform voting checks. Delegates must
     // be fetched from chain, which requires async calls, making this impossible to implement.
     // TODO: load on contract init

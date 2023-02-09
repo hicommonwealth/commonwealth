@@ -1,7 +1,6 @@
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { ChainBase } from 'common-common/src/types';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import SubstrateAccounts from 'controllers/chain/substrate/account';
+import SubstrateAccounts from 'controllers/chain/substrate/accounts';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
@@ -12,7 +11,7 @@ import SubstrateIdentities from './identities';
 import SubstrateChain from './shared';
 import SubstrateTreasuryTips from './treasury_tips';
 
-class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
+class Substrate extends IChainAdapter<SubstrateCoin> {
   public chain: SubstrateChain;
   public accounts: SubstrateAccounts;
   public democracyProposals: SubstrateDemocracyProposals;

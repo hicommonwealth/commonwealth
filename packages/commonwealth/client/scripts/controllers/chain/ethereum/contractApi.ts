@@ -10,7 +10,7 @@ import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type { Contract } from 'ethers';
 import { ethers } from 'ethers';
-import type { Account } from 'models';
+import AddressAccount from "models/Address";
 
 export type ContractFactoryT<ContractT> = (
   address: string,
@@ -19,7 +19,7 @@ export type ContractFactoryT<ContractT> = (
 
 export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
-  sender: Account,
+  sender: AddressAccount,
   contract: CT
 ): Promise<CT> {
   const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);

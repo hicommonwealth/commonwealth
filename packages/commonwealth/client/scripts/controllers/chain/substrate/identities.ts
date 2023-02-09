@@ -12,11 +12,11 @@ import BN from 'bn.js';
 import type { StorageModule } from 'models';
 import type { IApp } from 'state';
 import { PersistentStore } from 'stores';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './accounts';
 import type { ISubstrateIdentity } from './identity';
 import SubstrateIdentity from './identity';
 import type SubstrateChain from './shared';
+import AddressAccount from "models/Address";
 
 class SubstrateIdentityStore extends PersistentStore<
   ISubstrateIdentity,
@@ -111,7 +111,7 @@ class SubstrateIdentities implements StorageModule {
   }
 
   // given an account, fetch the corresponding identity (works on sub-accounts)
-  public async load(who: SubstrateAccount): Promise<SubstrateIdentity> {
+  public async load(who: AddressAccount): Promise<SubstrateIdentity> {
     // check immediately if we have the id
     const existingIdentity = this.store.getById(who.address);
     if (existingIdentity) {
@@ -187,7 +187,7 @@ class SubstrateIdentities implements StorageModule {
 
   // TRANSACTIONS
   // TODO: add helper for mashalling substrate Data fields
-  public async setIdentityTx(who: SubstrateAccount, data: IdentityInfoProps) {
+  public async setIdentityTx(who: AddressAccount, data: IdentityInfoProps) {
     const info = this._Chain.createType('IdentityInfo', data);
 
     // compute the basic required balance for the registration
@@ -214,7 +214,7 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public setRegistrarFeeTx(
-    who: SubstrateAccount,
+    who: AddressAccount,
     regIdx: number,
     fee: SubstrateCoin
   ) {
@@ -227,9 +227,9 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public setRegistrarAccountTx(
-    who: SubstrateAccount,
+    who: AddressAccount,
     regIdx: number,
-    newAcct: SubstrateAccount
+    newAcct: AddressAccount
   ) {
     return this._Chain.createTXModalData(
       who,
@@ -241,7 +241,7 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public setRegistrarFieldsTx(
-    who: SubstrateAccount,
+    who: AddressAccount,
     regIdx: number,
     fields: IdentityFields
   ) {
@@ -254,7 +254,7 @@ class SubstrateIdentities implements StorageModule {
   }
 
   // requires RegistrarOrigin or Root!
-  public addRegistrarMethod(account: SubstrateAccount): Call {
+  public addRegistrarMethod(account: AddressAccount): Call {
     const func = this._Chain.getTxMethod('identity', 'addRegistrar', [
       account.address,
     ]);
