@@ -60,7 +60,6 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
           {m(User, {
             user: author,
             hideAvatar: true,
-            hideIdentityIcon: true,
           })}{' '}
           created this thread
         </>

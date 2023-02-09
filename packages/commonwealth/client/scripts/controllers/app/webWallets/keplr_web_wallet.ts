@@ -2,11 +2,11 @@ import app from 'state';
 
 import type { AccountData } from '@cosmjs/proto-signing';
 import type { OfflineDirectSigner } from '@cosmjs/proto-signing';
+import type { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
-import type { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -72,15 +72,16 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
     const chainId = this.getChainId();
     const stdSignature = await window.keplr.signArbitrary(
       chainId,
       account.address,
-      JSON.stringify(canvasMessage)
+      canvas.serializeSessionPayload(canvasMessage)
     );
-    return JSON.stringify({ signature: stdSignature });
+    return JSON.stringify(stdSignature);
   }
 
   // ACTIONS
