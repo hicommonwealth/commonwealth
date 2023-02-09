@@ -179,10 +179,6 @@ export default class CompoundProposal extends Proposal<
     return +this.data.startBlock;
   }
 
-  public get votingPeriodEnd() {
-    return this.startingPeriod + +this._Gov.votingPeriod;
-  }
-
   public get state(): CompoundTypes.ProposalState {
     const time = Date.now() / 1000;
     if (this.data.cancelled) return CompoundTypes.ProposalState.Canceled;
@@ -473,54 +469,6 @@ export default class CompoundProposal extends Proposal<
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to queue proposal');
-    }
-    return txReceipt;
-  }
-
-  public async executeTx() {
-    if (this.data.executed) {
-      throw new Error('proposal already executed');
-    }
-
-    const contract = await attachSigner(
-      this._Gov.app.wallets,
-      this._Gov.app.user.activeAccount,
-      this._Gov.api.Contract
-    );
-
-    let tx: ContractTransaction;
-    if (this._Gov.api.govType === GovernorType.Oz) {
-      const descriptionHash = utils.keccak256(
-        utils.toUtf8Bytes(this.data.description)
-      );
-      const gasLimit = await (
-        contract as GovernorCompatibilityBravo
-      ).estimateGas['execute(address[],uint256[],bytes[],bytes32)'](
-        this.data.targets,
-        this.data.values,
-        this.data.calldatas,
-        descriptionHash
-      );
-      tx = await (contract as GovernorCompatibilityBravo)[
-        'execute(address[],uint256[],bytes[],bytes32)'
-      ](
-        this.data.targets,
-        this.data.values,
-        this.data.calldatas,
-        descriptionHash,
-        { gasLimit }
-      );
-    } else {
-      const gasLimit = await contract.estimateGas['execute(uint256)'](
-        this.data.identifier
-      );
-      tx = await contract['execute(uint256)'](this.data.identifier, {
-        gasLimit,
-      });
-    }
-    const txReceipt = await tx.wait();
-    if (txReceipt.status !== 1) {
-      throw new Error('failed to execute proposal');
     }
     return txReceipt;
   }
