@@ -70,9 +70,7 @@ export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAtt
   }
 }
 
-export type SubheaderProposalType =
-  | AaveProposal
-  | CompoundProposal
+export type SubheaderProposalType = AaveProposal | CompoundProposal;
 
 type ProposalSubheaderAttrs = {
   proposal: SubheaderProposalType;
@@ -80,12 +78,8 @@ type ProposalSubheaderAttrs = {
 
 export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
   view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
-    const {
-      onModalClose,
-      proposal,
-      toggleVotingModal,
-      votingModalOpen,
-    } = vnode.attrs;
+    const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
+      vnode.attrs;
 
     return (
       <div class="ProposalSubheader">

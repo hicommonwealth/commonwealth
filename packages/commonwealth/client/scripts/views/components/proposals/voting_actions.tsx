@@ -36,9 +36,7 @@ import { BinaryVote, DepositVote, VotingType } from 'models';
 import app from 'state';
 
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import {
-  CompoundCancelButton,
-} from '../../pages/view_proposal/proposal_components';
+import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { getCanVote, getVotingResults } from './helpers';
