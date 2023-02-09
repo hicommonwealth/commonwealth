@@ -109,7 +109,7 @@ export const EditTopicThresholdsModal = (
               return 0;
             })
             .map((topic) => {
-              return <EditTopicThresholdsRow topic={topic} />;
+              return <EditTopicThresholdsRow topic={topic} key={topic.id} />;
             })
         ) : (
           <CWText>There are no topics in this community yet</CWText>
