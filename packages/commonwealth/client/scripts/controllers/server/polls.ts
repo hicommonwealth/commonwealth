@@ -120,6 +120,7 @@ class PollsController {
       data: {
         thread_id: threadId,
         poll_id: pollId,
+        chain_id: app.activeChainId(),
         jwt: app.user.jwt,
       },
       success: (response) => {
