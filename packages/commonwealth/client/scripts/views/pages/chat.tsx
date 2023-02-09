@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'pages/chat.scss';
 

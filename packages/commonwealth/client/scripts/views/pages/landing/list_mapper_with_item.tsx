@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 import {
@@ -10,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import { removeOrAddClasslistToAllElements } from 'helpers';
 import { ICardListItem } from 'models/interfaces';

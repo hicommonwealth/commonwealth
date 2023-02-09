@@ -10,7 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 

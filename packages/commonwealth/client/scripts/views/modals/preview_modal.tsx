@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'modals/preview_modal.scss';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';

@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import $ from 'jquery';
 import type { SocialAccount } from 'models';
 import { navigateToSubpage } from 'router';

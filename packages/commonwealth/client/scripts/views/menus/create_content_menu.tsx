@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';

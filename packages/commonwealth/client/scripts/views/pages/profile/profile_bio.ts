@@ -39,12 +39,8 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     vnode.state.showProfileRight = false;
   },
   view: (vnode) => {
-    const {
-      account,
-      refreshCallback,
-      onOwnProfile,
-      onLinkedProfile,
-    } = vnode.attrs;
+    const { account, refreshCallback, onOwnProfile, onLinkedProfile } =
+      vnode.attrs;
     const showJoinCommunityButton = !onOwnProfile;
 
     window.addEventListener(

@@ -5,9 +5,7 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import { ClassComponent, ResultNode} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/tips.scss';
 

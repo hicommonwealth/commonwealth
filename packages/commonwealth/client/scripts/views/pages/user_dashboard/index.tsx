@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, setRoute, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import { notifyInfo } from 'controllers/app/notifications';

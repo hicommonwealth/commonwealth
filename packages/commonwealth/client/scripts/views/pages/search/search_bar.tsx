@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, setRoute, getRouteParam} from
-
- 'mithrilInterop';
+import { ClassComponent, setRoute, getRouteParam } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import { SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';

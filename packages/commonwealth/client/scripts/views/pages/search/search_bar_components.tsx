@@ -1,12 +1,7 @@
 import React from 'react';
 
 import { AddressInfo } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';

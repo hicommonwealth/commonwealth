@@ -16,7 +16,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';

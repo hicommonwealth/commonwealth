@@ -1,9 +1,7 @@
 import React from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
-import { ClassComponent} from
-
- 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';

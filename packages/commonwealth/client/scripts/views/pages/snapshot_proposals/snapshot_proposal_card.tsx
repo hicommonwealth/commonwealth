@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
 import { formatLastUpdated, formatTimestamp } from 'helpers';

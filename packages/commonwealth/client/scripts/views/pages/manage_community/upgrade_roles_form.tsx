@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';

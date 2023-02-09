@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';

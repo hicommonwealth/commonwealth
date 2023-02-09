@@ -131,7 +131,7 @@ export async function completeClientLogin(account: Account) {
     }
     const completeLogin = new EventEmitter();
 
-    completeLogin.emit('redraw')
+    completeLogin.emit('redraw');
   } catch (e) {
     console.trace(e);
   }

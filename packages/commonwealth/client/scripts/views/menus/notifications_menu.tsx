@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 // import Infinite from 'mithril-infinite';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 

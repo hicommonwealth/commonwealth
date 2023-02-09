@@ -10,7 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-    rootRender,
+  rootRender,
 } from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';

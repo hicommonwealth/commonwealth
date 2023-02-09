@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import { ProposalType } from 'common-common/src/types';
 
 import { externalLink, extractDomain, link } from 'helpers';

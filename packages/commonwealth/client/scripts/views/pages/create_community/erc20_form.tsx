@@ -8,9 +8,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { providers } from 'ethers';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import { ClassComponent, setRoute, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, setRoute, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import $ from 'jquery';

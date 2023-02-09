@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import { pluralize } from 'helpers';
 import type { ChainInfo } from 'models';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';

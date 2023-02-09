@@ -5,7 +5,7 @@ import {
   ResultNode,
   getRouteParam,
   redraw,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 

@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';

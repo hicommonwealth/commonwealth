@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';

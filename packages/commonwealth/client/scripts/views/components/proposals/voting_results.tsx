@@ -10,7 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import BN from 'bn.js';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';

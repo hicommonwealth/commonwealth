@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 import {
@@ -10,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'pages/landing/find_your_community_section.scss';
 

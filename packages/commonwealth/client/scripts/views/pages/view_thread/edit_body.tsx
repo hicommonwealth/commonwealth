@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import type { Thread } from 'models';
 import 'pages/view_thread/edit_body.scss';
 import { notifySuccess } from 'controllers/app/notifications';

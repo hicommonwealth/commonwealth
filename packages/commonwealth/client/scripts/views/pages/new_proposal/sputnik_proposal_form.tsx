@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import { notifyError } from 'controllers/app/notifications';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';

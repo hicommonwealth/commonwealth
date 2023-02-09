@@ -29,7 +29,10 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       } = rxn;
 
       return (
-        <div key={address + "#" + (chain?.id || chain)} style={{ display: 'flex', width: '120px' }}>
+        <div
+          key={address + '#' + (chain?.id || chain)}
+          style={{ display: 'flex', width: '120px' }}
+        >
           <CWText noWrap>
             <User
               user={new AddressInfo(null, address, chain?.id || chain, null)}

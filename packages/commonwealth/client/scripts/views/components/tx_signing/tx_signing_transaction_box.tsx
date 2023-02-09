@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_transaction_box.scss';
 import { CWText } from '../component_kit/cw_text';

@@ -73,9 +73,8 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   const [threadFetchFailed, setThreadFetchFailed] = useState<boolean>();
   const [title, setTitle] = useState<string>();
   const [viewCount, setViewCount] = useState<number>();
-  const [initializedComments, setInitializedComments] = useState<boolean>(
-    false
-  );
+  const [initializedComments, setInitializedComments] =
+    useState<boolean>(false);
   const [initializedPolls, setInitializedPolls] = useState<boolean>(false);
 
   // editorListener(e) {

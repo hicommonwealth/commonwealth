@@ -4,9 +4,7 @@ import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { DepositVote } from 'models';
 import type { IBalanceAccount } from 'models/interfaces';
-import { ClassComponent, ResultNode, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
 
 import 'pages/tip_detail.scss';
 

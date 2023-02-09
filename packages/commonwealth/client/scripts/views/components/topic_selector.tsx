@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'components/topic_selector.scss';
 import { isNotUndefined } from 'helpers/typeGuards';

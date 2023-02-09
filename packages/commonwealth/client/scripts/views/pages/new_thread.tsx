@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import { navigateToSubpage } from 'router';
 import { notifyInfo } from 'controllers/app/notifications';

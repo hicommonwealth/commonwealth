@@ -17,7 +17,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 import app from 'state';

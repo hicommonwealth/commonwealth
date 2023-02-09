@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'components/sidebar/explore_sidebar.scss';
 import { ChainInfo } from 'models';

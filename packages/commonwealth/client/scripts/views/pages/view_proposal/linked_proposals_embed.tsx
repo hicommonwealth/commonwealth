@@ -2,8 +2,8 @@ import React from 'react';
 
 import { navigateToSubpage } from 'router';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/view_proposal/linked_proposals_embed.scss';
 

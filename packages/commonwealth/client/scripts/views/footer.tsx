@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent} from
-
- 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import 'footer.scss';

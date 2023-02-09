@@ -10,7 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 import type { ISubstrateTXData } from 'controllers/chain/substrate/shared';

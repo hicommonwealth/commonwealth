@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
@@ -292,19 +290,22 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="tag-row">
           <CWLabel label="Community Tags" />
           <div className="tag-group">
-            {this.selectedTags && Object.keys(this.selectedTags).map((key) => {
-              return (
-                <CWButton
-                  label={key}
-                  buttonType={
-                    this.selectedTags[key] ? 'primary-black' : 'secondary-black'
-                  }
-                  onClick={() => {
-                    this.selectedTags[key] = !this.selectedTags[key];
-                  }}
-                />
-              );
-            })}
+            {this.selectedTags &&
+              Object.keys(this.selectedTags).map((key) => {
+                return (
+                  <CWButton
+                    label={key}
+                    buttonType={
+                      this.selectedTags[key]
+                        ? 'primary-black'
+                        : 'secondary-black'
+                    }
+                    onClick={() => {
+                      this.selectedTags[key] = !this.selectedTags[key];
+                    }}
+                  />
+                );
+              })}
           </div>
         </div>
 
