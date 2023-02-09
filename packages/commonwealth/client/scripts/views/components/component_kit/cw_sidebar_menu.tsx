@@ -1,8 +1,9 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { setRoute, jsx, redraw } from 'mithrilInterop';
+import { jsx, redraw } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
+import { useNavigate } from 'react-router-dom';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 import { AddressInfo } from 'models';
@@ -15,9 +16,10 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
-import withRouter from 'navigation/helpers';
 
-const CWSidebarMenuItemComponent = (props: MenuItem) => {
+export const CWSidebarMenuItem = (props: MenuItem) => {
+  const navigate = useNavigate();
+
   if (props.type === 'default') {
     const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
       props;
@@ -60,8 +62,7 @@ const CWSidebarMenuItemComponent = (props: MenuItem) => {
           app.sidebarToggled = false;
           app.sidebarMenu = 'default';
           app.sidebarRedraw.emit('redraw');
-          // TODO this setRoute is not related to react-router => won't work
-          setRoute(item.id ? `/${item.id}` : '/');
+          navigate(item.id ? `/${item.id}` : '/');
         }}
       >
         <CommunityLabel community={item} />
@@ -102,17 +103,15 @@ const CWSidebarMenuItemComponent = (props: MenuItem) => {
   }
 };
 
-// TODO add hooks
-const CWSidebarMenuItem = CWSidebarMenuItemComponent;
-
 type SidebarMenuProps = {
   className?: string;
   menuHeader?: { label: string; onClick: (e) => void };
   menuItems: Array<MenuItem>;
 };
 
-const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
+export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
+  const navigate = useNavigate();
 
   return (
     <div
@@ -148,8 +147,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               app.sidebarRedraw.emit('redraw');
-              // TODO this setRoute is not related to react-router => won't work
-              setRoute('/communities');
+              navigate('/communities');
             },
           },
           {
@@ -160,8 +158,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               app.sidebarRedraw.emit('redraw');
-              // TODO this setRoute is not related to react-router => won't work
-              setRoute('/notification-settings');
+              navigate('/notification-settings');
             },
           },
           {
@@ -175,8 +172,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
                 app.sidebarRedraw.emit('redraw');
-                // TODO this setRoute is not related to react-router => won't work
-                setRoute('/settings');
+                navigate('/settings');
               }
             },
           } as MenuItem,
@@ -187,6 +183,3 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
     </div>
   );
 };
-
-// TODO add hooks
-export const CWSidebarMenu = withRouter(CWSidebarMenuComponent);

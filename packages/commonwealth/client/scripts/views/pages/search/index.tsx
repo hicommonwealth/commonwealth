@@ -1,13 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  setRoute,
-  getRouteParam,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, getRouteParam, redraw, jsx } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -37,7 +31,7 @@ import withRouter from 'navigation/helpers';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
-const getDiscussionResult = (thread, searchTerm) => {
+const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const proposalId = thread.proposalid;
   const chain = thread.chain;
 
@@ -47,7 +41,6 @@ const getDiscussionResult = (thread, searchTerm) => {
     <div
       className="search-result-row"
       onClick={() => {
-        // TODO this setRoute is not related to react-router => won't work
         setRoute(`/${chain}/discussion/${proposalId}`);
       }}
     >
@@ -84,7 +77,7 @@ const getDiscussionResult = (thread, searchTerm) => {
   );
 };
 
-const getCommentResult = (comment, searchTerm) => {
+const getCommentResult = (comment, searchTerm, setRoute) => {
   const proposalId = comment.proposalid;
   const chain = comment.chain;
 
@@ -94,7 +87,6 @@ const getCommentResult = (comment, searchTerm) => {
     <div
       className="search-result-row"
       onClick={() => {
-        // TODO this setRoute is not related to react-router => won't work
         setRoute(
           `/${chain}/discussion/${proposalId.split('_')[0]}/${
             proposalId.split('_')[1]
@@ -137,7 +129,7 @@ const getCommentResult = (comment, searchTerm) => {
   );
 };
 
-const getCommunityResult = (community) => {
+const getCommunityResult = (community, setRoute) => {
   const params =
     community.SearchContentType === SearchContentType.Token
       ? { community }
@@ -147,10 +139,8 @@ const getCommunityResult = (community) => {
 
   const onSelect = () => {
     if (params.community) {
-      // TODO this setRoute is not related to react-router => won't work
       setRoute(params.community.id ? `/${params.community.id}` : '/');
     } else {
-      // TODO this setRoute is not related to react-router => won't work
       setRoute(community.id ? `/${community.id}` : '/');
     }
   };
@@ -186,20 +176,21 @@ const getListing = (
   searchTerm: string,
   pageCount: number,
   sort: SearchSort,
-  searchType?: SearchScope
+  searchType: SearchScope,
+  setRoute: any
 ) => {
   if (Object.keys(results).length === 0 || !results[searchType]) return [];
 
   const tabScopedResults = results[searchType]
     .map((res) => {
       return res.searchType === SearchScope.Threads
-        ? getDiscussionResult(res, searchTerm)
+        ? getDiscussionResult(res, searchTerm, setRoute)
         : res.searchType === SearchScope.Members
         ? getMemberResult(res)
         : res.searchType === SearchScope.Communities
-        ? getCommunityResult(res)
+        ? getCommunityResult(res, setRoute)
         : res.searchType === SearchScope.Replies
-        ? getCommentResult(res, searchTerm)
+        ? getCommentResult(res, searchTerm, setRoute)
         : null;
     })
     .slice(0, pageCount * 50);
@@ -294,7 +285,8 @@ class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
       searchTerm,
       pageCount,
       searchQuery.sort,
-      activeTab
+      activeTab,
+      this.setRoute
     );
 
     const resultCount =

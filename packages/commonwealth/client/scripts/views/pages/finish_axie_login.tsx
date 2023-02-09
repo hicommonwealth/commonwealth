@@ -5,16 +5,11 @@ import { initAppState } from 'state';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
 import app from 'state';
-import {
-  ClassComponent,
-  setRoute,
-  getRouteParam,
-  redraw,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent, getRouteParam, redraw, jsx } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';
+import withRouter from 'navigation/helpers';
 
 interface IState {
   validating: boolean;
@@ -25,7 +20,8 @@ interface IState {
 const validate = async (
   token: string,
   stateId: string,
-  chain: string
+  chain: string,
+  setRoute: ClassComponent['setRoute']
 ): Promise<void | string> => {
   // verifyAddress against token, returns user if not logged in
   let result;
@@ -44,7 +40,6 @@ const validate = async (
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
     await updateActiveAddresses(selectedChainMeta);
     console.log('Navigating to axie infinite community');
-    // TODO this setRoute is not related to react-router => won't work
     setRoute('/axie-infinity');
   } else {
     console.error(`Got login error: ${JSON.stringify(result)}`);
@@ -52,7 +47,7 @@ const validate = async (
   }
 };
 
-class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
+class FinishAxieLoginComponent extends ClassComponent<Record<string, unknown>> {
   public state: IState = {
     validating: false,
     error: '',
@@ -64,7 +59,7 @@ class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
     const token = getRouteParam('token');
     const stateId = getRouteParam('stateId');
 
-    validate(token, stateId, 'axie-infinity').then((res) => {
+    validate(token, stateId, 'axie-infinity', this.setRoute).then((res) => {
       if (typeof res === 'string') {
         this.state.error = res;
         redraw();
@@ -81,5 +76,7 @@ class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
     }
   }
 }
+
+const FinishAxieLogin = withRouter(FinishAxieLoginComponent);
 
 export default FinishAxieLogin;

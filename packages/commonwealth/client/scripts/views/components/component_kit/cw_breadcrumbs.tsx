@@ -1,12 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { setRoute, jsx } from 'mithrilInterop';
+import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
+import { useNavigate } from 'react-router-dom';
 
 type BreadcrumbsType = {
   label: string;
@@ -19,6 +20,7 @@ type BreadcrumbsProps = {
 
 export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
   const { breadcrumbs } = props;
+  const navigate = useNavigate();
 
   return (
     <div className={ComponentType.Breadcrumbs}>
@@ -31,8 +33,7 @@ export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
               type="caption"
               fontWeight="medium"
               className={isCurrent ? 'current-text' : 'parent-text'}
-              // TODO this setRoute is not related to react-router => won't work
-              onClick={isCurrent ? undefined : () => setRoute(b.path)}
+              onClick={isCurrent ? undefined : () => navigate(b.path)}
             >
               {b.label}
             </CWText>

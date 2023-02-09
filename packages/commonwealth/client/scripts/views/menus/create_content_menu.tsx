@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -10,16 +10,15 @@ import { MixpanelCommunityCreationEvent } from 'analytics/types';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import {
-  PopoverMenu,
-  PopoverMenuItem,
-} from '../components/component_kit/cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import type { MenuItem } from '../components/component_kit/types';
+import withRouter from 'navigation/helpers';
 
-const getCreateContentMenuItems = (): PopoverMenuItem[] => {
+const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =
@@ -182,8 +181,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
         app.sidebarRedraw.emit('redraw');
-        // TODO this setRoute is not related to react-router => won't work
-        setRoute('/createCommunity');
+        navigate('/createCommunity');
       },
     },
     {
@@ -241,7 +239,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
   ];
 };
 
-export class CreateContentSidebar extends ClassComponent {
+class CreateContentSidebarComponent extends ClassComponent {
   view() {
     return (
       <CWSidebarMenu
@@ -261,13 +259,15 @@ export class CreateContentSidebar extends ClassComponent {
             }, 200);
           },
         }}
-        menuItems={getCreateContentMenuItems()}
+        menuItems={getCreateContentMenuItems(this.setRoute)}
       />
     );
   }
 }
 
-export class CreateContentMenu extends ClassComponent {
+export const CreateContentSidebar = withRouter(CreateContentSidebarComponent);
+
+class CreateContentMenuComponent extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
@@ -279,13 +279,15 @@ export class CreateContentMenu extends ClassComponent {
             app.mobileMenuRedraw.emit('redraw');
           },
         }}
-        menuItems={getCreateContentMenuItems()}
+        menuItems={getCreateContentMenuItems(this.setRoute)}
       />
     );
   }
 }
 
-export class CreateContentPopover extends ClassComponent {
+export const CreateContentMenu = withRouter(CreateContentMenuComponent);
+
+class CreateContentPopoverComponent extends ClassComponent {
   view() {
     if (
       !app.isLoggedIn() ||
@@ -298,7 +300,7 @@ export class CreateContentPopover extends ClassComponent {
 
     return (
       <PopoverMenu
-        menuItems={getCreateContentMenuItems()}
+        menuItems={getCreateContentMenuItems(this.setRoute)}
         renderTrigger={(onclick) => (
           <CWIconButton
             iconButtonTheme="black"
@@ -310,3 +312,5 @@ export class CreateContentPopover extends ClassComponent {
     );
   }
 }
+
+export const CreateContentPopover = withRouter(CreateContentPopoverComponent);

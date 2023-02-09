@@ -3,7 +3,7 @@
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 
 import 'pages/landing/tokens_community_hero.scss';
 
@@ -11,8 +11,9 @@ import { notifyError } from 'controllers/app/notifications';
 import { FindYourTokenInputComponent } from './find_your_token_input';
 import { InputTokenList } from './input_tokens_lists';
 import { Chain, Token } from './index';
+import withRouter from 'navigation/helpers';
 
-const initiateFullSearch = (searchTerm) => {
+const initiateFullSearch = (searchTerm, setRoute) => {
   if (
     !searchTerm ||
     !searchTerm.toString().trim() ||
@@ -26,7 +27,6 @@ const initiateFullSearch = (searchTerm) => {
   const params = `q=${encodeURIComponent(
     searchTerm.toString().trim()
   )}&scope[]=Communities`;
-  // TODO this setRoute is not related to react-router => won't work
   setRoute(`/search?${params}`);
 };
 
@@ -42,7 +42,7 @@ type TokensCommunityComponentAttrs = {
   chains: Chain[];
 };
 
-export class TokensCommunityComponent extends ClassComponent<TokensCommunityComponentAttrs> {
+class TokensCommunity extends ClassComponent<TokensCommunityComponentAttrs> {
   private chainsAndTokens: Array<Chain | Token | typeof placeholderChain>;
   private hiddenInputTokenList: boolean;
   private inputTimeout: any;
@@ -129,7 +129,7 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
                     }}
                     onkeyupValue={(event: any) => {
                       if (event.key === 'Enter') {
-                        initiateFullSearch(event.target.value);
+                        initiateFullSearch(event.target.value, this.setRoute);
                       }
                     }}
                   />
@@ -146,7 +146,7 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
                     className="btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36"
                     style={{ padding: '8px 16px' }}
                     onClick={() => {
-                      initiateFullSearch(this.inputTokenValue);
+                      initiateFullSearch(this.inputTokenValue, this.setRoute);
                     }}
                   >
                     Let's Go{' '}
@@ -213,3 +213,5 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
     );
   }
 }
+
+export const TokensCommunityComponent = withRouter(TokensCommunity);

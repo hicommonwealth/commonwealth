@@ -1,6 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
-
+import type { NavigateFunction } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
@@ -38,7 +39,7 @@ import { Modal } from '../components/component_kit/cw_modal';
 //  - test what happens if the wallet site fails
 //  - move some of this stuff into controllers
 
-const redirectToNextPage = () => {
+const redirectToNextPage = (navigate: NavigateFunction) => {
   if (
     localStorage &&
     localStorage.getItem &&
@@ -53,8 +54,7 @@ const redirectToNextPage = () => {
         +new Date() - postAuth.timestamp < 24 * 60 * 60 * 1000
       ) {
         localStorage.removeItem('nearPostAuthRedirect');
-        // TODO this setRoute is not related to react-router => won't work
-        setRoute(postAuth.path, {}, { replace: true });
+        navigate(postAuth.path, { replace: true });
       } else {
         navigateToSubpage('/', { replace: true });
       }
@@ -68,6 +68,7 @@ const redirectToNextPage = () => {
 };
 
 const FinishNearLogin = () => {
+  const navigate = useNavigate();
   const [validating, setValidating] = React.useState<boolean>(false);
   const [validationCompleted, setValidationCompleted] =
     React.useState<boolean>(false);
@@ -200,8 +201,7 @@ const FinishNearLogin = () => {
         );
 
         await initAppState(false);
-        // TODO this setRoute is not related to react-router => won't work
-        setRoute(`${window.location.origin}/${res.result.chain.id}`);
+        navigate(`${window.location.origin}/${res.result.chain.id}`);
       } catch (err) {
         setValidationError(`Failed to initialize chain node: ${err.message}`);
       }
@@ -223,29 +223,29 @@ const FinishNearLogin = () => {
         <CWButton
           onClick={(e) => {
             e.preventDefault();
-            redirectToNextPage();
+            redirectToNextPage(navigate);
           }}
           label="Return Home"
         />
       </Sublayout>
     );
   } else if (validationCompleted) {
-    async () => {
-      if (validatedAccount.profile.name) {
-        redirectToNextPage();
-      } else {
-        if (isNewAccount) {
-          if (!app.isLoggedIn()) {
-            setIsModalOpen(true);
-          } else {
-            await completeClientLogin(validatedAccount);
-            redirectToNextPage();
-          }
+    if (validatedAccount.profile.name) {
+      redirectToNextPage(navigate);
+    } else {
+      if (isNewAccount) {
+        if (!app.isLoggedIn()) {
+          setIsModalOpen(true);
         } else {
-          redirectToNextPage();
+          completeClientLogin(validatedAccount).then(() => {
+            redirectToNextPage(navigate);
+          });
         }
+      } else {
+        redirectToNextPage(navigate);
       }
-    };
+    }
+
     return (
       <React.Fragment>
         <Modal
@@ -253,7 +253,7 @@ const FinishNearLogin = () => {
             <LoginModal
               onModalClose={() => {
                 setIsModalOpen(false);
-                redirectToNextPage();
+                redirectToNextPage(navigate);
               }}
               initialBody="welcome"
               initialSidebar="newOrReturning"

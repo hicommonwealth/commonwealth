@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import _ from 'lodash';
 import type { Account } from 'models';
-import type { Component } from 'mithrilInterop';
-import { render, setRoute, redraw } from 'mithrilInterop';
+import { render, redraw, ClassComponent } from 'mithrilInterop';
 import { initChain } from 'helpers/chain';
 import { setActiveAccount } from '../../../controllers/app/login';
 import type SubstrateIdentity from '../../../controllers/chain/substrate/identity';
@@ -15,11 +13,13 @@ import { User } from '../../components/user/user';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditIdentityModal } from '../../modals/edit_identity_modal';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
+import withRouter from 'navigation/helpers';
 
 const editIdentityAction = (
   account: Account,
   currentIdentity: SubstrateIdentity,
-  vnode
+  vnode,
+  setRoute
 ) => {
   const chainObj = app.config.chains.getById(account.chain.id);
   if (!chainObj) return;
@@ -37,7 +37,6 @@ const editIdentityAction = (
           const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
           confirmed = await confirmationModalWithText(msg)();
           if (confirmed) {
-            // TODO this setRoute is not related to react-router => won't work
             setRoute(`/${chainObj.id}/account/${account.address}`, {
               setIdentity: true,
             });
@@ -82,11 +81,12 @@ export interface IProfileHeaderState {
   showProfileRight: boolean;
 }
 
-const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
-  oninit: (vnode) => {
+class ProfileBioComponent extends ClassComponent<IProfileHeaderAttrs> {
+  oninit(vnode) {
     vnode.state.showProfileRight = false;
-  },
-  view: (vnode) => {
+  }
+
+  view(vnode) {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } =
       vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
@@ -188,7 +188,12 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       render('.bio-actions-right', [
         onOwnProfile
           ? [
-              editIdentityAction(account, vnode.state.identity, vnode),
+              editIdentityAction(
+                account,
+                vnode.state.identity,
+                vnode,
+                this.setRoute
+              ),
               render(CWButton, {
                 onClick: () => {
                   app.modals.create({
@@ -281,7 +286,9 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             " hasn't created a bio",
           ]),
     ]);
-  },
-};
+  }
+}
+
+const ProfileBio = withRouter(ProfileBioComponent);
 
 export default ProfileBio;

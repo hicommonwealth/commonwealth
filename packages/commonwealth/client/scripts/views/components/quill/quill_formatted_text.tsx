@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent, jsx, rootRender } from 'mithrilInterop';
 
 import 'components/quill/quill_formatted_text.scss';
@@ -13,6 +13,7 @@ import { countLinesQuill } from './helpers';
 
 // import { loadScript } from 'helpers';
 import { renderQuillDelta } from './render_quill_delta';
+import withRouter from 'navigation/helpers';
 
 export type QuillTextParams = {
   collapse?: boolean;
@@ -26,7 +27,7 @@ type QuillFormattedTextAttrs = {
   doc;
 } & QuillTextParams;
 
-export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> {
+class QuillFormattedTextComponent extends ClassComponent<QuillFormattedTextAttrs> {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;
   private isTruncated: boolean;
@@ -72,7 +73,13 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
     if (searchTerm) {
       if (JSON.stringify(this.truncatedDoc) !== this.cachedDocWithHighlights) {
         const vnodes = this.truncatedDoc
-          ? renderQuillDelta(this.truncatedDoc, hideFormatting, true)
+          ? renderQuillDelta(
+              this.truncatedDoc,
+              hideFormatting,
+              true,
+              false,
+              this.setRoute
+            )
           : []; // collapse = true, to inline blocks
 
         const root = document.createElement('div');
@@ -150,7 +157,8 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
               this.truncatedDoc,
               hideFormatting,
               collapse,
-              openLinksInNewTab
+              openLinksInNewTab,
+              this.setRoute
             )}
           {this.isTruncated && (
             <div className="show-more-button-wrapper">
@@ -165,3 +173,5 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
     }
   }
 }
+
+export const QuillFormattedText = withRouter(QuillFormattedTextComponent);

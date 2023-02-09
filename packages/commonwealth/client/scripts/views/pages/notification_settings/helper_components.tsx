@@ -2,7 +2,7 @@
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, setRoute, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw, jsx } from 'mithrilInterop';
 import { getProposalUrlPath } from 'identifiers';
 import type { NotificationSubscription } from 'models';
 import { AddressInfo } from 'models';
@@ -19,8 +19,12 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
+import withRouter from 'navigation/helpers';
 
-const getTextRows = (subscription: NotificationSubscription) => {
+const getTextRows = (
+  subscription: NotificationSubscription,
+  setRoute: ClassComponent['setRoute']
+) => {
   if (subscription.Thread) {
     const threadUrl = getProposalUrlPath(
       subscription.Thread.slug,
@@ -31,7 +35,6 @@ const getTextRows = (subscription: NotificationSubscription) => {
 
     return (
       <React.Fragment>
-        {/*// TODO this setRoute is not related to react-router => won't work*/}
         <div className="header-row" onClick={() => setRoute(threadUrl)}>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -119,7 +122,6 @@ const getTextRows = (subscription: NotificationSubscription) => {
     return (
       <div
         className="header-row"
-        // TODO this setRoute is not related to react-router => won't work
         onClick={() => setRoute(subscription.Chain.id)}
       >
         <CWText
@@ -145,7 +147,7 @@ type SubscriptionRowAttrs = {
   subscription: NotificationSubscription;
 };
 
-export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRowAttrs> {
+class SubscriptionRowTextContainerComponent extends ClassComponent<SubscriptionRowAttrs> {
   view(vnode: ResultNode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
 
@@ -160,12 +162,16 @@ export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRow
           iconSize="small"
         />
         <div className="title-and-body-container">
-          {getTextRows(subscription)}
+          {getTextRows(subscription, this.setRoute)}
         </div>
       </div>
     );
   }
 }
+
+export const SubscriptionRowTextContainer = withRouter(
+  SubscriptionRowTextContainerComponent
+);
 
 export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
   view(vnode: ResultNode<SubscriptionRowAttrs>) {
