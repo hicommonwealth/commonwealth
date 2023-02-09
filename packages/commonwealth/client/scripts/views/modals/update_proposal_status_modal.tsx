@@ -3,6 +3,17 @@ import React from 'react';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
+
 import $ from 'jquery';
 
 import 'modals/update_proposal_status_modal.scss';
