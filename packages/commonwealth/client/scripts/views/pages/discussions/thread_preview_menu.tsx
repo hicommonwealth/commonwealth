@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import type { Thread, ThreadStage, Topic } from 'models';
 import app from 'state';
@@ -99,6 +97,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                           thread,
                         },
                       });
+                      redraw();
                     },
                     label: 'Change topic',
                     iconLeft: 'filter' as const,
@@ -120,6 +119,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                           thread,
                         },
                       });
+                      redraw();
                     },
                     label: 'Update status',
                     iconLeft: 'democraticProposal' as const,
@@ -140,6 +140,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
 
                       app.threads.delete(thread).then(() => {
                         navigateToSubpage('/discussions');
+                        redraw();
                       });
                     },
                     label: 'Delete',

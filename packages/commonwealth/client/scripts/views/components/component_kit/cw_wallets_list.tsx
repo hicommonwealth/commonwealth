@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { redraw} from
-
- 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase } from 'common-common/src/types';
@@ -99,8 +97,13 @@ type AccountSelectorProps = {
 };
 
 export const AccountSelector = (props: AccountSelectorProps) => {
-  const { accounts, onModalClose, walletNetwork, walletChain, onSelect } =
-    props;
+  const {
+    accounts,
+    onModalClose,
+    walletNetwork,
+    walletChain,
+    onSelect,
+  } = props;
 
   return (
     <div className="AccountSelector">
@@ -197,14 +200,16 @@ export const CWWalletsList = (props: WalletsListProps) => {
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
       const validationBlockInfo =
         wallet.getRecentBlock && (await wallet.getRecentBlock(chainIdentifier));
-      const { account: signerAccount, newlyCreated } =
-        await createUserWithAddress(
-          address,
-          wallet.name,
-          chainIdentifier,
-          sessionPublicAddress,
-          validationBlockInfo
-        );
+      const {
+        account: signerAccount,
+        newlyCreated,
+      } = await createUserWithAddress(
+        address,
+        wallet.name,
+        chainIdentifier,
+        sessionPublicAddress,
+        validationBlockInfo
+      );
       accountVerifiedCallback(signerAccount, newlyCreated, linking);
     } catch (err) {
       console.log(err);
@@ -253,6 +258,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                         .WalletAccount;
                       if (!app.chain.apiInitialized) {
                         await app.chain.initApi();
+                        redraw();
                       }
                       const nearWallet = new WalletAccount(
                         (app.chain as Near).chain.api,

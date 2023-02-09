@@ -2,9 +2,7 @@ import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { navigateToSubpage } from 'router';
-import { getRoute} from
-
- 'mithrilInterop';
+import { getRoute, redraw } from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 
@@ -115,6 +113,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                                     defaultOffchainTemplate,
                                   },
                                 });
+                                redraw();
                               }}
                             />
                           )

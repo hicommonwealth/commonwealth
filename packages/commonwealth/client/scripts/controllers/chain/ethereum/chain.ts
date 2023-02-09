@@ -120,7 +120,6 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       }
       this.app.chain.block.duration = totalDuration / nHeadersForBlocktime;
       console.log(`Computed block duration: ${this.app.chain.block.duration}`);
-      redraw();
     }
     return this._api;
   }

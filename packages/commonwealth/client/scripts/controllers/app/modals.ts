@@ -20,7 +20,6 @@ export class ModalStore {
   public create(modalspec) {
     modalspec.id = uuidv4();
     this._modals.push(modalspec);
-    redraw();
   }
 
   public remove(modalspec) {
@@ -29,7 +28,6 @@ export class ModalStore {
       throw new Error('Invalid modal');
     }
     this._modals.splice(index, 1);
-    redraw();
   }
 
   public getList() {

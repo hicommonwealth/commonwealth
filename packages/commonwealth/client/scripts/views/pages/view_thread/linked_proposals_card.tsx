@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import {
@@ -63,7 +63,9 @@ type LinkedProposalsCardAttrs = {
   thread: Thread;
 };
 
-export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs> {
+export class LinkedProposalsCard extends ClassComponent<
+  LinkedProposalsCardAttrs
+> {
   private initialized: boolean;
   private snapshot: SnapshotProposal;
   private snapshotProposalsLoaded: boolean;
@@ -152,6 +154,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
                         thread,
                       },
                     });
+                    redraw();
                   }}
                 />
               )}

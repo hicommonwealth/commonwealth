@@ -9,7 +9,7 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
@@ -73,8 +73,9 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   const [threadFetchFailed, setThreadFetchFailed] = useState<boolean>();
   const [title, setTitle] = useState<string>();
   const [viewCount, setViewCount] = useState<number>();
-  const [initializedComments, setInitializedComments] =
-    useState<boolean>(false);
+  const [initializedComments, setInitializedComments] = useState<boolean>(
+    false
+  );
   const [initializedPolls, setInitializedPolls] = useState<boolean>(false);
 
   // editorListener(e) {
@@ -97,7 +98,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   // }
 
   if (!app.chain?.meta) {
-    console.log(1)
+    console.log(1);
     return (
       <PageLoading
       // title="Loading..."
@@ -126,7 +127,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         viewCountStarted: false,
         profilesStarted: false,
         profilesFinished: false,
-      }
+      },
     });
   }
 
@@ -140,7 +141,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
 
   // load app controller
   if (!app.threads.initialized) {
-    console.log(2)
+    console.log(2);
     return (
       <PageLoading
       // title={headerTitle}
@@ -150,8 +151,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
 
   const threadDoesNotMatch =
     thread &&
-    (+thread.identifier !== +threadId ||
-      thread.slug !== ProposalType.Thread);
+    (+thread.identifier !== +threadId || thread.slug !== ProposalType.Thread);
 
   if (threadDoesNotMatch) {
     setThread(undefined);
@@ -181,21 +181,21 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         setThreadFetched(true);
       }
     }
-    console.log(3)
+    console.log(3);
     return (
       <PageLoading
       //  title={headerTitle}
-        />
+      />
     );
   }
 
   if (recentlyEdited) {
     setRecentlyEdited(false);
-    console.log(4)
+    console.log(4);
     return (
       <PageLoading
       //  title={headerTitle}
-        />
+      />
     );
   }
 
@@ -218,15 +218,15 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
       ...prefetch,
       [threadIdAndType]: {
         ...prefetch[threadIdAndType],
-        threadReactionsStarted: true
-      }
+        threadReactionsStarted: true,
+      },
     });
-    console.log(5)
+    console.log(5);
     return (
-        <PageLoading
-        //  title={headerTitle}
-        />
-      );
+      <PageLoading
+      //  title={headerTitle}
+      />
+    );
   }
 
   // load comments
@@ -278,15 +278,15 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
       ...prefetch,
       [threadIdAndType]: {
         ...prefetch[threadIdAndType],
-        commentsStarted: true
-      }
+        commentsStarted: true,
+      },
     });
-    console.log(6)
+    console.log(6);
     return (
-        <PageLoading
-        //  title={headerTitle}
-        />
-      );
+      <PageLoading
+      //  title={headerTitle}
+      />
+    );
   }
 
   if (comments && comments.length > 0) {
@@ -299,10 +299,10 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         ...prefetch,
         [threadIdAndType]: {
           ...prefetch[threadIdAndType],
-          commentsStarted: false
-        }
+          commentsStarted: false,
+        },
       });
-    console.log(7)
+      console.log(7);
       return (
         <PageLoading
         //  title={headerTitle}
@@ -335,8 +335,8 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
       ...prefetch,
       [threadIdAndType]: {
         ...prefetch[threadIdAndType],
-        pollsStarted: true
-      }
+        pollsStarted: true,
+      },
     });
   }
   if (!initializedPolls) {
@@ -367,13 +367,13 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
       ...prefetch,
       [threadIdAndType]: {
         ...prefetch[threadIdAndType],
-        viewCountStarted: true
-      }
+        viewCountStarted: true,
+      },
     });
   }
 
   if (comments === undefined || viewCount === undefined) {
-    console.log(8)
+    console.log(8);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -393,22 +393,22 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
       ...prefetch,
       [threadIdAndType]: {
         ...prefetch[threadIdAndType],
-        profilesStarted: true
-      }
+        profilesStarted: true,
+      },
     });
-    console.log(9)
+    console.log(9);
     return (
-        <PageLoading
-        //  title={headerTitle}
-        />
-      );
+      <PageLoading
+      //  title={headerTitle}
+      />
+    );
   }
 
   if (
     !app.profiles.allLoaded() &&
     !prefetch[threadIdAndType]['profilesFinished']
   ) {
-    console.log(10)
+    console.log(10);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -421,15 +421,15 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
       ...prefetch,
       [threadIdAndType]: {
         ...prefetch[threadIdAndType],
-        profilesFinished: true
-      }
+        profilesFinished: true,
+      },
     });
-    console.log(11)
+    console.log(11);
     return (
-        <PageLoading
-        //  title={headerTitle}
-        />
-      );
+      <PageLoading
+      //  title={headerTitle}
+      />
+    );
   }
 
   const commentCount = app.comments.nComments(thread);
@@ -497,17 +497,21 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
               iconLeft: 'write' as const,
               onClick: async (e) => {
                 e.preventDefault();
-                setSavedEdits(localStorage.getItem(
-                  `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
-                ));
+                setSavedEdits(
+                  localStorage.getItem(
+                    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
+                  )
+                );
 
                 if (savedEdits) {
                   clearEditingLocalStorage(thread.id, ContentType.Thread);
-                  setShouldRestoreEdits(await confirmationModalWithText(
-                    'Previous changes found. Restore edits?',
-                    'Yes',
-                    'No'
-                  )());
+                  setShouldRestoreEdits(
+                    await confirmationModalWithText(
+                      'Previous changes found. Restore edits?',
+                      'Yes',
+                      'No'
+                    )()
+                  );
                 }
 
                 setIsGloballyEditing(true);
@@ -529,6 +533,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
                     thread,
                   },
                 });
+                redraw();
               },
             },
           ]
@@ -550,6 +555,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
                     thread,
                   },
                 });
+                redraw();
               },
             },
           ]
@@ -570,6 +576,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
 
                 app.threads.delete(thread).then(() => {
                   navigateToSubpage('/discussions');
+                  redraw();
                 });
               },
             },
@@ -621,87 +628,83 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
     ];
   };
 
-    // @ts-ignore
-    return (
-      <Sublayout
-      //  title={headerTitle}
-      >
-        <CWContentPage
-          contentBodyLabel="Thread"
-          showSidebar={
-            showLinkedProposalOptions ||
-            showLinkedThreadOptions ||
-            polls?.length > 0 ||
-            isAuthor
-          }
-          title={
-            isEditingBody ? (
-              <CWTextInput
-                onInput={(e) => {
-                  setTitle(e.target.value);
-                }}
-                defaultValue={thread.title}
-              />
+  // @ts-ignore
+  return (
+    <Sublayout
+    //  title={headerTitle}
+    >
+      <CWContentPage
+        contentBodyLabel="Thread"
+        showSidebar={
+          showLinkedProposalOptions ||
+          showLinkedThreadOptions ||
+          polls?.length > 0 ||
+          isAuthor
+        }
+        title={
+          isEditingBody ? (
+            <CWTextInput
+              onInput={(e) => {
+                setTitle(e.target.value);
+              }}
+              defaultValue={thread.title}
+            />
+          ) : (
+            thread.title
+          )
+        }
+        author={<ThreadAuthor thread={thread} />}
+        createdAt={thread.createdAt}
+        viewCount={viewCount}
+        readOnly={thread.readOnly}
+        headerComponents={
+          thread.stage !== ThreadStageType.Discussion && (
+            <ThreadStage thread={thread} />
+          )
+        }
+        subHeader={!!thread.url && <ExternalLink thread={thread} />}
+        actions={
+          app.user.activeAccount && !isGloballyEditing && getActionMenuItems()
+        }
+        body={
+          <div className="thread-content">
+            {isEditingBody ? (
+              <>
+                {reactionsAndReplyButtons}
+                <EditBody
+                  thread={thread}
+                  savedEdits={savedEdits}
+                  shouldRestoreEdits={shouldRestoreEdits}
+                  setIsEditing={setIsEditingBody}
+                  title={title}
+                />
+              </>
             ) : (
-              thread.title
-            )
-          }
-          author={<ThreadAuthor thread={thread} />}
-          createdAt={thread.createdAt}
-          viewCount={viewCount}
-          readOnly={thread.readOnly}
-          headerComponents={
-            thread.stage !== ThreadStageType.Discussion && (
-              <ThreadStage thread={thread} />
-            )
-          }
-          subHeader={!!thread.url && <ExternalLink thread={thread} />}
-          actions={
-            app.user.activeAccount &&
-            !isGloballyEditing &&
-            getActionMenuItems()
-          }
-          body={
-            <div className="thread-content">
-              {isEditingBody ? (
-                <>
-                  {reactionsAndReplyButtons}
-                  <EditBody
-                    thread={thread}
-                    savedEdits={savedEdits}
-                    shouldRestoreEdits={shouldRestoreEdits}
-                    setIsEditing={setIsEditingBody}
-                    title={title}
-                  />
-                </>
-              ) : (
-                <>
-                  <CollapsibleThreadBody thread={thread} />
-                  {thread.readOnly ? (
-                    <CWText type="h5" className="callout-text">
-                      Commenting is disabled because this post has been locked.
-                    </CWText>
-                  ) : !isGloballyEditing &&
-                    canComment &&
-                    app.isLoggedIn() ? (
-                    <>
-                      {reactionsAndReplyButtons}
-                      <CreateComment
-                        updatedCommentsCallback={updatedCommentsCallback}
-                        rootProposal={thread}
-                      />
-                    </>
-                  ) : null}
-                </>
-              )}
-            </div>
-          }
-          comments={
-            <CommentsTree
-              comments={comments}
-              proposal={thread}
-              setIsGloballyEditing={setIsGloballyEditing}
-              updatedCommentsCallback={updatedCommentsCallback}
+              <>
+                <CollapsibleThreadBody thread={thread} />
+                {thread.readOnly ? (
+                  <CWText type="h5" className="callout-text">
+                    Commenting is disabled because this post has been locked.
+                  </CWText>
+                ) : !isGloballyEditing && canComment && app.isLoggedIn() ? (
+                  <>
+                    {reactionsAndReplyButtons}
+                    <CreateComment
+                      updatedCommentsCallback={updatedCommentsCallback}
+                      rootProposal={thread}
+                    />
+                  </>
+                ) : null}
+              </>
+            )}
+          </div>
+        }
+        comments={
+          <CommentsTree
+            comments={comments}
+            proposal={thread}
+            setIsGloballyEditing={setIsGloballyEditing}
+            updatedCommentsCallback={updatedCommentsCallback}
           />
         }
         sidebarComponents={

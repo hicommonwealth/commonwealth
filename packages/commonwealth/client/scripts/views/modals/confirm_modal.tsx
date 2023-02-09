@@ -4,6 +4,7 @@ import $ from 'jquery';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 import type { ResultNode } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import 'modals/confirm_modal.scss';
 
@@ -82,6 +83,7 @@ export const confirmationModalWithText = (
         },
         exitCallback: () => resolve(confirmed),
       });
+      redraw();
     });
   };
 };

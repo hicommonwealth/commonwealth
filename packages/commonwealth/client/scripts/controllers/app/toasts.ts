@@ -29,7 +29,6 @@ export class ToastStore {
     const index = this._toasts.findIndex((t) => t.key === key);
     if (index === -1) return;
     this._toasts.splice(index, 1);
-    redraw();
   }
 
   public createSuccess(message) {
@@ -46,7 +45,6 @@ export class ToastStore {
     // });
     // toast['_message'] = message;
     // this._toasts.push(toast);
-    redraw();
   }
 
   public createError(message) {
@@ -69,7 +67,6 @@ export class ToastStore {
     // });
     // toast['_message'] = message;
     // this._toasts.push(toast);
-    redraw();
   }
 
   public createInfo(message) {
@@ -86,7 +83,6 @@ export class ToastStore {
     // });
     // toast['_message'] = message;
     // this._toasts.push(toast);
-    redraw();
   }
 
   public getList() {

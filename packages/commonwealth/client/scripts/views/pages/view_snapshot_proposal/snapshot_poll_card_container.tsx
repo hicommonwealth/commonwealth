@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import type {
   SnapshotProposal,
@@ -52,7 +52,9 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
   return timeRemainingString;
 }
 
-export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCardsAttrs> {
+export class SnapshotPollCardContainer extends ClassComponent<
+  SnapshotProposalCardsAttrs
+> {
   view(vnode: ResultNode<SnapshotProposalCardsAttrs>) {
     const {
       identifier,
@@ -124,6 +126,7 @@ export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCa
             successCallback: callback,
           },
         });
+        redraw();
         // vnode.state.votingModalOpen = true;
       } catch (err) {
         console.error(err);

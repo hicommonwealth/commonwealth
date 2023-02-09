@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'components/quill/quill_editor.scss';
 import $ from 'jquery';
@@ -50,7 +50,9 @@ type QuillEditorComponentAttrs = {
 // - Audit and fix image, video, & Twitter blots as necessary
 // - Convert generic HTML tags to CWText components in QuillFormattedText
 
-export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAttrs> {
+export class QuillEditorComponent extends ClassComponent<
+  QuillEditorComponentAttrs
+> {
   unsavedChanges;
   $editor: JQuery<HTMLElement>;
   editor: QuillEditor;
@@ -242,6 +244,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
                     : JSON.stringify(this.editor.contents),
               },
             });
+            redraw();
           }}
         />
       </div>

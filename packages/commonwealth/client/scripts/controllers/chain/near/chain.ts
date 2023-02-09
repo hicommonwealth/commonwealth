@@ -138,13 +138,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         +latest_block_time - prevBlock.header.timestamp;
       if (this.app.chain.networkStatus !== ApiStatus.Connected) {
         this.app.chain.networkStatus = ApiStatus.Connected;
-        redraw();
       }
     } catch (e) {
       if (this.app.chain.networkStatus !== ApiStatus.Disconnected) {
         console.error(`failed to query NEAR status: ${JSON.stringify(e)}`);
         this.app.chain.networkStatus = ApiStatus.Disconnected;
-        redraw();
       }
     }
   }

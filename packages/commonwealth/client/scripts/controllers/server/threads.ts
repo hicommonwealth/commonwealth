@@ -384,7 +384,6 @@ class ThreadsController {
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
-          redraw();
           resolve(result);
         })
         .catch((e) => {

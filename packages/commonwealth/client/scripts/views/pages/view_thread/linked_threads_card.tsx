@@ -4,9 +4,7 @@ import { getProposalUrlPath } from 'identifiers';
 import type { Thread } from 'models';
 import type { LinkedThreadRelation } from 'models/Thread';
 
-import { ClassComponent, ResultNode} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -84,6 +82,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
                       linkedThreads: this.linkedThreads,
                     },
                   });
+                  this.redraw();
                 }}
               />
             )}

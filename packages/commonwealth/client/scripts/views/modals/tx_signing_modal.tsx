@@ -11,7 +11,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'modals/tx_signing_modal.scss';
 import type { ITXModalData } from 'models/interfaces';
@@ -116,7 +116,6 @@ export const createTXModal = async (
         },
         data,
       });
-
       redraw();
     });
 

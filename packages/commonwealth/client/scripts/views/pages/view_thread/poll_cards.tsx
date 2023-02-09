@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import type { Poll, Thread } from 'models';
 
 import moment from 'moment';
@@ -22,7 +20,9 @@ type ThreadPollEditorCardAttrs = {
   threadAlreadyHasPolling: boolean;
 };
 
-export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAttrs> {
+export class ThreadPollEditorCard extends ClassComponent<
+  ThreadPollEditorCardAttrs
+> {
   view(vnode: ResultNode<ThreadPollEditorCardAttrs>) {
     const { thread, threadAlreadyHasPolling } = vnode.attrs;
 
@@ -45,6 +45,7 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
                     thread,
                   },
                 });
+                this.redraw();
               }}
             />
           </div>
@@ -110,6 +111,7 @@ export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
               modal: OffchainVotingModal,
               data: { votes: poll.votes },
             });
+            this.redraw();
           }
         }}
       />

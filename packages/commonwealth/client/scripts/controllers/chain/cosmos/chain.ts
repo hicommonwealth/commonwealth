@@ -109,7 +109,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     } = await this._api.staking.params();
     this._denom = bondDenom;
     this.app.chain.networkStatus = ApiStatus.Connected;
-    redraw();
   }
 
   public async deinit(): Promise<void> {

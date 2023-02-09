@@ -22,8 +22,7 @@ import { SolanaToken } from './types';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default class SolanaChain
-  implements IChainModule<SolanaToken, SolanaAccount>
-{
+  implements IChainModule<SolanaToken, SolanaAccount> {
   private _denom: string;
   public get denom(): string {
     return this._denom;
@@ -69,7 +68,6 @@ export default class SolanaChain
     );
     this.app.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
     this.app.chain.networkStatus = ApiStatus.Connected;
-    redraw();
   }
 
   public async deinit() {

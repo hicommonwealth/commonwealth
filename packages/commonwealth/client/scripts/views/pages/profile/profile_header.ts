@@ -133,6 +133,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 modal: BanUserModal,
                 data: { profile: account.profile },
               });
+              redraw();
             },
             label: 'Ban User',
             buttonType: 'primary-red',
