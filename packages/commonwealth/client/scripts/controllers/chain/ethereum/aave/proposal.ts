@@ -143,6 +143,14 @@ export default class AaveProposal extends Proposal<
     return VotingUnit.PowerVote;
   }
 
+  public async queryStateFromChain(): Promise<AaveTypes.ProposalState> {
+    const state = await this._Gov.api.Governance.getProposalState(this.data.id);
+    if (state === null) {
+      throw new Error(`Failed to get state for proposal #${this.data.id}`);
+    }
+    return state;
+  }
+
   public get state(): AaveTypes.ProposalState {
     const currentTime = Date.now() / 1000;
     if (this.data.cancelled) return AaveTypes.ProposalState.CANCELED;
@@ -447,6 +455,25 @@ export default class AaveProposal extends Proposal<
     return txReceipt;
   }
 
+  public async queueTx() {
+    // validate proposal state
+    if (this.state !== AaveTypes.ProposalState.SUCCEEDED) {
+      throw new Error('Proposal not in succeeded state');
+    }
+
+    // no user validation needed
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
+    const tx = await contract.queue(this.data.id);
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error(`Failed to submit vote on proposal #${this.data.id}`);
+    }
+  }
+
   public get isExecutable() {
     // will be EXPIRED if over grace period
     return (
@@ -468,6 +495,36 @@ export default class AaveProposal extends Proposal<
       this._Gov.api.Governance
     );
     const tx = await contract.execute(this.data.id);
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error(`Failed to submit vote on proposal #${this.data.id}`);
+    }
+  }
+
+  // web wallet TX only
+  public async submitVoteWebTx(vote: AaveProposalVote) {
+    const address = this._Gov.app.user.activeAccount.address;
+
+    // validate proposal state
+    if (this.state !== AaveTypes.ProposalState.ACTIVE) {
+      throw new Error('Proposal not in active state');
+    }
+
+    // ensure user hasn't voted
+    const previousVote = await this._Gov.api.Governance.getVoteOnProposal(
+      this.data.id,
+      address
+    );
+    if (previousVote && !previousVote.votingPower.isZero()) {
+      throw new Error('user has already voted on this proposal');
+    }
+
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
+    const tx = await contract.submitVote(this.data.id, vote.choice);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error(`Failed to submit vote on proposal #${this.data.id}`);
