@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import { Action } from 'commonwealth/shared/permissions';
@@ -18,6 +18,7 @@ import 'components/sidebar/index.scss';
 import { isActiveAddressPermitted } from 'controllers/server/roles';
 
 import app from 'state';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { ChatSection } from '../chat/chat_section';
@@ -27,13 +28,15 @@ import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { ExternalLinksModule } from './external_links_module';
 import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
 
 export type SidebarMenuName =
   | 'default'
   | 'createContent'
   | 'exploreCommunities';
 
-export class Sidebar extends ClassComponent {
+class SidebarComponent extends ClassComponent {
   view() {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
@@ -44,6 +47,8 @@ export class Sidebar extends ClassComponent {
     });
 
     const currentChainInfo = app.chain?.meta;
+
+    const onHomeRoute = getRoute() === `/${app.activeChainId()}/feed`;
 
     const hideChat =
       !currentChainInfo ||
@@ -75,6 +80,17 @@ export class Sidebar extends ClassComponent {
             {app.chain && (
               <div className="community-menu">
                 {showAdmin && <AdminSection />}
+                {app.chain.meta.hasHomepage && (
+                  <div
+                    className={
+                      onHomeRoute ? 'home-button active' : 'home-button'
+                    }
+                    onClick={() => this.navigateToSubpage('/feed')}
+                  >
+                    <CWIcon iconName="home" iconSize="small" />
+                    <CWText>Home</CWText>
+                  </div>
+                )}
                 <DiscussionSection />
                 <GovernanceSection />
                 {/* app.socket && !hideChat && <ChatSection /> */}
@@ -106,3 +122,5 @@ export class Sidebar extends ClassComponent {
     );
   }
 }
+
+export const Sidebar = NavigationWrapper(SidebarComponent);
