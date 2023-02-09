@@ -55,7 +55,6 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                   popover: true,
                   linkify: false,
                   hideAvatar: false,
-                  hideIdentityIcon: true,
                 })}
                 <CWIcon
                   iconName="close"

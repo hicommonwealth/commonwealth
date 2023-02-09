@@ -59,7 +59,6 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
                     null,
                     null
                   ),
-                  hideIdentityIcon: true,
                 })}
               </div>
               <div class="offchain-poll-voter-choice">{vote.option}</div>
