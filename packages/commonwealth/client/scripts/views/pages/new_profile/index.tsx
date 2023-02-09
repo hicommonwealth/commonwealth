@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,7 +9,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
   parsePathname,
 } from 'mithrilInterop';
 import $ from 'jquery';

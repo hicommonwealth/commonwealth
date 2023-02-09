@@ -1,16 +1,16 @@
-/* @jsx jsx */
 import React from 'react';
 
+import type {
+  ResultNode
+} from 'mithrilInterop';
 import {
   ClassComponent,
-  ResultNode,
   render,
   setRoute,
   getRoute,
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'underscore';
@@ -28,7 +28,7 @@ import {
 } from '../../../models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import AvatarUpload from '../../components/avatar_upload';
+import { AvatarUpload } from '../../components/avatar_upload';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWDivider } from '../../components/component_kit/cw_divider';

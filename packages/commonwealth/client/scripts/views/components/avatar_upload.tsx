@@ -37,7 +37,7 @@ type AvatarUploadAttrs = {
   name?: string;
 } & AvatarUploadStyleAttrs;
 
-const AvatarUpload = (props: AvatarUploadAttrs) => {
+export const AvatarUpload = (props: AvatarUploadAttrs) => {
   const [dropzone, setDropzone] = React.useState<Dropzone>(null);
   const [uploaded, setUploaded] = React.useState<boolean>();
 
@@ -167,5 +167,3 @@ const AvatarUpload = (props: AvatarUploadAttrs) => {
     </div>
   );
 }
-
-export default AvatarUpload;

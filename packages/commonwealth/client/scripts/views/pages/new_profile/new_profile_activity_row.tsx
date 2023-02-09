@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type {
@@ -12,7 +11,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import moment from 'moment';
 
