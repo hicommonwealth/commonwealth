@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
 import { ThreadStage } from 'models';
+import type { IChainAdapter, Coin, Account } from 'models';
 import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
@@ -36,9 +37,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return (arr
+  return arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown) as ThreadStage[];
+    .filter((s) => s) as unknown as ThreadStage[];
 }
 
 export const modalRedirectClick = (e, route) => {
@@ -410,4 +411,21 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
     default:
       return null;
   }
+}
+
+// Decimals For Tokens
+export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
+  let decimals;
+  if (chain.meta.id === 'evmos') {
+    // Custom for evmos
+    decimals = 18;
+  } else if (chain && chain.meta) {
+    decimals = chain.meta.decimals;
+  } else if (chain.network === ChainNetwork.ERC721) {
+    decimals = 0;
+  } else if (chain.base === ChainBase.CosmosSDK) {
+    decimals = 6;
+  }
+
+  return decimals;
 }

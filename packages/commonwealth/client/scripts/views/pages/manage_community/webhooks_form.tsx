@@ -1,9 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { link, pluralize } from 'helpers';
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { Webhook } from 'models';
 
@@ -78,7 +77,7 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
               : null;
 
           return (
-            <div className="webhook-row">
+            <div className="webhook-row" key={webhook.id}>
               <div className="webhook-info">
                 <CWText>{smartTruncate(webhook.url, 25)}</CWText>
                 {label && (

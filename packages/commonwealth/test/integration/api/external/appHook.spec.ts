@@ -42,9 +42,7 @@ before(async () => {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  const router = express.Router();
-  addExternalRoutes(router, app, models, tokenBalanceCache);
-  app.use('/api', router);
+  addExternalRoutes('/api', app, models, tokenBalanceCache);
 });
 
 export async function get(

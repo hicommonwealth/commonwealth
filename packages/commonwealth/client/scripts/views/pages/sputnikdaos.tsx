@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type Near from 'controllers/chain/near/adapter';
@@ -10,8 +9,7 @@ import {
   ResultNode,
   setRoute,
   redraw,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import BN from 'bn.js';
 import moment from 'moment';
 

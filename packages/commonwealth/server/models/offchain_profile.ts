@@ -6,9 +6,8 @@ import type { ModelInstance, ModelStatic } from './types';
 
 export type OffchainProfileAttributes = {
   address_id: number;
-  identity?: string; // display name from chain
-  judgements?: { [registrar: string]: SubstrateTypes.IdentityJudgement };
   data?: string;
+  identity?: string; // deprecated but keeping to preserve server-side behavior
 
   // associations
   Address?: AddressAttributes;
@@ -31,7 +30,6 @@ export default (
         primaryKey: true,
       },
       identity: { type: dataTypes.STRING, allowNull: true },
-      judgements: { type: dataTypes.JSONB, allowNull: true },
       data: { type: dataTypes.TEXT, allowNull: true },
     },
     {

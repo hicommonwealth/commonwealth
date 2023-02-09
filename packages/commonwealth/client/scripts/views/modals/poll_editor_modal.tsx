@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -12,8 +13,6 @@ import type { Thread } from 'models';
 import moment from 'moment';
 import app from 'state';
 import _ from 'underscore';
-
-import 'modals/poll_editor_modal.scss';
 
 import { getNextPollEndingTime } from 'utils';
 import { CWButton } from '../components/component_kit/cw_button';

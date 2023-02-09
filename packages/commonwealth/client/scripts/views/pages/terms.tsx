@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 /* eslint-disable max-len */
 
@@ -11,8 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import { renderMultilineText } from 'helpers';
 

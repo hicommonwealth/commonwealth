@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 // import Infinite from 'mithril-infinite';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
@@ -101,6 +99,10 @@ export class NotificationsMenu extends ClassComponent {
         this.minChainEventsNotification,
         this.minChainEventsNotification + MAX_NOTIFS
       );
+
+    app.user.notifications.isUpdated.on('redraw', () => {
+      this.redraw();
+    });
 
     return (
       <div className="NotificationsMenu">
