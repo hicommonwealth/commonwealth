@@ -9,9 +9,7 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import { ClassComponent} from
-
- 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
@@ -384,7 +382,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   }
 
   // load profiles
-  if (prefetch[threadIdAndType]['profilesStarted'] === undefined) {
+  if (!prefetch[threadIdAndType]['profilesStarted']) {
     app.profiles.getProfile(thread.authorChain, thread.author);
 
     comments.forEach((comment) => {
