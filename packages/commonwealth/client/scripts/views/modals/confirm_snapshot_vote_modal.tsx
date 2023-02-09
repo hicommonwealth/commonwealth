@@ -11,7 +11,7 @@ import { formatNumberShort } from 'adapters/currency';
 import 'modals/confirm_snapshot_vote_modal.scss';
 
 import app from 'state';
-// import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
+import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
