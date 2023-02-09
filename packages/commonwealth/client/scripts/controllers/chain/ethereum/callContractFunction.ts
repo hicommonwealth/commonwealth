@@ -51,6 +51,7 @@ async function sendFunctionCall(
  *
  * @throw Error if the contract is not found, or if the web3 api is not initialized or
  * if there is a web3 api calls are misconfigured or fail.
+ * // TODO: add formInputMap shape for clarity
  */
 export async function callContractFunction(
   contract: Contract,

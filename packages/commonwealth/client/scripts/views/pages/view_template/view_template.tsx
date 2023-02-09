@@ -20,6 +20,11 @@ import produce from 'immer';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { showConfirmationModal } from '../../modals/confirmation_modal';
+import type Contract from 'client/scripts/models/Contract';
+import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
+import { parseFunctionFromABI } from 'abi_utils';
 
 const jsonExample = {
   form_fields: [
@@ -97,6 +102,14 @@ const jsonExample = {
   },
 };
 
+const bullshit = {
+  // formInputMap looks like this bitch
+  propose: {
+    0: 'my-arg',
+    1: 'my-arg2',
+  },
+};
+
 enum TemplateComponents {
   DIVIDER = 'divider',
   TEXT = 'text',
@@ -106,11 +119,23 @@ enum TemplateComponents {
 
 class ViewTemplatePage extends ClassComponent {
   private formState = {};
-  private json = { form_fields: [], tx_template: {} };
+  private json: {
+    form_fields: any[]; // TODO type this or import from somewhere
+    tx_template: {
+      method: string;
+      args: {
+        target: string[];
+        calldata: string[];
+        values: string[][];
+        description: string;
+      };
+    };
+  };
   private isLoaded;
   private templateNickname = '';
   private formError = false;
   private txReady = false;
+  private currentContract: Contract | null = null;
 
   handleInputChange(e) {
     const value = e.target.value;
@@ -142,6 +167,9 @@ class ViewTemplatePage extends ClassComponent {
     if (!contractInStore || !templateMetadata) {
       m.route.set('/404');
     }
+
+    this.currentContract = contractInStore;
+    console.log({ contract: this.currentContract });
 
     this.templateNickname = templateMetadata.cctmd.nickname;
 
@@ -196,6 +224,8 @@ class ViewTemplatePage extends ClassComponent {
       this.loadData(vnode);
       return;
     }
+
+    console.log({ formState: this.formState });
 
     return (
       <Sublayout>
@@ -272,7 +302,43 @@ class ViewTemplatePage extends ClassComponent {
               <CWButton
                 label="Create"
                 buttonType="primary-black"
-                disabled={!this.txReady}
+                disabled={this.txReady}
+                onclick={() => {
+                  showConfirmationModal({
+                    title: 'Attempt this transaction?',
+                    description: '{}',
+                    confirmButton: {
+                      type: 'primary-black',
+                      label: 'confirm',
+                      onConfirm: async () => {
+                        console.log('hi');
+
+                        try {
+                          const abiItem = parseFunctionFromABI(
+                            this.currentContract.abi,
+                            this.json.tx_template?.method as string
+                          );
+
+                          console.log(abiItem);
+                          // await callContractFunction(
+                          //   this.currentContract,
+                          //   abiItem,
+                          //   new Map<string, Map<number, string>>()
+                          // );
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      },
+                    },
+                    cancelButton: {
+                      type: 'secondary-black',
+                      label: 'cancel',
+                      onCancel: () => {
+                        console.log('hi');
+                      },
+                    },
+                  });
+                }}
               />
             </div>
           </div>
