@@ -1,7 +1,4 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
@@ -141,19 +138,16 @@ export const ComponentShowcase = () => {
   const [isToggled, setIsToggled] = React.useState<boolean>(false);
   const [voteCount, setVoteCount] = React.useState<number>(0);
   const [selectedTab, setSelectedTab] = React.useState<number>(1);
-  const [isRadioButtonChecked, setIsRadioButtonChecked] = React.useState<
-    boolean
-  >(false);
-  const [isCheckboxChecked, setIsCheckboxChecked] = React.useState<boolean>(
-    false
-  );
+  const [isRadioButtonChecked, setIsRadioButtonChecked] =
+    React.useState<boolean>(false);
+  const [isCheckboxChecked, setIsCheckboxChecked] =
+    React.useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = React.useState<string>(
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = React.useState<
-    boolean
-  >(false);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
+    React.useState<boolean>(false);
 
   return (
     <div className="ComponentShowcase">

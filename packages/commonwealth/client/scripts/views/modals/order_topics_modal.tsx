@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import dragula from 'dragula';
 import $ from 'jquery';

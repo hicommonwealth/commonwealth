@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
@@ -8,7 +7,7 @@ import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';

@@ -1,15 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 /* eslint-disable no-useless-escape */
 
 import type { ResultNode } from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  redraw,
-  jsx,
-  rootRender,
-} from 'mithrilInterop';
+import { ClassComponent, render, redraw, rootRender } from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';
 import DOMPurify from 'dompurify';

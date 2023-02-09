@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, jsx, rootRender } from 'mithrilInterop';
+import { ClassComponent, rootRender } from 'mithrilInterop';
 
 import 'components/quill/quill_formatted_text.scss';
 import { findAll } from 'highlight-words-core';

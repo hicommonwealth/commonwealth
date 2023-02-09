@@ -1,11 +1,10 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { initAppState } from 'state';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
 import app from 'state';
-import { ClassComponent, getRouteParam, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, getRouteParam, redraw } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';

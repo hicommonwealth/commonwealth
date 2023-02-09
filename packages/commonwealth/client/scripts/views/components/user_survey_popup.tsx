@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import 'components/user_survey_popup.scss';
 import app from 'state';

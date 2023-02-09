@@ -1,8 +1,6 @@
 /* eslint-disable max-len */
-/* @jsx jsx */
-import React from 'react';
 
-import { jsx } from 'mithrilInterop';
+import React from 'react';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';

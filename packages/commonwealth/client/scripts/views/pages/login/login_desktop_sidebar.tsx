@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { ChainNetwork } from 'common-common/src/types';
 
 import type { IWebWallet } from 'models';

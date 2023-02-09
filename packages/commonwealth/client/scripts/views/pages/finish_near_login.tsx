@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +6,7 @@ import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import { getRouteParam, redraw, jsx } from 'mithrilInterop';
+import { getRouteParam, redraw } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,

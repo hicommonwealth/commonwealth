@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { ISubmittableResult } from '@polkadot/types/types';
@@ -7,7 +6,7 @@ import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import $ from 'jquery';
-import { ClassComponent, render, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, render, redraw } from 'mithrilInterop';
 
 import 'pages/admin.scss';
 

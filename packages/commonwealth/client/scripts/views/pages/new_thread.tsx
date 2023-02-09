@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import { navigateToSubpage } from 'router';
 import { notifyInfo } from 'controllers/app/notifications';

@@ -1,4 +1,4 @@
-import type { ClassComponent} from 'mithrilInterop';
+import type { ClassComponent } from 'mithrilInterop';
 import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';

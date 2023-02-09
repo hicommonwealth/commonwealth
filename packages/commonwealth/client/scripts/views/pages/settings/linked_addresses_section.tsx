@@ -1,11 +1,10 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { WalletId } from 'common-common/src/types';
 import { unlinkLogin } from 'controllers/app/login';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { formatAddressShort, link, orderAccountsByAddress } from 'helpers';
-import { ClassComponent, render, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, render, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import type { AddressInfo } from 'models';

@@ -1,9 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/spec_settings.scss';

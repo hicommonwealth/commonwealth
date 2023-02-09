@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, getRoute, jsx } from 'mithrilInterop';
+import { ClassComponent, getRoute } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
@@ -29,9 +28,8 @@ export class SharePopover extends ClassComponent<SharePopoverAttrs> {
             iconLeft: 'copy',
             label: 'Copy URL',
             onClick: async () => {
-              const currentRouteSansCommentParam = getRoute().split(
-                '?comment='
-              )[0];
+              const currentRouteSansCommentParam =
+                getRoute().split('?comment=')[0];
               if (!commentId) {
                 await navigator.clipboard.writeText(
                   `${domain}${currentRouteSansCommentParam}`

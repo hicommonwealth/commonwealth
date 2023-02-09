@@ -1,12 +1,11 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type Near from 'controllers/chain/near/adapter';
 import type { IDaoInfo } from 'controllers/chain/near/chain';
 import { formatDuration } from 'helpers';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import BN from 'bn.js';
 import moment from 'moment';
 

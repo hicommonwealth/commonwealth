@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { MixpanelChatEvents } from 'analytics/types';
@@ -12,7 +11,6 @@ import {
   ResultNode,
   getRouteParam,
   redraw,
-  jsx,
 } from 'mithrilInterop';
 import moment from 'moment';
 

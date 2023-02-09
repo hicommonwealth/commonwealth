@@ -1,10 +1,9 @@
-/* @jsx jsx */
 import React from 'react';
 
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import 'modals/tx_signing_modal.scss';
 import type { ITXModalData } from 'models/interfaces';

@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, getRouteParam, jsx } from 'mithrilInterop';
+import { ClassComponent, getRouteParam } from 'mithrilInterop';
 
 import 'pages/chat.scss';
 

@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -6,7 +5,6 @@ import {
   getRoute,
   getRouteParam,
   redraw,
-  jsx,
 } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 

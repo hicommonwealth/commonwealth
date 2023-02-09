@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import 'components/sidebar/sidebar_quick_switcher.scss';
 import { link } from 'helpers';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';

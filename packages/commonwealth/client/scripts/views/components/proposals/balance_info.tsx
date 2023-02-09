@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
 
 import { formatCoin } from 'adapters/currency';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';

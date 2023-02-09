@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, render, jsx } from 'mithrilInterop';
+import { ClassComponent, render } from 'mithrilInterop';
 import type { ChainCategoryType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type { ChainInfo } from 'models';

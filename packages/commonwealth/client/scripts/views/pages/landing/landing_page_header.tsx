@@ -1,8 +1,5 @@
-/* @jsx jsx */
-
 import React from 'react';
 
-import { jsx } from 'mithrilInterop';
 import { useNavigate } from 'react-router-dom';
 
 import 'pages/landing/landing_page_header.scss';

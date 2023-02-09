@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';

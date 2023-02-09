@@ -1,11 +1,10 @@
-/* @jsx jsx */
 import React from 'react';
 
 import $ from 'jquery';
 import type { ITXModalData, IWebWallet } from 'models';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { CWButton } from '../component_kit/cw_button';

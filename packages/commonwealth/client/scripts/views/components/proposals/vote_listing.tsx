@@ -1,9 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
 
 import 'components/proposals/vote_listing.scss';
 import { CosmosVote } from 'controllers/chain/cosmos/proposal';

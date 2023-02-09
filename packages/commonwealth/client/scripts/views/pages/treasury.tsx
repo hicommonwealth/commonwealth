@@ -1,11 +1,10 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/treasury.scss';
 

@@ -1,8 +1,6 @@
-/* @jsx jsx */
-
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 export class JoinCommonWealthSection extends ClassComponent {
   view() {

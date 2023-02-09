@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import Sublayout from 'views/sublayout';
 import { ComponentShowcase } from '../components/component_kit/cw_component_showcase';
 

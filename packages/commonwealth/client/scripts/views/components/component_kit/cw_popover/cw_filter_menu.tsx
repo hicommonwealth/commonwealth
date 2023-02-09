@@ -1,8 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
 

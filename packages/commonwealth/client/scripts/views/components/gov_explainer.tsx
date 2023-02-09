@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'components/gov_explainer.scss';
 import { CWText } from './component_kit/cw_text';

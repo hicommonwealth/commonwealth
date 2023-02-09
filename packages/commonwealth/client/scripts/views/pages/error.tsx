@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import Sublayout from 'views/sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';

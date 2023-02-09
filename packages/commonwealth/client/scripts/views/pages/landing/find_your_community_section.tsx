@@ -1,9 +1,7 @@
-/* @jsx jsx */
-
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/landing/find_your_community_section.scss';
 

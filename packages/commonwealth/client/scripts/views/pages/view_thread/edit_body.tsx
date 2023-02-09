@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { Thread } from 'models';
 import 'pages/view_thread/edit_body.scss';
 import { notifySuccess } from 'controllers/app/notifications';

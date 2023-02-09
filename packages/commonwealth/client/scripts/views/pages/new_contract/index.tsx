@@ -1,8 +1,6 @@
-/* @jsx jsx */
-
 import 'pages/new_contract/new_contract_page.scss';
 import app from 'state';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { ChainBase } from 'common-common/src/types';
 import AddContractAndAbiForm from './add_contract_and_abi_form';
 import PageNotFound from '../404';

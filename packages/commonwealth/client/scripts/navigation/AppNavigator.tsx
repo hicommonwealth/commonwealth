@@ -1,7 +1,3 @@
-/* @jsx jsx */
-
-import { jsx } from 'mithrilInterop';
-
 import React from 'react';
 import { Routes } from 'react-router-dom';
 

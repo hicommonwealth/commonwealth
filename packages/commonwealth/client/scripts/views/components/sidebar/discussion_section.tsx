@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, getRoute, getRouteParam, jsx } from 'mithrilInterop';
+import { ClassComponent, getRoute, getRouteParam } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import app from 'state';

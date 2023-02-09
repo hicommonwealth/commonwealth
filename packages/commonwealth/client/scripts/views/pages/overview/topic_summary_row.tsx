@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { pluralize } from 'helpers';
@@ -6,7 +5,7 @@ import { getProposalUrlPath } from 'identifiers';
 // import { navigateToSubpage } from 'router';
 import type { Thread, Topic } from 'models';
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';

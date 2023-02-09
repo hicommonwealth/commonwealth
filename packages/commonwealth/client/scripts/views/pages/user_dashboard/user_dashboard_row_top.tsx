@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { formatTimestamp } from 'helpers/index';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';

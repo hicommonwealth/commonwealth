@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { MixpanelSnapshotEvents } from 'analytics/types';
@@ -9,8 +8,8 @@ import type {
 } from 'helpers/snapshot_utils';
 import { getPower, getResults } from 'helpers/snapshot_utils';
 import { AddressInfo } from 'models';
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 import app from 'state';

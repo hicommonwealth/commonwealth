@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { formatCoin } from 'adapters/currency';

@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';

@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 /* eslint-disable max-len */
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import { renderMultilineText } from 'helpers';
 

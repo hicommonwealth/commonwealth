@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import $ from 'jquery';
 import type { RoleInfo } from 'models';

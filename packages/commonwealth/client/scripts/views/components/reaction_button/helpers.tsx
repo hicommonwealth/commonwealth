@@ -1,7 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import type { ChainInfo, Comment } from 'models';
 import { AddressInfo, Thread } from 'models';

@@ -1,9 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { Coin, formatNumberLong } from 'adapters/currency';
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import BN from 'bn.js';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';

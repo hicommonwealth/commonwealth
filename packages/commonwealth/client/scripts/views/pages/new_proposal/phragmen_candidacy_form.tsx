@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import { formatCoin } from 'adapters/currency';
 import type Substrate from 'controllers/chain/substrate/adapter';

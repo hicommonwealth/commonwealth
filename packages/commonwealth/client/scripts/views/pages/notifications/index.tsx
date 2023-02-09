@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 // import Infinite from 'mithril-infinite';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 

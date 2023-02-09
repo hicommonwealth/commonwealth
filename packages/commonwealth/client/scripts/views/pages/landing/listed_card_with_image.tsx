@@ -1,9 +1,7 @@
-/* @jsx jsx */
-
 import React from 'react';
 
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 type ListedCardWithImageAttrs = {
   buttonId: string;

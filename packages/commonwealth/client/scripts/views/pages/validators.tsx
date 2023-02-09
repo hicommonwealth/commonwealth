@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -7,7 +6,7 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import { externalLink, pluralize } from 'helpers';
 import { AddressInfo } from 'models';
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import 'pages/validators.scss';
 
 import app from 'state';

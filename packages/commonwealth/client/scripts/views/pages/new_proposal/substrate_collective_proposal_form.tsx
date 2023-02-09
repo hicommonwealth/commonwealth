@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -6,7 +5,7 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { proposalSlugToClass } from 'identifiers';
 import type { ITXModalData, ProposalModule } from 'models';
-import { ClassComponent, render, jsx } from 'mithrilInterop';
+import { ClassComponent, render } from 'mithrilInterop';
 import app from 'state';
 import { ProposalType } from '../../../../../../common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';

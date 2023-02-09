@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import { pluralize } from 'helpers';
 import type { ChainInfo } from 'models';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';

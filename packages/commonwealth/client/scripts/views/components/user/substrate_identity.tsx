@@ -1,9 +1,8 @@
-/* @jsx jsx */
 /* eslint-disable no-script-url */
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import 'components/user/user.scss';
 

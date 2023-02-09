@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type * as solanaWeb3 from '@solana/web3.js';
@@ -8,7 +7,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';

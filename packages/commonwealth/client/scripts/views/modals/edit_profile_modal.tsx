@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import 'modals/edit_profile_modal.scss';
 import type { Account } from 'models';

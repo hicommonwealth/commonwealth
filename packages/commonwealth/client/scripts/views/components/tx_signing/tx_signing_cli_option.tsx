@@ -1,9 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { ChainBase } from 'common-common/src/types';
-import type { ResultNode} from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 import type { ISubstrateTXData } from 'controllers/chain/substrate/shared';

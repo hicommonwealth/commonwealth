@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, getRouteParam, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, getRouteParam, redraw } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 

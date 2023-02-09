@@ -1,8 +1,7 @@
-/* @jsx jsx */
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import { getProposalUrlPath } from 'identifiers';
 import type { NotificationSubscription } from 'models';
 import { AddressInfo } from 'models';

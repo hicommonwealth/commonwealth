@@ -1,7 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, getRoute, jsx } from 'mithrilInterop';
+import { ClassComponent, getRoute } from 'mithrilInterop';
 import {
   ChainBase,
   ChainNetwork,
