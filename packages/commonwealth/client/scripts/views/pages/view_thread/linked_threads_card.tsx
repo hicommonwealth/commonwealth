@@ -4,8 +4,6 @@ import { getProposalUrlPath } from 'identifiers';
 import type { Thread } from 'models';
 import type { LinkedThreadRelation } from 'models/Thread';
 
-import { ClassComponent, ResultNode } from 'mithrilInterop';
-
 import 'pages/view_thread/linked_threads_card.scss';
 
 import app from 'state';
@@ -14,48 +12,50 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
+import { Modal } from '../../components/component_kit/cw_modal';
 
-type LinkedThreadsCardAttrs = {
+type LinkedThreadsCardProps = {
   allowLinking: boolean;
   threadId: number;
 };
 
-export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
-  private initialized: boolean;
-  private linkedThreads: Thread[] = [];
+export const LinkedThreadsCard = (props: LinkedThreadsCardProps) => {
+  const { allowLinking, threadId } = props;
 
-  view(vnode: ResultNode<LinkedThreadsCardAttrs>) {
-    const { allowLinking, threadId } = vnode.attrs;
+  const [initialized, setInitialized] = React.useState<boolean>(false);
+  const [linkedThreads, setLinkedThreads] = React.useState<Array<Thread>>([]);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-    const thread = app.threads.getById(threadId);
+  const thread = app.threads.getById(threadId);
 
-    if (thread.linkedThreads.length > 0 && !this.initialized) {
-      this.initialized = true;
+  if (thread.linkedThreads.length > 0 && !initialized) {
+    setInitialized(true);
 
-      app.threads
-        .fetchThreadsFromId(
-          thread.linkedThreads.map(
-            (relation: LinkedThreadRelation) => relation.linkedThread
-          )
+    app.threads
+      .fetchThreadsFromId(
+        thread.linkedThreads.map(
+          (relation: LinkedThreadRelation) => relation.linkedThread
         )
-        .then((result) => {
-          this.linkedThreads = result;
-          this.initialized = false;
-        })
-        .catch((err) => {
-          console.error(err);
-          this.initialized = false;
-        });
-    }
+      )
+      .then((result) => {
+        setLinkedThreads(result);
+        setInitialized(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setInitialized(false);
+      });
+  }
 
-    return (
+  return (
+    <React.Fragment>
       <CWContentPageCard
         header="Linked Discussions"
         content={
           <div className="LinkedThreadsCard">
             {thread.linkedThreads.length > 0 ? (
               <div className="links-container">
-                {this.linkedThreads.map((t) => {
+                {linkedThreads.map((t) => {
                   const discussionLink = getProposalUrlPath(
                     t.slug,
                     `${t.identifier}-${slugify(t.title)}`
@@ -75,20 +75,24 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
                 label="Link discussion"
                 onClick={(e) => {
                   e.preventDefault();
-                  app.modals.create({
-                    modal: LinkedThreadModal,
-                    data: {
-                      linkingThread: thread,
-                      linkedThreads: this.linkedThreads,
-                    },
-                  });
-                  this.redraw();
+                  setIsModalOpen(true);
                 }}
               />
             )}
           </div>
         }
       />
-    );
-  }
-}
+      <Modal
+        content={
+          <LinkedThreadModal
+            linkingThread={thread}
+            linkedThreads={linkedThreads}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};
