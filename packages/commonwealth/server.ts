@@ -40,7 +40,7 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
-import setupEntityProxy from './server/util/entitiesProxy';
+import setupCEProxy from './server/util/entitiesProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import RuleCache from './server/util/rules/ruleCache';
@@ -292,7 +292,7 @@ async function main() {
 
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
-  setupEntityProxy(app);
+  setupCEProxy(app);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 
   setupErrorHandlers(app, rollbar);

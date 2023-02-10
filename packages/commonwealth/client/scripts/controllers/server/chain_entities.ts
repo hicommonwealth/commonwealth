@@ -13,7 +13,7 @@ import {
 import { SubstrateTypes } from 'chain-events/src/types';
 import type { ProposalType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { getBaseUrl, getFetch } from 'helpers/getUrl';
+import getFetch from 'helpers/getFetch';
 import type { ChainInfo } from 'models';
 import { ChainEntity, ChainEvent } from 'models';
 import { proposalSlugToChainEntityType } from '../../identifiers';
@@ -96,8 +96,8 @@ class ChainEntityController {
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
-      getFetch(getBaseUrl() + '/entities', options),
-      getFetch(getBaseUrl() + '/getEntityMeta', options),
+      getFetch(`${app.serverUrl()}/ce/entities`, options),
+      getFetch(`${app.serverUrl()}/getEntityMeta`, options),
     ]);
 
     const data = [];
@@ -128,7 +128,9 @@ class ChainEntityController {
   }
 
   public async getRawEntities(chain: string): Promise<ChainEntity[]> {
-    const entities = await getFetch(getBaseUrl() + '/entities', { chain });
+    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, {
+      chain,
+    });
     const data = [];
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
