@@ -19,6 +19,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
+import withRouter from 'navigation/helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -212,6 +213,7 @@ class GovernanceSectionComponent extends ClassComponent<SidebarSectionAttrs> {
         onMembersPage(getRoute()) &&
         (app.chain ? app.chain.serverLoaded : true),
       onClick: (e, toggle: boolean) => {
+        console.log('this', this);
         handleRedirectClicks(this, e, '/members', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Members.toggledState', toggle);
         });
@@ -389,4 +391,4 @@ class GovernanceSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const GovernanceSection = GovernanceSectionComponent;
+export const GovernanceSection = withRouter(GovernanceSectionComponent);

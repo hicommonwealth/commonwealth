@@ -12,6 +12,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
+import withRouter from 'navigation/helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -252,4 +253,4 @@ class DiscussionSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const DiscussionSection = DiscussionSectionComponent;
+export const DiscussionSection = withRouter(DiscussionSectionComponent);

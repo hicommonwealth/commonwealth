@@ -15,6 +15,7 @@ import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
 import withRouter from 'navigation/helpers';
+import { HelpMenuPopover } from 'views/menus/help_menu';
 
 type SublayoutHeaderAttrs = {
   hideSearch?: boolean;
