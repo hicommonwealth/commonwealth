@@ -57,11 +57,19 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
         if (!contract) {
           throw new Error('Contract not found');
         }
-        const result = await callContractFunction(
-          contract,
-          fn,
-          this.form.functionNameToFunctionInputArgs
+
+        // Convert map of number to string to array of string
+        const inputArgs = this.form.functionNameToFunctionInputArgs.get(
+          fn.name
         );
+        const inputArgsArray = [];
+        if (inputArgs && inputArgs.size > 0) {
+          for (let i = 0; i < inputArgs.size; i++) {
+            inputArgsArray.push(inputArgs.get(i));
+          }
+        }
+
+        const result = await callContractFunction(contract, fn, inputArgsArray);
 
         this.functionNameToFunctionOutput.set(fn.name, result);
         this.saving = false;

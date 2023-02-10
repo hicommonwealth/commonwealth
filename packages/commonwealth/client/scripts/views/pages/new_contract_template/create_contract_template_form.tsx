@@ -16,7 +16,6 @@ class CreateContractTemplateForm extends ClassComponent {
   private saving = false;
   private form = {
     displayName: '',
-    nickname: '',
     template: '',
   };
 
@@ -47,10 +46,7 @@ class CreateContractTemplateForm extends ClassComponent {
 
   view() {
     const isCreatingDisabled =
-      this.saving ||
-      !this.form.displayName ||
-      !this.form.nickname ||
-      !this.form.template;
+      this.saving || !this.form.displayName || !this.form.template;
 
     return (
       <div class="CreateContractTemplateForm">
@@ -64,17 +60,6 @@ class CreateContractTemplateForm extends ClassComponent {
             placeholder="Enter display name"
             oninput={(e) => {
               this.form.displayName = e.target.value;
-            }}
-          />
-          <CWText type="caption" fontWeight="medium" className="input-label">
-            Nickname
-          </CWText>
-          <CWTextInput
-            label="A name that your community can easily remember and identify"
-            value={this.form.nickname}
-            placeholder="Enter nickname"
-            oninput={(e) => {
-              this.form.nickname = e.target.value;
             }}
           />
           <CWText type="caption" fontWeight="medium" className="input-label">

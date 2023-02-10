@@ -65,7 +65,7 @@ const createContract = async (
   res: TypedResponse<CreateContractResp>
 ) => {
   const {
-    community = 'dydx',
+    community,
     address,
     contractType = '',
     abi,
