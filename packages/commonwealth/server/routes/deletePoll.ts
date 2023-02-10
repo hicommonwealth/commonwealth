@@ -37,7 +37,7 @@ const deletePoll = async (
     const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
-        chain: chain_id
+        chain: chain_id,
       },
     });
 
