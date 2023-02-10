@@ -119,7 +119,9 @@ class ChainEntityController {
   }
 
   public async refreshRawEntities(chain: string) {
-    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, { chain });
+    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, {
+      chain,
+    });
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);

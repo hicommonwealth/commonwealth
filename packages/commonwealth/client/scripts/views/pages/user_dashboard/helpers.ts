@@ -91,10 +91,10 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       jwt: app.user.jwt,
     });
   } else if (requestType === DashboardViews.Chain) {
-    const events = await getFetch(
-      `${app.serverUrl()}/ce/events`,
-      { limit: 50, ordered: true }
-    );
+    const events = await getFetch(`${app.serverUrl()}/ce/events`, {
+      limit: 50,
+      ordered: true,
+    });
 
     if (!Array.isArray(events)) {
       return { status: 'Failure', result: [] };

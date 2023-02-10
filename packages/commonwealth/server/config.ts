@@ -18,7 +18,8 @@ export const SERVER_URL =
     : 'http://localhost:8080');
 
 export const CE_URL =
-  process.env.ENTITIES_URL || process.env.CE_URL ||
+  process.env.ENTITIES_URL ||
+  process.env.CE_URL ||
   (process.env.NODE_ENV === 'production'
     ? 'https://chain-events.herokuapp.com/api'
     : 'http://localhost:8081/api');
