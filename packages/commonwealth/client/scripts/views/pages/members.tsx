@@ -14,6 +14,7 @@ import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
+import { Link, NavLink } from 'react-router-dom';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -199,24 +200,15 @@ class MembersPage extends ClassComponent {
             style={{ height: 300 }}
             data={profilesLoaded}
             itemContent={(index, profileInfo) => {
-              console.log('profileInfo', profileInfo);
               const { address, chain } = profileInfo.profile;
               return (
                 <div className="member-row" key={index}>
-                  <a
-                    href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      localStorage[`${app.activeChainId()}-members-scrollY`] =
-                        window.scrollY;
-                      localStorage[
-                        `${app.activeChainId()}-members-numProfilesLoaded`
-                      ] = numProfilesLoaded;
-                      navigateToSubpage(`/account/${address}?base=${chain}`);
-                    }}
-                  >
-                    <User user={profileInfo.profile} showRole />
-                  </a>
+                  <User
+                    user={profileInfo.profile}
+                    showRole
+                    hideAvatar={false}
+                    linkify={true}
+                  />
                   <CWText>{profileInfo.postCount}</CWText>
                 </div>
               );
