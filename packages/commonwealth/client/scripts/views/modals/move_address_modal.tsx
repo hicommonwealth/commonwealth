@@ -123,9 +123,9 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
                 <MoveAddressRow
                   profile={option}
                   selected={option.id === this.selectedProfile?.id}
-                  onclick={(e) => {
-                    e.preventDefault();
+                  onclick={() => {
                     this.selectedProfile = option;
+                    this.redraw();
                   }}
                 />
               ))

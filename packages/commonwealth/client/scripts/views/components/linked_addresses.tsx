@@ -32,7 +32,7 @@ type LinkedAddressesAttrs = {
 
 class Address extends ClassComponent<AddressAttrs> {
   view(vnode: ResultNode<AddressAttrs>) {
-    const { addressInfo, refreshProfiles, toggleTransferModal, toggleRemoveModal } = vnode.attrs;
+    const { addressInfo, toggleTransferModal, toggleRemoveModal } = vnode.attrs;
     const { address } = addressInfo;
 
     return (
@@ -101,7 +101,10 @@ export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
               profile={profile}
               profiles={profiles}
               address={this.currentAddress?.address}
-              closeModal={() => this.isTransferModalOpen = false}
+              closeModal={() => {
+                this.isTransferModalOpen = false;
+                refreshProfiles();
+              }}
             />
           }
           onClose={() => this.currentAddress = null}
@@ -113,7 +116,10 @@ export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
               profile={profile}
               address={this.currentAddress?.address}
               chain={this.currentAddress?.chain.id}
-              closeModal={() => this.isRemoveModalOpen = false}
+              closeModal={() => {
+                this.isRemoveModalOpen = false;
+                refreshProfiles();
+              }}
             />
           }
           onClose={() => this.currentAddress = null}
