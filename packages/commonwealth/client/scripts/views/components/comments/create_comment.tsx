@@ -7,7 +7,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import 'components/comments/create_comment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { weiToTokens } from 'helpers';
+import { weiToTokens, getDecimals } from 'helpers';
 import type { AnyProposal } from 'models';
 import { Thread } from 'models';
 
@@ -127,18 +127,12 @@ export const CreateComment = (props: CreateCommmentProps) => {
   const disabled =
     quillEditorState?.isBlank() || sendingComment || userFailsThreshold;
 
-  const decimals = app.chain?.meta?.decimals
-    ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
+  const decimals = getDecimals(app.chain);
 
   return (
     <div className="CreateComment">
       {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
-        <React.Fragment>
+        <>
           <Modal
             content={
               <EditProfileModal
@@ -164,9 +158,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
               Set a display name.
             </a>
           </CWText>
-        </React.Fragment>
+        </>
       ) : (
-        <React.Fragment>
+        <>
           <div className="attribution-row">
             <div className="attribution-left-content">
               <CWText type="caption">
@@ -198,10 +192,10 @@ export const CreateComment = (props: CreateCommmentProps) => {
               {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
               {app.chain.meta.default_symbol}.{' '}
               {userBalance && app.user.activeAccount && (
-                <React.Fragment>
+                <>
                   You have {weiToTokens(userBalance.toString(), decimals)}{' '}
                   {app.chain.meta.default_symbol}.
-                </React.Fragment>
+                </>
               )}
             </CWText>
           )}
@@ -234,7 +228,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
               />
             </div>
           </div>
-        </React.Fragment>
+        </>
       )}
     </div>
   );

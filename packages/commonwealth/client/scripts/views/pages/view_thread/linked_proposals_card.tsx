@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import {
@@ -19,33 +18,32 @@ import { CWContentPageCard } from '../../components/component_kit/cw_content_pag
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
+import { Modal } from '../../components/component_kit/cw_modal';
 
-type LinkedProposalAttrs = {
+type LinkedProposalProps = {
   chainEntity: ChainEntity;
   thread: Thread;
 };
 
-class LinkedProposal extends ClassComponent<LinkedProposalAttrs> {
-  view(vnode: ResultNode<LinkedProposalAttrs>) {
-    const { thread, chainEntity } = vnode.attrs;
+const LinkedProposal = (props: LinkedProposalProps) => {
+  const { thread, chainEntity } = props;
 
-    const slug = chainEntityTypeToProposalSlug(chainEntity.type);
+  const slug = chainEntityTypeToProposalSlug(chainEntity.type);
 
-    const threadLink = `${
-      app.isCustomDomain() ? '' : `/${thread.chain}`
-    }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
+  const threadLink = `${
+    app.isCustomDomain() ? '' : `/${thread.chain}`
+  }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
 
-    return (
-      <a href={threadLink}>
-        {`${chainEntityTypeToProposalName(chainEntity.type)} #${
-          chainEntity.typeId
-        } ${chainEntity.completed ? ' (Completed)' : ''}`}
-      </a>
-    );
-  }
-}
+  return (
+    <a href={threadLink}>
+      {`${chainEntityTypeToProposalName(chainEntity.type)} #${
+        chainEntity.typeId
+      } ${chainEntity.completed ? ' (Completed)' : ''}`}
+    </a>
+  );
+};
 
-type LinkedProposalsCardAttrs = {
+type LinkedProposalsCardProps = {
   onChangeHandler: (
     stage: ThreadStage,
     chainEntities: Array<ChainEntity>,
@@ -55,54 +53,55 @@ type LinkedProposalsCardAttrs = {
   thread: Thread;
 };
 
-export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs> {
-  private initialized: boolean;
-  private snapshot: SnapshotProposal;
-  private snapshotProposalsLoaded: boolean;
-  private space: SnapshotSpace;
+export const LinkedProposalsCard = (props: LinkedProposalsCardProps) => {
+  const { onChangeHandler, thread, showAddProposalButton } = props;
 
-  view(vnode: ResultNode<LinkedProposalsCardAttrs>) {
-    const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
+  const [initialized, setInitialized] = React.useState<boolean>(false);
+  const [snapshot, setSnapshot] = React.useState<SnapshotProposal>();
+  const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] =
+    React.useState<boolean>(false);
+  const [space, setSpace] = React.useState<SnapshotSpace>();
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-    if (!this.initialized && thread.snapshotProposal?.length > 0) {
-      this.initialized = true;
+  if (!initialized && thread.snapshotProposal?.length > 0) {
+    setInitialized(true);
 
-      loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
-        for (const { space, proposals } of data) {
-          const matchingSnapshot = proposals.find(
-            (sn) => sn.id === thread.snapshotProposal
-          );
+    loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+      for (const { space: _space, proposals } of data) {
+        const matchingSnapshot = proposals.find(
+          (sn) => sn.id === thread.snapshotProposal
+        );
 
-          if (matchingSnapshot) {
-            this.snapshot = matchingSnapshot;
-            this.space = space;
-            break;
-          }
+        if (matchingSnapshot) {
+          setSnapshot(matchingSnapshot);
+          setSpace(_space);
+          break;
         }
+      }
 
-        this.snapshotProposalsLoaded = true;
-        this.initialized = false;
-        redraw();
-      });
-    }
+      setSnapshotProposalsLoaded(true);
+      setInitialized(false);
+      redraw();
+    });
+  }
 
-    let snapshotUrl = '';
+  let snapshotUrl = '';
 
-    if (this.space && this.snapshot) {
-      snapshotUrl = `${
-        app.isCustomDomain() ? '' : `/${thread.chain}`
-      }/snapshot/${this.space.id}/${this.snapshot.id}`;
-    }
+  if (space && snapshot) {
+    snapshotUrl = `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+      space.id
+    }/${snapshot.id}`;
+  }
 
-    const showSnapshot =
-      thread.snapshotProposal?.length > 0 && this.snapshotProposalsLoaded;
+  const showSnapshot =
+    thread.snapshotProposal?.length > 0 && snapshotProposalsLoaded;
 
-    return (
+  return (
+    <React.Fragment>
       <CWContentPageCard
         header="Linked Proposals"
         content={
-          thread.snapshotProposal?.length > 0 &&
-          !this.snapshotProposalsLoaded ? (
+          thread.snapshotProposal?.length > 0 && !snapshotProposalsLoaded ? (
             <div className="spinner-container">
               <CWSpinner size="medium" />
             </div>
@@ -123,7 +122,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
                     </div>
                   )}
                   {showSnapshot && (
-                    <a href={snapshotUrl}>Snapshot: {this.snapshot?.title}</a>
+                    <a href={snapshotUrl}>Snapshot: {snapshot?.title}</a>
                   )}
                 </div>
               ) : (
@@ -137,13 +136,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
                   label="Link proposal"
                   onClick={(e) => {
                     e.preventDefault();
-                    app.modals.create({
-                      modal: UpdateProposalStatusModal,
-                      data: {
-                        onChangeHandler,
-                        thread,
-                      },
-                    });
+                    setIsModalOpen(true);
                   }}
                 />
               )}
@@ -151,6 +144,17 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
           )
         }
       />
-    );
-  }
-}
+      <Modal
+        content={
+          <UpdateProposalStatusModal
+            onChangeHandler={onChangeHandler}
+            thread={thread}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};

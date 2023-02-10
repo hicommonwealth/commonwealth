@@ -49,6 +49,10 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
     const { category } = notifications[0].subscription;
 
+    app.user.notifications.isUpdated.on('redraw', () => {
+      this.redraw();
+    });
+
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
@@ -157,7 +161,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       const author = new AddressInfo(null, author_address, chain_id, null);
 
-      const authorName = <User user={author} hideAvatar hideIdentityIcon />;
+      const authorName = <User user={author} hideAvatar />;
 
       // link(
       //   'a.NotificationRow',

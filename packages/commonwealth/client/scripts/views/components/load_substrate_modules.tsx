@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { ChainBase } from 'common-common/src/types';
-
 import type { ProposalModule } from 'models';
 
 import app from 'state';

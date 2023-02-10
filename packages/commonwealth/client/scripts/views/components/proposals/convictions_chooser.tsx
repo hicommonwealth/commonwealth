@@ -1,8 +1,5 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
-
 import {
   convictions,
   convictionToLocktime,
@@ -10,29 +7,29 @@ import {
 } from 'controllers/chain/substrate/democracy_referendum';
 import { CWDropdown } from '../component_kit/cw_dropdown';
 
-type ConvictionsChooserAttrs = { callback: (number) => void };
+type ConvictionsChooserProps = { callback: (number) => void };
 
-export class ConvictionsChooser extends ClassComponent<ConvictionsChooserAttrs> {
-  oncreate(vnode: ResultNode<ConvictionsChooserAttrs>) {
-    vnode.attrs.callback(convictions()[0].toString());
-  }
+export const ConvictionsChooser = (props: ConvictionsChooserProps) => {
+  const { callback } = props;
 
-  view(vnode: ResultNode<ConvictionsChooserAttrs>) {
-    const options = convictions().map((c) => ({
-      value: c.toString(),
-      label: `${convictionToWeight(
-        c
-      )}x weight (locked for ${convictionToLocktime(c)}x enactment period)`,
-    }));
+  React.useEffect(() => {
+    callback(convictions()[0].toString());
+  }, []);
 
-    return (
-      <CWDropdown
-        label="Convictions"
-        options={options}
-        onSelect={(o) => {
-          vnode.attrs.callback(parseInt((o as any).value, 10));
-        }}
-      />
-    );
-  }
-}
+  const options = convictions().map((c) => ({
+    value: c.toString(),
+    label: `${convictionToWeight(c)}x weight (locked for ${convictionToLocktime(
+      c
+    )}x enactment period)`,
+  }));
+
+  return (
+    <CWDropdown
+      label="Convictions"
+      options={options}
+      onSelect={(o) => {
+        callback(parseInt((o as any).value, 10));
+      }}
+    />
+  );
+};

@@ -108,8 +108,8 @@ export class Comment extends ClassComponent<CommentAttrs> {
           <div className="thread-connectors-container">
             {Array(threadLevel)
               .fill(undefined)
-              .map(() => (
-                <div className="thread-connector" />
+              .map((_, i) => (
+                <div key={i} className="thread-connector" />
               ))}
           </div>
         )}
@@ -138,7 +138,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
               updatedCommentsCallback={updatedCommentsCallback}
             />
           ) : (
-            <React.Fragment>
+            <>
               <CWText className="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
@@ -212,7 +212,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                   </div>
                 </div>
               )}
-            </React.Fragment>
+            </>
           )}
         </div>
       </div>

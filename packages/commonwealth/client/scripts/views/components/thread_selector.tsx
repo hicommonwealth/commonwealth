@@ -86,7 +86,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
         {this.loading ? (
           <CWSpinner />
         ) : (
-          <React.Fragment>
+          <>
             <CWTextInput
               placeholder="Search thread titles..."
               iconRightonClick={() => {
@@ -178,7 +178,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                 }
               },
             })} */}
-          </React.Fragment>
+          </>
         )}
       </div>
     );

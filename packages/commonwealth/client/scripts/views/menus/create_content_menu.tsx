@@ -3,7 +3,6 @@ import React from 'react';
 import { ClassComponent, redraw } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 
@@ -14,12 +13,9 @@ import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_m
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import type { MenuItem } from '../components/component_kit/types';
 import withRouter from 'navigation/helpers';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
-  const activeAccount = app.user.activeAccount;
-
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
@@ -106,26 +102,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
             iconLeft: 'democraticProposal',
-          },
-          ...(((activeAccount as SubstrateAccount)?.isCouncillor
-            ? [
-                {
-                  label: 'New council motion',
-                  onClick: () =>
-                    navigateToSubpage('/new/proposal/:type', {
-                      type: ProposalType.SubstrateCollectiveProposal,
-                    }),
-                  iconLeft: 'councilProposal',
-                },
-              ]
-            : []) as PopoverMenuItem[]),
-          {
-            label: 'New bounty proposal',
-            onClick: () =>
-              navigateToSubpage('/new/proposal/:type', {
-                type: ProposalType.SubstrateBountyProposal,
-              }),
-            iconLeft: 'badge',
           },
           {
             label: 'New tip',

@@ -35,13 +35,7 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
-    return [
-      chain.council,
-      chain.technicalCommittee,
-      chain.treasury,
-      chain.democracyProposals,
-      chain.democracy,
-    ];
+    return [chain.treasury, chain.democracyProposals, chain.democracy];
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     const chain = app.chain as Cosmos;
     return [chain.governance];
@@ -107,12 +101,6 @@ class ProposalsPage extends ClassComponent {
         .getAll()
         .filter((p) => !p.completed);
 
-    const activeCouncilProposals =
-      onSubstrate &&
-      (app.chain as Substrate).council.store
-        .getAll()
-        .filter((p) => !p.completed);
-
     const activeCosmosProposals =
       app.chain &&
       app.chain.base === ChainBase.CosmosSDK &&
@@ -151,7 +139,6 @@ class ProposalsPage extends ClassComponent {
 
     const activeProposalContent =
       !activeDemocracyProposals?.length &&
-      !activeCouncilProposals?.length &&
       !activeCosmosProposals?.length &&
       !activeMolochProposals?.length &&
       !activeCompoundProposals?.length &&
@@ -160,11 +147,6 @@ class ProposalsPage extends ClassComponent {
         ? [<div className="no-proposals">No active proposals</div>]
         : (activeDemocracyProposals || [])
             .map((proposal) => <ProposalCard proposal={proposal} />)
-            .concat(
-              (activeCouncilProposals || []).map((proposal) => (
-                <ProposalCard proposal={proposal} />
-              ))
-            )
             .concat(
               (activeCosmosProposals || []).map((proposal) => (
                 <ProposalCard proposal={proposal} />
@@ -206,12 +188,6 @@ class ProposalsPage extends ClassComponent {
         .getAll()
         .filter((p) => p.completed);
 
-    const inactiveCouncilProposals =
-      onSubstrate &&
-      (app.chain as Substrate).council.store
-        .getAll()
-        .filter((p) => p.completed);
-
     const inactiveCosmosProposals =
       app.chain &&
       app.chain.base === ChainBase.CosmosSDK &&
@@ -250,7 +226,6 @@ class ProposalsPage extends ClassComponent {
 
     const inactiveProposalContent =
       !inactiveDemocracyProposals?.length &&
-      !inactiveCouncilProposals?.length &&
       !inactiveCosmosProposals?.length &&
       !inactiveMolochProposals?.length &&
       !inactiveCompoundProposals?.length &&
@@ -259,11 +234,6 @@ class ProposalsPage extends ClassComponent {
         ? [<div className="no-proposals">No past proposals</div>]
         : (inactiveDemocracyProposals || [])
             .map((proposal) => <ProposalCard proposal={proposal} />)
-            .concat(
-              (inactiveCouncilProposals || []).map((proposal) => (
-                <ProposalCard proposal={proposal} />
-              ))
-            )
             .concat(
               (inactiveCosmosProposals || []).map((proposal) => (
                 <ProposalCard proposal={proposal} />

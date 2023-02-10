@@ -314,7 +314,7 @@ class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
     ) : (
       <Sublayout>
         <div className="SearchPage">
-          <React.Fragment>
+          <>
             {!app.search.getByQuery(searchQuery)?.loaded ? (
               <CWSpinner size="xl" />
             ) : (
@@ -366,7 +366,7 @@ class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
                 <div className="search-results-list">{tabScopedListing}</div>
               </div>
             )}
-          </React.Fragment>
+          </>
         </div>
       </Sublayout>
     );

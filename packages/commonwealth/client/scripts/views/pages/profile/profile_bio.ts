@@ -1,95 +1,47 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import _ from 'lodash';
 import type { Account } from 'models';
-import { render, redraw, ClassComponent } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+} from 'mithrilInterop';
 import { initChain } from 'helpers/chain';
 import { setActiveAccount } from '../../../controllers/app/login';
-import type SubstrateIdentity from '../../../controllers/chain/substrate/identity';
 import app from '../../../state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { User } from '../../components/user/user';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { EditIdentityModal } from '../../modals/edit_identity_modal';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
-import withRouter from 'navigation/helpers';
-
-const editIdentityAction = (
-  account: Account,
-  currentIdentity: SubstrateIdentity,
-  vnode,
-  setRoute
-) => {
-  const chainObj = app.config.chains.getById(account.chain.id);
-  if (!chainObj) return;
-
-  // TODO: look up the chainObj's chain base
-  return (
-    (account.chain.id.indexOf('edgeware') !== -1 ||
-      account.chain.id.indexOf('kusama') !== -1) &&
-    render(CWButton, {
-      // wait for info to load before making it clickable
-      disabled: vnode.state.chainLoading,
-      onClick: async () => {
-        if (app.activeChainId() !== chainObj.id) {
-          let confirmed = false;
-          const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
-          confirmed = await confirmationModalWithText(msg)();
-          if (confirmed) {
-            setRoute(`/${chainObj.id}/account/${account.address}`, {
-              setIdentity: true,
-            });
-          }
-        } else if (!app.chain?.loaded) {
-          vnode.state.chainLoading = true;
-          initChain()
-            .then(() => {
-              vnode.state.chainLoading = false;
-              app.modals.create({
-                modal: EditIdentityModal,
-                data: { account, currentIdentity },
-              });
-            })
-            .catch(() => {
-              vnode.state.chainLoading = false;
-            });
-        } else {
-          app.modals.create({
-            modal: EditIdentityModal,
-            data: { account, currentIdentity },
-          });
-        }
-      },
-      label: currentIdentity?.exists ? 'Edit identity' : 'Set identity',
-    })
-  );
-};
-
 export interface IProfileHeaderAttrs {
   account: Account;
-  setIdentity: boolean;
   refreshCallback: Function;
   onLinkedProfile: boolean;
   onOwnProfile: boolean;
 }
 
 export interface IProfileHeaderState {
-  identity: SubstrateIdentity | null;
   copied: boolean;
   loading: boolean;
   showProfileRight: boolean;
 }
 
-class ProfileBioComponent extends ClassComponent<IProfileHeaderAttrs> {
-  oninit(vnode) {
+const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
+  oninit: (vnode) => {
     vnode.state.showProfileRight = false;
-  }
-
-  view(vnode) {
+  },
+  view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } =
       vnode.attrs;
-    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
+    const showJoinCommunityButton = !onOwnProfile;
 
     window.addEventListener(
       'scroll',
@@ -188,12 +140,6 @@ class ProfileBioComponent extends ClassComponent<IProfileHeaderAttrs> {
       render('.bio-actions-right', [
         onOwnProfile
           ? [
-              editIdentityAction(
-                account,
-                vnode.state.identity,
-                vnode,
-                this.setRoute
-              ),
               render(CWButton, {
                 onClick: () => {
                   app.modals.create({
@@ -286,9 +232,7 @@ class ProfileBioComponent extends ClassComponent<IProfileHeaderAttrs> {
             " hasn't created a bio",
           ]),
     ]);
-  }
-}
-
-const ProfileBio = withRouter(ProfileBioComponent);
+  },
+};
 
 export default ProfileBio;

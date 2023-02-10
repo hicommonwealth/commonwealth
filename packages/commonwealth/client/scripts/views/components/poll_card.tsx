@@ -150,7 +150,7 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
     return (
       <div className="VoteDisplay">
         {!pollEnded ? (
-          <React.Fragment>
+          <>
             <div className="vote-direction">
               <CWIcon
                 iconName="check"
@@ -162,7 +162,7 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
             <CWText className="time-remaining-text" type="caption">
               {timeRemaining}
             </CWText>
-          </React.Fragment>
+          </>
         ) : (
           <div className="completed-vote-information">
             <CWText type="caption">This Poll is Complete</CWText>
@@ -375,7 +375,7 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
         </CWText>
         <div className="poll-voting-section">
           {!this.hasVoted && !pollEnded && !isPreview && (
-            <React.Fragment>
+            <>
               <PollOptions
                 multiSelect={multiSelect}
                 voteInformation={voteInformation}
@@ -390,7 +390,7 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
                 tooltipErrorMessage={tooltipErrorMessage}
                 onVoteCast={castVote}
               />
-            </React.Fragment>
+            </>
           )}
           {((this.hasVoted && !isPreview) || pollEnded) && (
             <VoteDisplay

@@ -58,7 +58,6 @@ export class UserDashboardRowTopComponent extends ClassComponent<UserDashboardRo
         user={
           new AddressInfo(null, author_address, author_chain ?? chain_id, null)
         }
-        hideIdentityIcon={false}
         linkify
         avatarSize={16}
         onclick={(e: any) => {

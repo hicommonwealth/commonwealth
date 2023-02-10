@@ -47,9 +47,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
 
   const topicName = parentThread?.topic?.name;
 
-  setIsLoading(
-    isLoading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName))
-  );
+  const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
 
   const activeAddress = app.user.activeAccount?.address;
 
@@ -97,7 +95,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
@@ -106,7 +104,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
       />
       <div
         className={getClasses<{ disabled?: boolean }>(
-          { disabled: isLoading },
+          { disabled: isLoading || isUserForbidden },
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
@@ -157,6 +155,6 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
           </CWText>
         )}
       </div>
-    </React.Fragment>
+    </>
   );
 };

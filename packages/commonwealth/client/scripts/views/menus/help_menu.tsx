@@ -1,30 +1,17 @@
 import React from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
-
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { FeedbackModal } from '../modals/feedback_modal';
+import { Modal } from '../components/component_kit/cw_modal';
 
-const gethelpMenuItems = (): Array<PopoverMenuItem> => {
-  return [
-    {
-      label: 'Send Feedback',
-      onClick: () => app.modals.create({ modal: FeedbackModal }),
-    },
-    {
-      label: 'Help',
-      onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
-    },
-  ];
-};
+export const HelpMenu = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-export class HelpMenu extends ClassComponent {
-  view() {
-    return (
+  return (
+    <React.Fragment>
       <CWMobileMenu
         className="HelpMenu"
         menuHeader={{
@@ -34,15 +21,32 @@ export class HelpMenu extends ClassComponent {
             app.mobileMenuRedraw.emit('redraw');
           },
         }}
-        menuItems={gethelpMenuItems()}
+        menuItems={[
+          {
+            label: 'Send Feedback',
+            onClick: () => setIsModalOpen(true),
+          },
+          {
+            label: 'Help',
+            onClick: () =>
+              window.open('https://docs.commonwealth.im/commonwealth/'),
+          },
+        ]}
       />
-    );
-  }
-}
+      <Modal
+        content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};
 
-export class HelpMenuPopover extends ClassComponent {
-  view() {
-    return (
+export const HelpMenuPopover = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+  return (
+    <React.Fragment>
       <PopoverMenu
         renderTrigger={(onclick) => (
           <CWIconButton
@@ -51,8 +55,23 @@ export class HelpMenuPopover extends ClassComponent {
             onClick={onclick}
           />
         )}
-        menuItems={gethelpMenuItems()}
+        menuItems={[
+          {
+            label: 'Send Feedback',
+            onClick: () => setIsModalOpen(true),
+          },
+          {
+            label: 'Help',
+            onClick: () =>
+              window.open('https://docs.commonwealth.im/commonwealth/'),
+          },
+        ]}
       />
-    );
-  }
-}
+      <Modal
+        content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+      />
+    </React.Fragment>
+  );
+};

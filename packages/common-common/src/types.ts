@@ -22,11 +22,8 @@ export const NotificationCategories = {
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
-  SubstrateBountyProposal = 'bountyproposal',
   SubstrateTreasuryTip = 'treasurytip',
-  SubstrateCollectiveProposal = 'councilmotion',
   SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
-  PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
@@ -152,4 +149,10 @@ export interface ISnapshotNotification {
   event?: string;
   start?: string;
   expire?: string;
+}
+
+export enum DefaultPage {
+  Discussions = 'default_all_discussions_view',
+  Overview = 'default_summary_view',
+  Homepage = 'homepage',
 }

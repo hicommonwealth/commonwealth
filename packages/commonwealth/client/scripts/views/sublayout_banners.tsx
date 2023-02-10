@@ -26,7 +26,7 @@ export class SublayoutBanners extends ClassComponent<SublayoutBannersAttrs> {
     const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
 
     return (
-      <React.Fragment>
+      <>
         {banner && bannerStatus !== 'off' && (
           <CWMessageBanner
             bannerContent={banner}
@@ -45,7 +45,7 @@ export class SublayoutBanners extends ClassComponent<SublayoutBannersAttrs> {
         {isNonEmptyString(terms) && tosStatus !== 'off' && (
           <TermsBanner terms={terms} />
         )}
-      </React.Fragment>
+      </>
     );
   }
 }
