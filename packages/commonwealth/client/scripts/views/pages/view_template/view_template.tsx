@@ -102,14 +102,6 @@ const jsonExample = {
   },
 };
 
-const bullshit = {
-  // formInputMap looks like this bitch
-  propose: {
-    0: 'my-arg',
-    1: 'my-arg2',
-  },
-};
-
 enum TemplateComponents {
   DIVIDER = 'divider',
   TEXT = 'text',
@@ -146,6 +138,7 @@ class ViewTemplatePage extends ClassComponent {
       this.formError = !isValidJson(json);
     } catch (err) {
       console.log('err', err);
+      // Handle Error Appropriately
       this.formError = true;
     }
   }
@@ -169,23 +162,19 @@ class ViewTemplatePage extends ClassComponent {
     }
 
     this.currentContract = contractInStore;
-    console.log({ contract: this.currentContract });
-
     this.templateNickname = templateMetadata.cctmd.nickname;
 
     app.contracts
       .getTemplatesForContract(contractInStore.id)
       .then((templates) => {
-        console.log({ templates });
-
         const template = templates.find((t) => {
-          return t.id === templateMetadata.cctmd.id;
+          return t.id === templateMetadata.templateId;
         });
 
         try {
           this.json = JSON.parse(template.template);
         } catch (err) {
-          console.log('err');
+          console.log('err', err);
 
           // TODO: Handle errors here- probably have to send some kind of error message to the view
           return;
@@ -215,6 +204,55 @@ class ViewTemplatePage extends ClassComponent {
         this.isLoaded = true;
         m.redraw();
       });
+  }
+
+  formatFunctionArgs(formState) {
+    const { tx_template } = this.json;
+
+    const outputArr = [];
+
+    Object.keys(tx_template.args).forEach((key) => {
+      const arg = tx_template.args[key];
+
+      // Formats the args for the function call
+      if (Array.isArray(arg)) {
+        const subArr = [];
+        arg.forEach((a) => {
+          if (Array.isArray(a)) {
+            const subSubArr = [];
+            a.forEach((subA) => {
+              if (subA.startsWith('$')) {
+                const ref = subA.slice(1);
+                subSubArr.push(formState[ref]);
+              } else {
+                subSubArr.push(subA);
+              }
+            });
+            subArr.push(subSubArr);
+          } else {
+            if (a.startsWith('$')) {
+              const ref = a.slice(1);
+              subArr.push(formState[ref]);
+            } else {
+              subArr.push(a);
+            }
+          }
+        });
+
+        outputArr.push(subArr);
+      } else {
+        if (arg.startsWith('$')) {
+          const ref = arg.slice(1);
+          outputArr.push(formState[ref]);
+        } else {
+          outputArr.push(arg);
+        }
+      }
+    });
+    // output an array that will be used in callContactFun
+    return outputArr.map((outputVal) => {
+      return JSON.stringify(outputVal);
+    });
   }
 
   view(vnode) {
@@ -304,31 +342,25 @@ class ViewTemplatePage extends ClassComponent {
                 onclick={() => {
                   showConfirmationModal({
                     title: 'Attempt this transaction?',
-                    description: '{tx_information}',
+                    description: '{tx_information}', // TODO: Replace with some preview we like
                     confirmButton: {
                       type: 'primary-black',
                       label: 'confirm',
                       onConfirm: async () => {
-                        console.log('hi');
-
                         try {
                           const abiItem = parseFunctionFromABI(
                             this.currentContract.abi,
                             this.json.tx_template?.method as string
                           );
 
-                          console.log({
-                            abiItem: abiItem,
-                            formState: this.formState,
-                            contract: this.currentContract,
-                          });
-
-                          Object.values(this.formState.args
-
+                          const functionArgs = this.formatFunctionArgs(
+                            this.formState
+                          );
+                          console.log('args', functionArgs);
                           await callContractFunction(
                             this.currentContract,
                             abiItem,
-                            [this.formState]
+                            functionArgs
                           );
                         } catch (e) {
                           console.log(e);
