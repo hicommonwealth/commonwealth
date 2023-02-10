@@ -1,17 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
-
-import app from 'state';
+import { ClassComponent } from 'mithrilInterop';
 
 export class AppToasts extends ClassComponent {
   view() {

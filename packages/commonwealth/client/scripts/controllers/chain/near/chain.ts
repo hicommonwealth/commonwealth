@@ -20,16 +20,7 @@ import { ApiStatus } from 'state';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw, dangerouslySetRoute } from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;
@@ -340,7 +331,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         failureUrl,
       });
     } else {
-      setRoute(successUrl);
+      dangerouslySetRoute(successUrl);
     }
   }
 

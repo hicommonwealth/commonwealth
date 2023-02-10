@@ -1,14 +1,5 @@
 import { notifySuccess } from 'controllers/app/notifications';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import type { NotificationSubscription, Thread } from 'models';
 import moment from 'moment';
 

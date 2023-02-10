@@ -1,16 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import { StarredCommunity } from 'models';
 import app from 'state';
 

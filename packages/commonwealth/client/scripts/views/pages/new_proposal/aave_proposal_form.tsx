@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import { utils } from 'ethers';
 import m from 'mithril';
 

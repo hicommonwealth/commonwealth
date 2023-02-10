@@ -1,14 +1,12 @@
 import React from 'react';
 
-import { ClassComponent} from
-
- 'mithrilInterop';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'footer.scss';
 import m from 'mithril';
 
 import { isNotUndefined } from '../helpers/typeGuards';
+import withRouter from 'navigation/helpers';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -69,4 +67,4 @@ class FooterComponent extends ClassComponent {
   }
 }
 
-export const Footer = NavigationWrapper(FooterComponent);
+export const Footer = withRouter(FooterComponent);

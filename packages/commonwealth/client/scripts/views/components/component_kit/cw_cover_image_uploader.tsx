@@ -2,9 +2,7 @@ import React from 'react';
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import $ from 'jquery';
 
-import { redraw} from
-
- 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import app from 'state';
 
 import { CWIcon } from './cw_icons/cw_icon';

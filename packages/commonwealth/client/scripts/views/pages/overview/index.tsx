@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { Thread, Topic } from 'models';
 import { navigateToSubpage } from 'router';
 import 'pages/overview/index.scss';

@@ -1,9 +1,6 @@
-
 import React from 'react';
 
-import { setRoute} from
-
- 'mithrilInterop';
+import { useNavigate } from 'react-router-dom';
 
 import 'pages/landing/landing_page_header.scss';
 
@@ -30,6 +27,7 @@ type HeaderLandingPageProps = {
 };
 
 export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -61,7 +59,7 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
   }, []);
 
   const redirectClick = (route) => {
-    setRoute(route);
+    navigate(route);
   };
 
   return (

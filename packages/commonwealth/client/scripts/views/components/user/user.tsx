@@ -1,6 +1,7 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
+import { render, redraw } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
@@ -14,6 +15,7 @@ import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
+import { useNavigate } from 'react-router-dom';
 import { Modal } from '../component_kit/cw_modal';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
@@ -48,6 +50,7 @@ export const User = (props: UserAttrs) => {
     popover,
     showRole,
   } = props;
+  const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
@@ -194,7 +197,8 @@ export const User = (props: UserAttrs) => {
                   </>
                 )}
                 {getRoleTags(false)}
-              </>
+              </>,
+              navigate
             )
           ) : (
             <a className="user-display-name username">
@@ -265,7 +269,8 @@ export const User = (props: UserAttrs) => {
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
                 </React.Fragment>
-              )
+              ),
+              navigate
             )}
         </div>
         {profile?.address && (

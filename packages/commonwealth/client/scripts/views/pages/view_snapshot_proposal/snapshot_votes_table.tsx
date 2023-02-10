@@ -2,16 +2,8 @@ import React from 'react';
 
 import { formatNumberLong } from 'helpers';
 import { AddressInfo } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 

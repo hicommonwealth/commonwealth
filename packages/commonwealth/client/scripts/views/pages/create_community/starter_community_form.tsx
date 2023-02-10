@@ -6,16 +6,7 @@ import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 import m from 'mithril';
 
@@ -32,6 +23,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { defaultChainRows, initChainForm } from './chain_input_rows';
 import type { ChainFormFields, ChainFormState } from './types';
+import withRouter from 'navigation/helpers';
 
 // TODO: ChainFormState contains "uploadInProgress" which is technically
 // not part of the form what we pass to /createChain, but of the general view's state,
@@ -40,7 +32,7 @@ type CreateStarterForm = ChainFormFields & { base: ChainBase };
 
 type CreateStarterState = ChainFormState & { form: CreateStarterForm };
 
-export class StarterCommunityForm extends ClassComponent {
+class StarterCommunityFormComponent extends ClassComponent {
   public state: CreateStarterState = {
     message: '',
     loaded: false,
@@ -183,7 +175,7 @@ export class StarterCommunityForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              setRoute(`/${res.result.chain?.id}`);
+              this.setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               console.log(err);
               notifyError(
@@ -199,3 +191,5 @@ export class StarterCommunityForm extends ClassComponent {
     );
   }
 }
+
+export const StarterCommunityForm = withRouter(StarterCommunityFormComponent);

@@ -5,7 +5,6 @@ import { navigateToSubpage } from 'router';
 import { threadStageToLabel } from 'helpers';
 import { ThreadStage } from 'models';
 
-
 import 'pages/discussions/stages_menu.scss';
 
 import app from 'state';

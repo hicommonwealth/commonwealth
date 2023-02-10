@@ -16,6 +16,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { Modal } from '../../components/component_kit/cw_modal';
+import {useNavigate} from "react-router-dom";
 
 type WebhooksFormProps = {
   webhooks: Array<Webhook>;
@@ -23,6 +24,7 @@ type WebhooksFormProps = {
 
 export const WebhooksForm = (props: WebhooksFormProps) => {
   const { webhooks } = props;
+  const navigate = useNavigate();
 
   const [disabled, setDisabled] = React.useState<boolean>(false);
   const [webhookUrl, setWebhookUrl] = React.useState<string>('');
@@ -170,7 +172,7 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
           No webhooks yet. Slack, Discord, and Telegram webhooks are supported.
           For more information and examples for setting these up, please view
           our
-          {link('a', 'https://docs.commonwealth.im', [' documentation.'])}
+          {link('a', 'https://docs.commonwealth.im', [' documentation.'], navigate)}
         </CWText>
       )}
       <CWTextInput

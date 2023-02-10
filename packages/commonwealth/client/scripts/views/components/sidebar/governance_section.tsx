@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, getRoute } from 'mithrilInterop';
 import {
   ChainBase,
   ChainNetwork,
@@ -19,7 +10,6 @@ import {
 
 import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import app from 'state';
 import { verifyCachedToggleTree } from './helpers';
@@ -29,6 +19,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
+import withRouter from 'navigation/helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -222,6 +213,7 @@ class GovernanceSectionComponent extends ClassComponent<SidebarSectionAttrs> {
         onMembersPage(getRoute()) &&
         (app.chain ? app.chain.serverLoaded : true),
       onClick: (e, toggle: boolean) => {
+        console.log('this', this);
         handleRedirectClicks(this, e, '/members', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Members.toggledState', toggle);
         });
@@ -399,4 +391,4 @@ class GovernanceSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const GovernanceSection = NavigationWrapper(GovernanceSectionComponent);
+export const GovernanceSection = withRouter(GovernanceSectionComponent);

@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent} from
-
- 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/settings/composer_section.scss';
 

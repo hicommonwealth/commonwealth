@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, setRoute, getRouteParam} from
-
- 'mithrilInterop';
+import { ClassComponent, getRouteParam } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import { SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
@@ -20,8 +18,12 @@ import {
   SearchBarMemberPreviewRow,
   SearchBarThreadPreviewRow,
 } from './search_bar_components';
+import withRouter from 'navigation/helpers';
 
-const goToSearchPage = (query: SearchQuery) => {
+const goToSearchPage = (
+  query: SearchQuery,
+  setRoute: ClassComponent['setRoute']
+) => {
   if (!query.searchTerm || !query.searchTerm.toString().trim()) {
     notifyError('Enter a valid search term');
     return;
@@ -55,7 +57,7 @@ const getSearchPreview = async (searchQuery: SearchQuery, state) => {
   app.search.addToHistory(searchQuery);
 };
 
-export class SearchBar extends ClassComponent {
+class SearchBarComponent extends ClassComponent {
   private showDropdown: boolean;
   private searchResults: Record<string, Array<any>>;
   private searchQuery: SearchQuery;
@@ -102,7 +104,7 @@ export class SearchBar extends ClassComponent {
         });
       }
 
-      goToSearchPage(this.searchQuery);
+      goToSearchPage(this.searchQuery, this.setRoute);
     };
 
     return (
@@ -260,3 +262,5 @@ export class SearchBar extends ClassComponent {
     );
   }
 }
+
+export const SearchBar = withRouter(SearchBarComponent);

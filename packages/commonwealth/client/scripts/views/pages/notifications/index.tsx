@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 // import Infinite from 'mithril-infinite';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 

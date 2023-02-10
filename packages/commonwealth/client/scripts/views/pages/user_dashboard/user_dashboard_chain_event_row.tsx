@@ -2,9 +2,7 @@ import React from 'react';
 
 import type { ChainInfo } from 'models';
 
-import { ClassComponent, setRoute, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import type { ResultNode } from 'mithrilInterop';
 
@@ -15,6 +13,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import type { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
+import withRouter from 'navigation/helpers';
 
 type UserDashboardChainEventRowAttrs = {
   blockNumber: number;
@@ -22,7 +21,7 @@ type UserDashboardChainEventRowAttrs = {
   label: IEventLabel;
 };
 
-export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChainEventRowAttrs> {
+export class UserDashboardChainEventRowComponent extends ClassComponent<UserDashboardChainEventRowAttrs> {
   view(vnode: ResultNode<UserDashboardChainEventRowAttrs>) {
     const { blockNumber, chain, label } = vnode.attrs;
 
@@ -34,7 +33,7 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
         )}
         onClick={() => {
           if (label.linkUrl) {
-            setRoute(label.linkUrl);
+            this.setRoute(label.linkUrl);
           }
           redraw();
         }}
@@ -52,7 +51,7 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setRoute(`/${chain}`);
+                this.setRoute(`/${chain}`);
               }}
             >
               <CWText type="caption" fontWeight="medium">
@@ -75,3 +74,7 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
     );
   }
 }
+
+export const UserDashboardChainEventRow = withRouter(
+  UserDashboardChainEventRowComponent
+);

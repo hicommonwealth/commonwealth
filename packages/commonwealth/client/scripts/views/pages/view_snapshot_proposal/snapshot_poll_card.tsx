@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
 import { CWCard } from '../../components/component_kit/cw_card';

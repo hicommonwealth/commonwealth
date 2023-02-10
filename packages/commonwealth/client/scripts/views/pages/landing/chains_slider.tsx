@@ -1,31 +1,23 @@
-
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import 'pages/landing/chains_slider.scss';
 
-import { Chain } from './index';
+import type { Chain } from './index';
+import withRouter from 'navigation/helpers';
 
 const initialSlides = 4;
 
-const chainToTag = (chain, index: number) => {
+const chainToTag = (chain, index: number, navigate) => {
   return (
     <li
       id={`card_${index}`}
       className="glide__slide mt-4 pb-8"
       onClick={(e) => {
         e.preventDefault();
-        setRoute(`/${chain.id}`);
+        navigate(`/${chain.id}`);
         localStorage['home-scrollY'] = window.scrollY;
       }}
     >
@@ -48,7 +40,7 @@ type TokensChainsComponentAttrs = {
   oncreateSlider: () => any;
 };
 
-export class TokensChainsComponent extends ClassComponent<TokensChainsComponentAttrs> {
+class TokensChains extends ClassComponent<TokensChainsComponentAttrs> {
   private displayedChains;
   private index: number;
   private oncreateSlider: () => any;
@@ -58,7 +50,7 @@ export class TokensChainsComponent extends ClassComponent<TokensChainsComponentA
 
     this.displayedChains = vnode.attrs.chains
       .slice(0, initialSlides)
-      .map(chainToTag);
+      .map((chain, index) => chainToTag(chain, index, this.setRoute));
 
     this.oncreateSlider = vnode.attrs.oncreateSlider;
 
@@ -73,7 +65,8 @@ export class TokensChainsComponent extends ClassComponent<TokensChainsComponentA
       this.displayedChains.push(
         chainToTag(
           vnode.attrs.chains[this.index + initialSlides],
-          this.index + initialSlides - 1
+          this.index + initialSlides - 1,
+          this.setRoute
         )
       );
 
@@ -107,3 +100,5 @@ export class TokensChainsComponent extends ClassComponent<TokensChainsComponentA
     );
   }
 }
+
+export const TokensChainsComponent = withRouter(TokensChains);

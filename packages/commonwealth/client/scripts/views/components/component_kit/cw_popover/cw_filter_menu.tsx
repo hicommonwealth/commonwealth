@@ -1,7 +1,6 @@
 import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
-
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
 import m from 'mithril';
 import { CWButton } from '../cw_button';
