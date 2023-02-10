@@ -8,13 +8,11 @@ import type { Profile } from 'models';
 import 'pages/members.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import { PageLoading } from 'views/pages/loading';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
-import { Link, NavLink } from 'react-router-dom';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -200,7 +198,6 @@ class MembersPage extends ClassComponent {
             style={{ height: 300 }}
             data={profilesLoaded}
             itemContent={(index, profileInfo) => {
-              const { address, chain } = profileInfo.profile;
               return (
                 <div className="member-row" key={index}>
                   <User
