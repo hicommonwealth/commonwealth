@@ -225,8 +225,6 @@ class ViewTemplatePage extends ClassComponent {
       return;
     }
 
-    console.log({ formState: this.formState });
-
     return (
       <Sublayout>
         <div class="ViewTemplatePage">
@@ -306,7 +304,7 @@ class ViewTemplatePage extends ClassComponent {
                 onclick={() => {
                   showConfirmationModal({
                     title: 'Attempt this transaction?',
-                    description: '{}',
+                    description: '{tx_information}',
                     confirmButton: {
                       type: 'primary-black',
                       label: 'confirm',
@@ -319,7 +317,11 @@ class ViewTemplatePage extends ClassComponent {
                             this.json.tx_template?.method as string
                           );
 
-                          console.log(abiItem);
+                          console.log({
+                            abiItem: abiItem,
+                            formState: this.formState,
+                            contract: this.currentContract,
+                          });
                           // await callContractFunction(
                           //   this.currentContract,
                           //   abiItem,
