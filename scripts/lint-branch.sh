@@ -5,5 +5,5 @@ then
     echo "There is nothing to lint"
 else
     echo $LINES
-    eslint $LINES
+    NODE_OPTIONS="--max-old-space-size=4096" eslint $LINES
 fi
