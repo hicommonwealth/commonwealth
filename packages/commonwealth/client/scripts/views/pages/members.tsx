@@ -185,7 +185,7 @@ class MembersPage extends ClassComponent {
     } = this;
 
     return (
-      <Sublayout onScroll={this.onScroll}>
+      <Sublayout>
         <div className="MembersPage">
           <CWText type="h3" fontWeight="medium">
             {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}
@@ -221,8 +221,7 @@ class MembersPage extends ClassComponent {
                 </div>
               );
             }}
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            endReached={() => {}}
+            endReached={this.onScroll}
             overscan={200}
           />
 
