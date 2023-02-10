@@ -1,15 +1,6 @@
 import React from 'react';
-
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { Virtuoso } from 'react-virtuoso';
+import { ClassComponent } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 import type { Profile } from 'models';
@@ -203,11 +194,15 @@ class MembersPage extends ClassComponent {
             <CWText type="h5">Member</CWText>
             <CWText type="h5">Posts / Month</CWText>
           </div>
-          <div className="members-container">
-            {profilesLoaded.map((profileInfo, i) => {
+          <Virtuoso
+            className="members-container"
+            style={{ height: 300 }}
+            data={profilesLoaded}
+            itemContent={(index, profileInfo) => {
+              console.log('profileInfo', profileInfo);
               const { address, chain } = profileInfo.profile;
               return (
-                <div className="member-row" key={i}>
+                <div className="member-row" key={index}>
                   <a
                     href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
                     onClick={(e) => {
@@ -225,8 +220,12 @@ class MembersPage extends ClassComponent {
                   <CWText>{profileInfo.postCount}</CWText>
                 </div>
               );
-            })}
-          </div>
+            }}
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            endReached={() => {}}
+            overscan={200}
+          />
+
           <div className="infinite-scroll-wrapper">
             {profilesFinishedLoading ? (
               <CWText className="infinite-scroll-reached-end-text">
