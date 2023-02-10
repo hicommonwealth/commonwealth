@@ -14,7 +14,7 @@ import {
 } from 'helpers/chain';
 
 import app from 'state';
-import PageNotFound from 'views/pages/404';
+import { PageNotFound } from 'views/pages/404';
 import { AppToasts } from 'views/toast';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';

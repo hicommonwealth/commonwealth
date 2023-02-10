@@ -12,7 +12,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
-import PageNotFound from './404';
+import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import { Modal } from '../components/component_kit/cw_modal';

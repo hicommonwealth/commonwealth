@@ -1,8 +1,6 @@
 import React from 'react';
 /* eslint-disable max-len */
 
-import { ClassComponent } from 'mithrilInterop';
-
 import { renderMultilineText } from 'helpers';
 
 import 'pages/privacy_and_terms.scss';
@@ -124,23 +122,21 @@ Section 6.10 No Waiver. No failure on the part of any Person to exercise any pow
 
 const notice = `Notice is hereby given, pursuant to Section 184(1B) of the BVI Business Companies Act, 2004 (as amended), that the Company intends to continue as a company incorporated under the laws of Delaware, United States of America.`;
 
-class TermsPage extends ClassComponent {
-  view() {
-    return (
-      <Sublayout>
-        <div className="TermsPage">
-          <div className="forum-container">
-            <CWText>Posted on 1/26/2023</CWText>
+const TermsPage = () => {
+  return (
+    <Sublayout>
+      <div className="TermsPage">
+        <div className="forum-container">
+          <CWText>Posted on 1/26/2023</CWText>
 
-            <CWText type="h3">Notice</CWText>
-            {renderMultilineText(notice)}
-            <CWText type="h3">Terms of Service</CWText>
-            {renderMultilineText(TermsOfService)}
-          </div>
+          <CWText type="h3">Notice</CWText>
+          {renderMultilineText(notice)}
+          <CWText type="h3">Terms of Service</CWText>
+          {renderMultilineText(TermsOfService)}
         </div>
-      </Sublayout>
-    );
-  }
-}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default TermsPage;

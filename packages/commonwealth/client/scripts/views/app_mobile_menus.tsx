@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
-
 import app from 'state';
 import { CreateContentMenu } from './menus/create_content_menu';
 import { HelpMenu } from './menus/help_menu';
@@ -17,10 +15,8 @@ const mobileMenuLookup = {
 
 export type MobileMenuName = keyof typeof mobileMenuLookup;
 
-export class AppMobileMenus extends ClassComponent {
-  view() {
-    const ActiveMenu = mobileMenuLookup[app.mobileMenu];
+export const AppMobileMenus = () => {
+  const ActiveMenu = mobileMenuLookup[app.mobileMenu];
 
-    return <ActiveMenu />;
-  }
-}
+  return <ActiveMenu />;
+};

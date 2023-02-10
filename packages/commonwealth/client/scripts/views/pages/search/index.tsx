@@ -22,7 +22,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import PageNotFound from '../404';
+import { PageNotFound } from '../404';
 import ErrorPage from '../error';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { User } from '../../components/user/user';

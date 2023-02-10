@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import _ from 'underscore';
 
 import app from 'state';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +7,7 @@ import { DefaultPage } from '../../../../../common-common/src/types';
 
 export default function DiscussionsRedirect() {
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!app.chain) return;
 
