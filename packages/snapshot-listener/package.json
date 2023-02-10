@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias",
-    "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "lint-all": "eslint './**/*.ts'",
     "check-types": "tsc --project tsconfig.json --noEmit",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only src/index.ts",
