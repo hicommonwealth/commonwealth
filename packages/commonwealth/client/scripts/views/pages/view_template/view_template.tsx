@@ -322,11 +322,14 @@ class ViewTemplatePage extends ClassComponent {
                             formState: this.formState,
                             contract: this.currentContract,
                           });
-                          // await callContractFunction(
-                          //   this.currentContract,
-                          //   abiItem,
-                          //   new Map<string, Map<number, string>>()
-                          // );
+
+                          Object.values(this.formState.args
+
+                          await callContractFunction(
+                            this.currentContract,
+                            abiItem,
+                            [this.formState]
+                          );
                         } catch (e) {
                           console.log(e);
                         }
