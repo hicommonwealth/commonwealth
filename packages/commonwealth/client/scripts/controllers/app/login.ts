@@ -129,9 +129,7 @@ export async function completeClientLogin(account: Account) {
     ) {
       app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
-    const completeLogin = new EventEmitter();
-
-    completeLogin.emit('redraw')
+    redraw();
   } catch (e) {
     console.trace(e);
   }
