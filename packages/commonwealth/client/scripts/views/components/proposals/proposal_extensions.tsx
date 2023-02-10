@@ -36,9 +36,9 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
   }, []);
 
   if (proposal instanceof SubstrateDemocracyReferendum) {
-    if (!setDemocracyVoteConviction) return 'Misconfigured';
-    if (!setDemocracyVoteAmount) return 'Misconfigured';
-    if (!app.user.activeAccount) return 'Misconfigured';
+    if (!setDemocracyVoteConviction) return <CWText>Misconfigured</CWText>;
+    if (!setDemocracyVoteAmount) return <CWText>Misconfigured</CWText>;
+    if (!app.user.activeAccount) return <CWText>Misconfigured</CWText>;
 
     return (
       <div className="ProposalExtensions">
@@ -64,7 +64,7 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
     proposal instanceof CosmosProposal &&
     proposal.status === 'DepositPeriod'
   ) {
-    if (!setCosmosDepositAmount) return 'Misconfigured';
+    if (!setCosmosDepositAmount) return <CWText>Misconfigured</CWText>;
 
     return (
       <div className="ProposalExtensions">

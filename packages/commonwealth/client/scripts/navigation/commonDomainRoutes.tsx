@@ -42,11 +42,9 @@ const SettingsPage = lazy(() => import('views/pages/settings'));
 const TreasuryPage = lazy(() => import('views/pages/treasury'));
 const TipsPage = lazy(() => import('views/pages/tips'));
 
-const AdminPage = lazy(() => import('views/pages/admin'));
 const ManageCommunityPage = lazy(
   () => import('views/pages/manage_community/index')
 );
-const SpecSettingsPage = lazy(() => import('views/pages/spec_settings'));
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals')
@@ -305,25 +303,12 @@ const getCommonDomainsRoutes = () => (
     {/* TREASURY END*/}
     {/* ADMIN */}
     <Route
-      path="/:scope/admin"
-      element={withLayout(AdminPage, {
-        scoped: true,
-      })}
-    />
-    <Route
       path="/:scope/manage"
       element={withLayout(ManageCommunityPage, {
         scoped: true,
       })}
     />
     <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />
-    <Route
-      path="/:scope/spec_settings"
-      element={withLayout(SpecSettingsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
     <Route
       path="/:scope/analytics"
       element={withLayout(AnalyticsPage, {
