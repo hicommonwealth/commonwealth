@@ -85,7 +85,7 @@ const TipsPage = () => {
 
   const modLoading = loadSubstrateModules('Tips', getModules);
 
-  if (modLoading) return modLoading;
+  if (modLoading) return <div>{modLoading}</div>;
 
   const activeTips = (app.chain as Substrate).tips.store
     .getAll()

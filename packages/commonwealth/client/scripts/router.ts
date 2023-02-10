@@ -298,7 +298,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/proposals': importRoute(import('views/pages/proposals'), {
     scoped: true,
   }),
-  '/delegate': importRoute(import('views/pages/delegate'), { scoped: true }),
   '/proposal/:type/:identifier': importRoute(
     import('views/pages/view_proposal/index'),
     { scoped: true }
@@ -390,7 +389,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
-  '/:scope/delegate': redirectRoute(() => '/delegate'),
   '/:scope/proposal/:type/:identifier': redirectRoute(
     (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
   ),
@@ -548,9 +546,6 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   scoped: true,
   // }),
   // '/:scope/council': importRoute(import('views/pages/council'), {
-  //   scoped: true,
-  // }),
-  // '/:scope/delegate': importRoute(import('views/pages/delegate'), {
   //   scoped: true,
   // }),
   // '/:scope/proposal/:type/:identifier': importRoute(

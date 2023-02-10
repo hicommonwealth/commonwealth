@@ -15,7 +15,7 @@ import Sublayout from 'views/sublayout';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';
 import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'client/scripts/router';
+import { navigateToSubpage } from 'router';
 
 type SputnikDaoRowProps = {
   clickable: boolean;
