@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import 'components/sidebar/explore_sidebar.scss';
 import { ChainInfo } from 'models';

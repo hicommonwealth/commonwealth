@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'modals/new_thread_modal.scss';
 

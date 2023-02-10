@@ -1,14 +1,15 @@
 import React from 'react';
 
-import { ClassComponent, setRoute } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/why_commonwealth.scss';
 import { CWButton } from '../components/component_kit/cw_button';
 
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
+import withRouter from 'navigation/helpers';
 
-class WhyCommonwealthPage extends ClassComponent {
+class WhyCommonwealthPageComponent extends ClassComponent {
   view() {
     return (
       <Sublayout>
@@ -37,7 +38,7 @@ class WhyCommonwealthPage extends ClassComponent {
               label="Explore Our Communities"
               onClick={(e) => {
                 e.preventDefault();
-                setRoute('/communities');
+                this.setRoute('/communities');
               }}
             />
             <CWText>
@@ -74,5 +75,7 @@ class WhyCommonwealthPage extends ClassComponent {
     );
   }
 }
+
+const WhyCommonwealthPage = withRouter(WhyCommonwealthPageComponent);
 
 export default WhyCommonwealthPage;

@@ -1,13 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import type { SubmittableResult } from '@polkadot/api';
 import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import type {

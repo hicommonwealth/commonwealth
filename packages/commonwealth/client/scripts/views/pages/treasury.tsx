@@ -4,16 +4,7 @@ import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/treasury.scss';
 

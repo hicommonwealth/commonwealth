@@ -1,16 +1,7 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 
@@ -22,8 +13,9 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { User, AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
+import withRouter from 'navigation/helpers';
 
-export class UserBlock extends ClassComponent<{
+class UserBlockComponent extends ClassComponent<{
   addressDisplayOptions?: AddressDisplayOptions;
   avatarSize?: number;
   compact?: boolean;
@@ -51,6 +43,7 @@ export class UserBlock extends ClassComponent<{
       user,
     } = vnode.attrs;
 
+    console.log('???? dziala');
     const { showFullAddress } = vnode.attrs.addressDisplayOptions || {};
 
     let profile;
@@ -146,7 +139,7 @@ export class UserBlock extends ClassComponent<{
       : 'javascript:';
 
     return linkify ? (
-      link('.UserBlock', userLink, children)
+      link('.UserBlock', userLink, children, this.setRoute.bind(this))
     ) : (
       <div
         className={getClasses<{ compact?: boolean }>({ compact }, 'UserBlock')}
@@ -156,3 +149,5 @@ export class UserBlock extends ClassComponent<{
     );
   }
 }
+
+export const UserBlock = withRouter(UserBlockComponent);

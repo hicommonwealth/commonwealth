@@ -5,7 +5,7 @@ import {
   getRoute,
   getRouteParam,
   redraw,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
@@ -17,7 +17,6 @@ import app from 'state';
 import { WebsocketMessageNames } from 'types';
 import { CWSpinner } from '../component_kit/cw_spinner';
 import { verifyCachedToggleTree } from '../sidebar/helpers';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import type {
   SectionGroupAttrs,
@@ -446,4 +445,4 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const ChatSection = NavigationWrapper(ChatSectionComponent);
+export const ChatSection = ChatSectionComponent;

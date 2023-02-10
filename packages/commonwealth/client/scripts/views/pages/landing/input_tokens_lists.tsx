@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import { InputTokenOptionComponent } from './input_token_option';
 import { Chain, Token } from './index';

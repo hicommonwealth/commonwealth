@@ -7,16 +7,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
@@ -29,6 +20,7 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { defaultChainRows, initChainForm } from './chain_input_rows';
 import type { ChainFormFields, ChainFormState } from './types';
+import withRouter from 'navigation/helpers';
 
 type SplTokenFormFields = {
   cluster: solanaWeb3.Cluster;
@@ -40,7 +32,7 @@ type CreateERC20Form = ChainFormFields & SplTokenFormFields;
 
 type CreateSplTokenState = ChainFormState & { form: CreateERC20Form };
 
-export class SplTokenForm extends ClassComponent {
+class SplTokenFormComponent extends ClassComponent {
   public state: CreateSplTokenState = {
     message: '',
     loaded: false,
@@ -188,7 +180,7 @@ export class SplTokenForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              setRoute(`/${res.result.chain?.id}`);
+              this.setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error || 'Creating new SPL community failed'
@@ -202,3 +194,5 @@ export class SplTokenForm extends ClassComponent {
     );
   }
 }
+
+export const SplTokenForm = withRouter(SplTokenFormComponent);

@@ -7,16 +7,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import type { BlockInfo, ChainInfo } from 'models';
 import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';
 import moment from 'moment';

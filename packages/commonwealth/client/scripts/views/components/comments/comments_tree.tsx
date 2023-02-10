@@ -1,15 +1,7 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'components/comments/comments_tree.scss';
 import type { AnyProposal, Comment as CommentType } from 'models';

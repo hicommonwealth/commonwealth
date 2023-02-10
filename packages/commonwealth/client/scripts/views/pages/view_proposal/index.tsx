@@ -1,9 +1,7 @@
 import React from 'react';
 
 import { navigateToSubpage } from 'router';
-import { ClassComponent, ResultNode, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';

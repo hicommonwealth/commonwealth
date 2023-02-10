@@ -1,16 +1,7 @@
 import React from 'react';
 /* eslint-disable max-len */
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import { renderMultilineText } from 'helpers';
 

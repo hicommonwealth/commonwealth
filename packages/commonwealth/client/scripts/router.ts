@@ -1,12 +1,11 @@
 import { alertModalWithText } from 'views/modals/alert_modal';
 import app from 'state';
 import { ChainType } from 'common-common/src/types';
-import { Layout } from 'views/layout';
 import {
   APPLICATION_UPDATE_ACTION,
   APPLICATION_UPDATE_MESSAGE,
 } from 'helpers/constants';
-import { getRoute, getRouteParam, setRoute, render } from 'mithrilInterop';
+import { getRoute, getRouteParam } from 'mithrilInterop';
 
 export const pathIsDiscussion = (
   scope: string | null,
@@ -54,7 +53,8 @@ const navigateToSubpage = (...args) => {
   }
   app.sidebarMenu = 'default';
   // app.sidebarRedraw.emit('redraw');
-  setRoute.apply(this, args);
+  // TODO navigate should be passed as argument
+  // setRoute.apply(this, args);
 };
 
 const shouldDeferChain = ({
@@ -82,20 +82,25 @@ const shouldDeferChain = ({
   return deferChain;
 };
 
+// DEPRECATED in favour of "Navigate" in "navigation/helpers.tsx"
+// Left here for now to not break the code in "getCustomDomainRoutes".
+// Should be removed after all occurrences of "redirectRoute" will be removed.
 const redirectRoute = (
   path: string | ((attrs: Record<string, unknown>) => string)
 ) => ({
   render: (vnode) => {
-    setRoute(
-      typeof path === 'string' ? path : path(vnode.attrs),
-      {},
-      { replace: true }
-    );
-
-    return render(Layout);
+    // TODO remove when redirectRoute will be removed
+    // setRoute(
+    //   typeof path === 'string' ? path : path(vnode.attrs),
+    //   {},
+    //   { replace: true }
+    // );
+    // return render(Layout);
   },
 });
 
+// TODO this function used to be in the app.ts but now
+// should be incorporated in new react flow
 const handleLoginRedirects = () => {
   const routeParam = getRouteParam();
   if (
@@ -117,7 +122,8 @@ const handleLoginRedirects = () => {
       console.log('creating account');
     }
 
-    setRoute(getRouteParam['path'], {}, { replace: true });
+    // TODO setRoute outside of react router, might not work properly
+    // setRoute(getRouteParam['path'], {}, { replace: true });
   } else if (
     localStorage &&
     localStorage.getItem &&
@@ -129,7 +135,8 @@ const handleLoginRedirects = () => {
         localStorage.getItem('githubPostAuthRedirect')
       );
       if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-        setRoute(postAuth.path, {}, { replace: true });
+        // TODO setRoute outside of react router, might not work properly
+        // setRoute(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('githubPostAuthRedirect');
     } catch (e) {
@@ -145,7 +152,8 @@ const handleLoginRedirects = () => {
         localStorage.getItem('discordPostAuthRedirect')
       );
       if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-        setRoute(postAuth.path, {}, { replace: true });
+        // TODO setRoute outside of react router, might not work properly
+        // setRoute(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('discordPostAuthRedirect');
     } catch (e) {
@@ -196,7 +204,7 @@ const renderRoute = (
       path: importPromise.moduleName,
     });
 
-    return render(Layout, { scope, deferChain, hideSidebar }, [vnode]);
+    // return render(Layout, { scope, deferChain, hideSidebar }, [vnode]);
   },
 });
 
@@ -322,13 +330,8 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
 
   // Admin
-  '/admin': importRoute(import('views/pages/admin'), { scoped: true }),
   '/manage': importRoute(import('views/pages/manage_community/index'), {
     scoped: true,
-  }),
-  '/spec_settings': importRoute(import('views/pages/spec_settings'), {
-    scoped: true,
-    deferChain: true,
   }),
   '/settings': importRoute(import('views/pages/settings'), { scoped: true }),
   '/analytics': importRoute(import('views/pages/stats'), {
@@ -409,7 +412,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/settings': redirectRoute(() => '/settings'),
   '/:scope/admin': redirectRoute(() => '/admin'),
   '/:scope/manage': redirectRoute(() => '/manage'),
-  '/:scope/spec_settings': redirectRoute(() => '/spec_settings'),
   '/:scope/analytics': redirectRoute(() => '/analytics'),
   '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
     (attrs) => `/snapshot/${attrs.snapshotId}`
@@ -587,14 +589,9 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   scoped: true,
   // }),
   // Admin
-  // '/:scope/admin': importRoute(import('views/pages/admin'), { scoped: true }),
   // '/manage': importRoute(import('views/pages/manage_community/index')),
   // '/:scope/manage': importRoute(import('views/pages/manage_community/index'), {
   //   scoped: true,
-  // }),
-  // '/:scope/spec_settings': importRoute(import('views/pages/spec_settings'), {
-  //   scoped: true,
-  //   deferChain: true,
   // }),
   // '/:scope/analytics': importRoute(import('views/pages/stats'), {
   //   scoped: true,

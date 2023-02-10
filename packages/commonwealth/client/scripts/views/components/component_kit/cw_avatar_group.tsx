@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import type { Profile } from 'client/scripts/models';
 

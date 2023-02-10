@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 // import Infinite from 'mithril-infinite';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
@@ -26,10 +17,11 @@ import {
 } from '../components/component_kit/cw_popover/cw_popover';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWText } from '../components/component_kit/cw_text';
+import withRouter from 'navigation/helpers';
 
 const MAX_NOTIFS = 40;
 
-export class NotificationsMenu extends ClassComponent {
+export class NotificationsMenuComponent extends ClassComponent {
   private init = false;
   private minChainEventsNotification = 0;
   private minDiscussionNotification = 0;
@@ -185,7 +177,7 @@ export class NotificationsMenu extends ClassComponent {
             onClick={() => {
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
-                : setRoute('/notifications');
+                : this.setRoute('/notifications');
             }}
           />
           <CWDivider isVertical />
@@ -237,6 +229,8 @@ export class NotificationsMenu extends ClassComponent {
     );
   }
 }
+
+export const NotificationsMenu = withRouter(NotificationsMenuComponent);
 
 export const NotificationsMenuPopover = () => {
   const popoverProps = usePopover();

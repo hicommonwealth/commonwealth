@@ -1,9 +1,7 @@
 import React from 'react';
 
 import { formatTimestamp } from 'helpers/index';
-import { ClassComponent, setRoute} from
-
- 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';
@@ -15,13 +13,14 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getCommentPreview } from './helpers';
+import withRouter from 'navigation/helpers';
 
 type UserDashboardRowTopAttrs = {
   activityData: any;
   category: string;
 };
 
-export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs> {
+export class UserDashboardRowTopComponent extends ClassComponent<UserDashboardRowTopAttrs> {
   view(vnode: ResultNode<UserDashboardRowTopAttrs>) {
     const {
       created_at,
@@ -64,7 +63,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         onclick={(e: any) => {
           e.preventDefault();
           e.stopPropagation();
-          setRoute(`/${author_chain}/account/${author_address}`);
+          this.setRoute(`/${author_chain}/account/${author_address}`);
         }}
       />
     );
@@ -80,7 +79,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setRoute(`/${chain_id}`);
+                this.setRoute(`/${chain_id}`);
               }}
             >
               {communityName}
@@ -105,3 +104,5 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
     );
   }
 }
+
+export const UserDashboardRowTop = withRouter(UserDashboardRowTopComponent);

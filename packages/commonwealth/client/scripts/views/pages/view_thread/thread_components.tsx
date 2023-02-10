@@ -21,6 +21,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
+import withRouter from 'navigation/helpers';
 
 type ThreadComponentAttrs = {
   thread: Thread;
@@ -98,15 +99,22 @@ export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
   }
 }
 
-export class ExternalLink extends ClassComponent<ThreadComponentAttrs> {
+class ExternalLinkComponent extends ClassComponent<ThreadComponentAttrs> {
   view(vnode: ResultNode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     return (
       <div className="HeaderLink">
-        {externalLink('a', thread.url, [extractDomain(thread.url)])}
+        {externalLink(
+          'a',
+          thread.url,
+          [extractDomain(thread.url)],
+          this.setRoute
+        )}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
 }
+
+export const ExternalLink = withRouter(ExternalLinkComponent);

@@ -1,7 +1,8 @@
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { Navigate, withLayout } from 'navigation/helpers';
+import { Navigate } from 'navigation/helpers';
 import app from 'state';
+import { withLayout } from 'views/layout';
 
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
@@ -43,11 +44,9 @@ const SettingsPage = lazy(() => import('views/pages/settings'));
 const TreasuryPage = lazy(() => import('views/pages/treasury'));
 const TipsPage = lazy(() => import('views/pages/tips'));
 
-const AdminPage = lazy(() => import('views/pages/admin'));
 const ManageCommunityPage = lazy(
   () => import('views/pages/manage_community/index')
 );
-const SpecSettingsPage = lazy(() => import('views/pages/spec_settings'));
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals')
@@ -313,25 +312,12 @@ const getCommonDomainsRoutes = () => (
     {/* TREASURY END*/}
     {/* ADMIN */}
     <Route
-      path="/:scope/admin"
-      element={withLayout(AdminPage, {
-        scoped: true,
-      })}
-    />
-    <Route
       path="/:scope/manage"
       element={withLayout(ManageCommunityPage, {
         scoped: true,
       })}
     />
     <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />
-    <Route
-      path="/:scope/spec_settings"
-      element={withLayout(SpecSettingsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
     <Route
       path="/:scope/analytics"
       element={withLayout(AnalyticsPage, {

@@ -2,12 +2,7 @@ import React from 'react';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
-import app from 'state';
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-} from 'controllers/app/notifications';
+import { notifySuccess } from 'controllers/app/notifications';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
@@ -159,7 +154,7 @@ export const ComponentShowcase = () => {
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
       <Modal
         content={<div>hi</div>}
-        onClose={() => setIsModalOpen('Message')}
+        onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
       <CWButton label="Toast" onClick={() => notifySuccess('message')} />

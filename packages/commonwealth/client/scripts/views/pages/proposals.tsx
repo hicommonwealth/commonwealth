@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';

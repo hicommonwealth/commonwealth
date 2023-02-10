@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { ClassComponent } from 'mithrilInterop';
