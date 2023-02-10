@@ -553,7 +553,6 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       app.user.activeAccount?.address ===
         app.chain.accounts.get(thread.author).address;
 
-    // @ts-ignore
     return (
       <Sublayout
       //  title={headerTitle}
