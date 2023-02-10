@@ -53,15 +53,6 @@
       @include smallInclusive {
         margin-top: 0;
       }
-
-      .save-button-message {
-        opacity: 0;
-        transition: opacity 0.25s ease;
-
-        &.show {
-          opacity: 1;
-        }
-      }
     }
   }
 

@@ -1,16 +1,4 @@
 import React from 'react';
-
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  parsePathname,
-} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/new_profile/index.scss';
@@ -20,7 +8,7 @@ import type { Thread} from 'models';
 import { ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
-import { NewProfileHeader } from './new_profile_header';
+import NewProfileHeader from './new_profile_header';
 import type {
   CommentWithAssociatedThread} from './new_profile_activity';
 import NewProfileActivity from './new_profile_activity';

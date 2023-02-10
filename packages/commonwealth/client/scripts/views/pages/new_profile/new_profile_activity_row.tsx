@@ -1,24 +1,14 @@
 import React from 'react';
 
-import type {
-  ResultNode
-} from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/new_profile/new_profile_activity_row.scss';
 
-import { link } from 'helpers';
 import type Thread from 'client/scripts/models/Thread';
 import type { ChainInfo } from 'client/scripts/models';
+import withRouter from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import { renderQuillTextBody } from '../../components/quill/helpers';
@@ -49,7 +39,17 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
         <div className="chain-info">
           <img src={chainInfo.iconUrl} />
           <CWText fontWeight="semiBold" className="link">
-            {link('a', `/${chain}/discussions`, [`${chain}`])}
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('this.setRoute', this.setRoute);
+                console.log(`/${chain}/discussions`)
+                this.setRoute(`/${chain}/discussions`);
+              }}
+            >
+              {chain}
+            </a>
           </CWText>
           <div className="dot">.</div>
           <CWTag label={author.slice(0, 5)} />
@@ -67,10 +67,28 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
               &nbsp;
             </span>
             {isThread
-              ? link('a', `/${chain}/discussion/${id}`, [`${title}`])
-              : link('a', `/${chain}/discussion/${comment.thread?.id}`, [
-                  `${decodeURIComponent(comment.thread?.title)}`,
-                ])}
+              ? (
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.setRoute(`/${chain}/discussion/${id}`);
+                  }}
+                >
+                  {title}
+                </a>
+              ) : (
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.setRoute(`/${chain}/discussions`);
+                  }}
+                >
+                  {decodeURIComponent(comment.thread?.title)}
+                </a>
+              )
+            }
           </CWText>
         </div>
         <div className="content">
@@ -125,4 +143,4 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   }
 }
 
-export default NewProfileActivityRow;
+export default withRouter(NewProfileActivityRow);

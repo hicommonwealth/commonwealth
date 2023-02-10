@@ -1,18 +1,5 @@
 import React from 'react';
-
-import type {
-  ResultNode
-} from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
+import { useNavigate } from 'react-router-dom';
 import jdenticon from 'jdenticon';
 
 import 'pages/new_profile/new_profile_header.scss';
@@ -24,69 +11,67 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { SocialAccounts } from '../../components/social_accounts';
 
-type NewProfileHeaderAttrs = {
+type NewProfileHeaderProps = {
   profile: Profile;
   isOwner: boolean;
 };
 
-class NewProfileHeaderComponent extends ClassComponent<NewProfileHeaderAttrs> {
-  private defaultAvatar: string;
+const NewProfileHeader = (props: NewProfileHeaderProps) => {
+  const navigate = useNavigate();
+  const [defaultAvatar, setDefaultAvatar] = React.useState<string>();
 
-  oninit(vnode: ResultNode<NewProfileHeaderAttrs>) {
-    this.defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
-  }
+  React.useEffect(() => {
+    setDefaultAvatar(jdenticon.toSvg(props.profile.id, 90))
+  }, []);
 
-  view(vnode: ResultNode<NewProfileHeaderAttrs>) {
-    const { profile, isOwner } = vnode.attrs;
 
-    if (!profile) return;
-    const { bio, name, username } = profile;
+  const { profile, isOwner } = props;
 
-    const isCurrentUser = app.isLoggedIn() && isOwner;
+  if (!profile) return;
+  const { bio, name, username } = profile;
 
-    return (
-      <div className="ProfileHeader">
-        <div className="edit">
-          {isCurrentUser && (
-            <CWButton
-              label="Edit"
-              buttonType="mini-white"
-              iconLeft="write"
-              onClick={() => this.navigateToSubpage(`/${username}/edit`)}
-            />
-          )}
-        </div>
-        <div className="profile-image">
-          {profile.avatarUrl ? (
-            <img src={profile.avatarUrl} />
-          ) : (
-            <img
-              src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                this.defaultAvatar
-              )}`}
-            />
-          )}
-        </div>
-        <div className="profile-name-and-bio">
-          <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
-            {name || username}
-          </CWText>
-          <div className="buttons">
-            {/* TODO: Add delegate and follow buttons */}
-            {/* <CWButton label="Delegate" buttonType="mini-black" onClick={() => {}} />
-            <CWButton label="Follow" buttonType="mini-black" onClick={() => {}} /> */}
-          </div>
-          <SocialAccounts profile={profile} />
-          {bio && (
-            <div>
-              <CWText type="h4">Bio</CWText>
-              <CWText className="bio">{renderQuillTextBody(bio)}</CWText>
-            </div>
-          )}
-        </div>
+  const isCurrentUser = app.isLoggedIn() && isOwner;
+
+  return (
+    <div className="ProfileHeader">
+      <div className="edit">
+        {isCurrentUser && (
+          <CWButton
+            label="Edit"
+            buttonType="mini-white"
+            iconLeft="write"
+            onClick={() => navigate(`/profile/${username}/edit`)}
+          />
+        )}
       </div>
-    );
-  }
+      <div className="profile-image">
+        {profile.avatarUrl ? (
+          <img src={profile.avatarUrl} />
+        ) : (
+          <img
+            src={`data:image/svg+xml;utf8,${encodeURIComponent(defaultAvatar)}`}
+          />
+        )}
+      </div>
+      <div className="profile-name-and-bio">
+        <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
+          {name || username}
+        </CWText>
+        <div className="buttons">
+          {/* TODO: Add delegate and follow buttons */}
+          {/* <CWButton label="Delegate" buttonType="mini-black" onClick={() => {}} />
+          <CWButton label="Follow" buttonType="mini-black" onClick={() => {}} /> */}
+        </div>
+        <SocialAccounts profile={profile} />
+        {bio && (
+          <div>
+            <CWText type="h4">Bio</CWText>
+            <CWText className="bio">{renderQuillTextBody(bio)}</CWText>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
-export const NewProfileHeader = NavigationWrapper(NewProfileHeaderComponent);
+export default NewProfileHeader;

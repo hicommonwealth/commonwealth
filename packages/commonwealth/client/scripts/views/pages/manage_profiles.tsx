@@ -1,18 +1,5 @@
 import React from 'react';
-
-import type {
-  ResultNode
-} from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
+import { useNavigate } from 'react-router-dom';
 import $ from 'jquery';
 
 import 'pages/manage_profiles.scss';
@@ -26,24 +13,25 @@ import PageNotFound from './404';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWButton } from '../components/component_kit/cw_button';
 
-class ManageProfiles extends ClassComponent {
-  private error: boolean;
-  private loading: boolean;
-  private profiles: Profile[];
-  private addresses: AddressInfo[];
+const ManageProfiles = () => {
+  const navigate = useNavigate();
+  const [error, setError] = React.useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [profiles, setProfiles] = React.useState<Profile[]>();
+  const [addresses, setAddresses] = React.useState<AddressInfo[]>();
 
-  private getProfiles = async () => {
-    this.loading = true;
+  const getProfiles = async () => {
+    setLoading(true);
 
     try {
       const response = await $.post(`${app.serverUrl()}/newProfiles`, {
         jwt: app.user.jwt,
       });
 
-      this.profiles = response.result.profiles?.map(
+      setProfiles(response.result.profiles?.map(
         (profile) => new Profile(profile)
-      );
-      this.addresses = response.result.addresses?.map(
+      ));
+      setAddresses(response.result.addresses?.map(
         (a) =>
           new AddressInfo(
             a.id,
@@ -54,72 +42,67 @@ class ManageProfiles extends ClassComponent {
             a.ghost_address,
             a.profile_id
           )
-      );
+      ));
     } catch (err) {
-      this.error = true;
+      setError(true);
     }
-    this.loading = false;
+    setLoading(false);
   };
 
-  oninit() {
-    this.error = false;
-    this.getProfiles();
-  }
+  React.useEffect(() => {
+    getProfiles();
+  }, []);
 
-  view() {
-    if (this.loading)
-      return (
-        <div className="ManageProfiles full-height">
-          <div className="loading-spinner">
-            <CWSpinner />
-          </div>
-        </div>
-      );
-
-    if (this.error)
-      return <PageNotFound message="We cannot find any profiles." />;
-
-    if (!this.profiles) return;
-
+  if (loading)
     return (
-      <Sublayout>
-        <div className="ManageProfiles">
-          <div className="title-container">
-            <div>
-              <CWText type="h3" className="title">
-                Manage Profiles and Addresses
-              </CWText>
-              <CWText className="description">
-                Create and edit profiles and manage your connected addresses.
-              </CWText>
-            </div>
-            <CWButton
-              label="Create Profile"
-              iconLeft="plus"
-              buttonType="mini-white"
-              onClick={() => {
-                this.loading = true;
-                setTimeout(() => {
-                  this.navigateToSubpage('/new');
-                }, 1000);
-              }}
-            />
-          </div>
-          {this.profiles.map((profile, i) => (
-            <ProfilePreview
-              key={i}
-              profiles={this.profiles}
-              profile={profile}
-              addresses={this.addresses?.filter(
-                (a) => a.profileId === profile.id
-              )}
-              refreshProfiles={this.getProfiles}
-            />
-          ))}
+      <div className="ManageProfiles full-height">
+        <div className="loading-spinner">
+          <CWSpinner />
         </div>
-      </Sublayout>
+      </div>
     );
-  }
+
+  if (error)
+    return <PageNotFound message="We cannot find any profiles." />;
+
+  if (!profiles) return;
+
+  return (
+    <Sublayout>
+      <div className="ManageProfiles">
+        <div className="title-container">
+          <div>
+            <CWText type="h3" className="title">
+              Manage Profiles and Addresses
+            </CWText>
+            <CWText className="description">
+              Create and edit profiles and manage your connected addresses.
+            </CWText>
+          </div>
+          <CWButton
+            label="Create Profile"
+            iconLeft="plus"
+            buttonType="mini-white"
+            onClick={() => {
+              setLoading(true);
+              setTimeout(() => navigate('/profile/new'), 1000);
+            }}
+          />
+        </div>
+        {profiles.map((profile, i) => (
+          <ProfilePreview
+            key={i}
+            profiles={profiles}
+            profile={profile}
+            addresses={addresses?.filter(
+              (a) => a.profileId === profile.id
+            )}
+            refreshProfiles={getProfiles}
+          />
+        ))}
+      </div>
+    </Sublayout>
+  );
 }
 
-export default NavigationWrapper(ManageProfiles);
+export default ManageProfiles;

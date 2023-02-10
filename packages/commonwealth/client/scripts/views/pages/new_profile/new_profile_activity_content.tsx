@@ -1,17 +1,7 @@
 import React from 'react';
 
-import type {
-  ResultNode
-} from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import type Thread from 'client/scripts/models/Thread';
 import type { ChainInfo } from 'client/scripts/models';
@@ -40,8 +30,9 @@ class NewProfileActivityContent extends ClassComponent<NewProfileActivityContent
     if (option === ProfileActivity.Threads) {
       return threads
         .sort((a, b) => +b.createdAt - +a.createdAt)
-        .map((thread) => (
+        .map((thread, i) => (
           <NewProfileActivityRow
+            key={i}
             activity={thread}
             address={address}
             chains={chains}
@@ -54,9 +45,10 @@ class NewProfileActivityContent extends ClassComponent<NewProfileActivityContent
       ...threads,
     ].sort((a, b) => +b.createdAt - +a.createdAt);
 
-    return allActivities.map((activity) => {
+    return allActivities.map((activity, i) => {
       return (
         <NewProfileActivityRow
+          key={i}
           activity={activity}
           address={address}
           chains={chains}
