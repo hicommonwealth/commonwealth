@@ -121,6 +121,7 @@
   }
 
   .role-tag-container {
+    display: inline-block;
     .role-tag-text.Text {
       background-color: $neutral-200;
       border-radius: $border-radius-rounded-corners;
