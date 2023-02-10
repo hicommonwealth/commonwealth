@@ -81,7 +81,7 @@ export type ITokenBalanceCache = {
 };
 
 const ContractTypes = ['erc20', 'erc721', 'erc1155', 'spl-token'] as const;
-export type ContractType = (typeof ContractTypes)[number];
+export type ContractType = typeof ContractTypes[number];
 export function parseContractType(arg: string): ContractType {
   const ct = ContractTypes.find((validName) => validName === arg);
   if (ct) return ct;
