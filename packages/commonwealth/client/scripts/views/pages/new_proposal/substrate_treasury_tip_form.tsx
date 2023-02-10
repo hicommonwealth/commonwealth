@@ -1,6 +1,8 @@
 import React from 'react';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 
 import { proposalSlugToClass } from 'identifiers';
 import type { ITXModalData, ProposalModule } from 'models';

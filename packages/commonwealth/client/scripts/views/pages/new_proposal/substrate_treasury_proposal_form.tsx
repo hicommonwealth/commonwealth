@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type Substrate from 'controllers/chain/substrate/adapter';
 
 import { proposalSlugToClass } from 'identifiers';

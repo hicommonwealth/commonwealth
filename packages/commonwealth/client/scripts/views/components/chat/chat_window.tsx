@@ -11,7 +11,7 @@ import {
   ResultNode,
   getRouteParam,
   redraw,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/chat.scss';

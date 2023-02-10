@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { getProposalUrlPath } from 'identifiers';
 import type { NotificationSubscription } from 'models';
 import { AddressInfo } from 'models';

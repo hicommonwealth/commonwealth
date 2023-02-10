@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'components/community_label.scss';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';

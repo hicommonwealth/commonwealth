@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import app from 'state';
 import { CreateContentMenu } from './menus/create_content_menu';

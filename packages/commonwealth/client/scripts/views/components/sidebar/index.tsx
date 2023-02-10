@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import { Action } from 'commonwealth/shared/permissions';

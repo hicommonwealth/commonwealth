@@ -13,7 +13,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';

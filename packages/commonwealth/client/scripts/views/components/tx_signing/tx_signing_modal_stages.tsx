@@ -12,7 +12,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import app from 'state';
 import { CWButton } from '../component_kit/cw_button';

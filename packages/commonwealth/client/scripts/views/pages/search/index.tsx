@@ -5,7 +5,7 @@ import {
   setRoute,
   getRouteParam,
   redraw,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -341,31 +341,30 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                     </a>
                   )}
                 </CWText>
-                {tabScopedListing.length > 0 &&
-                  this.activeTab === 'Threads' && (
-                    <div className="search-results-filters">
-                      <CWText type="h5">Sort By:</CWText>
-                      <CWDropdown
-                        label=""
-                        initialValue={{
-                          label: this.searchQuery.sort,
-                          value: this.searchQuery.sort,
-                        }}
-                        options={[
-                          { label: 'Best', value: 'Best' },
-                          { label: 'Newest', value: 'Newest' },
-                          { label: 'Oldest', value: 'Oldest' },
-                        ]}
-                        onSelect={(o) => {
-                          searchQuery.sort = SearchSort[o.value];
-                          setRoute(`/search?${searchQuery.toUrlParams()}`);
-                          setTimeout(() => {
-                            this.refreshResults = true;
-                          }, 0);
-                        }}
-                      />
-                    </div>
-                  )}
+                {tabScopedListing.length > 0 && this.activeTab === 'Threads' && (
+                  <div className="search-results-filters">
+                    <CWText type="h5">Sort By:</CWText>
+                    <CWDropdown
+                      label=""
+                      initialValue={{
+                        label: this.searchQuery.sort,
+                        value: this.searchQuery.sort,
+                      }}
+                      options={[
+                        { label: 'Best', value: 'Best' },
+                        { label: 'Newest', value: 'Newest' },
+                        { label: 'Oldest', value: 'Oldest' },
+                      ]}
+                      onSelect={(o) => {
+                        searchQuery.sort = SearchSort[o.value];
+                        setRoute(`/search?${searchQuery.toUrlParams()}`);
+                        setTimeout(() => {
+                          this.refreshResults = true;
+                        }, 0);
+                      }}
+                    />
+                  </div>
+                )}
                 <div className="search-results-list">{tabScopedListing}</div>
               </div>
             )}

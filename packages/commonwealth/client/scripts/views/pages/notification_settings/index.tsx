@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw} from
+
+ 'mithrilInterop';
 import moment from 'moment';
 import { AddressInfo } from 'models';
 import 'pages/notification_settings/index.scss';

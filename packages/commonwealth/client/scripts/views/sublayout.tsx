@@ -5,7 +5,7 @@ import {
   ResultNode,
   getRouteParam,
   redraw,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import app from 'state';
 

@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { ChainNetwork } from 'common-common/src/types';
 
 import type { IWebWallet } from 'models';

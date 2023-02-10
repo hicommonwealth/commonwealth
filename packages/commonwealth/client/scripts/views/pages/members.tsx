@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 import type { Profile } from 'models';

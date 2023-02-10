@@ -1,6 +1,11 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, redraw } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  redraw,
+  } from 'mithrilInterop';
 
 import 'components/snapshot_proposal_selector.scss';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
@@ -42,9 +47,9 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
     return (
       <div className="SnapshotProposalSelector">
         {
-          // this.snapshotProposalsLoaded ? (
+        // this.snapshotProposalsLoaded ? (
           // render('@TODO @REACT please remove me')
-          // ) : (
+        // ) : (
           // m(QueryList, {
           //   checkmark: true,
           //   items: this.allProposals.sort((a, b) => {
@@ -90,7 +95,7 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
                 : 'Loading snapshot proposals...'}
             </div>
           </div>
-          // )
+        // )
         }
       </div>
     );

@@ -15,7 +15,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';

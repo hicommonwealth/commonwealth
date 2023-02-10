@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { debounce } from 'lodash';
 import { pluralize } from 'helpers';
 import { isNotUndefined } from 'helpers/typeGuards';

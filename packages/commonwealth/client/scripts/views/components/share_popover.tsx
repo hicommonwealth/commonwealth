@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { ClassComponent, getRoute } from 'mithrilInterop';
+import { ClassComponent, getRoute} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import { CWIconButton } from './component_kit/cw_icon_button';

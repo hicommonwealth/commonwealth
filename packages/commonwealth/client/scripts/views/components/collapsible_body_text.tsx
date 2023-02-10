@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import type { AnyProposal, Thread } from 'models';
 
 import app from 'state';
@@ -64,20 +64,20 @@ export const CollapsibleThreadBody = ({ thread }) => {
 
     if (
       doc.ops.length === 1 &&
-      doc.ops[0] &&
-      typeof doc.ops[0].insert === 'string' &&
-      doc.ops[0].insert.trim() === ''
+        doc.ops[0] &&
+        typeof doc.ops[0].insert === 'string' &&
+        doc.ops[0].insert.trim() === ''
     ) {
       return getPlaceholder();
     }
 
     return (
       <QuillFormattedText
-        doc={doc}
-        cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-        collapse={false}
-        hideFormatting={false}
-      />
+      doc={doc}
+      cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+      collapse={false}
+      hideFormatting={false}
+        />
     );
   } catch (e) {
     if (thread.body?.toString().trim() === '') {
@@ -87,13 +87,13 @@ export const CollapsibleThreadBody = ({ thread }) => {
     return (
       thread.body && (
         <MarkdownFormattedText
-          doc={body}
-          cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
-        />
+        doc={body}
+        cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+          />
       )
     );
   }
-};
+}
 
 type CollapsibleProposalBodyAttrs = {
   proposal: AnyProposal;

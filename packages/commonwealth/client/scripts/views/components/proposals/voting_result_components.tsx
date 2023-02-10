@@ -10,7 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'components/proposals/voting_result_components.scss';
 import type {

@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import Sublayout from 'views/sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';

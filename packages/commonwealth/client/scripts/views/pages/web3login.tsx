@@ -2,7 +2,9 @@ import React from 'react';
 
 import { link } from 'helpers';
 
-import { getRouteParam, redraw } from 'mithrilInterop';
+import { getRouteParam, redraw} from
+
+ 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/web3login.scss';

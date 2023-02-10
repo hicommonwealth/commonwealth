@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';

@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import { CWLabel } from './component_kit/cw_label';

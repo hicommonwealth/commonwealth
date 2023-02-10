@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import type { Thread, Topic } from 'models';
 import { navigateToSubpage } from 'router';
 import 'pages/overview/index.scss';

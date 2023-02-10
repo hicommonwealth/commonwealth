@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 import {
@@ -9,7 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 

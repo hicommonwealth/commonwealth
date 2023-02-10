@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw} from
+
+ 'mithrilInterop';
 
 import 'modals/edit_collaborators_modal.scss';
 

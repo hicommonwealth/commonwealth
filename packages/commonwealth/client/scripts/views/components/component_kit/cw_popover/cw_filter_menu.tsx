@@ -1,6 +1,7 @@
 import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
+
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
 
 import type { CheckboxType } from '../cw_checkbox';

@@ -11,7 +11,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 

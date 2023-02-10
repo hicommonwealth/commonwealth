@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/feedback_modal.scss';

@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import type PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import type Substrate from 'controllers/chain/substrate/adapter';

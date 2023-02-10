@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 import type { Thread, ThreadStage, Topic } from 'models';
 import app from 'state';
@@ -9,36 +9,35 @@ import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_m
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { Modal } from '../../components/component_kit/cw_modal';
 
-type ThreadPreviewMenuProps = {
+type ThreadPreviewMenuAttrs = {
   thread: Thread;
 };
 
-export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
-  const { thread } = props;
+export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
+  view(vnode: ResultNode<ThreadPreviewMenuAttrs>) {
+    if (!app.isLoggedIn()) return;
 
-  const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] =
-    React.useState<boolean>(false);
-  const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
-    React.useState<boolean>(false);
+    const { thread } = vnode.attrs;
 
-  const hasAdminPermissions =
-    app.user.activeAccount &&
-    (app.roles.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-    }) ||
-      app.roles.isRoleOfCommunity({
-        role: 'moderator',
+    const hasAdminPermissions =
+      app.user.activeAccount &&
+      (app.roles.isRoleOfCommunity({
+        role: 'admin',
         chain: app.activeChainId(),
-      }));
+      }) ||
+        app.roles.isRoleOfCommunity({
+          role: 'moderator',
+          chain: app.activeChainId(),
+        }));
 
-  const isAuthor =
-    app.user.activeAccount && thread.author === app.user.activeAccount.address;
+    const isAuthor =
+      app.user.activeAccount &&
+      thread.author === app.user.activeAccount.address;
 
-  return (
-    <React.Fragment>
+    if (!isAuthor && !hasAdminPermissions) return;
+
+    return (
       <div
         className="ThreadPreviewMenu"
         onClick={(e) => {
@@ -57,7 +56,7 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
 
                       app.threads.pin({ proposal: thread }).then(() => {
                         navigateToSubpage('/discussions');
-                        redraw();
+                        this.redraw();
                       });
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
@@ -88,7 +87,17 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
                   {
                     onClick: (e) => {
                       e.preventDefault();
-                      setIsChangeTopicModalOpen(true);
+                      app.modals.create({
+                        modal: ChangeTopicModal,
+                        data: {
+                          onChangeHandler: (topic: Topic) => {
+                            thread.topic = topic;
+                            redraw();
+                          },
+                          thread,
+                        },
+                      });
+                      redraw();
                     },
                     label: 'Change topic',
                     iconLeft: 'filter' as const,
@@ -100,7 +109,17 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
                   {
                     onClick: (e) => {
                       e.preventDefault();
-                      setIsUpdateProposalStatusModalOpen(true);
+                      app.modals.create({
+                        modal: UpdateProposalStatusModal,
+                        data: {
+                          onChangeHandler: (stage: ThreadStage) => {
+                            thread.stage = stage;
+                            redraw();
+                          },
+                          thread,
+                        },
+                      });
+                      redraw();
                     },
                     label: 'Update status',
                     iconLeft: 'democraticProposal' as const,
@@ -139,34 +158,6 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
           )}
         />
       </div>
-      <Modal
-        content={
-          <ChangeTopicModal
-            onChangeHandler={(topic: Topic) => {
-              thread.topic = topic;
-              redraw();
-            }}
-            thread={thread}
-            onModalClose={() => setIsChangeTopicModalOpen(false)}
-          />
-        }
-        onClose={() => setIsChangeTopicModalOpen(false)}
-        open={isChangeTopicModalOpen}
-      />
-      <Modal
-        content={
-          <UpdateProposalStatusModal
-            onChangeHandler={(stage: ThreadStage) => {
-              thread.stage = stage;
-              redraw();
-            }}
-            thread={thread}
-            onModalClose={() => setIsUpdateProposalStatusModalOpen(false)}
-          />
-        }
-        onClose={() => setIsUpdateProposalStatusModalOpen(false)}
-        open={isUpdateProposalStatusModalOpen}
-      />
-    </React.Fragment>
-  );
-};
+    );
+  }
+}

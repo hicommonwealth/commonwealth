@@ -8,7 +8,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 
 import type { Profile } from 'client/scripts/models';
 

@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 
 import 'components/component_kit/cw_avatar_username_input.scss';
 import { formatAddressShort } from 'helpers';

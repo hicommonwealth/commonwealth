@@ -2,7 +2,9 @@ import React from 'react';
 
 import type { ChainInfo } from 'models';
 
-import { ClassComponent, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw} from
+
+ 'mithrilInterop';
 
 import type { ResultNode } from 'mithrilInterop';
 

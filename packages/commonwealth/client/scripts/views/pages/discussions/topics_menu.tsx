@@ -16,7 +16,6 @@ import {
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { ThreadsFilterMenuItem } from './stages_menu';
-import { Modal } from '../../components/component_kit/cw_modal';
 
 type Topic = {
   defaultOffchainTemplate?: string;
@@ -40,7 +39,6 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
   const { featuredTopics, otherTopics, selectedTopic, topic } = props;
 
   const popoverProps = usePopover();
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
@@ -71,6 +69,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                       id,
                       name,
                       description,
+                      telegram,
                       featuredInSidebar,
                       featuredInNewPost,
                       defaultOffchainTemplate,
@@ -97,33 +96,26 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                           app.roles?.isAdminOfEntity({
                             chain: app.activeChainId(),
                           }) && (
-                            <React.Fragment>
-                              <CWIconButton
-                                iconName="write"
-                                iconSize="small"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setIsModalOpen(true);
-                                }}
-                              />
-                              <Modal
-                                content={
-                                  <EditTopicModal
-                                    id={id}
-                                    name={name}
-                                    description={description}
-                                    featuredInSidebar={featuredInSidebar}
-                                    featuredInNewPost={featuredInNewPost}
-                                    defaultOffchainTemplate={
-                                      defaultOffchainTemplate
-                                    }
-                                    onModalClose={() => setIsModalOpen(false)}
-                                  />
-                                }
-                                onClose={() => setIsModalOpen(false)}
-                                open={isModalOpen}
-                              />
-                            </React.Fragment>
+                            <CWIconButton
+                              iconName="write"
+                              iconSize="small"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                app.modals.create({
+                                  modal: EditTopicModal,
+                                  data: {
+                                    id,
+                                    name,
+                                    description,
+                                    telegram,
+                                    featuredInSidebar,
+                                    featuredInNewPost,
+                                    defaultOffchainTemplate,
+                                  },
+                                });
+                                redraw();
+                              }}
+                            />
                           )
                         }
                       />

@@ -10,7 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import type { ProposalModule } from 'models';
 
 import app from 'state';

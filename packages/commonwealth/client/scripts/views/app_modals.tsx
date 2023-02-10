@@ -36,7 +36,9 @@ import React from 'react';
 //  },
 // })
 
-import { ClassComponent, render, redraw } from 'mithrilInterop';
+import { ClassComponent, render, redraw} from
+
+ 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';

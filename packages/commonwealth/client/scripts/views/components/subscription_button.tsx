@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { NotificationCategories } from 'common-common/src/types';
 import { isNotUndefined } from 'helpers/typeGuards';
 

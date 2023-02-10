@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, setRoute, redraw} from
+
+ 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';

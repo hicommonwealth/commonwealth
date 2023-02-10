@@ -9,7 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
 
 import 'components/user/user.scss';

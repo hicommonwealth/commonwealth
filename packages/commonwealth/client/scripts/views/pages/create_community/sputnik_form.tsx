@@ -15,7 +15,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import $ from 'jquery';
 import type { ConnectConfig } from 'near-api-js';
 import { connect as nearConnect, keyStores } from 'near-api-js';

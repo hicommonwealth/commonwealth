@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode} from
+
+ 'mithrilInterop';
 import { ChainNetwork, ProposalType } from 'common-common/src/types';
 import {
   chainToProposalSlug,

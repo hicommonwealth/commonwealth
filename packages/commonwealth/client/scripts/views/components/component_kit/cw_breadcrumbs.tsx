@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { setRoute } from 'mithrilInterop';
+import { setRoute} from
+
+ 'mithrilInterop';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
 import { CWText } from './cw_text';

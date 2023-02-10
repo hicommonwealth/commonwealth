@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';

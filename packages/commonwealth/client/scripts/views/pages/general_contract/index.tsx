@@ -1,3 +1,4 @@
+
 import 'pages/general_contract/index.scss';
 import app from 'state';
 import type { Contract } from 'models';

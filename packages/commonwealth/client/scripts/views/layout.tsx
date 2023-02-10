@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load

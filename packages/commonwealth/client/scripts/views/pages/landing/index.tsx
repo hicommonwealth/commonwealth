@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 import {
@@ -9,7 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import Glide from '@glidejs/glide';
 
 // Logged Out Homepage View
