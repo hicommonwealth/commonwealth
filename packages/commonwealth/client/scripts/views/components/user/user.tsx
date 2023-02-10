@@ -8,7 +8,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
@@ -249,25 +249,25 @@ export const User = (props: UserAttrs) => {
       </div>
       <div className="user-name">
         {link(
-          'a.user-display-name',
-          profile
-            ? `/${app.activeChainId() || profile.chain}/account/${
-                profile.address
-              }?base=${profile.chain}`
-            : 'javascript:',
-          !profile ? (
-            addrShort
-          ) : !showAddressWithDisplayName ? (
-            profile.displayName
-          ) : (
-            <>
-              {profile.displayName}
-              <div className="id-short">
-                {formatAddressShort(profile.address, profile.chain)}
-              </div>
-            </>
-          )
-        )}
+              'a.user-display-name',
+              profile
+                ? `/${app.activeChainId() || profile.chain}/account/${
+                    profile.address
+                  }?base=${profile.chain}`
+                : 'javascript:',
+              !profile ? (
+                addrShort
+              ) : !showAddressWithDisplayName ? (
+                profile.displayName
+              ) : (
+                <>
+                  {profile.displayName}
+                  <div className="id-short">
+                    {formatAddressShort(profile.address, profile.chain)}
+                  </div>
+                </>
+              )
+            )}
       </div>
       {profile?.address && (
         <div className="user-address">
