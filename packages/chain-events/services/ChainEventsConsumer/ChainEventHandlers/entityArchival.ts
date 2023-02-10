@@ -10,7 +10,11 @@ import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import type { DB } from '../../database/database';
 
 import type { ChainEventInstance } from 'chain-events/services/database/models/chain_event';
-import type { CWEvent, IChainEntityKind, IChainEventData } from 'chain-events/src';
+import type {
+  CWEvent,
+  IChainEntityKind,
+  IChainEventData,
+} from 'chain-events/src';
 import {
   EntityEventKind,
   eventToEntity,
