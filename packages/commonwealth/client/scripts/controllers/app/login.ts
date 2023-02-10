@@ -6,7 +6,6 @@ import type { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
-import { EventEmitter } from 'events';
 
 import {
   ClassComponent,
@@ -16,7 +15,7 @@ import {
   getRoute,
   getRouteParam,
   redraw,
-  Component,
+  Component
 } from 'mithrilInterop';
 import type { BlockInfo, ChainInfo } from 'models';
 import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';
