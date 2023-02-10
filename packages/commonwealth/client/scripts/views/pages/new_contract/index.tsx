@@ -3,7 +3,7 @@ import app from 'state';
 import { ClassComponent } from 'mithrilInterop';
 import { ChainBase } from 'common-common/src/types';
 import AddContractAndAbiForm from './add_contract_and_abi_form';
-import PageNotFound from '../404';
+import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';

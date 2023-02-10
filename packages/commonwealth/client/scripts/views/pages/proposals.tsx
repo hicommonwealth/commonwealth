@@ -15,7 +15,7 @@ import 'pages/proposals.scss';
 import app from 'state';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { ProposalCard } from 'views/components/proposal_card';
-import PageNotFound from 'views/pages/404';
+import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
