@@ -9,8 +9,6 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
 import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
 
@@ -162,9 +160,9 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   // load thread, and return PageLoading
   if (!thread || recentlyEdited) {
     try {
-      const thread = idToProposal(ProposalType.Thread, threadId);
-      if (thread === undefined) throw new Error();
-      setThread(thread);
+      const _thread = idToProposal(ProposalType.Thread, threadId);
+      if (_thread === undefined) throw new Error();
+      setThread(_thread);
     } catch (e) {
       // proposal might be loading, if it's not an thread
       if (!threadFetched) {
@@ -235,10 +233,10 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
       .refresh(thread, app.activeChainId())
       .then(async () => {
         // fetch comments
-        const comments = app.comments
+        const _comments = app.comments
           .getByProposal(thread)
           .filter((c) => c.parentComment === null);
-        setComments(comments);
+        setComments(_comments);
 
         // fetch reactions
         const { result: reactionCounts } = await $.ajax({
@@ -312,11 +310,11 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   }
 
   const updatedCommentsCallback = () => {
-    const comments =
+    const _comments =
       app.comments
         .getByProposal(thread)
         .filter((c) => c.parentComment === null) || [];
-    setComments(comments);
+    setComments(_comments);
   };
   if (!initializedComments) {
     setInitializedComments(true);
@@ -628,7 +626,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
     ];
   };
 
-  // @ts-ignore
   return (
     <Sublayout
     //  title={headerTitle}

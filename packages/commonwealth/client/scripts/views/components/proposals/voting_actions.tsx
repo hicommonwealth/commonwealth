@@ -1,15 +1,7 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
@@ -36,19 +28,11 @@ import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import {
-  convictionToWeight,
-  SubstrateDemocracyReferendum,
-} from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import type { AnyProposal } from 'models';
-import { BinaryVote, DepositVote, VotingType } from 'models';
+import { VotingType } from 'models';
 
 import app from 'state';
 
-import { createTXModal } from 'views/modals/tx_signing_modal';
 import {
   CompoundCancelButton,
   MolochCancelButton,
@@ -57,6 +41,9 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 
 type CannotVoteAttrs = { label: string };
 
@@ -85,24 +72,17 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
       vnode.attrs;
 
-    if (proposal instanceof SubstrateTreasuryProposal) {
-      return;
-    } else if (!app.isLoggedIn()) {
-      return <CannotVote label="Log in to vote" />;
-    } else if (!app.user.activeAccount) {
-      return <CannotVote label="Connect an address to vote" />;
-    } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
-      return <CannotVote label="Cannot vote from this address" />;
+    if (
+      proposal instanceof SubstrateDemocracyProposal ||
+      proposal instanceof SubstrateDemocracyReferendum ||
+      proposal instanceof SubstrateTreasuryProposal
+    ) {
+      return null;
     }
 
     let user;
 
-    if (
-      proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateDemocracyReferendum
-    ) {
-      user = app.user.activeAccount as SubstrateAccount;
-    } else if (proposal instanceof CosmosProposal) {
+    if (proposal instanceof CosmosProposal) {
       user = app.user.activeAccount as CosmosAccount;
     } else if (
       proposal instanceof MolochProposal ||
@@ -120,36 +100,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       e.preventDefault();
       toggleVotingModal(true);
 
-      if (proposal instanceof SubstrateDemocracyProposal) {
-        createTXModal(
-          proposal.submitVoteTx(
-            new DepositVote(user, proposal.deposit),
-            onModalClose
-          )
-        );
-      } else if (proposal instanceof SubstrateDemocracyReferendum) {
-        if (this.conviction === undefined) {
-          toggleVotingModal(false);
-          return notifyError('Must select a conviction');
-        }
-
-        if (this.amount === 0) {
-          toggleVotingModal(false);
-          return notifyError('Must select a valid amount');
-        }
-
-        createTXModal(
-          proposal.submitVoteTx(
-            new BinaryVote(
-              user,
-              true,
-              this.amount,
-              convictionToWeight(this.conviction)
-            ),
-            onModalClose
-          )
-        );
-      } else if (proposal instanceof CosmosProposal) {
+      if (proposal instanceof CosmosProposal) {
         if (proposal.status === 'DepositPeriod') {
           // TODO: configure deposit amount
           proposal
@@ -197,29 +148,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       e.preventDefault();
       toggleVotingModal(true);
 
-      if (proposal instanceof SubstrateDemocracyReferendum) {
-        if (this.conviction === undefined) {
-          toggleVotingModal(false);
-          return notifyError('Must select a conviction');
-        }
-
-        if (this.amount === 0) {
-          toggleVotingModal(false);
-          return notifyError('Must select a valid amount');
-        }
-
-        createTXModal(
-          proposal.submitVoteTx(
-            new BinaryVote(
-              user,
-              false,
-              this.amount,
-              convictionToWeight(this.conviction)
-            ),
-            onModalClose
-          )
-        );
-      } else if (proposal instanceof CosmosProposal) {
+      if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'No'))
           .then(() => redraw())
