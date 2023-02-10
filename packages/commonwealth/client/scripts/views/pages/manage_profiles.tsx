@@ -9,7 +9,7 @@ import { AddressInfo, NewProfile as Profile } from 'models';
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
 import ProfilePreview from '../components/profile_preview';
-import PageNotFound from './404';
+import { PageNotFound } from './404';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWButton } from '../components/component_kit/cw_button';
 

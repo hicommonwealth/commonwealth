@@ -1,16 +1,9 @@
 import React from 'react';
 
-import type {
-  ResultNode
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import {
   ClassComponent,
-  render,
-  setRoute,
-  getRoute,
   getRouteParam,
-  redraw,
-  Component,
 } from 'mithrilInterop';
 
 import 'pages/new_profile/new_profile_activity.scss';

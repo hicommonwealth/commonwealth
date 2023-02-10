@@ -1,8 +1,5 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
-
 import 'components/avatar_upload.scss';
 import Dropzone from 'dropzone';
 import { isUndefined } from 'helpers/typeGuards';
@@ -18,28 +15,24 @@ type AvatarUploadStyleAttrs = {
   size?: 'small' | 'large';
 };
 
-type AvatarUploadAttrs = {
+type AvatarUploadProps = {
   account?: Account;
   darkMode?: boolean;
   scope: 'community' | 'user';
   uploadCompleteCallback?: CallableFunction;
   uploadStartedCallback?: CallableFunction;
-  name?: string;
 } & AvatarUploadStyleAttrs;
 
-export const AvatarUpload = (props: AvatarUploadAttrs) => {
-  const [dropzone, setDropzone] = React.useState<Dropzone>(null);
+export const AvatarUpload = (props: AvatarUploadProps) => {
+  const [dropzone, setDropzone] = React.useState<any>();
   const [uploaded, setUploaded] = React.useState<boolean>();
+  const nodeRef = React.useRef<any>();
 
   React.useEffect(() => {
-    const container = document.createElement('div');
-    container.className = `dropzone-${props.name}`;
-    const root = document.getElementById('root');
-    if (!document.querySelector(`.dropzone-${props.name}`)) root.appendChild(container);
-
     if (Dropzone.instances.length > 0) return;
+    Dropzone.autoDiscover = false;
 
-    const newDropzone = new Dropzone(`div.dropzone-${props.name}`, {
+    const newDropzone = new Dropzone(nodeRef.current, {
       clickable: '.icon-button-container',
       previewsContainer: '.AvatarUpload .dropzone-preview-container',
       // configuration for direct upload to s3
@@ -53,7 +46,6 @@ export const AvatarUpload = (props: AvatarUploadAttrs) => {
       maxFilesize: 10, // MB
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
-        if (props.uploadStartedCallback) props.uploadStartedCallback(file);
         $.post(`${app.serverUrl()}/getUploadSignature`, {
           name: file.name, // imageName.png
           mimetype: file.type, // image/png
@@ -68,9 +60,9 @@ export const AvatarUpload = (props: AvatarUploadAttrs) => {
               );
             }
             file.uploadURL = response.result;
-            setUploaded(true);
+            setUploaded(true)
             done();
-            if (props.uploadCompleteCallback) props.uploadCompleteCallback(file);
+            setTimeout(() => newDropzone.processFile(file));
           })
           .catch((err: any) => {
             done(
@@ -87,8 +79,30 @@ export const AvatarUpload = (props: AvatarUploadAttrs) => {
       },
     });
 
+    newDropzone.on('processing', (file) => {
+      newDropzone.options.url = file.uploadURL;
+      if (props.uploadStartedCallback) {
+        props.uploadStartedCallback();
+      }
+    });
+
+    newDropzone.on('complete', (file) => {
+      if (props.uploadCompleteCallback) {
+        props.uploadCompleteCallback(file);
+      }
+    });
+
     setDropzone(newDropzone);
-  }, []);
+
+    const cleanUpFiles = () => {
+      dropzone.files.map((file) => dropzone.removeFile(file));
+    }
+
+    nodeRef.current.addEventListener('cleardropzone', cleanUpFiles);
+    return () => {
+      nodeRef.current.removeEventListener('cleardropzone', cleanUpFiles);
+    }
+  }, [])
 
   const { account, darkMode, scope, size = 'small' } = props;
 
@@ -110,11 +124,12 @@ export const AvatarUpload = (props: AvatarUploadAttrs) => {
         { size },
         ComponentType.AvatarUpload
       )}
+      ref={nodeRef}
     >
       <div
         className={getClasses<{ darkMode?: boolean }>(
           { darkMode },
-          'icon-button-container'
+          'icon-button-container dz-clickable'
         )}
       >
         <CWIconButton

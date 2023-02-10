@@ -15,7 +15,7 @@ import NewProfileActivity from './new_profile_activity';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
-import PageNotFound from '../404';
+import { PageNotFound } from '../404';
 
 enum ProfileError {
   None,

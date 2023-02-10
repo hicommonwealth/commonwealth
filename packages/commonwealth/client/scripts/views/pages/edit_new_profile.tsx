@@ -29,7 +29,7 @@ import type {
   ImageBehavior,
 } from '../components/component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
-import PageNotFound from './404';
+import { PageNotFound } from './404';
 
 enum EditProfileError {
   None,
@@ -77,7 +77,7 @@ const EditNewProfile = (props: EditNewProfileProps) => {
       setName(response.profile.profile_name || '');
       setEmail(response.profile.email || '');
       setSocials(response.profile.socials);
-      setAvatarUrl(response.profile.avatarUrl);
+      setAvatarUrl(response.profile.avatar_url);
       setCoverImage(response.profile.cover_image);
       setBackgroundImage(response.profile.background_image);
       setAddresses(response.addresses.map(
@@ -230,6 +230,7 @@ const EditNewProfile = (props: EditNewProfileProps) => {
     // not the best solution because address is not always available
     // should refactor AvatarUpload to make it work with new profiles
     let account: Account | null;
+    console.log('addresses', addresses);
     if (addresses?.length > 0) {
       const oldProfile = new OldProfile(
         addresses[0].chain.name,

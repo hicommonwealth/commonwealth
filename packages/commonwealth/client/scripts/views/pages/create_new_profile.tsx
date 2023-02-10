@@ -41,7 +41,6 @@ const CreateNewProfile = () => {
 
   const createProfile = async (profileUpdates: any) => {
     setLoading(true);
-    console.log('PROFILE IN CREATE PROFILE', profileUpdates);
 
     try {
       const response = await $.post(`${app.serverUrl()}/createProfile`, {
@@ -116,7 +115,6 @@ const CreateNewProfile = () => {
                 label="Cancel"
                 onClick={() => {
                   setIsConfirmCancelModalOpen(true);
-                  // this.redraw();
                 }}
                 className="save-button"
                 buttonType="mini-white"
@@ -144,7 +142,6 @@ const CreateNewProfile = () => {
               </CWText>
               <div className="image-upload">
                 <AvatarUpload
-                  name="new-profile"
                   scope="user"
                   account={null}
                   uploadCompleteCallback={(file) => {
