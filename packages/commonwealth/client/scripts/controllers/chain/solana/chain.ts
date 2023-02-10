@@ -1,16 +1,7 @@
 import type * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';

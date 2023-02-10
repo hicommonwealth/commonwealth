@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { ClassComponent, redraw, getRoute } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import { Action } from 'commonwealth/shared/permissions';
@@ -18,10 +9,8 @@ import 'components/sidebar/index.scss';
 import { isActiveAddressPermitted } from 'controllers/server/roles';
 
 import app from 'state';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
-import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { DiscussionSection } from './discussion_section';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
@@ -30,6 +19,7 @@ import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
+import withRouter from '../../../navigation/helpers';
 
 export type SidebarMenuName =
   | 'default'
@@ -85,7 +75,7 @@ class SidebarComponent extends ClassComponent {
                     className={
                       onHomeRoute ? 'home-button active' : 'home-button'
                     }
-                    onClick={() => this.navigateToSubpage('/feed')}
+                    onClick={() => this.setRoute('/feed')}
                   >
                     <CWIcon iconName="home" iconSize="small" />
                     <CWText>Home</CWText>
@@ -123,4 +113,4 @@ class SidebarComponent extends ClassComponent {
   }
 }
 
-export const Sidebar = NavigationWrapper(SidebarComponent);
+export const Sidebar = withRouter(SidebarComponent);

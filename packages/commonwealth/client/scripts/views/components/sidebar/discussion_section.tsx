@@ -1,19 +1,9 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, getRoute, getRouteParam } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import app from 'state';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { handleRedirectClicks } from '../../../helpers';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
@@ -22,6 +12,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
+import withRouter from 'navigation/helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -262,4 +253,4 @@ class DiscussionSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   }
 }
 
-export const DiscussionSection = NavigationWrapper(DiscussionSectionComponent);
+export const DiscussionSection = withRouter(DiscussionSectionComponent);

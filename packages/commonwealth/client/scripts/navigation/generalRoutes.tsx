@@ -1,6 +1,6 @@
 import { Route } from 'react-router-dom';
-import { withLayout } from 'navigation/helpers';
 import React, { lazy } from 'react';
+import { withLayout } from 'views/layout';
 
 const LandingPage = lazy(() => import('views/pages/landing'));
 const TermsPage = lazy(() => import('views/pages/terms'));

@@ -1,15 +1,7 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, getRouteParam } from 'mithrilInterop';
 import { debounce } from 'lodash';
 import { pluralize } from 'helpers';
 import { isNotUndefined } from 'helpers/typeGuards';
@@ -115,9 +107,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
     const subpage = topicName || stageName;
 
     return this.initializing ? (
-      <div>
-        <h1>loading</h1>
-      </div>
+      <PageLoading />
     ) : (
       <Sublayout
       // onScroll={() => debounce(this.onScroll.bind(this), 400)}

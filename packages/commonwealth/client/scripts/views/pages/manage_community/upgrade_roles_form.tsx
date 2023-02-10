@@ -1,15 +1,7 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';

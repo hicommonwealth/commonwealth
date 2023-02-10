@@ -1,17 +1,8 @@
 import React from 'react';
 /* eslint-disable no-useless-escape */
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-    rootRender,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, render, redraw, rootRender } from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';
 import DOMPurify from 'dompurify';

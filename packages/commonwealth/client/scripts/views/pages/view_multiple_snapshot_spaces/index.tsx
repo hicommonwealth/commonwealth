@@ -4,9 +4,7 @@ import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import type { Thread } from 'models';
 
-import { ClassComponent, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/snapshot/multiple_snapshots_page.scss';

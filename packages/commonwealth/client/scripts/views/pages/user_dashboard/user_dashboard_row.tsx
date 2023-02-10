@@ -5,9 +5,7 @@ import { Label as ChainEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
 import type { DashboardActivityNotification } from 'models';
 
-import { ClassComponent, setRoute, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
@@ -16,12 +14,13 @@ import { getClasses } from '../../components/component_kit/helpers';
 import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
 import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
 import { UserDashboardRowTop } from './user_dashboard_row_top';
+import withRouter from 'navigation/helpers';
 
 type UserDashboardRowAttrs = {
   notification: DashboardActivityNotification;
 };
 
-export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
+class UserDashboardRowComponent extends ClassComponent<UserDashboardRowAttrs> {
   view(vnode: ResultNode<UserDashboardRowAttrs>) {
     const {
       commentCount,
@@ -66,7 +65,7 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
           'UserDashboardRow'
         )}
         onClick={() => {
-          setRoute(path);
+          this.setRoute(path);
           redraw();
         }}
       >
@@ -85,3 +84,5 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
     );
   }
 }
+
+export const UserDashboardRow = withRouter(UserDashboardRowComponent);

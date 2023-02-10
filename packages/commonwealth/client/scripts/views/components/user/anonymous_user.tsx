@@ -1,15 +1,7 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, render } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
 
 import 'components/user/user.scss';

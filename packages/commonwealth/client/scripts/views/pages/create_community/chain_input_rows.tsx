@@ -3,16 +3,7 @@ import React from 'react';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { ChainBase } from 'common-common/src/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { AvatarUpload } from 'views/components/avatar_upload';

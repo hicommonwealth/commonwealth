@@ -1,16 +1,8 @@
 import React from 'react';
 /* eslint-disable max-classes-per-file */
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'components/proposals/voting_result_components.scss';
 import type {

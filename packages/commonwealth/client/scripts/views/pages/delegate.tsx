@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import { ChainNetwork } from 'common-common/src/types';
 
 import 'pages/delegate.scss';

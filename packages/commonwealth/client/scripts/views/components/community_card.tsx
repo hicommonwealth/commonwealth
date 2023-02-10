@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { setRoute } from 'mithrilInterop';
+import { useNavigate } from "react-router-dom";
 
 import 'components/community_card.scss';
 
@@ -16,6 +15,7 @@ type CommunityCardProps = { chain: ChainInfo };
 
 export const CommunityCard = (props: CommunityCardProps) => {
   const { chain } = props;
+  const navigate = useNavigate();
 
   const redirectFunction = (e) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ export const CommunityCard = (props: CommunityCardProps) => {
       return;
     }
     localStorage['home-scrollY'] = window.scrollY;
-    setRoute(`/${chain.id}`);
+    navigate(`/${chain.id}`);
   };
 
   // Potentially Temporary (could be built into create community flow)

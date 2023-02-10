@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, getRouteParam } from 'mithrilInterop';
 
 import 'pages/chat.scss';
 
@@ -18,6 +9,8 @@ import { navigateToSubpage } from 'router';
 import { ChatWindow } from 'views/components/chat/chat_window';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { MixpanelChatEvents } from 'analytics/types';
 
 class ChatPage extends ClassComponent {
   oncreate() {

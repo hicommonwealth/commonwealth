@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { redraw} from
-
- 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase } from 'common-common/src/types';

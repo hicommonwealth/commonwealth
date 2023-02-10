@@ -5,7 +5,7 @@ import {
   getRoute,
   getRouteParam,
   redraw,
-  } from 'mithrilInterop';
+} from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
 

@@ -8,14 +8,13 @@
  * as we do not want to expose its imports and features until we are prepared to migrate to react.
  */
 
-import {
-  createElement,
-  FunctionComponent,
-  ReactNode,
-  // eslint-disable-next-line import/no-unresolved
-  Component as ReactComponent,
-} from 'react';
-import { redirect, NavigateFunction } from 'react-router-dom';
+import type { FunctionComponent, ReactNode } from 'react';
+import { createElement, Component as ReactComponent } from 'react';
+import type {
+  NavigateFunction,
+  Location,
+  NavigateOptions,
+} from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
@@ -83,13 +82,18 @@ export type Component<Props = unknown> = FunctionComponent<Props>;
 // corresponds to Mithril's Vnode type with attrs only (no state)
 export type ResultNode<A = unknown> = { attrs: A; children: Children };
 
+export type ClassComponentRouter = {
+  location: Location;
+  navigate: NavigateFunction;
+  params: Readonly<Record<string, string | undefined>>;
+};
 // Additions to base React Component attrs
 type AdditionalAttrs = {
   // simulate mithril's vnode.children
   children?: Children;
 
-  // optionally used navigation for NavigationWrapper, see `./helpers.tsx`
-  navigate?: NavigateFunction;
+  // optionally used navigation for withRouter, see `navigation/helpers.tsx`
+  router?: ClassComponentRouter;
 };
 
 // Replicates Mithril's ClassComponent functionality with support for JSX syntax.
@@ -174,10 +178,12 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
   }
 
   // replicates `m.route.set()` functionality via react-router
-  public setRoute(route: string) {
-    if (this.props.navigate) {
-      console.log('setting route', route);
-      this.props.navigate(route);
+  public setRoute(route: string, options?: NavigateOptions) {
+    if (this.props.router.navigate) {
+      console.log('setting route: ', route, ' with options: ', options);
+      this.props.router.navigate(route, options);
+    } else {
+      console.error('Prop "navigate" is not defined!');
     }
   }
 
@@ -231,26 +237,19 @@ type RouteOptions = {
   replace?: boolean;
 };
 
-// attempt to replicate global m.route.set(), currently a no-op.
-export function setRoute(
+// This should not be used for setting the route, because it does not use react-router.
+// Instead it uses native history API, and because react router does not recognize the
+// path change, the page has to be reloaded programmatically.
+// This is only for legacy code, where react router is not accessible (eg in controllers or JS classes).
+// Always use "withRouter" for react class components or "useNavigate" for functional components.
+export function dangerouslySetRoute(
   route: string,
   data?: Record<string, unknown>,
   options?: RouteOptions
 ) {
-  // app._lastNavigatedBack = false;
-  // app._lastNavigatedFrom = getRoute();
-  /*
-  if (route !== getRoute()) {
-    if (options?.replace) {
-      window.history.replaceState(data, null, route);
-    } else {
-      window.history.pushState(data, null, route);
-    }
-  }
-  */
+  window.history.pushState('', '', route);
+  window.location.reload();
 
-  redirect(route);
-  // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];

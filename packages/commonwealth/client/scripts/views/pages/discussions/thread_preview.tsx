@@ -1,12 +1,9 @@
 import React from 'react';
 
-import { ClassComponent, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/discussions/thread_preview.scss';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import {
   chainEntityTypeToProposalShortName,
   getProposalUrlPath,
@@ -40,6 +37,7 @@ import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import withRouter from 'navigation/helpers';
 
 type ThreadPreviewAttrs = {
   thread: Thread;
@@ -113,7 +111,7 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
             scrollEle.scrollTop;
 
-          this.props.navigate(discussionLink);
+          this.setRoute(discussionLink);
         }}
         key={thread.id}
       >
@@ -240,4 +238,4 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
   }
 }
 
-export const ThreadPreview = NavigationWrapper(ThreadPreviewComponent);
+export const ThreadPreview = withRouter(ThreadPreviewComponent);
