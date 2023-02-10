@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode} from
-
- 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import { ChainNetwork, ProposalType } from 'common-common/src/types';
 import {
   chainToProposalSlug,
@@ -22,9 +21,6 @@ import { AaveProposalForm } from './aave_proposal_form';
 import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 import { SputnikProposalForm } from './sputnik_proposal_form';
-import { SubstrateDemocracyProposalForm } from './substrate_democracy_proposal_form';
-import { SubstrateTreasuryProposalForm } from './substrate_treasury_proposal_form';
-import { SubstrateTreasuryTipForm } from './substrate_treasury_tip_form';
 
 type NewProposalPageAttrs = {
   type: ProposalType;
@@ -86,12 +82,6 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
           return <CosmosProposalForm />;
         case ProposalType.SputnikProposal:
           return <SputnikProposalForm />;
-        case ProposalType.SubstrateDemocracyProposal:
-          return <SubstrateDemocracyProposalForm />;
-        case ProposalType.SubstrateTreasuryProposal:
-          return <SubstrateTreasuryProposalForm />;
-        case ProposalType.SubstrateTreasuryTip:
-          return <SubstrateTreasuryTipForm />;
         default:
           return <CWText>Invalid proposal type</CWText>;
       }

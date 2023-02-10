@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import type { AnyProposal, Thread } from 'models';
 
 import app from 'state';
@@ -17,43 +9,44 @@ import { countLinesMarkdown, countLinesQuill } from './quill/helpers';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
 import { User } from './user/user';
+import { CWText } from './component_kit/cw_text';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
 
-type CollapsibleThreadBodyAttrs = {
+type CollapsibleThreadBodyProps = {
   thread: Thread;
 };
 
-export const CollapsibleThreadBody = ({ thread }) => {
+export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
+  const { thread } = props;
+
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
   useEffect(() => {
     try {
       const doc = JSON.parse(thread.body);
       if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
-        this.collapsed = true;
+        setCollapsed(true);
       }
     } catch (e) {
       if (
         countLinesMarkdown(thread.body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
       ) {
-        this.collapsed = true;
+        setCollapsed(true);
       }
     }
   }, [thread.body]);
 
   const getPlaceholder = () => {
-    const author = app.chain
-      ? app.chain.accounts.get(vnode.attrs.thread.author)
-      : null;
+    const author = app.chain ? app.chain.accounts.get(thread.author) : null;
 
     return author ? (
       <>
         <User user={author} hideAvatar /> created this thread
       </>
     ) : (
-      'Created this thread'
+      <CWText>Created this thread</CWText>
     );
   };
 
@@ -64,20 +57,20 @@ export const CollapsibleThreadBody = ({ thread }) => {
 
     if (
       doc.ops.length === 1 &&
-        doc.ops[0] &&
-        typeof doc.ops[0].insert === 'string' &&
-        doc.ops[0].insert.trim() === ''
+      doc.ops[0] &&
+      typeof doc.ops[0].insert === 'string' &&
+      doc.ops[0].insert.trim() === ''
     ) {
       return getPlaceholder();
     }
 
     return (
       <QuillFormattedText
-      doc={doc}
-      cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-      collapse={false}
-      hideFormatting={false}
-        />
+        doc={doc}
+        cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+        collapse={collapsed}
+        hideFormatting={false}
+      />
     );
   } catch (e) {
     if (thread.body?.toString().trim() === '') {
@@ -87,13 +80,13 @@ export const CollapsibleThreadBody = ({ thread }) => {
     return (
       thread.body && (
         <MarkdownFormattedText
-        doc={body}
-        cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
-          />
+          doc={thread.body}
+          cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+        />
       )
     );
   }
-}
+};
 
 type CollapsibleProposalBodyAttrs = {
   proposal: AnyProposal;
