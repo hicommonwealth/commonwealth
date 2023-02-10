@@ -1,32 +1,27 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
-
 import Sublayout from 'views/sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 
-type PageNotFoundAttrs = { title?: string; message?: string };
+type PageNotFoundProps = { title?: string; message?: string };
 
-export default class PageNotFound extends ClassComponent<PageNotFoundAttrs> {
-  view(vnode: ResultNode<PageNotFoundAttrs>) {
-    const { message } = vnode.attrs;
+export const PageNotFound = (props: PageNotFoundProps) => {
+  const { message } = props;
 
-    return (
-      <Sublayout
-      // title={title}
-      >
-        <CWEmptyState
-          iconName="cautionCircle"
-          content={
-            message ||
-            `
+  return (
+    <Sublayout
+    // title={title}
+    >
+      <CWEmptyState
+        iconName="cautionCircle"
+        content={
+          message ||
+          `
             This page may not be visible to the public.
             If it belongs to a private thread or community, try logging in.
             `
-          }
-        />
-      </Sublayout>
-    );
-  }
-}
+        }
+      />
+    </Sublayout>
+  );
+};
