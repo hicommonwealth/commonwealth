@@ -1,8 +1,5 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
-
 import 'components/comments/edit_comment.scss';
 import type { Comment } from 'models';
 
@@ -14,7 +11,7 @@ import type { QuillEditor } from '../quill/quill_editor';
 import { QuillEditorComponent } from '../quill/quill_editor_component';
 import { clearEditingLocalStorage } from './helpers';
 
-type EditCommentAttrs = {
+type EditCommentProps = {
   comment: Comment<any>;
   savedEdits?: string;
   setIsEditing: (status: boolean) => void;
@@ -22,81 +19,78 @@ type EditCommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-export class EditComment extends ClassComponent<EditCommentAttrs> {
-  private quillEditorState: QuillEditor;
-  private saving: boolean;
+export const EditComment = (props: EditCommentProps) => {
+  const {
+    comment,
+    savedEdits,
+    setIsEditing,
+    shouldRestoreEdits,
+    updatedCommentsCallback,
+  } = props;
 
-  view(vnode: ResultNode<EditCommentAttrs>) {
-    const {
-      comment,
-      savedEdits,
-      setIsEditing,
-      shouldRestoreEdits,
-      updatedCommentsCallback,
-    } = vnode.attrs;
+  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
+  const [saving, setSaving] = React.useState<boolean>();
 
-    const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+  const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
 
-    return (
-      <div className="EditComment">
-        <QuillEditorComponent
-          contentsDoc={body}
-          oncreateBind={(state: QuillEditor) => {
-            this.quillEditorState = state;
+  return (
+    <div className="EditComment">
+      <QuillEditorComponent
+        contentsDoc={body}
+        oncreateBind={(state: QuillEditor) => {
+          setQuillEditorState(state);
+        }}
+        imageUploader
+        theme="snow"
+        editorNamespace={`edit-comment-${comment.id}`}
+      />
+      <div className="buttons-row">
+        <CWButton
+          label="Cancel"
+          disabled={saving}
+          buttonType="secondary-blue"
+          onClick={async (e) => {
+            e.preventDefault();
+
+            let confirmed = true;
+
+            const commentText = quillEditorState.textContentsAsString;
+
+            if (commentText !== body) {
+              confirmed = await confirmationModalWithText(
+                'Cancel editing? Changes will not be saved.',
+                'Delete changes',
+                'Keep editing'
+              )();
+            }
+
+            if (confirmed) {
+              setIsEditing(false);
+              clearEditingLocalStorage(comment.id, ContentType.Comment);
+            }
           }}
-          imageUploader
-          theme="snow"
-          editorNamespace={`edit-comment-${comment.id}`}
         />
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            disabled={this.saving}
-            buttonType="secondary-blue"
-            onClick={async (e) => {
-              e.preventDefault();
+        <CWButton
+          label="Save"
+          disabled={saving}
+          onClick={(e) => {
+            e.preventDefault();
 
-              let confirmed = true;
+            setSaving(true);
 
-              const commentText = this.quillEditorState.textContentsAsString;
+            quillEditorState.disable();
 
-              if (commentText !== body) {
-                confirmed = await confirmationModalWithText(
-                  'Cancel editing? Changes will not be saved.',
-                  'Delete changes',
-                  'Keep editing'
-                )();
-              }
+            const itemText = quillEditorState.textContentsAsString;
 
-              if (confirmed) {
-                setIsEditing(false);
-                clearEditingLocalStorage(comment.id, ContentType.Comment);
-                redraw();
-              }
-            }}
-          />
-          <CWButton
-            label="Save"
-            disabled={this.saving}
-            onClick={(e) => {
-              e.preventDefault();
-
-              this.saving = true;
-
-              this.quillEditorState.disable();
-
-              const itemText = this.quillEditorState.textContentsAsString;
-
-              app.comments.edit(comment, itemText).then(() => {
-                this.saving = false;
-                clearEditingLocalStorage(comment.id, ContentType.Comment);
-                setIsEditing(false);
-                updatedCommentsCallback();
-              });
-            }}
-          />
-        </div>
+            app.comments.edit(comment, itemText).then(() => {
+              setSaving(false);
+              clearEditingLocalStorage(comment.id, ContentType.Comment);
+              setIsEditing(false);
+              updatedCommentsCallback();
+            });
+          }}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
