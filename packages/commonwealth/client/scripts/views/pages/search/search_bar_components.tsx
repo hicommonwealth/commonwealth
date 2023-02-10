@@ -14,129 +14,128 @@ import { getClasses } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
 import withRouter from 'navigation/helpers';
+import { navigateToSubpage } from 'router';
 
-type SearchChipAttrs = {
+type SearchChipProps = {
   isActive: boolean;
   label: string;
   onClick: () => void;
 };
 
-export class SearchChip extends ClassComponent<SearchChipAttrs> {
-  view(vnode: ResultNode<SearchChipAttrs>) {
-    const { isActive, label, onClick } = vnode.attrs;
+export const SearchChip = (props: SearchChipProps) => {
+  const { isActive, label, onClick } = props;
 
-    return (
-      <CWText
-        type="b2"
-        fontWeight="medium"
-        className={getClasses<{ isActive: boolean }>(
-          {
-            isActive,
-          },
-          'SearchChip'
-        )}
-        onClick={onClick}
-      >
-        {label}
-      </CWText>
-    );
-  }
-}
+  return (
+    <CWText
+      type="b2"
+      fontWeight="medium"
+      className={getClasses<{ isActive: boolean }>(
+        {
+          isActive,
+        },
+        'SearchChip'
+      )}
+      onClick={onClick}
+    >
+      {label}
+    </CWText>
+  );
+};
 
-type SearchBarPreviewRowAttrs = {
+type SearchBarPreviewRowProps = {
   searchResult: any;
   searchTerm?: string;
 };
 
-export class SearchBarThreadPreviewRowComponent extends ClassComponent<SearchBarPreviewRowAttrs> {
-  view(vnode: ResultNode<SearchBarPreviewRowAttrs>) {
-    const { searchResult, searchTerm } = vnode.attrs;
+export const SearchBarThreadPreviewRowComponent = (
+  props: SearchBarPreviewRowProps
+) => {
+  const { searchResult, searchTerm } = props;
 
-    return (
-      <div
-        className="SearchBarThreadPreviewRow"
-        onClick={() =>
-          this.setRoute(
-            `/${searchResult.chain}/discussion/${searchResult.proposalid}`
-          )
-        }
-      >
-        <div className="header-row">
-          <User
-            user={
-              new AddressInfo(
-                searchResult.address_id,
-                searchResult.address,
-                searchResult.address_chain,
-                null
-              )
-            }
-          />
-          <CWText className="last-updated-text">•</CWText>
-          <CWText type="caption" className="last-updated-text">
-            {moment(searchResult.created_at).format('l')}
-          </CWText>
-          {/* <CWText type="caption">{searchResult.chain}</CWText> */}
-        </div>
-        <CWText type="b2" fontWeight="bold">
-          {decodeURIComponent(searchResult.title)}
+  return (
+    <div
+      className="SearchBarThreadPreviewRow"
+      onClick={() =>
+        navigateToSubpage(
+          `/${searchResult.chain}/discussion/${searchResult.proposalid}`
+        )
+      }
+    >
+      <div className="header-row">
+        <User
+          user={
+            new AddressInfo(
+              searchResult.address_id,
+              searchResult.address,
+              searchResult.address_chain,
+              null
+            )
+          }
+        />
+        <CWText className="last-updated-text">•</CWText>
+        <CWText type="caption" className="last-updated-text">
+          {moment(searchResult.created_at).format('l')}
         </CWText>
-        <CWText type="caption" className="excerpt-text" fontWeight="medium">
-          {renderQuillTextBody(searchResult.body, {
-            hideFormatting: true,
-            collapse: true,
-            searchTerm,
-          })}
-        </CWText>
+        {/* <CWText type="caption">{searchResult.chain}</CWText> */}
       </div>
-    );
-  }
-}
+      <CWText type="b2" fontWeight="bold">
+        {decodeURIComponent(searchResult.title)}
+      </CWText>
+      <CWText type="caption" className="excerpt-text" fontWeight="medium">
+        {renderQuillTextBody(searchResult.body, {
+          hideFormatting: true,
+          collapse: true,
+          searchTerm,
+        })}
+      </CWText>
+    </div>
+  );
+};
 
 export const SearchBarThreadPreviewRow = withRouter(
   SearchBarThreadPreviewRowComponent
 );
 
-class SearchBarCommentPreviewRowComponent extends ClassComponent<SearchBarPreviewRowAttrs> {
-  view(vnode: ResultNode<SearchBarPreviewRowAttrs>) {
-    const { searchResult, searchTerm } = vnode.attrs;
+const SearchBarCommentPreviewRowComponent = (
+  props: SearchBarPreviewRowProps
+) => {
+  const { searchResult, searchTerm } = props;
 
-    return (
-      <div
-        className="SearchBarCommentPreviewRow"
-        onClick={() => {
-          this.setRoute(
-            `/${searchResult.chain}/proposal/${
-              searchResult.proposalid.split('_')[0]
-            }/${searchResult.proposalid.split('_')[1]}`
-          );
-        }}
-      >
-        <CWText type="caption" className="last-updated-text">
-          {moment(searchResult.created_at).format('l')}
-        </CWText>
-        {/* <CWText type="caption">{searchResult.chain}</CWText> */}
-        {/* <CWText type="b2" fontWeight="medium">
+  return (
+    <div
+      className="SearchBarCommentPreviewRow"
+      onClick={() => {
+        navigateToSubpage(
+          `/${searchResult.chain}/proposal/${
+            searchResult.proposalid.split('_')[0]
+          }/${searchResult.proposalid.split('_')[1]}`
+        );
+      }}
+    >
+      <CWText type="caption" className="last-updated-text">
+        {moment(searchResult.created_at).format('l')}
+      </CWText>
+      {/* <CWText type="caption">{searchResult.chain}</CWText> */}
+      {/* <CWText type="b2" fontWeight="medium">
           {decodeURIComponent(searchResult.title)}
         </CWText> */}
-        <CWText type="caption" className="excerpt-text">
-          {renderQuillTextBody(searchResult.text, {
-            hideFormatting: true,
-            collapse: true,
-            searchTerm,
-          })}
-        </CWText>
-      </div>
-    );
-  }
-}
+      <CWText type="caption" className="excerpt-text">
+        {renderQuillTextBody(searchResult.text, {
+          hideFormatting: true,
+          collapse: true,
+          searchTerm,
+        })}
+      </CWText>
+    </div>
+  );
+};
 
 export const SearchBarCommentPreviewRow = withRouter(
   SearchBarCommentPreviewRowComponent
 );
 
-class SearchBarCommunityPreviewRowComponent extends ClassComponent<SearchBarPreviewRowAttrs> {
-  view(vnode: ResultNode<SearchBarPreviewRowAttrs>) {
+class SearchBarCommunityPreviewRowComponent extends ClassComponent<SearchBarPreviewRowProps> {
+  view(vnode: ResultNode<SearchBarPreviewRowProps>) {
     const { searchResult } = vnode.attrs;
 
     return (
@@ -162,20 +161,15 @@ export const SearchBarCommunityPreviewRow = withRouter(
   SearchBarCommunityPreviewRowComponent
 );
 
-export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
-  view(vnode: ResultNode<SearchBarPreviewRowAttrs>) {
-    const { searchResult } = vnode.attrs;
+export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
+  const { searchResult } = props;
 
-    return (
-      <div className="SearchBarMemberPreviewRow">
-        <User
-          user={app.profiles.getProfile(
-            searchResult.chain,
-            searchResult.address
-          )}
-          linkify
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div className="SearchBarMemberPreviewRow">
+      <User
+        user={app.profiles.getProfile(searchResult.chain, searchResult.address)}
+        linkify
+      />
+    </div>
+  );
+};

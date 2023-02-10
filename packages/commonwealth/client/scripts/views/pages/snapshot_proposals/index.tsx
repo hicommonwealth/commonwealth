@@ -1,21 +1,19 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import { MixpanelSnapshotEvents } from 'analytics/types';
 
 import 'pages/snapshot_proposals.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
+import { PageLoading } from '../loading';
+import { MixpanelSnapshotEvents } from 'analytics/types';
+import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -26,119 +24,110 @@ enum SnapshotProposalFilter {
   Ended = 'Ended',
 }
 
-type SnapshotProposalStagesBarAttrs = {
-  selected: SnapshotProposalFilter;
+type SnapshotProposalStagesBarProps = {
   onChangeFilter: (value: SnapshotProposalFilter) => void;
 };
 
-class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
-  view(vnode: ResultNode<SnapshotProposalStagesBarAttrs>) {
-    return (
-      <div className="SnapshotProposalStagesBar">
-        {Object.values(SnapshotProposalFilter).map(
-          (option: SnapshotProposalFilter, i) => (
-            <CWButton
-              key={i}
-              disabled={
-                option === SnapshotProposalFilter.Core ||
-                option === SnapshotProposalFilter.Community
-              }
-              onClick={(e) => {
-                e.preventDefault();
-                vnode.attrs.onChangeFilter(option);
-              }}
-              label={option}
-            />
-          )
-        )}
-      </div>
-    );
-  }
-}
+const SnapshotProposalStagesBar = (props: SnapshotProposalStagesBarProps) => {
+  const { onChangeFilter } = props;
 
-type SnapshotProposalsPageAttrs = {
+  return (
+    <div className="SnapshotProposalStagesBar">
+      {Object.values(SnapshotProposalFilter).map(
+        (option: SnapshotProposalFilter, i) => (
+          <CWButton
+            key={i}
+            disabled={
+              option === SnapshotProposalFilter.Core ||
+              option === SnapshotProposalFilter.Community
+            }
+            onClick={(e) => {
+              e.preventDefault();
+              onChangeFilter(option);
+            }}
+            label={option}
+          />
+        )
+      )}
+    </div>
+  );
+};
+
+type SnapshotProposalsPageProps = {
   topic?: string;
   snapshotId: string;
 };
 
-class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
-  private selectedFilter: SnapshotProposalFilter;
+const SnapshotProposalsPage = (props: SnapshotProposalsPageProps) => {
+  const { snapshotId } = props;
 
-  oncreate() {
-    this.selectedFilter = SnapshotProposalFilter.Active;
-    // mixpanelBrowserTrack({
-    //   event: MixpanelSnapshotEvents.SNAPSHOT_PAGE_VISIT,
-    //   isCustomDomain: app.isCustomDomain(),
-    // });
-  }
+  const [selectedFilter, setSelectedFilter] =
+    React.useState<SnapshotProposalFilter>(SnapshotProposalFilter.Active);
 
-  view(vnode: ResultNode<SnapshotProposalsPageAttrs>) {
-    const { selectedFilter } = this;
-    const { snapshotId } = vnode.attrs;
+  //   mixpanelBrowserTrack({
+  //     event: MixpanelSnapshotEvents.SNAPSHOT_PAGE_VISIT,
+  //     isCustomDomain: app.isCustomDomain(),
+  //   });
 
-    if (!app.snapshot.initialized || app.snapshot?.space?.id !== snapshotId) {
-      app.snapshot.init(snapshotId).then(() => {
-        redraw();
-      });
+  // if (!app.snapshot.initialized || app.snapshot?.space?.id !== snapshotId) {
+  //   app.snapshot.init(snapshotId).then(() => {
+  //     redraw();
+  //   });
 
-      return <PageLoading />;
+  //   return <PageLoading />;
+  // }
+
+  const checkProposalByFilter = (
+    proposal: SnapshotProposal,
+    option: SnapshotProposalFilter
+  ) => {
+    switch (option) {
+      case SnapshotProposalFilter.Core:
+      case SnapshotProposalFilter.Community:
+        return true;
+      case SnapshotProposalFilter.Active:
+        return moment(+proposal.end * 1000) >= moment();
+      case SnapshotProposalFilter.Ended:
+        return moment(+proposal.end * 1000) < moment();
+      default:
+        break;
     }
+    return true;
+  };
 
-    const checkProposalByFilter = (
-      proposal: SnapshotProposal,
-      option: SnapshotProposalFilter
-    ) => {
-      switch (option) {
-        case SnapshotProposalFilter.Core:
-        case SnapshotProposalFilter.Community:
-          return true;
-        case SnapshotProposalFilter.Active:
-          return moment(+proposal.end * 1000) >= moment();
-        case SnapshotProposalFilter.Ended:
-          return moment(+proposal.end * 1000) < moment();
-        default:
-          break;
-      }
-      return true;
-    };
+  const proposals = app.snapshot.proposals.filter(
+    (proposal: SnapshotProposal) =>
+      checkProposalByFilter(proposal, selectedFilter)
+  );
 
-    const proposals = app.snapshot.proposals.filter(
-      (proposal: SnapshotProposal) =>
-        checkProposalByFilter(proposal, selectedFilter)
-    );
+  const onChangeFilter = (value: SnapshotProposalFilter) => {
+    setSelectedFilter(value);
+  };
 
-    const onChangeFilter = (value: SnapshotProposalFilter) => {
-      this.selectedFilter = value;
-    };
-
-    return (
-      <Sublayout
-      // title="Proposals"
-      >
-        <div className="SnapshotProposalsPage">
-          <SnapshotProposalStagesBar
-            selected={selectedFilter}
-            onChangeFilter={onChangeFilter}
+  return (
+    <Sublayout
+    // title="Proposals"
+    >
+      <div className="SnapshotProposalsPage">
+        <SnapshotProposalStagesBar onChangeFilter={onChangeFilter} />
+        {proposals.length > 0 ? (
+          <CardsCollection
+            content={proposals.map((proposal, i) => (
+              <SnapshotProposalCard
+                key={i}
+                snapshotId={snapshotId}
+                proposal={proposal}
+              />
+            ))}
           />
-          {proposals.length > 0 ? (
-            <CardsCollection
-              content={proposals.map((proposal, i) => (
-                <SnapshotProposalCard
-                  key={i}
-                  snapshotId={snapshotId}
-                  proposal={proposal}
-                />
-              ))}
-            />
-          ) : (
-            <CWText className="no-proposals-text">
-              No {this.selectedFilter.toLowerCase()} proposals found.
-            </CWText>
-          )}
-        </div>
-      </Sublayout>
-    );
-  }
-}
+        ) : (
+          <CWText className="no-proposals-text">
+            No {selectedFilter.toLowerCase()} proposals found.
+          </CWText>
+        )}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default SnapshotProposalsPage;
