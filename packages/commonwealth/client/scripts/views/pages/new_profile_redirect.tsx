@@ -1,18 +1,23 @@
-/* @jsx m */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import type { ResultNode } from 'mithrilInterop';
+import { getRoute } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { NewProfile as Profile } from 'models';
+import withRouter from 'navigation/helpers';
 import { PageLoading } from './loading';
 import { PageNotFound } from './404';
 
+type NewProfileRedirectAttrs = {
+  address: string;
+}
+
 // TODO: this is a temporary solution to redirect old profile links (using address)
 // to new profile links (using username). this should be removed once PR4 is merged
-class NewProfileRedirect extends ClassComponent {
+class NewProfileRedirect extends ClassComponent<NewProfileRedirectAttrs> {
   private profile: Profile;
   private loading: boolean;
   private error: boolean;
@@ -30,11 +35,10 @@ class NewProfileRedirect extends ClassComponent {
       this.error = true;
     }
     this.loading = false;
-    m.redraw();
   };
 
-  oninit() {
-    this.getLinkedProfile(m.route.param('address'));
+  oninit(vnode: ResultNode<NewProfileRedirectAttrs>) {
+    this.getLinkedProfile(vnode.attrs.address);
   }
 
   view() {
@@ -47,13 +51,13 @@ class NewProfileRedirect extends ClassComponent {
     }
 
     if (this.profile) {
-      if (m.route.get().includes('/edit')) {
-        navigateToSubpage(`/profile/${this.profile.username}/edit`);
+      if (getRoute().includes('/edit')) {
+        this.setRoute(`/profile/${this.profile.username}/edit`);
       } else {
-        navigateToSubpage(`/profile/${this.profile.username}`);
+        this.setRoute(`/profile/${this.profile.username}`);
       }
     }
   }
 }
 
-export default NewProfileRedirect;
+export default withRouter(NewProfileRedirect);

@@ -55,7 +55,8 @@ type LoginSelectorMenuLeftAttrs = {
   nAccountsWithoutRole: number;
 };
 
-export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
+const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
+  const navigate = useNavigate();
   const { activeAddressesWithRole, nAccountsWithoutRole } = props;
 
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] =
@@ -93,7 +94,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
               const pf = app.user.activeAccount.profile;
               if (pf) {
                 // TODO: switch to profile.username once PR4 is merged
-                m.route.set(`/profile/a/${pf.address}`);
+                navigate(`/profile/a/${pf.address}`);
               }
             }}
           >
@@ -107,7 +108,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
               const pf = app.user.activeAccount.profile;
               if (pf) {
                 // TODO: switch to profile.username once PR4 is merged
-                setRoute(`/profile/a/${pf.address}/edit`);
+                navigate(`/profile/a/${pf.address}/edit`);
               }
             }}
           >
@@ -117,7 +118,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
         <div
           className="login-menu-item"
           onClick={() => {
-            setRoute(`/profile/manage`);
+            navigate(`/profile/manage`);
           }}
         >
           <CWText type="caption">Manage profiles</CWText>
