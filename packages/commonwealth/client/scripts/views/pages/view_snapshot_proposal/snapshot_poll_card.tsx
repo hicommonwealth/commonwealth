@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
-
 import 'components/poll_card.scss';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -18,57 +16,54 @@ import {
   VoteDisplay,
 } from '../../components/poll_card';
 
-export type SnapshotPollCardAttrs = Omit<
+export type SnapshotPollCardProps = Omit<
   PollCardAttrs,
   'multiSelect' | 'onResultsClick'
 >;
 
-export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
-  private hasVoted: boolean;
-  private selectedOptions: Array<string>;
-  private totalVoteCount: number;
-  private voteDirectionString: string;
-  private localVoteInformation: Array<VoteInformation>;
+export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
+  const {
+    disableVoteButton = false,
+    hasVoted,
+    incrementalVoteCast,
+    isPreview,
+    onVoteCast,
+    pollEnded,
+    proposalTitle,
+    timeRemaining,
+    tokenSymbol,
+    tooltipErrorMessage,
+    totalVoteCount,
+    votedFor,
+    voteInformation,
+  } = props;
 
-  oninit(vnode: ResultNode<SnapshotPollCardAttrs>) {
-    // Initialize state which can change during the lifecycle of the component.
-    this.hasVoted = vnode.attrs.hasVoted;
-    this.voteDirectionString = vnode.attrs.votedFor
-      ? buildVoteDirectionString(vnode.attrs.votedFor)
-      : '';
-    this.totalVoteCount = vnode.attrs.totalVoteCount;
-    this.selectedOptions = [];
-    this.localVoteInformation = vnode.attrs.voteInformation;
-  }
+  const [internalHasVoted, setInternalHasVoted] =
+    React.useState<boolean>(hasVoted);
+  const [selectedOptions, setSelectedOptions] = React.useState<Array<string>>(
+    [] // is never updated?
+  );
+  const [internalTotalVoteCount, setInternalTotalVoteCount] =
+    React.useState<number>(totalVoteCount);
+  const [voteDirectionString, setVoteDirectionString] = React.useState<string>(
+    votedFor ? buildVoteDirectionString(votedFor) : ''
+  );
+  const [internalVoteInformation, setInternalVoteInformation] =
+    React.useState<Array<VoteInformation>>(voteInformation);
 
-  view(vnode: ResultNode<SnapshotPollCardAttrs>) {
-    const {
-      disableVoteButton = false,
-      incrementalVoteCast,
-      onVoteCast,
-      pollEnded,
-      proposalTitle,
-      timeRemaining,
-      tokenSymbol,
-      votedFor,
-      tooltipErrorMessage,
-      isPreview,
-    } = vnode.attrs;
+  const resultString = 'Results';
 
-    const resultString = 'Results';
-
-    const castVote = async () => {
-      await onVoteCast(this.selectedOptions[0], () => {
-        if (!votedFor) {
-          this.totalVoteCount += incrementalVoteCast;
-        }
-        this.voteDirectionString = buildVoteDirectionString(
-          this.selectedOptions[0]
-        );
-        this.hasVoted = true;
-        // Local vote information is updated here because it is not updated in the parent component in time
-        this.localVoteInformation = this.localVoteInformation.map((option) => {
-          if (option.label === this.selectedOptions[0]) {
+  const castVote = async () => {
+    await onVoteCast(selectedOptions[0], () => {
+      if (!votedFor) {
+        setInternalTotalVoteCount(internalTotalVoteCount + incrementalVoteCast);
+      }
+      setVoteDirectionString(buildVoteDirectionString(selectedOptions[0]));
+      setInternalHasVoted(true);
+      // Local vote information is updated here because it is not updated in the parent component in time
+      setInternalVoteInformation(
+        internalVoteInformation.map((option) => {
+          if (option.label === selectedOptions[0]) {
             return {
               ...option,
               hasVoted: true,
@@ -77,55 +72,54 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
           } else {
             return option;
           }
-        });
-      });
-      redraw();
-    };
+        })
+      );
+    });
+  };
 
-    return (
-      <CWCard className="PollCard">
-        <CWText type="b2" className="poll-title-text">
-          {proposalTitle}
-        </CWText>
-        <div className="poll-voting-section">
-          {!this.hasVoted && !pollEnded && !isPreview && (
-            <>
-              <PollOptions
-                multiSelect={false}
-                voteInformation={this.localVoteInformation}
-                selectedOptions={this.selectedOptions}
-                disableVoteOptions={disableVoteButton}
-              />
-              <CastVoteSection
-                disableVoteButton={
-                  disableVoteButton || this.selectedOptions.length === 0
-                }
-                timeRemaining={timeRemaining}
-                tooltipErrorMessage={tooltipErrorMessage}
-                onVoteCast={castVote}
-              />
-            </>
-          )}
-          {((this.hasVoted && !isPreview) || pollEnded) && (
-            <VoteDisplay
-              timeRemaining={timeRemaining}
-              voteDirectionString={this.voteDirectionString}
-              pollEnded={pollEnded}
-              voteInformation={this.localVoteInformation}
+  return (
+    <CWCard className="PollCard">
+      <CWText type="b2" className="poll-title-text">
+        {proposalTitle}
+      </CWText>
+      <div className="poll-voting-section">
+        {!internalHasVoted && !pollEnded && !isPreview && (
+          <>
+            <PollOptions
+              multiSelect={false}
+              voteInformation={internalVoteInformation}
+              selectedOptions={selectedOptions}
+              disableVoteOptions={disableVoteButton}
             />
-          )}
-        </div>
-        <ResultsSection
-          resultString={resultString}
-          onResultsClick={null}
-          tokenSymbol={tokenSymbol}
-          voteInformation={this.localVoteInformation}
-          pollEnded={pollEnded}
-          totalVoteCount={this.totalVoteCount}
-          votedFor={votedFor}
-          isPreview={isPreview}
-        />
-      </CWCard>
-    );
-  }
-}
+            <CastVoteSection
+              disableVoteButton={
+                disableVoteButton || selectedOptions.length === 0
+              }
+              timeRemaining={timeRemaining}
+              tooltipErrorMessage={tooltipErrorMessage}
+              onVoteCast={castVote}
+            />
+          </>
+        )}
+        {((internalHasVoted && !isPreview) || pollEnded) && (
+          <VoteDisplay
+            timeRemaining={timeRemaining}
+            voteDirectionString={voteDirectionString}
+            pollEnded={pollEnded}
+            voteInformation={internalVoteInformation}
+          />
+        )}
+      </div>
+      <ResultsSection
+        resultString={resultString}
+        onResultsClick={null}
+        tokenSymbol={tokenSymbol}
+        voteInformation={internalVoteInformation}
+        pollEnded={pollEnded}
+        totalVoteCount={internalTotalVoteCount}
+        votedFor={votedFor}
+        isPreview={isPreview}
+      />
+    </CWCard>
+  );
+};
