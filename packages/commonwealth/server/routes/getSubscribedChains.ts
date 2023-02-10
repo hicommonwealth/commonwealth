@@ -1,5 +1,5 @@
-import { DB } from '../models';
-import { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
+import type { NextFunction, Request, Response } from 'express';
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',

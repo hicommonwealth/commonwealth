@@ -6,7 +6,7 @@ import type {
   ChainEntityAttributes,
   ChainEntityInstance,
 } from './chain_entity';
-import { SupportedNetwork } from '../../../src';
+import type { SupportedNetwork } from '../../../src';
 
 export type ChainEventAttributes = {
   id: number;

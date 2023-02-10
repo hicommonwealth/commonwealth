@@ -10,12 +10,12 @@ import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
 import { Op } from 'sequelize';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
-import type { IPostNotificationData } from '../../shared/types';
-import {
-  DynamicTemplate,
+import type { IPostNotificationData ,
   IChainEventNotificationData,
   IChatNotification,
-  ICommunityNotificationData,
+  ICommunityNotificationData} from '../../shared/types';
+import {
+  DynamicTemplate
 } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import type { UserAttributes } from '../models/user';
