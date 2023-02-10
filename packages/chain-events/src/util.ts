@@ -79,7 +79,6 @@ export function Title(
 }
 
 export function Label(chain: string, event: CWEvent): IEventLabel {
-  console.log(chain, event);
   switch (event.network) {
     case SupportedNetwork.Substrate:
       return SubstrateLabel(event.blockNumber, chain, event.data);
