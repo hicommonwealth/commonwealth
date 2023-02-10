@@ -156,11 +156,6 @@ export default async (
         NotificationsReads: [], // also contains notifications
         ...nr.Subscription,
       };
-      // If the Notification is a chain-event notification then save the chain event type
-      if (nr.Notification.chain_event_id) {
-        subscriptionsObj[nr.subscription_id].chain_event_type_id =
-          chainEvent.ChainEventType.id;
-      }
     }
 
     // push the NotificationsRead + Notifications data to the NotificationsRead array for each subscription
