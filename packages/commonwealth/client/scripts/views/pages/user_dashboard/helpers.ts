@@ -2,7 +2,7 @@
 
 import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
-import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
+import getFetch from 'helpers/getFetch';
 import $ from 'jquery';
 import m from 'mithril';
 import type { NotificationSubscription } from 'models';
@@ -92,7 +92,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
     });
   } else if (requestType === DashboardViews.Chain) {
     const events = await getFetch(
-      getBaseUrl(ServiceUrls.chainEvents) + '/events',
+      `${app.serverUrl()}/ce/events`,
       { limit: 50, ordered: true }
     );
 

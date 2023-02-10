@@ -37,6 +37,7 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
         network: eventNetwork,
         data: vnode.attrs.notification.eventData,
       };
+      console.log(vnode.attrs.notification);
 
       const label = ChainEventLabel(chain, chainEvent);
 
