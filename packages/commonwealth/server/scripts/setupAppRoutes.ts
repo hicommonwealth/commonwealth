@@ -72,7 +72,7 @@ const setupAppRoutes = (
     if (image) {
       $tmpl('meta[name="twitter:image"]').attr('content', image);
     }
-    $tmpl('meta[property="og:type"]').attr('content', 'article');
+
     $tmpl('meta[property="og:site_name"]').attr('content', 'Commonwealth');
     $tmpl('meta[property="og:title"]').attr('content', title);
     $tmpl('meta[property="og:description"]').attr('content', description);

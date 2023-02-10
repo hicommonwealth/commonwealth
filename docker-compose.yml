@@ -1,6 +1,8 @@
 version: "3.9"
 services:
-  server-local-db:
+  server-external-db:
+    container_name: server
+    restart: always
     env_file:
       ./packages/commonwealth/.env
     build:
@@ -10,8 +12,11 @@ services:
         - PORT=8080
         - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
         - REDIS_URL=redis:6379
+        - DATABASE_URL=postgresql://commonwealth:edgeware@host.docker.internal/commonwealth #change this URI for external db
     ports:
-      - "8090:8090"
+      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -21,6 +26,8 @@ services:
       - separate
 
   server:
+    container_name: server
+    restart: always
     env_file:
       ./packages/commonwealth/.env
     build:
@@ -32,7 +39,9 @@ services:
         - REDIS_URL=redis:6379
         - DATABASE_URL=postgresql://commonwealth:edgeware@postgres/commonwealth
     ports:
-      - "8090:8090"
+      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -42,24 +51,25 @@ services:
         condition: service_healthy
 
   postgres:
+    container_name: db
     image: postgres:14.6-alpine
     restart: always
     environment:
       - POSTGRES_USER=commonwealth
+      - POSTGRES_DB=commonwealth
       - POSTGRES_PASSWORD=edgeware
-      - POSTGRES_DATABASE=commonwealth
     ports:
       - '5432:5432'
 #    volumes:
 #      - postgres:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
-      interval: 30s
-      timeout: 60s
-      retries: 5
-      start_period: 80s
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
+    container_name: redis
     image: redis:alpine
     restart: always
     ports:
@@ -73,8 +83,8 @@ services:
       retries: 10
 
   rabbitmq:
+    container_name: rabbitmq
     image: rabbitmq:alpine
-    container_name: 'rabbitmq'
     ports:
       - 15672:15672
       - 5672:5672

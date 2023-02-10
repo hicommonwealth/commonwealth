@@ -63,8 +63,6 @@ log.info(
 );
 
 async function main() {
-  console.log(process.env.DATABASE_URI);
-  console.log(process.env.DATABASE_URL);
   const DEV = process.env.NODE_ENV !== 'production';
 
   // CLI parameters for which task to run
@@ -246,8 +244,12 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  await ruleCache.start();
+  try {
+    if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
+    await ruleCache.start();
+  } catch (e) {
+    console.log(e);
+  }
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 

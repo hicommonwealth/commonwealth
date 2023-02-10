@@ -1,11 +1,11 @@
 FROM node:18.13.0-alpine
 
-WORKDIR /usr/src/app
-
-COPY . .
+WORKDIR /usr/src/app/commonwealth
 
 # git needed for yarn, rest needed for node-gyp to build (dependency yarn installs)
 RUN apk --no-cache add git python3 make gcc g++
+
+COPY . .
 
 RUN yarn --ignore-engines
 
@@ -19,6 +19,8 @@ ENV REDIS_URL=$REDIS_URL
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
-EXPOSE $PORT
+WORKDIR /usr/src/app/commonwealth/packages/commonwealth
 
-CMD ["yarn", "start"]
+RUN chmod +x scripts/commonwealth-entrypoint.sh
+
+CMD ["./scripts/commonwealth-entrypoint.sh"]
