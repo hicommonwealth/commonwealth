@@ -7,13 +7,14 @@ import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
+import _ from 'underscore';
 import $ from 'jquery';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, DefaultPage } from 'common-common/src/types';
 import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputRow, ToggleRow } from 'views/components/metadata_rows';
+import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import type { ChainInfo, RoleInfo } from 'models';
 import {
@@ -81,6 +82,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   selectedSnapshotChannel: { id: string; name: string } | null;
   snapshotNotificationsEnabled: boolean;
   permissionsManager = new PermissionManager();
+  defaultPage: string;
+  hasHomepage: boolean;
 
   oninit(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -107,6 +110,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.snapshot = chain.snapshot;
     this.snapshotString = chain.snapshot.toString();
     this.defaultOverview = chain.defaultOverview;
+    this.defaultPage = chain.defaultPage;
+    this.hasHomepage = chain.hasHomepage;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
     this.discordBotConnected = chain.discordConfigId !== null;
@@ -119,6 +124,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
 
   view(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
+    if (!this.selectedTags) return;
 
     const getChannels = async () => {
       try {
@@ -211,17 +217,65 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           }
         />
         <ToggleRow
-          title="Summary view"
-          defaultValue={chain.defaultOverview}
+          title="Homepage"
+          defaultValue={chain.hasHomepage}
           onToggle={(checked) => {
-            this.defaultOverview = checked;
+            this.hasHomepage = checked;
+            if (checked) this.defaultPage = DefaultPage.Homepage;
           }}
           caption={(checked) =>
             checked
-              ? 'Discussion listing defaults to summary view'
-              : 'Discussion listing defaults to latest activity view'
+              ? 'Enable homepage feature for this community'
+              : 'Disable homepage feature for this community'
           }
         />
+        {this.hasHomepage ? (
+          <SelectRow
+            title="Default Page"
+            options={[
+              {
+                label: 'Discussions',
+                value: DefaultPage.Discussions,
+              },
+              {
+                label: 'Overview',
+                value: DefaultPage.Overview,
+              },
+              {
+                label: 'Homepage',
+                value: DefaultPage.Homepage,
+              },
+            ]}
+            selected={this.defaultPage}
+            onChange={(e) => {
+              this.defaultPage = e;
+              if (e === DefaultPage.Discussions) this.defaultOverview = false;
+              if (e === DefaultPage.Overview) this.defaultOverview = true;
+            }}
+          />
+        ) : (
+          <SelectRow
+            title="Default Page"
+            options={[
+              {
+                label: 'Discussions',
+                value: DefaultPage.Discussions,
+              },
+              {
+                label: 'Overview',
+                value: DefaultPage.Overview,
+              },
+            ]}
+            selected={
+              this.defaultOverview
+                ? DefaultPage.Overview
+                : DefaultPage.Discussions
+            }
+            onChange={(e) =>
+              (this.defaultOverview = e === DefaultPage.Overview)
+            }
+          />
+        )}
         <ToggleRow
           title="Chat Enabled"
           defaultValue={this.chatEnabled}
@@ -295,6 +349,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             {this.selectedTags && Object.keys(this.selectedTags).map((key) => {
               return (
                 <CWButton
+                  key={key}
                   label={key}
                   buttonType={
                     this.selectedTags[key] ? 'primary-black' : 'secondary-black'
@@ -344,6 +399,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               terms,
               iconUrl,
               defaultOverview,
+              defaultPage,
+              hasHomepage,
             } = this;
 
             for (const space of snapshot) {
@@ -416,6 +473,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 terms,
                 iconUrl,
                 defaultOverview,
+                defaultPage,
+                hasHomepage,
                 default_allow_permissions: this.default_allow_permissions,
                 default_deny_permissions: this.default_deny_permissions,
               });

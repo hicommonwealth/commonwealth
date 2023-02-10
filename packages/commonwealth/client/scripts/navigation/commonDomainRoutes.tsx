@@ -33,6 +33,7 @@ const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect')
 );
+const FeedPage = lazy(() => import('views/pages/feed'));
 
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
 const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
@@ -263,6 +264,13 @@ const getCommonDomainsRoutes = () => (
       path="/:scope"
       element={withLayout(DiscussionsRedirectPage, {
         scoped: true,
+      })}
+    />
+    <Route
+      path="/:scope/feed"
+      element={withLayout(FeedPage, {
+        scoped: true,
+        deferChain: true,
       })}
     />
     {/* DISCUSSIONS END*/}

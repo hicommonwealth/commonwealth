@@ -5,6 +5,7 @@ import {
   BalanceType,
   ChainBase,
   ChainType,
+  DefaultPage,
   NotificationCategories,
 } from 'common-common/src/types';
 import type { NextFunction } from 'express';
@@ -338,6 +339,8 @@ const createChain = async (
     chain_node_id: node.id,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound',
+    default_page: DefaultPage.Homepage,
+    has_homepage: true,
   });
 
   await createDefaultCommunityRoles(models, chain.id);
