@@ -8,7 +8,7 @@ import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal'
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
 import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import m from 'mithril';
+import type m from 'mithril';
 import type { AnyProposal } from 'models';
 import { VotingType } from 'models';
 
