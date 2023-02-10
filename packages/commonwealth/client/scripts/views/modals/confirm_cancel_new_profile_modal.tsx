@@ -1,17 +1,7 @@
 import React from 'react';
 
-import type {
-  ResultNode
-} from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import $ from 'jquery';
 
@@ -21,18 +11,21 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-class ConfirmCancelNewProfileModal extends ClassComponent {
-  view() {
+type ConfirmCancelNewProfileModalAttrs = {
+  closeModal: () => void;
+}
+
+class ConfirmCancelNewProfileModal extends ClassComponent<ConfirmCancelNewProfileModalAttrs> {
+  view(vnode: ResultNode<ConfirmCancelNewProfileModalAttrs>) {
+    const { closeModal } = vnode.attrs;
+
     return (
       <div className="ConfirmCancelNewProfileModal">
         <div className="title">
           <CWText type="h4">Are You Sure You Want To Leave?</CWText>
           <CWIconButton
             iconName="close"
-            onClick={(e) => {
-              e.preventDefault();
-              $(e.target).trigger('modalexit');
-            }}
+            onClick={closeModal}
           />
         </div>
         <CWText>Leaving this page will delete all profile information.</CWText>
@@ -40,18 +33,13 @@ class ConfirmCancelNewProfileModal extends ClassComponent {
           <CWButton
             label="Leave"
             buttonType="secondary-black"
-            onClick={(e) => {
-              e.preventDefault();
-              $(e.target).trigger('modalexit');
-            }}
+            onClick={closeModal}
           />
           <CWButton
             label="Delete"
             buttonType="primary-black"
-            onClick={(e) => {
-              e.preventDefault();
-              $(e.target).trigger('modalcomplete');
-              $(e.target).trigger('modalexit');
+            onClick={() => {
+              closeModal();
               this.navigateToSubpage('/manage');
             }}
           />

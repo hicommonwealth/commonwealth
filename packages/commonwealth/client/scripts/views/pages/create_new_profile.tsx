@@ -39,6 +39,7 @@ import type {
 import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
 import type { Image } from './edit_new_profile';
 import ConfirmCancelNewProfileModal from '../modals/confirm_cancel_new_profile_modal';
+import { Modal } from '../components/component_kit/cw_modal';
 
 class CreateNewProfile extends ClassComponent {
   private email: string;
@@ -52,6 +53,7 @@ class CreateNewProfile extends ClassComponent {
   private avatarUrl: string;
   private coverImage: Image;
   private backgroundImage: Image;
+  private isConfirmCancelModalOpen: boolean;
 
   private createProfile = async () => {
     this.loading = true;
@@ -135,7 +137,8 @@ class CreateNewProfile extends ClassComponent {
                 <CWButton
                   label="Cancel"
                   onClick={() => {
-                    app.modals.create({ modal: ConfirmCancelNewProfileModal });
+                    this.isConfirmCancelModalOpen = true;
+                    this.redraw();
                   }}
                   className="save-button"
                   buttonType="mini-white"
@@ -310,6 +313,13 @@ class CreateNewProfile extends ClassComponent {
               />
             </CWFormSection>
           </CWForm>
+          <Modal
+            content={
+              <ConfirmCancelNewProfileModal closeModal={() => this.isConfirmCancelModalOpen = false} />
+            }
+            onClose={() => this.isConfirmCancelModalOpen = false}
+            open={this.isConfirmCancelModalOpen}
+          />
         </div>
       </Sublayout>
     );
