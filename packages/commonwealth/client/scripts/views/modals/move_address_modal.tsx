@@ -1,17 +1,7 @@
 import React from 'react';
 
-import type {
-  ResultNode
-} from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
 
@@ -29,12 +19,13 @@ type MoveAddressModalAttrs = {
   profile: Profile;
   profiles: Profile[];
   address: string;
+  closeModal: () => void;
 };
 
 type MoveAddressRowAttrs = {
   profile: Profile;
   selected?: boolean;
-  onclick?: (e: Event) => void;
+  onclick?: (e: any) => void;
 };
 
 export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
@@ -68,7 +59,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
     e: Event,
     vnode: ResultNode<MoveAddressModalAttrs>
   ) => {
-    const { address, profile } = vnode.attrs;
+    const { address, profile, closeModal } = vnode.attrs;
 
     e.preventDefault();
 
@@ -96,12 +87,11 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
       }, 1000);
     }
 
-    $(e.target).trigger('modalcomplete');
-    $(e.target).trigger('modalexit');
+    closeModal();
   };
 
-  view(vnode: m.Vnode<MoveAddressModalAttrs>) {
-    const { profile, profiles, address } = vnode.attrs;
+  view(vnode: ResultNode<MoveAddressModalAttrs>) {
+    const { profile, profiles, address, closeModal } = vnode.attrs;
     const moveToOptions = profiles.filter((p) => {
       return p.id !== profile.id;
     });
@@ -112,10 +102,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
           <CWText type="h4">Transfer Address</CWText>
           <CWIconButton
             iconName="close"
-            onclick={(e) => {
-              e.preventDefault();
-              $(e.target).trigger('modalexit');
-            }}
+            onClick={closeModal}
           />
         </div>
         <div className="body">
@@ -148,15 +135,12 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
             <CWButton
               label="Cancel"
               buttonType="secondary-black"
-              onClick={(e) => {
-                e.preventDefault();
-                $(e.target).trigger('modalexit');
-              }}
+              onClick={closeModal}
             />
             <CWButton
               label="Save"
               buttonType="primary-black"
-              onClick={(e) => this.onMoveAddress(e, vnode)}
+              onClick={(e: any) => this.onMoveAddress(e, vnode)}
             />
           </div>
         </div>

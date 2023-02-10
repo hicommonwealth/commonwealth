@@ -1,17 +1,7 @@
 import React from 'react';
 
-import type {
-  ResultNode
-} from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
 
@@ -29,6 +19,7 @@ type DeleteAddressModalAttrs = {
   profile: Profile;
   address: string;
   chain: string;
+  closeModal: () => void;
 };
 
 export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> {
@@ -36,7 +27,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
     e: Event,
     vnode: ResultNode<DeleteAddressModalAttrs>
   ) => {
-    const { address, chain, profile } = vnode.attrs;
+    const { address, chain, profile, closeModal } = vnode.attrs;
 
     e.preventDefault();
 
@@ -62,12 +53,11 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
       }, 1000);
     }
 
-    $(e.target).trigger('modalcomplete');
-    $(e.target).trigger('modalexit');
+    closeModal();
   };
 
   view(vnode: ResultNode<DeleteAddressModalAttrs>) {
-    const { profile, address } = vnode.attrs;
+    const { profile, address, closeModal } = vnode.attrs;
     const { name, username } = profile;
     const defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
 
@@ -79,10 +69,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
           </CWText>
           <CWIconButton
             iconName="close"
-            onClick={(e) => {
-              e.preventDefault();
-              $(e.target).trigger('modalexit');
-            }}
+            onClick={closeModal}
           />
         </div>
         <div className="body">
@@ -109,15 +96,12 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
             <CWButton
               label="Delete"
               buttonType="secondary-red"
-              onClick={(e) => this.onDeleteAddress(e, vnode)}
+              onClick={(e: any) => this.onDeleteAddress(e, vnode)}
             />
             <CWButton
               label="Cancel"
               buttonType="primary-black"
-              onClick={(e) => {
-                e.preventDefault();
-                $(e.target).trigger('modalexit');
-              }}
+              onClick={closeModal}
             />
           </div>
         </div>
