@@ -18,7 +18,7 @@ import {
 } from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import type { Result } from 'ethers/lib/utils';
-import PageNotFound from '../404';
+import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 

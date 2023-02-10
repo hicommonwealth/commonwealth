@@ -2,7 +2,6 @@ import React from 'react';
 
 import { redraw } from 'mithrilInterop';
 import BN from 'bn.js';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/comments/create_comment.scss';
 import { notifyError } from 'controllers/app/notifications';

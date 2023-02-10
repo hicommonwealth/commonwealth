@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Virtuoso } from 'react-virtuoso';
 import { ClassComponent, redraw } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
@@ -8,7 +8,6 @@ import type { Profile } from 'models';
 import 'pages/members.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import { PageLoading } from 'views/pages/loading';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
@@ -185,7 +184,7 @@ class MembersPage extends ClassComponent {
     } = this;
 
     return (
-      <Sublayout onScroll={this.onScroll}>
+      <Sublayout>
         <div className="MembersPage">
           <CWText type="h3" fontWeight="medium">
             {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}
@@ -194,32 +193,27 @@ class MembersPage extends ClassComponent {
             <CWText type="h5">Member</CWText>
             <CWText type="h5">Posts / Month</CWText>
           </div>
-          <div className="members-container">
-            {profilesLoaded.map((profileInfo) => {
-              const { address } = profileInfo.profile;
+          <Virtuoso
+            className="members-container"
+            style={{ height: 300 }}
+            data={profilesLoaded}
+            itemContent={(index, profileInfo) => {
               return (
-                <div className="member-row" key={i}>
-                  <a
-                    // TODO: switch to profile.username once PR4 is merged
-                    href={`/profile/a/${address}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      localStorage[`${app.activeChainId()}-members-scrollY`] =
-                        window.scrollY;
-                      localStorage[
-                        `${app.activeChainId()}-members-numProfilesLoaded`
-                      ] = numProfilesLoaded;
-                      // TODO: switch to profile.username once PR4 is merged
-                      setRoute(`/profile/a/${address}`);
-                    }}
-                  >
-                    <User user={profileInfo.profile} showRole />
-                  </a>
+                <div className="member-row" key={index}>
+                  <User
+                    user={profileInfo.profile}
+                    showRole
+                    hideAvatar={false}
+                    linkify={true}
+                  />
                   <CWText>{profileInfo.postCount}</CWText>
                 </div>
               );
-            })}
-          </div>
+            }}
+            endReached={this.onScroll}
+            overscan={200}
+          />
+
           <div className="infinite-scroll-wrapper">
             {profilesFinishedLoading ? (
               <CWText className="infinite-scroll-reached-end-text">

@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
-
 import 'footer.scss';
 import m from 'mithril';
 
 import { isNotUndefined } from '../helpers/typeGuards';
 import withRouter from 'navigation/helpers';
+import { navigateToSubpage } from '../router';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -28,43 +27,41 @@ const footercontents = [
   },
 ];
 
-class FooterComponent extends ClassComponent {
-  view() {
-    const redirectClick = (route) => {
-      this.setRoute(route);
-    };
+const FooterComponent = () => {
+  const redirectClick = (route) => {
+    navigateToSubpage(route);
+  };
 
-    return (
-      <div className="Footer">
-        <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
-        <div className="footer-links-container">
-          {footercontents.map((item) => {
-            return isNotUndefined(item.redirectTo) ? (
-              <a
-                className="footer-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  redirectClick(item.redirectTo);
-                }}
-                key={item.text}
-              >
-                {item.text}
-              </a>
-            ) : (
-              <a
-                className="footer-link"
-                key={item.text}
-                href={item.externalLink}
-                target="_blank"
-              >
-                {item.text}
-              </a>
-            );
-          })}
-        </div>
+  return (
+    <div className="Footer">
+      <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
+      <div className="footer-links-container">
+        {footercontents.map((item) => {
+          return isNotUndefined(item.redirectTo) ? (
+            <a
+              className="footer-link"
+              onClick={(e) => {
+                e.preventDefault();
+                redirectClick(item.redirectTo);
+              }}
+              key={item.text}
+            >
+              {item.text}
+            </a>
+          ) : (
+            <a
+              className="footer-link"
+              key={item.text}
+              href={item.externalLink}
+              target="_blank"
+            >
+              {item.text}
+            </a>
+          );
+        })}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export const Footer = withRouter(FooterComponent);

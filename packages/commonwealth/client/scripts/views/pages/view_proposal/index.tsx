@@ -20,7 +20,7 @@ import type { AnyProposal, Comment, ProposalModule } from 'models';
 import { Account } from 'models';
 
 import { slugify } from 'utils';
-import PageNotFound from 'views/pages/404';
+import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CommentsTree } from '../../components/comments/comments_tree';
@@ -239,16 +239,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     this.prefetch[proposalIdAndType]['profilesFinished'] = true;
 
     if (this.proposal instanceof SubstrateTreasuryTip) {
-      return (
-        <TipDetail
-          tipAmount={this.tipAmount}
-          proposal={this.proposal}
-          headerTitle={headerTitle}
-          setTipAmount={(tip) => {
-            this.tipAmount = tip;
-          }}
-        />
-      );
+      return <TipDetail proposal={this.proposal} />;
     }
 
     const toggleVotingModal = (newModalState: boolean) => {
