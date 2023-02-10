@@ -1,5 +1,4 @@
 import React from 'react';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import type { Profile } from 'client/scripts/models';
 
@@ -11,56 +10,55 @@ export type ProfileWithAddress = Profile & {
   Addresses: any;
 };
 
-type AvatarGroupAttrs = {
+type AvatarGroupProps = {
   profiles: ProfileWithAddress[];
   chainId: string;
 };
 
-export class CWAvatarGroup extends ClassComponent<AvatarGroupAttrs> {
-  view(vnode: ResultNode<AvatarGroupAttrs>) {
-    const { profiles, chainId } = vnode.attrs;
-    if (!profiles || profiles?.length === 0) return;
+export const CWAvatarGroup = (props: AvatarGroupProps) => {
+  const { profiles, chainId } = props;
 
-    const truncatedProfiles = profiles.slice(0, 4).reverse();
+  if (!profiles || profiles?.length === 0) return;
 
-    const count = profiles.length - 4;
-    let countText;
+  const truncatedProfiles = profiles.slice(0, 4).reverse();
 
-    if (count > 5) {
-      countText = `+${count} others`;
-    } else if (count === 1) {
-      countText = '+1 other';
-    } else {
-      countText = '';
-    }
+  const count = profiles.length - 4;
+  let countText;
 
-    return (
-      <div className="AvatarGroup">
-        <div className="avatar-group-icons">
-          {truncatedProfiles.map((profile, i) => {
-            if (profile.avatarUrl) {
-              return (
-                <div className="avatar-group-icon" key={i}>
-                  <CWAvatar avatarUrl={profile.avatarUrl} size={16} />
-                </div>
-              );
-            } else {
-              const address = profile.Addresses.find((addr) => {
-                return addr.chain == chainId;
-              });
-
-              return (
-                <div className="avatar-group-icon" key={i}>
-                  <CWJdenticon address={address.address} size={16} />
-                </div>
-              );
-            }
-          })}
-        </div>
-        <CWText className="avatar-group-count" type="caption">
-          {countText}
-        </CWText>
-      </div>
-    );
+  if (count > 5) {
+    countText = `+${count} others`;
+  } else if (count === 1) {
+    countText = '+1 other';
+  } else {
+    countText = '';
   }
-}
+
+  return (
+    <div className="AvatarGroup">
+      <div className="avatar-group-icons">
+        {truncatedProfiles.map((profile, i) => {
+          if (profile.avatarUrl) {
+            return (
+              <div className="avatar-group-icon" key={i}>
+                <CWAvatar avatarUrl={profile.avatarUrl} size={16} />
+              </div>
+            );
+          } else {
+            const address = profile.Addresses.find((addr) => {
+              return addr.chain == chainId;
+            });
+
+            return (
+              <div className="avatar-group-icon" key={i}>
+                <CWJdenticon address={address.address} size={16} />
+              </div>
+            );
+          }
+        })}
+      </div>
+      <CWText className="avatar-group-count" type="caption">
+        {countText}
+      </CWText>
+    </div>
+  );
+};
