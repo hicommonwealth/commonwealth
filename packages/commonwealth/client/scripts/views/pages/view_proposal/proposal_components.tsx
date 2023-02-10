@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
@@ -213,52 +214,3 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
     );
   }
 }
-
-// // needs refactoring
-// export class ProposalBodyLastEdited
-//   extends
-//     ClassComponent<{
-//       item: Thread | Comment<any>;
-//     }>
-// {
-//   view(vnode) {
-//     const { item } = vnode.attrs;
-
-//     const isThread = item instanceof Thread;
-
-//     if (!item.lastEdited) {
-//       return;
-//     }
-
-//     return (
-//       <a
-//         href="#"
-//         onClick={async (e) => {
-//           e.preventDefault();
-
-//           let postWithHistory;
-
-//           const grabHistory = isThread && !item.versionHistory?.length;
-
-//           if (grabHistory) {
-//             try {
-//               postWithHistory = await app.threads.fetchThreadsFromId([item.id]);
-//             } catch (err) {
-//               notifyError('Version history not found.');
-//               return;
-//             }
-//           }
-
-//           app.modals.create({
-//             modal: VersionHistoryModal,
-//             data: {
-//               item: grabHistory && postWithHistory ? postWithHistory : item,
-//             },
-//           });
-//         }}
-//       >
-//         Edited {item.lastEdited.fromNow()}
-//       </a>
-//     );
-//   }
-// }

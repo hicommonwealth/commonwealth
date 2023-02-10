@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
-
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
-import type SubstrateIdentity from 'controllers/chain/substrate/identity';
 import {
   ClassComponent,
   ResultNode,
@@ -13,7 +11,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 
 import app from 'state';
@@ -24,14 +21,12 @@ import { BanUserModal } from '../../modals/ban_user_modal';
 
 export interface IProfileHeaderAttrs {
   account;
-  setIdentity: boolean;
   refreshCallback: Function;
   onLinkedProfile: boolean;
   onOwnProfile: boolean;
 }
 
 export interface IProfileHeaderState {
-  identity: SubstrateIdentity | null;
   copied: boolean;
   loading: boolean;
 }
@@ -39,7 +34,7 @@ export interface IProfileHeaderState {
 const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, onOwnProfile, onLinkedProfile } = vnode.attrs;
-    const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
+    const showJoinCommunityButton = !onOwnProfile;
 
     // For Banning
     const loggedInUserIsAdmin =

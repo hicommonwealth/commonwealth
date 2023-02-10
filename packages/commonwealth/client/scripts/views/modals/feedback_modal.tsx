@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { redraw, jsx } from 'mithrilInterop';
+import { redraw} from
+
+ 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/feedback_modal.scss';
@@ -20,7 +21,7 @@ type FeedbackModalProps = {
 export const FeedbackModal = (props: FeedbackModalProps) => {
   const { onModalClose } = props;
 
-  const [feedbackText, setFeedbackText] = React.useState<string | null>(null);
+  const [feedbackText, setFeedbackText] = React.useState<string | null>('');
   const [message, setMessage] = React.useState<string | null>(null);
   const [isSending, setIsSending] = React.useState<boolean>(false);
   const [status, setStatus] = React.useState<ValidationStatus | null>(null);

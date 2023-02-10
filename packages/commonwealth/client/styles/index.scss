@@ -37,7 +37,8 @@ html.invert {
   -ms-filter: invert(90%);
 
   img,
-  .user-avatar {
+  .user-avatar:not(:has(.Avatar)),
+  .Avatar {
     filter: invert(90%);
     -webkit-filter: invert(90%);
     -moz-filter: invert(90%);

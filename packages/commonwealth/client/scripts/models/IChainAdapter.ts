@@ -11,7 +11,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
@@ -72,6 +71,17 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     //   console.log(this.meta.id, getRouteParam('scope'));
     //   return false;
     // }
+
+    if (this.meta.id === '1inch') {
+      if (localStorage.getItem('user-dark-mode-state') !== 'off') {
+        localStorage.setItem('dark-mode-state', 'on');
+        document.getElementsByTagName('html')[0].classList.add('invert');
+      }
+    } else {
+      if (localStorage.getItem('user-dark-mode-state') !== 'on') {
+        document.getElementsByTagName('html')[0].classList.remove('invert');
+      }
+    }
 
     const {
       pinnedThreads,

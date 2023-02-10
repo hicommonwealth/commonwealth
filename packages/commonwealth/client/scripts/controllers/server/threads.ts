@@ -17,7 +17,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 import type { ChainEntity, Profile, Topic } from 'models';
 import {

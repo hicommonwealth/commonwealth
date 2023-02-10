@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, jsx } from 'mithrilInterop';
+import { ClassComponent} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -13,17 +14,16 @@ import moment from 'moment';
 import app from 'state';
 import _ from 'underscore';
 
-import 'modals/poll_editor_modal.scss';
-
 import { getNextPollEndingTime } from 'utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
-import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 type PollEditorAttrs = {
+  onModalClose: () => void;
   thread: Thread;
 };
 
@@ -52,7 +52,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
   private prompt: string;
 
   view(vnode: ResultNode<PollEditorAttrs>) {
-    const { thread } = vnode.attrs;
+    const { onModalClose, thread } = vnode.attrs;
     const { customDurationEnabled, customDuration } = this;
 
     // reset options when initializing
@@ -64,7 +64,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
       <div className="PollEditorModal">
         <div className="compact-modal-title">
           <h3>Create Poll</h3>
-          <ModalExitButton />
+          <CWIconButton iconName="close" onClick={() => onModalClose()} />
         </div>
         <div className="compact-modal-body">
           <CWTextInput
@@ -143,8 +143,8 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
             <CWButton
               label="Cancel"
               buttonType="secondary-blue"
-              onClick={(e) => {
-                $(e.target).trigger('modalexit');
+              onClick={() => {
+                onModalClose();
               }}
             />
             <CWButton
@@ -183,7 +183,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                   console.error(err);
                 }
 
-                $(e.target).trigger('modalexit');
+                onModalClose();
               }}
             />
           </div>

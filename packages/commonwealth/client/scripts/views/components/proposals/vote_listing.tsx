@@ -1,9 +1,10 @@
-/* @jsx jsx */
 import React from 'react';
 
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
-import { ClassComponent, ResultNode, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, redraw} from
+
+ 'mithrilInterop';
 
 import 'components/proposals/vote_listing.scss';
 import { CosmosVote } from 'controllers/chain/cosmos/proposal';
@@ -12,7 +13,6 @@ import AaveProposal, {
 } from 'controllers/chain/ethereum/aave/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
 import { MolochProposalVote } from 'controllers/chain/ethereum/moloch/proposal';
-import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import type { AnyProposal, IVote } from 'models';
 import { BinaryVote, DepositVote, VotingUnit } from 'models';
@@ -173,14 +173,6 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                         </div>
                       </div>
                     );
-
-                  case vote instanceof SubstrateCollectiveVote:
-                    return (
-                      <div className="vote">
-                        <User user={vote.account} linkify popover />
-                      </div>
-                    );
-
                   default:
                     return (
                       <div className="vote">

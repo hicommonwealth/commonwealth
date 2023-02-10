@@ -290,7 +290,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/proposals': importRoute(import('views/pages/proposals'), {
     scoped: true,
   }),
-  '/council': importRoute(import('views/pages/council'), { scoped: true }),
   '/delegate': importRoute(import('views/pages/delegate'), { scoped: true }),
   '/proposal/:type/:identifier': importRoute(
     import('views/pages/view_proposal/index'),
@@ -320,20 +319,11 @@ const getCustomDomainRoutes = (importRoute) => ({
 
   // Treasury
   '/treasury': importRoute(import('views/pages/treasury'), { scoped: true }),
-  '/bounties': importRoute(import('views/pages/bounties'), { scoped: true }),
   '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
-  '/validators': importRoute(import('views/pages/validators'), {
-    scoped: true,
-  }),
 
   // Admin
-  '/admin': importRoute(import('views/pages/admin'), { scoped: true }),
   '/manage': importRoute(import('views/pages/manage_community/index'), {
     scoped: true,
-  }),
-  '/spec_settings': importRoute(import('views/pages/spec_settings'), {
-    scoped: true,
-    deferChain: true,
   }),
   '/settings': importRoute(import('views/pages/settings'), { scoped: true }),
   '/analytics': importRoute(import('views/pages/stats'), {
@@ -392,7 +382,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
-  '/:scope/council': redirectRoute(() => '/council'),
   '/:scope/delegate': redirectRoute(() => '/delegate'),
   '/:scope/proposal/:type/:identifier': redirectRoute(
     (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
@@ -415,7 +404,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/settings': redirectRoute(() => '/settings'),
   '/:scope/admin': redirectRoute(() => '/admin'),
   '/:scope/manage': redirectRoute(() => '/manage'),
-  '/:scope/spec_settings': redirectRoute(() => '/spec_settings'),
   '/:scope/analytics': redirectRoute(() => '/analytics'),
   '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
     (attrs) => `/snapshot/${attrs.snapshotId}`
@@ -593,14 +581,9 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   scoped: true,
   // }),
   // Admin
-  // '/:scope/admin': importRoute(import('views/pages/admin'), { scoped: true }),
   // '/manage': importRoute(import('views/pages/manage_community/index')),
   // '/:scope/manage': importRoute(import('views/pages/manage_community/index'), {
   //   scoped: true,
-  // }),
-  // '/:scope/spec_settings': importRoute(import('views/pages/spec_settings'), {
-  //   scoped: true,
-  //   deferChain: true,
   // }),
   // '/:scope/analytics': importRoute(import('views/pages/stats'), {
   //   scoped: true,

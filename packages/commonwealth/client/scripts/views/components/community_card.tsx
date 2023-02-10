@@ -1,17 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { setRoute } from 'mithrilInterop';
 
 import 'components/community_card.scss';
 
@@ -23,101 +12,97 @@ import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWText } from './component_kit/cw_text';
 
-type CommunityCardAttrs = { chain: ChainInfo };
+type CommunityCardProps = { chain: ChainInfo };
 
-export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
-  view(vnode: ResultNode<CommunityCardAttrs>) {
-    const { chain } = vnode.attrs as CommunityCardAttrs;
+export const CommunityCard = (props: CommunityCardProps) => {
+  const { chain } = props;
 
-    const redirectFunction = (e) => {
-      e.preventDefault();
-      if (isCommandClick(e)) {
-        window.open(`/${chain.id}`, '_blank');
-        return;
-      }
-      localStorage['home-scrollY'] = window.scrollY;
-      setRoute(`/${chain.id}`);
-    };
-
-    // Potentially Temporary (could be built into create community flow)
-    let prettyDescription = '';
-
-    if (chain.description) {
-      prettyDescription =
-        chain.description[chain.description.length - 1] === '.'
-          ? chain.description
-          : `${chain.description}.`;
+  const redirectFunction = (e) => {
+    e.preventDefault();
+    if (isCommandClick(e)) {
+      window.open(`/${chain.id}`, '_blank');
+      return;
     }
+    localStorage['home-scrollY'] = window.scrollY;
+    setRoute(`/${chain.id}`);
+  };
 
-    return (
-      <CWCard
-        elevation="elevation-2"
-        interactive
-        className="community-card"
-        onClick={redirectFunction}
-      >
-        <div className="top-content">
-          <CWCommunityAvatar community={chain} size="xxl" />
-          <CWText
-            type="h4"
-            fontWeight="semiBold"
-            className="chain-name"
-            title={chain.name}
-            noWrap
-          >
-            {chain.name}
-          </CWText>
-        </div>
-        <div className="bottom-content">
-          <CWText
-            className="card-description"
-            type="caption"
-            title={prettyDescription}
-          >
-            {prettyDescription}
-          </CWText>
-          <CWButton
-            buttonType="secondary-black"
-            label="See More"
-            onClick={redirectFunction}
-          />
-          {/* for mobile */}
-          <CWIconButton iconName="expand" onClick={redirectFunction} />
-        </div>
-      </CWCard>
-    );
-  }
-}
+  // Potentially Temporary (could be built into create community flow)
+  let prettyDescription = '';
 
-export class NewCommunityCard extends ClassComponent {
-  view() {
-    return (
-      <CWCard
-        elevation="elevation-2"
-        interactive={true}
-        className="new-community-card"
-        onClick={(e) => {
-          e.preventDefault();
-          document.location =
-            'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
-        }}
-      >
-        <div className="new-community-card-body">
-          <CWText
-            type="h3"
-            fontWeight="semiBold"
-            className="new-community-header"
-          >
-            Create a new community
-          </CWText>
-          <CWText className="new-community">
-            Launch and grow your decentralized community on Commonwealth
-          </CWText>
-          <a className="learn-more" href="#">
-            Learn more
-          </a>
-        </div>
-      </CWCard>
-    );
+  if (chain.description) {
+    prettyDescription =
+      chain.description[chain.description.length - 1] === '.'
+        ? chain.description
+        : `${chain.description}.`;
   }
-}
+
+  return (
+    <CWCard
+      elevation="elevation-2"
+      interactive
+      className="community-card"
+      onClick={redirectFunction}
+    >
+      <div className="top-content">
+        <CWCommunityAvatar community={chain} size="xxl" />
+        <CWText
+          type="h4"
+          fontWeight="semiBold"
+          className="chain-name"
+          title={chain.name}
+          noWrap
+        >
+          {chain.name}
+        </CWText>
+      </div>
+      <div className="bottom-content">
+        <CWText
+          className="card-description"
+          type="caption"
+          title={prettyDescription}
+        >
+          {prettyDescription}
+        </CWText>
+        <CWButton
+          buttonType="secondary-black"
+          label="See More"
+          onClick={redirectFunction}
+        />
+        {/* for mobile */}
+        <CWIconButton iconName="expand" onClick={redirectFunction} />
+      </div>
+    </CWCard>
+  );
+};
+
+export const NewCommunityCard = () => {
+  return (
+    <CWCard
+      elevation="elevation-2"
+      interactive={true}
+      className="new-community-card"
+      onClick={(e) => {
+        e.preventDefault();
+        document.location =
+          'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
+      }}
+    >
+      <div className="new-community-card-body">
+        <CWText
+          type="h3"
+          fontWeight="semiBold"
+          className="new-community-header"
+        >
+          Create a new community
+        </CWText>
+        <CWText className="new-community">
+          Launch and grow your decentralized community on Commonwealth
+        </CWText>
+        <a className="learn-more" href="#">
+          Learn more
+        </a>
+      </div>
+    </CWCard>
+  );
+};

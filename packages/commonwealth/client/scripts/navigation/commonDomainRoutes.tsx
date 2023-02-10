@@ -1,4 +1,3 @@
-import { jsx } from 'mithrilInterop';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { Navigate, withLayout } from 'navigation/helpers';
@@ -24,7 +23,6 @@ const NotificationSettingsPage = lazy(
 
 const ReferendaPage = lazy(() => import('views/pages/referenda'));
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
-const CouncilPage = lazy(() => import('views/pages/council'));
 const DelegatePage = lazy(() => import('views/pages/delegate'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
@@ -35,6 +33,7 @@ const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect')
 );
+const FeedPage = lazy(() => import('views/pages/feed'));
 
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
 const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
@@ -42,15 +41,11 @@ const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
 const SettingsPage = lazy(() => import('views/pages/settings'));
 
 const TreasuryPage = lazy(() => import('views/pages/treasury'));
-const BountiesPage = lazy(() => import('views/pages/bounties'));
 const TipsPage = lazy(() => import('views/pages/tips'));
-const ValidatorsPage = lazy(() => import('views/pages/validators'));
 
-const AdminPage = lazy(() => import('views/pages/admin'));
 const ManageCommunityPage = lazy(
   () => import('views/pages/manage_community/index')
 );
-const SpecSettingsPage = lazy(() => import('views/pages/spec_settings'));
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals')
@@ -68,7 +63,7 @@ const NewSnapshotProposalPage = lazy(
 const ProfilePage = lazy(() => import('views/pages/profile'));
 
 const getCommonDomainsRoutes = () => (
-  <React.Fragment>
+  <>
     <Route
       path="/whyCommonwealth"
       element={withLayout(WhyCommonwealthPage, { hideSidebar: true })}
@@ -183,12 +178,6 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
-      path="/:scope/council"
-      element={withLayout(CouncilPage, {
-        scoped: true,
-      })}
-    />
-    <Route
       path="/:scope/delegate"
       element={withLayout(DelegatePage, {
         scoped: true,
@@ -271,6 +260,13 @@ const getCommonDomainsRoutes = () => (
         scoped: true,
       })}
     />
+    <Route
+      path="/:scope/feed"
+      element={withLayout(FeedPage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />
     {/* DISCUSSIONS END*/}
 
     {/* CONTRACTS */}
@@ -307,31 +303,13 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
-      path="/:scope/bounties"
-      element={withLayout(BountiesPage, {
-        scoped: true,
-      })}
-    />
-    <Route
       path="/:scope/tips"
       element={withLayout(TipsPage, {
         scoped: true,
       })}
     />
-    <Route
-      path="/:scope/validators"
-      element={withLayout(ValidatorsPage, {
-        scoped: true,
-      })}
-    />
     {/* TREASURY END*/}
     {/* ADMIN */}
-    <Route
-      path="/:scope/admin"
-      element={withLayout(AdminPage, {
-        scoped: true,
-      })}
-    />
     <Route
       path="/:scope/manage"
       element={withLayout(ManageCommunityPage, {
@@ -339,13 +317,6 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />
-    <Route
-      path="/:scope/spec_settings"
-      element={withLayout(SpecSettingsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
     <Route
       path="/:scope/analytics"
       element={withLayout(AnalyticsPage, {
@@ -468,7 +439,7 @@ const getCommonDomainsRoutes = () => (
       element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
     />
     {/*  LEGACY REDIRECTS END */}
-  </React.Fragment>
+  </>
 );
 
 export default getCommonDomainsRoutes;

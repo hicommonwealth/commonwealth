@@ -1,14 +1,12 @@
-/* @jsx jsx */
 import React from 'react';
-
-import { jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
-import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
+import { CWBreadcrumbs } from './cw_breadcrumbs';
+
 import { CWButton } from './cw_button';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
@@ -28,7 +26,6 @@ import { CWToggle } from './cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
-import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
@@ -160,6 +157,7 @@ export const ComponentShowcase = () => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
+      <CWButton label="Toast" onClick={() => notifySuccess('message')} />
       <CWButton
         label="Full Screen Modal"
         onClick={() => setIsFullScreenModalOpen(true)}

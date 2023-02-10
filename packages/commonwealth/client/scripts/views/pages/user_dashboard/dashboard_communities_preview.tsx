@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,8 +9,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { pluralize } from 'helpers';
 import type { ChainInfo } from 'models';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
@@ -61,12 +59,12 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
         </CWText>
         {/* if no recently active threads, hide this module altogether */}
         {!!monthlyThreadCount && (
-          <React.Fragment>
+          <>
             <CWText className="card-subtext" type="b2" fontWeight="medium">
               {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
             </CWText>
             {isMember && (
-              <React.Fragment>
+              <>
                 {app.isLoggedIn() && !visitedChain && (
                   <CWText className="new-activity-tag">New</CWText>
                 )}
@@ -75,9 +73,9 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
                     {updatedThreads} new
                   </CWText>
                 )}
-              </React.Fragment>
+              </>
             )}
-          </React.Fragment>
+          </>
         )}
       </CWCard>
     );

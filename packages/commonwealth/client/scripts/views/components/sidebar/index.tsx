@@ -1,4 +1,3 @@
-/* @jsx jsx */
 import React from 'react';
 
 import {
@@ -10,7 +9,6 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
 } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
@@ -20,6 +18,7 @@ import 'components/sidebar/index.scss';
 import { isActiveAddressPermitted } from 'controllers/server/roles';
 
 import app from 'state';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { ChatSection } from '../chat/chat_section';
@@ -29,13 +28,15 @@ import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { ExternalLinksModule } from './external_links_module';
 import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
 
 export type SidebarMenuName =
   | 'default'
   | 'createContent'
   | 'exploreCommunities';
 
-export class Sidebar extends ClassComponent {
+class SidebarComponent extends ClassComponent {
   view() {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
@@ -47,6 +48,8 @@ export class Sidebar extends ClassComponent {
 
     const currentChainInfo = app.chain?.meta;
 
+    const onHomeRoute = getRoute() === `/${app.activeChainId()}/feed`;
+
     const hideChat =
       !currentChainInfo ||
       !activeAddressRoles ||
@@ -56,6 +59,19 @@ export class Sidebar extends ClassComponent {
         Action.VIEW_CHAT_CHANNELS
       );
 
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.roles.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
+
+    const isMod = app.roles.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+    });
+
+    const showAdmin = app.user && (isAdmin || isMod);
+
     return (
       <div className="Sidebar">
         {app.sidebarMenu === 'default' && (
@@ -63,7 +79,18 @@ export class Sidebar extends ClassComponent {
             <SidebarQuickSwitcher />
             {app.chain && (
               <div className="community-menu">
-                <AdminSection />
+                {showAdmin && <AdminSection />}
+                {app.chain.meta.hasHomepage && (
+                  <div
+                    className={
+                      onHomeRoute ? 'home-button active' : 'home-button'
+                    }
+                    onClick={() => this.navigateToSubpage('/feed')}
+                  >
+                    <CWIcon iconName="home" iconSize="small" />
+                    <CWText>Home</CWText>
+                  </div>
+                )}
                 <DiscussionSection />
                 <GovernanceSection />
                 {/* app.socket && !hideChat && <ChatSection /> */}
@@ -95,3 +122,5 @@ export class Sidebar extends ClassComponent {
     );
   }
 }
+
+export const Sidebar = NavigationWrapper(SidebarComponent);

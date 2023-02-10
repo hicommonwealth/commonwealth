@@ -1,8 +1,9 @@
-/* @jsx jsx */
 import React from 'react';
 
 import { formatTimestamp } from 'helpers/index';
-import { ClassComponent, setRoute, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute} from
+
+ 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { AddressInfo } from 'models';
@@ -58,7 +59,6 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         user={
           new AddressInfo(null, author_address, author_chain ?? chain_id, null)
         }
-        hideIdentityIcon={false}
         linkify
         avatarSize={16}
         onclick={(e: any) => {

@@ -1,17 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { getRoute } from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
@@ -25,12 +14,15 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
+import { Modal } from '../component_kit/cw_modal';
 
-function setAdminToggleTree(path: string, toggle: boolean) {
+const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
     localStorage[`${app.activeChainId()}-admin-toggle-tree`]
   );
+
   const split = path.split('.');
+
   for (const field of split.slice(0, split.length - 1)) {
     if (Object.prototype.hasOwnProperty.call(currentTree, field)) {
       currentTree = currentTree[field];
@@ -38,165 +30,159 @@ function setAdminToggleTree(path: string, toggle: boolean) {
       return;
     }
   }
+
   currentTree[split[split.length - 1]] = toggle;
+
   const newTree = currentTree;
+
   localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
     JSON.stringify(newTree);
-}
+};
 
-class AdminSectionComponent extends ClassComponent<SidebarSectionAttrs> {
-  private editTopicThresholdsModalActive: boolean;
-  private orderTopicsModalActive: boolean;
-  private newTopicModalActive: boolean;
+const AdminSectionComponent = () => {
+  const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
+    React.useState<boolean>(false);
+  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
+    React.useState<boolean>(false);
+  const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
+    React.useState<boolean>(false);
 
-  view() {
-    if (!app.user) return;
-
-    const isAdmin =
-      app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
-      });
-    const isMod = app.roles.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-    });
-    if (!isAdmin && !isMod) return null;
-
-    const adminGroupData: SectionGroupAttrs[] = [
-      {
-        title: 'Manage community',
-        containsChildren: false,
-        displayData: null,
-        hasDefaultToggle: false,
-        isActive: getRoute().includes('/manage'),
-        isVisible: true,
-        isUpdated: false,
-        onClick: (e, toggle: boolean) => {
-          e.preventDefault();
-          handleRedirectClicks(this, e, `/manage`, app.activeChainId(), () => {
-            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
-          });
-        },
-      },
-      {
-        title: 'Analytics',
-        containsChildren: false,
-        displayData: null,
-        hasDefaultToggle: false,
-        isActive: getRoute().includes('/analytics'),
-        isVisible: true,
-        isUpdated: false,
-        onClick: (e, toggle: boolean) => {
-          e.preventDefault();
-          handleRedirectClicks(
-            this,
-            e,
-            `/analytics`,
-            app.activeChainId(),
-            () => {
-              setAdminToggleTree(`children.analytics.toggledState`, toggle);
-            }
-          );
-        },
-      },
-      {
-        title: 'New topic',
-        isActive: this.newTopicModalActive,
-        isVisible: true,
-        containsChildren: false,
-        displayData: null,
-        isUpdated: false,
-        hasDefaultToggle: false,
-        onClick: (e) => {
-          e.preventDefault();
-          this.newTopicModalActive = true;
-          app.modals.create({
-            modal: NewTopicModal,
-            data: {},
-            exitCallback: () => {
-              this.newTopicModalActive = false;
-            },
-          });
-        },
-      },
-      {
-        title: 'Order sidebar topics',
-        isActive: this.orderTopicsModalActive,
-        isVisible: true,
-        containsChildren: false,
-        displayData: null,
-        isUpdated: false,
-        hasDefaultToggle: false,
-        onClick: (e) => {
-          e.preventDefault();
-          this.orderTopicsModalActive = true;
-          app.modals.create({
-            modal: OrderTopicsModal,
-            data: {},
-            exitCallback: () => {
-              this.orderTopicsModalActive = false;
-            },
-          });
-        },
-      },
-      {
-        title: 'Edit topic thresholds',
-        isActive: this.editTopicThresholdsModalActive,
-        isVisible: true,
-        containsChildren: false,
-        displayData: null,
-        isUpdated: false,
-        hasDefaultToggle: false,
-        onClick: (e) => {
-          e.preventDefault();
-          this.editTopicThresholdsModalActive = true;
-          app.modals.create({
-            modal: EditTopicThresholdsModal,
-            data: {},
-            exitCallback: () => {
-              this.editTopicThresholdsModalActive = false;
-            },
-          });
-        },
-      },
-    ];
-
-    // Build Toggle Tree
-    const adminDefaultToggleTree: ToggleTree = {
-      toggledState: false,
-      children: {},
-    };
-
-    // Check if an existing toggle tree is stored
-    if (!localStorage[`${app.activeChainId()}-admin-toggle-tree`]) {
-      localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-        adminDefaultToggleTree
-      );
-    } else if (!verifyCachedToggleTree('admin', adminDefaultToggleTree)) {
-      localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-        adminDefaultToggleTree
-      );
-    }
-    const toggleTreeState = JSON.parse(
-      localStorage[`${app.activeChainId()}-admin-toggle-tree`]
-    );
-
-    const sidebarSectionData: SidebarSectionAttrs = {
-      title: 'Admin Capabilities',
-      className: 'AdminSection',
-      hasDefaultToggle: toggleTreeState['toggledState'],
+  const adminGroupData: SectionGroupAttrs[] = [
+    {
+      title: 'Manage community',
+      containsChildren: false,
+      displayData: null,
+      hasDefaultToggle: false,
+      isActive: getRoute().includes('/manage'),
+      isVisible: true,
+      isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        setAdminToggleTree('toggledState', toggle);
+        handleRedirectClicks(this, e, `/manage`, app.activeChainId(), () => {
+          setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+        });
       },
-      displayData: adminGroupData,
-      isActive: true,
-      toggleDisabled: false,
-    };
+    },
+    {
+      title: 'Analytics',
+      containsChildren: false,
+      displayData: null,
+      hasDefaultToggle: false,
+      isActive: getRoute().includes('/analytics'),
+      isVisible: true,
+      isUpdated: false,
+      onClick: (e, toggle: boolean) => {
+        e.preventDefault();
+        handleRedirectClicks(this, e, `/analytics`, app.activeChainId(), () => {
+          setAdminToggleTree(`children.analytics.toggledState`, toggle);
+        });
+      },
+    },
+    {
+      title: 'New topic',
+      isActive: isNewTopicModalOpen,
+      isVisible: true,
+      containsChildren: false,
+      displayData: null,
+      isUpdated: false,
+      hasDefaultToggle: false,
+      onClick: (e) => {
+        e.preventDefault();
+        setIsNewTopicModalOpen(true);
+      },
+    },
+    {
+      title: 'Order sidebar topics',
+      isActive: isOrderTopicsModalOpen,
+      isVisible: true,
+      containsChildren: false,
+      displayData: null,
+      isUpdated: false,
+      hasDefaultToggle: false,
+      onClick: (e) => {
+        e.preventDefault();
+        setIsOrderTopicsModalOpen(true);
+      },
+    },
+    {
+      title: 'Edit topic thresholds',
+      isActive: isEditTopicThresholdsModalOpen,
+      isVisible: true,
+      containsChildren: false,
+      displayData: null,
+      isUpdated: false,
+      hasDefaultToggle: false,
+      onClick: (e) => {
+        e.preventDefault();
+        setIsEditTopicThresholdsModalOpen(true);
+      },
+    },
+  ];
 
-    return <SidebarSectionGroup {...sidebarSectionData} />;
+  // Build Toggle Tree
+  const adminDefaultToggleTree: ToggleTree = {
+    toggledState: false,
+    children: {},
+  };
+
+  // Check if an existing toggle tree is stored
+  if (!localStorage[`${app.activeChainId()}-admin-toggle-tree`]) {
+    localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
+      adminDefaultToggleTree
+    );
+  } else if (!verifyCachedToggleTree('admin', adminDefaultToggleTree)) {
+    localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
+      adminDefaultToggleTree
+    );
   }
-}
+
+  const toggleTreeState = JSON.parse(
+    localStorage[`${app.activeChainId()}-admin-toggle-tree`]
+  );
+
+  const sidebarSectionData: SidebarSectionAttrs = {
+    title: 'Admin Capabilities',
+    className: 'AdminSection',
+    hasDefaultToggle: toggleTreeState['toggledState'],
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      setAdminToggleTree('toggledState', toggle);
+    },
+    displayData: adminGroupData,
+    isActive: true,
+    toggleDisabled: false,
+  };
+
+  return (
+    <React.Fragment>
+      <SidebarSectionGroup {...sidebarSectionData} />
+      <Modal
+        content={
+          <NewTopicModal onModalClose={() => setIsNewTopicModalOpen(false)} />
+        }
+        onClose={() => setIsNewTopicModalOpen(false)}
+        open={isNewTopicModalOpen}
+      />
+      <Modal
+        content={
+          <OrderTopicsModal
+            onModalClose={() => setIsOrderTopicsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsOrderTopicsModalOpen(false)}
+        open={isOrderTopicsModalOpen}
+      />
+      <Modal
+        content={
+          <EditTopicThresholdsModal
+            onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}
+          />
+        }
+        onClose={() => setIsEditTopicThresholdsModalOpen(false)}
+        open={isEditTopicThresholdsModalOpen}
+      />
+    </React.Fragment>
+  );
+};
 
 export const AdminSection = NavigationWrapper(AdminSectionComponent);

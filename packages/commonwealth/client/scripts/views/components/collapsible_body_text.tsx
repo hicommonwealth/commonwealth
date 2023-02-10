@@ -1,17 +1,7 @@
-/* @jsx jsx */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  jsx,
-} from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 import type { AnyProposal, Thread } from 'models';
 
 import app from 'state';
@@ -19,103 +9,84 @@ import { countLinesMarkdown, countLinesQuill } from './quill/helpers';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
 import { User } from './user/user';
+import { CWText } from './component_kit/cw_text';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
 
-type CollapsibleThreadBodyAttrs = {
+type CollapsibleThreadBodyProps = {
   thread: Thread;
 };
 
-export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyAttrs> {
-  private body: any;
-  private collapsed: boolean;
+export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
+  const { thread } = props;
 
-  oninit(vnode: ResultNode<CollapsibleThreadBodyAttrs>) {
-    const { thread } = vnode.attrs;
+  const [collapsed, setCollapsed] = useState<boolean>(false);
 
-    this.collapsed = false;
-    this.body = thread.body;
-
+  useEffect(() => {
     try {
       const doc = JSON.parse(thread.body);
       if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
-        this.collapsed = true;
+        setCollapsed(true);
       }
     } catch (e) {
       if (
         countLinesMarkdown(thread.body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
       ) {
-        this.collapsed = true;
+        setCollapsed(true);
       }
     }
+  }, [thread.body]);
+
+  const getPlaceholder = () => {
+    const author = app.chain ? app.chain.accounts.get(thread.author) : null;
+
+    return author ? (
+      <>
+        <User user={author} hideAvatar /> created this thread
+      </>
+    ) : (
+      <CWText>Created this thread</CWText>
+    );
+  };
+
+  try {
+    const doc = JSON.parse(thread.body);
+
+    if (!doc.ops) throw new Error();
+
+    if (
+      doc.ops.length === 1 &&
+      doc.ops[0] &&
+      typeof doc.ops[0].insert === 'string' &&
+      doc.ops[0].insert.trim() === ''
+    ) {
+      return getPlaceholder();
+    }
+
+    return (
+      <QuillFormattedText
+        doc={doc}
+        cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+        collapse={collapsed}
+        hideFormatting={false}
+      />
+    );
+  } catch (e) {
+    if (thread.body?.toString().trim() === '') {
+      return getPlaceholder();
+    }
+
+    return (
+      thread.body && (
+        <MarkdownFormattedText
+          doc={thread.body}
+          cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+        />
+      )
+    );
   }
-
-  onupdate(vnode: ResultNode<CollapsibleThreadBodyAttrs>) {
-    const { thread } = vnode.attrs;
-
-    this.body = thread.body;
-  }
-
-  view(vnode: ResultNode<CollapsibleThreadBodyAttrs>) {
-    const { body } = this;
-
-    const getPlaceholder = () => {
-      const author = app.chain
-        ? app.chain.accounts.get(vnode.attrs.thread.author)
-        : null;
-
-      return author ? (
-        <React.Fragment>
-          <User user={author} hideAvatar hideIdentityIcon /> created this thread
-        </React.Fragment>
-      ) : (
-        'Created this thread'
-      );
-    };
-
-    const text = () => {
-      try {
-        const doc = JSON.parse(body);
-
-        if (!doc.ops) throw new Error();
-
-        if (
-          doc.ops.length === 1 &&
-          doc.ops[0] &&
-          typeof doc.ops[0].insert === 'string' &&
-          doc.ops[0].insert.trim() === ''
-        ) {
-          return getPlaceholder();
-        }
-
-        return (
-          <QuillFormattedText
-            doc={doc}
-            cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-            collapse={false}
-            hideFormatting={false}
-          />
-        );
-      } catch (e) {
-        if (body?.toString().trim() === '') {
-          return getPlaceholder();
-        }
-
-        return (
-          body && (
-            <MarkdownFormattedText
-              doc={body}
-              cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
-            />
-          )
-        );
-      }
-    };
-
-    return text();
-  }
-}
+};
 
 type CollapsibleProposalBodyAttrs = {
   proposal: AnyProposal;

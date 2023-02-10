@@ -1,7 +1,5 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import type { ChainInfo, Comment } from 'models';
 import { AddressInfo, Thread } from 'models';
@@ -9,6 +7,7 @@ import { AddressInfo, Thread } from 'models';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWText } from '../component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -30,7 +29,7 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       } = rxn;
 
       return (
-        <div style={{ display: 'flex', width: '120px' }}>
+        <div key={address + "#" + (chain?.id || chain)} style={{ display: 'flex', width: '120px' }}>
           <CWText noWrap>
             <User
               user={new AddressInfo(null, address, chain?.id || chain, null)}
@@ -44,7 +43,7 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
   if (slicedReactors.length < likes) {
     const diff = likes - slicedReactors.length;
 
-    slicedReactors.push(<CWText>{`and ${diff} more`}</CWText>);
+    slicedReactors.push(<CWText key="final">{`and ${diff} more`}</CWText>);
   }
 
   return (

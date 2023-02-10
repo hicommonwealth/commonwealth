@@ -1,7 +1,8 @@
-/* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, redraw, jsx } from 'mithrilInterop';
+import { ClassComponent, redraw} from
+
+ 'mithrilInterop';
 import { ChainNetwork } from 'common-common/src/types';
 
 import 'pages/delegate.scss';
@@ -11,12 +12,12 @@ import { PageLoading } from 'views/pages/loading';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import PageNotFound from './404';
 import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { GovExplainer } from '../components/gov_explainer';
+import PageNotFound from './404';
 
 type DelegateFormType = {
   address: string;

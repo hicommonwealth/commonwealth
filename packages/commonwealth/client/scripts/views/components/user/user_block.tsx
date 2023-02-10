@@ -1,4 +1,3 @@
-/* @jsx jsx */
 /* eslint-disable no-script-url */
 import React from 'react';
 
@@ -11,8 +10,7 @@ import {
   getRouteParam,
   redraw,
   Component,
-  jsx,
-} from 'mithrilInterop';
+  } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 
@@ -29,7 +27,6 @@ export class UserBlock extends ClassComponent<{
   addressDisplayOptions?: AddressDisplayOptions;
   avatarSize?: number;
   compact?: boolean;
-  hideIdentityIcon?: boolean;
   hideOnchainRole?: boolean;
   linkify?: boolean;
   popover?: boolean;
@@ -44,7 +41,6 @@ export class UserBlock extends ClassComponent<{
     const {
       addressDisplayOptions,
       compact,
-      hideIdentityIcon,
       linkify,
       popover,
       searchTerm,
@@ -79,19 +75,19 @@ export class UserBlock extends ClassComponent<{
           const queryEnd = queryStart + searchTerm.length;
 
           return (
-            <React.Fragment>
+            <>
               <span>{profile.address.slice(0, queryStart)}</span>
               <mark>{profile.address.slice(queryStart, queryEnd)}</mark>
               <span>
                 {profile.address.slice(queryEnd, profile.address.length)}
               </span>
-            </React.Fragment>
+            </>
           );
         })()
       : null;
 
     const children = (
-      <React.Fragment>
+      <>
         <div className="user-block-left">
           <User
             user={user}
@@ -105,7 +101,6 @@ export class UserBlock extends ClassComponent<{
             <User
               user={user}
               hideAvatar
-              hideIdentityIcon={hideIdentityIcon}
               showAddressWithDisplayName={showAddressWithDisplayName}
               addressDisplayOptions={addressDisplayOptions}
               popover={popover}
@@ -141,7 +136,7 @@ export class UserBlock extends ClassComponent<{
             {selected ? <CWIcon iconName="check" /> : ''}
           </div>
         </div>
-      </React.Fragment>
+      </>
     );
 
     const userLink = profile

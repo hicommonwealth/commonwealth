@@ -1,12 +1,12 @@
-/* @jsx jsx */
 import React from 'react';
 
+import { ClassComponent } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+
 import { formatCoin } from 'adapters/currency';
-import { navigateToSubpage } from 'router';
-import { ChainBase, ProposalType } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'pages/tips.scss';
 
@@ -17,7 +17,6 @@ import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CardsCollection } from '../components/cards_collection';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { GovExplainer } from '../components/gov_explainer';
 import { User } from '../components/user/user';
@@ -79,8 +78,6 @@ function getModules() {
 
 class TipsPage extends ClassComponent {
   view() {
-    const activeAccount = app.user.activeAccount;
-
     if (!app.chain || !app.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
@@ -151,18 +148,6 @@ class TipsPage extends ClassComponent {
                   formatCoin((app.chain as Substrate).treasury.pot),
               },
             ]}
-            statAction={
-              activeAccount && (
-                <CWButton
-                  onClick={() =>
-                    navigateToSubpage('/new/proposal/:type', {
-                      type: ProposalType.SubstrateTreasuryTip,
-                    })
-                  }
-                  label="New tip"
-                />
-              )
-            }
           />
           <CardsCollection content={activeTipContent} header="Active Tips" />
           <CardsCollection
