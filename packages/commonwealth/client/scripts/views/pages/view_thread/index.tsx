@@ -10,7 +10,14 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 import m from 'mithril';
-import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
+import type {
+  Account,
+  ChainEntity,
+  Comment,
+  Poll,
+  Thread,
+  Topic,
+} from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
 
 import 'pages/view_thread/index.scss';
@@ -541,7 +548,11 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       ];
     };
 
-    // @ts-ignore
+    const isAuthorOrAdmin =
+      app.roles.isAdminOfEntity({ chain: app.activeChainId() }) ||
+      app.user.activeAccount?.address ===
+        app.chain.accounts.get(thread.author).address;
+
     return (
       <Sublayout
       //  title={headerTitle}
@@ -680,7 +691,12 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                               this.polls?.map((poll) => [poll.id, poll])
                             ).values(),
                           ].map((poll: Poll) => {
-                            return <ThreadPollCard poll={poll} />;
+                            return (
+                              <ThreadPollCard
+                                poll={poll}
+                                showDeleteButton={isAuthorOrAdmin}
+                              />
+                            );
                           })}
                           {isAuthor &&
                             (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
