@@ -33,8 +33,6 @@ export type SubscriptionAttributes = {
   chain_id?: string;
   offchain_thread_id?: number;
   offchain_comment_id?: number;
-  chain_event_type_id?: string;
-  chain_entity_id?: number;
   snapshot_id?: string;
 
   User?: UserAttributes;
@@ -91,8 +89,6 @@ export default (
       chain_id: { type: dataTypes.STRING, allowNull: true },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
       offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
-      chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
-      chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
       snapshot_id: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -130,14 +126,6 @@ export default (
     });
     models.Subscription.belongsTo(models.Thread, {
       foreignKey: 'offchain_thread_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.ChainEventType, {
-      foreignKey: 'chain_event_type_id',
-      targetKey: 'id',
-    });
-    models.Subscription.belongsTo(models.ChainEntityMeta, {
-      foreignKey: 'chain_entity_id',
       targetKey: 'id',
     });
     models.Subscription.belongsTo(models.Comment, {

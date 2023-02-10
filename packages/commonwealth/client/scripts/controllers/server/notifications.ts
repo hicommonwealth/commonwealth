@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import m from 'mithril';
-import { ChainEventType, Notification, NotificationSubscription } from 'models';
+import { Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
 
 import app from 'state';
@@ -42,12 +42,19 @@ interface NotifOptions {
 class NotificationsController {
   private _discussionStore: NotificationStore = new NotificationStore();
   private _chainEventStore: NotificationStore = new NotificationStore();
+  // these are the chains that chain-events has active listeners for (used to detemine what chains are shown on the
+  // notification settings page
+  private _chainEventSubscribedChainIds: string[] = [];
 
   private _maxChainEventNotificationId: number = Number.POSITIVE_INFINITY;
   private _maxDiscussionNotificationId: number = Number.POSITIVE_INFINITY;
 
   private _numPages = 0;
   private _numUnread = 0;
+
+  public get chainEventSubscribedChainIds(): string[] {
+    return this._chainEventSubscribedChainIds;
+  }
 
   public get numPages(): number {
     return this._numPages;
@@ -83,7 +90,6 @@ class NotificationsController {
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
-      // TODO: Change to POST /subscription
       return post(
         '/createSubscription',
         {
@@ -92,7 +98,7 @@ class NotificationsController {
           is_active: true,
         },
         (result) => {
-          const newSubscription = NotificationSubscription.fromJSON(result);
+          const newSubscription = modelFromServer(result);
           if (newSubscription.category === 'chain-event')
             app.socket.chainEventsNs.addChainEventSubscriptions([
               newSubscription,
@@ -335,25 +341,13 @@ class NotificationsController {
     for (const subscriptionJSON of subscriptions) {
       const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
 
-      // save the chainEventType for the subscription if the subscription type is chain-event
-      let chainEventType = null;
-      if (subscriptionJSON.ChainEventType) {
-        chainEventType = ChainEventType.fromJSON(
-          subscriptionJSON.ChainEventType
-        );
-      }
-
       // save the notification read + notification instances if any
       for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
         const data = {
           is_read: notificationsReadJSON.is_read,
           ...notificationsReadJSON.Notification,
         };
-        const notification = Notification.fromJSON(
-          data,
-          subscription,
-          chainEventType
-        );
+        const notification = Notification.fromJSON(data, subscription);
 
         if (subscription.category === 'chain-event') {
           if (!this._chainEventStore.getById(notification.id))
@@ -388,11 +382,18 @@ class NotificationsController {
     });
   }
 
+  public getSubscribedChains() {
+    return post('/getSubscribedChains', {}, (result) => {
+      this._chainEventSubscribedChainIds = result.map((x) => x.id);
+    });
+  }
+
   public async refresh() {
     return Promise.all([
       this.getDiscussionNotifications(),
       this.getChainEventNotifications(),
       this.getSubscriptions(),
+      this.getSubscribedChains(),
     ]);
   }
 }
