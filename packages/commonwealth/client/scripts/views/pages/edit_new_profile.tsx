@@ -60,6 +60,10 @@ const EditNewProfile = (props: EditNewProfileProps) => {
   const [isOwner, setIsOwner] = React.useState<boolean>();
   const [coverImage, setCoverImage] = React.useState<Image>();
   const [backgroundImage, setBackgroundImage] = React.useState<Image>();
+  const coverImageRef = React.useRef<Image>();
+  coverImageRef.current = coverImage;
+  const backgroundImageRef = React.useRef<Image>();
+  backgroundImageRef.current = backgroundImage;
 
   const getProfile = async (passedUsername: string) => {
     setLoading(true);
@@ -70,12 +74,12 @@ const EditNewProfile = (props: EditNewProfileProps) => {
       });
 
       setProfile(new Profile(response.profile));
-      setName(response.profile.name || '');
+      setName(response.profile.profile_name || '');
       setEmail(response.profile.email || '');
       setSocials(response.profile.socials);
       setAvatarUrl(response.profile.avatarUrl);
-      setCoverImage(response.profile.coverImage);
-      setBackgroundImage(response.profile.backgroundImage);
+      setCoverImage(response.profile.cover_image);
+      setBackgroundImage(response.profile.background_image);
       setAddresses(response.addresses.map(
         (a) =>
           new AddressInfo(
@@ -145,11 +149,11 @@ const EditNewProfile = (props: EditNewProfileProps) => {
     if (!_.isEqual(socials, profile?.socials))
       profileUpdate.socials = JSON.stringify(socials);
 
-    if (!_.isEqual(coverImage, profile?.coverImage))
-      profileUpdate.coverImage = JSON.stringify(coverImage);
+    if (!_.isEqual(coverImageRef.current, profile?.coverImage))
+      profileUpdate.coverImage = JSON.stringify(coverImageRef.current);
 
-    if (!_.isEqual(backgroundImage, profile?.backgroundImage))
-      profileUpdate.backgroundImage = JSON.stringify(backgroundImage);
+    if (!_.isEqual(backgroundImageRef.current, profile?.backgroundImage))
+      profileUpdate.backgroundImage = JSON.stringify(backgroundImageRef.current);
 
     if (Object.keys(profileUpdate)?.length > 0) {
       updateProfile(profileUpdate);

@@ -15,34 +15,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWText } from './cw_text';
 import { CWRadioGroup } from './cw_radio_group';
 
-const uploadImage = async (file: File): Promise<[string, ValidationStatus]> => {
-  try {
-    const signatureResponse = await $.post(
-      `${app.serverUrl()}/getUploadSignature`,
-      {
-        name: file.name,
-        mimetype: file.type,
-        auth: true,
-        jwt: app.user.jwt,
-      }
-    );
-    if (signatureResponse.status !== 'Success') throw new Error();
-
-    const uploadURL = signatureResponse.result;
-    const uploadResponse = await fetch(uploadURL, {
-      method: 'put',
-      body: file,
-    });
-
-    const imageURL = uploadResponse.url?.replace(/\?.*/, '').trim();
-    if (!imageURL) throw new Error();
-
-    return [imageURL, 'success'];
-  } catch (e) {
-    return [null, 'failure'];
-  }
-};
-
 type CoverImageUploaderProps = {
   headerText?: string;
   subheaderText?: string;
@@ -78,31 +50,57 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   const attachButton = React.useRef<HTMLDivElement>(null);
   const pseudoInput = React.useRef<HTMLInputElement>(null);
 
-  const generateImage = async (
-    passedPrompt: string,
-    passedProps: CoverImageUploaderProps
-  ) => {
+  const uploadImage = async (file: File): Promise<[string, ValidationStatus]> => {
+    try {
+      const signatureResponse = await $.post(
+        `${app.serverUrl()}/getUploadSignature`,
+        {
+          name: file.name,
+          mimetype: file.type,
+          auth: true,
+          jwt: app.user.jwt,
+        }
+      );
+      if (signatureResponse.status !== 'Success') throw new Error();
+
+      const uploadURL = signatureResponse.result;
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'put',
+        body: file,
+      });
+
+      const trimmedImageURL = uploadResponse.url?.replace(/\?.*/, '').trim();
+      if (!trimmedImageURL) throw new Error();
+
+      return [trimmedImageURL, 'success'];
+    } catch (e) {
+      return [null, 'failure'];
+    }
+  };
+
+  const generateImage = async () => {
     try {
       const res = await $.post(`${app.serverUrl()}/generateImage`, {
-        description: passedPrompt,
+        description: prompt,
         jwt: app.user.jwt,
       });
 
       if (isPrompting) {
         setImageURL(res.result.imageUrl);
-        if (!imageBehavior) setImageBehavior(ImageBehavior.Fill);
+        const currentImageBehavior = !imageBehavior ? ImageBehavior.Fill : imageBehavior;
+        setImageBehavior(currentImageBehavior);
         setUploadStatus('success');
         attachButton.current.style.display = 'none';
 
-        if (passedProps.generatedImageCallback)
-          passedProps.generatedImageCallback(imageURL, imageBehavior);
-        passedProps.uploadCompleteCallback(imageURL, imageBehavior);
+        props.generatedImageCallback(res.result.imageUrl, currentImageBehavior);
+        props.uploadCompleteCallback(res.result.imageUrl, currentImageBehavior);
       }
 
       setIsUploading(false);
       setIsPrompting(false);
       setIsGenerating(false);
       redraw();
+
 
       return res.result.imageUrl;
     } catch (e) {
@@ -135,9 +133,10 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
 
     if (_imageURL) {
       setImageURL(_imageURL);
-      if (!imageBehavior) setImageBehavior(ImageBehavior.Fill);
+      const currentImageBehavior = !imageBehavior ? ImageBehavior.Fill : imageBehavior;
+      setImageBehavior(currentImageBehavior);
       attachButton.current.style.display = 'none';
-      uploadCompleteCallback(imageURL, imageBehavior);
+      uploadCompleteCallback(_imageURL, currentImageBehavior);
     }
   };
 
@@ -166,17 +165,16 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
     handleUpload(files[0]);
   };
 
-    // On-click support
-    const pseudoInputHandler = (inputEvent: InputEvent) => {
-      handleUpload((inputEvent.target as HTMLInputElement).files[0]);
-    };
+  // On-click support
+  const pseudoInputHandler = (inputEvent: InputEvent) => {
+    handleUpload((inputEvent.target as HTMLInputElement).files[0]);
+  };
 
-    const clickHandler = (e) => {
-      e.stopImmediatePropagation();
-      if (isUploading) return;
-      pseudoInput.current.click();
-    };
-
+  const clickHandler = (e) => {
+    e.stopImmediatePropagation();
+    if (isUploading) return;
+    pseudoInput.current?.click();
+  };
 
   React.useEffect(() => {
     const { defaultImageUrl, defaultImageBehavior } = props;
@@ -186,7 +184,9 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
     setIsPrompting(false);
 
     pseudoInput.current.addEventListener('change', pseudoInputHandler);
-    attachZone.current.addEventListener('click', clickHandler);
+    attachZone.current.addEventListener('click', (e: any) => {
+      if (e.target.classList.contains('attach-zone')) clickHandler(e);
+    });
 
     attachZone.current.addEventListener('dragenter', dragEnterHandler);
     attachZone.current.addEventListener('dragleave', dragLeaveHandler);
@@ -249,7 +249,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
           },
           'attach-zone'
         )}
-        style={!isPrompting && !isGenerating && backgroundStyles}
+        style={backgroundStyles}
         ref={attachZone}
       >
         {uploadStatus === 'success' && enableGenerativeAI && (
@@ -307,7 +307,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
                     if (prompt.length < 1) return;
                     setIsGenerating(true);
                     try {
-                      await generateImage(prompt, props);
+                      await generateImage();
                     } catch (e) {
                       console.error(e);
                     }
@@ -317,14 +317,12 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
             )}
           </div>
         )}
-        {!isPrompting && (
-          <input
-            type="file"
-            accept="image/jpeg, image/jpg, image/png"
-            className="pseudo-input"
-            ref={pseudoInput}
-          />
-        )}
+        <input
+          type="file"
+          accept="image/jpeg, image/jpg, image/png"
+          className="pseudo-input"
+          ref={pseudoInput}
+        />
         {isUploading && <CWSpinner size="large" />}
         <div className="attach-btn" ref={attachButton}>
           {!isUploading && (
@@ -339,8 +337,8 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
               label="Generate Image"
               className="generate-btn"
               onClick={(e) => {
-                setPrompt('');
                 e.stopPropagation();
+                setPrompt('');
                 setIsPrompting(true);
               }}
             />
