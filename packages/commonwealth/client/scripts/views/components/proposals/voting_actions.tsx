@@ -148,6 +148,11 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             .then(() => m.redraw())
             .catch((err) => notifyError(err.toString()));
         }
+      } else if (proposal instanceof CompoundProposal) {
+        proposal
+          .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
         proposal
           .submitVoteWebTx(new AaveProposalVote(user, true))
