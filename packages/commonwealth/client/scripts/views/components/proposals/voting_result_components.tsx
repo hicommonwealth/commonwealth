@@ -1,8 +1,4 @@
 import React from 'react';
-/* eslint-disable max-classes-per-file */
-
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
 
 import 'components/proposals/voting_result_components.scss';
 import type {
@@ -19,50 +15,48 @@ import type { AnyProposal, IVote } from 'models';
 import { CWText } from '../component_kit/cw_text';
 import { VoteListing } from './vote_listing';
 
-type BaseVotingResultAttrs = {
+type BaseVotingResultProps = {
   proposal: AnyProposal;
   votes: Array<IVote<any>>;
 };
 
-type VotingResultAttrs = {
+type VotingResultProps = {
   abstainVotes?: Array<IVote<any>>;
   noVotes: Array<IVote<any>>;
   yesVotes: Array<IVote<any>>;
   proposal: AnyProposal;
 };
 
-export class VotingResult extends ClassComponent<VotingResultAttrs> {
-  view(vnode: ResultNode<VotingResultAttrs>) {
-    const { abstainVotes, noVotes, yesVotes, proposal } = vnode.attrs;
+export const VotingResult = (props: VotingResultProps) => {
+  const { abstainVotes, noVotes, yesVotes, proposal } = props;
 
-    return (
-      <div className="VotingResult">
-        <div className="results-column-yes">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Yes (${yesVotes.length})`}
-          </CWText>
-          <VoteListing proposal={proposal} votes={yesVotes} />
-        </div>
+  return (
+    <div className="VotingResult">
+      <div className="results-column-yes">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Yes (${yesVotes.length})`}
+        </CWText>
+        <VoteListing proposal={proposal} votes={yesVotes} />
+      </div>
+      <div className="results-column-no">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`No (${noVotes.length})`}
+        </CWText>
+        <VoteListing proposal={proposal} votes={noVotes} />
+      </div>
+      {abstainVotes && (
         <div className="results-column-no">
           <CWText type="h4" fontWeight="medium" className="results-header">
-            {`No (${noVotes.length})`}
+            {`Abstain (${abstainVotes.length})`}
           </CWText>
-          <VoteListing proposal={proposal} votes={noVotes} />
+          <VoteListing proposal={proposal} votes={abstainVotes} />
         </div>
-        {abstainVotes && (
-          <div className="results-column-no">
-            <CWText type="h4" fontWeight="medium" className="results-header">
-              {`Abstain (${abstainVotes.length})`}
-            </CWText>
-            <VoteListing proposal={proposal} votes={abstainVotes} />
-          </div>
-        )}
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
 
-type CompletedProposalVotingResultAttrs = {
+type CompletedProposalVotingResultProps = {
   abstainPct: string;
   abstainResults: string;
   noPct: string;
@@ -73,72 +67,72 @@ type CompletedProposalVotingResultAttrs = {
   yesResults: string;
 };
 
-export class CompletedProposalVotingResult extends ClassComponent<CompletedProposalVotingResultAttrs> {
-  view(vnode: ResultNode<CompletedProposalVotingResultAttrs>) {
-    const {
-      abstainPct,
-      abstainResults,
-      noPct,
-      noResults,
-      noWithVetoPct,
-      noWithVetoResults,
-      yesPct,
-      yesResults,
-    } = vnode.attrs;
+export const CompletedProposalVotingResult = (
+  props: CompletedProposalVotingResultProps
+) => {
+  const {
+    abstainPct,
+    abstainResults,
+    noPct,
+    noResults,
+    noWithVetoPct,
+    noWithVetoResults,
+    yesPct,
+    yesResults,
+  } = props;
 
-    return (
-      <div className="VotingResult">
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`${yesPct}% voted Yes`}
-          </CWText>
-          <CWText>{`(${yesResults})`}</CWText>
-        </div>
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`${noPct}% voted No`}
-          </CWText>
-          <CWText>{`(${noResults})`}</CWText>
-        </div>
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`${abstainPct}% voted Abstain`}
-          </CWText>
-          <CWText>{`(${abstainResults})`}</CWText>
-        </div>
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`${noWithVetoPct}% voted Veto`}
-          </CWText>
-          <CWText>{`(${noWithVetoResults})`}</CWText>
-        </div>
+  return (
+    <div className="VotingResult">
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`${yesPct}% voted Yes`}
+        </CWText>
+        <CWText>{`(${yesResults})`}</CWText>
       </div>
-    );
-  }
-}
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`${noPct}% voted No`}
+        </CWText>
+        <CWText>{`(${noResults})`}</CWText>
+      </div>
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`${abstainPct}% voted Abstain`}
+        </CWText>
+        <CWText>{`(${abstainResults})`}</CWText>
+      </div>
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`${noWithVetoPct}% voted Veto`}
+        </CWText>
+        <CWText>{`(${noWithVetoResults})`}</CWText>
+      </div>
+    </div>
+  );
+};
 
-type SimpleYesApprovalVotingResultAttrs = {
+type SimpleYesApprovalVotingResultProps = {
   approvedCount: number;
-} & BaseVotingResultAttrs;
+} & BaseVotingResultProps;
 
-export class SimpleYesApprovalVotingResult extends ClassComponent<SimpleYesApprovalVotingResultAttrs> {
-  view(vnode: ResultNode<SimpleYesApprovalVotingResultAttrs>) {
-    const { approvedCount, proposal, votes } = vnode.attrs;
+export const SimpleYesApprovalVotingResult = (
+  props: SimpleYesApprovalVotingResultProps
+) => {
+  const { approvedCount, proposal, votes } = props;
 
-    return (
-      <div className="VotingResult">
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Approved ${approvedCount}`}
-          </CWText>
-          <VoteListing proposal={proposal} votes={votes} />
-        </div>
+  return (
+    <div className="VotingResult">
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Approved ${approvedCount}`}
+        </CWText>
+        <VoteListing proposal={proposal} votes={votes} />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-type AaveVotingResultAttrs = {
+type AaveVotingResultProps = {
   noBalanceString: string;
   noVotesCount: number;
   proposal: AaveProposal;
@@ -147,168 +141,162 @@ type AaveVotingResultAttrs = {
   yesVotesCount: number;
 };
 
-export class AaveVotingResult extends ClassComponent<AaveVotingResultAttrs> {
-  view(vnode: ResultNode<AaveVotingResultAttrs>) {
-    const {
-      noBalanceString,
-      noVotesCount,
-      proposal,
-      votes,
-      yesBalanceString,
-      yesVotesCount,
-    } = vnode.attrs;
+export const AaveVotingResult = (props: AaveVotingResultProps) => {
+  const {
+    noBalanceString,
+    noVotesCount,
+    proposal,
+    votes,
+    yesBalanceString,
+    yesVotesCount,
+  } = props;
 
-    return (
-      <div className="VotingResult">
-        <div className="results-column-yes">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Yes (${yesBalanceString} ${yesVotesCount}) voters`}
+  return (
+    <div className="VotingResult">
+      <div className="results-column-yes">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Yes (${yesBalanceString} ${yesVotesCount}) voters`}
+        </CWText>
+        <div className="results-subheader">
+          <CWText type="h5" fontWeight="medium">
+            User
           </CWText>
-          <div className="results-subheader">
-            <CWText type="h5" fontWeight="medium">
-              User
-            </CWText>
-            <CWText type="h5" fontWeight="medium">
-              Power
-            </CWText>
-          </div>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter((v) => !!v.choice)}
-          />
-        </div>
-        <div className="results-column-no">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`No (${noBalanceString} ${noVotesCount}) voters`}
+          <CWText type="h5" fontWeight="medium">
+            Power
           </CWText>
-          <div className="results-subheader">
-            <CWText type="h5" fontWeight="medium">
-              User
-            </CWText>
-            <CWText type="h5" fontWeight="medium">
-              Power
-            </CWText>
-          </div>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter((v) => !v.choice)}
-          />
         </div>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter((v) => !!v.choice)}
+        />
       </div>
-    );
-  }
-}
+      <div className="results-column-no">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`No (${noBalanceString} ${noVotesCount}) voters`}
+        </CWText>
+        <div className="results-subheader">
+          <CWText type="h5" fontWeight="medium">
+            User
+          </CWText>
+          <CWText type="h5" fontWeight="medium">
+            Power
+          </CWText>
+        </div>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter((v) => !v.choice)}
+        />
+      </div>
+    </div>
+  );
+};
 
-type YesNoAbstainVetoVotingResultAttrs = {
+type YesNoAbstainVetoVotingResultProps = {
   proposal: CosmosProposal;
   votes: Array<CosmosVote>;
 };
 
-export class YesNoAbstainVetoVotingResult extends ClassComponent<YesNoAbstainVetoVotingResultAttrs> {
-  view(vnode: ResultNode<YesNoAbstainVetoVotingResultAttrs>) {
-    const { proposal, votes } = vnode.attrs;
+export const YesNoAbstainVetoVotingResult = (
+  props: YesNoAbstainVetoVotingResultProps
+) => {
+  const { proposal, votes } = props;
 
-    return (
-      <div className="VotingResult">
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}
-          </CWText>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter((v) => v.choice === 'Yes')}
-          />
-        </div>
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Voted no (${votes.filter((v) => v.choice === 'No').length})`}
-          </CWText>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter((v) => v.choice === 'No')}
-          />
-        </div>
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Voted abstain (${
-              votes.filter((v) => v.choice === 'Abstain').length
-            })`}
-          </CWText>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter((v) => v.choice === 'Abstain')}
-          />
-        </div>
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Voted veto (${
-              votes.filter((v) => v.choice === 'NoWithVeto').length
-            })`}
-          </CWText>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter((v) => v.choice === 'NoWithVeto')}
-          />
-        </div>
+  return (
+    <div className="VotingResult">
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}
+        </CWText>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter((v) => v.choice === 'Yes')}
+        />
       </div>
-    );
-  }
-}
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Voted no (${votes.filter((v) => v.choice === 'No').length})`}
+        </CWText>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter((v) => v.choice === 'No')}
+        />
+      </div>
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Voted abstain (${
+            votes.filter((v) => v.choice === 'Abstain').length
+          })`}
+        </CWText>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter((v) => v.choice === 'Abstain')}
+        />
+      </div>
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Voted veto (${
+            votes.filter((v) => v.choice === 'NoWithVeto').length
+          })`}
+        </CWText>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter((v) => v.choice === 'NoWithVeto')}
+        />
+      </div>
+    </div>
+  );
+};
 
-type YesNoRejectVotingResultAttrs = {
+type YesNoRejectVotingResultProps = {
   proposal: NearSputnikProposal;
   votes: Array<NearSputnikVote>;
 };
 
-export class YesNoRejectVotingResult extends ClassComponent<YesNoRejectVotingResultAttrs> {
-  view(vnode: ResultNode<YesNoRejectVotingResultAttrs>) {
-    const { proposal, votes } = vnode.attrs;
+export const YesNoRejectVotingResult = (
+  props: YesNoRejectVotingResultProps
+) => {
+  const { proposal, votes } = props;
 
-    return (
-      <div className="VotingResult">
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Voted approve (${
-              votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
-                .length
-            })`}
-          </CWText>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter(
-              (v) => v.choice === NearSputnikVoteString.Approve
-            )}
-          />
-        </div>
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Voted reject (${
-              votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
-                .length
-            })`}
-          </CWText>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter(
-              (v) => v.choice === NearSputnikVoteString.Reject
-            )}
-          />
-        </div>
-        <div className="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Voted remove (${
-              votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
-                .length
-            })`}
-          </CWText>
-          <VoteListing
-            proposal={proposal}
-            votes={votes.filter(
-              (v) => v.choice === NearSputnikVoteString.Remove
-            )}
-          />
-        </div>
+  return (
+    <div className="VotingResult">
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Voted approve (${
+            votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
+              .length
+          })`}
+        </CWText>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter(
+            (v) => v.choice === NearSputnikVoteString.Approve
+          )}
+        />
       </div>
-    );
-  }
-}
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Voted reject (${
+            votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
+              .length
+          })`}
+        </CWText>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter((v) => v.choice === NearSputnikVoteString.Reject)}
+        />
+      </div>
+      <div className="results-column">
+        <CWText type="h4" fontWeight="medium" className="results-header">
+          {`Voted remove (${
+            votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
+              .length
+          })`}
+        </CWText>
+        <VoteListing
+          proposal={proposal}
+          votes={votes.filter((v) => v.choice === NearSputnikVoteString.Remove)}
+        />
+      </div>
+    </div>
+  );
+};
