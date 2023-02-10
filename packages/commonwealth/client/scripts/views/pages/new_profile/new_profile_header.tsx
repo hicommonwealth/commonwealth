@@ -21,9 +21,8 @@ const NewProfileHeader = (props: NewProfileHeaderProps) => {
   const [defaultAvatar, setDefaultAvatar] = React.useState<string>();
 
   React.useEffect(() => {
-    setDefaultAvatar(jdenticon.toSvg(props.profile.id, 90))
+    setDefaultAvatar(jdenticon.toSvg(props.profile.id, 90));
   }, []);
-
 
   const { profile, isOwner } = props;
 
@@ -72,6 +71,6 @@ const NewProfileHeader = (props: NewProfileHeaderProps) => {
       </div>
     </div>
   );
-}
+};
 
 export default NewProfileHeader;

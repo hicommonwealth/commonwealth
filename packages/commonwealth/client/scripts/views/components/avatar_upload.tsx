@@ -60,7 +60,7 @@ export const AvatarUpload = (props: AvatarUploadProps) => {
               );
             }
             file.uploadURL = response.result;
-            setUploaded(true)
+            setUploaded(true);
             done();
             setTimeout(() => newDropzone.processFile(file));
           })
@@ -96,13 +96,13 @@ export const AvatarUpload = (props: AvatarUploadProps) => {
 
     const cleanUpFiles = () => {
       dropzone.files.map((file) => dropzone.removeFile(file));
-    }
+    };
 
     nodeRef.current.addEventListener('cleardropzone', cleanUpFiles);
     return () => {
       nodeRef.current.removeEventListener('cleardropzone', cleanUpFiles);
-    }
-  }, [])
+    };
+  }, []);
 
   const { account, darkMode, scope, size = 'small' } = props;
 
@@ -160,4 +160,4 @@ export const AvatarUpload = (props: AvatarUploadProps) => {
       />
     </div>
   );
-}
+};

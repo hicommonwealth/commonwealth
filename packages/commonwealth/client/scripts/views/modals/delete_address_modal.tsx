@@ -67,10 +67,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
           <CWText type="h4" fontWeight="semiBold">
             Delete Address
           </CWText>
-          <CWIconButton
-            iconName="close"
-            onClick={closeModal}
-          />
+          <CWIconButton iconName="close" onClick={closeModal} />
         </div>
         <div className="body">
           <CWText>

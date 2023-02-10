@@ -42,7 +42,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   const [uploadStatus, setUploadStatus] = React.useState<
     ValidationStatus | undefined
   >();
-  const [imageBehavior, setImageBehavior ] = React.useState<ImageBehavior>();
+  const [imageBehavior, setImageBehavior] = React.useState<ImageBehavior>();
   const [prompt, setPrompt] = React.useState<string>();
   const [isPrompting, setIsPrompting] = React.useState<boolean>();
   const [isGenerating, setIsGenerating] = React.useState<boolean>();
@@ -50,7 +50,9 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   const attachButton = React.useRef<HTMLDivElement>(null);
   const pseudoInput = React.useRef<HTMLInputElement>(null);
 
-  const uploadImage = async (file: File): Promise<[string, ValidationStatus]> => {
+  const uploadImage = async (
+    file: File
+  ): Promise<[string, ValidationStatus]> => {
     try {
       const signatureResponse = await $.post(
         `${app.serverUrl()}/getUploadSignature`,
@@ -87,7 +89,9 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
 
       if (isPrompting) {
         setImageURL(res.result.imageUrl);
-        const currentImageBehavior = !imageBehavior ? ImageBehavior.Fill : imageBehavior;
+        const currentImageBehavior = !imageBehavior
+          ? ImageBehavior.Fill
+          : imageBehavior;
         setImageBehavior(currentImageBehavior);
         setUploadStatus('success');
         attachButton.current.style.display = 'none';
@@ -100,7 +104,6 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
       setIsPrompting(false);
       setIsGenerating(false);
       redraw();
-
 
       return res.result.imageUrl;
     } catch (e) {
@@ -133,13 +136,14 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
 
     if (_imageURL) {
       setImageURL(_imageURL);
-      const currentImageBehavior = !imageBehavior ? ImageBehavior.Fill : imageBehavior;
+      const currentImageBehavior = !imageBehavior
+        ? ImageBehavior.Fill
+        : imageBehavior;
       setImageBehavior(currentImageBehavior);
       attachButton.current.style.display = 'none';
       uploadCompleteCallback(_imageURL, currentImageBehavior);
     }
   };
-
 
   // Drag'n'Drop event handler declarations
   const dragEnterHandler = (enterEvent: DragEvent) => {
@@ -325,9 +329,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
         />
         {isUploading && <CWSpinner size="large" />}
         <div className="attach-btn" ref={attachButton}>
-          {!isUploading && (
-            <CWIcon iconName="imageUpload" iconSize="medium" />
-          )}
+          {!isUploading && <CWIcon iconName="imageUpload" iconSize="medium" />}
           <CWText type="caption" fontWeight="medium">
             {headerText}
           </CWText>

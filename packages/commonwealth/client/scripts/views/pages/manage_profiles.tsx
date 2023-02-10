@@ -28,21 +28,23 @@ const ManageProfiles = () => {
         jwt: app.user.jwt,
       });
 
-      setProfiles(response.result.profiles?.map(
-        (profile) => new Profile(profile)
-      ));
-      setAddresses(response.result.addresses?.map(
-        (a) =>
-          new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address,
-            a.profile_id
-          )
-      ));
+      setProfiles(
+        response.result.profiles?.map((profile) => new Profile(profile))
+      );
+      setAddresses(
+        response.result.addresses?.map(
+          (a) =>
+            new AddressInfo(
+              a.id,
+              a.address,
+              a.chain,
+              a.keytype,
+              a.wallet_id,
+              a.ghost_address,
+              a.profile_id
+            )
+        )
+      );
     } catch (err) {
       setError(true);
     }
@@ -62,8 +64,7 @@ const ManageProfiles = () => {
       </div>
     );
 
-  if (error)
-    return <PageNotFound message="We cannot find any profiles." />;
+  if (error) return <PageNotFound message="We cannot find any profiles." />;
 
   if (!profiles) return;
 
@@ -94,15 +95,13 @@ const ManageProfiles = () => {
             key={i}
             profiles={profiles}
             profile={profile}
-            addresses={addresses?.filter(
-              (a) => a.profileId === profile.id
-            )}
+            addresses={addresses?.filter((a) => a.profileId === profile.id)}
             refreshProfiles={getProfiles}
           />
         ))}
       </div>
     </Sublayout>
   );
-}
+};
 
 export default ManageProfiles;

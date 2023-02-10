@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import jdenticon from 'jdenticon';
 
 import 'components/profile_preview.scss';
@@ -22,11 +22,12 @@ type ProfilePreviewProps = {
 
 const ProfilePreview = (props: ProfilePreviewProps) => {
   const [defaultAvatar, setDefaultAvatar] = React.useState<string>();
-  const [isLoginModalOpen, setIsLoginModalOpen] = React.useState<boolean>(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] =
+    React.useState<boolean>(false);
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    setDefaultAvatar(jdenticon.toSvg(props.profile.id, 90))
+    setDefaultAvatar(jdenticon.toSvg(props.profile.id, 90));
   }, []);
 
   const { profiles, profile, addresses, refreshProfiles } = props;
@@ -40,7 +41,9 @@ const ProfilePreview = (props: ProfilePreviewProps) => {
             <img src={avatarUrl} />
           ) : (
             <img
-              src={`data:image/svg+xml;utf8,${encodeURIComponent(defaultAvatar)}`}
+              src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                defaultAvatar
+              )}`}
             />
           )}
         </div>
@@ -106,12 +109,13 @@ const ProfilePreview = (props: ProfilePreviewProps) => {
               setIsLoginModalOpen(false);
               refreshProfiles();
             }}
-          />}
+          />
+        }
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
       />
     </div>
   );
-}
+};
 
 export default ProfilePreview;

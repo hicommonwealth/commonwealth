@@ -26,9 +26,7 @@ export const CWForm = (props: FormProps) => {
       </div>
       <CWDivider />
       <div className="content">{props.children}</div>
-      {actions && (
-        <div className="actions">{actions}</div>
-      )}
+      {actions && <div className="actions">{actions}</div>}
     </div>
   );
 };

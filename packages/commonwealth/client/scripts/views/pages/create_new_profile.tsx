@@ -18,9 +18,7 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
-import type {
-  ImageBehavior,
-} from '../components/component_kit/cw_cover_image_uploader';
+import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
 import type { Image } from './edit_new_profile';
 import ConfirmCancelNewProfileModal from '../modals/confirm_cancel_new_profile_modal';
@@ -37,7 +35,8 @@ const CreateNewProfile = () => {
   const [bio, setBio] = React.useState<QuillEditor>();
   const [coverImage, setCoverImage] = React.useState<Image>();
   const [backgroundImage, setBackgroundImage] = React.useState<Image>();
-  const [isConfirmCancelModalOpen, setIsConfirmCancelModalOpen] = React.useState<boolean>(false);
+  const [isConfirmCancelModalOpen, setIsConfirmCancelModalOpen] =
+    React.useState<boolean>(false);
 
   const createProfile = async (profileUpdates: any) => {
     setLoading(true);
@@ -74,8 +73,7 @@ const CreateNewProfile = () => {
     if (socials) newProfileFields.socials = JSON.stringify(socials);
     // if (this.bio.textContentsAsString)
     //   this.newProfileFields.bio = this.bio.textContentsAsString;
-    if (coverImage)
-      newProfileFields.coverImage = JSON.stringify(coverImage);
+    if (coverImage) newProfileFields.coverImage = JSON.stringify(coverImage);
     if (backgroundImage)
       newProfileFields.backgroundImage = JSON.stringify(backgroundImage);
 
@@ -289,7 +287,9 @@ const CreateNewProfile = () => {
         </CWForm>
         <Modal
           content={
-            <ConfirmCancelNewProfileModal closeModal={() => setIsConfirmCancelModalOpen(false)} />
+            <ConfirmCancelNewProfileModal
+              closeModal={() => setIsConfirmCancelModalOpen(false)}
+            />
           }
           onClose={() => setIsConfirmCancelModalOpen(false)}
           open={isConfirmCancelModalOpen}
@@ -297,6 +297,6 @@ const CreateNewProfile = () => {
       </div>
     </Sublayout>
   );
-}
+};
 
 export default CreateNewProfile;

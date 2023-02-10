@@ -25,9 +25,7 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
-import type {
-  ImageBehavior,
-} from '../components/component_kit/cw_cover_image_uploader';
+import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from './404';
 
@@ -48,7 +46,9 @@ export type Image = {
 const EditNewProfile = (props: EditNewProfileProps) => {
   const navigate = useNavigate();
   const [email, setEmail] = React.useState<string>('');
-  const [error, setError] = React.useState<EditProfileError>(EditProfileError.None);
+  const [error, setError] = React.useState<EditProfileError>(
+    EditProfileError.None
+  );
   const [loading, setLoading] = React.useState<boolean>(false);
   const [socials, setSocials] = React.useState<string[]>();
   const [profile, setProfile] = React.useState<Profile>();
@@ -80,17 +80,19 @@ const EditNewProfile = (props: EditNewProfileProps) => {
       setAvatarUrl(response.profile.avatar_url);
       setCoverImage(response.profile.cover_image);
       setBackgroundImage(response.profile.background_image);
-      setAddresses(response.addresses.map(
-        (a) =>
-          new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          )
-      ));
+      setAddresses(
+        response.addresses.map(
+          (a) =>
+            new AddressInfo(
+              a.id,
+              a.address,
+              a.chain,
+              a.keytype,
+              a.wallet_id,
+              a.ghost_address
+            )
+        )
+      );
       setIsOwner(response.isOwner);
     } catch (err) {
       if (
@@ -153,7 +155,9 @@ const EditNewProfile = (props: EditNewProfileProps) => {
       profileUpdate.coverImage = JSON.stringify(coverImageRef.current);
 
     if (!_.isEqual(backgroundImageRef.current, profile?.backgroundImage))
-      profileUpdate.backgroundImage = JSON.stringify(backgroundImageRef.current);
+      profileUpdate.backgroundImage = JSON.stringify(
+        backgroundImageRef.current
+      );
 
     if (Object.keys(profileUpdate)?.length > 0) {
       updateProfile(profileUpdate);
@@ -230,20 +234,13 @@ const EditNewProfile = (props: EditNewProfileProps) => {
     // not the best solution because address is not always available
     // should refactor AvatarUpload to make it work with new profiles
     let account: Account | null;
-    console.log('addresses', addresses);
     if (addresses?.length > 0) {
       const oldProfile = new OldProfile(
         addresses[0].chain.name,
         addresses[0].address
       );
 
-      oldProfile.initialize(
-        username,
-        null,
-        bio,
-        avatarUrl,
-        null
-      );
+      oldProfile.initialize(username, null, bio, avatarUrl, null);
 
       account = new Account({
         chain: addresses[0].chain,
@@ -381,8 +378,8 @@ const EditNewProfile = (props: EditNewProfileProps) => {
               <div className="socials-section">
                 <CWText type="b1">Social Links</CWText>
                 <CWText type="caption">
-                  Add any of your community's links (Websites, social
-                  platforms, etc) These can be added and edited later.
+                  Add any of your community's links (Websites, social platforms,
+                  etc) These can be added and edited later.
                 </CWText>
                 <CWSocials
                   socials={profile?.socials}
@@ -451,6 +448,6 @@ const EditNewProfile = (props: EditNewProfileProps) => {
       </Sublayout>
     );
   }
-}
+};
 
 export default EditNewProfile;

@@ -100,10 +100,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
       <div className="MoveAddressModal">
         <div className="title">
           <CWText type="h4">Transfer Address</CWText>
-          <CWIconButton
-            iconName="close"
-            onClick={closeModal}
-          />
+          <CWIconButton iconName="close" onClick={closeModal} />
         </div>
         <div className="body">
           <CWText type="caption">Address to be moved</CWText>

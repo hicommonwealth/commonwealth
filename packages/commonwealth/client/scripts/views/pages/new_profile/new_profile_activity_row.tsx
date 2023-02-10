@@ -43,8 +43,6 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('this.setRoute', this.setRoute);
-                console.log(`/${chain}/discussions`)
                 this.setRoute(`/${chain}/discussions`);
               }}
             >
@@ -66,29 +64,27 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
               {isThread ? 'Created a thread' : 'Commented on the thread'}
               &nbsp;
             </span>
-            {isThread
-              ? (
-                <a
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.setRoute(`/${chain}/discussion/${id}`);
-                  }}
-                >
-                  {title}
-                </a>
-              ) : (
-                <a
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.setRoute(`/${chain}/discussions`);
-                  }}
-                >
-                  {decodeURIComponent(comment.thread?.title)}
-                </a>
-              )
-            }
+            {isThread ? (
+              <a
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  this.setRoute(`/${chain}/discussion/${id}`);
+                }}
+              >
+                {title}
+              </a>
+            ) : (
+              <a
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  this.setRoute(`/${chain}/discussions`);
+                }}
+              >
+                {decodeURIComponent(comment.thread?.title)}
+              </a>
+            )}
           </CWText>
         </div>
         <div className="content">

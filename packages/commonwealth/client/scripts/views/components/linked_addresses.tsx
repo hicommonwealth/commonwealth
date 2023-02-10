@@ -54,7 +54,9 @@ class Address extends ClassComponent<AddressAttrs> {
               onClick: () => toggleRemoveModal(true, addressInfo),
             },
           ]}
-          renderTrigger={(onclick) => <CWIconButton iconName="dotsVertical" onClick={onclick} />}
+          renderTrigger={(onclick) => (
+            <CWIconButton iconName="dotsVertical" onClick={onclick} />
+          )}
         />
       </div>
     );
@@ -84,11 +86,17 @@ export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
               profile={profile}
               addressInfo={address}
               refreshProfiles={refreshProfiles}
-              toggleTransferModal={(val: boolean, currentAddress: AddressInfo) => {
+              toggleTransferModal={(
+                val: boolean,
+                currentAddress: AddressInfo
+              ) => {
                 this.isTransferModalOpen = val;
                 this.currentAddress = currentAddress;
               }}
-              toggleRemoveModal={(val: boolean, currentAddress: AddressInfo) => {
+              toggleRemoveModal={(
+                val: boolean,
+                currentAddress: AddressInfo
+              ) => {
                 this.isRemoveModalOpen = val;
                 this.currentAddress = currentAddress;
               }}
@@ -107,7 +115,7 @@ export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
               }}
             />
           }
-          onClose={() => this.currentAddress = null}
+          onClose={() => (this.currentAddress = null)}
           open={this.isTransferModalOpen}
         />
         <Modal
@@ -122,7 +130,7 @@ export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
               }}
             />
           }
-          onClose={() => this.currentAddress = null}
+          onClose={() => (this.currentAddress = null)}
           open={this.isRemoveModalOpen}
         />
       </div>

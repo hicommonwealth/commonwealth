@@ -1,17 +1,7 @@
 import React from 'react';
 
-import type {
-  ResultNode
-} from 'mithrilInterop';
-import {
-  ClassComponent,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'components/social_accounts.scss';
 
@@ -26,7 +16,7 @@ type SocialAccountAttrs = {
 
 type SocialAccountsAttrs = {
   profile: Profile;
-}
+};
 
 class SocialAccount extends ClassComponent<SocialAccountAttrs> {
   view(vnode: ResultNode<SocialAccountAttrs>) {

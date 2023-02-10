@@ -13,7 +13,7 @@ import { PageNotFound } from './404';
 
 type NewProfileRedirectAttrs = {
   address: string;
-}
+};
 
 // TODO: this is a temporary solution to redirect old profile links (using address)
 // to new profile links (using username). this should be removed once PR4 is merged
