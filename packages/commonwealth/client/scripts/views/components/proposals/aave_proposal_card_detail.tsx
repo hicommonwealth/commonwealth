@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'components/proposals/aave_proposal_card_detail.scss';
 
@@ -38,6 +38,11 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
     ? statusText[0]?.split(',')[0]
     : statusText;
 
+  const [author, setAuthor] = useState<string>(proposal.ipfsData?.author);
+  useEffect(() => {
+    // TODO: we need to load titles / description async too
+    proposal.ipfsDataReady.once('ready', () => setAuthor(proposal.ipfsData?.author));
+  })
   // TODO: move executor display to entire page
   // TODO: display stats about voting turnout/etc
   // const executor = proposal.Executor;
@@ -47,9 +52,9 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
       <div className="aave-metadata-container">
         <div className="aave-metadata-column">
           <CWLabel label="Author" />
-          {proposal.ipfsData?.author ? (
-            <CWText title={proposal.ipfsData.author.split(' (')[0]} noWrap>
-              {proposal.ipfsData.author.split(' (')[0]}
+          {author ? (
+            <CWText title={author.split(' (')[0]} noWrap>
+              {author.split(' (')[0]}
             </CWText>
           ) : (
             <User user={proposal.author} hideAvatar linkify />
