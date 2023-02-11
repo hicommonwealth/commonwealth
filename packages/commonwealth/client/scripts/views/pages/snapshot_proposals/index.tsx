@@ -63,19 +63,15 @@ const SnapshotProposalsPage = (props: SnapshotProposalsPageProps) => {
 
   const [selectedFilter, setSelectedFilter] =
     React.useState<SnapshotProposalFilter>(SnapshotProposalFilter.Active);
+  const [, updateState] = React.useState({});
 
-  //   mixpanelBrowserTrack({
-  //     event: MixpanelSnapshotEvents.SNAPSHOT_PAGE_VISIT,
-  //     isCustomDomain: app.isCustomDomain(),
-  //   });
-
-  // if (!app.snapshot.initialized || app.snapshot?.space?.id !== snapshotId) {
-  //   app.snapshot.init(snapshotId).then(() => {
-  //     redraw();
-  //   });
-
-  //   return <PageLoading />;
-  // }
+  if (!app.snapshot.initialized) {
+    app.snapshot.init(snapshotId).then(() => {
+      console.log('snapshot initialized');
+      updateState({});
+    });
+    return <PageLoading />;
+  }
 
   const checkProposalByFilter = (
     proposal: SnapshotProposal,
