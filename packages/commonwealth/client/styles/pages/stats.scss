@@ -27,14 +27,14 @@
   }
 
   .bottom {
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: $border-radius-corners;
+    border-bottom-left-radius: $border-radius-corners;
   }
 
   .top {
     border-top: 1px solid $neutral-100;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
+    border-top-right-radius: $border-radius-corners;
+    border-top-left-radius: $border-radius-corners;
 
     .Text {
       color: $neutral-500;
