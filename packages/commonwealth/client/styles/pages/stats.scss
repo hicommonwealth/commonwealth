@@ -3,11 +3,45 @@
 .StatsPage {
   flex: 1;
   padding: 24px;
+  padding-left: 36px;
+
 
   .stat-row {
-    border-bottom: 1px solid $neutral-300;
+    border: 1px solid $neutral-100;
+    border-top: none;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    padding: 8px;
+    padding: 12px;
+
+
+    .Text:first-of-type {
+      justify-content: start;
+    }
+    .Text {
+      justify-content: right;
+      margin-right: 8px;
+    }
+
+  }
+
+  .dark {
+    background-color: $neutral-50;
+    color: $neutral-500;
+  }
+
+  .bottom {
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  .top {
+    border-top: 1px solid $neutral-100;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+
+    .Text {
+      color: $neutral-500;
+
+    }
   }
 }
