@@ -208,6 +208,8 @@ export function redraw(sync = false, component?: any) {
   if (component) {
     console.log(component);
     component.forceUpdate();
+  } else {
+    // console.trace('no-op redraw called!');
   }
 }
 

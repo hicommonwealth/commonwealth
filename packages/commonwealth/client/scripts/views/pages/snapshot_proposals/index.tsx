@@ -78,7 +78,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
 
     if (!app.snapshot.initialized || app.snapshot?.space?.id !== snapshotId) {
       app.snapshot.init(snapshotId).then(() => {
-        redraw();
+        this.redraw();
       });
 
       return <PageLoading />;
