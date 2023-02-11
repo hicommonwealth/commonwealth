@@ -5,14 +5,12 @@
   padding: 24px;
   padding-left: 36px;
 
-
   .stat-row {
     border: 1px solid $neutral-100;
     border-top: none;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     padding: 12px;
-
 
     .Text:first-of-type {
       justify-content: start;
@@ -21,7 +19,6 @@
       justify-content: right;
       margin-right: 8px;
     }
-
   }
 
   .dark {
@@ -41,7 +38,6 @@
 
     .Text {
       color: $neutral-500;
-
     }
   }
 }

@@ -5,7 +5,6 @@ import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
 
-
 import app from 'state';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
