@@ -253,14 +253,6 @@ const getCustomDomainRoutes = (importRoute) => ({
 
   // Discussions
   '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-  '/discussions': importRoute(import('views/pages/discussions'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/discussions/:topic': importRoute(import('views/pages/discussions'), {
-    scoped: true,
-    deferChain: true,
-  }),
   '/overview': importRoute(import('views/pages/overview'), {
     scoped: true,
     deferChain: true,
