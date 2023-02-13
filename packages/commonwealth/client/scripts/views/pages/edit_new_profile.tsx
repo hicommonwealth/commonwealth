@@ -49,7 +49,7 @@ const EditNewProfile = (props: EditNewProfileProps) => {
   const [error, setError] = React.useState<EditProfileError>(
     EditProfileError.None
   );
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>(true);
   const [socials, setSocials] = React.useState<string[]>();
   const [profile, setProfile] = React.useState<Profile>();
   const [username, setUsername] = React.useState<string>(props.username || '');
@@ -66,7 +66,6 @@ const EditNewProfile = (props: EditNewProfileProps) => {
   backgroundImageRef.current = backgroundImage;
 
   const getProfile = async (passedUsername: string) => {
-    setLoading(true);
     try {
       const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
         username: passedUsername,
