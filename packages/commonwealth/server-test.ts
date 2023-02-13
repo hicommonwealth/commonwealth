@@ -16,7 +16,7 @@ import http from 'http';
 import passport from 'passport';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
+import setupAPI from 'server/routing/router'; // performance note: this takes 15 seconds
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
