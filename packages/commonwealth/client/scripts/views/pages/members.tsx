@@ -5,6 +5,7 @@ import 'pages/members.scss';
 
 import app from 'state';
 import type { Profile } from 'models';
+import { AccessLevel } from 'models';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { CWText } from '../components/component_kit/cw_text';
@@ -22,9 +23,21 @@ const MembersPage = () => {
     const fetch = async () => {
       await activeInfo.getMembers(activeInfo.id);
 
-      const profiles: Array<MemberInfo> = activeInfo.members.map((role) => ({
-        profile: app.profiles.getProfile(role.address_chain, role.address),
-      }));
+      const accessLevelOrder = Object.values(AccessLevel);
+
+      const membersCopy = [...activeInfo.members];
+
+      const membersCopySortedByPerms = membersCopy.sort(
+        (a, b) =>
+          accessLevelOrder.indexOf(a.permission) -
+          accessLevelOrder.indexOf(b.permission)
+      );
+
+      const profiles: Array<MemberInfo> = membersCopySortedByPerms.map(
+        (role) => ({
+          profile: app.profiles.getProfile(role.address_chain, role.address),
+        })
+      );
 
       setMembersList(profiles);
     };
