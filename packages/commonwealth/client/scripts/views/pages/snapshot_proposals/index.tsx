@@ -53,6 +53,24 @@ const SnapshotProposalStagesBar = (props: SnapshotProposalStagesBarProps) => {
   );
 };
 
+const checkProposalByFilter = (
+  proposal: SnapshotProposal,
+  option: SnapshotProposalFilter
+) => {
+  switch (option) {
+    case SnapshotProposalFilter.Core:
+    case SnapshotProposalFilter.Community:
+      return true;
+    case SnapshotProposalFilter.Active:
+      return moment(+proposal.end * 1000) >= moment();
+    case SnapshotProposalFilter.Ended:
+      return moment(+proposal.end * 1000) < moment();
+    default:
+      break;
+  }
+  return true;
+};
+
 type SnapshotProposalsPageProps = {
   topic?: string;
   snapshotId: string;
@@ -61,60 +79,43 @@ type SnapshotProposalsPageProps = {
 const SnapshotProposalsPage = (props: SnapshotProposalsPageProps) => {
   const { snapshotId } = props;
 
+  const [proposals, setProposals] = React.useState<Array<SnapshotProposal>>([]);
   const [selectedFilter, setSelectedFilter] =
     React.useState<SnapshotProposalFilter>(SnapshotProposalFilter.Active);
-  const [, updateState] = React.useState({});
 
-  if (!app.snapshot.initialized) {
-    app.snapshot.init(snapshotId).then(() => {
-      console.log('snapshot initialized');
-      updateState({});
-    });
-    return <PageLoading />;
-  }
+  React.useEffect(() => {
+    const fetch = async () => {
+      await app.snapshot.init(snapshotId);
 
-  const checkProposalByFilter = (
-    proposal: SnapshotProposal,
-    option: SnapshotProposalFilter
-  ) => {
-    switch (option) {
-      case SnapshotProposalFilter.Core:
-      case SnapshotProposalFilter.Community:
-        return true;
-      case SnapshotProposalFilter.Active:
-        return moment(+proposal.end * 1000) >= moment();
-      case SnapshotProposalFilter.Ended:
-        return moment(+proposal.end * 1000) < moment();
-      default:
-        break;
-    }
-    return true;
-  };
+      if (app.snapshot.initialized) {
+        setProposals(app.snapshot.proposals);
+      }
+    };
 
-  const proposals = app.snapshot.proposals.filter(
-    (proposal: SnapshotProposal) =>
-      checkProposalByFilter(proposal, selectedFilter)
-  );
+    fetch();
+  }, [snapshotId]);
 
   const onChangeFilter = (value: SnapshotProposalFilter) => {
     setSelectedFilter(value);
   };
 
   return (
-    <Sublayout
-    // title="Proposals"
-    >
+    <Sublayout>
       <div className="SnapshotProposalsPage">
         <SnapshotProposalStagesBar onChangeFilter={onChangeFilter} />
         {proposals.length > 0 ? (
           <CardsCollection
-            content={proposals.map((proposal, i) => (
-              <SnapshotProposalCard
-                key={i}
-                snapshotId={snapshotId}
-                proposal={proposal}
-              />
-            ))}
+            content={proposals
+              .filter((proposal: SnapshotProposal) =>
+                checkProposalByFilter(proposal, selectedFilter)
+              )
+              .map((proposal, i) => (
+                <SnapshotProposalCard
+                  key={i}
+                  snapshotId={snapshotId}
+                  proposal={proposal}
+                />
+              ))}
           />
         ) : (
           <CWText className="no-proposals-text">
