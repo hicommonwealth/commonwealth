@@ -2,7 +2,6 @@
 
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import _ from 'lodash';
 import m from 'mithril';
 
 import app from 'state';
