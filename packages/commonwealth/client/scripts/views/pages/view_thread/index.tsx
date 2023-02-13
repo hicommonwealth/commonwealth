@@ -17,7 +17,7 @@ import 'pages/view_thread/index.scss';
 import app from 'state';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
-import PageNotFound from 'views/pages/404';
+import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CollapsibleThreadBody } from '../../components/collapsible_body_text';

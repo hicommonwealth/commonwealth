@@ -1,14 +1,7 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import {
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { render, redraw } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
@@ -21,17 +14,16 @@ import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
+import { useNavigate } from 'react-router-dom';
+import { Modal } from '../component_kit/cw_modal';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
 export type AddressDisplayOptions = {
   autoTruncate?: boolean;
   maxCharLength?: number;
-  showFullAddress?: boolean;
-};
 
 type UserAttrs = {
-  addressDisplayOptions?: AddressDisplayOptions; // display full or truncated address
   avatarOnly?: boolean; // overrides most other properties
   avatarSize?: number;
   hideAvatar?: boolean;
@@ -54,6 +46,7 @@ export const User = (props: UserAttrs) => {
     popover,
     showRole,
   } = props;
+  const navigate = useNavigate();
 
   const popoverProps = usePopover();
 
@@ -198,7 +191,8 @@ export const User = (props: UserAttrs) => {
                   </>
                 )}
                 {getRoleTags(false)}
-              </>
+              </>,
+              navigate
             )
           ) : (
             <a className="user-display-name username">
@@ -265,8 +259,9 @@ export const User = (props: UserAttrs) => {
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
-                </>
-              )
+                </React.Fragment>
+              ),
+              navigate
             )}
       </div>
       {profile?.address && (

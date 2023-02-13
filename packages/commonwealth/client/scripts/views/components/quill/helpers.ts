@@ -1,13 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import type { QuillTextParams } from './quill_formatted_text';

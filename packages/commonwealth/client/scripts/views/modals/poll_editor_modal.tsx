@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent} from
-
- 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';

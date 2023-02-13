@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { setRoute, redraw } from 'mithrilInterop';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
+import { redraw } from 'mithrilInterop';
 import { navigateToSubpage } from 'router';
+import { useNavigate } from 'react-router-dom';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 import { AddressInfo } from 'models';
@@ -16,7 +16,9 @@ import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
-const CWSidebarMenuItemComponent = (props: MenuItem) => {
+export const CWSidebarMenuItem = (props: MenuItem) => {
+  const navigate = useNavigate();
+
   if (props.type === 'default') {
     const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
       props;
@@ -59,7 +61,7 @@ const CWSidebarMenuItemComponent = (props: MenuItem) => {
           app.sidebarToggled = false;
           app.sidebarMenu = 'default';
           app.sidebarRedraw.emit('redraw');
-          setRoute(item.id ? `/${item.id}` : '/');
+          navigate(item.id ? `/${item.id}` : '/');
         }}
       >
         <CommunityLabel community={item} />
@@ -100,16 +102,15 @@ const CWSidebarMenuItemComponent = (props: MenuItem) => {
   }
 };
 
-const CWSidebarMenuItem = NavigationWrapper(CWSidebarMenuItemComponent);
-
 type SidebarMenuProps = {
   className?: string;
   menuHeader?: { label: string; onClick: (e) => void };
   menuItems: Array<MenuItem>;
 };
 
-const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
+export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
+  const navigate = useNavigate();
 
   return (
     <div
@@ -145,7 +146,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               app.sidebarRedraw.emit('redraw');
-              setRoute('/communities');
+              navigate('/communities');
             },
           },
           {
@@ -156,7 +157,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               app.sidebarRedraw.emit('redraw');
-              setRoute('/notification-settings');
+              navigate('/notification-settings');
             },
           },
           {
@@ -170,7 +171,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
                 app.sidebarRedraw.emit('redraw');
-                setRoute('/settings');
+                navigate('/settings');
               }
             },
           } as MenuItem,
@@ -181,5 +182,3 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
     </div>
   );
 };
-
-export const CWSidebarMenu = NavigationWrapper(CWSidebarMenuComponent);

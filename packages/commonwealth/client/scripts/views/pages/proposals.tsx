@@ -1,15 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
@@ -24,7 +15,7 @@ import 'pages/proposals.scss';
 import app from 'state';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { ProposalCard } from 'views/components/proposal_card';
-import PageNotFound from 'views/pages/404';
+import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
@@ -72,6 +63,7 @@ class ProposalsPage extends ClassComponent {
 
   view() {
     if (!app.chain || !app.chain.loaded) {
+      app.chainAdapterReady.on('ready', () => this.redraw());
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut

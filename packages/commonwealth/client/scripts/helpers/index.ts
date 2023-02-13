@@ -1,4 +1,5 @@
-import { render, setRoute } from 'mithrilInterop';
+import type { ClassComponent } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
@@ -43,16 +44,16 @@ export function parseCustomStages(str) {
     .filter((s) => s) as unknown as ThreadStage[];
 }
 
-export const modalRedirectClick = (e, route) => {
+export const modalRedirectClick = (e, redirectCb: () => void) => {
   e.preventDefault();
   $(e.target).trigger('modalexit');
-  setRoute(route);
+  redirectCb?.();
 };
 
 /*
  * mithril link helper
  */
-export function externalLink(selector, target, children) {
+export function externalLink(selector, target, children, setRouteCb) {
   return render(
     selector,
     {
@@ -65,7 +66,7 @@ export function externalLink(selector, target, children) {
           // don't open a new window if the link is on Commonwealth
           e.preventDefault();
           e.stopPropagation();
-          setRoute(target);
+          setRouteCb?.(target);
         }
       },
     },
@@ -73,10 +74,15 @@ export function externalLink(selector, target, children) {
   );
 }
 
+// This function should not be used anymore for links.
+// Instead, <Link/> component from react-router is advised.
+// It is adjusted, not rewritten, as there are non-jsx components
+// that still use this method.ł
 export function link(
   selector: string,
   target: string,
   children,
+  setRoute: ClassComponent['setRoute'],
   extraAttrs?: object,
   saveScrollPositionAs?: string,
   beforeRouteSet?: () => void,
@@ -95,9 +101,9 @@ export function link(
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
       if (beforeRouteSet) beforeRouteSet();
-      const routeArgs: [string, any?, any?] =
+      const routeArgs: [string, any?] =
         window.location.href.split('?')[0] === target.split('?')[0]
-          ? [target, {}, { replace: true }]
+          ? [target, { replace: true }]
           : [target];
       if (afterRouteSet) {
         (async () => {

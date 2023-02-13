@@ -1,15 +1,7 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import $ from 'jquery';
 import type { RoleInfo } from 'models';
@@ -22,6 +14,7 @@ import { User } from 'views/components/user/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
+import withRouter from 'navigation/helpers';
 
 type ManageRoleRowAttrs = {
   label: string;
@@ -29,7 +22,7 @@ type ManageRoleRowAttrs = {
   roledata?: Array<RoleInfo>;
 };
 
-export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
+class ManageRolesComponent extends ClassComponent<ManageRoleRowAttrs> {
   view(vnode: ResultNode<ManageRoleRowAttrs>) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
 
@@ -143,7 +136,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                       vnode.attrs.onRoleUpdate(role, newRole);
 
                       if (isLosingAdminPermissions) {
-                        setRoute(`/${app.activeChainId()}`);
+                        this.setRoute(`/${app.activeChainId()}`);
                       }
                     } catch (err) {
                       const errMsg =
@@ -160,3 +153,5 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
     );
   }
 }
+
+export const ManageRoles = withRouter(ManageRolesComponent);

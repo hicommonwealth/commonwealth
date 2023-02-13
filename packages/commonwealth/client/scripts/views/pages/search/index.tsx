@@ -1,11 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  setRoute,
-  getRouteParam,
-  redraw,
-  } from 'mithrilInterop';
+import { ClassComponent, getRouteParam, redraw } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -27,14 +22,15 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import PageNotFound from '../404';
+import { PageNotFound } from '../404';
 import ErrorPage from '../error';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { User } from '../../components/user/user';
+import withRouter from 'navigation/helpers';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
-const getDiscussionResult = (thread, searchTerm) => {
+const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const proposalId = thread.proposalid;
   const chain = thread.chain;
 
@@ -80,7 +76,7 @@ const getDiscussionResult = (thread, searchTerm) => {
   );
 };
 
-const getCommentResult = (comment, searchTerm) => {
+const getCommentResult = (comment, searchTerm, setRoute) => {
   const proposalId = comment.proposalid;
   const chain = comment.chain;
 
@@ -132,7 +128,7 @@ const getCommentResult = (comment, searchTerm) => {
   );
 };
 
-const getCommunityResult = (community) => {
+const getCommunityResult = (community, setRoute) => {
   const params =
     community.SearchContentType === SearchContentType.Token
       ? { community }
@@ -179,20 +175,21 @@ const getListing = (
   searchTerm: string,
   pageCount: number,
   sort: SearchSort,
-  searchType?: SearchScope
+  searchType: SearchScope,
+  setRoute: any
 ) => {
   if (Object.keys(results).length === 0 || !results[searchType]) return [];
 
   const tabScopedResults = results[searchType]
     .map((res) => {
       return res.searchType === SearchScope.Threads
-        ? getDiscussionResult(res, searchTerm)
+        ? getDiscussionResult(res, searchTerm, setRoute)
         : res.searchType === SearchScope.Members
         ? getMemberResult(res)
         : res.searchType === SearchScope.Communities
-        ? getCommunityResult(res)
+        ? getCommunityResult(res, setRoute)
         : res.searchType === SearchScope.Replies
-        ? getCommentResult(res, searchTerm)
+        ? getCommentResult(res, searchTerm, setRoute)
         : null;
     })
     .slice(0, pageCount * 50);
@@ -219,7 +216,7 @@ type SearchPageAttrs = {
   results: any[];
 };
 
-class SearchPage extends ClassComponent<SearchPageAttrs> {
+class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
   private activeTab: SearchScope;
   private errorText: string;
   private pageCount: number;
@@ -287,7 +284,8 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
       searchTerm,
       pageCount,
       searchQuery.sort,
-      activeTab
+      activeTab,
+      this.setRoute
     );
 
     const resultCount =
@@ -331,7 +329,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                       className="search-all-communities"
                       onClick={() => {
                         searchQuery.chainScope = undefined;
-                        setRoute(`/search?${searchQuery.toUrlParams()}`);
+                        this.setRoute(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);
@@ -357,7 +355,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                       ]}
                       onSelect={(o) => {
                         searchQuery.sort = SearchSort[o.value];
-                        setRoute(`/search?${searchQuery.toUrlParams()}`);
+                        this.setRoute(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);
@@ -374,5 +372,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
     );
   }
 }
+
+const SearchPage = withRouter(SearchPageComponent);
 
 export default SearchPage;

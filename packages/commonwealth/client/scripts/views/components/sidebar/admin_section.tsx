@@ -2,7 +2,6 @@ import React from 'react';
 
 import { getRoute } from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
@@ -185,4 +184,4 @@ const AdminSectionComponent = () => {
   );
 };
 
-export const AdminSection = NavigationWrapper(AdminSectionComponent);
+export const AdminSection = AdminSectionComponent;

@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent} from
-
- 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import { navigateToSubpage } from 'router';

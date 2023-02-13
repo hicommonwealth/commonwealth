@@ -5,9 +5,8 @@ import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import { setRoute, redraw} from
-
- 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
+import { useNavigate } from 'react-router-dom';
 
 import _ from 'lodash';
 
@@ -159,6 +158,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
 };
 
 export const LoginSelectorMenuRight = () => {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
@@ -168,7 +168,7 @@ export const LoginSelectorMenuRight = () => {
       <div className="LoginSelectorMenu">
         <div
           className="login-menu-item"
-          onClick={() => setRoute('/notification-settings')}
+          onClick={() => navigate('/notification-settings')}
         >
           <CWText type="caption">Notification settings</CWText>
         </div>
@@ -177,7 +177,7 @@ export const LoginSelectorMenuRight = () => {
           onClick={() =>
             app.activeChainId()
               ? navigateToSubpage('/settings')
-              : setRoute('/settings')
+              : navigate('/settings')
           }
         >
           <CWText type="caption">Account settings</CWText>

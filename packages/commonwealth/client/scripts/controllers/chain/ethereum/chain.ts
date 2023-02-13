@@ -1,16 +1,7 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import type { ChainInfo, IChainModule, ITXModalData, NodeInfo } from 'models';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';

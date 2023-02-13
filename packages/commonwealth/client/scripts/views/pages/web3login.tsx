@@ -2,9 +2,7 @@ import React from 'react';
 
 import { link } from 'helpers';
 
-import { getRouteParam, redraw} from
-
- 'mithrilInterop';
+import { getRouteParam, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/web3login.scss';
@@ -14,12 +12,14 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
-import PageNotFound from './404';
+import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import { Modal } from '../components/component_kit/cw_modal';
+import { useNavigate } from 'react-router-dom';
 
 const Web3LoginPage = () => {
+  const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -90,11 +90,17 @@ const Web3LoginPage = () => {
               }}
             />
             {getRouteParam('prev')
-              ? link('a.web3login-go-home', getRouteParam('prev'), 'Go back')
+              ? link(
+                  'a.web3login-go-home',
+                  getRouteParam('prev'),
+                  'Go back',
+                  navigate
+                )
               : link(
                   'a.web3login-go-home',
                   app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,
-                  'Go home'
+                  'Go home',
+                  navigate
                 )}
             {isNonEmptyString(errorMsg) && <CWText>{errorMsg}</CWText>}
           </div>

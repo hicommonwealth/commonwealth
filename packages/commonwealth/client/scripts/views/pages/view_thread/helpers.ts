@@ -1,13 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import type { Poll } from 'models';
 import moment from 'moment';
 

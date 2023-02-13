@@ -4,19 +4,11 @@ import { initAppState } from 'state';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
 import app from 'state';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, getRouteParam, redraw } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';
+import withRouter from 'navigation/helpers';
 
 interface IState {
   validating: boolean;
@@ -27,7 +19,8 @@ interface IState {
 const validate = async (
   token: string,
   stateId: string,
-  chain: string
+  chain: string,
+  setRoute: ClassComponent['setRoute']
 ): Promise<void | string> => {
   // verifyAddress against token, returns user if not logged in
   let result;
@@ -53,7 +46,7 @@ const validate = async (
   }
 };
 
-class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
+class FinishAxieLoginComponent extends ClassComponent<Record<string, unknown>> {
   public state: IState = {
     validating: false,
     error: '',
@@ -65,7 +58,7 @@ class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
     const token = getRouteParam('token');
     const stateId = getRouteParam('stateId');
 
-    validate(token, stateId, 'axie-infinity').then((res) => {
+    validate(token, stateId, 'axie-infinity', this.setRoute).then((res) => {
       if (typeof res === 'string') {
         this.state.error = res;
         redraw();
@@ -82,5 +75,7 @@ class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
     }
   }
 }
+
+const FinishAxieLogin = withRouter(FinishAxieLoginComponent);
 
 export default FinishAxieLogin;

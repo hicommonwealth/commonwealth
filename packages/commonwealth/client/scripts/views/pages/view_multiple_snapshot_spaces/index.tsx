@@ -4,11 +4,6 @@ import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import type { Thread } from 'models';
 
-import { ClassComponent, redraw} from
-
- 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
-
 import 'pages/snapshot/multiple_snapshots_page.scss';
 
 import app from 'state';
@@ -58,61 +53,57 @@ function redirectHandler(
   };
 }
 
-type MultipleSnapshotsPageAttrs = {
+type MultipleSnapshotsPageProps = {
   action?: string;
   proposal?: Thread;
 };
 
-class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
-  private snapshotSpaces: string[];
-  private spacesMetadata: Array<{
-    space: SnapshotSpace;
-    proposals: SnapshotProposal[];
-  }>;
+const MultipleSnapshotsPage = (props: MultipleSnapshotsPageProps) => {
+  const { action, proposal } = props;
 
-  view(vnode: ResultNode<MultipleSnapshotsPageAttrs>) {
-    const { action, proposal } = vnode.attrs;
-    const redirectOptions = redirectHandler(action, proposal);
+  const [snapshotSpaces, setSnapshotSpaces] = React.useState<Array<string>>();
+  const [spacesMetadata, setSpacesMetadata] = React.useState<
+    Array<{
+      space: SnapshotSpace;
+      proposals: SnapshotProposal[];
+    }>
+  >();
 
-    if (app.chain && !this.snapshotSpaces) {
-      this.snapshotSpaces =
-        app.config.chains?.getById(app.activeChainId()).snapshot || [];
-      redraw();
-    }
+  const redirectOptions = redirectHandler(action, proposal);
 
-    const { snapshotSpaces } = this;
-
-    if (!this.spacesMetadata && snapshotSpaces) {
-      loadMultipleSpacesData(snapshotSpaces).then((data) => {
-        this.spacesMetadata = data;
-        redraw();
-      });
-
-      return <PageLoading />;
-    }
-
-    return (
-      <Sublayout
-      // title="Proposals"
-      >
-        <div className="MultipleSnapshotsPage">
-          <CWText type="h3">{redirectOptions.headerMessage}</CWText>
-          {app.chain && this.spacesMetadata && (
-            <CardsCollection
-              content={this.spacesMetadata.map((data) => (
-                <SnapshotSpaceCard
-                  space={data.space}
-                  proposals={data.proposals}
-                  redirectAction={redirectOptions.redirectOption}
-                  proposal={redirectOptions.proposal}
-                />
-              ))}
-            />
-          )}
-        </div>
-      </Sublayout>
+  if (app.chain && !snapshotSpaces) {
+    setSnapshotSpaces(
+      app.config.chains?.getById(app.activeChainId()).snapshot || []
     );
   }
-}
+
+  if (!spacesMetadata && snapshotSpaces) {
+    loadMultipleSpacesData(snapshotSpaces).then((data) => {
+      setSpacesMetadata(data);
+    });
+
+    return <PageLoading />;
+  }
+
+  return (
+    <Sublayout>
+      <div className="MultipleSnapshotsPage">
+        <CWText type="h3">{redirectOptions.headerMessage}</CWText>
+        {app.chain && spacesMetadata && (
+          <CardsCollection
+            content={spacesMetadata.map((data) => (
+              <SnapshotSpaceCard
+                space={data.space}
+                proposals={data.proposals}
+                redirectAction={redirectOptions.redirectOption}
+                proposal={redirectOptions.proposal}
+              />
+            ))}
+          />
+        )}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default MultipleSnapshotsPage;

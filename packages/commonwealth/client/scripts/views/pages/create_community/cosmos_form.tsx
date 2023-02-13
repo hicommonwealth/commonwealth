@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, setRoute, redraw} from
-
- 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -18,6 +16,7 @@ import { CWValidationText } from '../../components/component_kit/cw_validation_t
 import { IdRow, InputRow } from '../../components/metadata_rows';
 import { defaultChainRows, initChainForm } from './chain_input_rows';
 import type { ChainFormFields, ChainFormState, EthFormFields } from './types';
+import withRouter from 'navigation/helpers';
 
 // TODO: populate additional fields
 
@@ -30,7 +29,7 @@ type CreateCosmosForm = ChainFormFields & EthFormFields & CosmosFormFields;
 
 type CreateCosmosState = ChainFormState & { form: CreateCosmosForm };
 
-export class CosmosForm extends ClassComponent {
+class CosmosFormComponent extends ClassComponent {
   public state: CreateCosmosState = {
     message: '',
     saving: false,
@@ -135,7 +134,7 @@ export class CosmosForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              setRoute(`/${res.result.chain?.id}`);
+              this.setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               this.state.message =
                 err.responseJSON?.error ||
@@ -153,3 +152,5 @@ export class CosmosForm extends ClassComponent {
     );
   }
 }
+
+export const CosmosForm = withRouter(CosmosFormComponent);

@@ -1,7 +1,8 @@
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { Navigate, withLayout } from 'navigation/helpers';
+import { Navigate } from 'navigation/helpers';
 import app from 'state';
+import { withLayout } from 'views/layout';
 
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
@@ -23,7 +24,6 @@ const NotificationSettingsPage = lazy(
 
 const ReferendaPage = lazy(() => import('views/pages/referenda'));
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
-const DelegatePage = lazy(() => import('views/pages/delegate'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
@@ -174,12 +174,6 @@ const getCommonDomainsRoutes = () => (
     <Route
       path="/:scope/proposals"
       element={withLayout(ProposalsPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/delegate"
-      element={withLayout(DelegatePage, {
         scoped: true,
       })}
     />

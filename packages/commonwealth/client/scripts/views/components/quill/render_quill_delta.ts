@@ -1,13 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
@@ -16,7 +7,8 @@ export const renderQuillDelta = (
   delta,
   hideFormatting = false,
   collapse = false,
-  openLinksInNewTab = false
+  openLinksInNewTab = false,
+  navigate
 ) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
@@ -129,7 +121,7 @@ export const renderQuillDelta = (
                           // don't open a new window if the link is on Commonwealth
                           e.preventDefault();
                           e.stopPropagation();
-                          setRoute(child.attributes.link);
+                          navigate(child.attributes.link);
                         }
                       },
                     },
@@ -230,7 +222,7 @@ export const renderQuillDelta = (
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
-                    setRoute(child.attributes.link);
+                    navigate(child.attributes.link);
                   }
                 },
               },

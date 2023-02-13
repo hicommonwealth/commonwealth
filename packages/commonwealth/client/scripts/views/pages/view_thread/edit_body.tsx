@@ -1,15 +1,5 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
 import type { Thread } from 'models';
 import 'pages/view_thread/edit_body.scss';
 import { notifySuccess } from 'controllers/app/notifications';
@@ -22,7 +12,7 @@ import { QuillEditorComponent } from '../../components/quill/quill_editor_compon
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { navigateToSubpage } from 'router';
 
-type EditBodyAttrs = {
+type EditBodyProps = {
   savedEdits: string;
   setIsEditing: (status: boolean) => void;
   shouldRestoreEdits: boolean;
@@ -30,78 +20,72 @@ type EditBodyAttrs = {
   title: string;
 };
 
-export class EditBody extends ClassComponent<EditBodyAttrs> {
-  private quillEditorState: QuillEditor;
-  private saving: boolean;
+export const EditBody = (props: EditBodyProps) => {
+  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
+  const [saving, setSaving] = React.useState<boolean>(false);
+  const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } = props;
 
-  view(vnode: ResultNode<EditBodyAttrs>) {
-    const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } =
-      vnode.attrs;
+  const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
 
-    const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
+  return (
+    <div className="EditBody">
+      <QuillEditorComponent
+        contentsDoc={body}
+        oncreateBind={(state: QuillEditor) => {
+          setQuillEditorState(state);
+        }}
+        imageUploader
+        theme="snow"
+        editorNamespace={`edit-thread-${thread.id}`}
+      />
+      <div className="buttons-row">
+        <CWButton
+          label="Cancel"
+          disabled={saving}
+          buttonType="secondary-blue"
+          onClick={async (e) => {
+            e.preventDefault();
 
-    return (
-      <div className="EditBody">
-        <QuillEditorComponent
-          contentsDoc={body}
-          oncreateBind={(state: QuillEditor) => {
-            this.quillEditorState = state;
+            let confirmed = true;
+
+            const threadText = quillEditorState.textContentsAsString;
+
+            if (threadText !== body) {
+              confirmed = await confirmationModalWithText(
+                'Cancel editing? Changes will not be saved.',
+                'Delete changes',
+                'Keep editing'
+              )();
+            }
+
+            if (confirmed) {
+              setIsEditing(false);
+              clearEditingLocalStorage(thread.id, ContentType.Thread);
+            }
           }}
-          imageUploader
-          theme="snow"
-          editorNamespace={`edit-thread-${thread.id}`}
         />
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            disabled={this.saving}
-            buttonType="secondary-blue"
-            onClick={async (e) => {
-              e.preventDefault();
+        <CWButton
+          label="Save"
+          disabled={saving}
+          onClick={(e) => {
+            e.preventDefault();
 
-              let confirmed = true;
+            setSaving(true);
 
-              const threadText = this.quillEditorState.textContentsAsString;
+            quillEditorState.disable();
 
-              if (threadText !== body) {
-                confirmed = await confirmationModalWithText(
-                  'Cancel editing? Changes will not be saved.',
-                  'Delete changes',
-                  'Keep editing'
-                )();
-              }
+            const itemText = quillEditorState.textContentsAsString;
 
-              if (confirmed) {
-                setIsEditing(false);
-                clearEditingLocalStorage(thread.id, ContentType.Thread);
-                redraw();
-              }
-            }}
-          />
-          <CWButton
-            label="Save"
-            disabled={this.saving}
-            onClick={(e) => {
-              e.preventDefault();
-
-              this.saving = true;
-
-              this.quillEditorState.disable();
-
-              const itemText = this.quillEditorState.textContentsAsString;
-
-              app.threads.edit(thread, itemText, title).then(() => {
-                navigateToSubpage(`/discussion/${thread.id}`);
-                this.saving = false;
-                clearEditingLocalStorage(thread.id, ContentType.Thread);
-                setIsEditing(false);
-                redraw();
-                notifySuccess('Thread successfully edited');
-              });
-            }}
-          />
-        </div>
+            app.threads.edit(thread, itemText, title).then(() => {
+              navigateToSubpage(`/discussion/${thread.id}`);
+              setSaving(false);
+              clearEditingLocalStorage(thread.id, ContentType.Thread);
+              setIsEditing(false);
+              notifySuccess('Thread successfully edited');
+            });
+          }}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

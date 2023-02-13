@@ -1,17 +1,6 @@
-/* @jsx jsx */
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
-import $ from 'jquery';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/feed/index.scss';
 

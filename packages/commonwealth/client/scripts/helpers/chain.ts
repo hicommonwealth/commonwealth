@@ -3,7 +3,8 @@ import { ChainInfo, NodeInfo } from 'models';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
-import { redraw, setRoute } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
+import type { NavigateFunction } from 'react-router-dom';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;
@@ -256,7 +257,10 @@ export const initChain = async (): Promise<void> => {
   redraw();
 };
 
-export const initNewTokenChain = async (address: string) => {
+export const initNewTokenChain = async (
+  address: string,
+  navigate: NavigateFunction
+) => {
   const chain_network = app.chain.network;
   const response = await $.getJSON('/api/getTokenForum', {
     address,
@@ -266,7 +270,7 @@ export const initNewTokenChain = async (address: string) => {
 
   if (response.status !== 'Success') {
     // TODO: better custom 404
-    setRoute('/404');
+    navigate('/404');
   }
 
   // TODO: check if this is valid

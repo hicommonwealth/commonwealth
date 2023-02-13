@@ -1,16 +1,7 @@
-
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
+import withRouter from 'navigation/helpers';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 
@@ -20,7 +11,7 @@ type InputTokenOptionComponentAttrs = {
   route: string;
 };
 
-export class InputTokenOptionComponent extends ClassComponent<InputTokenOptionComponentAttrs> {
+class InputTokenOption extends ClassComponent<InputTokenOptionComponentAttrs> {
   view(vnode: ResultNode<InputTokenOptionComponentAttrs>) {
     const { iconImg } = vnode.attrs;
 
@@ -53,7 +44,7 @@ export class InputTokenOptionComponent extends ClassComponent<InputTokenOptionCo
             } else {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;
-              setRoute(`/${vnode.attrs.route}`);
+              this.setRoute(`/${vnode.attrs.route}`);
             }
           }}
           className={`p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row
@@ -68,3 +59,5 @@ export class InputTokenOptionComponent extends ClassComponent<InputTokenOptionCo
     );
   }
 }
+
+export const InputTokenOptionComponent = withRouter(InputTokenOption);
