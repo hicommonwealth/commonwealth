@@ -317,8 +317,10 @@ class ContractsController {
     contract_id: string;
   }) {
     try {
+      console.log('chain_id', app.activeChainId());
       await $.post(`${app.serverUrl()}/contract/template`, {
         jwt: app.user.jwt,
+        chain_id: app.activeChainId(),
         name,
         template,
         contract_id,
@@ -350,6 +352,7 @@ class ContractsController {
         `${app.serverUrl()}/contract/community_template_and_metadata`,
         {
           ...communityContractTemplateAndMetadata,
+          chain_id: app.activeChainId(),
           jwt: app.user.jwt,
         }
       );
@@ -406,10 +409,6 @@ class ContractsController {
         },
         type: 'DELETE',
       });
-
-      // TODO update store
-
-      console.log('what', res.result);
 
       if (res.result.deletedContract) {
         this._store.remove(this._store.getById(contract.contract_id));

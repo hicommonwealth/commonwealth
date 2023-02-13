@@ -43,6 +43,32 @@ const getCreateContentMenuItems = (): MenuItem[] => {
     app.chain?.base === ChainBase.Substrate &&
     app.chain?.network !== ChainNetwork.Plasm;
 
+  const getTemplateItems = (): MenuItem[] => {
+    const contracts = app.contracts.getCommunityContracts();
+
+    const items = [];
+
+    contracts.map((contract) => {
+      for (const cct of contract.ccts) {
+        if (
+          cct.cctmd.display_options === '2' ||
+          cct.cctmd.display_options === '3'
+        ) {
+          const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
+          items.push({
+            label: `New ${cct.cctmd.nickname}`,
+            iconLeft: 'star',
+            onclick: () => {
+              navigateToSubpage(`/${contract.address}/${slugWithSlashRemoved}`);
+            },
+          });
+        }
+      }
+    });
+
+    return items;
+  };
+
   const getTopicTemplateItems = (): MenuItem[] =>
     topics.map((t) => ({
       label: `New ${t.name} Thread`,
@@ -224,6 +250,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           ...getSputnikProposalItem(),
           ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
+          ...getTemplateItems(),
         ]
       : []),
     {

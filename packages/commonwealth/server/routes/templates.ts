@@ -7,11 +7,13 @@ import { success } from '../types';
 import type { DB } from '../models';
 import { AppError } from '../../../common-common/src/errors';
 import isValidJson from '../util/validateJson';
+import validateRoles from '../util/validateRoles';
 
 type CreateTemplateAndMetadataReq = {
   contract_id: string;
   name: string;
   template: string;
+  chain_id: string;
 };
 
 type CreateTemplateAndMetadataResp = {
@@ -23,7 +25,10 @@ export async function createTemplate(
   req: TypedRequestBody<CreateTemplateAndMetadataReq>,
   res: TypedResponse<CreateTemplateAndMetadataResp>
 ) {
-  const { contract_id, name, template } = req.body;
+  const { contract_id, name, template, chain_id } = req.body;
+
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
+  if (!isAdmin) throw new AppError('Must be admin');
 
   if (!contract_id || !name || !template) {
     throw new AppError('Must provide contract_id, name, and template');
