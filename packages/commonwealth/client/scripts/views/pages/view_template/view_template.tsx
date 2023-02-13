@@ -25,6 +25,7 @@ import { showConfirmationModal } from '../../modals/confirmation_modal';
 import type Contract from 'client/scripts/models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
+import validateType from 'client/scripts/helpers/validateType';
 
 const jsonExample = {
   form_fields: [
@@ -313,6 +314,9 @@ class ViewTemplatePage extends ClassComponent {
                             draft[field[component].field_ref] = e.target.value;
                           });
                         }}
+                        inputValidationFn{(val) => 
+                            validateType(val, field[component].formatter)
+                          }
                       />
                     );
                   case TemplateComponents.DROPDOWN:
