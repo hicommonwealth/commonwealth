@@ -22,6 +22,7 @@ import { Modal } from '../component_kit/cw_modal';
 export type AddressDisplayOptions = {
   autoTruncate?: boolean;
   maxCharLength?: number;
+};
 
 type UserAttrs = {
   avatarOnly?: boolean; // overrides most other properties
@@ -243,26 +244,26 @@ export const User = (props: UserAttrs) => {
       </div>
       <div className="user-name">
         {link(
-              'a.user-display-name',
-              profile
-                ? `/${app.activeChainId() || profile.chain}/account/${
-                    profile.address
-                  }?base=${profile.chain}`
-                : 'javascript:',
-              !profile ? (
-                addrShort
-              ) : !showAddressWithDisplayName ? (
-                profile.displayName
-              ) : (
-                <>
-                  {profile.displayName}
-                  <div className="id-short">
-                    {formatAddressShort(profile.address, profile.chain)}
-                  </div>
-                </React.Fragment>
-              ),
-              navigate
-            )}
+          'a.user-display-name',
+          profile
+            ? `/${app.activeChainId() || profile.chain}/account/${
+                profile.address
+              }?base=${profile.chain}`
+            : 'javascript:',
+          !profile ? (
+            addrShort
+          ) : !showAddressWithDisplayName ? (
+            profile.displayName
+          ) : (
+            <React.Fragment>
+              {profile.displayName}
+              <div className="id-short">
+                {formatAddressShort(profile.address, profile.chain)}
+              </div>
+            </React.Fragment>
+          ),
+          navigate
+        )}
       </div>
       {profile?.address && (
         <div className="user-address">
