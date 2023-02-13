@@ -53,6 +53,12 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
       const reaction = (await fetchReactionsByPost(thread)).find((r) => {
         return r.Address.address === activeAddress;
       });
+
+      const { session, action, hash } =
+        await app.sessions.signDeleteThreadReaction({
+          thread_id: reaction.canvasId,
+        });
+
       this.loading = true;
       app.reactionCounts
         .delete(reaction, {
@@ -69,7 +75,16 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
         });
     };
 
-    const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
+    const like = async (
+      chain: ChainInfo,
+      chainId: string,
+      userAddress: string
+    ) => {
+      const { session, action, hash } = await app.sessions.signThreadReaction({
+        thread_id: thread.id,
+        like: true,
+      });
+
       this.loading = true;
       app.reactionCounts
         .create(userAddress, thread, 'like', chainId)

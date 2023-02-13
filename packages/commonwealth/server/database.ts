@@ -9,7 +9,6 @@ import ChainFactory from './models/chain';
 import ChainCategoryFactory from './models/chain_category';
 import ChainCategoryTypeFactory from './models/chain_category_type';
 import ChainEntityMetaFactory from './models/chain_entity_meta';
-import ChainEventTypeFactory from './models/chain_event_type';
 import ChainNodeFactory from './models/chain_node';
 import ChatChannelFactory from './models/chat_channel';
 import ChatMessageFactory from './models/chat_message';
@@ -23,7 +22,6 @@ import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
 import DiscussionDraftFactory from './models/discussion_draft';
-import IdentityCacheFactory from './models/identity_cache';
 import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
@@ -87,7 +85,6 @@ const models: Models = {
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
@@ -98,7 +95,6 @@ const models: Models = {
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
-  IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),

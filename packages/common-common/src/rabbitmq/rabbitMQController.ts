@@ -9,15 +9,13 @@ import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';
 import type { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
 import type { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
-import type { ChainEventTypeModelStatic } from 'chain-events/services/database/models/chain_event_type';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export type SafeRmqPublishSupported =
   | ChainEntityModelStatic
-  | ChainEventModelStatic
-  | ChainEventTypeModelStatic;
+  | ChainEventModelStatic;
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {

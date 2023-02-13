@@ -9,8 +9,6 @@ import { ApiStatus } from 'state';
 import { SolanaToken } from './types';
 import AddressAccount from "models/Address";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 export default class SolanaChain
   implements IChainModule<SolanaToken, AddressAccount>
 {

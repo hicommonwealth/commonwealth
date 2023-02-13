@@ -58,6 +58,14 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     quillEditorState.disable();
     checkNewThreadErrors(form, body);
 
+    const { session, action, hash } = await app.sessions.signThread({
+      community: app.activeChainId(),
+      title: form.title,
+      body,
+      link: form.url,
+      topic: form.topic.id,
+    });
+
     try {
       const result = await app.threads.create(
         author.address,
@@ -333,7 +341,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
           <div class="new-thread-form-inputs">
             {author?.profile && !author.profile.name && (
               <div class="set-display-name-callout">
-                <CWText>You haven't set a display name yet.</CWText>
+                <CWText>{"You haven't set a display name yet."}</CWText>
                 <a
                   href={`/${chainId}/account/${author.address}?base=${author.chain.id}`}
                   onclick={(e) => {
@@ -445,7 +453,8 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         }
                       } catch (err) {
                         this.saving = false;
-                        notifyError(err.message);
+                        if (err) notifyError(err.message);
+                        m.redraw();
                       }
                     }}
                     label={
@@ -481,7 +490,8 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         m.redraw();
                       } catch (err) {
                         this.saving = false;
-                        notifyError(err.message);
+                        if (err) notifyError(err.message);
+                        m.redraw();
                       }
                     }}
                     label={fromDraft ? 'Update saved draft' : 'Save draft'}

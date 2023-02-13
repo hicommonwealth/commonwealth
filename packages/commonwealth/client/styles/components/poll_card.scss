@@ -100,11 +100,23 @@
     width: 100%;
   }
 
-  .poll-title-text.Text {
+  .poll-title-section {
+    width: 100%;
     border-bottom: 1px solid $neutral-200;
     min-height: 32px;
     padding: 16px;
-    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .poll-delete-button {
+      cursor: pointer;
+    }
+
+    .poll-title-text.Text {
+      width: 100%;
+    }
   }
 
   .poll-voting-section {
@@ -118,5 +130,23 @@
     &:empty {
       display: none;
     }
+  }
+}
+
+.DeleteThreadModal {
+  width: 504px;
+
+  @include smallInclusive {
+    width: 100%;
+  }
+
+  .modal-text {
+    color: $white;
+  }
+
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 }

@@ -78,8 +78,8 @@ export async function setupChainEventConsumer(): Promise<ServiceConsumer> {
   // WARNING: due to dbEvent in each handler ORDER OF HANDLERS MATTERS!
   const allChainEventHandlers = [
     storageHandler,
-    notificationsHandler,
     entityArchivalHandler,
+    notificationsHandler,
   ];
 
   // setup Chain

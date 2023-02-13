@@ -58,7 +58,6 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
                     address: vote.address,
                     chain: app.config.chains.getById(vote.authorChain)
                   }),
-                  hideIdentityIcon: true,
                 })}
               </div>
               <div class="offchain-poll-voter-choice">{vote.option}</div>

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import m from 'mithril';
 
@@ -7,8 +9,6 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type Web3 from 'web3';
 import AddressAccount from "models/Address";
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 const ETHEREUM_BLOCK_TIME = 13;
 

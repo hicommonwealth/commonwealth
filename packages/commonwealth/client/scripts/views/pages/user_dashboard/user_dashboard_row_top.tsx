@@ -59,7 +59,6 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         address: author_address,
         chain: app.config.chains.getById(author_chain ?? chain_id)
       }),
-      hideIdentityIcon: false,
       linkify: true,
       avatarSize: 16,
       onclick: (e: any) => {

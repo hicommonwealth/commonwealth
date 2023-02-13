@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
+import { notifyError } from 'controllers/app/notifications';
 import m from 'mithril';
 import type { Poll, Thread } from 'models';
 import moment from 'moment';
@@ -54,11 +55,12 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
 
 type ThreadPollCardAttrs = {
   poll: Poll;
+  showDeleteButton: boolean;
 };
 
 export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
   view(vnode: m.Vnode<ThreadPollCardAttrs>) {
-    const { poll } = vnode.attrs;
+    const { poll, showDeleteButton } = vnode.attrs;
 
     return (
       <PollCard
@@ -108,6 +110,19 @@ export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
               modal: OffchainVotingModal,
               data: { votes: poll.votes },
             });
+          }
+        }}
+        showDeleteButton={showDeleteButton}
+        onDeleteClick={async () => {
+          try {
+            await app.polls.deletePoll({
+              threadId: poll.threadId,
+              pollId: poll.id,
+            });
+            m.redraw();
+          } catch (e) {
+            console.error(e);
+            notifyError('Failed to delete poll');
           }
         }}
       />

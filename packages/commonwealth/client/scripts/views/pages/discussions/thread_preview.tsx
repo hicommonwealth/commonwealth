@@ -113,7 +113,6 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 linkify: true,
                 popover: false,
                 showAddressWithDisplayName: true,
-                hideIdentityIcon: true,
               })}
               {!this.isWindowSmallInclusive && (
                 <CWText className="last-updated-text">•</CWText>

@@ -48,39 +48,6 @@ describe('Tests for the commonwealth-app consumer', () => {
     await new Promise((resolve) => setTimeout(resolve, 10000));
   });
 
-  it('Should process chain-event-type messages from the ChainEventTypeCUD queue', async () => {
-    const cetCUD = {
-      chainEventTypeId: uuidv4(),
-      cud: 'create',
-    };
-
-    const publishJson = await publishRmqMsg(
-      RABBITMQ_API_URI,
-      RascalExchanges.CUD,
-      RascalRoutingKeys.ChainEventTypeCUD,
-      cetCUD
-    );
-
-    // ensure the event was properly published
-    expect(publishJson.routed, 'Failed to publish message').to.be.true;
-
-    // give time for the consumer to process the message
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    const dbResult = await models.ChainEventType.findOne({
-      where: {
-        id: cetCUD.chainEventTypeId,
-      },
-    });
-    expect(dbResult).to.not.be.null;
-
-    await models.ChainEventType.destroy({
-      where: {
-        id: cetCUD.chainEventTypeId,
-      },
-    });
-  });
-
   it('Should process chain-event-notification messages from the CENotificationsCUD queue', async () => {
     const ceData: ITransfer = {
       kind: EventKind.Transfer,
@@ -111,11 +78,11 @@ describe('Tests for the commonwealth-app consumer', () => {
 
     const chainEvent: ChainEventAttributes = {
       id: maxCeId + 1,
-      chain_event_type_id: cet.id,
       block_number: cwEvent.blockNumber,
       event_data: ceData,
       queued: -1,
-      ChainEventType: cet,
+      network: cwEvent.network,
+      chain: cwEvent.chain,
     };
 
     const ceNotifCUD: RmqCENotificationCUD.RmqMsgType = {

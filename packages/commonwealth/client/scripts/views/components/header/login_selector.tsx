@@ -508,7 +508,6 @@ export class LoginSelector extends ClassComponent {
                 <div class="left-button">
                   {m(User, {
                     user: app.user.activeAddressAccount,
-                    hideIdentityIcon: true,
                   })}
                 </div>
               }

@@ -5,8 +5,7 @@ import ClassComponent from 'class_component';
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import m from 'mithril';
-import type { ChainInfo } from 'models';
-import { Thread } from 'models';
+import { Thread, ChainInfo, Reaction } from 'models';
 
 import app from 'state';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -53,9 +52,17 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
     const activeAddress = app.user.activeAddressAccount?.address;
 
     const dislike = async (userAddress: string) => {
-      const reaction = (await fetchReactionsByPost(thread)).find((r) => {
+      const reaction: Reaction<Thread> = (
+        await fetchReactionsByPost(thread)
+      ).find((r) => {
         return r.Address.address === activeAddress;
       });
+
+      const { session, action, hash } =
+        await app.sessions.signDeleteThreadReaction({
+          thread_id: reaction.canvasHash,
+        });
+
       this.loading = true;
       app.reactionCounts
         .delete(reaction, {
@@ -72,7 +79,16 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
         });
     };
 
-    const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
+    const like = async (
+      chain: ChainInfo,
+      chainId: string,
+      userAddress: string
+    ) => {
+      const { session, action, hash } = await app.sessions.signThreadReaction({
+        thread_id: thread.id,
+        like: true,
+      });
+
       this.loading = true;
       app.reactionCounts
         .create(userAddress, thread, 'like', chainId)

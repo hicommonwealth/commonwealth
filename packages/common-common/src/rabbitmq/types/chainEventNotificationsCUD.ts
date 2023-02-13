@@ -23,19 +23,16 @@ export const RmqCENotificationCUD: RmqMsgNamespace<IRmqMsgCreateCENotificationsC
     isValidMsgFormat(data: any): data is IRmqMsgCreateCENotificationsCUD {
       return !!(
         typeof data.ChainEvent?.id === 'number' &&
-        data.ChainEvent.chain_event_type_id &&
-        typeof data.ChainEvent.chain_event_type_id === 'string' &&
         typeof data.ChainEvent.block_number === 'number' &&
         data.ChainEvent.event_data &&
+        Object.values(SupportedNetwork).includes(data.ChainEvent.network) &&
+        data.ChainEvent.chain &&
+        typeof data.ChainEvent.chain === 'string' &&
+        typeof data.ChainEvent.entity_id === 'number' &&
         typeof data.event.blockNumber === 'number' &&
         data.event.data &&
         Object.values(SupportedNetwork).includes(data.event.network) &&
-        data.cud === 'create' &&
-        data.ChainEvent.ChainEventType &&
-        data.ChainEvent.ChainEventType.id &&
-        data.ChainEvent.ChainEventType.chain &&
-        data.ChainEvent.ChainEventType.event_network &&
-        data.ChainEvent.ChainEventType.event_name
+        data.cud === 'create'
       );
     },
 

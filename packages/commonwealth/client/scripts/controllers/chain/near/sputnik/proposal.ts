@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import type { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ProposalType } from 'common-common/src/types';
@@ -25,8 +27,6 @@ import {
   WeightKind,
 } from './types';
 import AddressAccount from "models/Address";
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default class NearSputnikProposal extends Proposal<
   NearApi,
