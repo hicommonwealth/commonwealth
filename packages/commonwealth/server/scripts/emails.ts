@@ -10,12 +10,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
 import { Op } from 'sequelize';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
-import type {
-  IPostNotificationData,
-  IChainEventNotificationData,
-  IChatNotification,
-  ICommunityNotificationData,
-} from '../../shared/types';
+import type { IPostNotificationData } from '../../shared/types';
 import { DynamicTemplate } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import type { UserAttributes } from '../models/user';
@@ -27,33 +22,31 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const createImmediateNotificationEmailObject = async (
-  notification_data:
-    | IPostNotificationData
-    | ICommunityNotificationData
-    | IChainEventNotificationData
-    | IChatNotification,
+  notification_data,
   category_id,
   models
 ) => {
-  if (
-    (<IChainEventNotificationData>notification_data).block_number &&
-    (<IChainEventNotificationData>notification_data).event_data
-  ) {
-    const ceInstance = <IChainEventNotificationData>notification_data;
+  if (notification_data.chainEvent && notification_data.chainEventType) {
     // construct compatible CW event from DB by inserting network from type
     const evt: CWEvent = {
-      blockNumber: ceInstance.block_number,
-      data: ceInstance.event_data,
-      network: ceInstance.network,
+      blockNumber: notification_data.chainEvent.block_number,
+      data: notification_data.chainEvent.event_data as IChainEventData,
+      network: notification_data.chainEventType
+        .event_network as SupportedNetwork,
     };
 
     try {
-      const chainEventLabel = ChainEventLabel(ceInstance.chain, evt);
+      const chainEventLabel = ChainEventLabel(
+        notification_data.chainEventType.chain,
+        evt
+      );
       if (!chainEventLabel) return;
 
       const subject = `${
         process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-      }${chainEventLabel.heading} event on ${capitalize(ceInstance.chain)}`;
+      }${chainEventLabel.heading} event on ${capitalize(
+        notification_data.chainEventType.chain
+      )}`;
 
       return {
         from: 'Commonwealth <no-reply@commonwealth.im>',
@@ -63,8 +56,8 @@ export const createImmediateNotificationEmailObject = async (
         templateId: DynamicTemplate.ImmediateEmailNotification,
         dynamic_template_data: {
           notification: {
-            chainId: ceInstance.chain,
-            blockNumber: ceInstance.block_number,
+            chainId: notification_data.chainEventType.chain,
+            blockNumber: notification_data.chainEvent.blockNumber,
             subject,
             label: subject,
             path: null,
