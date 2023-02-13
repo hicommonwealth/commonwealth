@@ -179,9 +179,8 @@ export const User = (props: UserAttrs) => {
             link(
               'a.user-display-name.username',
               profile
-                ? `/${app.activeChainId() || profile.chain}/account/${
-                    profile.address
-                  }?base=${profile.chain}`
+                ? // TODO: switch to profile.username once PR4 is merged
+                `/profile/a/${profile.address}`
                 : 'javascript:',
               <>
                 {!profile ? (
@@ -254,10 +253,9 @@ export const User = (props: UserAttrs) => {
             link(
               'a.user-display-name',
               profile
-                ? `/${app.activeChainId() || profile.chain}/account/${
-                    profile.address
-                  }?base=${profile.chain}`
-                : 'javascript:',
+                  ? // TODO: switch to profile.username once PR4 is merged
+                  `/profile/a/${profile.address}`
+                  : 'javascript:',
               !profile ? (
                 addrShort
               ) : !showAddressWithDisplayName ? (

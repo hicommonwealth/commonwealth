@@ -26,11 +26,10 @@ type AvatarUploadProps = {
 export const AvatarUpload = (props: AvatarUploadProps) => {
   const [dropzone, setDropzone] = React.useState<any>();
   const [uploaded, setUploaded] = React.useState<boolean>();
-  const nodeRef = React.useRef<any>();
+  const nodeRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (Dropzone.instances.length > 0) return;
-    Dropzone.autoDiscover = false;
 
     const newDropzone = new Dropzone(nodeRef.current, {
       clickable: '.icon-button-container',
