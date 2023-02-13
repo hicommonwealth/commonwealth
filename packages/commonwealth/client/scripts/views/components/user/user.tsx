@@ -49,6 +49,8 @@ export const User = (props: UserAttrs) => {
   } = props;
   const navigate = useNavigate();
 
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
   const popoverProps = usePopover();
 
   const { maxCharLength } = props.addressDisplayOptions || {};
@@ -229,40 +231,71 @@ export const User = (props: UserAttrs) => {
   );
 
   const userPopover = (
-    <div
-      className="UserPopover"
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    >
-      <div className="user-avatar">
-        {!profile
-          ? null
-          : profile.avatarUrl
-          ? profile.getAvatar(36)
-          : profile.getAvatar(32)}
-      </div>
-      <div className="user-name">
-        {link(
-          'a.user-display-name',
-          profile
-            ? `/${app.activeChainId() || profile.chain}/account/${
-                profile.address
-              }?base=${profile.chain}`
-            : 'javascript:',
-          !profile ? (
-            addrShort
-          ) : !showAddressWithDisplayName ? (
-            profile.displayName
-          ) : (
-            <React.Fragment>
-              {profile.displayName}
-              <div className="id-short">
-                {formatAddressShort(profile.address, profile.chain)}
-              </div>
-            </React.Fragment>
-          ),
-          navigate
+    <React.Fragment>
+      <div
+        className="UserPopover"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <div className="user-avatar">
+          {!profile
+            ? null
+            : profile.avatarUrl
+            ? profile.getAvatar(36)
+            : profile.getAvatar(32)}
+        </div>
+        <div className="user-name">
+          {app.chain &&
+            app.chain.base === ChainBase.Substrate &&
+            link(
+              'a.user-display-name',
+              profile
+                ? `/${app.activeChainId() || profile.chain}/account/${
+                    profile.address
+                  }?base=${profile.chain}`
+                : 'javascript:',
+              !profile ? (
+                addrShort
+              ) : !showAddressWithDisplayName ? (
+                profile.displayName
+              ) : (
+                <React.Fragment>
+                  {profile.displayName}
+                  <div className="id-short">
+                    {formatAddressShort(profile.address, profile.chain)}
+                  </div>
+                </React.Fragment>
+              ),
+              navigate
+            )}
+        </div>
+        {profile?.address && (
+          <div className="user-address">
+            {formatAddressShort(
+              profile.address,
+              profile.chain,
+              false,
+              maxCharLength
+            )}
+          </div>
+        )}
+        {friendlyChainName && (
+          <div className="user-chain">{friendlyChainName}</div>
+        )}
+        {/* always show roleTags in UserPopover */}
+        {getRoleTags(true)}
+        {/* If Admin Allow Banning */}
+        {loggedInUserIsAdmin && (
+          <div className="ban-wrapper">
+            <CWButton
+              onClick={() => {
+                setIsModalOpen(true);
+              }}
+              label="Ban User"
+              buttonType="primary-red"
+            />
+          </div>
         )}
       </div>
       {profile?.address && (
@@ -296,7 +329,7 @@ export const User = (props: UserAttrs) => {
           />
         </div>
       )}
-    </div>
+    </React.Fragment>
   );
 
   return popover ? (
