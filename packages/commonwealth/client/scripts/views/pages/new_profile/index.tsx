@@ -4,13 +4,12 @@ import $ from 'jquery';
 import 'pages/new_profile/index.scss';
 
 import app from 'state';
-import type { Thread} from 'models';
+import type { Thread } from 'models';
 import { ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import NewProfileHeader from './new_profile_header';
-import type {
-  CommentWithAssociatedThread} from './new_profile_activity';
+import type { CommentWithAssociatedThread } from './new_profile_activity';
 import NewProfileActivity from './new_profile_activity';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
@@ -32,7 +31,9 @@ const NoProfileFoundError = 'No profile found';
 const NewProfile = (props: NewProfileAttrs) => {
   const [addresses, setAddresses] = React.useState<AddressInfo[]>();
   const [chains, setChains] = React.useState<ChainInfo[]>();
-  const [comments, setComments] = React.useState<CommentWithAssociatedThread[]>([]);
+  const [comments, setComments] = React.useState<CommentWithAssociatedThread[]>(
+    []
+  );
   const [error, setError] = React.useState<ProfileError>(ProfileError.None);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [profile, setProfile] = React.useState<Profile>();
@@ -49,7 +50,9 @@ const NewProfile = (props: NewProfileAttrs) => {
 
       setProfile(new Profile(response.profile));
       setThreads(response.threads.map((t) => app.threads.modelFromServer(t)));
-      const responseComments = response.comments.map((c) => modelCommentFromServer(c));
+      const responseComments = response.comments.map((c) =>
+        modelCommentFromServer(c)
+      );
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = response.commentThreads.find(
           (t) =>
@@ -58,21 +61,25 @@ const NewProfile = (props: NewProfileAttrs) => {
         return { ...c, thread };
       });
       setComments(commentsWithAssociatedThread);
-      setChains(response.chains.map((c) => ({
-        ...new ChainInfo(c),
-        iconUrl: c.icon_url,
-      })));
-      setAddresses(response.addresses.map(
-        (a) =>
-          new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          )
-      ));
+      setChains(
+        response.chains.map((c) => ({
+          ...new ChainInfo(c),
+          iconUrl: c.icon_url,
+        }))
+      );
+      setAddresses(
+        response.addresses.map(
+          (a) =>
+            new AddressInfo(
+              a.id,
+              a.address,
+              a.chain,
+              a.keytype,
+              a.wallet_id,
+              a.ghost_address
+            )
+        )
+      );
       setIsOwner(response.isOwner);
     } catch (err) {
       if (
@@ -204,6 +211,6 @@ const NewProfile = (props: NewProfileAttrs) => {
       </Sublayout>
     );
   }
-}
+};
 
 export default NewProfile;

@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 export const Errors = {
   NoIdentifierProvided: 'No username or address provided in query',
@@ -96,7 +96,7 @@ const getNewProfile = async (
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
     chains: chains.map((c) => c.toJSON()),
-    isOwner: req.user.id === profile.user_id,
+    isOwner: req.user?.id === profile.user_id,
   });
 };
 

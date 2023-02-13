@@ -64,7 +64,9 @@ const ProfilePage = lazy(() => import('views/pages/profile'));
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ManageProfilesPage = lazy(() => import('views/pages/manage_profiles'));
-const CreateNewProfilePage = lazy(() => import('views/pages/create_new_profile'));
+const CreateNewProfilePage = lazy(
+  () => import('views/pages/create_new_profile')
+);
 const NewProfileRedirect = lazy(
   () => import('views/pages/new_profile_redirect')
 );

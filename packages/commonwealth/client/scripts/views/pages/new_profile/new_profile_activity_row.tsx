@@ -79,7 +79,9 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  this.setRoute(`/${chain}/discussions`);
+                  this.setRoute(
+                    `/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`
+                  );
                 }}
               >
                 {decodeURIComponent(comment.thread?.title)}
