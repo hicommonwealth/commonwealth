@@ -356,7 +356,6 @@ class ViewTemplatePage extends ClassComponent {
                           const functionArgs = this.formatFunctionArgs(
                             this.formState
                           );
-                          console.log('args', functionArgs);
                           await callContractFunction(
                             this.currentContract,
                             abiItem,
