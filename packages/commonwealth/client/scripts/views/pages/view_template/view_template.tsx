@@ -25,6 +25,7 @@ import { showConfirmationModal } from '../../modals/confirmation_modal';
 import type Contract from 'client/scripts/models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
+import { constructProjectApi } from '../../../../../../chain-events/src/chains/commonwealth';
 
 const jsonExample = {
   form_fields: [
@@ -125,23 +126,10 @@ class ViewTemplatePage extends ClassComponent {
   };
   private isLoaded;
   private templateNickname = '';
-  private formError = false;
+  private templateError = true;
+  private validationErrors = false;
   private txReady = false;
   private currentContract: Contract | null = null;
-
-  handleInputChange(e) {
-    const value = e.target.value;
-    // this.form.abi = value;
-
-    try {
-      const json = JSON.parse(value);
-      this.formError = !isValidJson(json);
-    } catch (err) {
-      console.log('err', err);
-      // Handle Error Appropriately
-      this.formError = true;
-    }
-  }
 
   loadData(vnode) {
     // this.form.abi = JSON.stringify(jsonExample, null, 2); UNCLEAR IF NEEDED
@@ -173,6 +161,7 @@ class ViewTemplatePage extends ClassComponent {
 
         try {
           this.json = JSON.parse(template.template);
+          this.templateError = !isValidJson(this.json);
         } catch (err) {
           console.log('err', err);
 
@@ -256,13 +245,7 @@ class ViewTemplatePage extends ClassComponent {
   }
 
   constructTxPreview() {
-    const abiItem = parseFunctionFromABI(
-      this.currentContract.abi,
-      this.json.tx_template?.method as string
-    );
-
     const functionArgs = this.formatFunctionArgs(this.formState);
-
     const preview = {};
 
     preview['method'] = this.json.tx_template?.method;
@@ -278,6 +261,12 @@ class ViewTemplatePage extends ClassComponent {
       this.loadData(vnode);
       return;
     }
+
+    this.txReady =
+      !this.validationErrors &&
+      Object.values(this.formState).every((val) => {
+        return val !== null && val !== '';
+      });
 
     return (
       <Sublayout>
@@ -295,66 +284,72 @@ class ViewTemplatePage extends ClassComponent {
           <div class="form">
             <CWDivider className="divider" />
 
-            {this.formError && (
+            {!this.templateError ? (
+              <div className="template">
+                {this.json.form_fields.map((field, index) => {
+                  const [component] = Object.keys(this.json.form_fields[index]);
+
+                  switch (component) {
+                    case TemplateComponents.DIVIDER:
+                      return <CWDivider />;
+                    case TemplateComponents.TEXT:
+                      return (
+                        <CWText fontStyle={field[component].field_type}>
+                          {field[component].field_value}
+                        </CWText>
+                      );
+                    case TemplateComponents.INPUT:
+                      return (
+                        <CWTextInput
+                          label={field[component].field_label}
+                          value={this.formState[field[component].field_ref]}
+                          placeholder={field[component].field_name}
+                          oninput={(e) => {
+                            this.formState = produce(
+                              this.formState,
+                              (draft) => {
+                                draft[field[component].field_ref] =
+                                  e.target.value;
+                              }
+                            );
+                          }}
+                        />
+                      );
+                    case TemplateComponents.DROPDOWN:
+                      return (
+                        <CWDropdown
+                          label={field[component].field_label}
+                          options={field[component].field_options}
+                          onSelect={(item) => {
+                            this.formState = produce(
+                              this.formState,
+                              (draft) => {
+                                draft[field[component].field_ref] = item.value;
+                              }
+                            );
+                          }}
+                        />
+                      );
+                    default:
+                      return null;
+                  }
+                })}
+              </div>
+            ) : (
               <MessageRow
                 label="error"
                 hasFeedback
                 validationStatus="failure"
-                statusMessage="message here"
+                statusMessage="invalid template format"
               />
             )}
-
-            <div className="template">
-              {/* Render this here so it has easy access to the state object */}
-              {this.json.form_fields.map((field, index) => {
-                const [component] = Object.keys(this.json.form_fields[index]);
-
-                switch (component) {
-                  case TemplateComponents.DIVIDER:
-                    return <CWDivider />;
-                  case TemplateComponents.TEXT:
-                    return (
-                      <CWText fontStyle={field[component].field_type}>
-                        {field[component].field_value}
-                      </CWText>
-                    );
-                  case TemplateComponents.INPUT:
-                    return (
-                      <CWTextInput
-                        label={field[component].field_label}
-                        value={this.formState[field[component].field_ref]}
-                        placeholder={field[component].field_name}
-                        oninput={(e) => {
-                          this.formState = produce(this.formState, (draft) => {
-                            draft[field[component].field_ref] = e.target.value;
-                          });
-                        }}
-                      />
-                    );
-                  case TemplateComponents.DROPDOWN:
-                    return (
-                      <CWDropdown
-                        label={field[component].field_label}
-                        options={field[component].field_options}
-                        onSelect={(item) => {
-                          this.formState = produce(this.formState, (draft) => {
-                            draft[field[component].field_ref] = item.value;
-                          });
-                        }}
-                      />
-                    );
-                  default:
-                    return null;
-                }
-              })}
-            </div>
             <CWDivider />
             <div className="bottom-row">
               <CWButton label="Cancel" buttonType="secondary-black" />
               <CWButton
                 label="Create"
                 buttonType="primary-black"
-                disabled={this.txReady}
+                disabled={!this.txReady}
                 onclick={() => {
                   showConfirmationModal({
                     title: 'Attempt this transaction?',
@@ -372,8 +367,7 @@ class ViewTemplatePage extends ClassComponent {
                           const functionArgs = this.formatFunctionArgs(
                             this.formState
                           );
-                          console.log('args', functionArgs);
-                          console.log('abi', abiItem);
+
                           await callContractFunction(
                             this.currentContract,
                             abiItem,
