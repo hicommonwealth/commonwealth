@@ -63,6 +63,7 @@ class ProposalsPage extends ClassComponent {
 
   view() {
     if (!app.chain || !app.chain.loaded) {
+      app.chainAdapterReady.on('ready', () => this.redraw());
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut

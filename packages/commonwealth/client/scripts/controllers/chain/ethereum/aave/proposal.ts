@@ -7,6 +7,7 @@ import { AaveTypes } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
 import { blocknumToTime } from 'helpers';
 import $ from 'jquery';
+import { EventEmitter } from 'events';
 
 import type {
   ChainEntity,
@@ -97,6 +98,8 @@ export default class AaveProposal extends Proposal<
   public get Executor() {
     return this._Executor;
   }
+
+  public ipfsDataReady = new EventEmitter();
 
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
@@ -293,6 +296,7 @@ export default class AaveProposal extends Proposal<
         } else {
           throw new Error('Invalid IPFS data format');
         }
+        this.ipfsDataReady.emit('ready');
       })
       .catch(() =>
         console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`)

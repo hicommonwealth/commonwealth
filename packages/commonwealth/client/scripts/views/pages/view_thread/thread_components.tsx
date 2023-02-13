@@ -23,11 +23,11 @@ import { getClasses } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
 import withRouter from 'navigation/helpers';
 
-type ThreadComponentAttrs = {
+type ThreadComponentProps = {
   thread: Thread;
 };
 
-export const ThreadAuthor = (props: ThreadComponentAttrs) => {
+export const ThreadAuthor = (props: ThreadComponentProps) => {
   const { thread } = props;
 
   const popoverProps = usePopover();
@@ -66,41 +66,39 @@ export const ThreadAuthor = (props: ThreadComponentAttrs) => {
   );
 };
 
-export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: ResultNode<ThreadComponentAttrs>) {
-    const { thread } = vnode.attrs;
+export const ThreadStage = (props: ThreadComponentProps) => {
+  const { thread } = props;
 
-    return (
-      <CWText
-        type="caption"
-        className={getClasses<{ stage: 'negative' | 'positive' }>(
-          {
-            stage:
-              thread.stage === ThreadStageType.ProposalInReview
-                ? 'positive'
-                : thread.stage === ThreadStageType.Voting
-                ? 'positive'
-                : thread.stage === ThreadStageType.Passed
-                ? 'positive'
-                : thread.stage === ThreadStageType.Failed
-                ? 'negative'
-                : 'positive',
-          },
-          'proposal-stage-text'
-        )}
-        onClick={(e) => {
-          e.preventDefault();
-          navigateToSubpage(`?stage=${thread.stage}`);
-        }}
-      >
-        {threadStageToLabel(thread.stage)}
-      </CWText>
-    );
-  }
-}
+  return (
+    <CWText
+      type="caption"
+      className={getClasses<{ stage: 'negative' | 'positive' }>(
+        {
+          stage:
+            thread.stage === ThreadStageType.ProposalInReview
+              ? 'positive'
+              : thread.stage === ThreadStageType.Voting
+              ? 'positive'
+              : thread.stage === ThreadStageType.Passed
+              ? 'positive'
+              : thread.stage === ThreadStageType.Failed
+              ? 'negative'
+              : 'positive',
+        },
+        'proposal-stage-text'
+      )}
+      onClick={(e) => {
+        e.preventDefault();
+        navigateToSubpage(`?stage=${thread.stage}`);
+      }}
+    >
+      {threadStageToLabel(thread.stage)}
+    </CWText>
+  );
+};
 
-class ExternalLinkComponent extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: ResultNode<ThreadComponentAttrs>) {
+class ExternalLinkComponent extends ClassComponent<ThreadComponentProps> {
+  view(vnode: ResultNode<ThreadComponentProps>) {
     const { thread } = vnode.attrs;
 
     return (
