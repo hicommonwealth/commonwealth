@@ -3,7 +3,6 @@
 import ClassComponent from 'class_component';
 import { WalletId } from 'common-common/src/types';
 import { unlinkLogin } from 'controllers/app/login';
-import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { formatAddressShort, link, orderAccountsByAddress } from 'helpers';
 import _ from 'lodash';
 import m from 'mithril';
@@ -65,20 +64,6 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
               Magically linked to {app.user.email}
             </CWText>
           )}
-          {account instanceof MolochMember &&
-            account.isMember &&
-            account.delegateKey && (
-              <CWText noWrap>
-                Delegate:
-                {account.isMember
-                  ? link(
-                      'a',
-                      `/${account.chain.id}/account/${account.delegateKey}`,
-                      account.delegateKey
-                    )
-                  : 'N/A'}
-              </CWText>
-            )}
         </div>
         <CWButton
           buttonType="primary-red"

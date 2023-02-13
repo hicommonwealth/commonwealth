@@ -179,10 +179,6 @@ export default class CompoundProposal extends Proposal<
     return +this.data.startBlock;
   }
 
-  public get votingPeriodEnd() {
-    return this.startingPeriod + +this._Gov.votingPeriod;
-  }
-
   public get state(): CompoundTypes.ProposalState {
     const time = Date.now() / 1000;
     if (this.data.cancelled) return CompoundTypes.ProposalState.Canceled;

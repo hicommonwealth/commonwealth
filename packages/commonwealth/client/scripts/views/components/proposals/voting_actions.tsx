@@ -16,11 +16,6 @@ import CompoundProposal, {
   BravoVote,
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import MolochProposal, {
-  MolochProposalState,
-  MolochProposalVote,
-  MolochVote,
-} from 'controllers/chain/ethereum/moloch/proposal';
 import type { NearAccount } from 'controllers/chain/near/accounts';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
@@ -41,10 +36,7 @@ import { BinaryVote, DepositVote, VotingType } from 'models';
 import app from 'state';
 
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import {
-  CompoundCancelButton,
-  MolochCancelButton,
-} from '../../pages/view_proposal/proposal_components';
+import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { getCanVote, getVotingResults } from './helpers';
@@ -97,7 +89,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     } else if (proposal instanceof CosmosProposal) {
       user = app.user.activeAddressAccount as CosmosAccount;
     } else if (
-      proposal instanceof MolochProposal ||
       proposal instanceof CompoundProposal ||
       proposal instanceof AaveProposal
     ) {
@@ -157,11 +148,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             .then(() => m.redraw())
             .catch((err) => notifyError(err.toString()));
         }
-      } else if (proposal instanceof MolochProposal) {
-        proposal
-          .submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof CompoundProposal) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
@@ -216,10 +202,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           .voteTx(new CosmosVote(user, 'No'))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
-      } else if (proposal instanceof MolochProposal) {
-        proposal
-          .submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO))
-          .then(() => m.redraw());
       } else if (proposal instanceof CompoundProposal) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.NO))
@@ -237,27 +219,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           )
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
-      } else {
-        toggleVotingModal(false);
-        return notifyError('Invalid proposal type');
-      }
-    };
-
-    const processProposal = (e) => {
-      e.preventDefault();
-      toggleVotingModal(true);
-
-      if (proposal instanceof MolochProposal) {
-        proposal
-          .processTx()
-          .then(() => {
-            onModalClose();
-            m.redraw();
-          })
-          .catch((err) => {
-            onModalClose();
-            notifyError(err.toString());
-          });
       } else {
         toggleVotingModal(false);
         return notifyError('Invalid proposal type');
@@ -382,18 +343,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       />
     );
 
-    // moloch: process
-    const processButton = proposal instanceof MolochProposal && (
-      <CWButton
-        disabled={
-          proposal.state !== MolochProposalState.ReadyToProcess ||
-          votingModalOpen
-        }
-        onclick={processProposal}
-        label={proposal.data.processed ? 'Processed' : 'Process'}
-      />
-    );
-
     // near: remove
     const removeButton = proposal instanceof NearSputnikProposal && (
       <CWButton
@@ -460,23 +409,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             {noButton}
             {abstainButton}
             {noWithVetoButton}
-          </div>
-          <ProposalExtensions proposal={proposal} />
-        </>
-      );
-    } else if (proposal.votingType === VotingType.MolochYesNo) {
-      votingActionObj = (
-        <>
-          <div class="button-row">
-            {yesButton}
-            {noButton}
-            {processButton}
-            <MolochCancelButton
-              molochMember={user}
-              onModalClose={onModalClose}
-              proposal={proposal as MolochProposal}
-              votingModalOpen={votingModalOpen}
-            />
           </div>
           <ProposalExtensions proposal={proposal} />
         </>

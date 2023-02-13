@@ -4,7 +4,6 @@ import ClassComponent from 'class_component';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
-import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
 import m from 'mithril';
 
 import 'pages/view_proposal/proposal_components.scss';
@@ -26,37 +25,6 @@ type BaseCancelButtonAttrs = {
   toggleVotingModal?: (newModalState: boolean) => void;
   votingModalOpen?: boolean;
 };
-
-type MolochCancelButtonAttrs = {
-  proposal: MolochProposal;
-  molochMember: MolochMember;
-} & BaseCancelButtonAttrs;
-
-export class MolochCancelButton extends ClassComponent<MolochCancelButtonAttrs> {
-  view(vnode: m.Vnode<MolochCancelButtonAttrs>) {
-    const {
-      proposal,
-      votingModalOpen,
-      molochMember,
-      onModalClose,
-      toggleVotingModal,
-    } = vnode.attrs;
-
-    return (
-      <CWButton
-        buttonType="primary-red"
-        disabled={
-          !(proposal.canAbort(molochMember) && !proposal.completed) ||
-          votingModalOpen
-        }
-        onclick={(e) =>
-          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
-        }
-        label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
-      />
-    );
-  }
-}
 
 type AaveCancelButtonAttrs = {
   proposal: AaveProposal;
@@ -102,25 +70,16 @@ export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAtt
   }
 }
 
-export type SubheaderProposalType =
-  | AaveProposal
-  | CompoundProposal
-  | MolochProposal;
+export type SubheaderProposalType = AaveProposal | CompoundProposal;
 
 type ProposalSubheaderAttrs = {
   proposal: SubheaderProposalType;
-  molochMember?: MolochMember;
 } & BaseCancelButtonAttrs;
 
 export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
   view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
-    const {
-      molochMember,
-      onModalClose,
-      proposal,
-      toggleVotingModal,
-      votingModalOpen,
-    } = vnode.attrs;
+    const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
+      vnode.attrs;
 
     return (
       <div class="ProposalSubheader">
@@ -198,14 +157,6 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
               votingModalOpen={votingModalOpen}
             />
           </div>
-        )}
-        {proposal instanceof MolochProposal && (
-          <MolochCancelButton
-            molochMember={molochMember}
-            onModalClose={onModalClose}
-            proposal={proposal}
-            toggleVotingModal={toggleVotingModal}
-          />
         )}
       </div>
     );
