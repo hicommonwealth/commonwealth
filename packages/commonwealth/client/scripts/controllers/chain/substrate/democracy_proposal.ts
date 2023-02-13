@@ -332,7 +332,7 @@ class SubstrateDemocracyProposal extends Proposal<
       }
     };
     return this._Chain.createTXModalData(
-      vote.account as SubstrateAccount,
+      vote.account,
       txFunc,
       'secondDemocracyProposal',
       this.title,

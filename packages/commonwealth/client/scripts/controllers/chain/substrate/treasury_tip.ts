@@ -23,6 +23,7 @@ import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import type SubstrateTreasuryTips from './treasury_tips';
 import {SubstrateAccount} from "controllers/chain/substrate/account";
+import AddressAccount from "models/Address";
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
