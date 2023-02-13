@@ -48,20 +48,24 @@ const getCreateContentMenuItems = (): MenuItem[] => {
 
     const items = [];
 
-    contracts.map((contract) => {
-      for (const cct of contract.ccts) {
-        if (
-          cct.cctmd.display_options === '2' ||
-          cct.cctmd.display_options === '3'
-        ) {
-          const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
-          items.push({
-            label: `New ${cct.cctmd.nickname}`,
-            iconLeft: 'star',
-            onclick: () => {
-              navigateToSubpage(`/${contract.address}/${slugWithSlashRemoved}`);
-            },
-          });
+    contracts.forEach((contract) => {
+      if (contract.ccts) {
+        for (const cct of contract.ccts) {
+          if (
+            cct.cctmd.display_options === '2' ||
+            cct.cctmd.display_options === '3'
+          ) {
+            const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
+            items.push({
+              label: `New ${cct.cctmd.nickname}`,
+              iconLeft: 'star',
+              onclick: () => {
+                navigateToSubpage(
+                  `/${contract.address}/${slugWithSlashRemoved}`
+                );
+              },
+            });
+          }
         }
       }
     });
