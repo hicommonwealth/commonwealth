@@ -12,7 +12,7 @@ import {
 } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import getFetch from 'helpers/getFetch';
+import { getBaseUrl, getFetch } from 'helpers/getUrl';
 import $ from 'jquery';
 import type { ChainInfo } from 'models';
 import { ChainEntity, ChainEvent } from 'models';
@@ -96,8 +96,8 @@ class ChainEntityController {
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
-      getFetch(`${app.serverUrl()}/ce/entities`, options),
-      getFetch(`${app.serverUrl()}/getEntityMeta`, options),
+      getFetch(getBaseUrl() + '/entities', options),
+      getFetch(getBaseUrl() + '/getEntityMeta', options),
     ]);
 
     if (Array.isArray(entities)) {
@@ -119,9 +119,7 @@ class ChainEntityController {
   }
 
   public async refreshRawEntities(chain: string) {
-    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, {
-      chain,
-    });
+    const entities = await getFetch(getBaseUrl() + '/entities', { chain });
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);
