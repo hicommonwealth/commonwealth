@@ -236,7 +236,7 @@ export class QuillEditorComponent extends ClassComponent<
                     : JSON.stringify(this.editor.contents),
               },
             });
-            redraw();
+            this.redraw();
           }}
         />
       </div>

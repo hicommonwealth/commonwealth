@@ -4,6 +4,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import type { Component } from 'mithrilInterop';
 import { render, redraw } from 'mithrilInterop';
+import React from 'react';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
@@ -27,6 +28,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = !onOwnProfile;
+    const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
     // For Banning
     const loggedInUserIsAdmin =
@@ -114,6 +116,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           render(CWButton, {
             onClick: () => {
               alertModalWithText(account.profile.bio, 'Close')();
+              setIsModalOpen(true);
             },
             label: 'View Bio',
           }),
@@ -125,7 +128,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 modal: BanUserModal,
                 data: { profile: account.profile },
               });
-              redraw();
+              setIsModalOpen(true);
             },
             label: 'Ban User',
             buttonType: 'primary-red',

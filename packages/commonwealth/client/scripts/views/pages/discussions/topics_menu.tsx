@@ -38,6 +38,8 @@ type TopicsMenuProps = {
 export const TopicsMenu = (props: TopicsMenuProps) => {
   const { featuredTopics, otherTopics, selectedTopic, topic } = props;
 
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
   const popoverProps = usePopover();
 
   return (
@@ -113,7 +115,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                                     defaultOffchainTemplate,
                                   },
                                 });
-                                redraw();
+                                setIsModalOpen(true);
                               }}
                             />
                           )

@@ -53,7 +53,6 @@ export const alertModalWithText = (text: string, primaryButton?: string) => {
         modal: AlertModal,
         data: { text, primaryButton },
       });
-      redraw();
     });
   };
 };

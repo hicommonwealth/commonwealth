@@ -8,7 +8,8 @@ import 'components/user/user.scss';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { Account, AddressInfo, Profile } from 'models';
+import type { Account } from 'models';
+import { AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
@@ -322,7 +323,7 @@ export const User = (props: UserAttrs) => {
                 modal: BanUserModal,
                 data: { profile },
               });
-              redraw();
+              setIsModalOpen(true);
             }}
             label="Ban User"
             buttonType="primary-red"
