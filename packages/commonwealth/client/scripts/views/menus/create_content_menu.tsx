@@ -29,6 +29,8 @@ const getCreateContentMenuItems = (): MenuItem[] => {
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 
+  console.log('cntracts', app.contracts.store);
+
   const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
 
   const showOnChainProposalItem =
@@ -42,6 +44,28 @@ const getCreateContentMenuItems = (): MenuItem[] => {
   const showSubstrateProposalItems =
     app.chain?.base === ChainBase.Substrate &&
     app.chain?.network !== ChainNetwork.Plasm;
+
+  const getTemplateItems = (): MenuItem[] => {
+    const contracts = app.contracts.getCommunityContracts();
+
+    const items = [];
+
+    contracts.map((contract) => {
+      for (const cct of contract.ccts) {
+        if (cct.cctmd.display_options === '2') {
+          items.push({
+            label: `New ${cct.cctmd.nickname}`,
+            iconLeft: 'star',
+            onclick: () => {
+              navigateToSubpage(`/${contract.address}/${cct.cctmd.slug}`);
+            },
+          });
+        }
+      }
+    });
+
+    return items;
+  };
 
   const getTopicTemplateItems = (): MenuItem[] =>
     topics.map((t) => ({
@@ -224,6 +248,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           ...getSputnikProposalItem(),
           ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
+          ...getTemplateItems(),
         ]
       : []),
     {

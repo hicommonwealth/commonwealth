@@ -15,6 +15,7 @@ type CreateCommunityContractTemplateAndMetadataReq = {
   contract_id: number;
   community_id: number;
   template_id: number;
+  chain_id: string;
 };
 
 type CommunityContractTemplateAndMetadataResp = {
@@ -42,6 +43,7 @@ export async function createCommunityContractTemplateAndMetadata(
     community_id,
     contract_id,
     template_id,
+    chain_id,
   } = req.body;
 
   if (!community_id || !contract_id || !template_id) {
@@ -58,12 +60,14 @@ export async function createCommunityContractTemplateAndMetadata(
 
   // TODO something is off here
   const communityContract = await models.CommunityContract.findOne({
-    where: { contract_id: contract_id },
+    where: { contract_id: contract_id, chain_id },
   });
 
   if (!communityContract) {
     throw new AppError('Failed to create community contract');
   }
+
+  console.log('communityContract: ', communityContract);
 
   try {
     // TODO: can some kind of transcation happen here to make this atomic?
