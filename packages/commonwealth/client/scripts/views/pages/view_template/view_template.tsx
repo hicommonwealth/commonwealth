@@ -127,7 +127,7 @@ class ViewTemplatePage extends ClassComponent {
   private isLoaded;
   private templateNickname = '';
   private templateError = true;
-  private validationErrors = false;
+  private hasValidationErrors = false;
   private txReady = false;
   private currentContract: Contract | null = null;
 
@@ -263,7 +263,7 @@ class ViewTemplatePage extends ClassComponent {
     }
 
     this.txReady =
-      !this.validationErrors &&
+      !this.hasValidationErrors &&
       Object.values(this.formState).every((val) => {
         return val !== null && val !== '';
       });
