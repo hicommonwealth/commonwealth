@@ -49,17 +49,6 @@ window.onpopstate = (...args) => {
   }
 };
 
-const navigateToSubpage = (...args) => {
-  // prepend community if we are not on a custom domain
-  if (!app.isCustomDomain() && app.activeChainId()) {
-    args[0] = `/${app.activeChainId()}${args[0]}`;
-  }
-  app.sidebarMenu = 'default';
-  // app.sidebarRedraw.emit('redraw');
-  // TODO navigate should be passed as argument
-  // setRoute.apply(this, args);
-};
-
 const shouldDeferChain = ({
   deferChain,
   scope,
@@ -652,4 +641,4 @@ const getRoutes = (customDomain: string) => {
   };
 };
 
-export { getRoutes, navigateToSubpage, handleLoginRedirects };
+export { getRoutes, handleLoginRedirects };

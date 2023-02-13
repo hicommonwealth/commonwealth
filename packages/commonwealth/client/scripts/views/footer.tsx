@@ -3,8 +3,7 @@ import React from 'react';
 import 'footer.scss';
 
 import { isNotUndefined } from '../helpers/typeGuards';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from '../router';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -27,8 +26,10 @@ const footercontents = [
 ];
 
 const FooterComponent = () => {
+  const navigate = useCommonNavigate();
+
   const redirectClick = (route) => {
-    navigateToSubpage(route);
+    navigate(route, {}, null);
   };
 
   return (
