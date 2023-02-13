@@ -29,8 +29,6 @@ const getCreateContentMenuItems = (): MenuItem[] => {
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  console.log('cntracts', app.contracts.store);
-
   const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
 
   const showOnChainProposalItem =
@@ -52,12 +50,16 @@ const getCreateContentMenuItems = (): MenuItem[] => {
 
     contracts.map((contract) => {
       for (const cct of contract.ccts) {
-        if (cct.cctmd.display_options === '2') {
+        if (
+          cct.cctmd.display_options === '2' ||
+          cct.cctmd.display_options === '3'
+        ) {
+          const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
           items.push({
             label: `New ${cct.cctmd.nickname}`,
             iconLeft: 'star',
             onclick: () => {
-              navigateToSubpage(`/${contract.address}/${cct.cctmd.slug}`);
+              navigateToSubpage(`/${contract.address}/${slugWithSlashRemoved}`);
             },
           });
         }

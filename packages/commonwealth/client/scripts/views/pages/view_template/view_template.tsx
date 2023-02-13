@@ -255,6 +255,22 @@ class ViewTemplatePage extends ClassComponent {
     });
   }
 
+  constructTxPreview() {
+    const abiItem = parseFunctionFromABI(
+      this.currentContract.abi,
+      this.json.tx_template?.method as string
+    );
+
+    const functionArgs = this.formatFunctionArgs(this.formState);
+
+    const preview = {};
+
+    preview['method'] = this.json.tx_template?.method;
+    preview['args'] = functionArgs;
+
+    return JSON.stringify(preview, null, 4);
+  }
+
   view(vnode) {
     const scope = vnode.attrs.scope;
 
@@ -342,7 +358,7 @@ class ViewTemplatePage extends ClassComponent {
                 onclick={() => {
                   showConfirmationModal({
                     title: 'Attempt this transaction?',
-                    description: '{tx_information}', // TODO: Replace with some preview we like
+                    description: this.constructTxPreview(), // TODO: Replace with some preview we like
                     confirmButton: {
                       type: 'primary-black',
                       label: 'confirm',
@@ -357,6 +373,7 @@ class ViewTemplatePage extends ClassComponent {
                             this.formState
                           );
                           console.log('args', functionArgs);
+                          console.log('abi', abiItem);
                           await callContractFunction(
                             this.currentContract,
                             abiItem,
