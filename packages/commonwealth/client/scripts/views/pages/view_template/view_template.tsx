@@ -314,7 +314,7 @@ class ViewTemplatePage extends ClassComponent {
                             draft[field[component].field_ref] = e.target.value;
                           });
                         }}
-                        inputValidationFn{(val) => 
+                        inputValidationFn={(val) => 
                             validateType(val, field[component].formatter)
                           }
                       />
