@@ -5,7 +5,10 @@ import {
   APPLICATION_UPDATE_ACTION,
   APPLICATION_UPDATE_MESSAGE,
 } from 'helpers/constants';
-import { getRoute, getRouteParam } from 'mithrilInterop';
+import {
+  _DEPRECATED_getRoute,
+  _DEPRECATED_getSearchParams,
+} from 'mithrilInterop';
 
 export const pathIsDiscussion = (
   scope: string | null,
@@ -39,7 +42,7 @@ interface ShouldDeferChainAttrs {
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
-  app._lastNavigatedFrom = getRoute();
+  app._lastNavigatedFrom = _DEPRECATED_getRoute();
 
   if (_onpopstate) {
     _onpopstate.apply(this, args);
@@ -102,7 +105,7 @@ const DO_NOT_USE_redirectRoute = (
 // TODO this function used to be in the app.ts but now
 // should be incorporated in new react flow
 const handleLoginRedirects = () => {
-  const routeParam = getRouteParam();
+  const routeParam = _DEPRECATED_getSearchParams();
   if (
     routeParam['loggedin'] &&
     routeParam['loggedin'].toString() === 'true' &&
@@ -116,14 +119,14 @@ const handleLoginRedirects = () => {
      else we identify to associate mixpanel events
     */
     if (
-      getRouteParam()['new'] &&
-      getRouteParam()['new'].toString() === 'true'
+      _DEPRECATED_getSearchParams()['new'] &&
+      _DEPRECATED_getSearchParams()['new'].toString() === 'true'
     ) {
       console.log('creating account');
     }
 
     // TODO setRoute outside of react router, might not work properly
-    // setRoute(getRouteParam['path'], {}, { replace: true });
+    // setRoute(_DEPRECATED_getSearchParams['path'], {}, { replace: true });
   } else if (
     localStorage &&
     localStorage.getItem &&
@@ -379,7 +382,9 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/search': DO_NOT_USE_redirectRoute(() => '/search'),
   '/:scope/members': DO_NOT_USE_redirectRoute(() => '/members'),
   '/:scope/sputnik-daos': DO_NOT_USE_redirectRoute(() => '/sputnik-daos'),
-  '/:scope/chat/:channel': DO_NOT_USE_redirectRoute((attrs) => `/chat/${attrs.channel}`),
+  '/:scope/chat/:channel': DO_NOT_USE_redirectRoute(
+    (attrs) => `/chat/${attrs.channel}`
+  ),
   '/:scope/new/discussion': DO_NOT_USE_redirectRoute(() => '/new/discussion'),
   '/:scope/account/:address': DO_NOT_USE_redirectRoute(
     (attrs) => `/account/${attrs.address}/`
@@ -420,9 +425,10 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/new/snapshot-proposal/:snapshotId': DO_NOT_USE_redirectRoute(
     (attrs) => `/new/snapshot/${attrs.snapshotId}`
   ),
-  '/:scope/snapshot-proposals/:snapshotId/:identifier': DO_NOT_USE_redirectRoute(
-    (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-  ),
+  '/:scope/snapshot-proposals/:snapshotId/:identifier':
+    DO_NOT_USE_redirectRoute(
+      (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+    ),
   '/:scope/new/snapshot-proposals/:snapshotId': DO_NOT_USE_redirectRoute(
     (attrs) => `/new/snapshot/${attrs.snapshotId}`
   ),

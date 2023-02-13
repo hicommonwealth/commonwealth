@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getRoute } from 'mithrilInterop';
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import {
   ChainBase,
   ChainNetwork,
@@ -197,7 +197,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
     p.startsWith(`/${app.activeChainId()}/members`) ||
     p.startsWith(`/${app.activeChainId()}/account/`);
 
-  if (onNotificationsPage(getRoute())) return;
+  if (onNotificationsPage(_DEPRECATED_getRoute())) return;
 
   // ---------- Build Section Props ---------- //
 
@@ -209,7 +209,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
     isVisible: true,
     isUpdated: true,
     isActive:
-      onMembersPage(getRoute()) && (app.chain ? app.chain.serverLoaded : true),
+      onMembersPage(_DEPRECATED_getRoute()) && (app.chain ? app.chain.serverLoaded : true),
     onClick: (e, toggle: boolean) => {
       console.log('this', this);
       handleRedirectClicks(this, e, '/members', app.activeChainId(), () => {
@@ -227,7 +227,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
       ? toggleTreeState['children']['Snapshots']['toggledState']
       : false,
     isVisible: showSnapshotOptions,
-    isActive: onSnapshotProposal(getRoute()),
+    isActive: onSnapshotProposal(_DEPRECATED_getRoute()),
     isUpdated: true,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
@@ -282,7 +282,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
     },
     isVisible: showProposals,
     isUpdated: true,
-    isActive: onProposalPage(getRoute()),
+    isActive: onProposalPage(_DEPRECATED_getRoute()),
     displayData: null,
   };
 
@@ -301,7 +301,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
     },
     isVisible: showTreasury,
     isUpdated: true,
-    isActive: onTreasuryPage(getRoute()),
+    isActive: onTreasuryPage(_DEPRECATED_getRoute()),
     displayData: null,
   };
 
@@ -319,7 +319,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
     },
     isVisible: showReferenda,
     isUpdated: true,
-    isActive: onReferendaPage(getRoute()),
+    isActive: onReferendaPage(_DEPRECATED_getRoute()),
     displayData: null,
   };
 
@@ -337,7 +337,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
     },
     isVisible: showTips,
     isUpdated: true,
-    isActive: onTipsPage(getRoute()),
+    isActive: onTipsPage(_DEPRECATED_getRoute()),
     displayData: null,
   };
 
@@ -350,7 +350,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
       : false,
     isVisible: showCompoundOptions,
     isUpdated: true,
-    isActive: getRoute() === `/${app.activeChainId()}/delegate`,
+    isActive: _DEPRECATED_getRoute() === `/${app.activeChainId()}/delegate`,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
       handleRedirectClicks(this, e, '/delegate', app.activeChainId(), () => {

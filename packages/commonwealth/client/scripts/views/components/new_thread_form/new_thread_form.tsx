@@ -2,8 +2,8 @@ import React from 'react';
 
 import {
   ClassComponent,
-  getRoute,
-  getRouteParam,
+  _DEPRECATED_getRoute,
+  _DEPRECATED_getSearchParams,
   redraw,
 } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
@@ -191,7 +191,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.overwriteConfirmationModal = false;
     try {
       this.activeTopic = isModal
-        ? getRouteParam('topic')
+        ? _DEPRECATED_getSearchParams('topic')
         : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
         ? app.lastNavigatedFrom().split('/')[
             app.lastNavigatedFrom().split('/').indexOf('discussions') + 1
@@ -322,7 +322,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
               isSelected={this.form.kind === ThreadKind.Link}
             />
           </CWTabBar>
-          {isModal && getRoute() !== `${chainId}/new/discussion` && (
+          {isModal && _DEPRECATED_getRoute() !== `${chainId}/new/discussion` && (
             <CWButton
               label="Full editor"
               iconLeft="expand"

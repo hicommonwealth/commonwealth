@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, redraw, getRoute } from 'mithrilInterop';
+import { ClassComponent, redraw, _DEPRECATED_getRoute } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import { Action } from 'commonwealth/shared/permissions';
@@ -38,7 +38,8 @@ class SidebarComponent extends ClassComponent {
 
     const currentChainInfo = app.chain?.meta;
 
-    const onHomeRoute = getRoute() === `/${app.activeChainId()}/feed`;
+    const onHomeRoute =
+      _DEPRECATED_getRoute() === `/${app.activeChainId()}/feed`;
 
     const hideChat =
       !currentChainInfo ||

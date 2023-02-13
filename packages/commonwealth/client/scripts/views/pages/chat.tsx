@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, getRouteParam } from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getSearchParams } from 'mithrilInterop';
 
 import 'pages/chat.scss';
 
@@ -27,7 +27,7 @@ class ChatPage extends ClassComponent {
 
     if (!app.socket) navigateToSubpage('/'); // Stops un-logged in access
 
-    const channel_id = getRouteParam()['channel'];
+    const channel_id = _DEPRECATED_getSearchParams()['channel'];
 
     return !app.socket.chatNs.hasChannels() ? (
       <PageLoading />

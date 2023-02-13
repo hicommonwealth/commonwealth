@@ -13,6 +13,7 @@ import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
+import withRouter from 'navigation/helpers';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -40,6 +41,7 @@ class MembersPage extends ClassComponent {
   private totalMembersCount: number;
 
   view() {
+    console.log('this. props', this.props)
     const activeEntity = app.chain;
 
     if (!activeEntity) return <PageLoading message="Loading members" />;
@@ -229,4 +231,5 @@ class MembersPage extends ClassComponent {
   }
 }
 
-export default MembersPage;
+const a = withRouter(MembersPage);
+export default a;

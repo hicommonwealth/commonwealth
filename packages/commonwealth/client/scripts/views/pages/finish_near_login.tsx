@@ -6,7 +6,7 @@ import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import { getRouteParam, redraw } from 'mithrilInterop';
+import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -138,7 +138,7 @@ const FinishNearLogin = () => {
     }
 
     // tx error handling
-    const failedTx = getRouteParam('tx_failure');
+    const failedTx = _DEPRECATED_getSearchParams('tx_failure');
 
     if (failedTx) {
       console.log(`Login failed: deleting storage key ${failedTx}`);
@@ -153,7 +153,7 @@ const FinishNearLogin = () => {
 
     // tx success handling
     // TODO: ensure that create() calls redirect correctly
-    const savedTx = getRouteParam('saved_tx');
+    const savedTx = _DEPRECATED_getSearchParams('saved_tx');
 
     if (savedTx && localStorage[savedTx]) {
       try {
@@ -182,7 +182,7 @@ const FinishNearLogin = () => {
     // create new chain handling
     // TODO: we need to figure out how to clean this localStorage entry up
     //   in the case of transaction failure!!
-    const chainName = getRouteParam('chain_name');
+    const chainName = _DEPRECATED_getSearchParams('chain_name');
 
     if (chainName && localStorage[chainName]) {
       try {

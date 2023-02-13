@@ -2,7 +2,7 @@ import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { navigateToSubpage } from 'router';
-import { getRoute } from 'mithrilInterop';
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 
@@ -57,7 +57,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
             <div className="threads-filter-menu-items">
               <ThreadsFilterMenuItem
                 label="All Topics"
-                isSelected={getRoute() === `/${app.activeChainId()}` || !topic}
+                isSelected={_DEPRECATED_getRoute() === `/${app.activeChainId()}` || !topic}
                 onClick={() => {
                   navigateToSubpage('/discussions');
                 }}
@@ -78,7 +78,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                     i
                   ) => {
                     const active =
-                      getRoute() ===
+                      _DEPRECATED_getRoute() ===
                         `/${app.activeChainId()}/discussions/${encodeURI(
                           name.toString().trim()
                         )}` ||

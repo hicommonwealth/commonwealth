@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { getRoute, getRouteParam } from 'mithrilInterop';
+import {
+  _DEPRECATED_getRoute,
+  _DEPRECATED_getSearchParams,
+} from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import app from 'state';
@@ -35,7 +38,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 const DiscussionSectionComponent = () => {
   // Conditional Render Details +
   const onAllDiscussionPage = (p) => {
-    const identifier = getRouteParam('identifier');
+    const identifier = _DEPRECATED_getSearchParams('§');
     if (identifier) {
       const thread = app.threads.store.getByIdentifier(
         identifier.slice(0, identifier.indexOf('-'))
@@ -52,7 +55,7 @@ const DiscussionSectionComponent = () => {
   };
 
   const onOverviewDiscussionPage = (p) => {
-    const identifier = getRouteParam('identifier');
+    const identifier = _DEPRECATED_getSearchParams('identifier');
     if (identifier) {
       const thread = app.threads.store.getByIdentifier(
         identifier.slice(0, identifier.indexOf('-'))
@@ -66,7 +69,7 @@ const DiscussionSectionComponent = () => {
   };
 
   const onFeaturedDiscussionPage = (p, topic) => {
-    const identifier = getRouteParam('identifier');
+    const identifier = _DEPRECATED_getSearchParams('identifier');
     if (identifier) {
       const thread = app.threads.store.getByIdentifier(
         identifier.slice(0, identifier.indexOf('-'))
@@ -136,7 +139,7 @@ const DiscussionSectionComponent = () => {
       hasDefaultToggle: false,
       isVisible: true,
       isUpdated: true,
-      isActive: onAllDiscussionPage(getRoute()),
+      isActive: onAllDiscussionPage(_DEPRECATED_getRoute()),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(
@@ -157,7 +160,7 @@ const DiscussionSectionComponent = () => {
       hasDefaultToggle: false,
       isVisible: true,
       isUpdated: true,
-      isActive: onOverviewDiscussionPage(getRoute()),
+      isActive: onOverviewDiscussionPage(_DEPRECATED_getRoute()),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(this, e, `/overview`, app.activeChainId(), () => {
@@ -173,7 +176,7 @@ const DiscussionSectionComponent = () => {
       isVisible: true,
       isUpdated: true,
       isActive:
-        onSputnikDaosPage(getRoute()) &&
+        onSputnikDaosPage(_DEPRECATED_getRoute()) &&
         (app.chain ? app.chain.serverLoaded : true),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
@@ -202,7 +205,7 @@ const DiscussionSectionComponent = () => {
         hasDefaultToggle: false,
         isVisible: true,
         isUpdated: true,
-        isActive: onFeaturedDiscussionPage(getRoute(), topic.name),
+        isActive: onFeaturedDiscussionPage(_DEPRECATED_getRoute(), topic.name),
         // eslint-disable-next-line no-loop-func
         onClick: (e, toggle: boolean) => {
           e.preventDefault();

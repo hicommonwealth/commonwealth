@@ -16,6 +16,7 @@ import type {
   NavigateOptions,
 } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
+import { features } from 'process';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
 export type Children = ReactNode | ReactNode[];
@@ -224,31 +225,24 @@ export function rootRender(el: Element, vnodes: Children) {
 }
 
 // ROUTING FUNCTIONS
-// m.route.param() shim
-export function getRouteParam(name?: string) {
+// Do not use for new features. Instead, take a look on react-router hook => "useSearchParams"
+export function _DEPRECATED_getSearchParams(name?: string) {
   const search = new URLSearchParams(window.location.search);
   return search.get(name);
 }
 
 // m.route.get() shim
-export function getRoute() {
+// Do not use for new features. Instead, take a look on react-router hook => "useLocation"
+export function _DEPRECATED_getRoute() {
   return window.location.pathname;
 }
 
-type RouteOptions = {
-  replace?: boolean;
-};
-
 // This should not be used for setting the route, because it does not use react-router.
-// Instead it uses native history API, and because react router does not recognize the
+// Instead, it uses native history API, and because react router does not recognize the
 // path change, the page has to be reloaded programmatically.
 // This is only for legacy code, where react router is not accessible (eg in controllers or JS classes).
 // Always use "withRouter" for react class components or "useNavigate" for functional components.
-export function dangerouslySetRoute(
-  route: string,
-  data?: Record<string, unknown>,
-  options?: RouteOptions
-) {
+export function _DEPRECATED_dangerouslySetRoute(route: string) {
   window.history.pushState('', '', route);
   window.location.reload();
 

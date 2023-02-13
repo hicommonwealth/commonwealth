@@ -1,9 +1,9 @@
 import React from 'react';
 
+import type { ResultNode } from 'mithrilInterop';
 import {
   ClassComponent,
-  ResultNode,
-  getRouteParam,
+  _DEPRECATED_getSearchParams,
   redraw,
 } from 'mithrilInterop';
 import moment from 'moment';
@@ -34,9 +34,10 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
   oncreate(vnode: ResultNode<NotificationRowAttrs>) {
     if (
-      getRouteParam('id') &&
+      _DEPRECATED_getSearchParams('id') &&
       vnode.attrs.onListPage &&
-      getRouteParam('id') === vnode.attrs.notifications[0].id.toString()
+      _DEPRECATED_getSearchParams('id') ===
+        vnode.attrs.notifications[0].id.toString()
     ) {
       this.scrollOrStop = true;
     }
@@ -74,7 +75,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       if (this.scrollOrStop) {
         setTimeout(() => {
-          const el = document.getElementById(getRouteParam('id'));
+          const el = document.getElementById(_DEPRECATED_getSearchParams('id'));
           if (el) el.scrollIntoView();
         }, 1);
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getRoute } from 'mithrilInterop';
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
 import app from 'state';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
@@ -52,7 +52,7 @@ const AdminSectionComponent = () => {
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
-      isActive: getRoute().includes('/manage'),
+      isActive: _DEPRECATED_getRoute().includes('/manage'),
       isVisible: true,
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
@@ -67,7 +67,7 @@ const AdminSectionComponent = () => {
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
-      isActive: getRoute().includes('/analytics'),
+      isActive: _DEPRECATED_getRoute().includes('/analytics'),
       isVisible: true,
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
