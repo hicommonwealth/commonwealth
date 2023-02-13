@@ -317,8 +317,10 @@ class ContractsController {
     contract_id: string;
   }) {
     try {
+      console.log('chain_id', app.activeChainId());
       await $.post(`${app.serverUrl()}/contract/template`, {
         jwt: app.user.jwt,
+        chain_id: app.activeChainId(),
         name,
         template,
         contract_id,
