@@ -65,10 +65,8 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   React.useEffect(() => {
     const fetch = async () => {
-      setLoadingData(false);
-
       if (activePage === DashboardViews.ForYou) {
-        if (fyNotifications && fyNotifications.length === 0) {
+        if (fyNotifications.length === 0) {
           setLoadingData(true);
 
           const activity = await fetchActivity(activePage);
@@ -82,7 +80,7 @@ const UserDashboard = (props: UserDashboardProps) => {
           setLoadingData(false);
         }
       } else if (activePage === DashboardViews.Global) {
-        if (globalNotifications && globalNotifications.length === 0) {
+        if (globalNotifications.length === 0) {
           setLoadingData(true);
 
           const activity = await fetchActivity(activePage);
@@ -96,10 +94,11 @@ const UserDashboard = (props: UserDashboardProps) => {
           setLoadingData(false);
         }
       } else if (activePage === DashboardViews.Chain) {
-        if (chainEvents && chainEvents.length === 0) {
+        if (chainEvents.length === 0) {
           setLoadingData(true);
 
           const activity = await fetchActivity(activePage);
+
           const result = activity.result.map((notification) =>
             DashboardActivityNotification.fromJSON(notification)
           );
@@ -116,7 +115,7 @@ const UserDashboard = (props: UserDashboardProps) => {
     };
 
     fetch();
-  }, []);
+  }, [activePage]);
 
   return (
     <Sublayout>
@@ -211,48 +210,50 @@ const UserDashboard = (props: UserDashboardProps) => {
                   {fyNotifications && fyNotifications.length > 0 ? (
                     <>
                       {fyNotifications
-                        .slice(0, DEFAULT_COUNT)
+                        // .slice(0, DEFAULT_COUNT)
                         .map((data, i) => (
                           <UserDashboardRow key={i} notification={data} />
                         ))}
-                      {notificationsRemaining(
+                      {/* {notificationsRemaining(
                         fyNotifications.length,
                         DEFAULT_COUNT
-                      ) && <CWSpinner />}
+                      ) && <CWSpinner />} */}
                     </>
                   ) : (
                     <CWText>Join some communities to see Activity!</CWText>
                   )}
                 </>
               )}
-              {activePage === DashboardViews.Global && [
-                globalNotifications && globalNotifications.length > 0 ? (
-                  <>
-                    {globalNotifications
-                      .slice(0, DEFAULT_COUNT)
-                      .map((data, i) => (
-                        <UserDashboardRow key={i} notification={data} />
-                      ))}
-                    {notificationsRemaining(
-                      globalNotifications.length,
-                      DEFAULT_COUNT
-                    ) && <CWSpinner />}
-                  </>
-                ) : (
-                  <CWText>No Activity</CWText>
-                ),
-              ]}
+              {activePage === DashboardViews.Global && (
+                <>
+                  {globalNotifications && globalNotifications.length > 0 ? (
+                    <>
+                      {globalNotifications
+                        // .slice(0, DEFAULT_COUNT)
+                        .map((data, i) => (
+                          <UserDashboardRow key={i} notification={data} />
+                        ))}
+                      {/* {notificationsRemaining(
+                        globalNotifications.length,
+                        DEFAULT_COUNT
+                      ) && <CWSpinner />} */}
+                    </>
+                  ) : (
+                    <CWText>No Activity</CWText>
+                  )}
+                </>
+              )}
               {activePage === DashboardViews.Chain && (
                 <>
                   {chainEvents && chainEvents.length > 0 ? (
                     <>
-                      {chainEvents.slice(0, DEFAULT_COUNT).map((data, i) => {
+                      {chainEvents.map((data, i) => {
                         return <UserDashboardRow key={i} notification={data} />;
                       })}
-                      {notificationsRemaining(
+                      {/* {notificationsRemaining(
                         chainEvents.length,
                         DEFAULT_COUNT
-                      ) && <CWSpinner />}
+                      ) && <CWSpinner />} */}
                     </>
                   ) : (
                     <CWText>
