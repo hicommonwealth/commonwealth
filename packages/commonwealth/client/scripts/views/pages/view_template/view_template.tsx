@@ -28,7 +28,6 @@ import { parseFunctionFromABI } from 'abi_utils';
 import validateType from 'client/scripts/helpers/validateType';
 import { constructProjectApi } from '../../../../../../chain-events/src/chains/commonwealth';
 
-
 const jsonExample = {
   form_fields: [
     {
