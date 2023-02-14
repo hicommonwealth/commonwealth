@@ -76,12 +76,12 @@ const shouldDeferChain = ({
 
 // DEPRECATED in favour of "Navigate" in "navigation/helpers.tsx"
 // Left here for now to not break the code in "getCustomDomainRoutes".
-// Should be removed after all occurrences of "DO_NOT_USE_redirectRoute" will be removed.
-const DO_NOT_USE_redirectRoute = (
+// Should be removed after all occurrences of "_DEPRECATED_redirectRoute" will be removed.
+const _DEPRECATED_redirectRoute = (
   path: string | ((attrs: Record<string, unknown>) => string)
 ) => ({
   render: (vnode) => {
-    // TODO remove when DO_NOT_USE_redirectRoute will be removed
+    // TODO remove when _DEPRECATED_redirectRoute will be removed
     // setRoute(
     //   typeof path === 'string' ? path : path(vnode.attrs),
     //   {},
@@ -205,7 +205,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/': importRoute(import('views/pages/discussions_redirect'), {
     scoped: true,
   }),
-  '/web3login': DO_NOT_USE_redirectRoute(() => '/'),
+  '/web3login': _DEPRECATED_redirectRoute(() => '/'),
   '/search': importRoute(import('views/pages/search'), {
     deferChain: true,
   }),
@@ -244,7 +244,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
 
   // Discussions
-  '/home': DO_NOT_USE_redirectRoute((attrs) => `/${attrs.scope}/`),
+  '/home': _DEPRECATED_redirectRoute((attrs) => `/${attrs.scope}/`),
   '/discussions': importRoute(import('views/pages/discussions'), {
     scoped: true,
     deferChain: true,
@@ -279,7 +279,7 @@ const getCustomDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/account': DO_NOT_USE_redirectRoute(() =>
+  '/account': _DEPRECATED_redirectRoute(() =>
     app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
   ),
 
@@ -294,7 +294,7 @@ const getCustomDomainRoutes = (importRoute) => ({
     import('views/pages/view_proposal/index'),
     { scoped: true }
   ),
-  '/:scope/proposal/discussion/:identifier': DO_NOT_USE_redirectRoute(
+  '/:scope/proposal/discussion/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/discussion/${attrs.identifier}`
   ),
   '/proposal/:identifier': importRoute(
@@ -351,74 +351,74 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
 
   // Redirects
-  '/:scope/dashboard': DO_NOT_USE_redirectRoute(() => '/'),
-  '/:scope/notifications': DO_NOT_USE_redirectRoute(() => '/notifications'),
-  // '/:scope/notification-settings': DO_NOT_USE_redirectRoute(
+  '/:scope/dashboard': _DEPRECATED_redirectRoute(() => '/'),
+  '/:scope/notifications': _DEPRECATED_redirectRoute(() => '/notifications'),
+  // '/:scope/notification-settings': _DEPRECATED_redirectRoute(
   //   () => '/notification-settings'
   // ),
-  '/:scope/overview': DO_NOT_USE_redirectRoute(() => '/overview'),
-  '/:scope/projects': DO_NOT_USE_redirectRoute(() => '/projects'),
-  '/:scope/backers': DO_NOT_USE_redirectRoute(() => '/backers'),
-  '/:scope/collectives': DO_NOT_USE_redirectRoute(() => '/collectives'),
-  '/:scope/finishNearLogin': DO_NOT_USE_redirectRoute(() => '/finishNearLogin'),
-  '/:scope/finishaxielogin': DO_NOT_USE_redirectRoute(() => '/finishaxielogin'),
-  '/:scope/home': DO_NOT_USE_redirectRoute(() => '/'),
-  '/:scope/discussions': DO_NOT_USE_redirectRoute(() => '/discussions'),
-  '/:scope': DO_NOT_USE_redirectRoute(() => '/'),
-  '/:scope/discussions/:topic': DO_NOT_USE_redirectRoute(
+  '/:scope/overview': _DEPRECATED_redirectRoute(() => '/overview'),
+  '/:scope/projects': _DEPRECATED_redirectRoute(() => '/projects'),
+  '/:scope/backers': _DEPRECATED_redirectRoute(() => '/backers'),
+  '/:scope/collectives': _DEPRECATED_redirectRoute(() => '/collectives'),
+  '/:scope/finishNearLogin': _DEPRECATED_redirectRoute(() => '/finishNearLogin'),
+  '/:scope/finishaxielogin': _DEPRECATED_redirectRoute(() => '/finishaxielogin'),
+  '/:scope/home': _DEPRECATED_redirectRoute(() => '/'),
+  '/:scope/discussions': _DEPRECATED_redirectRoute(() => '/discussions'),
+  '/:scope': _DEPRECATED_redirectRoute(() => '/'),
+  '/:scope/discussions/:topic': _DEPRECATED_redirectRoute(
     (attrs) => `/discussions/${attrs.topic}/`
   ),
-  '/:scope/search': DO_NOT_USE_redirectRoute(() => '/search'),
-  '/:scope/members': DO_NOT_USE_redirectRoute(() => '/members'),
-  '/:scope/sputnik-daos': DO_NOT_USE_redirectRoute(() => '/sputnik-daos'),
-  '/:scope/chat/:channel': DO_NOT_USE_redirectRoute(
+  '/:scope/search': _DEPRECATED_redirectRoute(() => '/search'),
+  '/:scope/members': _DEPRECATED_redirectRoute(() => '/members'),
+  '/:scope/sputnik-daos': _DEPRECATED_redirectRoute(() => '/sputnik-daos'),
+  '/:scope/chat/:channel': _DEPRECATED_redirectRoute(
     (attrs) => `/chat/${attrs.channel}`
   ),
-  // '/:scope/new/discussion': DO_NOT_USE_redirectRoute(() => '/new/discussion'),
-  '/:scope/account/:address': DO_NOT_USE_redirectRoute(
+  // '/:scope/new/discussion': _DEPRECATED_redirectRoute(() => '/new/discussion'),
+  '/:scope/account/:address': _DEPRECATED_redirectRoute(
     (attrs) => `/account/${attrs.address}/`
   ),
-  '/:scope/account': DO_NOT_USE_redirectRoute(() =>
+  '/:scope/account': _DEPRECATED_redirectRoute(() =>
     app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
   ),
-  '/:scope/referenda': DO_NOT_USE_redirectRoute(() => '/referenda'),
-  '/:scope/proposals': DO_NOT_USE_redirectRoute(() => '/proposals'),
-  '/:scope/proposal/:type/:identifier': DO_NOT_USE_redirectRoute(
+  '/:scope/referenda': _DEPRECATED_redirectRoute(() => '/referenda'),
+  '/:scope/proposals': _DEPRECATED_redirectRoute(() => '/proposals'),
+  '/:scope/proposal/:type/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
   ),
-  '/:scope/proposal/:identifier': DO_NOT_USE_redirectRoute(
+  '/:scope/proposal/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/proposal/${attrs.identifier}/`
   ),
-  '/:scope/discussion/:identifier': DO_NOT_USE_redirectRoute(
+  '/:scope/discussion/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/discussion/${attrs.identifier}/`
   ),
-  '/:scope/new/proposal/:type': DO_NOT_USE_redirectRoute(
+  '/:scope/new/proposal/:type': _DEPRECATED_redirectRoute(
     (attrs) => `/new/proposal/${attrs.type}/`
   ),
-  '/:scope/new/proposal': DO_NOT_USE_redirectRoute(() => '/new/proposal'),
-  '/:scope/treasury': DO_NOT_USE_redirectRoute(() => '/treasury'),
-  '/:scope/bounties': DO_NOT_USE_redirectRoute(() => '/bounties'),
-  '/:scope/tips': DO_NOT_USE_redirectRoute(() => '/tips'),
-  '/:scope/validators': DO_NOT_USE_redirectRoute(() => '/validators'),
-  '/:scope/login': DO_NOT_USE_redirectRoute(() => '/login'),
-  '/:scope/settings': DO_NOT_USE_redirectRoute(() => '/settings'),
-  '/:scope/admin': DO_NOT_USE_redirectRoute(() => '/admin'),
-  '/:scope/manage': DO_NOT_USE_redirectRoute(() => '/manage'),
-  '/:scope/analytics': DO_NOT_USE_redirectRoute(() => '/analytics'),
-  '/:scope/snapshot-proposals/:snapshotId': DO_NOT_USE_redirectRoute(
+  '/:scope/new/proposal': _DEPRECATED_redirectRoute(() => '/new/proposal'),
+  '/:scope/treasury': _DEPRECATED_redirectRoute(() => '/treasury'),
+  '/:scope/bounties': _DEPRECATED_redirectRoute(() => '/bounties'),
+  '/:scope/tips': _DEPRECATED_redirectRoute(() => '/tips'),
+  '/:scope/validators': _DEPRECATED_redirectRoute(() => '/validators'),
+  '/:scope/login': _DEPRECATED_redirectRoute(() => '/login'),
+  '/:scope/settings': _DEPRECATED_redirectRoute(() => '/settings'),
+  '/:scope/admin': _DEPRECATED_redirectRoute(() => '/admin'),
+  '/:scope/manage': _DEPRECATED_redirectRoute(() => '/manage'),
+  '/:scope/analytics': _DEPRECATED_redirectRoute(() => '/analytics'),
+  '/:scope/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/snapshot/${attrs.snapshotId}`
   ),
-  '/:scope/snapshot-proposal/:snapshotId/:identifier': DO_NOT_USE_redirectRoute(
+  '/:scope/snapshot-proposal/:snapshotId/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
   ),
-  '/:scope/new/snapshot-proposal/:snapshotId': DO_NOT_USE_redirectRoute(
+  '/:scope/new/snapshot-proposal/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/new/snapshot/${attrs.snapshotId}`
   ),
   '/:scope/snapshot-proposals/:snapshotId/:identifier':
-    DO_NOT_USE_redirectRoute(
+    _DEPRECATED_redirectRoute(
       (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
     ),
-  '/:scope/new/snapshot-proposals/:snapshotId': DO_NOT_USE_redirectRoute(
+  '/:scope/new/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/new/snapshot/${attrs.snapshotId}`
   ),
 });
@@ -447,7 +447,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   deferChain: true,
   // }),
   // Scoped routes
-  // '/:scope/proposal/discussion/:identifier': DO_NOT_USE_redirectRoute(
+  // '/:scope/proposal/discussion/:identifier': _DEPRECATED_redirectRoute(
   //   (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
   // ),
   // Notifications
@@ -455,7 +455,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   scoped: true,
   //   deferChain: true,
   // }),
-  // '/notifications': DO_NOT_USE_redirectRoute(() => '/edgeware/notifications'),
+  // '/notifications': _DEPRECATED_redirectRoute(() => '/edgeware/notifications'),
   // '/notification-settings': importRoute(
   //   import('views/pages/notification_settings'),
   //   {
@@ -472,14 +472,14 @@ const getCommonDomainRoutes = (importRoute) => ({
   // ),
   // '/finishaxielogin': importRoute(import('views/pages/finish_axie_login')),
   // Settings
-  // '/settings': DO_NOT_USE_redirectRoute(() => '/edgeware/settings'),
+  // '/settings': _DEPRECATED_redirectRoute(() => '/edgeware/settings'),
   // '/:scope/settings': importRoute(import('views/pages/settings'), {
   //   scoped: true,
   // }),
   // Discussions
-  // '/home': DO_NOT_USE_redirectRoute('/'), // legacy redirect, here for compatibility only
-  // '/discussions': DO_NOT_USE_redirectRoute('/'), // legacy redirect, here for compatibility only
-  // '/:scope/home': DO_NOT_USE_redirectRoute((attrs) => `/${attrs.scope}/`),
+  // '/home': _DEPRECATED_redirectRoute('/'), // legacy redirect, here for compatibility only
+  // '/discussions': _DEPRECATED_redirectRoute('/'), // legacy redirect, here for compatibility only
+  // '/:scope/home': _DEPRECATED_redirectRoute((attrs) => `/${attrs.scope}/`),
   // '/:scope': importRoute(import('views/pages/discussions_redirect'), {
   //   scoped: true,
   // }),
@@ -528,7 +528,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   scoped: true,
   //   deferChain: true,
   // }),
-  // '/:scope/account': DO_NOT_USE_redirectRoute((a) =>
+  // '/:scope/account': _DEPRECATED_redirectRoute((a) =>
   //   app.user.activeAccount
   //     ? `/${a.scope}/account/${app.user.activeAccount.address}`
   //     : `/${a.scope}/`
@@ -603,21 +603,21 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   'views/pages/new_snapshot_proposal',
   //   { scoped: true, deferChain: true }
   // ),
-  // '/:scope/snapshot-proposals/:snapshotId': DO_NOT_USE_redirectRoute(
+  // '/:scope/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
   //   (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}`
   // ),
-  // '/:scope/snapshot-proposal/:snapshotId/:identifier': DO_NOT_USE_redirectRoute(
+  // '/:scope/snapshot-proposal/:snapshotId/:identifier': _DEPRECATED_redirectRoute(
   //   (attrs) =>
   //     `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
   // ),
-  // '/:scope/new/snapshot-proposal/:snapshotId': DO_NOT_USE_redirectRoute(
+  // '/:scope/new/snapshot-proposal/:snapshotId': _DEPRECATED_redirectRoute(
   //   (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
   // ),
-  // '/:scope/snapshot-proposals/:snapshotId/:identifier': DO_NOT_USE_redirectRoute(
+  // '/:scope/snapshot-proposals/:snapshotId/:identifier': _DEPRECATED_redirectRoute(
   //   (attrs) =>
   //     `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
   // ),
-  // '/:scope/new/snapshot-proposals/:snapshotId': DO_NOT_USE_redirectRoute(
+  // '/:scope/new/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
   //   (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
   // ),
 });
