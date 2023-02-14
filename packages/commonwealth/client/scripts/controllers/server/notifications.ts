@@ -384,7 +384,6 @@ class NotificationsController {
       this._subscriptions = [];
 
       const subs = result;
-      console.log({ subs });
       subs.forEach((sub) => this._subscriptions.push(modelFromServer(sub)));
     });
   }
