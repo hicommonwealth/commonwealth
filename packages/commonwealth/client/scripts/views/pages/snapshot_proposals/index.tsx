@@ -128,29 +128,41 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
       // title="Proposals"
       >
         <div class="SnapshotProposalsPage">
-          <SnapshotProposalStagesBar
-            selected={selectedFilter}
-            onChangeFilter={onChangeFilter}
-          />
-          <div>
-            <CWButton
-              label={
-                spaceSubscription !== undefined
-                  ? 'Remove Subscription'
-                  : 'Subscribe to Notifications'
-              }
-              onclick={() => {
-                if (spaceSubscription !== undefined) {
-                  app.user.notifications.deleteSubscription(spaceSubscription);
-                } else {
-                  app.user.notifications.subscribe(
-                    NotificationCategories.SnapshotProposal,
-                    snapshotId
-                  );
-                }
-              }}
+          <div class="top-bar">
+            <SnapshotProposalStagesBar
+              selected={selectedFilter}
+              onChangeFilter={onChangeFilter}
             />
+            <div>
+              <CWButton
+                label={
+                  spaceSubscription !== undefined
+                    ? 'Remove Subscription'
+                    : 'Subscribe to Notifications'
+                }
+                onclick={() => {
+                  if (spaceSubscription !== undefined) {
+                    app.user.notifications
+                      .deleteSubscription(spaceSubscription)
+                      .then(() => {
+                        m.redraw();
+                      });
+                  } else {
+                    app.user.notifications
+                      .subscribe(
+                        NotificationCategories.SnapshotProposal,
+                        snapshotId
+                      )
+                      .then(() => {
+                        m.redraw();
+                      });
+                  }
+                }}
+                buttonType="mini-black"
+              />
+            </div>
           </div>
+
           {proposals.length > 0 ? (
             <CardsCollection
               content={proposals.map((proposal) => (
