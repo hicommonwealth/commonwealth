@@ -3,7 +3,6 @@ import React from 'react';
 import { ClassComponent, redraw, parsePathname } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import moment from 'moment';
-import { navigateToSubpage } from 'router';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
@@ -24,12 +23,13 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { newLink } from './helpers';
 import type { ThreadForm } from './types';
+import withRouter from 'navigation/helpers';
 
 type NewSnapshotProposalPageAttrs = {
   snapshotId: string;
 };
 
-export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalPageAttrs> {
+class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposalPageAttrs> {
   private form: ThreadForm;
   private initialized: boolean;
   private isFromExistingProposal: boolean;
@@ -265,7 +265,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
 
                 notifySuccess('Snapshot Created!');
 
-                navigateToSubpage(`/snapshot/${this.space.id}`);
+                this.setRoute(`/snapshot/${this.space.id}`);
               } catch (err) {
                 this.saving = false;
 
@@ -278,5 +278,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
     );
   }
 }
+
+const NewSnapshotProposalPage = withRouter(NewSnapshotProposalPageComponent);
 
 export default NewSnapshotProposalPage;

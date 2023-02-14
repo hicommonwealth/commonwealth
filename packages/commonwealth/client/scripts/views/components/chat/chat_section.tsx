@@ -2,8 +2,8 @@ import React from 'react';
 
 import {
   ClassComponent,
-  getRoute,
-  getRouteParam,
+  _DEPRECATED_getRoute,
+  _DEPRECATED_getSearchParams,
   redraw,
 } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
@@ -154,7 +154,7 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   view() {
     if (!app.socket) return;
     if (!this.loaded) return <CWSpinner />;
-    this.activeChannel = getRouteParam()['channel'];
+    this.activeChannel = _DEPRECATED_getSearchParams()['channel'];
     app.socket.chatNs.activeChannel = String(this.activeChannel);
 
     const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
@@ -352,7 +352,7 @@ class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
         title: channel.name,
         rowIcon: true,
         isVisible: true,
-        isActive: onChannelPage(getRoute()),
+        isActive: onChannelPage(_DEPRECATED_getRoute()),
         isUpdated: channel.unread > 0,
         onClick: (e) => {
           handleRedirectClicks(

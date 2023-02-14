@@ -4,7 +4,7 @@ import 'components/component_kit/cw_breadcrumbs.scss';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
-import { useNavigate } from 'react-router-dom';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type BreadcrumbsType = {
   label: string;
@@ -17,7 +17,7 @@ type BreadcrumbsProps = {
 
 export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
   const { breadcrumbs } = props;
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   return (
     <div className={ComponentType.Breadcrumbs}>

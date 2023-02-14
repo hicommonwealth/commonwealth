@@ -1,18 +1,18 @@
 import React from 'react';
 
-import { ClassComponent, getRouteParam } from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getSearchParams } from 'mithrilInterop';
 
 import 'pages/chat.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import { ChatWindow } from 'views/components/chat/chat_window';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
+import withRouter from 'navigation/helpers';
 
-class ChatPage extends ClassComponent {
+class ChatPageComponent extends ClassComponent {
   oncreate() {
     mixpanelBrowserTrack({
       event: MixpanelChatEvents.CHAT_PAGE_VISIT,
@@ -25,9 +25,12 @@ class ChatPage extends ClassComponent {
     const activeEntity = app.chain;
     if (!activeEntity) return <PageLoading />;
 
-    if (!app.socket) navigateToSubpage('/'); // Stops un-logged in access
+    if (!app.socket) {
+      // Stops un-logged in access
+      this.setRoute('/');
+    }
 
-    const channel_id = getRouteParam()['channel'];
+    const channel_id = _DEPRECATED_getSearchParams()['channel'];
 
     return !app.socket.chatNs.hasChannels() ? (
       <PageLoading />
@@ -38,5 +41,7 @@ class ChatPage extends ClassComponent {
     );
   }
 }
+
+const ChatPage = withRouter(ChatPageComponent);
 
 export default ChatPage;

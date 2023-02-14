@@ -3,7 +3,6 @@ import React from 'react';
 import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import { navigateToSubpage } from 'router';
 
 import 'modals/edit_topic_modal.scss';
 import { Topic } from 'models';
@@ -19,6 +18,7 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import type { QuillEditor } from '../components/quill/quill_editor';
 import type { QuillTextContents } from '../components/quill/types';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type EditTopicModalProps = {
   defaultOffchainTemplate: string;
@@ -40,6 +40,8 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
     onModalClose,
     name: nameProp,
   } = props;
+
+  const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
@@ -105,7 +107,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
 
     await app.topics.remove(topicInfo);
 
-    navigateToSubpage('/');
+    navigate('/');
   };
 
   return (
@@ -187,7 +189,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
                 .then((closeModal) => {
                   if (closeModal) {
                     $(e.target).trigger('modalexit');
-                    navigateToSubpage(
+                    navigate(
                       `/discussions/${encodeURI(name.toString().trim())}`
                     );
                   }
@@ -211,7 +213,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
               deleteTopic()
                 .then(() => {
                   $(e.target).trigger('modalexit');
-                  navigateToSubpage('/');
+                  navigate('/');
                 })
                 .catch(() => {
                   setIsSaving(false);

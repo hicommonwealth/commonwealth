@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { redraw } from 'mithrilInterop';
-import { navigateToSubpage } from 'router';
 import type { Thread, ThreadStage, Topic } from 'models';
 import app from 'state';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
@@ -10,6 +9,7 @@ import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadPreviewMenuProps = {
   thread: Thread;
@@ -17,6 +17,7 @@ type ThreadPreviewMenuProps = {
 
 export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
   const { thread } = props;
+  const navigate = useCommonNavigate();
 
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] =
     React.useState<boolean>(false);
@@ -56,7 +57,7 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
                       e.preventDefault();
 
                       app.threads.pin({ proposal: thread }).then(() => {
-                        navigateToSubpage('/discussions');
+                        navigate('/discussions');
                         redraw();
                       });
                     },
@@ -120,7 +121,7 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
                       if (!confirmed) return;
 
                       app.threads.delete(thread).then(() => {
-                        navigateToSubpage('/discussions');
+                        navigate('/discussions');
                       });
                     },
                     label: 'Delete',

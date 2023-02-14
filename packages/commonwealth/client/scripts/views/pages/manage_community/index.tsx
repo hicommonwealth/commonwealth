@@ -6,7 +6,6 @@ import $ from 'jquery';
 import 'pages/manage_community/index.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import type { Webhook } from 'models';
 import { AccessLevel, RoleInfo } from 'models';
 import { ChainMetadataRows } from './chain_metadata_rows';
@@ -14,8 +13,9 @@ import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { sortAdminsAndModsFirst } from './helpers';
+import withRouter from 'navigation/helpers';
 
-class ManageCommunityPage extends ClassComponent {
+class ManageCommunityPageComponent extends ClassComponent {
   private loadingFinished: boolean;
   private loadingStarted: boolean;
   private roleData: Array<RoleInfo>;
@@ -110,7 +110,7 @@ class ManageCommunityPage extends ClassComponent {
       });
 
     if (!isAdmin) {
-      navigateToSubpage(``);
+      this.setRoute('/');
     }
 
     this.loadingFinished = false;
@@ -166,5 +166,7 @@ class ManageCommunityPage extends ClassComponent {
     );
   }
 }
+
+const ManageCommunityPage = withRouter(ManageCommunityPageComponent);
 
 export default ManageCommunityPage;
