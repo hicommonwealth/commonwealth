@@ -30,22 +30,22 @@ export const TokensCommunityComponent = (
   const [inputTokenValue, setInputTokenValue] = React.useState<string>('');
   const [refilterResults, setRefilterResults] = React.useState<boolean>(true);
 
-  const initiateFullSearch = (searchTerm: string) => {
-    // if (
-    //   !searchTerm ||
-    //   !searchTerm.toString().trim() ||
-    //   !searchTerm.match(/[A-Za-z]+/)
-    // ) {
-    //   return;
-    // }
-    // if (searchTerm.length < 3) {
-    //   notifyError('Query must be at least 3 characters');
-    // }
-    // const params = `q=${encodeURIComponent(
-    //   searchTerm.toString().trim()
-    // )}&scope[]=Communities`;
-    // navigate(`/search?${params}`);
-  };
+  // const initiateFullSearch = (searchTerm: string) => {
+  // if (
+  //   !searchTerm ||
+  //   !searchTerm.toString().trim() ||
+  //   !searchTerm.match(/[A-Za-z]+/)
+  // ) {
+  //   return;
+  // }
+  // if (searchTerm.length < 3) {
+  //   notifyError('Query must be at least 3 characters');
+  // }
+  // const params = `q=${encodeURIComponent(
+  //   searchTerm.toString().trim()
+  // )}&scope[]=Communities`;
+  // navigate(`/search?${params}`);
+  // };
 
   const mappedCommunities = [
     {
