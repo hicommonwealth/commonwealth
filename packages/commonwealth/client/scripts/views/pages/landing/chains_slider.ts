@@ -69,6 +69,8 @@ const TokensChainsComponent: m.Component<
     });
 
     glide.on('run.after', () => {
+      if (vnode.attrs.chains[vnode.state.index + initialSlides] === undefined)
+        return;
       vnode.state.displayedChains.push(
         chainToTag(
           vnode.attrs.chains[vnode.state.index + initialSlides],
