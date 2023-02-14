@@ -27,6 +27,10 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
 
   const chainId = notification.chainEvent.type.chain;
 
+  if (app.isCustomDomain() && chainId !== app.customDomainId()) {
+    return;
+  }
+
   const chainEvent: CWEvent = {
     blockNumber: notification.chainEvent.blockNumber,
     network: notification.chainEvent.type.eventNetwork,
@@ -35,12 +39,11 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
 
   const chainName = app.config.chains.getById(chainId)?.name;
 
-  if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
   const label = ChainEventLabel(chainId, chainEvent);
 
   if (!label) {
     return (
-      <li
+      <div
         className={getClasses<{ isUnread?: boolean }>(
           { isUnread: !notification.isRead },
           'NotificationRow'
@@ -51,12 +54,13 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
         <div className="comment-body">
           <div className="comment-body-top">Loading...</div>
         </div>
-      </li>
+      </div>
     );
   }
 
   return (
     <div
+      className="NotificationRow"
       onClick={() => navigateToSubpage(`/notifications?id=${notification.id}`)}
     >
       <div className="comment-body">
@@ -103,8 +107,9 @@ export const NewChatMentionNotificationRow = (
   const author = new AddressInfo(null, author_address, chain_id, null);
 
   const authorName = <User user={author} hideAvatar />;
+
   return (
-    <div onClick={() => navigateToSubpage(route)}>
+    <div className="NotificationRow" onClick={() => navigateToSubpage(route)}>
       <User user={author} avatarOnly avatarSize={26} />
       <div className="comment-body">
         <div className="comment-body-title">
@@ -169,7 +174,10 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   }
 
   return (
-    <div onClick={() => navigateToSubpage(path.replace(/ /g, '%20'))}>
+    <div
+      className="NotificationRow"
+      onClick={() => navigateToSubpage(path.replace(/ /g, '%20'))}
+    >
       {authorInfo.length === 1 ? (
         <User
           user={
@@ -194,8 +202,8 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
       <div className="comment-body">
         <div className="comment-body-title">{notificationHeader}</div>
         {notificationBody &&
-          category !== `${NotificationCategories.NewReaction}` &&
-          category !== `${NotificationCategories.NewThread}` && (
+          category !== NotificationCategories.NewReaction &&
+          category !== NotificationCategories.NewThread && (
             <div className="comment-body-excerpt">{notificationBody}</div>
           )}
         <div className="comment-body-bottom-wrap">

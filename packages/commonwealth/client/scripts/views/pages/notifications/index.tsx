@@ -183,11 +183,11 @@ const NotificationsPage = () => {
 
             if (totalLength > 0) {
               return (
-                <div>
+                <>
                   {allNotifications.map((n, i) => (
                     <NotificationRow key={i} notification={n} onListPage />
                   ))}
-                </div>
+                </>
               );
             } else
               return (
