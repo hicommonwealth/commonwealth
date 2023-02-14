@@ -9,8 +9,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import type { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'router';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardChainEventRowProps = {
   blockNumber: number;
@@ -22,6 +21,7 @@ export const UserDashboardChainEventRowComponent = (
   props: UserDashboardChainEventRowProps
 ) => {
   const { blockNumber, chain, label } = props;
+  const navigate = useCommonNavigate();
 
   return (
     <div
@@ -31,7 +31,7 @@ export const UserDashboardChainEventRowComponent = (
       )}
       onClick={() => {
         if (label.linkUrl) {
-          navigateToSubpage(label.linkUrl);
+          navigate(label.linkUrl);
         }
       }}
     >
@@ -48,7 +48,7 @@ export const UserDashboardChainEventRowComponent = (
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              this.setRoute(`/${chain}`);
+              navigate(`/${chain}`);
             }}
           >
             <CWText type="caption" fontWeight="medium">

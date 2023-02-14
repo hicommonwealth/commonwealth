@@ -14,6 +14,7 @@ import type {
   ToggleTree,
 } from './types';
 import { Modal } from '../component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
@@ -39,6 +40,8 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 };
 
 const AdminSectionComponent = () => {
+  const navigate = useCommonNavigate();
+
   const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
     React.useState<boolean>(false);
   const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
@@ -57,7 +60,7 @@ const AdminSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(this, e, `/manage`, app.activeChainId(), () => {
+        handleRedirectClicks(navigate, e, `/manage`, app.activeChainId(), () => {
           setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
         });
       },
@@ -72,7 +75,7 @@ const AdminSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(this, e, `/analytics`, app.activeChainId(), () => {
+        handleRedirectClicks(navigate, e, `/analytics`, app.activeChainId(), () => {
           setAdminToggleTree(`children.analytics.toggledState`, toggle);
         });
       },

@@ -16,7 +16,7 @@ import type {
   NavigateOptions,
 } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
-import { features } from 'process';
+import { getScopePrefix } from 'navigation/helpers';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
 export type Children = ReactNode | ReactNode[];
@@ -179,26 +179,17 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
   }
 
   // replicates `m.route.set()` functionality via react-router
-  public setRoute(route: string, options?: NavigateOptions) {
+  public setRoute(
+    route: string,
+    options?: NavigateOptions,
+    prefix?: null | string
+  ) {
+    const scopePrefix = getScopePrefix(prefix);
     if (this.props.router.navigate) {
-      console.log('setting route: ', route, ' with options: ', options);
-      this.props.router.navigate(route, options);
+      const url = `${scopePrefix}${route}`;
+      this.props.router.navigate(url, options);
     } else {
       console.error('Prop "navigate" is not defined!');
-    }
-  }
-
-  // replicates navigation to scoped page functionality via react-router
-  // see `navigateToSubpage` in `app.tsx`
-  public navigateToSubpage(route: string) {
-    console.log('Redirecting to', route);
-    // hacky way to get the current scope
-    // @REACT @TODO: this will fail on custom domains
-    const scope = window.location.pathname.split('/')[1];
-    if (scope) {
-      this.setRoute(`/${scope}${route}`);
-    } else {
-      this.setRoute(route);
     }
   }
 }

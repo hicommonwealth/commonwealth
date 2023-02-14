@@ -2,7 +2,6 @@ import React from 'react';
 
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
-import { navigateToSubpage } from 'router';
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import { ThreadStage } from 'models';
@@ -16,6 +15,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { StagesMenu } from './stages_menu';
 import { TopicsMenu } from './topics_menu';
+import withRouter from 'navigation/helpers';
 
 type RecentThreadsHeaderAttrs = {
   stage: string;
@@ -23,7 +23,7 @@ type RecentThreadsHeaderAttrs = {
   totalThreadCount: number;
 };
 
-export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs> {
+class RecentThreadsHeaderComponent extends ClassComponent<RecentThreadsHeaderAttrs> {
   private isWindowExtraSmall: boolean;
 
   onResize() {
@@ -96,16 +96,16 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
                     iconName="plusCircle"
                     iconButtonTheme="black"
                     onClick={() => {
-                      navigateToSubpage('/new/discussion');
+                      this.setRoute('/new/discussion');
                     }}
                   />
                 ) : (
                   <CWButton
                     buttonType="mini-black"
-                    label="Create Thread"
+                    label="Create Threadasd"
                     iconLeft="plus"
                     onClick={() => {
-                      navigateToSubpage('/new/discussion');
+                      this.setRoute('/new/discussion');
                     }}
                   />
                 )}
@@ -141,3 +141,5 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
     );
   }
 }
+
+export const RecentThreadsHeader = withRouter(RecentThreadsHeaderComponent);

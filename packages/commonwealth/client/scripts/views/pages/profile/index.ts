@@ -11,7 +11,6 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { navigateToSubpage } from 'router';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { ChainBase } from 'common-common/src/types';
@@ -299,9 +298,9 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
-          navigateToSubpage(
-            `/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`
-          );
+          // navigateToSubpage(
+          //   `/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`
+          // );
         } catch (e) {
           // do nothing if can't encode address
         }
@@ -312,11 +311,11 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
       if (!valid) {
         try {
           const checksumAddress = toChecksumAddress(address);
-          navigateToSubpage(
-            `/account/${checksumAddress}${
-              baseSuffix ? `?base=${baseSuffix}` : ''
-            }`
-          );
+          // navigateToSubpage(
+          //   `/account/${checksumAddress}${
+          //     baseSuffix ? `?base=${baseSuffix}` : ''
+          //   }`
+          // );
         } catch (e) {
           // do nothing if can't get checksumAddress
         }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import type Near from 'controllers/chain/near/adapter';
 import type { IDaoInfo } from 'controllers/chain/near/chain';
@@ -14,8 +14,7 @@ import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'router';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
 
 type SputnikDaoRowProps = {
   clickable: boolean;
@@ -24,6 +23,7 @@ type SputnikDaoRowProps = {
 
 const SputnikDaoRowComponent = (props: SputnikDaoRowProps) => {
   const { dao, clickable } = props;
+  const navigate = useCommonNavigate();
 
   const amountString = (app.chain as Near).chain
     .coins(new BN(dao.amount))
@@ -52,7 +52,7 @@ const SputnikDaoRowComponent = (props: SputnikDaoRowProps) => {
       onClick={(e) => {
         if (clickable) {
           e.preventDefault();
-          navigateToSubpage(`/${dao.contractId}`);
+          navigate(`/${dao.contractId}`, {}, null);
         }
       }}
     >
@@ -70,11 +70,16 @@ const SputnikDaoRowComponent = (props: SputnikDaoRowProps) => {
 const SputnikDaoRow = withRouter(SputnikDaoRowComponent);
 
 const SputnikDAOsPageComponent = () => {
+  const navigate = useCommonNavigate();
+
   const [daosList, setDaosList] = React.useState<Array<IDaoInfo>>();
   const [daosRequested, setDaosRequested] = React.useState<boolean>(false);
 
-  if (app.activeChainId() && app.activeChainId() !== 'near')
-    navigateToSubpage(`/${app.activeChainId()}`);
+  useEffect(() => {
+    if (app.activeChainId() && app.activeChainId() !== 'near') {
+      navigate(`/`);
+    }
+  }, [navigate]);
 
   const activeEntity = app.chain;
   const allCommunities = app.config.chains.getAll();
@@ -145,6 +150,7 @@ const SputnikDAOsPageComponent = () => {
   );
 };
 
+// TODO remove withRouter from FCs
 const SputnikDAOsPage = withRouter(SputnikDAOsPageComponent);
 
 export default SputnikDAOsPage;

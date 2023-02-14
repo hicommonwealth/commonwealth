@@ -1,10 +1,8 @@
 import React from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
-import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
 import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
@@ -30,6 +28,7 @@ import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
 import { Modal } from '../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // TODO:
 //  - figure out how account switching will work
@@ -38,7 +37,7 @@ import { Modal } from '../components/component_kit/cw_modal';
 //  - test what happens if the wallet site fails
 //  - move some of this stuff into controllers
 
-const redirectToNextPage = (navigate: NavigateFunction) => {
+const redirectToNextPage = (navigate) => {
   if (
     localStorage &&
     localStorage.getItem &&
@@ -55,7 +54,7 @@ const redirectToNextPage = (navigate: NavigateFunction) => {
         localStorage.removeItem('nearPostAuthRedirect');
         navigate(postAuth.path, { replace: true });
       } else {
-        navigateToSubpage('/', { replace: true });
+        navigate('/', { replace: true });
       }
       return;
     } catch (e) {
@@ -63,11 +62,11 @@ const redirectToNextPage = (navigate: NavigateFunction) => {
     }
   }
 
-  navigateToSubpage('/', { replace: true });
+  navigate('/', { replace: true });
 };
 
 const FinishNearLogin = () => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
   const [validating, setValidating] = React.useState<boolean>(false);
   const [validationCompleted, setValidationCompleted] =
     React.useState<boolean>(false);

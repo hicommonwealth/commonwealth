@@ -19,7 +19,10 @@ export const Navigate = ({ to }: NavigateWithParamsProps) => {
   return <ReactNavigate to={navigateTo} />;
 };
 
-const getScopePrefix = (scope: string, prefix?: null | string) => {
+export const getScopePrefix = (prefix?: null | string) => {
+  const activeChainIdPrefix = app.activeChainId() || '';
+  const scope = app.isCustomDomain() ? '' : activeChainIdPrefix;
+
   if (prefix === null) {
     return '';
   }
@@ -43,9 +46,7 @@ export const useCommonNavigate = () => {
       console.warn('Prefix should not start with slash character!');
     }
 
-    const activeChainIdPrefix = app.activeChainId() || '';
-    const scope = app.isCustomDomain() ? '' : activeChainIdPrefix;
-    const scopePrefix = getScopePrefix(scope, prefix);
+    const scopePrefix = getScopePrefix(prefix);
 
     return navigate(`${scopePrefix}${url}`, options);
   };

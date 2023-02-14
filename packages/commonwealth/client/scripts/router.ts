@@ -353,9 +353,9 @@ const getCustomDomainRoutes = (importRoute) => ({
   // Redirects
   '/:scope/dashboard': DO_NOT_USE_redirectRoute(() => '/'),
   '/:scope/notifications': DO_NOT_USE_redirectRoute(() => '/notifications'),
-  '/:scope/notification-settings': DO_NOT_USE_redirectRoute(
-    () => '/notification-settings'
-  ),
+  // '/:scope/notification-settings': DO_NOT_USE_redirectRoute(
+  //   () => '/notification-settings'
+  // ),
   '/:scope/overview': DO_NOT_USE_redirectRoute(() => '/overview'),
   '/:scope/projects': DO_NOT_USE_redirectRoute(() => '/projects'),
   '/:scope/backers': DO_NOT_USE_redirectRoute(() => '/backers'),
@@ -374,7 +374,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/chat/:channel': DO_NOT_USE_redirectRoute(
     (attrs) => `/chat/${attrs.channel}`
   ),
-  '/:scope/new/discussion': DO_NOT_USE_redirectRoute(() => '/new/discussion'),
+  // '/:scope/new/discussion': DO_NOT_USE_redirectRoute(() => '/new/discussion'),
   '/:scope/account/:address': DO_NOT_USE_redirectRoute(
     (attrs) => `/account/${attrs.address}/`
   ),

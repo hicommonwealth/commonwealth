@@ -7,7 +7,6 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 import 'components/header/notifications_menu.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -175,9 +174,7 @@ export class NotificationsMenuComponent extends ClassComponent {
             label="See all"
             buttonType="tertiary-black"
             onClick={() => {
-              app.activeChainId()
-                ? navigateToSubpage('/notifications')
-                : this.setRoute('/notifications');
+              this.setRoute('/notifications');
             }}
           />
           <CWDivider isVertical />

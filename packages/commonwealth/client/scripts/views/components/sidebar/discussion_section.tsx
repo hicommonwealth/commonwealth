@@ -15,7 +15,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import withRouter from 'navigation/helpers';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -36,6 +36,8 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 }
 
 const DiscussionSectionComponent = () => {
+  const navigate = useCommonNavigate();
+
   // Conditional Render Details +
   const onAllDiscussionPage = (p) => {
     const identifier = _DEPRECATED_getSearchParams('§');
@@ -143,7 +145,7 @@ const DiscussionSectionComponent = () => {
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(
-          this,
+          navigate,
           e,
           `/discussions`,
           app.activeChainId(),
@@ -163,9 +165,15 @@ const DiscussionSectionComponent = () => {
       isActive: onOverviewDiscussionPage(_DEPRECATED_getRoute()),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(this, e, `/overview`, app.activeChainId(), () => {
-          setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
-        });
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/overview`,
+          app.activeChainId(),
+          () => {
+            setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
+          }
+        );
       },
       displayData: null,
     },
@@ -181,7 +189,7 @@ const DiscussionSectionComponent = () => {
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(
-          this,
+          navigate,
           e,
           `/sputnik-daos`,
           app.activeChainId(),
@@ -210,7 +218,7 @@ const DiscussionSectionComponent = () => {
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
           handleRedirectClicks(
-            this,
+            navigate,
             e,
             `/discussions/${encodeURI(topic.name)}`,
             app.activeChainId(),

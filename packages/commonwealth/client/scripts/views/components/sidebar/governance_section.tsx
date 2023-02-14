@@ -19,7 +19,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import withRouter from 'navigation/helpers';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -44,7 +44,9 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
+const GovernanceSectionComponent = () => {
+  const navigate = useCommonNavigate();
+
   // Conditional Render Details
   const hasProposals =
     app.chain &&
@@ -209,10 +211,10 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
     isVisible: true,
     isUpdated: true,
     isActive:
-      onMembersPage(_DEPRECATED_getRoute()) && (app.chain ? app.chain.serverLoaded : true),
+      onMembersPage(_DEPRECATED_getRoute()) &&
+      (app.chain ? app.chain.serverLoaded : true),
     onClick: (e, toggle: boolean) => {
-      console.log('this', this);
-      handleRedirectClicks(this, e, '/members', app.activeChainId(), () => {
+      handleRedirectClicks(navigate, e, '/members', app.activeChainId(), () => {
         setGovernanceToggleTree('children.Members.toggledState', toggle);
       });
     },
@@ -236,7 +238,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
       const snapshotSpaces = app.chain.meta.snapshot;
       if (snapshotSpaces.length > 1) {
         handleRedirectClicks(
-          this,
+          navigate,
           e,
           '/multiple-snapshots?action=select-space',
           app.activeChainId(),
@@ -245,7 +247,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
       } else {
         if (snapshotSpaces[0].lastIndexOf('/') > -1) {
           handleRedirectClicks(
-            this,
+            navigate,
             e,
             `/snapshot/${snapshotSpaces[0]
               .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
@@ -255,7 +257,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
           );
         } else {
           handleRedirectClicks(
-            this,
+            navigate,
             e,
             `/snapshot/${snapshotSpaces}`,
             app.activeChainId(),
@@ -276,9 +278,15 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
       : false,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      handleRedirectClicks(this, e, '/proposals', app.activeChainId(), () => {
-        setGovernanceToggleTree('children.Proposals.toggledState', toggle);
-      });
+      handleRedirectClicks(
+        navigate,
+        e,
+        '/proposals',
+        app.activeChainId(),
+        () => {
+          setGovernanceToggleTree('children.Proposals.toggledState', toggle);
+        }
+      );
     },
     isVisible: showProposals,
     isUpdated: true,
@@ -295,9 +303,15 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
       : false,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      handleRedirectClicks(this, e, '/treasury', app.activeChainId(), () => {
-        setGovernanceToggleTree('children.Treasury.toggledState', toggle);
-      });
+      handleRedirectClicks(
+        navigate,
+        e,
+        '/treasury',
+        app.activeChainId(),
+        () => {
+          setGovernanceToggleTree('children.Treasury.toggledState', toggle);
+        }
+      );
     },
     isVisible: showTreasury,
     isUpdated: true,
@@ -313,9 +327,15 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
       : false,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      handleRedirectClicks(this, e, '/referenda', app.activeChainId(), () => {
-        setGovernanceToggleTree('children.Referenda.toggledState', toggle);
-      });
+      handleRedirectClicks(
+        navigate,
+        e,
+        '/referenda',
+        app.activeChainId(),
+        () => {
+          setGovernanceToggleTree('children.Referenda.toggledState', toggle);
+        }
+      );
     },
     isVisible: showReferenda,
     isUpdated: true,
@@ -331,7 +351,7 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
       : false,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      handleRedirectClicks(this, e, '/tips', app.activeChainId(), () => {
+      handleRedirectClicks(navigate, e, '/tips', app.activeChainId(), () => {
         setGovernanceToggleTree('children.Tips.toggledState', toggle);
       });
     },
@@ -353,9 +373,15 @@ const GovernanceSectionComponent = (props: SidebarSectionAttrs) => {
     isActive: _DEPRECATED_getRoute() === `/${app.activeChainId()}/delegate`,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      handleRedirectClicks(this, e, '/delegate', app.activeChainId(), () => {
-        setGovernanceToggleTree('children.Delegate.toggledState', toggle);
-      });
+      handleRedirectClicks(
+        navigate,
+        e,
+        '/delegate',
+        app.activeChainId(),
+        () => {
+          setGovernanceToggleTree('children.Delegate.toggledState', toggle);
+        }
+      );
     },
     displayData: null,
   };

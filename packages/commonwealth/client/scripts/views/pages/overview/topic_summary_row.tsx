@@ -2,7 +2,6 @@ import React from 'react';
 
 import { pluralize } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-// import { navigateToSubpage } from 'router';
 import type { Thread, Topic } from 'models';
 import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent } from 'mithrilInterop';
@@ -191,7 +190,6 @@ class TopicSummaryRowComponent extends ClassComponent<TopicSummaryRowAttrs> {
                                   if (!confirmed) return;
 
                                   app.threads.delete(thread).then(() => {
-                                    navigateToSubpage('/overview');
                                   });
                                 },
                               },

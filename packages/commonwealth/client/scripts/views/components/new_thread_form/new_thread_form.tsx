@@ -7,7 +7,6 @@ import {
   redraw,
 } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
-import { navigateToSubpage } from 'router';
 
 import 'components/new_thread_form.scss';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -74,7 +73,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
         form.url
       );
 
-      navigateToSubpage(`/discussion/${result.id}`);
+      this.setRoute(`/discussion/${result.id}`);
       updateTopicList(result.topic, app.chain);
     } catch (e) {
       quillEditorState.enable();
@@ -179,7 +178,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.form.topic = topic;
   }
 
-  oninit(vnode: ResultNode<NewThreadFormAttrs>) {
+  oncreate(vnode: ResultNode<NewThreadFormAttrs>) {
     const { isModal } = vnode.attrs;
     this.form = {
       topic: null,
@@ -330,7 +329,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
               onClick={(e) => {
                 this.overwriteConfirmationModal = true;
                 localStorage.setItem(`${chainId}-from-draft`, `${fromDraft}`);
-                navigateToSubpage('/new/discussion');
+                this.setRoute('/new/discussion');
                 $(e.target).trigger('modalexit');
               }}
             />

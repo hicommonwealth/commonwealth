@@ -2,7 +2,6 @@ import React from 'react';
 
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { Thread, Topic } from 'models';
-import { navigateToSubpage } from 'router';
 import 'pages/overview/index.scss';
 
 import app from 'state';
@@ -14,8 +13,9 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
+import withRouter from 'navigation/helpers';
 
-class OverviewPage extends ClassComponent {
+class OverviewPageComponent extends ClassComponent {
   private isWindowExtraSmall: boolean;
 
   onResize() {
@@ -38,6 +38,7 @@ class OverviewPage extends ClassComponent {
   }
 
   view() {
+    console.log('@@@@@ this ptops', this.props);
     const allMonthlyThreads = app.threads.overviewStore.getAll();
     const allPinnedThreads = app.threads.listingStore.getThreads({
       pinned: true,
@@ -86,7 +87,7 @@ class OverviewPage extends ClassComponent {
                 label="Latest Threads"
                 iconLeft="home"
                 onClick={() => {
-                  navigateToSubpage('/discussions');
+                  this.setRoute('/discussions');
                 }}
               />
             </div>
@@ -95,7 +96,7 @@ class OverviewPage extends ClassComponent {
                 iconName="plusCircle"
                 iconButtonTheme="black"
                 onClick={() => {
-                  navigateToSubpage('/new/discussion');
+                  this.setRoute('/new/discussion');
                 }}
               />
             ) : (
@@ -104,7 +105,7 @@ class OverviewPage extends ClassComponent {
                 label="Create Thread"
                 iconLeft="plus"
                 onClick={() => {
-                  navigateToSubpage('/new/discussion');
+                  this.setRoute('/new/discussion');
                 }}
               />
             )}
@@ -136,5 +137,7 @@ class OverviewPage extends ClassComponent {
     );
   }
 }
+
+const OverviewPage = withRouter(OverviewPageComponent);
 
 export default OverviewPage;

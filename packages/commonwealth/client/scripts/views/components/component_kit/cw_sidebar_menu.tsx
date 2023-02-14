@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { redraw } from 'mithrilInterop';
-import { navigateToSubpage } from 'router';
 import { useNavigate } from 'react-router-dom';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
@@ -15,6 +14,7 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
+import { useCommonNavigate } from 'navigation/helpers';
 
 export const CWSidebarMenuItem = (props: MenuItem) => {
   const navigate = useNavigate();
@@ -110,7 +110,7 @@ type SidebarMenuProps = {
 
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   return (
     <div
@@ -146,7 +146,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               app.sidebarRedraw.emit('redraw');
-              navigate('/communities');
+              navigate('/communities', {}, null);
             },
           },
           {
@@ -166,7 +166,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             iconLeft: 'bell',
             onClick: () => {
               if (app.activeChainId()) {
-                navigateToSubpage('/settings');
+                navigate('/settings');
               } else {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
