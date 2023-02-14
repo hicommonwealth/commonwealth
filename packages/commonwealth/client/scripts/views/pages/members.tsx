@@ -1,6 +1,6 @@
 import React from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 import type { Profile } from 'models';

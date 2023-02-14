@@ -270,6 +270,7 @@
     "chai-http": "^4.3.0",
     "esbuild-loader": "^2.16.0",
     "eslint-import-resolver-webpack": "^0.12.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "ganache-cli": "^6.9.1",
     "mocha": "^6.2.2",
     "nyc": "^15.1.0",

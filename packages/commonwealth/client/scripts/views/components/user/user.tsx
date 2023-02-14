@@ -14,8 +14,8 @@ import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
-import { useNavigate } from 'react-router-dom';
 import { Modal } from '../component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -49,7 +49,7 @@ export const User = (props: UserAttrs) => {
     popover,
     showRole,
   } = props;
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 

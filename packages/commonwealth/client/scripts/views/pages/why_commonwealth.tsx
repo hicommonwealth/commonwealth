@@ -5,9 +5,11 @@ import { CWButton } from '../components/component_kit/cw_button';
 
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-const WhyCommonwealthPageComponent = () => {
+const WhyCommonwealthPage = () => {
+  const navigate = useCommonNavigate();
+
   return (
     <Sublayout>
       <div className="WhyCommonwealthPage">
@@ -35,7 +37,7 @@ const WhyCommonwealthPageComponent = () => {
             label="Explore Our Communities"
             onClick={(e) => {
               e.preventDefault();
-              this.setRoute('/communities');
+              navigate('/communities', {}, null);
             }}
           />
           <CWText>
@@ -71,7 +73,5 @@ const WhyCommonwealthPageComponent = () => {
     </Sublayout>
   );
 };
-
-const WhyCommonwealthPage = withRouter(WhyCommonwealthPageComponent);
 
 export default WhyCommonwealthPage;

@@ -1,11 +1,7 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  getRouteParam,
-  redraw,
-} from 'mithrilInterop';
+import type { ResultNode} from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import app from 'state';
 

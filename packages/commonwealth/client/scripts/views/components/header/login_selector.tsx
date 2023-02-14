@@ -1,12 +1,10 @@
 import React from 'react';
 
 import { initAppState } from 'state';
-import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
 import { redraw } from 'mithrilInterop';
-import { useNavigate } from 'react-router-dom';
 
 import _ from 'lodash';
 
@@ -36,6 +34,7 @@ import { UserBlock } from '../user/user_block';
 import { CWDivider } from '../component_kit/cw_divider';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { Modal } from '../component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -57,6 +56,7 @@ type LoginSelectorMenuLeftAttrs = {
 
 export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
   const { activeAddressesWithRole, nAccountsWithoutRole } = props;
+  const navigate = useCommonNavigate();
 
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] =
     React.useState<boolean>(false);
@@ -92,7 +92,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
             onClick={() => {
               const pf = app.user.activeAccount.profile;
               if (app.chain) {
-                navigateToSubpage(`/account/${pf.address}`);
+                navigate(`/account/${pf.address}`);
               }
             }}
           >
@@ -158,7 +158,7 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
 };
 
 export const LoginSelectorMenuRight = () => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
@@ -168,18 +168,11 @@ export const LoginSelectorMenuRight = () => {
       <div className="LoginSelectorMenu">
         <div
           className="login-menu-item"
-          onClick={() => navigate('/notification-settings')}
+          onClick={() => navigate('/notification-settings', {}, null)}
         >
           <CWText type="caption">Notification settings</CWText>
         </div>
-        <div
-          className="login-menu-item"
-          onClick={() =>
-            app.activeChainId()
-              ? navigateToSubpage('/settings')
-              : navigate('/settings')
-          }
-        >
+        <div className="login-menu-item" onClick={() => navigate('/settings')}>
           <CWText type="caption">Account settings</CWText>
         </div>
         <div className="login-menu-item">

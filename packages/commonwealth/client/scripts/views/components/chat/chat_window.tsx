@@ -9,7 +9,7 @@ import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import {
   ClassComponent,
   ResultNode,
-  getRouteParam,
+  _DEPRECATED_getSearchParams,
   redraw,
 } from 'mithrilInterop';
 import moment from 'moment';
@@ -81,8 +81,8 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
 
   private _messageIsHighlighted = (message: any): boolean => {
     return (
-      getRouteParam('message') &&
-      Number(getRouteParam('message')) === message.id
+      _DEPRECATED_getSearchParams('message') &&
+      Number(_DEPRECATED_getSearchParams('message')) === message.id
     );
   };
 
@@ -102,7 +102,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     if (this.hideChat) return;
 
     this.shouldScroll = true;
-    this.shouldScrollToHighlight = Boolean(getRouteParam('message'));
+    this.shouldScrollToHighlight = Boolean(_DEPRECATED_getSearchParams('message'));
 
     this.scrollToBottom = () => {
       const scroller = $(vnode.dom).find('.chat-messages')[0];

@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { getRoute, getRouteParam } from 'mithrilInterop';
+import {
+  _DEPRECATED_getRoute,
+  _DEPRECATED_getSearchParams,
+} from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import app from 'state';
@@ -12,7 +15,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -32,10 +35,12 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-const DiscussionSectionComponent = () => {
+export const DiscussionSection = () => {
+  const navigate = useCommonNavigate();
+
   // Conditional Render Details +
   const onAllDiscussionPage = (p) => {
-    const identifier = getRouteParam('identifier');
+    const identifier = _DEPRECATED_getSearchParams('§');
     if (identifier) {
       const thread = app.threads.store.getByIdentifier(
         identifier.slice(0, identifier.indexOf('-'))
@@ -52,7 +57,7 @@ const DiscussionSectionComponent = () => {
   };
 
   const onOverviewDiscussionPage = (p) => {
-    const identifier = getRouteParam('identifier');
+    const identifier = _DEPRECATED_getSearchParams('identifier');
     if (identifier) {
       const thread = app.threads.store.getByIdentifier(
         identifier.slice(0, identifier.indexOf('-'))
@@ -66,7 +71,7 @@ const DiscussionSectionComponent = () => {
   };
 
   const onFeaturedDiscussionPage = (p, topic) => {
-    const identifier = getRouteParam('identifier');
+    const identifier = _DEPRECATED_getSearchParams('identifier');
     if (identifier) {
       const thread = app.threads.store.getByIdentifier(
         identifier.slice(0, identifier.indexOf('-'))
@@ -136,11 +141,11 @@ const DiscussionSectionComponent = () => {
       hasDefaultToggle: false,
       isVisible: true,
       isUpdated: true,
-      isActive: onAllDiscussionPage(getRoute()),
+      isActive: onAllDiscussionPage(_DEPRECATED_getRoute()),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(
-          this,
+          navigate,
           e,
           `/discussions`,
           app.activeChainId(),
@@ -157,12 +162,18 @@ const DiscussionSectionComponent = () => {
       hasDefaultToggle: false,
       isVisible: true,
       isUpdated: true,
-      isActive: onOverviewDiscussionPage(getRoute()),
+      isActive: onOverviewDiscussionPage(_DEPRECATED_getRoute()),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(this, e, `/overview`, app.activeChainId(), () => {
-          setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
-        });
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/overview`,
+          app.activeChainId(),
+          () => {
+            setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
+          }
+        );
       },
       displayData: null,
     },
@@ -173,12 +184,12 @@ const DiscussionSectionComponent = () => {
       isVisible: true,
       isUpdated: true,
       isActive:
-        onSputnikDaosPage(getRoute()) &&
+        onSputnikDaosPage(_DEPRECATED_getRoute()) &&
         (app.chain ? app.chain.serverLoaded : true),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(
-          this,
+          navigate,
           e,
           `/sputnik-daos`,
           app.activeChainId(),
@@ -202,12 +213,12 @@ const DiscussionSectionComponent = () => {
         hasDefaultToggle: false,
         isVisible: true,
         isUpdated: true,
-        isActive: onFeaturedDiscussionPage(getRoute(), topic.name),
+        isActive: onFeaturedDiscussionPage(_DEPRECATED_getRoute(), topic.name),
         // eslint-disable-next-line no-loop-func
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
           handleRedirectClicks(
-            this,
+            navigate,
             e,
             `/discussions/${encodeURI(topic.name)}`,
             app.activeChainId(),
@@ -239,5 +250,3 @@ const DiscussionSectionComponent = () => {
 
   return <SidebarSectionGroup {...sidebarSectionData} />;
 };
-
-export const DiscussionSection = withRouter(DiscussionSectionComponent);
