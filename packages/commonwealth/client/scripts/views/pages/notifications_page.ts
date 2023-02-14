@@ -95,19 +95,6 @@ const NotificationsPage: m.Component = {
         message: 'This page requires you to be logged in.',
       });
 
-    const activeEntity = app.chain;
-    if (!activeEntity)
-      return m(PageLoading, {
-        // title: [
-        //   'Notifications ',
-        //   m(Tag, {
-        //     size: 'xs',
-        //     label: 'Beta',
-        //     style: 'position: relative; top: -2px; margin-left: 6px',
-        //   }),
-        // ],
-      });
-
     const discussionNotifications =
       app.user.notifications.discussionNotifications;
     const chainEventNotifications =
