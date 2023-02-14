@@ -1,16 +1,15 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
-
 import 'pages/landing/chains_slider.scss';
 
 import type { Chain } from './index';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const initialSlides = 4;
 
-const chainToTag = (chain, index: number, navigate) => {
+const chainToTag = (chain, index: number) => {
+  const navigate = useCommonNavigate();
+
   return (
     <li
       id={`card_${index}`}
@@ -40,65 +39,57 @@ type TokensChainsComponentAttrs = {
   oncreateSlider: () => any;
 };
 
-class TokensChains extends ClassComponent<TokensChainsComponentAttrs> {
-  private displayedChains;
-  private index: number;
-  private oncreateSlider: () => any;
+export const TokensChainsComponent = (props: TokensChainsComponentAttrs) => {
+  const { chains, oncreateSlider } = props;
 
-  oncreate(vnode: ResultNode<TokensChainsComponentAttrs>) {
-    this.index = 0;
-
-    this.displayedChains = vnode.attrs.chains
+  const [displayedChains, setDisplayedChains] = React.useState<any>(
+    chains
       .slice(0, initialSlides)
-      .map((chain, index) => chainToTag(chain, index, this.setRoute));
+      .map((chain, index) => chainToTag(chain, index))
+  );
+  const [index, setIndex] = React.useState<number>(0);
 
-    this.oncreateSlider = vnode.attrs.oncreateSlider;
+  //   const glide = oncreateSlider();
 
-    const glide = this.oncreateSlider();
+  //   glide.on('run.before', () => {
+  //     redraw();
+  //     index++;
+  //   });
 
-    glide.on('run.before', () => {
-      redraw();
-      this.index++;
-    });
+  //   glide.on('run.after', () => {
+  //     displayedChains.push(
+  //       chainToTag(
+  //         chains[index + initialSlides],
+  //         index + initialSlides - 1,
+  //         setRoute
+  //       )
+  //     );
 
-    glide.on('run.after', () => {
-      this.displayedChains.push(
-        chainToTag(
-          vnode.attrs.chains[this.index + initialSlides],
-          this.index + initialSlides - 1,
-          this.setRoute
-        )
-      );
+  //     glide.update();
+  //   });
 
-      glide.update();
-    });
+  //   glide.mount();
+  // }
 
-    glide.mount();
-  }
-
-  view() {
-    return (
-      <section className="bg-geometric-pattern bg-cover bg-full pt-20 pb-40 md:pb-48 mb-48 relative">
-        <div className="container mx-auto">
-          <h2 className="text-3xl text-left font-extrabold mb-5 text-center">
-            Every token, every chain
-          </h2>
-          <p className="text-left max-w-screen-md mx-auto text-2xl text-center">
-            Subscribe to chain activity like whale transfers or major votes.
-            Discuss new ideas, crowdfund projects, and access native governance
-            for Layer 1s, tokens, and NFTs alike.
-          </p>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2">
-          <div className="glide">
-            <div className="glide__track" data-glide-el="track">
-              <ul className="glide__slides">{...this.displayedChains}</ul>
-            </div>
+  return (
+    <section className="bg-geometric-pattern bg-cover bg-full pt-20 pb-40 md:pb-48 mb-48 relative">
+      <div className="container mx-auto">
+        <h2 className="text-3xl text-left font-extrabold mb-5 text-center">
+          Every token, every chain
+        </h2>
+        <p className="text-left max-w-screen-md mx-auto text-2xl text-center">
+          Subscribe to chain activity like whale transfers or major votes.
+          Discuss new ideas, crowdfund projects, and access native governance
+          for Layer 1s, tokens, and NFTs alike.
+        </p>
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2">
+        <div className="glide">
+          <div className="glide__track" data-glide-el="track">
+            <ul className="glide__slides">{...displayedChains}</ul>
           </div>
         </div>
-      </section>
-    );
-  }
-}
-
-export const TokensChainsComponent = withRouter(TokensChains);
+      </div>
+    </section>
+  );
+};
