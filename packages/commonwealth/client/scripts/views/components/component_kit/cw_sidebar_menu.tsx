@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { redraw } from 'mithrilInterop';
-import { useNavigate } from 'react-router-dom';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 import { AddressInfo } from 'models';
@@ -17,7 +16,7 @@ import { ComponentType } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 
 export const CWSidebarMenuItem = (props: MenuItem) => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   if (props.type === 'default') {
     const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =

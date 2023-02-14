@@ -9,11 +9,10 @@ import app from 'state';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import withRouter from 'navigation/helpers';
-import { useNavigate } from 'react-router-dom';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
 
 const SidebarQuickSwitcherComponent = () => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   const allCommunities = app.config.chains
     .getAll()

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from "react-router-dom";
 
 import 'components/community_card.scss';
 
@@ -10,12 +9,13 @@ import { CWCard } from './component_kit/cw_card';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWText } from './component_kit/cw_text';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type CommunityCardProps = { chain: ChainInfo };
 
 export const CommunityCard = (props: CommunityCardProps) => {
   const { chain } = props;
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   const redirectFunction = (e) => {
     e.preventDefault();
