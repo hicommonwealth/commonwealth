@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { navigateToSubpage } from 'router';
-
 import 'pages/view_proposal/linked_proposals_embed.scss';
 
 import { ProposalType } from 'common-common/src/types';
@@ -16,6 +14,7 @@ import 'pages/view_proposal/linked_proposals_embed.scss';
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { useCommonNavigate } from 'navigation/helpers';
 
 export type LinkedSubstrateProposal =
   | SubstrateDemocracyProposal
@@ -28,6 +27,7 @@ type LinkedProposalsEmbedProps = {
 
 export const LinkedProposalsEmbed = (props: LinkedProposalsEmbedProps) => {
   const { proposal } = props;
+  const navigate = useCommonNavigate();
 
   // show link to treasury proposal if this is a proposal that passes a treasury spend
   if (
@@ -84,7 +84,7 @@ export const LinkedProposalsEmbed = (props: LinkedProposalsEmbedProps) => {
                   buttonType="tertiary-blue"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigateToSubpage(
+                    navigate(
                       `/proposal/${ProposalType.SubstrateDemocracyReferendum}/${
                         proposal.getReferendum().identifier
                       }`
@@ -108,7 +108,7 @@ export const LinkedProposalsEmbed = (props: LinkedProposalsEmbedProps) => {
                   buttonType="tertiary-blue"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigateToSubpage(
+                    navigate(
                       `/proposal/${
                         proposal.getProposalOrMotion(proposal.preimage).slug
                       }/${
@@ -167,7 +167,7 @@ export const LinkedProposalsEmbed = (props: LinkedProposalsEmbedProps) => {
                 buttonType="tertiary-blue"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigateToSubpage(
+                  navigate(
                     `/proposal/${ProposalType.SubstrateDemocracyProposal}/${p.identifier}`
                   );
                 }}
@@ -190,7 +190,7 @@ export const LinkedProposalsEmbed = (props: LinkedProposalsEmbedProps) => {
                 buttonType="tertiary-blue"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigateToSubpage(
+                  navigate(
                     `/proposal/${ProposalType.SubstrateDemocracyReferendum}/${r.identifier}`
                   );
                 }}

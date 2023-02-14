@@ -4,7 +4,7 @@ import { initAppState } from 'state';
 import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
 import app from 'state';
-import { ClassComponent, getRouteParam, redraw } from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';
@@ -55,8 +55,8 @@ class FinishAxieLoginComponent extends ClassComponent<Record<string, unknown>> {
   public oninit() {
     // grab token
     // TODO: how to use state id?
-    const token = getRouteParam('token');
-    const stateId = getRouteParam('stateId');
+    const token = _DEPRECATED_getSearchParams('token');
+    const stateId = _DEPRECATED_getSearchParams('stateId');
 
     validate(token, stateId, 'axie-infinity', this.setRoute).then((res) => {
       if (typeof res === 'string') {

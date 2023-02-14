@@ -188,7 +188,6 @@ const TopicSummaryRowComponent = (props: TopicSummaryRowProps) => {
                                   if (!confirmed) return;
 
                                   app.threads.delete(thread).then(() => {
-                                    navigateToSubpage('/overview');
                                   });
                                 },
                               },

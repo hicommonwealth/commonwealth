@@ -9,6 +9,7 @@ import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
 import type { Coin } from 'adapters/currency';
+import { NavigateFunction } from 'react-router-dom';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -381,7 +382,7 @@ export const isCommandClick = (
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
-  _this,
+  navigate: any,
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
@@ -396,7 +397,7 @@ export const handleRedirectClicks = (
     return;
   }
 
-  _this.navigateToSubpage(redirectLink);
+  navigate(redirectLink);
   if (callback) {
     callback();
   }

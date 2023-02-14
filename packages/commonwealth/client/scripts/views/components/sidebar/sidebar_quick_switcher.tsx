@@ -2,9 +2,6 @@ import React from 'react';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
-import { navigateToSubpage } from 'router';
-import { MixpanelPageViewEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { link } from 'helpers';
 import { ChainInfo } from 'models';
 
@@ -12,9 +9,11 @@ import app from 'state';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-const SidebarQuickSwitcherComponent = () => {
+export const SidebarQuickSwitcher = () => {
+  const navigate = useCommonNavigate();
+
   const allCommunities = app.config.chains
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
@@ -58,12 +57,10 @@ const SidebarQuickSwitcherComponent = () => {
             key={item.id}
             size="large"
             community={item}
-            onClick={link ? () => navigateToSubpage(`/${item.id}`) : undefined}
+            onClick={link ? () => navigate(`/${item.id}`) : undefined}
           />
         ))}
       </div>
     </div>
   );
 };
-
-export const SidebarQuickSwitcher = withRouter(SidebarQuickSwitcherComponent);

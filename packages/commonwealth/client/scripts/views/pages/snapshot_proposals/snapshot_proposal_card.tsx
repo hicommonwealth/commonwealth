@@ -6,10 +6,10 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 
 import app from 'state';
-import { navigateToSubpage } from '../../../router';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ProposalTag } from '../../components/proposal_card/proposal_tag';
+import withRouter from 'navigation/helpers';
 
 type SnapshotProposalCardProps = {
   snapshotId: string;
@@ -24,39 +24,42 @@ export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
   const time = moment(+proposal.end * 1000);
   const now = moment();
 
-  // TODO: display proposal.scores and proposal.scores_total on card
-  return (
-    <CWCard
-      elevation="elevation-2"
-      interactive={true}
-      className="ProposalCard"
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        if (app.chain) {
-          localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-            window.scrollY;
-          navigateToSubpage(proposalLink);
-        } else {
-          navigateToSubpage(proposalLink);
-        }
-      }}
-    >
-      <div className="proposal-card-metadata">
-        <ProposalTag
-          label={`${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(
-            proposal.ipfs.length - 6
-          )}`}
-        />
-        <CWText title={proposal.title} fontWeight="semiBold" noWrap>
-          {proposal.title}
+    // TODO: display proposal.scores and proposal.scores_total on card
+    return (
+      <CWCard
+        elevation="elevation-2"
+        interactive={true}
+        className="ProposalCard"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          if (app.chain) {
+            localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+              window.scrollY;
+            this.setRoute(proposalLink);
+          } else {
+            this.setRoute(proposalLink);
+          }
+        }}
+      >
+        <div className="proposal-card-metadata">
+          <ProposalTag
+            label={`${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(
+              proposal.ipfs.length - 6
+            )}`}
+          />
+          <CWText title={proposal.title} fontWeight="semiBold" noWrap>
+            {proposal.title}
+          </CWText>
+        </div>
+        <CWText>
+          {now > time
+            ? `Ended ${formatLastUpdated(time)}`
+            : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`}
         </CWText>
-      </div>
-      <CWText>
-        {now > time
-          ? `Ended ${formatLastUpdated(time)}`
-          : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`}
-      </CWText>
-    </CWCard>
-  );
-};
+      </CWCard>
+    );
+  }
+}
+
+export const SnapshotProposalCard = withRouter(SnapshotProposalCardComponent);

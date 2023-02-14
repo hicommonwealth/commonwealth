@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { ClassComponent, getRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import type { SocialAccount } from 'models';
-import { navigateToSubpage } from 'router';
 
 import 'pages/settings/email_section.scss';
 
@@ -166,7 +165,7 @@ export class EmailSection extends ClassComponent {
                   'githubPostAuthRedirect',
                   JSON.stringify({
                     timestamp: (+new Date()).toString(),
-                    path: getRoute(),
+                    path: _DEPRECATED_getRoute(),
                   })
                 );
                 document.location = `${app.serverUrl()}/auth/github` as any;
@@ -197,7 +196,7 @@ export class EmailSection extends ClassComponent {
                   'discordPostAuthRedirect',
                   JSON.stringify({
                     timestamp: (+new Date()).toString(),
-                    path: getRoute(),
+                    path: _DEPRECATED_getRoute(),
                   })
                 );
                 document.location = `${app.serverUrl()}/auth/discord` as any;

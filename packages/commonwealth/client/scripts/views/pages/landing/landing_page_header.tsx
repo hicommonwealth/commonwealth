@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { useNavigate } from 'react-router-dom';
-
 import 'pages/landing/landing_page_header.scss';
 
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // eslint-disable-next-line max-len
 const INITIAL_HEADER_STYLE = `bg-white static lg:flex lg:flex-row lg:justify-between
@@ -27,7 +26,7 @@ type HeaderLandingPageProps = {
 };
 
 export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
