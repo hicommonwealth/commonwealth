@@ -7,28 +7,6 @@ import { InputTokenList } from './input_tokens_lists';
 import { Chain } from './index';
 import { useCommonNavigate } from 'navigation/helpers';
 
-const initiateFullSearch = (searchTerm: string) => {
-  const navigate = useCommonNavigate();
-
-  if (
-    !searchTerm ||
-    !searchTerm.toString().trim() ||
-    !searchTerm.match(/[A-Za-z]+/)
-  ) {
-    return;
-  }
-
-  if (searchTerm.length < 3) {
-    notifyError('Query must be at least 3 characters');
-  }
-
-  const params = `q=${encodeURIComponent(
-    searchTerm.toString().trim()
-  )}&scope[]=Communities`;
-
-  navigate(`/search?${params}`);
-};
-
 export const placeholderChain = {
   img: 'static/img/add.svg',
   id: 'placeholder',
@@ -46,9 +24,28 @@ export const TokensCommunityComponent = (
 ) => {
   const { chains } = props;
 
+  const navigate = useCommonNavigate();
+
   const [inputTimeout, setInputTimeout] = React.useState<any>();
   const [inputTokenValue, setInputTokenValue] = React.useState<string>('');
   const [refilterResults, setRefilterResults] = React.useState<boolean>(true);
+
+  const initiateFullSearch = (searchTerm: string) => {
+    // if (
+    //   !searchTerm ||
+    //   !searchTerm.toString().trim() ||
+    //   !searchTerm.match(/[A-Za-z]+/)
+    // ) {
+    //   return;
+    // }
+    // if (searchTerm.length < 3) {
+    //   notifyError('Query must be at least 3 characters');
+    // }
+    // const params = `q=${encodeURIComponent(
+    //   searchTerm.toString().trim()
+    // )}&scope[]=Communities`;
+    // navigate(`/search?${params}`);
+  };
 
   const mappedCommunities = [
     {
@@ -103,7 +100,7 @@ export const TokensCommunityComponent = (
                 to discuss, vote, and fund projects together. Never miss an
                 on-chain event, proposal, or important discussion again.
               </p>
-              <div
+              {/* <div
                 className={`token-search-wrap bg-white shadow-2xl rounded-xl
                      p-2 flex flex-row justify-between mb-10 relative`}
               >
@@ -155,7 +152,7 @@ export const TokensCommunityComponent = (
                     alt="Let's Go"
                   />
                 </button>
-              </div>
+              </div> */}
               <div className="flex justify-center">
                 <h1 className="font-bold mb-5 leading-10 md:text-xl lg:text-2xl xl:text-4xl">
                   We’re also here

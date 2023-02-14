@@ -7,33 +7,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 
 const initialSlides = 4;
 
-const chainToTag = (chain, index: number) => {
-  const navigate = useCommonNavigate();
-
-  return (
-    <li
-      id={`card_${index}`}
-      className="glide__slide mt-4 pb-8"
-      onClick={(e) => {
-        e.preventDefault();
-        navigate(`/${chain.id}`);
-        localStorage['home-scrollY'] = window.scrollY;
-      }}
-    >
-      <div className="bg-white shadow-xl p-5 xl:p-10 rounded-xl text-center h-56 grow">
-        <img className="mx-auto mb-3 w-12 h-auto" src={chain.img} alt="" />
-        <h3
-          className="text-2xl font-extrabold mb-1"
-          style={{ wordBreak: 'break-word' }}
-        >
-          {chain.name}
-        </h3>
-        <p className="text-xl">{chain.description}</p>
-      </div>
-    </li>
-  );
-};
-
 type TokensChainsComponentAttrs = {
   chains: Array<Chain>;
   oncreateSlider: () => any;
@@ -41,6 +14,33 @@ type TokensChainsComponentAttrs = {
 
 export const TokensChainsComponent = (props: TokensChainsComponentAttrs) => {
   const { chains, oncreateSlider } = props;
+
+  const navigate = useCommonNavigate();
+
+  const chainToTag = (chain, index: number) => {
+    return (
+      <li
+        id={`card_${index}`}
+        className="glide__slide mt-4 pb-8"
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(`/${chain.id}`);
+          localStorage['home-scrollY'] = window.scrollY;
+        }}
+      >
+        <div className="bg-white shadow-xl p-5 xl:p-10 rounded-xl text-center h-56 grow">
+          <img className="mx-auto mb-3 w-12 h-auto" src={chain.img} alt="" />
+          <h3
+            className="text-2xl font-extrabold mb-1"
+            style={{ wordBreak: 'break-word' }}
+          >
+            {chain.name}
+          </h3>
+          <p className="text-xl">{chain.description}</p>
+        </div>
+      </li>
+    );
+  };
 
   const [displayedChains, setDisplayedChains] = React.useState<any>(
     chains
