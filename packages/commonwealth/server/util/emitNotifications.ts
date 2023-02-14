@@ -6,7 +6,6 @@ import type {
   IChatNotification,
   ICommunityNotificationData,
   IPostNotificationData,
-  ISnapshotNotificationData,
   SnapshotEventType,
   SnapshotNotification,
 } from '../../shared/types';

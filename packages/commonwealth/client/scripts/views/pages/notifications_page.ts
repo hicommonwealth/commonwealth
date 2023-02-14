@@ -8,7 +8,6 @@ import 'pages/notifications_page.scss';
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';
 import PageError from 'views/pages/error';
-import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 
 let minDiscussionNotification = 0;
