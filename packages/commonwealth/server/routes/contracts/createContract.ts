@@ -64,7 +64,7 @@ const createContract = async (
     chain_node_id,
     balance_type,
   } = req.body;
-
+  console.log('createContract', req.body);
   if (!req.user) {
     throw new AppError('Not logged in');
   }

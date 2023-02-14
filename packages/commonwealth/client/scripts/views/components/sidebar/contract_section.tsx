@@ -9,9 +9,10 @@ import 'components/sidebar/index.scss';
 
 import app from 'state';
 import { handleRedirectClicks } from 'helpers';
-import { Contract } from 'models';
+import type { Contract } from 'models';
 import { SidebarSectionGroup } from './sidebar_section';
-import { ToggleTree, SectionGroupAttrs, SidebarSectionAttrs } from './types';
+import type { SectionGroupAttrs, SidebarSectionAttrs } from './types';
+import { ToggleTree } from './types';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 export class ContractSection implements m.ClassComponent<SidebarSectionAttrs> {
   contracts: Contract[];
