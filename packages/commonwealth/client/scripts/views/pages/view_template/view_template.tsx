@@ -162,7 +162,7 @@ class ViewTemplatePage extends ClassComponent {
         });
 
         try {
-          const trimmedTemplate = template.template.replace(/\sg, '');
+          const trimmedTemplate = template.template.replace(/\s/g, '');
           this.json = JSON.parse(trimmedTemplate);
           this.templateError = !isValidJson(this.json);
         } catch (err) {
