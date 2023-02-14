@@ -79,7 +79,6 @@ class ContractsController {
         jwt: app.user.jwt,
       }
     );
-    console.log(response);
     const resultContract = response['result']['contract'];
     const resultAbi = response['result']['contractAbi'];
     this.update(resultAbi.abi, resultContract);
@@ -171,7 +170,6 @@ class ContractsController {
       }
 
       this._store.add(new Contract({ ...currentContractInStore, ccts }));
-      console.log('updated cctmd in ccts array', this._store);
     } else {
       const ccts = currentContractInStore.ccts || [];
       ccts.push({
@@ -225,6 +223,7 @@ class ContractsController {
       decimals,
       nickname,
       abiNickname,
+      chain_id: app.activeChainId(),
     });
     const responseContract = response['result']['contract'];
     const { id, type, is_factory } = responseContract;
@@ -251,9 +250,6 @@ class ContractsController {
     return this._store.add(contract);
   }
 
-  // TODO there is similar function above => "add"
-  // I created new one which has less params
-  // Should we remove one of those functions? Which one we should keep?
   public async addContractAndAbi({
     chain_node_id,
     address,
@@ -317,7 +313,6 @@ class ContractsController {
     contract_id: string;
   }) {
     try {
-      console.log('chain_id', app.activeChainId());
       await $.post(`${app.serverUrl()}/contract/template`, {
         jwt: app.user.jwt,
         chain_id: app.activeChainId(),
@@ -406,6 +401,7 @@ class ContractsController {
         data: {
           ...contract,
           jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
         },
         type: 'DELETE',
       });

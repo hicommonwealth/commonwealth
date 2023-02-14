@@ -5,6 +5,7 @@ import type { CommunityContractTemplateAttributes } from '../models/community_co
 import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import validateRoles from '../util/validateRoles';
 
 type CreateCommunityContractTemplateAndMetadataReq = {
   cct_id: string;
@@ -46,6 +47,9 @@ export async function createCommunityContractTemplateAndMetadata(
     chain_id,
   } = req.body;
 
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
+  if (!isAdmin) throw new AppError('Must be admin');
+
   if (!community_id || !contract_id || !template_id) {
     throw new AppError(
       'Must provide community_id, contract_id, and template_id'
@@ -66,8 +70,6 @@ export async function createCommunityContractTemplateAndMetadata(
   if (!communityContract) {
     throw new AppError('Failed to create community contract');
   }
-
-  console.log('communityContract: ', communityContract);
 
   try {
     // TODO: can some kind of transcation happen here to make this atomic?
@@ -157,6 +159,7 @@ export async function updateCommunityContractTemplate(
     if (!req.body) {
       throw new AppError('Must provide community_contract_id and template_id');
     }
+
     const {
       slug,
       nickname,
@@ -164,7 +167,11 @@ export async function updateCommunityContractTemplate(
       display_options,
       contract_id,
       cct_id,
+      chain_id,
     } = req.body;
+
+    const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
+    if (!isAdmin) throw new AppError('Must be admin');
 
     if (!contract_id) {
       throw new AppError('Must provide contract_id.');
@@ -225,7 +232,10 @@ export async function deleteCommunityContractTemplate(
       throw new AppError('Must provide community_contract_id and template_id');
     }
 
-    const { contract_id, template_id, cctmd_id } = req.body;
+    const { contract_id, template_id, cctmd_id, chain_id } = req.body;
+
+    const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
+    if (!isAdmin) throw new AppError('Must be admin');
 
     const shouldDeleteCommunityContract = req.query.community_contract;
     const contractTemplate: CommunityContractTemplateAttributes = req.body;
@@ -359,6 +369,14 @@ export async function updateCommunityContractTemplateMetadata(
       });
     }
 
+    const isAdmin = await validateRoles(
+      models,
+      req.user,
+      'admin',
+      req.body.chain_id
+    );
+    if (!isAdmin) throw new AppError('Must be admin');
+
     const contractTemplateMetadata: CommunityContractTemplateMetadataAttributes =
       req.body.contractMetadata;
 
@@ -408,6 +426,14 @@ export async function deleteCommunityContractTemplateMetadata(
         message: 'Must provide contract template metadata',
       });
     }
+
+    const isAdmin = await validateRoles(
+      models,
+      req.user,
+      'admin',
+      req.body.chain_id
+    );
+    if (!isAdmin) throw new AppError('Must be admin');
 
     const contractTemplateMetadata: CommunityContractTemplateMetadataAttributes =
       req.body.contractMetadata;

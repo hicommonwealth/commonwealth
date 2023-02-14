@@ -285,11 +285,13 @@ function setupRouter(
     '/contract/community_template',
     getCommunityContractTemplate.bind(this, models)
   );
+
   router.put(
     '/contract/community_template',
     passport.authenticate('jwt', { session: false }),
     updateCommunityContractTemplate.bind(this, models)
   );
+
   router.delete(
     '/contract/community_template',
     passport.authenticate('jwt', { session: false }),
@@ -301,11 +303,13 @@ function setupRouter(
     '/contract/community_template/metadata',
     getCommunityContractTemplateMetadata.bind(this, models)
   );
+
   router.put(
     '/contract/community_template/metadata',
     passport.authenticate('jwt', { session: false }),
     updateCommunityContractTemplateMetadata.bind(this, models)
   );
+
   router.delete(
     '/contract/community_template/metadata',
     passport.authenticate('jwt', { session: false }),
