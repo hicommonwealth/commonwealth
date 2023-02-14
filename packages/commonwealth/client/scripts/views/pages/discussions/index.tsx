@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, getRouteParam } from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getSearchParams } from 'mithrilInterop';
 import { debounce } from 'lodash';
 import { pluralize } from 'helpers';
 import { isNotUndefined } from 'helpers/typeGuards';
@@ -72,7 +72,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
     }
 
     this.topicName = vnode.attrs.topic;
-    this.stageName = getRouteParam('stage');
+    this.stageName = _DEPRECATED_getSearchParams('stage');
 
     const { topicName, stageName } = this;
 

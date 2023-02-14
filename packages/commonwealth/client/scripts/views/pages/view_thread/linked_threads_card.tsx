@@ -58,7 +58,8 @@ export const LinkedThreadsCard = (props: LinkedThreadsCardProps) => {
                 {linkedThreads.map((t) => {
                   const discussionLink = getProposalUrlPath(
                     t.slug,
-                    `${t.identifier}-${slugify(t.title)}`
+                    `${t.identifier}-${slugify(t.title)}`,
+                    true
                   );
 
                   return <a href={discussionLink}>{t.title}</a>;

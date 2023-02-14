@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { navigateToSubpage } from 'router';
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -40,6 +39,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
+import { useCommonNavigate } from 'navigation/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -57,7 +57,7 @@ type ViewThreadPageAttrs = {
 };
 
 const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
-  // React.Component<ViewThreadPageAttrs & { thread: Thread }> = () =>
+  const navigate = useCommonNavigate();
   const [comments, setComments] = useState<Array<Comment<Thread>>>();
   const [isEditingBody, setIsEditingBody] = useState<boolean>();
   const [isGloballyEditing, setIsGloballyEditing] = useState<boolean>();
@@ -197,13 +197,12 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   }
 
   if (identifier !== `${threadId}-${slugify(thread.title)}`) {
-    navigateToSubpage(
+    navigate(
       getProposalUrlPath(
         thread.slug,
         `${threadId}-${slugify(thread.title)}`,
         true
       ),
-      {},
       { replace: true }
     );
   }
@@ -570,7 +569,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
                 if (!confirmed) return;
 
                 app.threads.delete(thread).then(() => {
-                  navigateToSubpage('/discussions');
+                  navigate('/discussions');
                 });
               },
             },
@@ -606,12 +605,9 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
                 const snapshotSpaces = app.chain.meta.snapshot;
 
                 if (snapshotSpaces.length > 1) {
-                  navigateToSubpage('/multiple-snapshots', {
-                    action: 'create-from-thread',
-                    thread,
-                  });
+                  navigate('/multiple-snapshots');
                 } else {
-                  navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+                  navigate(`/snapshot/${snapshotSpaces}`);
                 }
               },
             },

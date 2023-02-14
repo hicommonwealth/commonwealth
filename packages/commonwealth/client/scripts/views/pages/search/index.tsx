@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, getRouteParam, redraw } from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -225,7 +225,7 @@ class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
-    const searchQuery = SearchQuery.fromUrlParams({ url: getRouteParam() });
+    const searchQuery = SearchQuery.fromUrlParams({ url: _DEPRECATED_getSearchParams() });
 
     const { chainScope, searchTerm } = searchQuery;
     const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;

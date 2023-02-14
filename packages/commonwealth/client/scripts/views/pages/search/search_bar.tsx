@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, getRouteParam } from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getSearchParams } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import { SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
@@ -118,7 +118,7 @@ class SearchBarComponent extends ClassComponent {
               isClearable: this.state.searchTerm?.length > 0,
             })}
             placeholder="Search Common"
-            defaultValue={getRouteParam('q') || this.state.searchTerm}
+            defaultValue={_DEPRECATED_getSearchParams('q') || this.state.searchTerm}
             // value={this.state.searchTerm}
             autoComplete="off"
             onFocus={() => {
