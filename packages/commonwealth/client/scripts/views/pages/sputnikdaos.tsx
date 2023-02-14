@@ -14,14 +14,14 @@ import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type SputnikDaoRowProps = {
   clickable: boolean;
   dao: IDaoInfo;
 };
 
-const SputnikDaoRowComponent = (props: SputnikDaoRowProps) => {
+const SputnikDaoRow = (props: SputnikDaoRowProps) => {
   const { dao, clickable } = props;
   const navigate = useCommonNavigate();
 
@@ -67,9 +67,7 @@ const SputnikDaoRowComponent = (props: SputnikDaoRowProps) => {
   );
 };
 
-const SputnikDaoRow = withRouter(SputnikDaoRowComponent);
-
-const SputnikDAOsPageComponent = () => {
+const SputnikDAOsPage = () => {
   const navigate = useCommonNavigate();
 
   const [daosList, setDaosList] = React.useState<Array<IDaoInfo>>();
@@ -149,8 +147,5 @@ const SputnikDAOsPageComponent = () => {
     </Sublayout>
   );
 };
-
-// TODO remove withRouter from FCs
-const SputnikDAOsPage = withRouter(SputnikDAOsPageComponent);
 
 export default SputnikDAOsPage;

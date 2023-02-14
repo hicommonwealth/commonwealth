@@ -3,7 +3,7 @@ import React from 'react';
 import 'footer.scss';
 
 import { isNotUndefined } from '../helpers/typeGuards';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -25,7 +25,7 @@ const footercontents = [
   },
 ];
 
-const FooterComponent = () => {
+export const Footer = () => {
   const navigate = useCommonNavigate();
 
   const redirectClick = (route) => {
@@ -63,5 +63,3 @@ const FooterComponent = () => {
     </div>
   );
 };
-
-export const Footer = withRouter(FooterComponent);

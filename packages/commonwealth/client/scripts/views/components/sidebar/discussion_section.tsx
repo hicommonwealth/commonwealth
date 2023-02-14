@@ -15,7 +15,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -35,7 +35,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-const DiscussionSectionComponent = () => {
+export const DiscussionSection = () => {
   const navigate = useCommonNavigate();
 
   // Conditional Render Details +
@@ -250,5 +250,3 @@ const DiscussionSectionComponent = () => {
 
   return <SidebarSectionGroup {...sidebarSectionData} />;
 };
-
-export const DiscussionSection = withRouter(DiscussionSectionComponent);

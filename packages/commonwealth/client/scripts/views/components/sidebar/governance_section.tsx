@@ -19,7 +19,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -44,7 +44,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-const GovernanceSectionComponent = () => {
+export const GovernanceSection = () => {
   const navigate = useCommonNavigate();
 
   // Conditional Render Details
@@ -413,5 +413,3 @@ const GovernanceSectionComponent = () => {
 
   return <SidebarSectionGroup {...sidebarSectionData} />;
 };
-
-export const GovernanceSection = withRouter(GovernanceSectionComponent);

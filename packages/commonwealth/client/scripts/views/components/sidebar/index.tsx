@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, redraw, _DEPRECATED_getRoute } from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getRoute } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 import { Action } from 'commonwealth/shared/permissions';

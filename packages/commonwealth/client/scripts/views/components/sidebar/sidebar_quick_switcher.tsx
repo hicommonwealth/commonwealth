@@ -9,9 +9,9 @@ import app from 'state';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-const SidebarQuickSwitcherComponent = () => {
+export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
 
   const allCommunities = app.config.chains
@@ -64,5 +64,3 @@ const SidebarQuickSwitcherComponent = () => {
     </div>
   );
 };
-
-export const SidebarQuickSwitcher = withRouter(SidebarQuickSwitcherComponent);

@@ -10,16 +10,14 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getCommentPreview } from './helpers';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardRowTopProps = {
   activityData: any;
   category: string;
 };
 
-export const UserDashboardRowTopComponent = (
-  props: UserDashboardRowTopProps
-) => {
+export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
   const { activityData, category } = props;
   const navigate = useCommonNavigate();
 
@@ -104,5 +102,3 @@ export const UserDashboardRowTopComponent = (
     </div>
   );
 };
-
-export const UserDashboardRowTop = withRouter(UserDashboardRowTopComponent);
