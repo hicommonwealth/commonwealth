@@ -10,16 +10,18 @@ import { AddressInfo } from 'models';
 import { NotificationCategories } from 'common-common/src/types';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getClasses } from '../../components/component_kit/helpers';
 import { User } from 'views/components/user/user';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { getBatchNotificationFields } from './helpers';
 import { UserGallery } from '../../components/user/user_gallery';
+import { useCommonNavigate } from 'navigation/helpers';
 
 export const ChainEventNotificationRow = (props: NotificationRowProps) => {
   const { notification, onListPage } = props;
+
+  const navigate = useCommonNavigate();
 
   if (!notification.chainEvent) {
     throw new Error('chain event notification does not have expected data');
@@ -61,7 +63,7 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
   return (
     <div
       className="NotificationRow"
-      onClick={() => navigateToSubpage(`/notifications?id=${notification.id}`)}
+      onClick={() => navigate(`/notifications?id=${notification.id}`)}
     >
       <div className="comment-body">
         <div className="comment-body-top chain-event-notification-top">
@@ -95,6 +97,8 @@ export const NewChatMentionNotificationRow = (
 ) => {
   const { handleSetMarkingRead, markingRead, notification } = props;
 
+  const navigate = useCommonNavigate();
+
   const { chain_id, author_address, created_at, message_id, channel_id } =
     JSON.parse(notification.data);
 
@@ -109,7 +113,7 @@ export const NewChatMentionNotificationRow = (
   const authorName = <User user={author} hideAvatar />;
 
   return (
-    <div className="NotificationRow" onClick={() => navigateToSubpage(route)}>
+    <div className="NotificationRow" onClick={() => navigate(route)}>
       <User user={author} avatarOnly avatarSize={26} />
       <div className="comment-body">
         <div className="comment-body-title">
@@ -151,6 +155,8 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
 
   const { category } = notification.subscription;
 
+  const navigate = useCommonNavigate();
+
   const notificationData = [notification].map((notif) =>
     typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
   );
@@ -176,7 +182,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   return (
     <div
       className="NotificationRow"
-      onClick={() => navigateToSubpage(path.replace(/ /g, '%20'))}
+      onClick={() => navigate(path.replace(/ /g, '%20'))}
     >
       {authorInfo.length === 1 ? (
         <User
