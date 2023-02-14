@@ -6,6 +6,8 @@ import 'pages/communities.scss';
 import type { ChainCategoryType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type { ChainInfo } from 'models';
+import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
+import type { ChainCategoryAttributes } from 'server/models/chain_category';
 
 import app from 'state';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
@@ -19,8 +21,8 @@ const buildCommunityString = (numCommunities: number) =>
     : `${numCommunities} Communities`;
 
 export const buildChainToCategoriesMap = (
-  categoryTypes,
-  chainsAndCategories
+  categoryTypes: Array<ChainCategoryTypeAttributes>,
+  chainsAndCategories: Array<ChainCategoryAttributes>
 ) => {
   // Handle mapping provided by ChainCategories table
   const categoryMap = {};
@@ -59,7 +61,7 @@ const chainNetworks = Object.keys(ChainNetwork).filter(
 ); // We only are allowing ERC20 for now
 const chainBases = Object.keys(ChainBase);
 
-const getInitialFilterMap = (): FilterMapType => {
+const getInitialFilterMap = (): Record<string, unknown> => {
   const filterMapChainCategories = chainCategories.map((c) => ({
     [c]: false,
   }));
@@ -73,12 +75,14 @@ const getInitialFilterMap = (): FilterMapType => {
   return Object.assign({}, ...allArrays);
 };
 
-type FilterMapType = { [val: string]: boolean };
-
 const CommunitiesPage = () => {
-  const [filterMap, setFilterMap] = React.useState<FilterMapType>(
+  const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
     getInitialFilterMap()
   );
+
+  const handleSetFilterMap = (key: string) => {
+    setFilterMap((prevState) => ({ ...prevState, [key]: !filterMap[key] }));
+  };
 
   const chainBaseFilter = (list: ChainInfo[]) => {
     return list.filter((data) => {
@@ -110,7 +114,7 @@ const CommunitiesPage = () => {
         if (
           filterMap[cat] &&
           (!chainToCategoriesMap[data.id] ||
-            !chainToCategoriesMap[data.id].includes(cat))
+            !chainToCategoriesMap[data.id].includes(cat as ChainCategoryType))
         ) {
           return false;
         }
@@ -133,26 +137,17 @@ const CommunitiesPage = () => {
       }
 
       // Filter for ChainBase
-      const chainBaseFilterOn =
-        chainBases.filter((base) => filterMap[base]).length > 0;
-
-      if (chainBaseFilterOn) {
+      if (chainBases.filter((base) => filterMap[base]).length > 0) {
         filteredList = chainBaseFilter(filteredList);
       }
 
       // Filter for ChainNetwork
-      const chainNetworkFilterOn =
-        chainNetworks.filter((network) => filterMap[network]).length > 0;
-
-      if (chainNetworkFilterOn) {
+      if (chainNetworks.filter((network) => filterMap[network]).length > 0) {
         filteredList = chainNetworkFilter(filteredList);
       }
 
       // Filter for ChainCategory
-      const chainCategoryFilterOn =
-        chainCategories.filter((cat) => filterMap[cat]).length > 0;
-
-      if (chainCategoryFilterOn) {
+      if (chainCategories.filter((cat) => filterMap[cat]).length > 0) {
         filteredList = chainCategoryFilter(filteredList);
       }
     }
@@ -189,7 +184,7 @@ const CommunitiesPage = () => {
                     filterMap[cat] ? 'primary-black' : 'secondary-black'
                   }
                   onClick={() => {
-                    filterMap[cat] = !filterMap[cat];
+                    handleSetFilterMap(cat);
                   }}
                 />
               );
@@ -203,7 +198,7 @@ const CommunitiesPage = () => {
                     filterMap[network] ? 'primary-black' : 'secondary-black'
                   }
                   onClick={() => {
-                    filterMap[network] = !filterMap[network];
+                    handleSetFilterMap(network);
                   }}
                 />
               );
@@ -217,7 +212,7 @@ const CommunitiesPage = () => {
                     filterMap[base] ? 'primary-black' : 'secondary-black'
                   }
                   onClick={() => {
-                    filterMap[base] = !filterMap[base];
+                    handleSetFilterMap(base);
                   }}
                 />
               );
