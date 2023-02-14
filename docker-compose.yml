@@ -1,10 +1,9 @@
-version: "3.9"
+version: '3.9'
 services:
   server-external-db:
     container_name: server
     restart: always
-    env_file:
-      ./packages/commonwealth/.env
+    env_file: ./packages/commonwealth/.env
     build:
       context: ./
       dockerfile: ./packages/commonwealth/Dockerfile
@@ -14,9 +13,9 @@ services:
         - REDIS_URL=redis:6379
         - DATABASE_URL=postgresql://commonwealth:edgeware@host.docker.internal/commonwealth #change this URI for external db
     ports:
-      - "8080:8080"
+      - '8080:8080'
     expose:
-      - "8080"
+      - '8080'
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -28,8 +27,7 @@ services:
   server:
     container_name: server
     restart: always
-    env_file:
-      ./packages/commonwealth/.env
+    env_file: ./packages/commonwealth/.env
     build:
       context: ./
       dockerfile: ./packages/commonwealth/Dockerfile
@@ -39,9 +37,9 @@ services:
         - REDIS_URL=redis:6379
         - DATABASE_URL=postgresql://commonwealth:edgeware@postgres/commonwealth
     ports:
-      - "8080:8080"
+      - '8080:8080'
     expose:
-      - "8080"
+      - '8080'
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -60,10 +58,10 @@ services:
       - POSTGRES_PASSWORD=edgeware
     ports:
       - '5432:5432'
-#    volumes:
-#      - postgres:/var/lib/postgresql/data
+    #    volumes:
+    #      - postgres:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'db_prod']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -74,10 +72,10 @@ services:
     restart: always
     ports:
       - '6379:6379'
-#    volumes:
-#      - $PWD/redis-data:/var/lib/redis
+    #    volumes:
+    #      - $PWD/redis-data:/var/lib/redis
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -88,9 +86,9 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
-#    volumes:
-#      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-#      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    #    volumes:
+    #      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+    #      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 5s
