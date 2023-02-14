@@ -173,7 +173,8 @@ class ViewTemplatePage extends ClassComponent {
         });
 
         try {
-          this.json = JSON.parse(template.template);
+          const trimmedTemplate = template.template.replace(/\sg, '');
+          this.json = JSON.parse(trimmedTemplate);
         } catch (err) {
           console.log('err', err);
 
