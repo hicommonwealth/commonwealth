@@ -17,10 +17,12 @@ import models from '../database';
  * throw when it attempts to insert and that message will be retried and eventually dead-lettered unnecessarily.
  *
  * @param ce_db_uri {string} The URI of the chain-events database to sync with
+ * @param enforceEventTypes {boolean} A  boolean indicating whether chain-event-types should be synced
  * @param enforceEntities {boolean} A boolean indicating whether chain-event-entities should be synced
  */
 export async function enforceDataConsistency(
   ce_db_uri: string,
+  enforceEventTypes = true,
   enforceEntities = true
 ) {
   // if the function is called with run-as-script i.e. yarn runEnforceDataConsistency ensure that CONFIRM=true is passed
@@ -31,6 +33,18 @@ export async function enforceDataConsistency(
     );
     process.exit(0);
   }
+
+  const chainEventTypeSyncQuery = `
+      WITH existingIds AS (SELECT id FROM "ChainEventTypes")
+      INSERT
+      INTO "ChainEventTypes"
+      SELECT "NewCETypes".id
+      FROM dblink('${ce_db_uri}',
+                  'SELECT id FROM "ChainEventTypes"') as "NewCETypes"(id varchar(255))
+      WHERE "NewCETypes".id NOT IN (SELECT * FROM existingIds)
+      RETURNING id;
+  `;
+
   const chainEntitySyncQuery = `
       WITH existingCeIds AS (SELECT ce_id FROM "ChainEntityMeta")
       INSERT INTO "ChainEntityMeta" (ce_id, chain, author, type_id)
@@ -42,6 +56,14 @@ export async function enforceDataConsistency(
   `;
 
   await models.sequelize.transaction(async (t) => {
+    if (enforceEventTypes) {
+      const result = await models.sequelize.query(chainEventTypeSyncQuery, {
+        type: QueryTypes.INSERT,
+        raw: true,
+        transaction: t,
+      });
+      console.log('ChainEventTypes synced:', result);
+    }
     if (enforceEntities) {
       const result = await models.sequelize.query(chainEntitySyncQuery, {
         type: QueryTypes.INSERT,

@@ -22,3 +22,5 @@ class ChainEventType {
     );
   }
 }
+
+export default ChainEventType;
