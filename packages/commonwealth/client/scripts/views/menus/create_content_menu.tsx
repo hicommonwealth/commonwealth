@@ -145,7 +145,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       label: 'New Community',
       iconLeft: 'people',
       onClick: (e) => {
-        console.log('e', e);
         e?.preventDefault();
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,

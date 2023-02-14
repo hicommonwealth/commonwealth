@@ -38,7 +38,6 @@ class OverviewPageComponent extends ClassComponent {
   }
 
   view() {
-    console.log('@@@@@ this ptops', this.props);
     const allMonthlyThreads = app.threads.overviewStore.getAll();
     const allPinnedThreads = app.threads.listingStore.getThreads({
       pinned: true,

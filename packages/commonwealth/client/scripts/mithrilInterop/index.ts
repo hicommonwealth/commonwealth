@@ -178,7 +178,7 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
     this.forceUpdate();
   }
 
-  // replicates `m.route.set()` functionality via react-router
+  // It works very similar as useCommonNavigate but only for class components with withRouter() HOC
   public setRoute(
     route: string,
     options?: NavigateOptions,

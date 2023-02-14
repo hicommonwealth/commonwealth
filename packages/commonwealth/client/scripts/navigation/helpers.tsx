@@ -38,16 +38,30 @@ export const getScopePrefix = (prefix?: null | string) => {
   return '';
 };
 
+/**
+ *  This hook should be used for navigate from functional components.
+ */
 export const useCommonNavigate = () => {
   const navigate = useNavigate();
 
+  /**
+   * @param url Path for navigation starting with "/" character
+   * @param options Navigate Options from react-router
+   * @param {null | string} prefix If not set, the prefix will be calculated based on the
+   * "activeChainId" and "isCustomDomain", meaning that scope does not need to be passed to the "navigate" function.
+   *
+   *  To override prefix calculation, the string has to be passed.
+   *  navigate("/discussion", {}, "dydx")
+   *
+   *  To navigate without prefix whatsoever, the null has to be passed.
+   *  navigate("/privacy", {}, null)
+   */
   return (url: To, options?: NavigateOptions, prefix?: null | string) => {
     if (prefix && prefix.startsWith('/')) {
       console.warn('Prefix should not start with slash character!');
     }
 
     const scopePrefix = getScopePrefix(prefix);
-
     return navigate(`${scopePrefix}${url}`, options);
   };
 };
