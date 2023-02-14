@@ -22,13 +22,13 @@ type TokensCommunityComponentProps = {
 export const TokensCommunityComponent = (
   props: TokensCommunityComponentProps
 ) => {
-  const { chains } = props;
+  // const { chains } = props;
 
-  const navigate = useCommonNavigate();
+  // const navigate = useCommonNavigate();
 
-  const [inputTimeout, setInputTimeout] = React.useState<any>();
-  const [inputTokenValue, setInputTokenValue] = React.useState<string>('');
-  const [refilterResults, setRefilterResults] = React.useState<boolean>(true);
+  // const [inputTimeout, setInputTimeout] = React.useState<any>();
+  // const [inputTokenValue, setInputTokenValue] = React.useState<string>('');
+  // const [refilterResults, setRefilterResults] = React.useState<boolean>(true);
 
   // const initiateFullSearch = (searchTerm: string) => {
   // if (
