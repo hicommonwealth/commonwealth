@@ -19,8 +19,7 @@ import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 // import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'router';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
@@ -28,8 +27,9 @@ type TopicSummaryRowProps = {
   topic: Topic;
 };
 
-const TopicSummaryRowComponent = (props: TopicSummaryRowProps) => {
+export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
   const { monthlyThreads, pinnedThreads, topic } = props;
+  const navigate = useCommonNavigate();
 
   const topSortedThreads = monthlyThreads
     .sort((a, b) => {
@@ -64,7 +64,7 @@ const TopicSummaryRowComponent = (props: TopicSummaryRowProps) => {
             className="topic-name-text"
             onClick={(e) => {
               e.preventDefault();
-              navigateToSubpage(
+              navigate(
                 `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
               );
             }}
@@ -100,7 +100,7 @@ const TopicSummaryRowComponent = (props: TopicSummaryRowProps) => {
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigateToSubpage(discussionLink);
+                  navigate(discussionLink);
                 }}
               >
                 <div className="row-top">
@@ -229,5 +229,3 @@ const TopicSummaryRowComponent = (props: TopicSummaryRowProps) => {
     </div>
   );
 };
-
-export const TopicSummaryRow = withRouter(TopicSummaryRowComponent);

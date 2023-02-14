@@ -1,7 +1,6 @@
 import React from 'react';
 
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'router';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 
@@ -11,8 +10,11 @@ type InputTokenOptionComponentProps = {
   text: string;
 };
 
-const InputTokenOption = (props: InputTokenOptionComponentProps) => {
+export const InputTokenOptionComponent = (
+  props: InputTokenOptionComponentProps
+) => {
   const { iconImg, route, text } = props;
+  const navigate = useCommonNavigate();
 
   let tokenImage;
 
@@ -41,7 +43,7 @@ const InputTokenOption = (props: InputTokenOptionComponentProps) => {
           } else {
             e.preventDefault();
             localStorage['home-scrollY'] = window.scrollY;
-            navigateToSubpage(`/${route}`);
+            navigate(`/${route}`);
           }
         }}
         className={`p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row
@@ -55,5 +57,3 @@ const InputTokenOption = (props: InputTokenOptionComponentProps) => {
     </li>
   );
 };
-
-export const InputTokenOptionComponent = withRouter(InputTokenOption);

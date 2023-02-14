@@ -9,15 +9,16 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'router';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type CommunityPreviewCardProps = {
   chain: ChainInfo;
 };
 
-const CommunityPreviewCardComponent = (props: CommunityPreviewCardProps) => {
+const CommunityPreviewCard = (props: CommunityPreviewCardProps) => {
   const { chain } = props;
+
+  const navigate = useCommonNavigate();
 
   const { unseenPosts } = app.user;
   const visitedChain = !!unseenPosts[chain.id];
@@ -37,7 +38,7 @@ const CommunityPreviewCardComponent = (props: CommunityPreviewCardProps) => {
       interactive
       onClick={(e) => {
         e.preventDefault();
-        navigateToSubpage(`/${chain.id}`);
+        navigate(`/${chain.id}`);
       }}
     >
       <div className="card-top">
@@ -73,9 +74,9 @@ const CommunityPreviewCardComponent = (props: CommunityPreviewCardProps) => {
   );
 };
 
-const CommunityPreviewCard = withRouter(CommunityPreviewCardComponent);
+export const DashboardCommunitiesPreview = () => {
+  const navigate = useCommonNavigate();
 
-const DashboardCommunitiesPreviewComponent = () => {
   const sortedChains = app.config.chains
     .getAll()
     .sort((a, b) => {
@@ -96,7 +97,7 @@ const DashboardCommunitiesPreviewComponent = () => {
       <div className="buttons">
         <CWButton
           onClick={() => {
-            navigateToSubpage('/communities');
+            navigate('/communities');
           }}
           label="Explore communities"
           buttonType="mini-black"
@@ -105,7 +106,3 @@ const DashboardCommunitiesPreviewComponent = () => {
     </div>
   );
 };
-
-export const DashboardCommunitiesPreview = withRouter(
-  DashboardCommunitiesPreviewComponent
-);

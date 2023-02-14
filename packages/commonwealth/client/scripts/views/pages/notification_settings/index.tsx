@@ -19,14 +19,15 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs } from './helpers';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'router';
+import { useCommonNavigate } from 'navigation/helpers';
 
-const NotificationSettingsPageComponent = () => {
+const NotificationSettingsPage = () => {
+  const navigate = useCommonNavigate();
+
   if (!app.loginStatusLoaded()) {
     return <PageLoading />;
   } else if (!app.isLoggedIn()) {
-    navigateToSubpage('/', { replace: true });
+    navigate('/', { replace: true });
     return <PageLoading />;
   }
 
@@ -222,7 +223,5 @@ const NotificationSettingsPageComponent = () => {
     </Sublayout>
   );
 };
-
-const NotificationSettingsPage = withRouter(NotificationSettingsPageComponent);
 
 export default NotificationSettingsPage;

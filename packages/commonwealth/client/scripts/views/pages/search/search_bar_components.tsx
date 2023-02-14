@@ -1,8 +1,6 @@
 import React from 'react';
 
 import { AddressInfo } from 'models';
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
@@ -13,8 +11,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'router';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type SearchChipProps = {
   isActive: boolean;
@@ -47,18 +44,15 @@ type SearchBarPreviewRowProps = {
   searchTerm?: string;
 };
 
-export const SearchBarThreadPreviewRowComponent = (
-  props: SearchBarPreviewRowProps
-) => {
+export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   const { searchResult, searchTerm } = props;
+  const navigate = useCommonNavigate();
 
   return (
     <div
       className="SearchBarThreadPreviewRow"
       onClick={() =>
-        navigateToSubpage(
-          `/${searchResult.chain}/discussion/${searchResult.proposalid}`
-        )
+        navigate(`/${searchResult.chain}/discussion/${searchResult.proposalid}`)
       }
     >
       <div className="header-row">
@@ -92,20 +86,15 @@ export const SearchBarThreadPreviewRowComponent = (
   );
 };
 
-export const SearchBarThreadPreviewRow = withRouter(
-  SearchBarThreadPreviewRowComponent
-);
-
-const SearchBarCommentPreviewRowComponent = (
-  props: SearchBarPreviewRowProps
-) => {
+export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
   const { searchResult, searchTerm } = props;
+  const navigate = useCommonNavigate();
 
   return (
     <div
       className="SearchBarCommentPreviewRow"
       onClick={() => {
-        navigateToSubpage(
+        navigate(
           `/${searchResult.chain}/proposal/${
             searchResult.proposalid.split('_')[0]
           }/${searchResult.proposalid.split('_')[1]}`
@@ -130,36 +119,29 @@ const SearchBarCommentPreviewRowComponent = (
   );
 };
 
-export const SearchBarCommentPreviewRow = withRouter(
-  SearchBarCommentPreviewRowComponent
-);
+export const SearchBarCommunityPreviewRow = (
+  props: SearchBarPreviewRowProps
+) => {
+  const { searchResult } = props;
+  const navigate = useCommonNavigate();
 
-class SearchBarCommunityPreviewRowComponent extends ClassComponent<SearchBarPreviewRowProps> {
-  view(vnode: ResultNode<SearchBarPreviewRowProps>) {
-    const { searchResult } = vnode.attrs;
-
-    return (
-      <div
-        className="SearchBarCommunityPreviewRow"
-        onClick={() => {
-          this.setRoute(
-            searchResult.address
-              ? `/${searchResult.address}`
-              : searchResult.id
-              ? `/${searchResult.id}`
-              : '/'
-          );
-        }}
-      >
-        <CommunityLabel community={searchResult} />
-      </div>
-    );
-  }
-}
-
-export const SearchBarCommunityPreviewRow = withRouter(
-  SearchBarCommunityPreviewRowComponent
-);
+  return (
+    <div
+      className="SearchBarCommunityPreviewRow"
+      onClick={() => {
+        navigate(
+          searchResult.address
+            ? `/${searchResult.address}`
+            : searchResult.id
+            ? `/${searchResult.id}`
+            : '/'
+        );
+      }}
+    >
+      <CommunityLabel community={searchResult} />
+    </div>
+  );
+};
 
 export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
   const { searchResult } = props;
