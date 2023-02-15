@@ -36,17 +36,17 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
-export async function addAllowDenyPermissionsForCommunityRole(
+export async function addAllowDenyPermissionsForMemberClass(
   role_name: Permission,
   chain_id: string,
   allow_permission: number | undefined,
   deny_permission: number | undefined
 ) {
   try {
-    console.log('addAllowDenyPermissionsForCommunityRole');
+    console.log('addAllowDenyPermissionsForMemberClass');
     const permissionsManager = new PermissionManager();
     // get community role object from the database
-    const communityRole = await models.CommunityRole.findOne({
+    const memberClass = await models.MemberClass.findOne({
       where: {
         chain_id,
         name: role_name,
@@ -56,20 +56,20 @@ export async function addAllowDenyPermissionsForCommunityRole(
     let allowPermission;
     if (deny_permission) {
       denyPermission = permissionsManager.addDenyPermission(
-        BigInt(communityRole?.deny || 0),
+        BigInt(memberClass?.deny || 0),
         deny_permission
       );
-      communityRole.deny = denyPermission;
+      memberClass.deny = denyPermission;
     }
     if (allow_permission) {
       allowPermission = permissionsManager.addAllowPermission(
-        BigInt(communityRole?.allow || 0),
+        BigInt(memberClass?.allow || 0),
         allow_permission
       );
-      communityRole.allow = allowPermission;
+      memberClass.allow = allowPermission;
     }
     // save community role object to the database
-    const updatedRole = await communityRole.save();
+    const updatedRole = await memberClass.save();
     console.log('updatedRole', updatedRole);
   } catch (err) {
     throw new Error(err);
@@ -373,12 +373,12 @@ export interface AssignRoleArgs {
 }
 
 export const assignRole = async (args: AssignRoleArgs) => {
-  const communityRole = await models.CommunityRole.findOne({
+  const memberClass = await models.MemberClass.findOne({
     where: { chain_id: args.chainOrCommObj.chain_id, name: args.role },
   });
-  const role = await models['RoleAssignment'].create({
+  const role = await models['Membership'].create({
     address_id: args.address_id,
-    community_role_id: communityRole.id,
+    member_class_id: memberClass.id,
   });
 
   return role;
@@ -404,9 +404,9 @@ export const updateRole = async (args: AssignRoleArgs) => {
   else if (currentRole.toJSON().permission === 'moderator') {
     // Demotion
     if (args.role === 'member') {
-      role = await models['RoleAssignment'].destroy({
+      role = await models['Membership'].destroy({
         where: {
-          community_role_id: currentRole.toJSON().community_role_id,
+          member_class_id: currentRole.toJSON().member_class_id,
           address_id: args.address_id,
         },
       });

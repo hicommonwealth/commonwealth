@@ -2,14 +2,14 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type {
-  CommunityRoleAttributes,
-  CommunityRoleInstance,
-} from './community_role';
+  MemberClassAttributes,
+  MemberClassInstance,
+} from './member_class';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type RoleAssignmentAttributes = {
+export type MembershipAttributes = {
   id?: number;
-  community_role_id: number;
+  member_class_id: number;
   address_id: number;
   created_at?: Date;
   updated_at?: Date;
@@ -17,26 +17,26 @@ export type RoleAssignmentAttributes = {
   is_user_default?: boolean;
 
   // associations
-  CommunityRole?: CommunityRoleAttributes;
+  MemberClass?: MemberClassAttributes;
   Address?: AddressAttributes;
 };
 
-export type RoleAssignmentInstance = ModelInstance<RoleAssignmentAttributes> & {
-  getCommunityRole: Sequelize.BelongsToGetAssociationMixin<CommunityRoleInstance>;
+export type MembershipInstance = ModelInstance<MembershipAttributes> & {
+  getMemberClass: Sequelize.BelongsToGetAssociationMixin<MemberClassInstance>;
   getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>;
 };
 
-export type RoleAssignmentModelStatic = ModelStatic<RoleAssignmentInstance>;
+export type MembershipModelStatic = ModelStatic<MembershipInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): RoleAssignmentModelStatic => {
-  const RoleAssignment = <RoleAssignmentModelStatic>sequelize.define(
-    'RoleAssignment',
+): MembershipModelStatic => {
+  const Membership = <MembershipModelStatic>sequelize.define(
+    'Membership',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      community_role_id: { type: dataTypes.INTEGER, allowNull: false },
+      member_class_id: { type: dataTypes.INTEGER, allowNull: false },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -50,22 +50,22 @@ export default (
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      tableName: 'RoleAssignments',
+      tableName: 'Memberships',
       underscored: true,
-      indexes: [{ fields: ['community_role_id'] }, { fields: ['address_id'] }],
+      indexes: [{ fields: ['member_class_id'] }, { fields: ['address_id'] }],
     }
   );
 
-  RoleAssignment.associate = (models) => {
-    models.RoleAssignment.belongsTo(models.CommunityRole, {
-      foreignKey: 'community_role_id',
+  Membership.associate = (models) => {
+    models.Membership.belongsTo(models.MemberClass, {
+      foreignKey: 'member_class_id',
       targetKey: 'id',
     });
-    models.RoleAssignment.belongsTo(models.Address, {
+    models.Membership.belongsTo(models.Address, {
       foreignKey: 'address_id',
       targetKey: 'id',
     });
   };
 
-  return RoleAssignment;
+  return Membership;
 };

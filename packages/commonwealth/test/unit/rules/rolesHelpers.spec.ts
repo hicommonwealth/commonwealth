@@ -1,10 +1,10 @@
 import { assert } from 'chai';
-import type { CommunityRoleAttributes } from '../../../server/models/community_role';
-import { getHighestRoleFromCommunityRoles } from '../../../server/util/roles';
+import type { MemberClassAttributes } from '../../../server/models/member_class';
+import { getHighestRoleFromMemberClasss } from '../../../server/util/roles';
 
-describe('getHighestRoleFromCommunityRoles() unit tests', () => {
+describe('getHighestRoleFromMemberClasss() unit tests', () => {
   it('should return highest role', async () => {
-    const roles: CommunityRoleAttributes[] = [
+    const roles: MemberClassAttributes[] = [
       {
         name: 'member',
         chain_id: 'ethereum',
@@ -24,7 +24,7 @@ describe('getHighestRoleFromCommunityRoles() unit tests', () => {
         deny: BigInt(0),
       },
     ];
-    const role = await getHighestRoleFromCommunityRoles(roles);
+    const role = await getHighestRoleFromMemberClasss(roles);
     assert.equal(role.name, 'admin');
   });
 });

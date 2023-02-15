@@ -206,7 +206,7 @@ const editComment = async (
                 chain: mention[0],
                 address: mention[1],
               },
-              include: [models.User, models.RoleAssignment],
+              include: [models.User, models.Membership],
             });
             return user;
           } catch (err) {

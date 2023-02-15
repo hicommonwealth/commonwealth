@@ -10,7 +10,7 @@ import {
   CWAvatar,
   CWJdenticon,
 } from '../views/components/component_kit/cw_avatar';
-import type CommunityRole from './CommunityRole';
+import type MemberClass from './MemberClass';
 
 class ChainInfo {
   public readonly id: string;
@@ -48,7 +48,7 @@ class ChainInfo {
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
-  public communityRoles: CommunityRole[];
+  public memberClasss: MemberClass[];
 
   public get node() {
     return this.ChainNode;
@@ -87,7 +87,7 @@ class ChainInfo {
     tokenName,
     adminOnlyPolling,
     discord_config_id,
-    communityRoles,
+    memberClasss,
   }) {
     this.id = id;
     this.network = network;
@@ -122,7 +122,7 @@ class ChainInfo {
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
-    this.communityRoles = communityRoles;
+    this.memberClasss = memberClasss;
   }
 
   public static fromJSON({
@@ -158,7 +158,7 @@ class ChainInfo {
     ChainNode,
     admin_only_polling,
     discord_config_id,
-    community_roles,
+    member_classs,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -205,7 +205,7 @@ class ChainInfo {
       ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
-      communityRoles: community_roles,
+      memberClasss: member_classs,
     });
   }
 

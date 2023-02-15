@@ -60,7 +60,7 @@
 //       Contracts: [],
 //       ChainNode: [],
 //       admin_only_polling: false,
-//       community_roles: [],
+//       member_classs: [],
 //     });
 
 //     assert.deepEqual(

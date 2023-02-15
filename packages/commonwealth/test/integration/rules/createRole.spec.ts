@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import models from 'commonwealth/server/database';
 import {
-  createDefaultCommunityRoles,
+  createDefaultMemberClasss,
   createRole,
 } from 'commonwealth/server/util/roles';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
@@ -71,7 +71,7 @@ describe('createRole tests', () => {
     } catch (error) {
       assert.deepEqual(
         error.message,
-        'insert or update on table "RoleAssignments" violates foreign key constraint "RoleAssignments_address_id_fkey"'
+        'insert or update on table "Memberships" violates foreign key constraint "Memberships_address_id_fkey"'
       );
     }
   });
@@ -82,7 +82,7 @@ describe('createRole tests', () => {
     } catch (error) {
       assert.deepEqual(
         error.message,
-        'insert or update on table "CommunityRoles" violates foreign key constraint "CommunityRoles_chain_id_fkey"'
+        'insert or update on table "MemberClasss" violates foreign key constraint "MemberClasss_chain_id_fkey"'
       );
     }
   });
@@ -103,8 +103,8 @@ describe('createRole tests', () => {
       default_deny_permissions: BigInt(2048),
     });
 
-    await createDefaultCommunityRoles(models, chainObj.id);
-    const roles = await models.CommunityRole.findAll({
+    await createDefaultMemberClasss(models, chainObj.id);
+    const roles = await models.MemberClass.findAll({
       where: { chain_id: chainObj.id },
     });
     assert.deepEqual(roles.length, 3);

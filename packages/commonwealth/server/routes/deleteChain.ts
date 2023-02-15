@@ -192,7 +192,7 @@ const deleteChain = async (
         transaction: t,
       });
 
-      await models.RoleAssignment.destroy({
+      await models.Membership.destroy({
         where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
         transaction: t,
       });
@@ -202,20 +202,20 @@ const deleteChain = async (
         transaction: t,
       });
 
-      const communityRoles = await models.CommunityRole.findAll({
+      const memberClasss = await models.MemberClass.findAll({
         where: { chain_id: chain.id },
         transaction: t,
       });
 
-      await models.RoleAssignment.destroy({
+      await models.Membership.destroy({
         where: {
-          community_role_id: { [Op.in]: communityRoles.map((r) => r.id) },
+          member_class_id: { [Op.in]: memberClasss.map((r) => r.id) },
         },
         transaction: t,
       });
 
       await Promise.all(
-        communityRoles.map((r) => r.destroy({ transaction: t }))
+        memberClasss.map((r) => r.destroy({ transaction: t }))
       );
 
       await models.Chain.destroy({

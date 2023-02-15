@@ -15,10 +15,10 @@ export async function getRoles(models: DB, req: Request, res: Response) {
   }
 
   const result = await models.sequelize.query(
-    `SELECT "RoleAssignments".*, "CommunityRoles".* FROM "Profiles"
+    `SELECT "Memberships".*, "MemberClasss".* FROM "Profiles"
     JOIN "Addresses" ON "Addresses"."user_id" = "Profiles"."user_id"
-    JOIN "RoleAssignments" ON "RoleAssignments"."address_id" = "Profiles"."user_id"
-    JOIN "CommunityRoles" ON "RoleAssignments"."community_role_id" = "CommunityRoles"."id"
+    JOIN "Memberships" ON "Memberships"."address_id" = "Profiles"."user_id"
+    JOIN "MemberClasss" ON "Memberships"."member_class_id" = "MemberClasss"."id"
     WHERE "Addresses"."address" = :address`,
     {
       replacements: { address },
@@ -55,16 +55,16 @@ export async function createRole(models: DB, req: Request, res: Response) {
   }
 
   const result = await models.sequelize.query(
-    `INSERT INTO "RoleAssignments" (
+    `INSERT INTO "Memberships" (
       "address_id",
-      "community_role_id",
+      "member_class_id",
       "created_at",
       "updated_at"
     )
     SELECT "Addresses"."user_id", :role_id, NOW(), NOW()
     FROM "Addresses"
     WHERE "Addresses"."address" = :address
-    RETURNING "address_id", "community_role_id"
+    RETURNING "address_id", "member_class_id"
     `,
     {
       replacements: { address, role_id },
@@ -102,12 +102,12 @@ export async function updateRole(models: DB, req: Request, res: Response) {
   }
 
   const result = await models.sequelize.query(
-    `UPDATE "RoleAssignments"
-    SET "community_role_id" = :role_id, "updated_at" = NOW()
+    `UPDATE "Memberships"
+    SET "member_class_id" = :role_id, "updated_at" = NOW()
     FROM "Addresses" a
     JOIN (SELECT "user_id", "address" FROM "Addresses") b ON a."address" = b."address"
     WHERE "address_id" = a."user_id" AND a."address" = :address
-    RETURNING "address_id", "community_role_id"
+    RETURNING "address_id", "member_class_id"
     `,
     {
       replacements: { address, role_id },
@@ -131,9 +131,9 @@ export async function getPermissions(models: DB, req: Request, res: Response) {
   const result = await models.sequelize.query(
     `SELECT "Permissions".* FROM "Profiles"
     JOIN "Addresses" ON "Addresses"."user_id" = "Profiles"."user_id"
-    JOIN "RoleAssignments" ON "RoleAssignments"."address_id" = "Profiles"."user_id"
-    JOIN "CommunityRoles" ON "RoleAssignments"."community_role_id" = "CommunityRoles"."id"
-    JOIN "Permissions" ON "Permissions"."community_role_id" = "CommunityRoles"."id"
+    JOIN "Memberships" ON "Memberships"."address_id" = "Profiles"."user_id"
+    JOIN "MemberClasss" ON "Memberships"."member_class_id" = "MemberClasss"."id"
+    JOIN "Permissions" ON "Permissions"."member_class_id" = "MemberClasss"."id"
     WHERE "Addresses"."address" = :address`,
     {
       replacements: { address },
@@ -177,17 +177,17 @@ export async function createPermission(
 
   const result = await models.sequelize.query(
     `INSERT INTO "Permissions" (
-      "community_role_id",
+      "member_class_id",
       "action",
       "created_at",
       "updated_at"
     )
-    SELECT "CommunityRoles"."id", :permission_id, NOW(), NOW()
-    FROM "RoleAssignments"
-    JOIN "CommunityRoles" ON "RoleAssignments"."community_role_id" = "CommunityRoles"."id"
-    JOIN "Addresses" ON "Addresses"."user_id" = "RoleAssignments"."address_id"
+    SELECT "MemberClasss"."id", :permission_id, NOW(), NOW()
+    FROM "Memberships"
+    JOIN "MemberClasss" ON "Memberships"."member_class_id" = "MemberClasss"."id"
+    JOIN "Addresses" ON "Addresses"."user_id" = "Memberships"."address_id"
     WHERE "Addresses"."address" = :address
-    RETURNING "community_role_id", "action"
+    RETURNING "member_class_id", "action"
     `,
     {
       replacements: { address, permission_id },
@@ -230,11 +230,11 @@ export async function updatePermission(
   const result = await models.sequelize.query(
     `UPDATE "Permissions"
     SET "action" = :permission
-    FROM "RoleAssignments"
-    JOIN "CommunityRoles" ON "RoleAssignments"."community_role_id" = "CommunityRoles"."id"
-    JOIN "Addresses" ON "Addresses"."user_id" = "RoleAssignments"."address_id"
-    WHERE "Permissions"."community_role_id" = "CommunityRoles"."id" AND "Addresses"."address" = :address
-    RETURNING "community_role_id", "action"
+    FROM "Memberships"
+    JOIN "MemberClasss" ON "Memberships"."member_class_id" = "MemberClasss"."id"
+    JOIN "Addresses" ON "Addresses"."user_id" = "Memberships"."address_id"
+    WHERE "Permissions"."member_class_id" = "MemberClasss"."id" AND "Addresses"."address" = :address
+    RETURNING "member_class_id", "action"
     `,
     {
       replacements: { address, permission_id },

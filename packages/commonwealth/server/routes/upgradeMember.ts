@@ -74,8 +74,8 @@ const upgradeMember = async (
   }
   let newMember: RoleInstanceWithPermission;
   if (ValidRoles.includes(new_role)) {
-    // “Demotion” should remove all RoleAssignments above the new role.
-    // “Promotion” should create new RoleAssignment above the existing role.
+    // “Demotion” should remove all Memberships above the new role.
+    // “Promotion” should create new Membership above the existing role.
     const currentRole = member.permission;
     // give each permissions a integer ranking
     const roleRanking = {
@@ -103,16 +103,16 @@ const upgradeMember = async (
       // handle demotions
       while (newRoleRanking < currentRoleRanking) {
         const roleToRemove = rankingToRole[currentRoleRanking];
-        const communityRole = await models.CommunityRole.findOne({
+        const memberClass = await models.MemberClass.findOne({
           where: {
             chain_id: chain.id,
             name: roleToRemove,
           },
         });
-        await models.RoleAssignment.destroy({
+        await models.Membership.destroy({
           where: {
             address_id: memberAddress.id,
-            community_role_id: communityRole.id,
+            member_class_id: memberClass.id,
           },
         });
         currentRoleRanking -= 1;

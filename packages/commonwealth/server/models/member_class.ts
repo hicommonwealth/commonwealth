@@ -3,12 +3,12 @@ import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
 import type { Permission } from './role';
 import type {
-  RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-} from './role_assignment';
+  MembershipAttributes,
+  MembershipInstance,
+} from './membership';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type CommunityRoleAttributes = {
+export type MemberClassAttributes = {
   name: Permission;
   id?: number;
   chain_id: string;
@@ -18,22 +18,22 @@ export type CommunityRoleAttributes = {
   updated_at?: Date;
 
   // associations
-  RoleAssignments?: RoleAssignmentAttributes[];
+  Memberships?: MembershipAttributes[];
   Chain?: ChainAttributes;
 };
 
-export type CommunityRoleInstance = ModelInstance<CommunityRoleAttributes> & {
-  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
+export type MemberClassInstance = ModelInstance<MemberClassAttributes> & {
+  getMemberships: Sequelize.HasManyGetAssociationsMixin<MembershipInstance>;
 };
 
-export type CommunityRoleModelStatic = ModelStatic<CommunityRoleInstance>;
+export type MemberClassModelStatic = ModelStatic<MemberClassInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): CommunityRoleModelStatic => {
-  const CommunityRole = <CommunityRoleModelStatic>sequelize.define(
-    'CommunityRole',
+): MemberClassModelStatic => {
+  const MemberClass = <MemberClassModelStatic>sequelize.define(
+    'MemberClass',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       chain_id: { type: dataTypes.STRING, allowNull: false },
@@ -60,21 +60,21 @@ export default (
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      tableName: 'CommunityRoles',
+      tableName: 'MemberClasss',
       underscored: true,
       indexes: [{ fields: ['chain_id'] }],
     }
   );
 
-  CommunityRole.associate = (models) => {
-    models.CommunityRole.hasMany(models.RoleAssignment, {
-      foreignKey: 'community_role_id',
+  MemberClass.associate = (models) => {
+    models.MemberClass.hasMany(models.Membership, {
+      foreignKey: 'member_class_id',
     });
-    models.CommunityRole.belongsTo(models.Chain, {
+    models.MemberClass.belongsTo(models.Chain, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
   };
 
-  return CommunityRole;
+  return MemberClass;
 };

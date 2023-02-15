@@ -6,7 +6,6 @@ export const NotificationCategories = {
   NewComment: 'new-comment-creation',
   NewThread: 'new-thread-creation',
   NewCommunity: 'new-community-creation',
-  NewRoleCreation: 'new-role-creation',
   NewMention: 'new-mention',
   NewReaction: 'new-reaction',
   NewCollaboration: 'new-collaboration',

@@ -54,12 +54,12 @@ describe('All rule tests', () => {
 
   it('should pass all rule on admin + allowList', async () => {
     // assign admin role to loggedInAddr
-    const communityRole = await models.CommunityRole.findOne({
+    const memberClass = await models.MemberClass.findOne({
       where: { chain_id: chain, name: 'admin' },
     });
-    await models['RoleAssignment'].create({
+    await models['Membership'].create({
       address_id: loggedInAddrId,
-      community_role_id: communityRole.id,
+      member_class_id: memberClass.id,
     });
     const rule = {
       AllRule: [
@@ -79,12 +79,12 @@ describe('All rule tests', () => {
   });
 
   it('should fail all rule on admin subRule', async () => {
-    const communityRole = await models.CommunityRole.findOne({
+    const memberClass = await models.MemberClass.findOne({
       where: { chain_id: chain, name: 'member' },
     });
-    await models['RoleAssignment'].create({
+    await models['Membership'].create({
       address_id: loggedInAddrId,
-      community_role_id: communityRole.id,
+      member_class_id: memberClass.id,
     });
     const rule = {
       AllRule: [
@@ -104,12 +104,12 @@ describe('All rule tests', () => {
   });
 
   it('should fail all rule on allowList subRule', async () => {
-    const communityRole = await models.CommunityRole.findOne({
+    const memberClass = await models.MemberClass.findOne({
       where: { chain_id: chain, name: 'member' },
     });
-    await models['RoleAssignment'].create({
+    await models['Membership'].create({
       address_id: loggedInAddrId,
-      community_role_id: communityRole.id,
+      member_class_id: memberClass.id,
     });
     const rule = {
       AllRule: [

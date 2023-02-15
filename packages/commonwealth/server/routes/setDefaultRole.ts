@@ -38,10 +38,10 @@ const setDefaultRole = async (
   );
   if (!existingRole) return next(new AppError(Errors.RoleDNE));
 
-  const existingRoleInstanceToUpdate = await models.RoleAssignment.findOne({
+  const existingRoleInstanceToUpdate = await models.Membership.findOne({
     where: {
       address_id: validAddress.id,
-      community_role_id: existingRole.toJSON().community_role_id,
+      member_class_id: existingRole.toJSON().member_class_id,
     },
   });
 
@@ -56,18 +56,18 @@ const setDefaultRole = async (
     },
   });
 
-  const communityRolesToUpdate = await models.CommunityRole.findAll({
+  const memberClasssToUpdate = await models.MemberClass.findAll({
     where: {
       chain_id: chain.id,
     },
   });
 
-  await models.RoleAssignment.update(
+  await models.Membership.update(
     { is_user_default: false },
     {
       where: {
         address_id: { [Op.in]: otherAddresses.map((a) => a.id) },
-        community_role_id: { [Op.in]: communityRolesToUpdate.map((r) => r.id) },
+        member_class_id: { [Op.in]: memberClasssToUpdate.map((r) => r.id) },
       },
     }
   );

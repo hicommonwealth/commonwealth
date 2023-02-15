@@ -1,6 +1,6 @@
 import { Permission } from 'server/models/role';
 
-class CommunityRole {
+class MemberClass {
   public readonly id: number;
   public readonly name: Permission;
   public readonly chain_id: string;
@@ -28,7 +28,7 @@ class CommunityRole {
     createdAt,
     updatedAt,
   }) {
-    return new CommunityRole({
+    return new MemberClass({
       id,
       name,
       chain_id,
@@ -40,4 +40,4 @@ class CommunityRole {
   }
 }
 
-export default CommunityRole;
+export default MemberClass;

@@ -23,7 +23,7 @@ import { success } from '../types';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 
 import type { RoleInstanceWithPermission } from '../util/roles';
-import { createDefaultCommunityRoles, createRole } from '../util/roles';
+import { createDefaultMemberClasss, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 
 const MAX_IMAGE_SIZE_KB = 500;
@@ -340,7 +340,7 @@ const createChain = async (
     has_chain_events_listener: network === 'aave' || network === 'compound',
   });
 
-  await createDefaultCommunityRoles(models, chain.id);
+  await createDefaultMemberClasss(models, chain.id);
 
   if (req.body.address) {
     const [contract] = await models.Contract.findOrCreate({

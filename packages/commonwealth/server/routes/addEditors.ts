@@ -50,7 +50,7 @@ const addEditors = async (
     Object.values(editors).map((editor: any) => {
       return models.Address.findOne({
         where: { id: editor.id },
-        include: [models.RoleAssignment, models.User],
+        include: [models.Membership, models.User],
       });
     })
   );
@@ -71,7 +71,7 @@ const addEditors = async (
     });
     await Promise.all(
       uniqueCollaborators.map(async (collaborator) => {
-        if (!collaborator.RoleAssignments || !collaborator.User) {
+        if (!collaborator.Memberships || !collaborator.User) {
           return null;
         }
         const isMember = await findOneRole(

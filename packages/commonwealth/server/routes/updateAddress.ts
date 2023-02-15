@@ -55,7 +55,7 @@ const updateAddress = async (
         );
 
         // update address in roles
-        await models.RoleAssignment.update(
+        await models.Membership.update(
           { address_id: newAddressId },
           { where: { address_id: ghostAddressId }, transaction }
         );
@@ -67,7 +67,7 @@ const updateAddress = async (
         );
 
         // delete role assignment by address
-        await models.RoleAssignment.destroy({
+        await models.Membership.destroy({
           where: { address_id: ghostAddressId },
           transaction,
         });

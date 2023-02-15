@@ -8,9 +8,9 @@ import type {
 } from './offchain_profile';
 import type { ProfileInstance } from './profile';
 import type {
-  RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-} from './role_assignment';
+  MembershipAttributes,
+  MembershipInstance,
+} from './membership';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes, UserInstance } from './user';
@@ -38,7 +38,7 @@ export type AddressAttributes = {
   Chain?: ChainAttributes;
   User?: UserAttributes;
   OffchainProfile?: OffchainProfileAttributes;
-  RoleAssignments?: RoleAssignmentAttributes[];
+  Memberships?: MembershipAttributes[];
   SsoToken?: SsoTokenAttributes;
 };
 
@@ -47,7 +47,7 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
-  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
+  getMemberships: Sequelize.HasManyGetAssociationsMixin<MembershipInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
@@ -134,7 +134,7 @@ export default (
     });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasOne(models.SsoToken);
-    models.Address.hasMany(models.RoleAssignment, { foreignKey: 'address_id' });
+    models.Address.hasMany(models.Membership, { foreignKey: 'address_id' });
     models.Address.belongsToMany(models.Thread, {
       through: models.Collaboration,
       as: 'collaboration',
