@@ -17,6 +17,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { getBatchNotificationFields } from './helpers';
 import { UserGallery } from '../../components/user/user_gallery';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useNavigate } from 'react-router';
 
 export const ChainEventNotificationRow = (props: NotificationRowProps) => {
   const { notification, onListPage } = props;
@@ -155,7 +156,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
 
   const { category } = notification.subscription;
 
-  const navigate = useCommonNavigate();
+  const navigate = useNavigate();
 
   const notificationData = [notification].map((notif) =>
     typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
@@ -177,6 +178,10 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
     path = path
       .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
       .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
+  } else {
+    path = path
+      .replace(`https://commonwealth.im/`, '/')
+      .replace(`http://localhost:8080/`, '/');
   }
 
   return (
