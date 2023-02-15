@@ -54,7 +54,7 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
               setDemocracyVoteAmount(parseFloat(e.target.value));
             }}
           />
-          {app.user.activeAddressAccount instanceof SubstrateAccount && (
+          {app.user.activeAddressAccount && (
             <BalanceInfo account={app.user.activeAddressAccount} />
           )}
         </div>

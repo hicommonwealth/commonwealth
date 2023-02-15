@@ -52,7 +52,7 @@ export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
         balancesCache[vote.account.address] = balance;
         m.redraw();
       } else {
-        vote.account.balance.then((b) => {
+        app.chain.chain.getBalance(vote.account).then((b) => {
           balance = b;
           balancesCache[vote.account.address] = formatCoin(b, true);
           m.redraw();
