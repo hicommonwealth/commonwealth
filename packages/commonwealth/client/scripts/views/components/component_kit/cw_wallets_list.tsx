@@ -241,6 +241,9 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 darkMode={darkMode}
                 onClick={async () => {
                   await wallet.enable();
+                  console.log(
+                    'this happens first but the code is going through, it not waits for the state update'
+                  );
                   setSelectedWallet(wallet);
 
                   if (wallet.chain === 'substrate') {
@@ -310,6 +313,9 @@ export const CWWalletsList = (props: WalletsListProps) => {
                         }
                       }
 
+                      console.log(
+                        'this is called and in login modal wallet is not set yet'
+                      );
                       await handleNormalWalletLogin(wallet, address);
                     }
                   }
