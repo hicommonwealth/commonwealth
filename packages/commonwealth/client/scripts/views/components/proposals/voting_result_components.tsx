@@ -30,6 +30,9 @@ type VotingResultProps = {
 export const VotingResult = (props: VotingResultProps) => {
   const { abstainVotes, noVotes, yesVotes, proposal } = props;
 
+  console.log('yes', yesVotes);
+  console.log('no', noVotes);
+
   return (
     <div className="VotingResult">
       <div className="results-column-yes">
