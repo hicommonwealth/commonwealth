@@ -16,6 +16,7 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWText } from '../components/component_kit/cw_text';
 import { useCommonNavigate } from 'navigation/helpers';
 import { NotificationRow } from '../pages/notifications/notification_row';
+import { isWindowSmallInclusive } from '../components/component_kit/helpers';
 
 export const NotificationsMenu = () => {
   const navigate = useCommonNavigate();
@@ -34,7 +35,11 @@ export const NotificationsMenu = () => {
       <div className="notification-list">
         {allNotifications.length > 0 ? (
           <Virtuoso
-            style={{ height: '480px', width: '294px' }}
+            style={
+              isWindowSmallInclusive(window.innerWidth)
+                ? { height: '100%', width: '100%' }
+                : { height: '480px', width: '294px' }
+            }
             data={allNotifications}
             itemContent={(i, data) => (
               <NotificationRow key={i} notification={data} />
