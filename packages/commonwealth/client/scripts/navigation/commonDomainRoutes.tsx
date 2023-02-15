@@ -27,7 +27,7 @@ const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
-const DiscussionsPage = lazy(() => import('views/pages/discussions'));
+const DiscussionsPage = lazy(() => import('views/pages/discussions/DiscussionsPage'));
 const ViewThreadPage = lazy(() => import('views/pages/view_thread/index'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(

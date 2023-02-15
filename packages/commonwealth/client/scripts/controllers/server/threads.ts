@@ -712,6 +712,8 @@ class ThreadsController {
     if (threads.length < DEFAULT_PAGE_SIZE) {
       this.listingStore.depleteListing(options);
     }
+
+    return modeledThreads
   }
 
   public initialize(initialThreads = [], numVotingThreads, reset) {

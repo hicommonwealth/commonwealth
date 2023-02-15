@@ -80,9 +80,9 @@ export const StagesMenu = (props: StagesMenuProps) => {
                 }}
               />
               <CWDivider />
-              {stages.map((targetStage) => (
+              {stages.map((targetStage, i) => (
                 <ThreadsFilterMenuItem
-                  key={stage}
+                  key={i}
                   isSelected={stage === targetStage}
                   onClick={(e) => {
                     e.preventDefault();
