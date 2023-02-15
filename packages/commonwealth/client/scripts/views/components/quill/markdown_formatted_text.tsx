@@ -1,7 +1,8 @@
 import React from 'react';
 /* eslint-disable no-useless-escape */
 
-import { render, redraw, rootRender } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, render, redraw, rootRender } from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';
 import DOMPurify from 'dompurify';
@@ -23,7 +24,7 @@ marked.setOptions({
   xhtml: true,
 });
 
-type MarkdownFormattedTextProps = {
+type MarkdownFormattedTextAttrs = {
   collapse?: boolean;
   doc: string;
   hideFormatting?: boolean;
@@ -32,159 +33,172 @@ type MarkdownFormattedTextProps = {
   cutoffLines?: number;
 };
 
-export const MarkdownFormattedText = (props: MarkdownFormattedTextProps) => {
-  const {
-    doc,
-    hideFormatting,
-    collapse,
-    searchTerm,
-    openLinksInNewTab,
-    cutoffLines,
-  } = props;
+export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextAttrs> {
+  private cachedDocWithHighlights: string;
+  private cachedResultWithHighlights;
+  truncatedDoc;
+  isTruncated: boolean;
 
-  const [cachedDocWithHighlights, setCachedDocWithHighlights] =
-    React.useState<string>();
-  const [cachedResultWithHighlights, setCachedResultWithHighlights] =
-    React.useState<any>();
-  const [truncatedDoc, setTruncatedDoc] = React.useState<any>(
-    cutoffLines && cutoffLines < countLinesMarkdown(doc)
-      ? doc.slice(0, doc.split('\n', cutoffLines).join('\n').length)
-      : doc
-  );
-  const [isTruncated, setIsTruncated] = React.useState<boolean>(false);
-
-  if (!doc) return;
-
-  const toggleDisplay = () => {
-    setIsTruncated(!isTruncated);
-
-    if (isTruncated) {
-      setTruncatedDoc(
-        doc.slice(0, doc.split('\n', cutoffLines).join('\n').length)
+  oninit(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
+    this.isTruncated =
+      vnode.attrs.cutoffLines &&
+      vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
+    if (this.isTruncated) {
+      this.truncatedDoc = vnode.attrs.doc.slice(
+        0,
+        vnode.attrs.doc.split('\n', vnode.attrs.cutoffLines).join('\n').length
       );
     } else {
-      setTruncatedDoc(doc);
+      this.truncatedDoc = vnode.attrs.doc;
     }
-    redraw();
-  };
+  }
 
-  renderer.link = (href, title, text) => {
-    return `<a ${
-      href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
-    } ${openLinksInNewTab ? 'target="_blank"' : ''} href="${href}">${text}</a>`;
-  };
+  view(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
+    const {
+      doc,
+      hideFormatting,
+      collapse,
+      searchTerm,
+      openLinksInNewTab,
+      cutoffLines,
+    } = vnode.attrs;
 
-  // if we're showing highlighted search terms, render the doc once, and cache the result
-  if (searchTerm) {
-    // TODO: Switch trim system to match QFT component
-    if (JSON.stringify(doc) !== cachedDocWithHighlights) {
-      const unsanitized = marked.parse(doc.toString());
+    if (!doc) return;
 
-      const sanitized = DOMPurify.sanitize(unsanitized, {
-        ALLOWED_TAGS: ['a'],
-        ADD_ATTR: ['target'],
-      });
+    const toggleDisplay = () => {
+      this.isTruncated = !this.isTruncated;
+      if (this.isTruncated) {
+        this.truncatedDoc = doc.slice(
+          0,
+          doc.split('\n', cutoffLines).join('\n').length
+        );
+      } else {
+        this.truncatedDoc = doc;
+      }
+      redraw();
+    };
 
-      const vnodes = render.trust(sanitized);
+    renderer.link = (href, title, text) => {
+      return `<a ${
+        href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
+      } ${
+        openLinksInNewTab ? 'target="_blank"' : ''
+      } href="${href}">${text}</a>`;
+    };
 
-      const root = document.createElement('div');
+    // if we're showing highlighted search terms, render the doc once, and cache the result
+    if (searchTerm) {
+      // TODO: Switch trim system to match QFT component
+      if (JSON.stringify(doc) !== this.cachedDocWithHighlights) {
+        const unsanitized = marked.parse(doc.toString());
 
-      rootRender(root, vnodes);
-
-      const textToHighlight = root.innerText
-        .replace(/\n/g, ' ')
-        .replace(/\ +/g, ' ');
-
-      const chunks = findAll({
-        searchWords: [searchTerm.trim()],
-        textToHighlight,
-      });
-
-      setCachedDocWithHighlights(JSON.stringify(doc));
-
-      setCachedResultWithHighlights(
-        chunks.map(({ end, highlight, start }, index) => {
-          const middle = 15;
-
-          const subString = textToHighlight.substr(start, end - start);
-
-          let text = smartTruncate(
-            subString,
-            chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
-            chunks.length <= 1
-              ? {}
-              : index === 0
-              ? { position: 0 }
-              : index === chunks.length - 1
-              ? {}
-              : { position: middle }
-          );
-
-          if (subString[subString.length - 1] === ' ') {
-            text += ' ';
-          }
-
-          if (subString[0] === ' ') {
-            text = ` ${text}`;
-          }
-
-          return highlight ? <mark>{text}</mark> : <span>{text}</span>;
-        })
-      );
-    }
-
-    return (
-      <div
-        className={getClasses<{ collapsed?: boolean }>(
-          { collapsed: !!collapse },
-          'MarkdownFormattedText'
-        )}
-      >
-        {cachedResultWithHighlights}
-      </div>
-    );
-  } else {
-    if (!doc) return <></>;
-    if (isTruncated) {
-      setTruncatedDoc(
-        doc.slice(0, doc.split('\n', cutoffLines).join('\n').length)
-      );
-    }
-    if (!truncatedDoc) return <></>;
-
-    const unsanitized = marked.parse(truncatedDoc.toString());
-
-    const sanitized = hideFormatting
-      ? DOMPurify.sanitize(unsanitized, {
+        const sanitized = DOMPurify.sanitize(unsanitized, {
           ALLOWED_TAGS: ['a'],
-          ADD_ATTR: ['target'],
-        })
-      : DOMPurify.sanitize(unsanitized, {
-          USE_PROFILES: { html: true },
           ADD_ATTR: ['target'],
         });
 
-    const results = render.trust(sanitized);
+        const vnodes = render.trust(sanitized);
 
-    return (
-      <>
+        const root = document.createElement('div');
+
+        rootRender(root, vnodes);
+
+        const textToHighlight = root.innerText
+          .replace(/\n/g, ' ')
+          .replace(/\ +/g, ' ');
+
+        const chunks = findAll({
+          searchWords: [searchTerm.trim()],
+          textToHighlight,
+        });
+
+        this.cachedDocWithHighlights = JSON.stringify(doc);
+
+        this.cachedResultWithHighlights = chunks.map(
+          ({ end, highlight, start }, index) => {
+            const middle = 15;
+
+            const subString = textToHighlight.substr(start, end - start);
+
+            let text = smartTruncate(
+              subString,
+              chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
+              chunks.length <= 1
+                ? {}
+                : index === 0
+                ? { position: 0 }
+                : index === chunks.length - 1
+                ? {}
+                : { position: middle }
+            );
+
+            if (subString[subString.length - 1] === ' ') {
+              text += ' ';
+            }
+
+            if (subString[0] === ' ') {
+              text = ` ${text}`;
+            }
+
+            return highlight ? <mark>{text}</mark> : <span>{text}</span>;
+          }
+        );
+      }
+
+      return (
         <div
           className={getClasses<{ collapsed?: boolean }>(
             { collapsed: !!collapse },
             'MarkdownFormattedText'
           )}
         >
-          {results}
+          {this.cachedResultWithHighlights}
         </div>
-        {isTruncated && (
-          <div className="show-more-button-wrapper">
-            <div className="show-more-button" onClick={toggleDisplay}>
-              <CWIcon iconName="plus" iconSize="small" />
-              <div className="show-more-text">Show More</div>
-            </div>
+      );
+    } else {
+      if (!doc) return <></>;
+      if (this.isTruncated) {
+        this.truncatedDoc = doc.slice(
+          0,
+          doc.split('\n', cutoffLines).join('\n').length
+        );
+      }
+      if (!this.truncatedDoc) return <></>;
+
+      const unsanitized = marked.parse(this.truncatedDoc.toString());
+
+      const sanitized = hideFormatting
+        ? DOMPurify.sanitize(unsanitized, {
+            ALLOWED_TAGS: ['a'],
+            ADD_ATTR: ['target'],
+          })
+        : DOMPurify.sanitize(unsanitized, {
+            USE_PROFILES: { html: true },
+            ADD_ATTR: ['target'],
+          });
+
+      const results = render.trust(sanitized);
+
+      return (
+        <>
+          <div
+            className={getClasses<{ collapsed?: boolean }>(
+              { collapsed: !!collapse },
+              'MarkdownFormattedText'
+            )}
+          >
+            {results}
           </div>
-        )}
-      </>
-    );
+          {this.isTruncated && (
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div className="show-more-text">Show More</div>
+              </div>
+            </div>
+          )}
+        </>
+      );
+    }
   }
-};
+}
