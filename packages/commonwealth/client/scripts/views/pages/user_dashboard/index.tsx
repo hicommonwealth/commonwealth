@@ -51,10 +51,9 @@ const UserDashboard = (props: UserDashboardProps) => {
       : DashboardViews.Global;
 
   React.useEffect(() => {
-
-      if (!activePage || activePage !== subpage) {
-        setActivePage(subpage);
-      }
+    if (!activePage || activePage !== subpage) {
+      setActivePage(subpage);
+    }
   }, [activePage]);
 
   return (
@@ -96,8 +95,8 @@ const UserDashboard = (props: UserDashboardProps) => {
             </CWTabBar>
           </div>
           <>
-          {/* TODO: add filter functionality */}
-          {/* <CWPopover
+            {/* TODO: add filter functionality */}
+            {/* <CWPopover
               trigger={
                 <CWButton
                   buttonType="mini-white"

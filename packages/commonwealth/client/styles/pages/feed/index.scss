@@ -7,9 +7,9 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-  
+
     @include contentPadding;
-  
+
     .h3 {
       margin-bottom: 16px;
     }

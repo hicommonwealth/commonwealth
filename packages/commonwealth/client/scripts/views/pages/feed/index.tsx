@@ -19,7 +19,10 @@ class FeedPage extends ClassComponent {
       const activity = await fetchActivity(DashboardViews.Global);
       const formattedData = activity.result
         .map((item) => DashboardActivityNotification.fromJSON(item))
-        .filter((item) => JSON.parse(item.notificationData).chain_id === app.activeChainId());
+        .filter(
+          (item) =>
+            JSON.parse(item.notificationData).chain_id === app.activeChainId()
+        );
       return formattedData;
     } catch (err) {
       return err;
@@ -39,12 +42,16 @@ class FeedPage extends ClassComponent {
   };
 
   private getCombinedFeed = async () => {
-    return Promise.all([this.getGlobalFeed(), this.getChainEvents()]).then((result) => {
-      return {
-        result: this.sortFeed(result[0], result[1]),
-      }
-    }).catch((err) => { return err });
-  }
+    return Promise.all([this.getGlobalFeed(), this.getChainEvents()])
+      .then((result) => {
+        return {
+          result: this.sortFeed(result[0], result[1]),
+        };
+      })
+      .catch((err) => {
+        return err;
+      });
+  };
 
   private sortFeed = (globalFeed, chainEvents) => {
     let sortedFeed = [];
@@ -60,7 +67,7 @@ class FeedPage extends ClassComponent {
       sortedFeed = chainEvents;
     }
     return sortedFeed;
-  }
+  };
 
   view() {
     if (!app.chain.meta.hasHomepage) {
