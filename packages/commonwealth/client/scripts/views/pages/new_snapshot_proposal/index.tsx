@@ -48,7 +48,7 @@ class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposa
     const pathVars = parsePathname(window.location.href);
 
     if (!app.snapshot.initialized) {
-      app.snapshot.init(vnode.attrs.snapshotId).then(() => redraw());
+      app.snapshot.init(vnode.attrs.snapshotId).then(() => this.redraw());
       return <PageLoading />;
     }
 
@@ -112,7 +112,7 @@ class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposa
         this.members = space.members;
 
         this.snapshotScoresFetched = true;
-        redraw();
+        this.redraw();
       });
     }
 
@@ -194,7 +194,7 @@ class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposa
                 }
                 onInput={(e) => {
                   this.form.choices[idx] = (e.target as any).value;
-                  redraw();
+                  this.redraw();
                 }}
                 iconRight={
                   idx > 1 && idx === this.form.choices.length - 1
@@ -203,7 +203,7 @@ class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposa
                 }
                 iconRightonClick={() => {
                   this.form.choices.pop();
-                  redraw();
+                  this.redraw();
                 }}
               />
             );
@@ -213,7 +213,7 @@ class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposa
             label="Add voting choice"
             onClick={() => {
               this.form.choices.push(`Option ${this.form.choices.length + 1}`);
-              redraw();
+              this.redraw();
             }}
           />
           <div className="date-range">
