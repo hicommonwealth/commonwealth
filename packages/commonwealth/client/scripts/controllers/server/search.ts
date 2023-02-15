@@ -184,11 +184,10 @@ class SearchController {
     params: SearchParams,
     order?: string[]
   ) => {
-    const { resultSize, communityScope, chainScope } = params;
+    const { resultSize, chainScope } = params;
     try {
       const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
         chain: chainScope,
-        community: communityScope,
         limit: resultSize,
         searchTerm,
         order,

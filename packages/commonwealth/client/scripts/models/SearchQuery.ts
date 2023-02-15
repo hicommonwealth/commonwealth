@@ -14,7 +14,6 @@ export enum SearchSort {
 }
 
 export interface SearchParams {
-  communityScope?: string;
   chainScope?: string;
   isSearchPreview?: boolean;
   searchScope?: Array<SearchScope>;
