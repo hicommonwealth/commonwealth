@@ -60,7 +60,7 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
           app.sidebarToggled = false;
           app.sidebarMenu = 'default';
           app.sidebarRedraw.emit('redraw');
-          navigate(item.id ? `/${item.id}` : '/');
+          navigate(item.id ? `/${item.id}` : '/', {}, null);
         }}
       >
         <CommunityLabel community={item} />
