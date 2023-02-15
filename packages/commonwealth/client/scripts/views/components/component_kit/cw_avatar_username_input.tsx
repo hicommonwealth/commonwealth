@@ -6,16 +6,16 @@ import 'components/component_kit/cw_avatar_username_input.scss';
 import { formatAddressShort } from 'helpers';
 import m from 'mithril';
 
-import type { Account } from 'models';
 import { AvatarUpload } from '../avatar_upload';
 import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
 import { getClasses } from './helpers';
+import {AddressAccount} from "models";
 
 type Orientation = 'horizontal' | 'vertical';
 
 type AvatarUsernameInputAttrs = {
-  account?: Account;
+  account?: AddressAccount;
   address: string;
   darkMode?: boolean;
   value: string;

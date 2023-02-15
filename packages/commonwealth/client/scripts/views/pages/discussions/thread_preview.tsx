@@ -8,7 +8,6 @@ import {
 } from 'identifiers';
 import m from 'mithril';
 import type { Thread } from 'models';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';

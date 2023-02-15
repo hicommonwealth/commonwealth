@@ -9,8 +9,8 @@ import {
   threadStageToLabel,
 } from 'helpers';
 import m from 'mithril';
-import type { Account, Thread } from 'models';
-import { AddressInfo, ThreadStage as ThreadStageType } from 'models';
+import type { Thread } from 'models';
+import { ThreadStage as ThreadStageType } from 'models';
 import 'pages/view_proposal/proposal_header_links.scss';
 
 import 'pages/view_thread/thread_components.scss';

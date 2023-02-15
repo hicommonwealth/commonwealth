@@ -3,7 +3,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
 import type { RouteOptions } from 'mithril';
 import m from 'mithril';
-import type { Account, IChainAdapter } from 'models';
+import type { IChainAdapter } from 'models';
 import { ThreadStage } from 'models';
 import type { Coin } from 'adapters/currency';
 import type { ICardListItem } from 'models/interfaces';

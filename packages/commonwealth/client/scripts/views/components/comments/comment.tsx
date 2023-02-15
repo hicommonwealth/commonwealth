@@ -4,7 +4,7 @@ import ClassComponent from 'class_component';
 
 import 'components/comments/comment.scss';
 import m from 'mithril';
-import type { Account, Comment as CommentType } from 'models';
+import type { Comment as CommentType } from 'models';
 import moment from 'moment';
 
 import app from 'state';

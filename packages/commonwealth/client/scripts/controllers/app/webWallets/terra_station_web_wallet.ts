@@ -1,9 +1,10 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
+import type { IWebWallet } from 'models';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
+import {AddressAccount} from "models";
 
 type TerraAddress = {
   address: string;
@@ -89,7 +90,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   }
 
   public async signCanvasMessage(
-    account: Account,
+    account: AddressAccount,
     canvasMessage: SessionPayload
   ): Promise<string> {
     // timeout?

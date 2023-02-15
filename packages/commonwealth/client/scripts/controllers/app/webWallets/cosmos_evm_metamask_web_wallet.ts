@@ -1,7 +1,7 @@
 import { bech32 } from 'bech32';
 import { Address } from 'ethereumjs-util';
 
-import type { Account, IWebWallet } from 'models';
+import type { AddressAccount, IWebWallet } from 'models';
 import app from 'state';
 import type Web3 from 'web3';
 
@@ -84,7 +84,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   }
 
   public async signCanvasMessage(
-    account: Account,
+    account: AddressAccount,
     canvasMessage: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');

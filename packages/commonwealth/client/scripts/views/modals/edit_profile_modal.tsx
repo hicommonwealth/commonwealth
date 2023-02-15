@@ -5,7 +5,6 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import 'modals/edit_profile_modal.scss';
-import type { Account } from 'models';
 
 import app from 'state';
 import { AvatarUpload } from 'views/components/avatar_upload';
@@ -13,9 +12,10 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import {AddressAccount} from "models";
 
 type EditProfileModalAttrs = {
-  account: Account;
+  account: AddressAccount;
   refreshCallback: () => void;
 };
 

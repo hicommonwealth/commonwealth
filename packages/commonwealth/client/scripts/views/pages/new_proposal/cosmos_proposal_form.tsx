@@ -3,7 +3,6 @@
 import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { notifyError } from 'controllers/app/notifications';
-import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
@@ -30,7 +29,7 @@ export class CosmosProposalForm extends ClassComponent {
   }
 
   view() {
-    const author = app.user.activeAddressAccount as CosmosAccount;
+    const author = app.user.activeAddressAccount;
     const cosmos = app.chain as Cosmos;
 
     return !cosmos.governance.initialized ? (

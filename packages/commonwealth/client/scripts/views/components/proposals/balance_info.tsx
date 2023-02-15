@@ -2,13 +2,13 @@
 
 import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
-import type { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import m from 'mithril';
 import app from 'state';
 import { CWText } from '../component_kit/cw_text';
+import AddressAccount from "models/AddressAccount";
 
 type BalanceInfoAttrs = {
-  account: SubstrateAccount;
+  account: AddressAccount;
 };
 
 export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {

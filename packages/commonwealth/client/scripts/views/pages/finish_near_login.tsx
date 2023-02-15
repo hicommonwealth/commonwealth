@@ -13,11 +13,9 @@ import {
   setActiveAccount,
   updateActiveAddresses,
 } from 'controllers/app/login';
-import type { NearAccount } from 'controllers/chain/near/accounts';
 import type Near from 'controllers/chain/near/adapter';
 import $ from 'jquery';
 import m from 'mithril';
-import type { Account } from 'models';
 import type { WalletConnection } from 'near-api-js';
 import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
@@ -30,15 +28,16 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { NewLoginModal } from '../modals/login_modal';
+import AddressAccount from "models/AddressAccount";
 
 interface IState {
   validating: boolean;
   validationCompleted: boolean;
-  validatedAccount: NearAccount | null;
+  validatedAccount: AddressAccount | null;
   validationError: string;
   exitActionSelected: boolean;
   isNewAccount: boolean;
-  account: Account;
+  account: AddressAccount;
 }
 
 // TODO:
@@ -88,7 +87,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
   private async _validate(wallet: WalletConnection) {
     try {
       // TODO: do we need to do this every time, or only on first connect?
-      const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
+      const acct = app.chain.accounts.get(wallet.getAccountId());
       const chain =
         app.user.selectedChain ||
         app.config.chains.getById(app.activeChainId());

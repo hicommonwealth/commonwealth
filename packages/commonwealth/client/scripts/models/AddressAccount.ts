@@ -124,7 +124,11 @@ export default class AddressAccount {
     return this.keytype === 'ed25519'
   }
 
-  public async validate(signature: string, chainId: string) {
+  public async validate(
+    signature: string,
+    timestamp: number,
+    chainId: string | number
+  ) {
     if (!this._validationToken && !this._validationBlockInfo) {
       throw new Error('no validation token found');
     }
@@ -141,7 +145,7 @@ export default class AddressAccount {
       wallet_id: this.walletId,
       session_public_address: await app.sessions.getOrCreateAddress(
         this.chain.base,
-        chainId
+        chainId.toString()
       ),
       session_block_data: this.validationBlockInfo,
     };

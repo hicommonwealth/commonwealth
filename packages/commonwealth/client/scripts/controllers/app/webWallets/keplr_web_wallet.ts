@@ -6,7 +6,7 @@ import type { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
+import type { AddressAccount, IWebWallet } from 'models';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -71,7 +71,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async signCanvasMessage(
-    account: Account,
+    account: AddressAccount,
     canvasMessage: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');

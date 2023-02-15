@@ -3,7 +3,6 @@
 import type { ISubmittableResult } from '@polkadot/types/types';
 import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
-import type { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import $ from 'jquery';
@@ -27,7 +26,7 @@ class SudoForm extends ClassComponent {
   private txProcessing: boolean;
 
   view() {
-    const author = app.user.activeAddressAccount as SubstrateAccount;
+    const author = app.user.activeAddressAccount;
     const substrate = app.chain as Substrate;
 
     if (!substrate.chain.sudoKey) {

@@ -15,8 +15,9 @@ import type { SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
-import type { Account, IWebWallet } from 'models';
+import type { IWebWallet } from 'models';
 import app from 'state';
+import {AddressAccount} from "models";
 
 class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>
@@ -69,7 +70,7 @@ class PolkadotWebWalletController
 
   // ACTIONS
   public async signCanvasMessage(
-    account: Account,
+    account: AddressAccount,
     canvasMessage: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');

@@ -1,9 +1,9 @@
-import { AddressInfo } from 'models';
 import type { AccessLevel } from 'commonwealth/shared/permissions';
+import AddressAccount from "models/AddressAccount";
 
 class RoleInfo {
   public readonly id: number;
-  public readonly Address?: AddressInfo;
+  public readonly Address?: AddressAccount;
   public readonly address_id: number;
   public readonly address: string;
   public readonly address_chain: string;

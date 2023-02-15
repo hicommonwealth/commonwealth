@@ -15,7 +15,6 @@ import {
 } from 'identifiers';
 import m from 'mithril';
 import type { AnyProposal, Comment, ProposalModule } from 'models';
-import { Account } from 'models';
 
 import app from 'state';
 import { slugify } from 'utils';

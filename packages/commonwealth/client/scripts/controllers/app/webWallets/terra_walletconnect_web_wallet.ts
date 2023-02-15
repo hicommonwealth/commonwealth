@@ -4,7 +4,7 @@ import type {
 } from '@terra-money/wallet-controller';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { Account, IWebWallet } from 'models';
+import {AddressAccount, IWebWallet} from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
 
@@ -68,7 +68,7 @@ class TerraWalletConnectWebWalletController
   }
 
   public async signCanvasMessage(
-    account: Account,
+    account: AddressAccount,
     canvasMessage: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');

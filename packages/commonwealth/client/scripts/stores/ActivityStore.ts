@@ -1,11 +1,11 @@
 import type { AbridgedThread } from 'models';
-import { AddressInfo } from 'models';
 import app from 'state';
 import { byAscendingCreationDate } from '../helpers';
+import {AddressAccount} from "models";
 
 export interface IAddressCountAndInfo {
   postCount: number;
-  addressInfo: AddressInfo;
+  addressAccount: AddressAccount;
 }
 
 export interface IIdScopedAddressCountAndInfo {
@@ -78,10 +78,10 @@ export class ActiveThreadsStore {
 export class ActiveAddressesStore {
   private _addressesByCommunity: ICommunityAddresses = {};
 
-  public getAddressesByCommunity(communityId: string): Array<AddressInfo> {
+  public getAddressesByCommunity(communityId: string): Array<AddressAccount> {
     const communityStore = this._addressesByCommunity[communityId];
     return communityStore
-      ? Object.values(communityStore).map((a) => a.addressInfo)
+      ? Object.values(communityStore).map((a) => a.addressAccount)
       : [];
   }
 
@@ -112,9 +112,13 @@ export class ActiveAddressesStore {
     }
     const communityStore = this._addressesByCommunity[parentEntity];
     if (!communityStore[id]) {
-      const addressInfo = new AddressInfo(id, address.address, chain, null);
+      const addressAccount = new AddressAccount({
+        addressId: id,
+        address: address.address,
+        chain: app.config.chains.getById(chain)
+      })
       const postCount = 1;
-      communityStore[id] = { addressInfo, postCount };
+      communityStore[id] = { addressAccount, postCount };
     } else {
       communityStore[id]['postCount'] += 1;
     }

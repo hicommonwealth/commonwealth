@@ -8,7 +8,6 @@ import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import $ from 'jquery';
 import m from 'mithril';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/chat.scss';

@@ -1,10 +1,10 @@
 import $ from 'jquery';
 import type { Thread } from 'models';
-import { AddressInfo } from 'models';
 import ThreadUniqueAddressesCount from 'models/ThreadUniqueAddressesCount';
 import app from 'state';
 
 import { ThreadUniqueAddressesCountStore } from 'stores';
+import {AddressAccount} from "models";
 
 export const modelFromServer = (threadUniqueAddressesCount) => {
   const { id, addresses, count } = threadUniqueAddressesCount;
@@ -65,7 +65,10 @@ class ThreadUniqueAddressesCountController {
     const rootId = `${slug}_${id}`;
     const { addresses = [] } = this._store.getById(rootId) || {};
     return addresses.map(
-      ({ address, chain }) => new AddressInfo(null, address, chain, null)
+      ({ address, chain }) => new AddressAccount({
+        address,
+        chain: app.config.chains.getById(chain)
+      })
     );
   }
 

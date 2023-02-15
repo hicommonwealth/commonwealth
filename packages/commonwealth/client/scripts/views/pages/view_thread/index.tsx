@@ -11,7 +11,6 @@ import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 import m from 'mithril';
 import type {
-  Account,
   ChainEntity,
   Comment,
   Poll,
@@ -550,7 +549,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
     const isAuthorOrAdmin =
       app.roles.isAdminOfEntity({ chain: app.activeChainId() }) ||
-      app.user.activeAccount?.address ===
+      app.user.activeAddressAccount?.address ===
         app.chain.accounts.get(thread.author).address;
 
     return (

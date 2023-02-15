@@ -4,25 +4,21 @@ import ClassComponent from 'class_component';
 
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
-import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
-import type EthereumAccount from 'controllers/chain/ethereum/account';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import CompoundProposal, {
   BravoVote,
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import type { NearAccount } from 'controllers/chain/near/accounts';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import type { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import {
   convictionToWeight,
@@ -81,23 +77,13 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
 
     let user;
 
-    if (
-      proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateDemocracyReferendum
+    if (!(proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateDemocracyReferendum) &&
+        !(proposal instanceof CosmosProposal) &&
+        !(proposal instanceof CompoundProposal || proposal instanceof AaveProposal) &&
+        !(proposal instanceof NearSputnikProposal)
     ) {
-      user = app.user.activeAddressAccount as SubstrateAccount;
-    } else if (proposal instanceof CosmosProposal) {
-      user = app.user.activeAddressAccount as CosmosAccount;
-    } else if (
-      proposal instanceof CompoundProposal ||
-      proposal instanceof AaveProposal
-    ) {
-      user = app.user.activeAddressAccount as EthereumAccount;
-    } else if (proposal instanceof NearSputnikProposal) {
-      user = app.user.activeAddressAccount as NearAccount;
-    } else {
       return <CannotVote label="Unrecognized proposal type" />;
-    }
+    } else user = app.user.activeAddressAccount
 
     const voteYes = async (e) => {
       e.preventDefault();

@@ -2,7 +2,7 @@ declare let window: any;
 
 import $ from 'jquery';
 
-import type { Account, BlockInfo, IWebWallet } from 'models';
+import type { AddressAccount, BlockInfo, IWebWallet } from 'models';
 import type Web3 from 'web3';
 
 import type { provider } from 'web3-core';
@@ -73,7 +73,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signCanvasMessage(
-    account: Account,
+    account: AddressAccount,
     sessionPayload: SessionPayload
   ): Promise<string> {
     const typedCanvasMessage = await constructTypedCanvasMessage(

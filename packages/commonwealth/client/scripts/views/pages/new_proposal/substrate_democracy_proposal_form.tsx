@@ -3,7 +3,6 @@
 import { blake2AsHex } from '@polkadot/util-crypto';
 import ClassComponent from 'class_component';
 import { notifyError } from 'controllers/app/notifications';
-import type { SubstrateAccount } from 'controllers/chain/substrate/accounts';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { proposalSlugToClass } from 'identifiers';
 import m from 'mithril';
@@ -26,7 +25,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
   }
 
   view() {
-    const author = app.user.activeAddressAccount as SubstrateAccount;
+    const author = app.user.activeAddressAccount;
     const substrate = app.chain as Substrate;
     const formState = { module: '', function: '', args: [] };
 

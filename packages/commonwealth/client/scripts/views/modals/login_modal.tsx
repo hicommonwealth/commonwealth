@@ -15,7 +15,7 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithAccount } from 'controllers/server/sessions';
-import { Account, IWebWallet } from 'models';
+import {AddressAccount, IWebWallet} from 'models';
 import { ChainBase } from 'common-common/src/types';
 import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import {
@@ -29,7 +29,7 @@ import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
   initialSidebar?: LoginSidebarType;
-  initialAccount?: Account;
+  initialAccount?: AddressAccount;
   initialWallets?: IWebWallet<any>[];
   onSuccess?: () => void;
 };
@@ -48,8 +48,8 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private cachedWalletSignature: string;
   private cachedTimestamp: number;
   private cachedChainId: string | number;
-  private primaryAccount: Account;
-  private secondaryLinkAccount: Account;
+  private primaryAccount: AddressAccount;
+  private secondaryLinkAccount: AddressAccount;
   private secondaryChainId: string | number;
   private currentlyInCommunityPage: boolean;
   private magicLoading: boolean;
@@ -163,7 +163,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
 
     // Performs Login on the client
     const logInWithAccount = async (
-      account: Account,
+      account: AddressAccount,
       exitOnComplete: boolean
     ) => {
       const profile = account.profile;
@@ -205,7 +205,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
 
     // Handle branching logic after wallet is selected
     const accountVerifiedCallback = async (
-      account: Account,
+      account: AddressAccount,
       newlyCreated: boolean,
       linking: boolean
     ) => {
