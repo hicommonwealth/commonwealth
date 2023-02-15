@@ -17,8 +17,6 @@ export type NotificationRowProps = {
 export const NotificationRow = (props: NotificationRowProps) => {
   const { notification, onListPage } = props;
 
-  console.log(notification);
-
   const [markingRead, setMarkingRead] = React.useState<boolean>(false);
 
   const handleSetMarkingRead = (isMarkingRead: boolean) => {
