@@ -15,10 +15,10 @@ export async function getRoles(models: DB, req: Request, res: Response) {
   }
 
   const result = await models.sequelize.query(
-    `SELECT "Memberships".*, "MemberClasss".* FROM "Profiles"
+    `SELECT "Memberships".*, "MemberClasses".* FROM "Profiles"
     JOIN "Addresses" ON "Addresses"."user_id" = "Profiles"."user_id"
     JOIN "Memberships" ON "Memberships"."address_id" = "Profiles"."user_id"
-    JOIN "MemberClasss" ON "Memberships"."member_class_id" = "MemberClasss"."id"
+    JOIN "MemberClasses" ON "Memberships"."member_class_id" = "MemberClasses"."id"
     WHERE "Addresses"."address" = :address`,
     {
       replacements: { address },
@@ -132,8 +132,8 @@ export async function getPermissions(models: DB, req: Request, res: Response) {
     `SELECT "Permissions".* FROM "Profiles"
     JOIN "Addresses" ON "Addresses"."user_id" = "Profiles"."user_id"
     JOIN "Memberships" ON "Memberships"."address_id" = "Profiles"."user_id"
-    JOIN "MemberClasss" ON "Memberships"."member_class_id" = "MemberClasss"."id"
-    JOIN "Permissions" ON "Permissions"."member_class_id" = "MemberClasss"."id"
+    JOIN "MemberClasses" ON "Memberships"."member_class_id" = "MemberClasses"."id"
+    JOIN "Permissions" ON "Permissions"."member_class_id" = "MemberClasses"."id"
     WHERE "Addresses"."address" = :address`,
     {
       replacements: { address },
@@ -182,9 +182,9 @@ export async function createPermission(
       "created_at",
       "updated_at"
     )
-    SELECT "MemberClasss"."id", :permission_id, NOW(), NOW()
+    SELECT "MemberClasses"."id", :permission_id, NOW(), NOW()
     FROM "Memberships"
-    JOIN "MemberClasss" ON "Memberships"."member_class_id" = "MemberClasss"."id"
+    JOIN "MemberClasses" ON "Memberships"."member_class_id" = "MemberClasses"."id"
     JOIN "Addresses" ON "Addresses"."user_id" = "Memberships"."address_id"
     WHERE "Addresses"."address" = :address
     RETURNING "member_class_id", "action"
@@ -231,9 +231,9 @@ export async function updatePermission(
     `UPDATE "Permissions"
     SET "action" = :permission
     FROM "Memberships"
-    JOIN "MemberClasss" ON "Memberships"."member_class_id" = "MemberClasss"."id"
+    JOIN "MemberClasses" ON "Memberships"."member_class_id" = "MemberClasses"."id"
     JOIN "Addresses" ON "Addresses"."user_id" = "Memberships"."address_id"
-    WHERE "Permissions"."member_class_id" = "MemberClasss"."id" AND "Addresses"."address" = :address
+    WHERE "Permissions"."member_class_id" = "MemberClasses"."id" AND "Addresses"."address" = :address
     RETURNING "member_class_id", "action"
     `,
     {

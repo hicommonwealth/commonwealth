@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import models from 'server/database';
 import type { ChainInstance } from 'server/models/chain';
 import {
-  createDefaultMemberClasss,
+  createDefaultMemberClasses,
   createRole,
   findAllRoles,
   findOneRole,
@@ -89,8 +89,8 @@ describe('findAllRoles and findOneRole tests', () => {
         default_deny_permissions: BigInt(2048),
       });
 
-      await createDefaultMemberClasss(models, newChain.id);
-      await createDefaultMemberClasss(models, newChain2.id);
+      await createDefaultMemberClasses(models, newChain.id);
+      await createDefaultMemberClasses(models, newChain2.id);
 
       await createRole(models, loggedInAddrId, newChain.id, 'member');
 

@@ -56,7 +56,7 @@ const setDefaultRole = async (
     },
   });
 
-  const memberClasssToUpdate = await models.MemberClass.findAll({
+  const memberClassesToUpdate = await models.MemberClass.findAll({
     where: {
       chain_id: chain.id,
     },
@@ -67,7 +67,7 @@ const setDefaultRole = async (
     {
       where: {
         address_id: { [Op.in]: otherAddresses.map((a) => a.id) },
-        member_class_id: { [Op.in]: memberClasssToUpdate.map((r) => r.id) },
+        member_class_id: { [Op.in]: memberClassesToUpdate.map((r) => r.id) },
       },
     }
   );

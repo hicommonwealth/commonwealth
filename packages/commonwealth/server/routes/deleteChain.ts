@@ -202,20 +202,20 @@ const deleteChain = async (
         transaction: t,
       });
 
-      const memberClasss = await models.MemberClass.findAll({
+      const memberClasses = await models.MemberClass.findAll({
         where: { chain_id: chain.id },
         transaction: t,
       });
 
       await models.Membership.destroy({
         where: {
-          member_class_id: { [Op.in]: memberClasss.map((r) => r.id) },
+          member_class_id: { [Op.in]: memberClasses.map((r) => r.id) },
         },
         transaction: t,
       });
 
       await Promise.all(
-        memberClasss.map((r) => r.destroy({ transaction: t }))
+        memberClasses.map((r) => r.destroy({ transaction: t }))
       );
 
       await models.Chain.destroy({

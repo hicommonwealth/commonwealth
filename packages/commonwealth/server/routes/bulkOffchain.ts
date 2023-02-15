@@ -39,7 +39,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     rules,
     communityBanner,
     contracts,
-    memberClasss,
+    memberClasses,
   ] = await (<
     Promise<
       [
@@ -232,7 +232,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contracts: contracts.map((c) => c.toJSON()),
-      memberClasss: memberClasss.map((r) => r.toJSON()),
+      memberClasses: memberClasses.map((r) => r.toJSON()),
     },
   });
 };

@@ -48,7 +48,7 @@ class ChainInfo {
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
-  public memberClasss: MemberClass[];
+  public memberClasses: MemberClass[];
 
   public get node() {
     return this.ChainNode;
@@ -87,7 +87,7 @@ class ChainInfo {
     tokenName,
     adminOnlyPolling,
     discord_config_id,
-    memberClasss,
+    memberClasses,
   }) {
     this.id = id;
     this.network = network;
@@ -122,7 +122,7 @@ class ChainInfo {
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
-    this.memberClasss = memberClasss;
+    this.memberClasses = memberClasses;
   }
 
   public static fromJSON({
@@ -205,7 +205,7 @@ class ChainInfo {
       ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
-      memberClasss: member_classs,
+      memberClasses: member_classs,
     });
   }
 

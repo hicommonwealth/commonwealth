@@ -60,7 +60,7 @@ export default (
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      tableName: 'MemberClasss',
+      tableName: 'MemberClasses',
       underscored: true,
       indexes: [{ fields: ['chain_id'] }],
     }

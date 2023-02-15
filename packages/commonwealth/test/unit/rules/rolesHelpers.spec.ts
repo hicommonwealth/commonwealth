@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import type { MemberClassAttributes } from '../../../server/models/member_class';
-import { getHighestRoleFromMemberClasss } from '../../../server/util/roles';
+import { getHighestRoleFromMemberClasses } from '../../../server/util/roles';
 
-describe('getHighestRoleFromMemberClasss() unit tests', () => {
+describe('getHighestRoleFromMemberClasses() unit tests', () => {
   it('should return highest role', async () => {
     const roles: MemberClassAttributes[] = [
       {
@@ -24,7 +24,7 @@ describe('getHighestRoleFromMemberClasss() unit tests', () => {
         deny: BigInt(0),
       },
     ];
-    const role = await getHighestRoleFromMemberClasss(roles);
+    const role = await getHighestRoleFromMemberClasses(roles);
     assert.equal(role.name, 'admin');
   });
 });

@@ -54,7 +54,7 @@ export class RoleInstanceWithPermission {
   }
 }
 
-export async function getHighestRoleFromMemberClasss(
+export async function getHighestRoleFromMemberClasses(
   roles: MemberClassAttributes[]
 ): Promise<MemberClassAttributes> {
   if (roles.findIndex((r) => r.name === 'admin') !== -1) {
@@ -67,7 +67,7 @@ export async function getHighestRoleFromMemberClasss(
 }
 
 // Server side helpers
-export async function findAllMemberClasssWithMemberships(
+export async function findAllMemberClassesWithMemberships(
   models: DB,
   findOptions: FindOptions<MembershipAttributes>,
   chain_id?: string,
@@ -109,8 +109,8 @@ export async function findAllMemberClasssWithMemberships(
     };
   }
 
-  const memberClasss = await models.MemberClass.findAll(roleFindOptions);
-  return memberClasss.map((memberClass) => memberClass.toJSON());
+  const memberClasses = await models.MemberClass.findAll(roleFindOptions);
+  return memberClasses.map((memberClass) => memberClass.toJSON());
 }
 
 export async function findAllRoles(
@@ -119,17 +119,17 @@ export async function findAllRoles(
   chain_id?: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission[]> {
-  // find all MemberClasss with chain id, permissions and find options given
-  const memberClasss: MemberClassAttributes[] =
-    await findAllMemberClasssWithMemberships(
+  // find all MemberClasses with chain id, permissions and find options given
+  const memberClasses: MemberClassAttributes[] =
+    await findAllMemberClassesWithMemberships(
       models,
       findOptions,
       chain_id,
       permissions
     );
   const roles: RoleInstanceWithPermission[] = [];
-  if (memberClasss) {
-    for (const memberClass of memberClasss) {
+  if (memberClasses) {
+    for (const memberClass of memberClasses) {
       const memberships = memberClass.Memberships;
       if (memberships && memberships.length > 0) {
         for (const membership of memberships) {
@@ -155,17 +155,17 @@ export async function findOneRole(
   chain_id: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission> {
-  const memberClasss: MemberClassAttributes[] =
-    await findAllMemberClasssWithMemberships(
+  const memberClasses: MemberClassAttributes[] =
+    await findAllMemberClassesWithMemberships(
       models,
       findOptions,
       chain_id,
       permissions
     );
   let memberClass: MemberClassAttributes;
-  if (memberClasss) {
+  if (memberClasses) {
     // find the highest role
-    memberClass = await getHighestRoleFromMemberClasss(memberClasss);
+    memberClass = await getHighestRoleFromMemberClasses(memberClasses);
   } else {
     throw new Error("Couldn't find any community roles");
   }
@@ -188,7 +188,7 @@ export async function findOneRole(
   return role;
 }
 
-export async function createDefaultMemberClasss(
+export async function createDefaultMemberClasses(
   models: DB,
   chain_id: string
 ): Promise<void> {
@@ -230,15 +230,15 @@ export async function createRole(
   }
 
   // check if role is already assigned to address
-  const memberClasss = await findAllMemberClasssWithMemberships(
+  const memberClasses = await findAllMemberClassesWithMemberships(
     models,
     { where: { address_id } },
     chain_id
   );
-  if (memberClasss.findIndex((r) => r.name === role_name) !== -1) {
+  if (memberClasses.findIndex((r) => r.name === role_name) !== -1) {
     // if role is already assigned to address, return current highest role this address has on that chain
     const highestMemberClass: MemberClassAttributes =
-      await getHighestRoleFromMemberClasss(memberClasss);
+      await getHighestRoleFromMemberClasses(memberClasses);
     if (
       highestMemberClass.Memberships &&
       highestMemberClass.Memberships.length > 0

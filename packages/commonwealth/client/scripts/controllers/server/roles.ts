@@ -291,7 +291,7 @@ export function isActiveAddressPermitted(
 
   // populate permission assignment array with role allow and deny permissions
   const roles: Array<RoleObject> = chainRoles.map((r) => {
-    const memberClass = chain_info.memberClasss.find(
+    const memberClass = chain_info.memberClasses.find(
       (cr) => cr.name === r.permission
     );
     return {

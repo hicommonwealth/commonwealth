@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import models from 'commonwealth/server/database';
 import {
-  createDefaultMemberClasss,
+  createDefaultMemberClasses,
   createRole,
 } from 'commonwealth/server/util/roles';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
@@ -82,7 +82,7 @@ describe('createRole tests', () => {
     } catch (error) {
       assert.deepEqual(
         error.message,
-        'insert or update on table "MemberClasss" violates foreign key constraint "MemberClasss_chain_id_fkey"'
+        'insert or update on table "MemberClasses" violates foreign key constraint "MemberClasses_chain_id_fkey"'
       );
     }
   });
@@ -103,7 +103,7 @@ describe('createRole tests', () => {
       default_deny_permissions: BigInt(2048),
     });
 
-    await createDefaultMemberClasss(models, chainObj.id);
+    await createDefaultMemberClasses(models, chainObj.id);
     const roles = await models.MemberClass.findAll({
       where: { chain_id: chainObj.id },
     });

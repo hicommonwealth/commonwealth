@@ -55,13 +55,13 @@ const getProfileStatus = (account) => {
   let currentAddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
     const communityOptions = { chain: app.activeChainId() };
-    const memberClasss = app.roles.getAllRolesInCommunity(communityOptions);
+    const memberClasses = app.roles.getAllRolesInCommunity(communityOptions);
     const joinableAddresses = app.roles.getJoinableAddresses(communityOptions);
     const unjoinedJoinableAddresses =
-      joinableAddresses.length > memberClasss.length
+      joinableAddresses.length > memberClasses.length
         ? joinableAddresses.filter((addr) => {
             return (
-              memberClasss.filter((role) => {
+              memberClasses.filter((role) => {
                 return role.address_id === addr.id;
               }).length === 0
             );
