@@ -76,7 +76,7 @@ class SublayoutHeaderComponent extends ClassComponent<SublayoutHeaderAttrs> {
           <div className="DesktopMenuContainer">
             <CreateContentPopover />
             <HelpMenuPopover />
-            {app.isLoggedIn() && <NotificationsMenuPopover />}
+            {app.isLoggedIn() && !onMobile && <NotificationsMenuPopover />}
           </div>
           <LoginSelector />
         </div>
