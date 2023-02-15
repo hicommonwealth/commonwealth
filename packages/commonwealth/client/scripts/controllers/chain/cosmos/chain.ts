@@ -180,6 +180,23 @@ class CosmosChain implements IChainModule<CosmosToken, AddressAccount> {
   ): ITXModalData {
     throw new Error('unsupported');
   }
+
+  public async getBalance(addressAccount: AddressAccount): Promise<CosmosToken> {
+    let balance;
+    try {
+      const bal = await this._api.bank.balance(
+        addressAccount.address,
+        this.denom
+      );
+      balance = this.coins(new BN(bal.amount));
+    } catch (e) {
+      // if coins is null, they have a zero balance
+      console.log(`no balance found: ${e.message}`);
+      balance = this.coins(0);
+    }
+
+    return balance;
+  }
 }
 
 export default CosmosChain;

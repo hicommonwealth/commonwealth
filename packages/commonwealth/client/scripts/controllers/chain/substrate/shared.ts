@@ -10,10 +10,8 @@ import type { u128 } from '@polkadot/types';
 
 import type { Compact } from '@polkadot/types/codec';
 import type {
-  ActiveEraInfo,
   Call,
-  DispatchError,
-  EraIndex,
+  DispatchError, EraIndex, Exposure,
   SessionIndex,
 } from '@polkadot/types/interfaces';
 import type { CallFunction, InterfaceTypes } from '@polkadot/types/types';
@@ -24,7 +22,6 @@ import { formatCoin } from 'adapters/currency';
 import BN from 'bn.js';
 
 import { SubstrateEvents } from 'chain-events/src';
-import { ChainNetwork } from 'common-common/src/types';
 
 import {
   notifyError,
@@ -606,6 +603,55 @@ class SubstrateChain implements IChainModule<SubstrateCoin, AddressAccount> {
 
   public get session(): Promise<SessionIndex> {
     return this.api.query.session.currentIndex();
+  }
+
+  public getBalance(addressAccount: AddressAccount): Promise<SubstrateCoin> {
+    if (!this.apiInitialized) return;
+    return this._api.derive.balances
+      .all(addressAccount.address)
+      .then(({ freeBalance, reservedBalance }) =>
+        this.coins(freeBalance.add(reservedBalance)))
+  }
+
+  public getLockedBalance(addressAccount: AddressAccount): Promise<SubstrateCoin> {
+    if (!this.apiInitialized) return;
+    return (
+      this._api.derive.balances
+        .all(addressAccount.address)
+        // we compute illiquid balance by doing (total - available), because there's no query
+        // or parameter to fetch it
+        .then(({ availableBalance, votingBalance }) =>
+          this.coins(votingBalance.sub(availableBalance))
+        )
+    );
+  }
+
+  public getFreeBalance(addressAccount: AddressAccount) {
+    if (!this.apiInitialized) return;
+    return this._api.derive.balances
+      .all(addressAccount.address)
+      .then(({ availableBalance }) => this.coins(availableBalance));
+  }
+
+  // The amount staked by this account & accounts who have nominated it
+  public getStakingExposure(addressAccount: AddressAccount): Promise<Exposure> {
+    if (!this.apiInitialized) return;
+    return this._api.query.staking
+      .currentEra<EraIndex>()
+      .then((era: EraIndex) => {
+        // Different runtimes call for different access to stakers: old vs. new
+        const stakersCall = this._api.query.staking.stakers
+          ? this._api.query.staking.stakers
+          : this._api.query.staking.erasStakers;
+        // Different staking functions call for different function arguments: old vs. new
+        const stakersCallArgs = (account) =>
+          this._api.query.staking.stakers
+            ? [account]
+            : [era.toString(), account];
+        return stakersCall(
+          ...stakersCallArgs(addressAccount.address)
+        ) as Promise<Exposure>;
+      });
   }
 }
 

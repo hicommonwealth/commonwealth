@@ -5,7 +5,7 @@ import type { EventEmitter } from 'events';
 import type moment from 'moment';
 import type StorageModule from './StorageModule';
 import type { TransactionStatus } from './types';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 /* eslint-disable */
 
@@ -56,6 +56,8 @@ export interface IChainModule<C extends Coin, A extends AddressAccount> {
     objName: string,
     cb?: (success: boolean) => void
   ): ITXModalData;
+
+  getBalance(addressAccount: AddressAccount): Promise<C>;
 }
 
 // Implemented by a chain's account module. Store for account objects.
@@ -67,8 +69,10 @@ export interface IAccountsModule<C extends Coin, A extends AddressAccount>
 }
 
 // Offchain stores and management for discussion features.
-export interface IOffchainAccountsModule<C extends Coin, A extends AddressAccount>
-  extends StorageModule {
+export interface IOffchainAccountsModule<
+  C extends Coin,
+  A extends AddressAccount
+> extends StorageModule {
   get(address: string, chain?: string): A;
 }
 
@@ -80,7 +84,9 @@ export interface ITransactionResult {
   timestamp?: moment.Moment;
 }
 
-export type IBalanceAccount<C extends Coin> = AddressAccount & { balance: Promise<C> };
+export type IBalanceAccount<C extends Coin> = AddressAccount & {
+  balance: Promise<C>;
+};
 
 export interface IVote<C extends Coin> {
   account: AddressAccount;

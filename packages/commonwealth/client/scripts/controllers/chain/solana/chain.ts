@@ -79,4 +79,8 @@ export default class SolanaChain
   ): ITXModalData {
     throw new Error('unsupported');
   }
+
+  public getBalance(addressAccount:AddressAccount): Promise<any> {
+    throw new Error('unsupported');
+  }
 }

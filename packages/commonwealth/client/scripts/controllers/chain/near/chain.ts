@@ -6,12 +6,14 @@ import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import moment from 'moment';
 import type { ConnectConfig, Near as NearApi } from 'near-api-js';
 import {
+  Account,
   Account as NearApiAccount,
-  connect as nearConnect,
+  connect as nearConnect, keyStores,
   WalletAccount,
 } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import type {
+  AccountView,
   CodeResult,
   NodeStatusResult,
 } from 'near-api-js/lib/providers/provider';
@@ -86,8 +88,11 @@ class NearChain implements IChainModule<NearToken, AddressAccount> {
     return this._app;
   }
 
+  public readonly keyStore: keyStores.BrowserLocalStorageKeyStore;
+
   constructor(app: IApp) {
     this._app = app;
+    this.keyStore = new keyStores.BrowserLocalStorageKeyStore(localStorage);
   }
 
   public async init(chain: ChainInfo, accounts: NearAccounts): Promise<void> {
@@ -106,7 +111,7 @@ class NearChain implements IChainModule<NearToken, AddressAccount> {
       walletUrl: this.isMainnet
         ? 'https://wallet.near.org/'
         : 'https://wallet.testnet.near.org/',
-      keyStore: accounts.keyStore,
+      keyStore: this.keyStore,
     };
 
     this._api = await nearConnect(this.config);
@@ -291,6 +296,28 @@ class NearChain implements IChainModule<NearToken, AddressAccount> {
   public createTXModalData(): ITXModalData {
     // TODO
     throw new Error('Txs not yet implemented');
+  }
+
+  public async signMessageWithKey(message: string, addressAccount: AddressAccount) {
+    const walletConnection = new Account(this._api.connection, addressAccount.address);
+
+    if (!walletConnection.connection?.signer) throw new Error('no signer found!');
+
+    const kp = await this.keyStore.getKey(
+      this.isMainnet ? 'mainnet' : 'testnet',
+      addressAccount.address
+    );
+    const { publicKey, signature } = kp.sign(Buffer.from(message));
+    return JSON.stringify({
+      signature: Buffer.from(signature).toString('base64'),
+      publicKey: Buffer.from(publicKey.data).toString('base64'),
+    });
+  }
+
+  public async getBalance(addressAccount: AddressAccount): Promise<NearToken> {
+    const walletConnection = new Account(this._api.connection, addressAccount.address);
+    const result: AccountView = await walletConnection.state();
+    return this.coins(result.amount, false);
   }
 }
 

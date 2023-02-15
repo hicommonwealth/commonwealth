@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import type { NearToken } from 'adapters/chain/near/types';
 import type { IAccountsModule } from 'models';
-import { Account as NearJsAccount, keyStores } from 'near-api-js';
+import {Account, Account as NearJsAccount, keyStores} from 'near-api-js';
 import type { AccountView } from 'near-api-js/lib/providers/provider';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
@@ -29,8 +29,6 @@ export class NearAccounts implements IAccountsModule<NearToken, AddressAccount> 
     return this._store;
   }
 
-  public readonly keyStore: keyStores.BrowserLocalStorageKeyStore;
-
   private _validators: INearValidators = {};
   public get validators() {
     return this._validators;
@@ -43,7 +41,6 @@ export class NearAccounts implements IAccountsModule<NearToken, AddressAccount> 
 
   constructor(app: IApp) {
     this._app = app;
-    this.keyStore = new keyStores.BrowserLocalStorageKeyStore(localStorage);
   }
 
   public get(address: string): AddressAccount {

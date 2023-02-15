@@ -75,7 +75,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   this.balancesCache[vote.account.address] = balance;
                   m.redraw();
                 } else {
-                  vote.account.balance.then((b) => {
+                  app.chain.chain.getBalance(vote.account).then((b) => {
                     balance = b;
                     this.balancesCache[vote.account.address] = formatCoin(
                       b,
