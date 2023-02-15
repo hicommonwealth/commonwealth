@@ -4,7 +4,6 @@ import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
 import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
 import $ from 'jquery';
-import { render } from 'mithrilInterop';
 import type { NotificationSubscription } from 'models';
 
 import app from 'state';
@@ -21,10 +20,7 @@ export const getCommentPreview = (commentText) => {
 
     if (!doc.ops) throw new Error();
 
-    decodedCommentText = render(QuillFormattedText, {
-      doc,
-      collapse: true,
-    });
+    decodedCommentText = <QuillFormattedText doc={doc} collapse />;
   } catch (e) {
     let doc = decodeURIComponent(commentText);
 
@@ -36,10 +32,9 @@ export const getCommentPreview = (commentText) => {
       doc = doc.replace(match[0], match[1]);
     });
 
-    decodedCommentText = render(MarkdownFormattedText, {
-      doc: doc.slice(0, 140),
-      collapse: true,
-    });
+    decodedCommentText = (
+      <MarkdownFormattedText doc={doc.slice(0, 140)} collapse />
+    );
   }
 
   return decodedCommentText;
@@ -115,9 +110,9 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       chainIconUrls[item.id] = item.icon_url;
     }
 
-    for (const event of events) {
-      (<any>events).icon_url = chainIconUrls[event.chain];
-    }
+    // for (const event of events) {
+    //   (<any>events).icon_url = chainIconUrls[event.chain];
+    // }
 
     activity = {
       status: 'Success',
