@@ -45,12 +45,6 @@ export function parseCustomStages(str) {
     .filter((s) => s) as unknown) as ThreadStage[];
 }
 
-export const modalRedirectClick = (e, redirectCb: () => void) => {
-  e.preventDefault();
-  $(e.target).trigger('modalexit');
-  redirectCb?.();
-};
-
 /*
  * mithril link helper
  */
@@ -297,7 +291,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p) => render('p', p));
+  return paragraphs.map((p, index) => render('p', { key: index }, p));
 }
 
 /*
