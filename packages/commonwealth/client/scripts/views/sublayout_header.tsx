@@ -35,9 +35,9 @@ class SublayoutHeaderComponent extends ClassComponent<SublayoutHeaderAttrs> {
             iconSize="xl"
             onClick={() => {
               if (app.isCustomDomain()) {
-                this.setRoute('/');
+                this.setRoute('/', {}, null);
               } else {
-                this.setRoute('/dashboard/for-you');
+                this.setRoute('/dashboard/for-you', {}, null);
               }
             }}
           />
