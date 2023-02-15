@@ -2,10 +2,10 @@ import React from 'react';
 import moment from 'moment';
 import { useCountdown } from 'usehooks-ts';
 
-import { blocknumToTime, formatDuration } from 'helpers';
+import { blocknumToDuration, formatDuration } from 'helpers';
 
 type CountdownProps = {
-  duration: moment.Moment;
+  duration: number;
 };
 
 export const Countdown = (props: CountdownProps) => {
@@ -32,5 +32,5 @@ type CountdownUntilBlockProps = {
 export const CountdownUntilBlock = (props: CountdownUntilBlockProps) => {
   const { block } = props;
 
-  return <Countdown duration={blocknumToTime(block)} />;
+  return <Countdown duration={blocknumToDuration(block)} />;
 };
