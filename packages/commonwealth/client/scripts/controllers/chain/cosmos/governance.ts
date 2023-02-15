@@ -23,7 +23,7 @@ import type CosmosAccounts from './accounts';
 import type CosmosChain from './chain';
 import type { CosmosApiType } from './chain';
 import { CosmosProposal } from './proposal';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 const stateEnumToString = (status: ProposalStatus): CosmosProposalState => {
   switch (status) {

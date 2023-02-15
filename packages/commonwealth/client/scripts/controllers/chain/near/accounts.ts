@@ -6,7 +6,7 @@ import type { AccountView } from 'near-api-js/lib/providers/provider';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import type NearChain from './chain';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 // NOTE: this is the actual type of validators in the NodeStatus struct,
 //    the library is wrong, it's not just a string.

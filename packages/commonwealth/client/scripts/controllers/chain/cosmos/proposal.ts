@@ -29,7 +29,7 @@ import type CosmosChain from './chain';
 import type { CosmosApiType } from './chain';
 import type CosmosGovernance from './governance';
 import { marshalTally } from './governance';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
   if (typeof voteOption === 'number') {

@@ -6,7 +6,7 @@ import type { Thread } from 'models';
 
 import app from 'state';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 interface IProfileCommentGroupAttrs {
   proposal: Thread | any;

@@ -25,7 +25,7 @@ import {
 } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
 import { CWSpinner } from './cw_spinner';
@@ -201,13 +201,14 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
 
       // Start the create-user flow, so validationBlockInfo gets saved to the backend
       // This creates a new `Account` object with fields set up to be validated by verifyAddress.
-      const { account } = await createUserWithAddress(
+      const result = await createUserWithAddress(
         address,
         wallet.name,
         chainIdentifier,
         sessionAddress,
         validationBlockInfo
       );
+      const account = result.addressAccount;
       account.setValidationBlockInfo(
         validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
       );

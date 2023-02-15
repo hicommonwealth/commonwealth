@@ -32,7 +32,7 @@ import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWPopover } from '../component_kit/cw_popover/cw_popover';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',

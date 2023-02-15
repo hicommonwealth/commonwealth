@@ -23,7 +23,7 @@ import type SubstrateDemocracy from './democracy';
 import type SubstrateDemocracyProposal from './democracy_proposal';
 import type SubstrateChain from './shared';
 import type { SubstrateTreasuryProposal } from './treasury_proposal';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export enum DemocracyConviction {
   None = 0,

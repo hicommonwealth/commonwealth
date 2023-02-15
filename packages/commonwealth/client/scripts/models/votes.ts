@@ -1,6 +1,6 @@
 import type { Coin } from 'adapters/currency';
 import type { IVote } from './interfaces';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export class DepositVote<C extends Coin> implements IVote<C> {
   public readonly account: AddressAccount

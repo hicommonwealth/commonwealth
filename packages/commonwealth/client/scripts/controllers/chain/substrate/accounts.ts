@@ -12,7 +12,7 @@ import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import SubstrateChain from './shared';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 type Delegation = [AccountId, Conviction] & Codec;
 

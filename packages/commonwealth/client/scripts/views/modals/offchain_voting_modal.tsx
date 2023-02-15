@@ -9,7 +9,7 @@ import type { Vote } from 'models';
 import { AddressInfo } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import User from 'views/components/widgets/user';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 import app from "state";
 
 type OffchainVotingModalAttrs = {

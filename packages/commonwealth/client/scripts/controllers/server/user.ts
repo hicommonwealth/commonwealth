@@ -13,7 +13,7 @@ import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export class UserController {
   private _activeAddressAccount: AddressAccount;

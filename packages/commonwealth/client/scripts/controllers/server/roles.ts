@@ -7,7 +7,7 @@ import type {Action} from 'commonwealth/shared/permissions';
 import {AccessLevel, everyonePermissions, PermissionManager, ToCheck,} from 'commonwealth/shared/permissions';
 import type {RoleObject} from 'commonwealth/shared/types';
 import type {UserController} from './user';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 const getPermissionLevel = (permission: AccessLevel | undefined) => {
   if (permission === undefined) {

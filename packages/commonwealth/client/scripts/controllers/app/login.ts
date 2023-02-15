@@ -11,7 +11,7 @@ import type { BlockInfo, ChainInfo } from 'models';
 import { ITokenAdapter, SocialAccount } from 'models';
 import moment from 'moment';
 import app from 'state';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,

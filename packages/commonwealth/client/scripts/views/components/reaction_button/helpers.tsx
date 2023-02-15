@@ -10,7 +10,7 @@ import User from 'views/components/widgets/user';
 import { NewLoginModal } from '../../modals/login_modal';
 import { CWText } from '../component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 

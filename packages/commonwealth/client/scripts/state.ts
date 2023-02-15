@@ -48,7 +48,7 @@ export const enum LoginState {
 
 export interface IApp {
   socket: WebSocketController;
-  chain: IChainAdapter<any, any>;
+  chain: IChainAdapter<any>;
   chainEntities: ChainEntityController;
 
   // XXX: replace this with some app.chain helper

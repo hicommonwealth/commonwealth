@@ -17,7 +17,7 @@ import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import type SubstrateTreasury from './treasury';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,

@@ -6,7 +6,7 @@ import app from 'state';
 import type ChainInfo from './ChainInfo';
 import type Profile from './Profile';
 
-export type AddressType = {
+export type AddressAccountType = {
   // required args
   chain: ChainInfo;
   address: string;
@@ -60,7 +60,7 @@ export default class AddressAccount {
     ignoreProfile,
     keytype,
     userId
-  }: AddressType) {
+  }: AddressAccountType) {
     this.keytype = keytype;
     // Check if the account is being initialized from a Community
     // Because there won't be any chain base or chain class
@@ -120,7 +120,11 @@ export default class AddressAccount {
     this._sessionPublicAddress = sessionPublicAddress;
   }
 
-  public async validate(signature: string, chainId: string | number) {
+  get isEd25519(): boolean {
+    return this.keytype === 'ed25519'
+  }
+
+  public async validate(signature: string, chainId: string) {
     if (!this._validationToken && !this._validationBlockInfo) {
       throw new Error('no validation token found');
     }

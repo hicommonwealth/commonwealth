@@ -414,7 +414,7 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
 }
 
 // Decimals For Tokens
-export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
+export function getDecimals(chain: IChainAdapter<Coin>): number {
   let decimals;
   if (chain.meta.id === 'evmos') {
     // Custom for evmos

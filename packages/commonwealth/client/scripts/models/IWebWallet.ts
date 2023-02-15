@@ -5,8 +5,8 @@ import type {
   WalletId,
 } from 'common-common/src/types';
 
-import type Account from './Account';
 import type BlockInfo from './BlockInfo';
+import AddressAccount from "models/AddressAccount";
 
 interface IWebWallet<AccountT extends { address: string } | string> {
   name: WalletId;
@@ -24,7 +24,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
 
   signCanvasMessage(
-    account: Account,
+    account: AddressAccount,
     canvasMessage: SessionPayload
   ): Promise<string>;
 

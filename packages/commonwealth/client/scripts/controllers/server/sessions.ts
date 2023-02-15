@@ -1,5 +1,4 @@
-import { IWebWallet, Account } from 'models';
-import { sessionSigninModal } from 'views/modals/session_signin_modal';
+import { IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import {
@@ -19,10 +18,11 @@ import {
   SolanaSessionController,
   NEARSessionController,
 } from './sessionSigners';
+import AddressAccount from "models/AddressAccount";
 
 export async function signSessionWithAccount<T extends { address: string }>(
   wallet: IWebWallet<T>,
-  account: Account,
+  account: AddressAccount,
   timestamp: number
 ) {
   // Try to infer Chain ID from the currently active chain.

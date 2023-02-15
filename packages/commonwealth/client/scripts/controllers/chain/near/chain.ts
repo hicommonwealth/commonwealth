@@ -21,7 +21,7 @@ import { ApiStatus } from 'state';
 import type { NearAccounts } from './accounts';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export interface IDaoInfo {
   contractId: string;

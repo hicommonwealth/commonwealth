@@ -8,7 +8,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import User from '../../components/widgets/user';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export interface IProfileHeaderAttrs {
   account: AddressAccount;

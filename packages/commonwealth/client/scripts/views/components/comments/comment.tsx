@@ -45,7 +45,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
       }
     }
 
-    const author: Account = app.chain.accounts.get(comment.author);
+    const author = app.chain.accounts.get(comment.author);
 
     return comment.deleted ? (
       <span>[deleted]</span>

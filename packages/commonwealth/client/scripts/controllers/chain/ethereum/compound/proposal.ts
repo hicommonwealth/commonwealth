@@ -28,7 +28,7 @@ import type CompoundAPI from './api';
 import { GovernorType } from './api';
 import type CompoundChain from './chain';
 import type CompoundGovernance from './governance';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export enum BravoVote {
   NO = 0,

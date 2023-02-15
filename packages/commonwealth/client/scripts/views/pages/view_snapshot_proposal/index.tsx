@@ -25,7 +25,7 @@ import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 type ViewProposalPageAttrs = {
   identifier: string;

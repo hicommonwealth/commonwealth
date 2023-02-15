@@ -6,7 +6,7 @@ import app from 'state';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 const ProfileBanner: m.Component<
   { addressAccount: AddressAccount },

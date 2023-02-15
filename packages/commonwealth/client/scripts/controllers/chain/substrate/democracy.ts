@@ -11,7 +11,7 @@ import type { IApp } from 'state';
 import type SubstrateAccounts from './accounts';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
 import type SubstrateChain from './shared';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 class SubstrateDemocracy extends ProposalModule<
   ApiPromise,

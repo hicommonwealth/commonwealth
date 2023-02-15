@@ -47,7 +47,7 @@ import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { chainToEventNetwork } from '../../server/chain_entities';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export interface ISubstrateTXData extends ITXData {
   nonce: string;

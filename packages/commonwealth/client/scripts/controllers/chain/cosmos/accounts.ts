@@ -3,7 +3,7 @@ import type { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import AddressAccount from "models/Address";
+import AddressAccount from "models/AddressAccount";
 
 export default class CosmosAccounts
   implements IAccountsModule<CosmosToken, AddressAccount>
