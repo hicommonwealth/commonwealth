@@ -1,0 +1,10 @@
+@import '../shared';
+
+.Feed {
+  .loading-spinner {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+  }
+}
