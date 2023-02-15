@@ -1,4 +1,5 @@
 import React from 'react';
+import { Virtuoso } from 'react-virtuoso';
 
 import { notifyInfo } from 'controllers/app/notifications';
 import { DashboardActivityNotification } from 'models';
@@ -11,7 +12,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
-import { fetchActivity, notificationsRemaining } from './helpers';
+import { fetchActivity } from './helpers';
 import { UserDashboardRow } from './user_dashboard_row';
 import { useCommonNavigate } from 'navigation/helpers';
 
@@ -208,17 +209,12 @@ const UserDashboard = (props: UserDashboardProps) => {
               {activePage === DashboardViews.ForYou && (
                 <>
                   {fyNotifications && fyNotifications.length > 0 ? (
-                    <>
-                      {fyNotifications
-                        // .slice(0, DEFAULT_COUNT)
-                        .map((data, i) => (
-                          <UserDashboardRow key={i} notification={data} />
-                        ))}
-                      {/* {notificationsRemaining(
-                        fyNotifications.length,
-                        DEFAULT_COUNT
-                      ) && <CWSpinner />} */}
-                    </>
+                    <Virtuoso
+                      data={fyNotifications}
+                      itemContent={(i, data) => {
+                        return <UserDashboardRow key={i} notification={data} />;
+                      }}
+                    />
                   ) : (
                     <CWText>Join some communities to see Activity!</CWText>
                   )}
@@ -227,17 +223,12 @@ const UserDashboard = (props: UserDashboardProps) => {
               {activePage === DashboardViews.Global && (
                 <>
                   {globalNotifications && globalNotifications.length > 0 ? (
-                    <>
-                      {globalNotifications
-                        // .slice(0, DEFAULT_COUNT)
-                        .map((data, i) => (
-                          <UserDashboardRow key={i} notification={data} />
-                        ))}
-                      {/* {notificationsRemaining(
-                        globalNotifications.length,
-                        DEFAULT_COUNT
-                      ) && <CWSpinner />} */}
-                    </>
+                    <Virtuoso
+                      data={globalNotifications}
+                      itemContent={(i, data) => {
+                        return <UserDashboardRow key={i} notification={data} />;
+                      }}
+                    />
                   ) : (
                     <CWText>No Activity</CWText>
                   )}
@@ -246,15 +237,12 @@ const UserDashboard = (props: UserDashboardProps) => {
               {activePage === DashboardViews.Chain && (
                 <>
                   {chainEvents && chainEvents.length > 0 ? (
-                    <>
-                      {chainEvents.map((data, i) => {
+                    <Virtuoso
+                      data={chainEvents}
+                      itemContent={(i, data) => {
                         return <UserDashboardRow key={i} notification={data} />;
-                      })}
-                      {/* {notificationsRemaining(
-                        chainEvents.length,
-                        DEFAULT_COUNT
-                      ) && <CWSpinner />} */}
-                    </>
+                      }}
+                    />
                   ) : (
                     <CWText>
                       Join some communities that have governance to see Chain
