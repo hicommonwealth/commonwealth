@@ -95,7 +95,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   // }
 
   if (!app.chain?.meta) {
-    console.log(1);
     return (
       <PageLoading
       // title="Loading..."
@@ -138,7 +137,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
 
   // load app controller
   if (!app.threads.initialized) {
-    console.log(2);
     return (
       <PageLoading
       // title={headerTitle}
@@ -178,7 +176,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         setThreadFetched(true);
       }
     }
-    console.log(3);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -188,7 +185,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
 
   if (recentlyEdited) {
     setRecentlyEdited(false);
-    console.log(4);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -217,7 +213,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         threadReactionsStarted: true,
       },
     });
-    console.log(5);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -277,7 +272,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         commentsStarted: true,
       },
     });
-    console.log(6);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -298,7 +292,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
           commentsStarted: false,
         },
       });
-      console.log(7);
       return (
         <PageLoading
         //  title={headerTitle}
@@ -369,7 +362,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   }
 
   if (comments === undefined || viewCount === undefined) {
-    console.log(8);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -392,7 +384,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         profilesStarted: true,
       },
     });
-    console.log(9);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -404,7 +395,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
     !app.profiles.allLoaded() &&
     !prefetch[threadIdAndType]['profilesFinished']
   ) {
-    console.log(10);
     return (
       <PageLoading
       //  title={headerTitle}
@@ -420,7 +410,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         profilesFinished: true,
       },
     });
-    console.log(11);
     return (
       <PageLoading
       //  title={headerTitle}
