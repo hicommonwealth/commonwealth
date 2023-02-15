@@ -1,18 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import _ from 'lodash';
 import type { Account } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import type { Component } from 'mithrilInterop';
+import { render, redraw } from 'mithrilInterop';
 import { initChain } from 'helpers/chain';
 import { setActiveAccount } from '../../../controllers/app/login';
 import app from '../../../state';

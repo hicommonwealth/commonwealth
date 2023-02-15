@@ -11,7 +11,7 @@ import { countLinesQuill } from './helpers';
 
 // import { loadScript } from 'helpers';
 import { renderQuillDelta } from './render_quill_delta';
-import { useNavigate } from 'react-router-dom';
+import { useCommonNavigate } from 'navigation/helpers';
 
 export type QuillTextParams = {
   collapse?: boolean;
@@ -33,7 +33,7 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({
   openLinksInNewTab,
   searchTerm,
 }) => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
   const [cachedDocWithHighlights, setCachedDocWithHighlights] = useState<any>();
   const [cachedResultWithHighlights, setCachedResultWithHighlights] =
     useState<any>();

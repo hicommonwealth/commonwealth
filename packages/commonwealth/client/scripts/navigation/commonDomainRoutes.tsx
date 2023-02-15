@@ -159,6 +159,10 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
+      path="/:scope/notification-settings"
+      element={<Navigate to="/notification-settings" />}
+    />
+    <Route
       path="/notifications"
       element={<Navigate to={'/edgeware/notifications'} />}
     />

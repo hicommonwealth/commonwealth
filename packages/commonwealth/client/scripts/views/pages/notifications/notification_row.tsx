@@ -1,42 +1,44 @@
 import React from 'react';
 
+import type { ResultNode } from 'mithrilInterop';
 import {
   ClassComponent,
-  ResultNode,
-  getRouteParam,
+  _DEPRECATED_getSearchParams,
   redraw,
 } from 'mithrilInterop';
 import moment from 'moment';
-import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
+import { Label as ChainEventLabel } from 'chain-events/src';
 
 import 'pages/notifications/notification_row.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import { NotificationCategories } from 'common-common/src/types';
-import { Notification, AddressInfo } from 'models';
-import { link } from 'helpers';
+import type { Notification } from 'models';
+import { AddressInfo } from 'models';
 import { User } from 'views/components/user/user';
 import { UserGallery } from 'views/components/user/user_gallery';
 import { getBatchNotificationFields } from './helpers';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { getClasses } from '../../components/component_kit/helpers';
+import withRouter from 'navigation/helpers';
 
 type NotificationRowAttrs = {
   notifications: Array<Notification>;
   onListPage?: boolean;
 };
 
-export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
+export class NotificationRowComponent extends ClassComponent<NotificationRowAttrs> {
   private markingRead: boolean;
   private scrollOrStop: boolean;
 
   oncreate(vnode: ResultNode<NotificationRowAttrs>) {
     if (
-      getRouteParam('id') &&
+      _DEPRECATED_getSearchParams('id') &&
       vnode.attrs.onListPage &&
-      getRouteParam('id') === vnode.attrs.notifications[0].id.toString()
+      _DEPRECATED_getSearchParams('id') ===
+        vnode.attrs.notifications[0].id.toString()
     ) {
       this.scrollOrStop = true;
     }
@@ -74,7 +76,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       if (this.scrollOrStop) {
         setTimeout(() => {
-          const el = document.getElementById(getRouteParam('id'));
+          const el = document.getElementById(_DEPRECATED_getSearchParams('id'));
           if (el) el.scrollIntoView();
         }, 1);
 
@@ -104,9 +106,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       return (
         <div
-          onClick={() =>
-            navigateToSubpage(`/notifications?id=${notification.id}`)
-          }
+          onClick={() => this.setRoute(`/notifications?id=${notification.id}`)}
         >
           <div className="comment-body">
             <div className="comment-body-top chain-event-notification-top">
@@ -168,7 +168,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       //   route,
 
       return (
-        <div onClick={() => navigateToSubpage(route)}>
+        <div onClick={() => this.setRoute(route)}>
           <User user={author} avatarOnly avatarSize={26} />
           <div className="comment-body">
             <div className="comment-body-title">
@@ -253,7 +253,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       //   path.replace(/ /g, '%20'),
 
       return (
-        <div onClick={() => navigateToSubpage(path.replace(/ /g, '%20'))}>
+        <div onClick={() => this.setRoute(path.replace(/ /g, '%20'))}>
           {authorInfo.length === 1 ? (
             <User
               user={
@@ -336,3 +336,5 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
     }
   }
 }
+
+export const NotificationRow = withRouter(NotificationRowComponent);
