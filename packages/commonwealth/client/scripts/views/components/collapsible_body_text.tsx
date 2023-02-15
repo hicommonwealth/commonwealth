@@ -115,6 +115,7 @@ export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalB
         this.collapsed = true;
       }
     }
+    this.redraw();
   }
 
   onupdate(vnode: ResultNode<CollapsibleProposalBodyAttrs>) {

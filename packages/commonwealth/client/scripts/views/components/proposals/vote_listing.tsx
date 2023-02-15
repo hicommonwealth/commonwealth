@@ -49,7 +49,7 @@ export const VoteListing = (props: VoteListingProps) => {
       {sortedVotes.length === 0 ? (
         <CWText className="no-votes">No votes</CWText>
       ) : (
-        votes.map((vote) => {
+        votes.map((vote, index) => {
           let balance;
 
           if (balanceWeighted && !(vote instanceof CosmosVote)) {
@@ -83,7 +83,7 @@ export const VoteListing = (props: VoteListingProps) => {
           switch (true) {
             case vote instanceof CosmosVote:
               return (
-                <div className="vote">
+                <div className="vote" key={index}>
                   <User user={vote.account} linkify popover />
                   {/* {balanceWeighted && balance && <CWText>{balance}</CWText>} */}
                 </div>
@@ -91,7 +91,7 @@ export const VoteListing = (props: VoteListingProps) => {
 
             case vote instanceof MolochProposalVote:
               return (
-                <div className="vote">
+                <div className="vote" key={index}>
                   <User user={vote.account} linkify />
                   {balance && typeof balance === 'string' && (
                     <div className="vote-right-container">
@@ -105,7 +105,7 @@ export const VoteListing = (props: VoteListingProps) => {
 
             case vote instanceof CompoundProposalVote:
               return (
-                <div className="vote">
+                <div className="vote" key={index}>
                   <User user={vote.account} linkify />
                   {balance && typeof balance === 'string' && (
                     <div className="vote-right-container">
@@ -119,7 +119,7 @@ export const VoteListing = (props: VoteListingProps) => {
 
             case vote instanceof AaveProposalVote:
               return (
-                <div className="vote">
+                <div className="vote" key={index}>
                   <User user={vote.account} linkify />
                   {balance && typeof balance === 'string' && (
                     <div className="vote-right-container">
@@ -135,7 +135,7 @@ export const VoteListing = (props: VoteListingProps) => {
               switch (true) {
                 case vote instanceof SubstrateDemocracyVote:
                   return (
-                    <div className="vote">
+                    <div className="vote" key={index}>
                       <User user={vote.account} linkify popover />
                       <div className="vote-right-container">
                         <CWText
@@ -165,7 +165,7 @@ export const VoteListing = (props: VoteListingProps) => {
                   );
                 default:
                   return (
-                    <div className="vote">
+                    <div className="vote" key={index}>
                       <User user={vote.account} linkify popover />
                       <div className="vote-right-container">
                         <CWText
@@ -189,7 +189,7 @@ export const VoteListing = (props: VoteListingProps) => {
 
             case vote instanceof DepositVote:
               return (
-                <div className="vote">
+                <div className="vote" key={index}>
                   <User user={vote.account} linkify popover />
                   <CWText>
                     {formatCoin((vote as DepositVote<any>).deposit, true)}
@@ -199,7 +199,7 @@ export const VoteListing = (props: VoteListingProps) => {
 
             default:
               return (
-                <div className="vote">
+                <div className="vote" key={index}>
                   <User user={vote.account} linkify popover />
                 </div>
               );
