@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/component_kit/cw_avatar_username_input.scss';
 import { formatAddressShort } from 'helpers';
 
@@ -18,8 +16,8 @@ type AvatarUsernameInputProps = {
   address: string;
   darkMode?: boolean;
   value: string;
-  onAvatarChangeHandler: (e) => void;
-  onUsernameChangeHandler: (e) => void;
+  onAvatarChangeHandler: (avatarUrl: string) => void;
+  onUsernameChangeHandler: (username: string) => void;
   orientation?: Orientation;
 };
 
@@ -46,16 +44,15 @@ export const CWAvatarUsernameInput = (props: AvatarUsernameInputProps) => {
         scope="user"
         size={orientation === 'vertical' ? 'large' : 'small'}
         account={account}
-        uploadStartedCallback={() => {
-          redraw();
-        }}
         uploadCompleteCallback={(files) => {
           files.forEach((f) => {
-            if (!f.uploadURL) return;
+            if (!f.uploadURL) {
+              return;
+            }
+
             const url = f.uploadURL.replace(/\?.*/, '');
             onAvatarChangeHandler(url.trim);
           });
-          redraw();
         }}
       />
       <div className="input-and-address-container">
