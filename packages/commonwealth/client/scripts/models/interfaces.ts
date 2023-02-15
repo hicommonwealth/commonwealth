@@ -5,7 +5,7 @@ import type { EventEmitter } from 'events';
 import type moment from 'moment';
 import type StorageModule from './StorageModule';
 import type { TransactionStatus } from './types';
-import AddressAccount from 'models/AddressAccount';
+import type AddressAccount from 'models/AddressAccount';
 
 /* eslint-disable */
 

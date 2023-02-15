@@ -8,8 +8,8 @@ import type { IAccountsModule } from 'models';
 
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import SubstrateChain from './shared';
-import AddressAccount from 'models/AddressAccount';
+import type SubstrateChain from './shared';
+import { AddressAccount } from 'models';
 
 type Delegation = [AccountId, Conviction] & Codec;
 

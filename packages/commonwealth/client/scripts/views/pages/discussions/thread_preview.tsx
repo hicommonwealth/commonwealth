@@ -34,7 +34,7 @@ import {
   isHot,
 } from './helpers';
 import { ThreadPreviewMenu } from './thread_preview_menu';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 type ThreadPreviewAttrs = {
   thread: Thread;

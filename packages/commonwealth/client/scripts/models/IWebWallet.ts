@@ -6,7 +6,7 @@ import type {
 } from 'common-common/src/types';
 
 import type BlockInfo from './BlockInfo';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
   name: WalletId;

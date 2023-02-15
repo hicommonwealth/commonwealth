@@ -25,7 +25,7 @@ import {
 } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
 import { CWSpinner } from './cw_spinner';
@@ -184,10 +184,11 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       wallets,
       setSelectedWallet,
       accountVerifiedCallback,
-      linking,
       useSessionKeyLoginFlow,
       hideConnectAnotherWayLink,
     } = vnode.attrs;
+
+    let { linking } = vnode.attrs;
 
     // We call handleNormalWalletLogin if we're using connecting a new wallet, and
     // handleSessionKeyRevalidation if we're regenerating a session key.
@@ -229,7 +230,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       console.log('Started new session for', wallet.chain, chainId);
 
       const newlyCreated = false;
-      const linking = false;
+      linking = false;
       accountVerifiedCallback(account, newlyCreated, linking);
     }
     async function handleNormalWalletLogin(

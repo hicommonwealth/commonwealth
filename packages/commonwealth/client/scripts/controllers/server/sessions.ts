@@ -1,4 +1,4 @@
-import { IWebWallet } from 'models';
+import type { IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import {
@@ -9,16 +9,16 @@ import {
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
-import { ChainBase } from '../../../../../common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import type { ISessionController } from './sessionSigners';
 import {
-  ISessionController,
   EthereumSessionController,
   SubstrateSessionController,
   CosmosSDKSessionController,
   SolanaSessionController,
   NEARSessionController,
 } from './sessionSigners';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 export async function signSessionWithAccount<T extends { address: string }>(
   wallet: IWebWallet<T>,

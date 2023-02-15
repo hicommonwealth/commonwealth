@@ -5,5 +5,6 @@ then
     echo "There is nothing to lint"
 else
     echo $LINES
-    NODE_OPTIONS="--max-old-space-size=4096" eslint $LINES
+    # "$@" allows you to pass eslint arguments to the yarn command like `yarn lint-branch --quiet`
+    NODE_OPTIONS="--max-old-space-size=4096" eslint "$@" $LINES
 fi

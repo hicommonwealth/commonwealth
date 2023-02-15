@@ -14,7 +14,7 @@ import _ from 'lodash';
 
 import m from 'mithril';
 import type { Comment, Thread } from 'models';
-import { Profile } from 'models';
+import { AddressAccount, Profile } from 'models';
 import 'pages/profile.scss';
 
 import app from 'state';
@@ -28,7 +28,6 @@ import ProfileBanner from './profile_banner';
 import ProfileBio from './profile_bio';
 import ProfileContent from './profile_content';
 import ProfileHeader from './profile_header';
-import AddressAccount from 'models/AddressAccount';
 
 const getProfileStatus = (account) => {
   const onOwnProfile =

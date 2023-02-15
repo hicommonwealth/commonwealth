@@ -9,7 +9,7 @@ import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 export class UserController {
   private _activeAddressAccount: AddressAccount;

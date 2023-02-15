@@ -12,7 +12,7 @@ import { formatAddressShort } from 'utils';
 import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import { SubstrateTreasuryTip } from './treasury_tip';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 class SubstrateTreasuryTips extends ProposalModule<
   ApiPromise,

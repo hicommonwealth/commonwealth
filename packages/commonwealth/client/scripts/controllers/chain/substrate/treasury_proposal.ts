@@ -17,7 +17,7 @@ import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import type SubstrateTreasury from './treasury';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -28,7 +28,6 @@ const backportEventToAdapter = (
   return {
     identifier: event.proposalIndex.toString(),
     index: event.proposalIndex,
-    //@ts-ignore
     value: ChainInfo.createType('u128', event.value),
     beneficiary: event.beneficiary,
     bond: ChainInfo.createType('u128', event.bond),

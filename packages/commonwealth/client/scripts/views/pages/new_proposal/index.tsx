@@ -7,7 +7,7 @@ import {
   proposalSlugToClass,
   proposalSlugToFriendlyName,
 } from 'identifiers';
-import m from 'mithril';
+import type m from 'mithril';
 import type { ProposalModule } from 'models';
 
 import 'pages/new_proposal/index.scss';

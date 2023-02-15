@@ -8,10 +8,9 @@ import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 import m from 'mithril';
 import type { BlockInfo, ChainInfo } from 'models';
-import { ITokenAdapter, SocialAccount } from 'models';
+import { ITokenAdapter, SocialAccount, AddressAccount } from 'models';
 import moment from 'moment';
 import app from 'state';
-import AddressAccount from 'models/AddressAccount';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,

@@ -15,6 +15,7 @@ import {
 } from 'identifiers';
 import m from 'mithril';
 import type { AnyProposal, Comment, ProposalModule } from 'models';
+import { AddressAccount } from 'models';
 
 import app from 'state';
 import { slugify } from 'utils';
@@ -33,7 +34,6 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
-import AddressAccount from 'models/AddressAccount';
 
 type ProposalPrefetch = {
   [identifier: string]: {

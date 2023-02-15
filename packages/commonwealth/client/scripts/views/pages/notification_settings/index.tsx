@@ -22,7 +22,7 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs } from './helpers';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 class NotificationSettingsPage extends ClassComponent {
   view() {

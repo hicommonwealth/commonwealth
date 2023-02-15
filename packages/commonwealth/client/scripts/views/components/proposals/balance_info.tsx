@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 import m from 'mithril';
 import app from 'state';
 import { CWText } from '../component_kit/cw_text';
-import AddressAccount from 'models/AddressAccount';
+import type AddressAccount from 'models/AddressAccount';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 
 type BalanceInfoAttrs = {

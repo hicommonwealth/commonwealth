@@ -15,7 +15,7 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithAccount } from 'controllers/server/sessions';
-import { AddressAccount, IWebWallet } from 'models';
+import type { AddressAccount, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
 import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import {

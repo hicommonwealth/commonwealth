@@ -7,7 +7,7 @@ import { pluralize } from 'helpers';
 import _, { capitalize } from 'lodash';
 import m from 'mithril';
 import type { Profile } from 'models';
-import { SearchQuery } from 'models';
+import { SearchQuery, AddressAccount } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
 import moment from 'moment';
 
@@ -27,7 +27,6 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { PageNotFound } from '../404';
 import ErrorPage from '../error';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import AddressAccount from 'models/AddressAccount';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 

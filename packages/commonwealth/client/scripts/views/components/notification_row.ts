@@ -18,7 +18,7 @@ import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 const jumpHighlightNotification = (
   commentId,

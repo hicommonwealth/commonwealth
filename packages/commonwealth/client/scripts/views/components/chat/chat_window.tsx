@@ -22,7 +22,7 @@ import { renderQuillTextBody } from '../quill/helpers';
 import type { QuillEditor } from '../quill/quill_editor';
 
 import { QuillEditorComponent } from '../quill/quill_editor_component';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;

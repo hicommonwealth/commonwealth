@@ -8,7 +8,7 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type Web3 from 'web3';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 import BN from 'bn.js';
 
 const ETHEREUM_BLOCK_TIME = 13;

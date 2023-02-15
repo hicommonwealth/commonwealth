@@ -15,7 +15,7 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 // TODO: Switch to new component kit system, migrate to more native setup
 const renderCommunity = (item: ChainInfo) => {

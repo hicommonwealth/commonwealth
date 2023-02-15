@@ -5,7 +5,8 @@ import ClassComponent from 'class_component';
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import m from 'mithril';
-import { Thread, ChainInfo, Reaction } from 'models';
+import type {  ChainInfo, Reaction } from 'models';
+import { Thread } from 'models';
 
 import app from 'state';
 import { CWIconButton } from '../component_kit/cw_icon_button';

@@ -6,13 +6,13 @@ import 'components/avatar_upload.scss';
 import Dropzone from 'dropzone';
 import { isUndefined } from 'helpers/typeGuards';
 import $ from 'jquery';
-import m from 'mithril';
+import type m from 'mithril';
 
 import app from 'state';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
-import { AddressAccount } from 'models';
+import type { AddressAccount } from 'models';
 
 type AvatarUploadStyleAttrs = {
   size?: 'small' | 'large';

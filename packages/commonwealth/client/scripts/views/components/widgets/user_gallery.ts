@@ -5,7 +5,7 @@ import m from 'mithril';
 
 import app from 'state';
 import User, { AnonymousUser } from './user';
-import AddressAccount from 'models/AddressAccount';
+import type AddressAccount from 'models/AddressAccount';
 
 // The UserGallery does not perform uniqueness checks.
 // The list of passed users must be unique to begin with, if one

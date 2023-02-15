@@ -7,7 +7,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 
 import { SolanaToken } from './types';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 export default class SolanaChain
   implements IChainModule<SolanaToken, AddressAccount>

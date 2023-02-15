@@ -18,7 +18,7 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

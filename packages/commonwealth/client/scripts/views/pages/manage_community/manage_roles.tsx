@@ -13,7 +13,7 @@ import User from 'views/components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 type ManageRoleRowAttrs = {
   label: string;

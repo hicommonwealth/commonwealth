@@ -28,9 +28,8 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { NewLoginModal } from '../modals/login_modal';
-import AddressAccount from 'models/AddressAccount';
-import { NearAccounts } from 'controllers/chain/near/accounts';
-import NearChain from 'controllers/chain/near/chain';
+import type AddressAccount from 'models/AddressAccount';
+import type NearChain from 'controllers/chain/near/chain';
 
 interface IState {
   validating: boolean;

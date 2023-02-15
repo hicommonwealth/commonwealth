@@ -4,7 +4,7 @@ import bs58 from 'bs58';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { AddressAccount, IWebWallet } from 'models';
+import type { AddressAccount, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS

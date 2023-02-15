@@ -9,7 +9,7 @@ import 'pages/snapshot/snapshot_votes_table.scss';
 import app from 'state';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 type SnapshotVoteType = {
   balance: number;

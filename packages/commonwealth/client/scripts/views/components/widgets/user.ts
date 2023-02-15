@@ -13,7 +13,7 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length

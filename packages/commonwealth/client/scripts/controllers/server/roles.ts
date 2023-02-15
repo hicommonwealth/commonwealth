@@ -12,7 +12,7 @@ import {
 } from 'commonwealth/shared/permissions';
 import type { RoleObject } from 'commonwealth/shared/types';
 import type { UserController } from './user';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 const getPermissionLevel = (permission: AccessLevel | undefined) => {
   if (permission === undefined) {

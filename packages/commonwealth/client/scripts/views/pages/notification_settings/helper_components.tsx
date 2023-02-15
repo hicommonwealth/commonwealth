@@ -17,7 +17,7 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import User from '../../components/widgets/user';
 import { getNotificationTypeText } from './helpers';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 const getTextRows = (subscription: NotificationSubscription) => {
   if (subscription.Thread) {

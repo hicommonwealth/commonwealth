@@ -4,7 +4,7 @@ import { AccountsStore } from 'stores';
 
 import type SolanaChain from './chain';
 import type { SolanaToken } from './types';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 export default class SolanaAccounts
   implements IAccountsModule<SolanaToken, AddressAccount>

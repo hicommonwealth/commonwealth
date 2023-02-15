@@ -15,9 +15,8 @@ import type { SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
-import type { IWebWallet } from 'models';
+import type { AddressAccount, IWebWallet } from 'models';
 import app from 'state';
-import { AddressAccount } from 'models';
 
 class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>

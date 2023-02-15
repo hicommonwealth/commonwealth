@@ -7,7 +7,7 @@ import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import m from 'mithril';
+import type m from 'mithril';
 import type { AnyProposal } from 'models';
 
 import app from 'state';

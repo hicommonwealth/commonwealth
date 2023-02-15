@@ -12,7 +12,7 @@ import app from 'state';
 import User from 'views/components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getCommentPreview } from './helpers';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 type UserDashboardRowTopAttrs = {
   activityData: any;

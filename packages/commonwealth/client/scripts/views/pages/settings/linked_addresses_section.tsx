@@ -15,7 +15,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import AddressAccount from 'models/AddressAccount';
+import type AddressAccount from 'models/AddressAccount';
 
 type AccountRowAttrs = {
   account: AddressAccount;

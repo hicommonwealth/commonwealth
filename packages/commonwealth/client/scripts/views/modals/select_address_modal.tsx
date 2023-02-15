@@ -20,7 +20,7 @@ import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';
-import AddressAccount from 'models/AddressAccount';
+import type AddressAccount from 'models/AddressAccount';
 
 export class SelectAddressModal extends ClassComponent {
   private loading: boolean;

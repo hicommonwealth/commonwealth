@@ -28,7 +28,7 @@ import type SubstrateDemocracyProposals from './democracy_proposals';
 import type { SubstrateDemocracyReferendum } from './democracy_referendum';
 
 import type SubstrateChain from './shared';
-import AddressAccount from 'models/AddressAccount';
+import type { AddressAccount } from 'models';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -39,7 +39,6 @@ const backportEventToAdapter = (
     identifier: event.proposalIndex.toString(),
     index: event.proposalIndex,
     hash: enc.encode(event.proposalHash),
-    //@ts-ignore
     deposit: ChainInfo.createType('u128', event.deposit),
     author: event.proposer,
   };

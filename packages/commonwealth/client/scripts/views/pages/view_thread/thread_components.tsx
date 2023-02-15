@@ -21,7 +21,7 @@ import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover'
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import User from '../../components/widgets/user';
-import AddressAccount from 'models/AddressAccount';
+import { AddressAccount } from 'models';
 
 type ThreadComponentAttrs = {
   thread: Thread;

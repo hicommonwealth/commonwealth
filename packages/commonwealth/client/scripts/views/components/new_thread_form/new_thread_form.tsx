@@ -30,7 +30,7 @@ import { TopicSelector } from '../topic_selector';
 import { checkNewThreadErrors, updateTopicList } from './helpers';
 import type { NewThreadFormType } from './types';
 import { NewDraftErrors } from './types';
-import AddressAccount from 'models/AddressAccount';
+import type AddressAccount from 'models/AddressAccount';
 
 type NewThreadFormAttrs = {
   hasTopics: boolean;
