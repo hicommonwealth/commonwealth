@@ -52,6 +52,7 @@ export const User = (props: UserAttrs) => {
   const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [, updateState] = React.useState({});
 
   const popoverProps = usePopover();
 
@@ -106,6 +107,11 @@ export const User = (props: UserAttrs) => {
     }
 
     profile = app.profiles.getProfile(chainId.id, address);
+    if (!profile.initialized) {
+      app.profiles.isFetched.on('redraw', () => {
+        updateState({});
+      });
+    }
 
     role = adminsAndMods.find(
       (r) => r.address === address && r.address_chain === chainId.id
