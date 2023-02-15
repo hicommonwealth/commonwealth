@@ -1,6 +1,10 @@
 @import '../shared';
 
 .Feed {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
   .loading-spinner {
     align-items: center;
     display: flex;

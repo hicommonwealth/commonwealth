@@ -37,7 +37,7 @@ class FeedPage extends ClassComponent {
   private getCombinedFeed = async () => {
     return Promise.all([this.getGlobalFeed(), this.getChainEvents()]).then((result) => {
       return {
-        result: result[0].concat(result[1]),
+        result: this.sortFeed(result[0], result[1]),
       }
     }).catch((err) => { return err });
   }
@@ -73,9 +73,7 @@ class FeedPage extends ClassComponent {
           </CWText>
           <Feed
             fetchData={this.getCombinedFeed}
-            type={FeedType.Combined}
             noFeedMessage="No activity yet"
-            onFetchedDataCallback={this.sortFeed}
           />
         </div>
       </Sublayout>
