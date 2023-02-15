@@ -11,13 +11,15 @@ import { fetchActivity } from '../user_dashboard/helpers';
 import { DashboardViews } from '../user_dashboard';
 import { CWText } from '../../components/component_kit/cw_text';
 import ErrorPage from '../error';
-import { Feed, FeedType } from '../../components/feed';
+import { Feed } from '../../components/feed';
 
 class FeedPage extends ClassComponent {
   private getGlobalFeed = async () => {
     try {
       const activity = await fetchActivity(DashboardViews.Global);
-      const formattedData = activity.result.map((item) => DashboardActivityNotification.fromJSON(item));
+      const formattedData = activity.result
+        .map((item) => DashboardActivityNotification.fromJSON(item))
+        .filter((item) => JSON.parse(item.notificationData).chain_id === app.activeChainId());
       return formattedData;
     } catch (err) {
       return err;
@@ -27,7 +29,9 @@ class FeedPage extends ClassComponent {
   private getChainEvents = async () => {
     try {
       const activity = await fetchActivity(DashboardViews.Chain);
-      const formattedData = activity.result.map((item) => DashboardActivityNotification.fromJSON(item));
+      const formattedData = activity.result
+        .map((item) => DashboardActivityNotification.fromJSON(item))
+        .filter((item) => item.chain === app.activeChainId());
       return formattedData;
     } catch (err) {
       return err;
