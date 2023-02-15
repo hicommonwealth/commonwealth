@@ -385,6 +385,7 @@ const createChain = async (
   let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
+  // TODO: how do we move away from chain here?
   if (chain.base === ChainBase.Ethereum) {
     addressToBeAdmin = await models.Address.findOne({
       where: {

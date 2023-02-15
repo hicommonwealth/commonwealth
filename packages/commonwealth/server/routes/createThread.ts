@@ -117,6 +117,7 @@ const dispatchHooks = async (
       mentionedAddresses = await Promise.all(
         mentions.map(async (mention) => {
           try {
+            // TODO: how do we move away from chain here?
             return models.Address.findOne({
               where: {
                 chain: mention[0] || null,

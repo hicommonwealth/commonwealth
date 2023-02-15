@@ -25,6 +25,7 @@ const updateAddress = async (
   const transaction = await sequelize.transaction();
   try {
     if (req.user.id) {
+      // TODO: how to move away from Chain here?
       const { id: ghostAddressId } =
         (await models.Address.scope('withPrivateData').findOne({
           where: { chain, ghost_address: true, user_id: req.user.id },

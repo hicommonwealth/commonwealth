@@ -11,6 +11,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
+// TODO: where is this used? can we get rid of chain?
 const getAddressStatus = async (
   models: DB,
   req: Request,

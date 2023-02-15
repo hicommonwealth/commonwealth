@@ -161,6 +161,7 @@ const deleteChain = async (
         transaction: t,
       });
 
+      // TODO: delete roles instead?
       const addresses = await models.Address.findAll({
         where: { chain: chain.id },
       });

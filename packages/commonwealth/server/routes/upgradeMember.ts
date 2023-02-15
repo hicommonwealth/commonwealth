@@ -40,6 +40,8 @@ const upgradeMember = async (
 
   if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
     return next(new AppError(Errors.MustBeAdmin));
+
+  // TODO: how to move away from Chain here?
   const memberAddress = await models.Address.findOne({
     where: {
       address,

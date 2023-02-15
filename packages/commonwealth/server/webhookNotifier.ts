@@ -125,7 +125,6 @@ const send = async (models, content: WebhookContent) => {
     address = await models.Address.findOne({
       where: {
         address: content.user,
-        chain: content.author_chain,
       },
     });
   } catch (err) {

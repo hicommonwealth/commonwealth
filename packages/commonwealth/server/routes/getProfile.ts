@@ -29,6 +29,7 @@ const getProfile = async (
   if (!chain) throw new AppError(Errors.NoChain);
   if (!address) throw new AppError(Errors.NoAddress);
 
+  // TODO: how to move away from Chain here?
   const addressModel = await models.Address.findOne({
     where: {
       address,

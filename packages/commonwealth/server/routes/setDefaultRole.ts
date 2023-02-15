@@ -10,6 +10,7 @@ export const Errors = {
   RoleDNE: 'Role does not exist',
 };
 
+// TODO: what does this do & how to move away from Chain here?
 const setDefaultRole = async (
   models: DB,
   req,

@@ -33,6 +33,7 @@ const handleMentions = async (
     if (mentions && mentions.length > 0) {
       mentionedAddresses = await Promise.all(
         mentions.map(async (mention) => {
+          // TODO: how to move away from Chain here?
           const user = await models.Address.findOne({
             where: {
               chain: mention[0] || null,

@@ -42,6 +42,7 @@ const deleteEditors = async (
 
   await Promise.all(
     editors.map(async (editor: any) => {
+      // TODO: how to move away from Chain here?
       const address = await models.Address.findOne({
         where: {
           chain: editor.chain,

@@ -19,6 +19,7 @@ export const Errors = {
   BioTooLong: `Bio must be less than ${PROFILE_BIO_MAX_CHARS} characters`,
 };
 
+// TODO: how to move away from Chain here?
 const updateProfile = async (
   models: DB,
   req: Request,

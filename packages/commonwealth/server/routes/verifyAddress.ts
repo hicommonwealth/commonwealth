@@ -32,6 +32,7 @@ import type { AddressInstance } from '../models/address';
 import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
 import { mixpanelTrack } from '../util/mixpanelUtil';
+import { createRole, findOneRole } from '../util/roles';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import {
   chainBaseToCanvasChain,
@@ -386,6 +387,16 @@ const verifySignature = async (
     addressModel.profile_id = profile.id;
   }
   await addressModel.save();
+
+  // create initial role once address has been verified as belonging to user
+  const existingRole = await findOneRole(
+    models,
+    { where: { address_id: addressModel.id } },
+    chain.id
+  );
+  if (!existingRole) {
+    await createRole(models, addressModel.id, chain.id, 'member');
+  }
   return isValid;
 };
 
@@ -403,7 +414,7 @@ const processAddress = async (
 ): Promise<void> => {
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: chain.id, address },
+      where: { address },
     }
   );
   if (!existingAddress) {
@@ -525,7 +536,7 @@ const verifyAddress = async (
   } else {
     // if user isn't logged in, log them in now
     const newAddress = await models.Address.findOne({
-      where: { chain: req.body.chain, address },
+      where: { address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
       where: { id: newAddress.user_id },

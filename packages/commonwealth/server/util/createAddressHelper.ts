@@ -16,8 +16,6 @@ type CreateAddressReq = {
   address: string;
   chain: string;
   wallet_id: WalletId;
-  community?: string;
-  keytype?: string;
   block_info?: string;
 };
 
@@ -84,7 +82,7 @@ export async function createAddressHelper(
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: req.chain, address: encodedAddress },
+      where: { address: encodedAddress },
     }
   );
 
@@ -111,7 +109,6 @@ export async function createAddressHelper(
     if (updatedId) {
       existingAddress.user_id = updatedId;
     }
-    existingAddress.keytype = req.keytype;
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
@@ -121,19 +118,6 @@ export async function createAddressHelper(
     existingAddress.wallet_id = req.wallet_id;
 
     const updatedObj = await existingAddress.save();
-
-    // even if this is the existing address, there is a case to login to community through this address's chain
-    // if community is valid, then we should create a role between this community vs address
-    if (req.community) {
-      const role = await findOneRole(
-        models,
-        { where: { address_id: updatedObj.id } },
-        req.community
-      );
-      if (!role) {
-        await createRole(models, updatedObj.id, req.community, 'member');
-      }
-    }
     return { ...updatedObj.toJSON(), newly_created: false };
   } else {
     // address doesn't exist, add it to the database
@@ -162,16 +146,9 @@ export async function createAddressHelper(
         verification_token,
         verification_token_expires,
         block_info: req.block_info,
-        keytype: req.keytype,
         last_active,
         wallet_id: req.wallet_id,
       });
-
-      // if user.id is undefined, the address is being used to create a new user,
-      // and we should automatically give it a Role in its native chain (or community)
-      if (!user) {
-        await createRole(models, newObj.id, req.chain, 'member');
-      }
 
       if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({

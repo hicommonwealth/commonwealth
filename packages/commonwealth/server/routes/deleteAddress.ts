@@ -27,6 +27,7 @@ const deleteAddress = async (
     return next(new AppError(Errors.NeedChain));
   }
 
+  // TODO: is this safe to remove chain here? is this called where we expect to remove roles?
   const addressObj = await models.Address.findOne({
     where: { chain: req.body.chain, address: req.body.address },
   });

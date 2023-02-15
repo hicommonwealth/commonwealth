@@ -91,7 +91,6 @@ export async function putCommunities(
           const r: CreateAddressReq = {
             address,
             chain: community.id,
-            community: community.id,
             wallet_id: null,
           };
 

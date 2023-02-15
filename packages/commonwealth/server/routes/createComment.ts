@@ -325,6 +325,7 @@ const createComment = async (
     if (mentions && mentions.length > 0) {
       mentionedAddresses = await Promise.all(
         mentions.map(async (mention) => {
+          // TODO: how do we remove chain here?
           const user = await models.Address.findOne({
             where: {
               chain: mention[0] || null,

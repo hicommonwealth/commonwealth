@@ -21,7 +21,6 @@ export const filterAddressOwnedByUser = async (
   addressIds: number[]
 ): Promise<{ owned: AddressInstance[]; unowned: UnownedAddresses[] }> => {
   const where = {
-    chain: { [Op.in]: chains },
     user_id,
   };
 
@@ -34,7 +33,7 @@ export const filterAddressOwnedByUser = async (
 
   // get the list of addresses owned by user
   let addressesOwnedByUser: AddressInstance[] = await models.Address.findAll({
-    where,
+    where
   });
   addressesOwnedByUser = addressesOwnedByUser.filter((a) => a.verified);
 
@@ -69,7 +68,6 @@ const lookupAddressIsOwnedByUser = async (
 
   const author = await models.Address.findOne({
     where: {
-      chain: req.body.author_chain,
       address: req.body.address,
       user_id: req.user.id,
     },

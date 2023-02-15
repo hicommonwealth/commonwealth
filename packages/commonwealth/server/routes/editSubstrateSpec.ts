@@ -6,6 +6,7 @@ import { findAllRoles } from '../util/roles';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
 
+// TODO: deprecate / delete outright
 const editSubstrateSpec = async (
   models: DB,
   req: Request,

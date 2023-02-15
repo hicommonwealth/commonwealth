@@ -107,6 +107,7 @@ const setupAppRoutes = (
   app.get('/:scope/account/:address', async (req, res) => {
     // Retrieve title, description, and author from the database
     let title, description, author, profileData, image;
+    // TODO: how to move away from Chain here?
     const address = await models.Address.findOne({
       where: { chain: req.params.scope, address: req.params.address },
       include: [models.OffchainProfile],

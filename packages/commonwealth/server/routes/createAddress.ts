@@ -18,8 +18,6 @@ export type CreateAddressReq = {
   address: string;
   chain: string;
   wallet_id: WalletId;
-  community?: string;
-  keytype?: string;
   block_info?: string;
 };
 

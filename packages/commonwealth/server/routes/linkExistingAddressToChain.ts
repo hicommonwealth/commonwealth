@@ -1,13 +1,11 @@
 import { AppError } from 'common-common/src/errors';
-import { ChainBase } from 'common-common/src/types';
-import crypto from 'crypto';
-import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import { addressSwapper } from '../../shared/utils';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { DB } from '../models';
 import { createRole, findOneRole } from '../util/roles';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { success } from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import type { RoleInstanceWithPermissionAttributes } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,29 +14,32 @@ const { Op } = Sequelize;
 export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
-  NeedOriginChain: 'Must provide original chain',
   NeedLoggedIn: 'Must be logged in',
+  RoleAlreadyExists: 'Role already exists',
   NotVerifiedAddressOrUser: 'Not verified address or user',
   InvalidChain: 'Invalid chain',
 };
 
+type linkExistingAddressToChainReq = {
+  address: string; // address they already own
+  chain: string;   // chain they are joining
+}
+
+type linkExistingAddressToChainResp = RoleInstanceWithPermissionAttributes;
+
 const linkExistingAddressToChain = async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestBody<linkExistingAddressToChainReq>,
+  res: TypedResponse<linkExistingAddressToChainResp>
 ) => {
   if (!req.body.address) {
-    return next(new AppError(Errors.NeedAddress));
+    throw new AppError(Errors.NeedAddress);
   }
   if (!req.body.chain) {
-    return next(new AppError(Errors.NeedChain));
-  }
-  if (!req.body.originChain) {
-    return next(new AppError(Errors.NeedOriginChain));
+    throw new AppError(Errors.NeedChain);
   }
   if (!req.user?.id) {
-    return next(new AppError(Errors.NeedLoggedIn));
+    throw new AppError(Errors.NeedLoggedIn);
   }
   const userId = req.user.id;
 
@@ -47,11 +48,10 @@ const linkExistingAddressToChain = async (
   });
 
   if (!chain) {
-    return next(new AppError(Errors.InvalidChain));
+    throw new AppError(Errors.InvalidChain);
   }
 
-  // check if the original address is verified and is owned by the user
-  const originalAddress = await models.Address.scope('withPrivateData').findOne(
+  const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
       where: {
         address: req.body.address,
@@ -61,143 +61,22 @@ const linkExistingAddressToChain = async (
     }
   );
 
-  if (!originalAddress) {
-    return next(new AppError(Errors.NotVerifiedAddressOrUser));
+  if (!addressInstance) {
+    throw new AppError(Errors.NotVerifiedAddressOrUser);
   }
 
-  const originalProfile = await models.OffchainProfile.findOne({
-    where: { address_id: originalAddress.id },
-  });
+  const role = await findOneRole(
+    models,
+    { where: { address_id: addressInstance.id } },
+    req.body.chain
+  );
 
-  const profileData =
-    originalProfile && originalProfile.data ? originalProfile.data : null;
-
-  // check if the original address's token is expired. refer edge case 1)
-  let verificationToken = originalAddress.verification_token;
-  let verificationTokenExpires = originalAddress.verification_token_expires;
-  const isOriginalTokenValid =
-    verificationTokenExpires && +verificationTokenExpires <= +new Date();
-
-  if (!isOriginalTokenValid) {
-    const chains = await models.Chain.findAll({
-      where: { base: chain.base },
-    });
-
-    verificationToken = crypto.randomBytes(18).toString('hex');
-    verificationTokenExpires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
-    );
-
-    await models.Address.update(
-      {
-        verification_token: verificationToken,
-        verification_token_expires: verificationTokenExpires,
-      },
-      {
-        where: {
-          user_id: originalAddress.user_id,
-          address: req.body.address,
-          chain: { [Op.in]: chains.map((ch) => ch.id) },
-        },
-      }
-    );
+  if (role) {
+    throw new AppError(Errors.RoleAlreadyExists);
   }
 
-  try {
-    const encodedAddress =
-      chain.base === ChainBase.Substrate
-        ? addressSwapper({
-            address: req.body.address,
-            currentPrefix: chain.ss58_prefix,
-          })
-        : req.body.address;
-
-    const existingAddress = await models.Address.scope(
-      'withPrivateData'
-    ).findOne({
-      where: { chain: req.body.chain, address: encodedAddress },
-    });
-
-    let addressId: number;
-    if (existingAddress) {
-      // refer edge case 2)
-      // either if the existing address is owned by someone else or this user,
-      //   we can just update with userId. this covers both edge case (1) & (2)
-      // Address.updateWithTokenProvided
-      existingAddress.user_id = userId;
-      existingAddress.keytype = req.body.keytype;
-      existingAddress.verification_token = verificationToken;
-      existingAddress.verification_token_expires = verificationTokenExpires;
-      existingAddress.last_active = new Date();
-      const updatedObj = await existingAddress.save();
-      addressId = updatedObj.id;
-    } else {
-      const newObj = await models.Address.create({
-        user_id: originalAddress.user_id,
-        profile_id: originalAddress.profile_id,
-        address: encodedAddress,
-        chain: req.body.chain,
-        verification_token: verificationToken,
-        verification_token_expires: verificationTokenExpires,
-        verified: originalAddress.verified,
-        keytype: originalAddress.keytype,
-        name: originalAddress.name,
-        wallet_id: originalAddress.wallet_id,
-        last_active: new Date(),
-      });
-
-      addressId = newObj.id;
-    }
-
-    const existingProfile = await models.OffchainProfile.findOne({
-      where: { address_id: addressId },
-    });
-
-    if (existingProfile) {
-      await models.OffchainProfile.update(
-        {
-          data: profileData,
-        },
-        {
-          where: {
-            address_id: addressId,
-          },
-        }
-      );
-    } else {
-      await models.OffchainProfile.create({
-        address_id: addressId,
-        data: profileData,
-      });
-    }
-
-    const ownedAddresses = await models.Address.findAll({
-      where: { user_id: originalAddress.user_id },
-    });
-
-    const role = await findOneRole(
-      models,
-      { where: { address_id: addressId } },
-      req.body.chain
-    );
-
-    if (!role) {
-      await createRole(models, addressId, req.body.chain, 'member');
-    }
-
-    return res.json({
-      status: 'Success',
-      result: {
-        verification_token: verificationToken,
-        addressId,
-        addresses: ownedAddresses.map((a) => a.toJSON()),
-        encodedAddress,
-      },
-    });
-  } catch (e) {
-    log.error(e.message);
-    return next(e);
-  }
+  const newRole = await createRole(models, addressInstance.id, req.body.chain, 'member');
+  return success(res, newRole.toJSON());
 };
 
 export default linkExistingAddressToChain;

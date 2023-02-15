@@ -36,6 +36,7 @@ const bulkProfiles = async (
   let addrObjs;
   // if all profiles are on the same chain, make a fast query, otherwise, make multiple queries
   if (_.uniq(chains).length === 1) {
+    // TODO: this is now an invalid query. what to do? use roles instead?
     addrObjs = await models.Address.findAll({
       where: {
         chain: chains[0],

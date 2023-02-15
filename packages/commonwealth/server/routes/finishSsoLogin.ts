@@ -136,7 +136,6 @@ const finishSsoLogin = async (
     {
       where: {
         address: checksumAddress,
-        chain: 'axie-infinity',
       },
       include: [
         {

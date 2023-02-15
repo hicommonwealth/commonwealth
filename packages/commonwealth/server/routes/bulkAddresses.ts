@@ -40,6 +40,8 @@ const bulkAddresses = async (models: DB, req, res) => {
   }
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
+  // TODO: this is going to cause TROUBLE -- we should consider deprecating, or at least
+  //  rethinking the mentioning feature.
   const addresses = await models.Address.findAll(options);
   return res.json({
     status: 'Success',

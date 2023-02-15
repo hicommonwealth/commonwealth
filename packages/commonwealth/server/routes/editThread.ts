@@ -230,6 +230,7 @@ const editThread = async (
       mentionedAddresses = await Promise.all(
         mentions.map(async (mention) => {
           try {
+            // TODO: how to move away from Chain here?
             const user = await models.Address.findOne({
               where: {
                 chain: mention[0],
