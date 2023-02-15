@@ -50,5 +50,9 @@
     height: 40px;
     padding: 0 8px;
     width: 100%;
+
+    > .Button {
+      flex: 1;
+    }
   }
 }
