@@ -2,8 +2,8 @@ import React from 'react';
 
 import { redraw } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -146,12 +146,12 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'people',
       onClick: (e) => {
         e?.preventDefault();
-        mixpanelBrowserTrack({
-          event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-          chainBase: null,
-          isCustomDomain: app.isCustomDomain(),
-          communityType: null,
-        });
+        // mixpanelBrowserTrack({
+        //   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
+        //   chainBase: null,
+        //   isCustomDomain: app.isCustomDomain(),
+        //   communityType: null,
+        // });
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
         app.sidebarRedraw.emit('redraw');
@@ -163,12 +163,12 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'discord',
       onClick: (e) => {
         e?.preventDefault();
-        mixpanelBrowserTrack({
-          event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-          chainBase: null,
-          isCustomDomain: app.isCustomDomain(),
-          communityType: null,
-        });
+        // mixpanelBrowserTrack({
+        //   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
+        //   chainBase: null,
+        //   isCustomDomain: app.isCustomDomain(),
+        //   communityType: null,
+        // });
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
         app.sidebarRedraw.emit('redraw');

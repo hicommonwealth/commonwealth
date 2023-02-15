@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -55,7 +55,7 @@ class CreateCommunity extends ClassComponent {
     loadingEthChains: true,
   };
 
-  oninit() {
+  oncreate() {
     // query eth chains
     $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(async (res) => {
       if (res.status === 'Success') {
@@ -64,14 +64,16 @@ class CreateCommunity extends ClassComponent {
 
       // query names from chainlist if possible
       const chains = await $.getJSON('https://chainid.network/chains.json');
+
       for (const id of Object.keys(this.state.ethChains)) {
         const chain = chains.find((c) => c.chainId === +id);
         if (chain) {
           this.state.ethChainNames[id] = chain.name;
         }
       }
+
       this.state.loadingEthChains = false;
-      redraw();
+      this.redraw();
     });
   }
 
@@ -120,22 +122,27 @@ class CreateCommunity extends ClassComponent {
             <CWTabBar>
               {Object.values(CommunityType)
                 .filter((t) => {
-                  return !ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin;
+                  return (
+                    (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+                    t !== CommunityType.AbiFactory
+                  );
                 })
-                .map((t) => {
+                .map((t, i) => {
                   return (
                     <CWTab
+                      key={i}
                       label={t.toString()}
                       isSelected={this.state.activeForm === t}
                       onClick={() => {
                         this.state.activeForm = t;
-                        mixpanelBrowserTrack({
-                          event:
-                            MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
-                          chainBase: null,
-                          isCustomDomain: app.isCustomDomain(),
-                          communityType: t,
-                        });
+                        this.redraw();
+                        // mixpanelBrowserTrack({
+                        //   event:
+                        //     MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
+                        //   chainBase: null,
+                        //   isCustomDomain: app.isCustomDomain(),
+                        //   communityType: t,
+                        // });
                       }}
                     />
                   );
