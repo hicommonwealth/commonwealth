@@ -17,14 +17,27 @@ export enum FeedType {
 type FeedProps = {
   fetchData: () => Promise<any>;
   noFeedMessage: string;
+  defaultCount?: number;
   onFetchedDataCallback?: (...data: any) => DashboardActivityNotification;
 };
 
+const DEFAULT_COUNT = 10;
+
 export const Feed = (props: FeedProps) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  const [data, setData] = useState<any>();
+  const [data, setData] = useState<DashboardActivityNotification[]>();
+  const [currentCount, setCurrentCount] = useState<number>(props.defaultCount || DEFAULT_COUNT);
   const { fetchData, onFetchedDataCallback } = props;
+
+  const loadMore = useCallback(() => {
+    setLoadingMore(true);
+    return setTimeout(() => {
+      setCurrentCount((currentCount) => currentCount + (props.defaultCount || DEFAULT_COUNT));
+      setLoadingMore(false);
+    }, 500)
+  }, [setCurrentCount, setLoadingMore])
 
   useEffect(() => {
     const getData = async () => {
@@ -69,16 +82,23 @@ export const Feed = (props: FeedProps) => {
     );
   }
 
+  if (currentCount > data.length) setCurrentCount(data.length);
+
   return (
     <div className="Feed">
       <Virtuoso
-        data={data}
-        totalCount={10}
-        style={{ height: '100%' }}
-        itemContent={(i, item) => {
-          return <UserDashboardRow key={i} notification={item} />;
+        totalCount={currentCount}
+        endReached={loadMore}
+        style={{ height: '100%'}}
+        itemContent={(i) => {
+          return <UserDashboardRow key={i} notification={data[i]} />;
         }}
       />
+      {loadingMore && (
+        <div className="loading-spinner small">
+          <CWSpinner />
+        </div>
+      )}
     </div>
   );
 };
