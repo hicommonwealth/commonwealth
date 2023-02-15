@@ -158,7 +158,7 @@ class ChainInfo {
     ChainNode,
     admin_only_polling,
     discord_config_id,
-    member_classs,
+    member_classes,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -205,7 +205,7 @@ class ChainInfo {
       ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
-      memberClasses: member_classs,
+      memberClasses: member_classes,
     });
   }
 
