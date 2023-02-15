@@ -321,6 +321,7 @@ export const User = (props: UserAttrs) => {
 
   return popover ? (
     <div
+      className="user-popover-wrapper"
       onMouseEnter={popoverProps.handleInteraction}
       onMouseLeave={popoverProps.handleInteraction}
     >
