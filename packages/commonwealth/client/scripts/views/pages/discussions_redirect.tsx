@@ -20,6 +20,7 @@ export default function DiscussionsRedirect() {
       view = defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions;
     }
 
+    // @TODO: make sure that this navigation does not apply to back button
     switch (view) {
       case DefaultPage.Overview:
         navigate('/overview');
