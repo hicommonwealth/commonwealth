@@ -480,8 +480,6 @@ const verifyAddress = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('>>>>>>>>>>>>>>>>>>>', req.body);
-
   if (!req.body.chain || !req.body.chain_id) {
     throw new AppError(Errors.NoChain);
   }
