@@ -11,7 +11,7 @@ import type {
   VotingType,
   VotingUnit,
 } from './types';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 abstract class Proposal<
   ApiT,

@@ -25,7 +25,7 @@ import type AaveAPI from './api';
 import type { AaveExecutor } from './api';
 import type AaveChain from './chain';
 import type AaveGovernance from './governance';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: AddressAccount;

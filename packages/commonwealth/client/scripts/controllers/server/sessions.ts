@@ -18,7 +18,7 @@ import {
   SolanaSessionController,
   NEARSessionController,
 } from './sessionSigners';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export async function signSessionWithAccount<T extends { address: string }>(
   wallet: IWebWallet<T>,

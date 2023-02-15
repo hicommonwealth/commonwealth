@@ -1,10 +1,10 @@
-import type {SnapshotSpace} from 'helpers/snapshot_utils';
-import {createProposal, getSpaceBlockNumber} from 'helpers/snapshot_utils';
+import type { SnapshotSpace } from 'helpers/snapshot_utils';
+import { createProposal, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 import app from 'state';
-import type {QuillEditor} from '../../components/quill/quill_editor';
-import type {ThreadForm} from './types';
-import {NewThreadErrors} from './types';
-import AddressAccount from "models/AddressAccount";
+import type { QuillEditor } from '../../components/quill/quill_editor';
+import type { ThreadForm } from './types';
+import { NewThreadErrors } from './types';
+import AddressAccount from 'models/AddressAccount';
 
 // Don't call it a new thread if it ain't a new thread.
 const newThread = async (

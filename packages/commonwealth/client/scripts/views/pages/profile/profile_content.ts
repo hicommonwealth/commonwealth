@@ -8,7 +8,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import type { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
 import ProfileProposal from './profile_proposal';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 const postsRemaining = (contentLength, count) => {
   return contentLength > 10 && count < contentLength;

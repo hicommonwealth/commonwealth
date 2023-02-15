@@ -1,12 +1,12 @@
 /* eslint-disable no-use-before-define */
 import type { NearToken } from 'adapters/chain/near/types';
 import type { IAccountsModule } from 'models';
-import {Account, Account as NearJsAccount, keyStores} from 'near-api-js';
+import { Account, Account as NearJsAccount, keyStores } from 'near-api-js';
 import type { AccountView } from 'near-api-js/lib/providers/provider';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import type NearChain from './chain';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 // NOTE: this is the actual type of validators in the NodeStatus struct,
 //    the library is wrong, it's not just a string.
@@ -22,7 +22,9 @@ export interface INearValidators {
   };
 }
 
-export class NearAccounts implements IAccountsModule<NearToken, AddressAccount> {
+export class NearAccounts
+  implements IAccountsModule<NearToken, AddressAccount>
+{
   private _Chain: NearChain;
   private _store: AccountsStore<AddressAccount> = new AccountsStore();
   public get store() {
@@ -55,7 +57,7 @@ export class NearAccounts implements IAccountsModule<NearToken, AddressAccount> 
     } catch (e) {
       acct = new AddressAccount({
         address,
-        chain: this.app.config.chains.getById(this.app.activeChainId())
+        chain: this.app.config.chains.getById(this.app.activeChainId()),
       });
     }
     return acct;

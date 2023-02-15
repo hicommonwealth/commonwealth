@@ -65,6 +65,8 @@ export default class Nft extends Ethereum implements ITokenAdapter {
 
   public async initData() {
     await super.initData();
-    await this.activeAddressHasToken(this.app.user?.activeAddressAccount?.address);
+    await this.activeAddressHasToken(
+      this.app.user?.activeAddressAccount?.address
+    );
   }
 }

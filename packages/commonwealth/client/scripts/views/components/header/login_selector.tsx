@@ -32,7 +32,7 @@ import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWPopover } from '../component_kit/cw_popover/cw_popover';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -370,8 +370,8 @@ export class LoginSelector extends ClassComponent {
                   address: a.address,
                   chain: app.config.chains.getById(a.chain),
                   keytype: a.keytype,
-                  walletId: a.wallet_id
-                })
+                  walletId: a.wallet_id,
+                });
               })
             );
             const addressAccount = app.user.addresses.find(

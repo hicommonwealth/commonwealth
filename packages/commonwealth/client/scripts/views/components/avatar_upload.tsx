@@ -12,7 +12,7 @@ import app from 'state';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
-import {AddressAccount} from "models";
+import { AddressAccount } from 'models';
 
 type AvatarUploadStyleAttrs = {
   size?: 'small' | 'large';

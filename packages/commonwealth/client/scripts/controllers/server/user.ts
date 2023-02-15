@@ -3,17 +3,13 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import $ from 'jquery';
 
-import type {
-  ChainInfo,
-  SocialAccount,
-  StarredCommunity,
-} from 'models';
+import type { ChainInfo, SocialAccount, StarredCommunity } from 'models';
 import app from 'state';
 import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export class UserController {
   private _activeAddressAccount: AddressAccount;

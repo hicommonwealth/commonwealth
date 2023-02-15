@@ -49,7 +49,9 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
           if (response.status !== 'Success')
             throw new Error('Could not fetch members');
           this.items = response.result.filter((role) => {
-            return role.Address.address !== app.user.activeAddressAccount?.address;
+            return (
+              role.Address.address !== app.user.activeAddressAccount?.address
+            );
           });
 
           m.redraw();

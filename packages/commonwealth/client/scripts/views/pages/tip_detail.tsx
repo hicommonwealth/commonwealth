@@ -75,9 +75,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
             </div>
           </div>
           <div class="tip-contributions">
-            {proposal.canVoteFrom(
-              app.user.activeAddressAccount
-            ) && (
+            {proposal.canVoteFrom(app.user.activeAddressAccount) && (
               <div class="contribute">
                 <div class="title">Contribute</div>
                 <div class="mb-12">

@@ -22,10 +22,7 @@ export const checkNewThreadErrors = (
   }
 };
 
-export const updateTopicList = (
-  topic: Topic,
-  chain: IChainAdapter<any>
-) => {
+export const updateTopicList = (topic: Topic, chain: IChainAdapter<any>) => {
   try {
     const topicNames = app.topics.getByCommunity(chain.id).map((t) => t.name);
     if (!topicNames.includes(topic.name)) {

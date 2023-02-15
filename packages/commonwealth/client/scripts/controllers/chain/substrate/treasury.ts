@@ -16,7 +16,7 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 class SubstrateTreasury extends ProposalModule<
   ApiPromise,

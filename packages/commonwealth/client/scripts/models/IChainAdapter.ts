@@ -9,7 +9,7 @@ import { clearLocalStorage } from 'stores/PersistentStore';
 import type { ProposalModule } from '.';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.

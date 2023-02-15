@@ -1,5 +1,5 @@
-import type {WalletId} from 'common-common/src/types';
-import {ChainType} from 'common-common/src/types';
+import type { WalletId } from 'common-common/src/types';
+import { ChainType } from 'common-common/src/types';
 import $ from 'jquery';
 import app from 'state';
 
@@ -24,7 +24,7 @@ export type AddressAccountType = {
   // flags
   ghostAddress?: boolean;
   ignoreProfile?: boolean;
-}
+};
 
 export default class AddressAccount {
   public readonly address: string;
@@ -59,7 +59,7 @@ export default class AddressAccount {
     profile,
     ignoreProfile,
     keytype,
-    userId
+    userId,
   }: AddressAccountType) {
     this.keytype = keytype;
     // Check if the account is being initialized from a Community
@@ -121,7 +121,7 @@ export default class AddressAccount {
   }
 
   get isEd25519(): boolean {
-    return this.keytype === 'ed25519'
+    return this.keytype === 'ed25519';
   }
 
   public async validate(
@@ -148,26 +148,27 @@ export default class AddressAccount {
         this.chain.base,
         chainId.toString()
       ),
+      session_timestamp: timestamp,
       session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {
       // update ghost address for discourse users
       const hasGhostAddress = app.user.addresses.some(
-        ({address, ghostAddress, chain}) =>
+        ({ address, ghostAddress, chain }) =>
           ghostAddress &&
           this.chain.id === chain.id &&
           app.user.activeAccounts.some((account) => account.address === address)
       );
       if (hasGhostAddress) {
-        const {success, ghostAddressId} = await $.post(
+        const { success, ghostAddressId } = await $.post(
           `${app.serverUrl()}/updateAddress`,
           params
         );
         if (success && ghostAddressId) {
           // remove ghost address from addresses
           app.user.setAddresses(
-            app.user.addresses.filter(({ghostAddress}) => {
+            app.user.addresses.filter(({ ghostAddress }) => {
               return !ghostAddress;
             })
           );

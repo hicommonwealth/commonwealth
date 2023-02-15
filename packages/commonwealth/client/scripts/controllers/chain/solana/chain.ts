@@ -7,7 +7,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 
 import { SolanaToken } from './types';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export default class SolanaChain
   implements IChainModule<SolanaToken, AddressAccount>
@@ -80,7 +80,7 @@ export default class SolanaChain
     throw new Error('unsupported');
   }
 
-  public getBalance(addressAccount:AddressAccount): Promise<any> {
+  public getBalance(addressAccount: AddressAccount): Promise<any> {
     throw new Error('unsupported');
   }
 }

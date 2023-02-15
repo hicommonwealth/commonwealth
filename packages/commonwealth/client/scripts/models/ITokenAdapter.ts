@@ -1,7 +1,7 @@
 import type { Coin } from 'adapters/currency';
 import BN from 'bn.js';
 import { IChainAdapter } from '.';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 // Extension of IChainAdapter to support Token functionality
 // See controller/ethereum/tokenAdapter for example usage

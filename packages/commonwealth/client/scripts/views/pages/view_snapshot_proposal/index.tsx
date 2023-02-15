@@ -25,7 +25,7 @@ import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -133,7 +133,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
                 m(User, {
                   user: new AddressAccount({
                     address: this.proposal.author,
-                    chain: app.config.chains.getById(app.activeChainId())
+                    chain: app.config.chains.getById(app.activeChainId()),
                   }),
                   showAddressWithDisplayName: true,
                   linkify: true,

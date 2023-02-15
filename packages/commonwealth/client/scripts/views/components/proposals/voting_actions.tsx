@@ -77,13 +77,19 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
 
     let user;
 
-    if (!(proposal instanceof SubstrateDemocracyProposal || proposal instanceof SubstrateDemocracyReferendum) &&
-        !(proposal instanceof CosmosProposal) &&
-        !(proposal instanceof CompoundProposal || proposal instanceof AaveProposal) &&
-        !(proposal instanceof NearSputnikProposal)
+    if (
+      !(
+        proposal instanceof SubstrateDemocracyProposal ||
+        proposal instanceof SubstrateDemocracyReferendum
+      ) &&
+      !(proposal instanceof CosmosProposal) &&
+      !(
+        proposal instanceof CompoundProposal || proposal instanceof AaveProposal
+      ) &&
+      !(proposal instanceof NearSputnikProposal)
     ) {
       return <CannotVote label="Unrecognized proposal type" />;
-    } else user = app.user.activeAddressAccount
+    } else user = app.user.activeAddressAccount;
 
     const voteYes = async (e) => {
       e.preventDefault();

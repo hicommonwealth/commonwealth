@@ -34,7 +34,7 @@ import {
   isHot,
 } from './helpers';
 import { ThreadPreviewMenu } from './thread_preview_menu';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 type ThreadPreviewAttrs = {
   thread: Thread;
@@ -107,7 +107,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 avatarSize: 24,
                 user: new AddressAccount({
                   address: thread.author,
-                  chain: app.config.chains.getById(thread.authorChain)
+                  chain: app.config.chains.getById(thread.authorChain),
                 }),
                 linkify: true,
                 popover: false,

@@ -26,7 +26,7 @@ import {
   NearSputnikVote,
   WeightKind,
 } from './types';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export default class NearSputnikProposal extends Proposal<
   NearApi,

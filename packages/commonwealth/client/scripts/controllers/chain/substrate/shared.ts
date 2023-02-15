@@ -11,7 +11,9 @@ import type { u128 } from '@polkadot/types';
 import type { Compact } from '@polkadot/types/codec';
 import type {
   Call,
-  DispatchError, EraIndex, Exposure,
+  DispatchError,
+  EraIndex,
+  Exposure,
   SessionIndex,
 } from '@polkadot/types/interfaces';
 import type { CallFunction, InterfaceTypes } from '@polkadot/types/types';
@@ -44,7 +46,7 @@ import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { chainToEventNetwork } from '../../server/chain_entities';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export interface ISubstrateTXData extends ITXData {
   nonce: string;
@@ -610,10 +612,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, AddressAccount> {
     return this._api.derive.balances
       .all(addressAccount.address)
       .then(({ freeBalance, reservedBalance }) =>
-        this.coins(freeBalance.add(reservedBalance)))
+        this.coins(freeBalance.add(reservedBalance))
+      );
   }
 
-  public getLockedBalance(addressAccount: AddressAccount): Promise<SubstrateCoin> {
+  public getLockedBalance(
+    addressAccount: AddressAccount
+  ): Promise<SubstrateCoin> {
     if (!this.apiInitialized) return;
     return (
       this._api.derive.balances

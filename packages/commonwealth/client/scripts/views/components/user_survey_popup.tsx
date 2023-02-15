@@ -142,8 +142,8 @@ export class UserSurveyPopup extends ClassComponent<UserSurveyPopupAttrs> {
     };
 
     const hasAnAddress =
-      (app.user.activeAddressAccount?.address ?? app.user.addresses[0]?.address) !==
-      undefined;
+      (app.user.activeAddressAccount?.address ??
+        app.user.addresses[0]?.address) !== undefined;
 
     return (
       <UserSurveyView

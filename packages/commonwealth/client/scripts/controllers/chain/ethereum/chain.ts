@@ -8,8 +8,8 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type Web3 from 'web3';
-import AddressAccount from "models/AddressAccount";
-import BN from "bn.js";
+import AddressAccount from 'models/AddressAccount';
+import BN from 'bn.js';
 
 const ETHEREUM_BLOCK_TIME = 13;
 
@@ -152,7 +152,7 @@ class EthereumChain implements IChainModule<EthereumCoin, AddressAccount> {
     }
   }
 
-  public getBalance(addressAccount:AddressAccount): Promise<EthereumCoin> {
+  public getBalance(addressAccount: AddressAccount): Promise<EthereumCoin> {
     return this._api.eth
       .getBalance(addressAccount.address)
       .then((v) => new EthereumCoin('ETH', new BN(v), false));

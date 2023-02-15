@@ -13,7 +13,7 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -82,11 +82,11 @@ const User: m.Component<{
       addressAccount = user;
 
       if (user.profile) profile = user.profile;
-      else  profile = app.profiles.getProfile(user.chain.id, user.address);
+      else profile = app.profiles.getProfile(user.chain.id, user.address);
 
       role = adminsAndMods.find(
         (r) => r.address === user.address && r.address_chain === user.chain.id
-      )
+      );
     } else if (vnode.attrs.user instanceof Profile) {
       profile = vnode.attrs.user;
       // only load account if it's possible to, using the current chain
@@ -119,7 +119,8 @@ const User: m.Component<{
     const ghostAddress = app.user.addresses.some(
       // eslint-disable-next-line
       ({ address, ghostAddress }) => {
-        if (this !== undefined) addressAccount.address === address && ghostAddress;
+        if (this !== undefined)
+          addressAccount.address === address && ghostAddress;
       }
     );
 
@@ -314,7 +315,7 @@ export const UserBlock: m.Component<{
     if (user instanceof AddressAccount) {
       if (!user.chain || !user.address) return;
       if (user.profile) profile = user.profile;
-      else  profile = app.profiles.getProfile(user.chain.id, user.address);
+      else profile = app.profiles.getProfile(user.chain.id, user.address);
     } else if (user instanceof Profile) {
       profile = user;
     }

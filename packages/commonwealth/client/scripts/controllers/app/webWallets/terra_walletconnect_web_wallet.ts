@@ -4,7 +4,7 @@ import type {
 } from '@terra-money/wallet-controller';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import {AddressAccount, IWebWallet} from 'models';
+import { AddressAccount, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
 

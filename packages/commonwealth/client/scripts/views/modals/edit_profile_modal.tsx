@@ -12,7 +12,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import {AddressAccount} from "models";
+import { AddressAccount } from 'models';
 
 type EditProfileModalAttrs = {
   account: AddressAccount;

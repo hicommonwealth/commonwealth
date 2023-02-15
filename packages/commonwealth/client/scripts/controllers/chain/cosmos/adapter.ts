@@ -9,10 +9,7 @@ import CosmosChain from './chain';
 import CosmosGovernance from './governance';
 import type { CosmosToken } from './types';
 
-class Cosmos
-  extends IChainAdapter<CosmosToken>
-  implements ITokenAdapter
-{
+class Cosmos extends IChainAdapter<CosmosToken> implements ITokenAdapter {
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
@@ -35,7 +32,9 @@ class Cosmos
   public async initData() {
     await this.governance.init(this.chain, this.accounts);
     await super.initData();
-    await this.activeAddressHasToken(this.app.user?.activeAddressAccount?.address);
+    await this.activeAddressHasToken(
+      this.app.user?.activeAddressAccount?.address
+    );
   }
 
   public async deinit(): Promise<void> {

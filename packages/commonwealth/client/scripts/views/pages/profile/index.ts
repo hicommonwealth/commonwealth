@@ -1,30 +1,34 @@
-import {checkAddress, decodeAddress, encodeAddress,} from '@polkadot/util-crypto';
-import {navigateToSubpage} from 'router';
-import {bech32} from 'bech32';
+import {
+  checkAddress,
+  decodeAddress,
+  encodeAddress,
+} from '@polkadot/util-crypto';
+import { navigateToSubpage } from 'router';
+import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-import {ChainBase} from 'common-common/src/types';
-import {setActiveAccount} from 'controllers/app/login';
-import {modelFromServer as modelCommentFromServer} from 'controllers/server/comments';
+import { ChainBase } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import $ from 'jquery';
 import _ from 'lodash';
 
 import m from 'mithril';
-import type {Comment, Thread} from 'models';
-import {Profile} from 'models';
+import type { Comment, Thread } from 'models';
+import { Profile } from 'models';
 import 'pages/profile.scss';
 
 import app from 'state';
-import {CWTab, CWTabBar} from 'views/components/component_kit/cw_tabs';
-import {PageNotFound} from 'views/pages/404';
-import {PageLoading} from 'views/pages/loading';
+import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
+import { PageNotFound } from 'views/pages/404';
+import { PageLoading } from 'views/pages/loading';
 
 import Sublayout from 'views/sublayout';
-import {checkAddressChecksum, toChecksumAddress} from 'web3-utils';
+import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import ProfileBanner from './profile_banner';
 import ProfileBio from './profile_bio';
 import ProfileContent from './profile_content';
 import ProfileHeader from './profile_header';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 const getProfileStatus = (account) => {
   const onOwnProfile =
@@ -188,7 +192,7 @@ const loadProfile = async (
       address: a.address,
       addressId: a.id,
       ghostAddress: a.ghost_address,
-      userId: a.user_id
+      userId: a.user_id,
     });
     state.threads = result.threads.map((t) => app.threads.modelFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
@@ -201,7 +205,7 @@ const loadProfile = async (
         state.account = new AddressAccount({
           chain: chainInfo,
           address,
-        })
+        });
       } catch (e) {
         // do nothing if can't decode
       }
@@ -210,21 +214,21 @@ const loadProfile = async (
         state.account = new AddressAccount({
           chain: chainInfo,
           address,
-        })
+        });
       }
     } else if (chainInfo?.base === ChainBase.CosmosSDK) {
       if (checkCosmosAddress(address)) {
         state.account = new AddressAccount({
           chain: chainInfo,
           address,
-        })
+        });
       }
     } else if (chainInfo?.base === ChainBase.Solana) {
       if (checkSolanaAddress(address)) {
         state.account = new AddressAccount({
           chain: chainInfo,
           address,
-        })
+        });
       }
     }
     state.loaded = true;
@@ -406,7 +410,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
         m('.ProfilePage', [
           displayBanner &&
             m(ProfileBanner, {
-              addressAccount: account
+              addressAccount: account,
             }),
           m('.row.row-narrow.forum-row', [
             m('.col-xs-12 .col-md-8', [

@@ -8,8 +8,8 @@ import 'modals/offchain_voting_modal.scss';
 import type { Vote } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import User from 'views/components/widgets/user';
-import AddressAccount from "models/AddressAccount";
-import app from "state";
+import AddressAccount from 'models/AddressAccount';
+import app from 'state';
 
 type OffchainVotingModalAttrs = {
   votes: Array<Vote>;
@@ -55,7 +55,7 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
                   linkify: true,
                   user: new AddressAccount({
                     address: vote.address,
-                    chain: app.config.chains.getById(vote.authorChain)
+                    chain: app.config.chains.getById(vote.authorChain),
                   }),
                 })}
               </div>

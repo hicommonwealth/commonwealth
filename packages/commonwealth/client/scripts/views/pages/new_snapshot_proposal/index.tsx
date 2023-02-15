@@ -96,25 +96,27 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
 
       const space = app.snapshot.space;
 
-      getScore(space, app.user.activeAddressAccount.address).then((response) => {
-        const scores = response
-          .map((score) =>
-            Object.values(score).reduce(
-              (a, b) => (a as number) + (b as number),
-              0
+      getScore(space, app.user.activeAddressAccount.address).then(
+        (response) => {
+          const scores = response
+            .map((score) =>
+              Object.values(score).reduce(
+                (a, b) => (a as number) + (b as number),
+                0
+              )
             )
-          )
-          .reduce((a, b) => (a as number) + (b as number), 0);
+            .reduce((a, b) => (a as number) + (b as number), 0);
 
-        this.userScore = scores as number;
+          this.userScore = scores as number;
 
-        this.space = space;
+          this.space = space;
 
-        this.members = space.members;
+          this.members = space.members;
 
-        this.snapshotScoresFetched = true;
-        m.redraw();
-      });
+          this.snapshotScoresFetched = true;
+          m.redraw();
+        }
+      );
     }
 
     if (!this.snapshotScoresFetched) return <PageLoading />;

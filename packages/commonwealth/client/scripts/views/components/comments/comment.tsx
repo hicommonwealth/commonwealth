@@ -112,7 +112,8 @@ export class Comment extends ClassComponent<CommentAttrs> {
 
     const canEditAndDelete =
       !isLocked &&
-      (comment.author === app.user.activeAddressAccount?.address || isAdminOrMod);
+      (comment.author === app.user.activeAddressAccount?.address ||
+        isAdminOrMod);
 
     // if (!this.verificationChecked) {
     //   this.verificationChecked = true;

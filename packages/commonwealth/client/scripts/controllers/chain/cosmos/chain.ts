@@ -18,7 +18,7 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -181,7 +181,9 @@ class CosmosChain implements IChainModule<CosmosToken, AddressAccount> {
     throw new Error('unsupported');
   }
 
-  public async getBalance(addressAccount: AddressAccount): Promise<CosmosToken> {
+  public async getBalance(
+    addressAccount: AddressAccount
+  ): Promise<CosmosToken> {
     let balance;
     try {
       const bal = await this._api.bank.balance(

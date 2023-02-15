@@ -22,7 +22,7 @@ import { renderQuillTextBody } from '../quill/helpers';
 import type { QuillEditor } from '../quill/quill_editor';
 
 import { QuillEditorComponent } from '../quill/quill_editor_component';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -170,7 +170,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                 {m(User, {
                   user: new AddressAccount({
                     address: grp.address,
-                    chain: app.config.chains.getById(app.activeChainId())
+                    chain: app.config.chains.getById(app.activeChainId()),
                   }),
                   linkify: true,
                   avatarSize: 24,

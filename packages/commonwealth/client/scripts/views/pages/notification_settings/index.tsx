@@ -22,7 +22,7 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs } from './helpers';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 class NotificationSettingsPage extends ClassComponent {
   view() {
@@ -161,15 +161,19 @@ class NotificationSettingsPage extends ClassComponent {
                             return m(User, {
                               user: new AddressAccount({
                                 address: sub.Thread.author,
-                                chain: app.config.chains.getById(sub.Thread.chain)
-                              })
+                                chain: app.config.chains.getById(
+                                  sub.Thread.chain
+                                ),
+                              }),
                             });
                           } else if (sub.Comment) {
                             return m(User, {
                               user: new AddressAccount({
                                 address: sub.Comment.author,
-                                chain: app.config.chains.getById(sub.Comment.chain)
-                              })
+                                chain: app.config.chains.getById(
+                                  sub.Comment.chain
+                                ),
+                              }),
                             });
                           } else {
                             // return empty div to ensure that grid layout is correct

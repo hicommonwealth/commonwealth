@@ -1,7 +1,7 @@
 import type { AbridgedThread } from 'models';
 import app from 'state';
 import { byAscendingCreationDate } from '../helpers';
-import {AddressAccount} from "models";
+import { AddressAccount } from 'models';
 
 export interface IAddressCountAndInfo {
   postCount: number;
@@ -115,8 +115,8 @@ export class ActiveAddressesStore {
       const addressAccount = new AddressAccount({
         addressId: id,
         address: address.address,
-        chain: app.config.chains.getById(chain)
-      })
+        chain: app.config.chains.getById(chain),
+      });
       const postCount = 1;
       communityStore[id] = { addressAccount, postCount };
     } else {

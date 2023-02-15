@@ -17,7 +17,7 @@ import { addressSwapper } from 'commonwealth/shared/utils';
 
 import type { IWebWallet } from 'models';
 import app from 'state';
-import {AddressAccount} from "models";
+import { AddressAccount } from 'models';
 
 class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>

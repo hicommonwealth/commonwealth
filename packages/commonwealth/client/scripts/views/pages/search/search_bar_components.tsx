@@ -12,7 +12,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import User from '../../components/widgets/user';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 type SearchChipAttrs = {
   isActive: boolean;
@@ -65,8 +65,8 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
             user: new AddressAccount({
               address: searchResult.address,
               addressId: searchResult.address_id,
-              chain: app.config.chains.getById(searchResult.address_chain)
-            })
+              chain: app.config.chains.getById(searchResult.address_chain),
+            }),
           })}
           <CWText className="last-updated-text">•</CWText>
           <CWText type="caption" className="last-updated-text">

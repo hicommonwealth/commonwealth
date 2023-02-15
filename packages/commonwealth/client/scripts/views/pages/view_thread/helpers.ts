@@ -16,7 +16,10 @@ export const handlePollVote = async (
 
   if (!app.isLoggedIn() || !activeAddressAccount || isSelected) return;
 
-  const userInfo = [activeAddressAccount.chain.id, activeAddressAccount.address] as const;
+  const userInfo = [
+    activeAddressAccount.chain.id,
+    activeAddressAccount.address,
+  ] as const;
 
   let confirmationText;
 

@@ -18,7 +18,7 @@ import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 const jumpHighlightNotification = (
   commentId,
@@ -111,7 +111,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const actorName = m(User, {
     user: new AddressAccount({
       address: author_address,
-      chain: app.config.chains.getById(author_chain)
+      chain: app.config.chains.getById(author_chain),
     }),
     hideAvatar: true,
   });
@@ -224,8 +224,9 @@ const getBatchNotificationFields = (
   const actorName = m(User, {
     user: new AddressAccount({
       address: author_address,
-      chain: app.config.chains.getById(author_chain)
-    }),    hideAvatar: true,
+      chain: app.config.chains.getById(author_chain),
+    }),
+    hideAvatar: true,
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -417,8 +418,8 @@ const NotificationRow: m.Component<
       );
       const author = new AddressAccount({
         address: author_address,
-        chain: app.config.chains.getById(chain_id)
-      })
+        chain: app.config.chains.getById(chain_id),
+      });
       const authorName = m(User, {
         user: author,
         hideAvatar: true,
@@ -521,17 +522,20 @@ const NotificationRow: m.Component<
             ? m(User, {
                 user: new AddressAccount({
                   address: (authorInfo[0] as [string, string])[1],
-                  chain: app.config.chains.getById((authorInfo[0] as [string, string])[0])
+                  chain: app.config.chains.getById(
+                    (authorInfo[0] as [string, string])[0]
+                  ),
                 }),
                 avatarOnly: true,
                 avatarSize: 26,
               })
             : m(UserGallery, {
                 users: authorInfo.map(
-                  (auth) => new AddressAccount({
-                    address: auth[1],
-                    chain: app.config.chains.getById(auth[0])
-                  })
+                  (auth) =>
+                    new AddressAccount({
+                      address: auth[1],
+                      chain: app.config.chains.getById(auth[0]),
+                    })
                 ),
                 avatarSize: 26,
               }),

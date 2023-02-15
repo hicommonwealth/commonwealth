@@ -10,7 +10,7 @@ import { AvatarUpload } from '../avatar_upload';
 import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
 import { getClasses } from './helpers';
-import {AddressAccount} from "models";
+import { AddressAccount } from 'models';
 
 type Orientation = 'horizontal' | 'vertical';
 

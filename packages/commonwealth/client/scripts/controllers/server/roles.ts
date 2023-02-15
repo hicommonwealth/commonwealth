@@ -1,13 +1,18 @@
 import $ from 'jquery';
 import app from 'state';
 
-import type {ChainInfo, RoleInfo} from 'models';
-import {aggregatePermissions} from 'commonwealth/shared/utils';
-import type {Action} from 'commonwealth/shared/permissions';
-import {AccessLevel, everyonePermissions, PermissionManager, ToCheck,} from 'commonwealth/shared/permissions';
-import type {RoleObject} from 'commonwealth/shared/types';
-import type {UserController} from './user';
-import AddressAccount from "models/AddressAccount";
+import type { ChainInfo, RoleInfo } from 'models';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
+import type { Action } from 'commonwealth/shared/permissions';
+import {
+  AccessLevel,
+  everyonePermissions,
+  PermissionManager,
+  ToCheck,
+} from 'commonwealth/shared/permissions';
+import type { RoleObject } from 'commonwealth/shared/types';
+import type { UserController } from './user';
+import AddressAccount from 'models/AddressAccount';
 
 const getPermissionLevel = (permission: AccessLevel | undefined) => {
   if (permission === undefined) {
@@ -82,7 +87,8 @@ export class RolesController {
       if (options.chain) {
         this.removeRole((r) => {
           return (
-            r.chain_id === options.chain && r.address_id === options.address.addressId
+            r.chain_id === options.chain &&
+            r.address_id === options.address.addressId
           );
         });
       }
@@ -186,7 +192,10 @@ export class RolesController {
       return [account, role];
     });
     return activeAccountsByRole.reduce(
-      (arr: [AddressAccount, RoleInfo][], current: [AddressAccount, RoleInfo]) => {
+      (
+        arr: [AddressAccount, RoleInfo][],
+        current: [AddressAccount, RoleInfo]
+      ) => {
         const index = arr.findIndex(
           (item) => item[0].address === current[0].address
         );
@@ -237,7 +246,9 @@ export class RolesController {
     community?: string;
   }): boolean {
     const roles = this.roles.filter((role) =>
-      options.addressAccount ? role.address_id === options.addressAccount.addressId : true
+      options.addressAccount
+        ? role.address_id === options.addressAccount.addressId
+        : true
     );
     if (options.chain) {
       return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;

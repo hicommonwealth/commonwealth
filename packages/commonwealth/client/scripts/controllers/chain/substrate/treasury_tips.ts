@@ -12,7 +12,7 @@ import { formatAddressShort } from 'utils';
 import type SubstrateAccounts from './accounts';
 import type SubstrateChain from './shared';
 import { SubstrateTreasuryTip } from './treasury_tip';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 class SubstrateTreasuryTips extends ProposalModule<
   ApiPromise,
@@ -76,11 +76,7 @@ class SubstrateTreasuryTips extends ProposalModule<
     this._initializing = false;
   }
 
-  public createTx(
-    author: AddressAccount,
-    reason: string,
-    who: AddressAccount
-  ) {
+  public createTx(author: AddressAccount, reason: string, who: AddressAccount) {
     return this._Chain.createTXModalData(
       author,
       (api: ApiPromise) => api.tx.tips.reportAwesome(reason, who.address),

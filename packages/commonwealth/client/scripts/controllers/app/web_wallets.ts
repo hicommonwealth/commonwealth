@@ -13,7 +13,7 @@ import RoninWebWalletController from './webWallets/ronin_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];

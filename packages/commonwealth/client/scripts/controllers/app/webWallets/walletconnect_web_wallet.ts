@@ -8,7 +8,7 @@ import type Web3 from 'web3';
 
 import { hexToNumber } from 'web3-utils';
 import type { SessionPayload } from '@canvas-js/interfaces';
-import {AddressAccount} from "models";
+import { AddressAccount } from 'models';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;

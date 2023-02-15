@@ -4,7 +4,7 @@ import { AccountsStore } from 'stores';
 
 import type SolanaChain from './chain';
 import type { SolanaToken } from './types';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export default class SolanaAccounts
   implements IAccountsModule<SolanaToken, AddressAccount>
@@ -42,8 +42,8 @@ export default class SolanaAccounts
     } catch (e) {
       acct = new AddressAccount({
         address,
-        chain: this.app.config.chains.getById(this.app.activeChainId())
-      })
+        chain: this.app.config.chains.getById(this.app.activeChainId()),
+      });
     }
     return acct;
   }

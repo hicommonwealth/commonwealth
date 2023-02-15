@@ -30,7 +30,7 @@ import { isWindowMediumSmallInclusive } from '../components/component_kit/helper
 import { NewLoginModal } from '../modals/login_modal';
 import AddressAccount from 'models/AddressAccount';
 import { NearAccounts } from 'controllers/chain/near/accounts';
-import NearChain from "controllers/chain/near/chain";
+import NearChain from 'controllers/chain/near/chain';
 
 interface IState {
   validating: boolean;
@@ -128,9 +128,10 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       acct.setValidationBlockInfo(null);
 
       const canvas = await import('@canvas-js/interfaces');
-      const signature = await (
-        app.chain.chain as NearChain
-      ).signMessageWithKey(canvas.serializeSessionPayload(canvasMessage), acct);
+      const signature = await (app.chain.chain as NearChain).signMessageWithKey(
+        canvas.serializeSessionPayload(canvasMessage),
+        acct
+      );
 
       await acct.validate(signature, canvasMessage.sessionIssued, chainId);
 

@@ -1,10 +1,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
 import { decodeAddress } from '@polkadot/keyring';
-import type {
-  AccountId,
-  Conviction,
-} from '@polkadot/types/interfaces';
+import type { AccountId, Conviction } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import type { IAccountsModule } from 'models';
@@ -12,7 +9,7 @@ import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import SubstrateChain from './shared';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 type Delegation = [AccountId, Conviction] & Codec;
 
@@ -62,7 +59,7 @@ class SubstrateAccounts
       return;
     }
 
-    const keytype = isEd25519 ? 'ed25519': undefined;
+    const keytype = isEd25519 ? 'ed25519' : undefined;
     try {
       const acct = this._store.getByAddress(address);
       // update account key type if created with incorrect settings
@@ -70,15 +67,15 @@ class SubstrateAccounts
         return new AddressAccount({
           address,
           chain: this.app.config.chains.getById(this.app.activeChainId()),
-          keytype
-        })
+          keytype,
+        });
       } else return acct;
     } catch (e) {
       return new AddressAccount({
         address,
         chain: this.app.config.chains.getById(this.app.activeChainId()),
-        keytype
-      })
+        keytype,
+      });
     }
   }
 

@@ -28,7 +28,7 @@ import type SubstrateDemocracyProposals from './democracy_proposals';
 import type { SubstrateDemocracyReferendum } from './democracy_referendum';
 
 import type SubstrateChain from './shared';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,

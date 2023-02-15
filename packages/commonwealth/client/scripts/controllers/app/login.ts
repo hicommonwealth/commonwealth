@@ -11,7 +11,7 @@ import type { BlockInfo, ChainInfo } from 'models';
 import { ITokenAdapter, SocialAccount } from 'models';
 import moment from 'moment';
 import app from 'state';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -78,7 +78,9 @@ export async function setActiveAccount(account: AddressAccount): Promise<void> {
 export async function completeClientLogin(addressAccount: AddressAccount) {
   try {
     let existingAddressAccount = app.user.addresses.find(
-      (a) => a.address === addressAccount.address && a.chain.id === addressAccount.chain.id
+      (a) =>
+        a.address === addressAccount.address &&
+        a.chain.id === addressAccount.chain.id
     );
 
     if (!existingAddressAccount && addressAccount.addressId) {
@@ -112,7 +114,9 @@ export async function completeClientLogin(addressAccount: AddressAccount) {
       app.user.activeAccounts.filter((a) => isSameAccount(a, addressAccount))
         .length === 0
     ) {
-      app.user.setActiveAccounts(app.user.activeAccounts.concat([addressAccount]));
+      app.user.setActiveAccounts(
+        app.user.activeAccounts.concat([addressAccount])
+      );
     }
     m.redraw();
   } catch (e) {
@@ -213,7 +217,7 @@ export function updateActiveUser(data) {
             chain: app.config.chains.getById(a.chain),
             keytype: a.keytype,
             walletId: a.wallet_id,
-            ghostAddress: a.ghost_address
+            ghostAddress: a.ghost_address,
           })
       )
     );
@@ -261,7 +265,8 @@ export async function createUserWithAddress(
 }
 
 export async function unlinkLogin(account: AddressAccount) {
-  const unlinkingCurrentlyActiveAccount = app.user.activeAddressAccount === account;
+  const unlinkingCurrentlyActiveAccount =
+    app.user.activeAddressAccount === account;
   // TODO: Change to DELETE /address
   await $.post(`${app.serverUrl()}/deleteAddress`, {
     address: account.address,

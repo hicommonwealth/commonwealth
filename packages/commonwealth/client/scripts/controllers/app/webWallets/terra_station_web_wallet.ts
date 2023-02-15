@@ -4,7 +4,7 @@ import type { IWebWallet } from 'models';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
-import {AddressAccount} from "models";
+import { AddressAccount } from 'models';
 
 type TerraAddress = {
   address: string;

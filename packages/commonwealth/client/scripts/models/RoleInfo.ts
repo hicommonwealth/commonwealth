@@ -1,5 +1,5 @@
 import type { AccessLevel } from 'commonwealth/shared/permissions';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 class RoleInfo {
   public readonly id: number;

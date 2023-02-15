@@ -1,9 +1,9 @@
 import type { Coin } from 'adapters/currency';
 import type { IVote } from './interfaces';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export class DepositVote<C extends Coin> implements IVote<C> {
-  public readonly account: AddressAccount
+  public readonly account: AddressAccount;
   public readonly deposit: C;
 
   constructor(account: AddressAccount, deposit: C) {
@@ -13,7 +13,7 @@ export class DepositVote<C extends Coin> implements IVote<C> {
 }
 
 export class BinaryVote<C extends Coin> implements IVote<C> {
-  public readonly account: AddressAccount
+  public readonly account: AddressAccount;
   public readonly choice: boolean;
   public readonly amount: number;
   public readonly weight: number;

@@ -27,7 +27,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { PageNotFound } from '../404';
 import ErrorPage from '../error';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -55,8 +55,8 @@ const getDiscussionResult = (thread, searchTerm) => {
             user: new AddressAccount({
               address: thread.address,
               addressId: thread.address_id,
-              chain: app.config.chains.getById(thread.address_chain)
-            })
+              chain: app.config.chains.getById(thread.address_chain),
+            }),
           })}
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -104,8 +104,8 @@ const getCommentResult = (comment, searchTerm) => {
             user: new AddressAccount({
               address: comment.address,
               addressId: comment.address_id,
-              chain: app.config.chains.getById(comment.address_chain)
-            })
+              chain: app.config.chains.getById(comment.address_chain),
+            }),
           })}
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}

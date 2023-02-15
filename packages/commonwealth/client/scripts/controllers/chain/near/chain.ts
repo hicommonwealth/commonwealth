@@ -8,7 +8,8 @@ import type { ConnectConfig, Near as NearApi } from 'near-api-js';
 import {
   Account,
   Account as NearApiAccount,
-  connect as nearConnect, keyStores,
+  connect as nearConnect,
+  keyStores,
   WalletAccount,
 } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
@@ -23,7 +24,7 @@ import { ApiStatus } from 'state';
 import type { NearAccounts } from './accounts';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export interface IDaoInfo {
   contractId: string;
@@ -298,10 +299,17 @@ class NearChain implements IChainModule<NearToken, AddressAccount> {
     throw new Error('Txs not yet implemented');
   }
 
-  public async signMessageWithKey(message: string, addressAccount: AddressAccount) {
-    const walletConnection = new Account(this._api.connection, addressAccount.address);
+  public async signMessageWithKey(
+    message: string,
+    addressAccount: AddressAccount
+  ) {
+    const walletConnection = new Account(
+      this._api.connection,
+      addressAccount.address
+    );
 
-    if (!walletConnection.connection?.signer) throw new Error('no signer found!');
+    if (!walletConnection.connection?.signer)
+      throw new Error('no signer found!');
 
     const kp = await this.keyStore.getKey(
       this.isMainnet ? 'mainnet' : 'testnet',
@@ -315,7 +323,10 @@ class NearChain implements IChainModule<NearToken, AddressAccount> {
   }
 
   public async getBalance(addressAccount: AddressAccount): Promise<NearToken> {
-    const walletConnection = new Account(this._api.connection, addressAccount.address);
+    const walletConnection = new Account(
+      this._api.connection,
+      addressAccount.address
+    );
     const result: AccountView = await walletConnection.state();
     return this.coins(result.amount, false);
   }

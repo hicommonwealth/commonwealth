@@ -3,7 +3,7 @@ import type { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 export default class CosmosAccounts
   implements IAccountsModule<CosmosToken, AddressAccount>
@@ -42,8 +42,8 @@ export default class CosmosAccounts
     } catch (e) {
       acct = new AddressAccount({
         address,
-        chain: this.app.config.chains.getById(this.app.activeChainId())
-      })
+        chain: this.app.config.chains.getById(this.app.activeChainId()),
+      });
     }
     return acct;
   }

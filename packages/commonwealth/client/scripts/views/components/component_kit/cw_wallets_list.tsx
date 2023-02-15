@@ -25,7 +25,7 @@ import {
 } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
 import { CWSpinner } from './cw_spinner';
@@ -79,7 +79,9 @@ const LinkAccountItem: m.Component<
             m(User, {
               user: new AddressAccount({
                 address,
-                chain: app.config.chains.getById(app.chain?.id || walletNetwork)
+                chain: app.config.chains.getById(
+                  app.chain?.id || walletNetwork
+                ),
               }),
               avatarOnly: true,
               avatarSize: 40,
@@ -94,7 +96,9 @@ const LinkAccountItem: m.Component<
               m(User, {
                 user: new AddressAccount({
                   address,
-                  chain: app.config.chains.getById(app.chain?.id || walletNetwork)
+                  chain: app.config.chains.getById(
+                    app.chain?.id || walletNetwork
+                  ),
                 }),
                 hideAvatar: true,
               })
@@ -267,14 +271,13 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
         const validationBlockInfo =
           wallet.getRecentBlock &&
           (await wallet.getRecentBlock(chainIdentifier));
-        const { addressAccount, newlyCreated } =
-          await createUserWithAddress(
-            address,
-            wallet.name,
-            chainIdentifier,
-            sessionAddress,
-            validationBlockInfo
-          );
+        const { addressAccount, newlyCreated } = await createUserWithAddress(
+          address,
+          wallet.name,
+          chainIdentifier,
+          sessionAddress,
+          validationBlockInfo
+        );
         accountVerifiedCallback(addressAccount, newlyCreated, linking);
       } catch (err) {
         console.log(err);

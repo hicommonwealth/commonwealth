@@ -4,7 +4,7 @@ import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import type EthereumChain from './chain';
-import AddressAccount from "models/AddressAccount";
+import AddressAccount from 'models/AddressAccount';
 
 // NOTE: this is just a boilerplate class; not verified to work yet.
 // TODO: hook this up to rest of the application and verify that it works
@@ -49,9 +49,9 @@ class EthereumAccounts
     } catch (e) {
       const addressAccount = new AddressAccount({
         address,
-        chain: this.app.config.chains.getById(this.app.activeChainId())
-      })
-      this._store.add(addressAccount)
+        chain: this.app.config.chains.getById(this.app.activeChainId()),
+      });
+      this._store.add(addressAccount);
       return addressAccount;
     }
   }
