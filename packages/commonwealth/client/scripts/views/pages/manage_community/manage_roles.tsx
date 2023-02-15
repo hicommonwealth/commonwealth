@@ -40,13 +40,13 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
               role.chain_id === app.user.activeAddressAccount?.chain.id;
 
             const roleBelongsToUser = !!app.user.addresses.filter(
-              (addr_) => addr_.addressId === (role.address_id || role.Address.id)
+              (addr_) => addr_.addressId === (role.address_id || role.Address.addressId)
             ).length;
             return (
               <div class="role-row">
                 {m(User, {
                   user: new AddressAccount({
-                    addressId: addr.id,
+                    addressId: addr.addressId,
                     address: addr.address,
                     chain: app.config.chains.getById(role.chain_id),
                     walletId: addr.walletId
