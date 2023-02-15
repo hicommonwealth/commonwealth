@@ -1,4 +1,4 @@
-@import 'shared';
+@import '../../shared';
 @import 'quill.core';
 @import 'quill.bubble';
 @import 'quill.snow';
@@ -58,6 +58,7 @@
 
     img {
       background-color: $neutral-400;
+      max-width: 80%;
     }
 
     code,

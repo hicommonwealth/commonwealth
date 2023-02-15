@@ -1,16 +1,17 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'modals/edit_topic_thresholds_modal.scss';
-
-import app from 'state';
-import { Topic } from 'models';
+import { getDecimals } from 'helpers';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
+import m from 'mithril';
+
+import 'modals/edit_topic_thresholds_modal.scss';
+import type { Topic } from 'models';
+
+import app from 'state';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 
@@ -28,13 +29,7 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
       this.newTokenThresholdInWei = topic.tokenThreshold?.toString() || '0';
     }
 
-    const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-      ? 6
-      : 18;
+    const decimals = getDecimals(app.chain);
 
     return (
       <div class="EditTopicThresholdsRow">

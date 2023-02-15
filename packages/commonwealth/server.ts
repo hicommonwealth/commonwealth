@@ -1,58 +1,66 @@
-import session from 'express-session';
-import express from 'express';
-import webpack from 'webpack';
-import webpackDevMiddleware from 'webpack-dev-middleware';
-import SessionSequelizeStore from 'connect-session-sequelize';
-import fs from 'fs';
-import Rollbar from 'rollbar';
-import passport from 'passport';
-import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import compression from 'compression';
-import webpackHotMiddleware from 'webpack-hot-middleware';
-import { redirectToHTTPS } from 'express-http-to-https';
-import favicon from 'serve-favicon';
-import logger from 'morgan';
-import prerenderNode from 'prerender-node';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import {
-  RabbitMQController,
   getRabbitMQConfig,
+  RabbitMQController,
 } from 'common-common/src/rabbitmq';
 import { StatsDController } from 'common-common/src/statsd';
-import { BrokerConfig } from 'rascal';
-import devWebpackConfig from './webpack/webpack.config.dev.js';
-import prodWebpackConfig from './webpack/webpack.config.prod.js';
-import ViewCountCache from './server/util/viewCountCache';
-import RuleCache from './server/util/rules/ruleCache';
-import BanCache from './server/util/banCheckCache';
+import compression from 'compression';
+import SessionSequelizeStore from 'connect-session-sequelize';
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import { redirectToHTTPS } from 'express-http-to-https';
+import session from 'express-session';
+import fs from 'fs';
+import logger from 'morgan';
+import passport from 'passport';
+import prerenderNode from 'prerender-node';
+import type { BrokerConfig } from 'rascal';
+import Rollbar from 'rollbar';
+import favicon from 'serve-favicon';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import webpack from 'webpack';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
+import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   RABBITMQ_URI,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
 } from './server/config';
 import models from './server/database';
-import setupAppRoutes from './server/scripts/setupAppRoutes';
-import setupServer from './server/scripts/setupServer';
-import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
-import setupPrerenderServer from './server/scripts/setupPrerenderService';
-import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
+import setupPassport from './server/passport';
+import { addSwagger } from './server/routing/addSwagger';
+import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
+import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import setupAppRoutes from './server/scripts/setupAppRoutes';
+import expressStatsdInit from './server/scripts/setupExpressStats';
+import setupPrerenderServer from './server/scripts/setupPrerenderService';
+import setupServer from './server/scripts/setupServer';
+import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupEntityProxy from './server/util/entitiesProxy';
-import setupIpfsProxy from './server/util/ipfsProxy';
-import setupPassport from './server/passport';
-import expressStatsdInit from './server/scripts/setupExpressStats';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import DatabaseValidationService from './server/middleware/databaseValidationService';
+import setupIpfsProxy from './server/util/ipfsProxy';
+import RuleCache from './server/util/rules/ruleCache';
+import ViewCountCache from './server/util/viewCountCache';
+import devWebpackConfig from './webpack/webpack.dev.config.js';
+import prodWebpackConfig from './webpack/webpack.prod.config.js';
+import * as v8 from 'v8';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 // set up express async error handling hack
 require('express-async-errors');
 
 const app = express();
+
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
@@ -63,6 +71,7 @@ async function main() {
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+  const NO_RULE_CACHE = process.env.NO_RULE_CACHE === 'true';
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
@@ -97,14 +106,6 @@ async function main() {
         })
       : null;
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
-
-  const closeMiddleware = (): Promise<void> => {
-    if (!NO_CLIENT_SERVER) {
-      return new Promise((resolve) => devMiddleware.close(() => resolve()));
-    } else {
-      return Promise.resolve();
-    }
-  };
 
   const sessionStore = new SequelizeStore({
     db: models.sequelize,
@@ -245,14 +246,15 @@ async function main() {
 
   if (!rabbitMQController.initialized) {
     console.warn(
-      'The RabbitMQController is not initialized! Some services may be unavailable e.g. (Create/Delete chain and Websocket notifications'
+      'The RabbitMQController is not initialized! Some services may be unavailable e.g.' +
+        ' (Create/Delete chain and Websocket notifications)'
     );
     rollbar.critical('The main service RabbitMQController is not initialized!');
     // TODO: this requires an immediate response if in production
   }
 
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  await ruleCache.start();
+  if (!NO_RULE_CACHE) await ruleCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 
@@ -265,6 +267,7 @@ async function main() {
     new DatabaseValidationService(models);
 
   setupAPI(
+    '/api',
     app,
     models,
     viewCountCache,
@@ -274,6 +277,11 @@ async function main() {
     globalActivityCache,
     dbValidationService
   );
+
+  // new API
+  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addSwagger('/docs', app);
+
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);

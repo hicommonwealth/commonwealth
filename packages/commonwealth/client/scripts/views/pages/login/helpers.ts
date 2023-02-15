@@ -1,4 +1,4 @@
-import { LoginBodyType } from './types';
+import type { LoginBodyType } from './types';
 
 export const getText = (bodyType: LoginBodyType) => {
   if (bodyType === 'walletList') {

@@ -1,11 +1,11 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
+import type { AnyProposal, Thread } from 'models';
 
 import app from 'state';
-import { AnyProposal, Thread } from 'models';
-import { countLinesQuill, countLinesMarkdown } from './quill/helpers';
+import { countLinesMarkdown, countLinesQuill } from './quill/helpers';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
 import User from './widgets/user';
@@ -60,7 +60,6 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
           {m(User, {
             user: author,
             hideAvatar: true,
-            hideIdentityIcon: true,
           })}{' '}
           created this thread
         </>

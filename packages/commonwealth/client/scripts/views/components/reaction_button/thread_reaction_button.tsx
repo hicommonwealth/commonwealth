@@ -1,22 +1,22 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/reaction_button/comment_reaction_button.scss';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import m from 'mithril';
+import { Thread, ChainInfo, Reaction } from 'models';
 
 import app from 'state';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { Thread, ChainInfo } from 'models';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import { CWText } from '../component_kit/cw_text';
+import { getClasses } from '../component_kit/helpers';
 import {
   fetchReactionsByPost,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
-import { CWText } from '../component_kit/cw_text';
-import { getClasses } from '../component_kit/helpers';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 
 type ThreadReactionButtonAttrs = {
   thread: Thread;
@@ -52,9 +52,17 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
     const activeAddress = app.user.activeAccount?.address;
 
     const dislike = async (userAddress: string) => {
-      const reaction = (await fetchReactionsByPost(thread)).find((r) => {
+      const reaction: Reaction<Thread> = (
+        await fetchReactionsByPost(thread)
+      ).find((r) => {
         return r.Address.address === activeAddress;
       });
+
+      const { session, action, hash } =
+        await app.sessions.signDeleteThreadReaction({
+          thread_id: reaction.canvasHash,
+        });
+
       this.loading = true;
       app.reactionCounts
         .delete(reaction, {
@@ -71,7 +79,16 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
         });
     };
 
-    const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
+    const like = async (
+      chain: ChainInfo,
+      chainId: string,
+      userAddress: string
+    ) => {
+      const { session, action, hash } = await app.sessions.signThreadReaction({
+        thread_id: thread.id,
+        like: true,
+      });
+
       this.loading = true;
       app.reactionCounts
         .create(userAddress, thread, 'like', chainId)

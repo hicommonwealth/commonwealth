@@ -1,12 +1,9 @@
-import {
-  CWEvent,
-  IDisconnectedRange,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 
-import {
+import type {
   Api,
   EventKind,
   IEventData,
@@ -127,7 +124,10 @@ export class Listener extends BaseListener<
 
   protected async processBlock(event: RawEvent): Promise<void> {
     const { blockNumber } = event;
-    if (!this._lastCachedBlockNumber || blockNumber > this._lastCachedBlockNumber) {
+    if (
+      !this._lastCachedBlockNumber ||
+      blockNumber > this._lastCachedBlockNumber
+    ) {
       this._lastCachedBlockNumber = blockNumber;
     }
 
@@ -142,17 +142,23 @@ export class Listener extends BaseListener<
     const offlineRange = await this.processOfflineRange(this.log);
     if (!offlineRange) return;
 
-    this.log.info(`Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
+    this.log.info(
+      `Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`
+    );
     try {
       const maxBlocksPerPoll = 250;
       let startBlock = offlineRange.startBlock;
       let endBlock;
 
-      if (startBlock + maxBlocksPerPoll < offlineRange.endBlock) endBlock = startBlock + maxBlocksPerPoll;
+      if (startBlock + maxBlocksPerPoll < offlineRange.endBlock)
+        endBlock = startBlock + maxBlocksPerPoll;
       else endBlock = offlineRange.endBlock;
 
       while (endBlock <= offlineRange.endBlock) {
-        const cwEvents = await this.storageFetcher.fetch({startBlock, endBlock});
+        const cwEvents = await this.storageFetcher.fetch({
+          startBlock,
+          endBlock,
+        });
         for (const event of cwEvents) {
           await this.handleEvent(event);
         }
@@ -161,13 +167,16 @@ export class Listener extends BaseListener<
         if (endBlock === offlineRange.endBlock) break;
 
         startBlock = endBlock + 1;
-        if (endBlock + maxBlocksPerPoll <= offlineRange.endBlock) endBlock += maxBlocksPerPoll;
+        if (endBlock + maxBlocksPerPoll <= offlineRange.endBlock)
+          endBlock += maxBlocksPerPoll;
         else endBlock = offlineRange.endBlock;
       }
     } catch (error) {
       this.log.error(`Unable to fetch events from storage`, error);
     }
-    this.log.info(`Successfully processed block ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
+    this.log.info(
+      `Successfully processed block ${offlineRange.startBlock} to ${offlineRange.endBlock}`
+    );
   }
 
   public get options(): CompoundListenerOptions {

@@ -1,13 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import 'modals/offchain_voting_modal.scss';
 
-import { Vote, AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import type { Vote } from 'models';
+import { AddressInfo } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import User from 'views/components/widgets/user';
 
 type OffchainVotingModalAttrs = {
   votes: Array<Vote>;
@@ -58,7 +59,6 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
                     null,
                     null
                   ),
-                  hideIdentityIcon: true,
                 })}
               </div>
               <div class="offchain-poll-voter-choice">{vote.option}</div>

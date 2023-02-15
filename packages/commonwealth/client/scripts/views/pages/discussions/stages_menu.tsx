@@ -1,19 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
+import { threadStageToLabel } from 'helpers';
+import m from 'mithril';
+import { ThreadStage } from 'models';
 
 import 'pages/discussions/stages_menu.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { ThreadStage } from 'models';
-import { threadStageToLabel } from 'helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
 import { getClasses } from '../../components/component_kit/helpers';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWDivider } from '../../components/component_kit/cw_divider';
 
 type ThreadsFilterMenuItemAttrs = {
   iconRight?: m.Vnode;

@@ -1,6 +1,5 @@
-import { io } from 'socket.io-client';
 import { ChainEventsNamespace } from 'controllers/server/socket/chainEventsNs';
-import { ChatNamespace } from "controllers/server/socket/chatNs";
+import { ChatNamespace } from 'controllers/server/socket/chatNs';
 
 export class WebSocketController {
   private _socket;
@@ -15,6 +14,7 @@ export class WebSocketController {
   }
 
   public async init(jwt: string) {
+    const { io } = await import('socket.io-client');
     this._socket = io({
       transports: ['websocket'],
       query: { token: jwt },

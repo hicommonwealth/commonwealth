@@ -1,12 +1,12 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { AddressAttributes } from './address';
-import { ChainAttributes } from './chain';
-import { AttachmentAttributes } from './attachment';
-import { LinkedThreadAttributes } from './linked_thread';
-import { TopicAttributes } from './topic';
-import { ChainEntityMetaAttributes } from "./chain_entity_meta";
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { AddressAttributes } from './address';
+import type { AttachmentAttributes } from './attachment';
+import type { ChainAttributes } from './chain';
+import type { ChainEntityMetaAttributes } from './chain_entity_meta';
+import type { LinkedThreadAttributes } from './linked_thread';
+import type { TopicAttributes } from './topic';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ThreadAttributes = {
   address_id: number;
@@ -27,6 +27,10 @@ export type ThreadAttributes = {
 
   has_poll?: boolean;
 
+  canvas_action: string;
+  canvas_session: string;
+  canvas_hash: string;
+
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -35,9 +39,7 @@ export type ThreadAttributes = {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  Attachments?:
-    | AttachmentAttributes[]
-    | AttachmentAttributes['id'][];
+  Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
   ChainEntityMeta?: ChainEntityMetaAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
@@ -90,6 +92,11 @@ export default (
 
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
+      // signed data
+      canvas_action: { type: dataTypes.JSONB, allowNull: true },
+      canvas_session: { type: dataTypes.JSONB, allowNull: true },
+      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -110,6 +117,7 @@ export default (
         { fields: ['chain', 'updated_at'] },
         { fields: ['chain', 'pinned'] },
         { fields: ['chain', 'has_poll'] },
+        { fields: ['canvas_hash'] },
       ],
     }
   );
@@ -145,7 +153,7 @@ export default (
     models.Thread.hasMany(models.ChainEntityMeta, {
       foreignKey: 'thread_id',
       constraints: false,
-      as: 'chain_entity_meta'
+      as: 'chain_entity_meta',
     });
     models.Thread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
@@ -159,8 +167,8 @@ export default (
       foreignKey: 'thread_id',
     });
     models.Thread.hasOne(models.ChainEntityMeta, {
-      foreignKey: 'id'
-    })
+      foreignKey: 'id',
+    });
   };
 
   return Thread;

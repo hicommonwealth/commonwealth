@@ -1,13 +1,13 @@
 import { StatsDController, ProjectTag } from 'common-common/src/statsd';
-import { BalanceProvider } from './types';
+import type { BalanceProvider } from './types';
 
 // Class with Helper functions to send statsD
 export class TbcStatsDSender {
   private statsD = StatsDController.get();
 
   // Log requests per provider + node + contract
-  sendProviderInfo(bps: BalanceProvider[], nodeId?: number) {
-    bps.forEach(bp => {
+  sendProviderInfo(bps: BalanceProvider<any>[], nodeId?: number) {
+    bps.forEach((bp) => {
       const tags = {
         name: bp.name,
         nodeId: nodeId.toString(),
@@ -15,7 +15,7 @@ export class TbcStatsDSender {
         project: ProjectTag.TokenBalanceCache,
       };
 
-      this.statsD.increment(`tbc.provider_requests`, tags)
+      this.statsD.increment(`tbc.provider_requests`, tags);
     });
   }
 

@@ -1,23 +1,20 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
+import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import m from 'mithril';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { MenuItem } from '../components/component_kit/types';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
+import type { MenuItem } from '../components/component_kit/types';
 
 const getCreateContentMenuItems = (): MenuItem[] => {
-  const activeAccount = app.user.activeAccount;
-
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
@@ -104,26 +101,6 @@ const getCreateContentMenuItems = (): MenuItem[] => {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
             iconLeft: 'democraticProposal',
-          },
-          ...(((activeAccount as SubstrateAccount)?.isCouncillor
-            ? [
-                {
-                  label: 'New council motion',
-                  onclick: () =>
-                    navigateToSubpage('/new/proposal/:type', {
-                      type: ProposalType.SubstrateCollectiveProposal,
-                    }),
-                  iconLeft: 'councilProposal',
-                },
-              ]
-            : []) as MenuItem[]),
-          {
-            label: 'New bounty proposal',
-            onclick: () =>
-              navigateToSubpage('/new/proposal/:type', {
-                type: ProposalType.SubstrateBountyProposal,
-              }),
-            iconLeft: 'badge',
           },
           {
             label: 'New tip',

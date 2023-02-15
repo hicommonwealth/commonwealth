@@ -5,9 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias",
+    "lint-all": "eslint './**/*.ts'",
     "check-types": "tsc --project tsconfig.json --noEmit",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only src/index.ts",
     "test": "ts-mocha -p tsconfig.json --exit src/**/*.spec.ts"
+  },
+  "engines": {
+    "node": "14.x"
   },
   "keywords": [],
   "author": "",

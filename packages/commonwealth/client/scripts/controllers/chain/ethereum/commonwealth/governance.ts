@@ -1,16 +1,12 @@
-import { ProposalModule, ITXModalData } from 'models';
-
-import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
 // import { ICommonwealthProposalResponse } from 'adapters/chain/moloch/types';
-
 // import { CommonwealthEvents } from 'chain-events/src';
-
-import { IApp } from 'state';
+import type { IApp } from 'state';
 
 // import CommonwealthProposal from './proposal';
-import CommonwealthAPI from './api';
-import Commonwealth from './adapter';
-import CommonwealthChain from './chain';
+import type CommonwealthAPI from './api';
+import type CommonwealthChain from './chain';
 
 export default class CommonwealthGovernance extends ProposalModule<
   any,
@@ -49,11 +45,13 @@ export default class CommonwealthGovernance extends ProposalModule<
   //   return ((Date.now() / 1000) - this.summoningTime.toNumber()) / this.periodDuration.toNumber();
   // }
 
-  public get api() { return this._api; }
+  public get api() {
+    return this._api;
+  }
 
   // INIT / DEINIT
   constructor(app: IApp) {
-    super(app, (e) => {
+    super(app, () => {
       return null;
       // return new CommonwealthProposal(this._Members, this, e);
     });
@@ -103,6 +101,7 @@ export default class CommonwealthGovernance extends ProposalModule<
     this.store.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args: any[]): ITXModalData {
     throw new Error('Method not implemented.');
   }

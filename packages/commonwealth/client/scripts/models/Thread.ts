@@ -1,23 +1,11 @@
-import $ from 'jquery';
-import m from 'mithril';
-import app from 'state';
-import moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
-import { IChainEntityKind } from 'chain-events/src';
-import { IUniqueId } from './interfaces';
-import { ThreadKind, ThreadStage } from './types';
-import Attachment from './Attachment';
-import Topic from './Topic';
-import Vote from './Vote';
-import { VersionHistory } from '../controllers/server/threads';
-import { ChainEntity } from '.';
-import Poll from './Poll';
-
-// field names copied from snapshot
-interface IOffchainVotingOptions {
-  name: string;
-  choices: string[];
-}
+import type moment from 'moment';
+import type { VersionHistory } from '../controllers/server/threads';
+import type Attachment from './Attachment';
+import type { IUniqueId } from './interfaces';
+import type Poll from './Poll';
+import type Topic from './Topic';
+import type { ThreadKind, ThreadStage } from './types';
 
 export interface LinkedThreadRelation {
   id: string;
@@ -29,6 +17,7 @@ interface IThreadCollaborator {
   address: string;
   chain: string;
 }
+
 class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
@@ -42,6 +31,10 @@ class Thread implements IUniqueId {
   public stage: ThreadStage;
   public readonly attachments: Attachment[];
   public readonly readOnly: boolean;
+
+  public readonly canvasAction: string;
+  public readonly canvasSession: string;
+  public readonly canvasHash: string;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
   //  we should remove the number to allow the store to work.
@@ -91,6 +84,9 @@ class Thread implements IUniqueId {
     lastCommentedOn,
     linkedThreads,
     numberOfComments,
+    canvasAction,
+    canvasSession,
+    canvasHash,
   }: {
     author: string;
     title: string;
@@ -117,6 +113,9 @@ class Thread implements IUniqueId {
     linkedThreads: LinkedThreadRelation[];
     polls?: Poll[];
     numberOfComments?: number;
+    canvasAction?: string;
+    canvasSession?: string;
+    canvasHash?: string;
   }) {
     this.author = author;
     this.title = title;
@@ -154,6 +153,9 @@ class Thread implements IUniqueId {
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
     this.numberOfComments = numberOfComments || 0;
+    this.canvasAction = canvasAction;
+    this.canvasSession = canvasSession;
+    this.canvasHash = canvasHash;
   }
 }
 

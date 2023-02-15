@@ -1,13 +1,11 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError } from 'common-common/src/errors';
-import { AddressAttributes } from '../models/address';
-import { CommentAttributes } from '../models/comment';
-import { ThreadAttributes } from '../models/thread';
-import { success, TypedRequestQuery, TypedResponse } from '../types';
-import { DB } from '../models';
-
-
-const log = factory.getLogger(formatFilename(__filename));
+import { Op } from 'sequelize';
+import type { DB } from '../models';
+import type { AddressAttributes } from '../models/address';
+import type { CommentAttributes } from '../models/comment';
+import type { ThreadAttributes } from '../models/thread';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { success } from '../types';
 
 export const Errors = {
   NoChain: 'No base chain provided in query',
@@ -15,12 +13,12 @@ export const Errors = {
   NoAddressFound: 'No address found',
 };
 
-type GetProfileReq = { chain: string, address: string };
+type GetProfileReq = { chain: string; address: string };
 type GetProfileResp = {
-  account: AddressAttributes,
-  threads: ThreadAttributes[],
-  comments: CommentAttributes[],
-}
+  account: AddressAttributes;
+  threads: ThreadAttributes[];
+  comments: CommentAttributes[];
+};
 
 const getProfile = async (
   models: DB,
@@ -36,16 +34,9 @@ const getProfile = async (
       address,
       chain,
     },
-    include: [ models.OffchainProfile, ],
+    include: [models.OffchainProfile],
   });
   if (!addressModel) throw new AppError(Errors.NoAddressFound);
-
-  const threads = await models.Thread.findAll({
-    where: {
-      address_id: addressModel.id,
-    },
-    include: [ { model: models.Address, as: 'Address' } ],
-  });
 
   const comments = await models.Comment.findAll({
     where: {
@@ -53,11 +44,25 @@ const getProfile = async (
     },
   });
 
+  const commentThreadIds = comments
+    .map((c) => c.root_id.split('_')[1])
+    .filter((id) => !!parseInt(id, 10)); // remove proposals from id list
+
+  const threads = await models.Thread.findAll({
+    where: {
+      [Op.or]: [
+        { id: { [Op.in]: commentThreadIds } },
+        { address_id: addressModel.id },
+      ],
+    },
+    include: [{ model: models.Address, as: 'Address' }],
+  });
+
   return success(res, {
     account: addressModel.toJSON(),
     threads: threads.map((t) => t.toJSON()),
-    comments: comments.map((c) => c.toJSON())
-  })
+    comments: comments.map((c) => c.toJSON()),
+  });
 };
 
 export default getProfile;

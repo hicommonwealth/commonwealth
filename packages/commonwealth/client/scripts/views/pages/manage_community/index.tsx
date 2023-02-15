@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/manage_community/index.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { RoleInfo, RolePermission, Webhook } from 'models';
+import { navigateToSubpage } from 'router';
+import { AccessLevel, RoleInfo, Webhook } from 'models';
 import { ChainMetadataRows } from './chain_metadata_rows';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
@@ -82,9 +82,9 @@ class ManageCommunityPage extends ClassComponent {
 
     if (this.roleData?.length > 0) {
       this.roleData.sort(sortAdminsAndModsFirst).forEach((role) => {
-        if (role.permission === RolePermission.admin) {
+        if (role.permission === AccessLevel.Admin) {
           admins.push(role);
-        } else if (role.permission === RolePermission.moderator) {
+        } else if (role.permission === AccessLevel.Moderator) {
           mods.push(role);
         }
       });

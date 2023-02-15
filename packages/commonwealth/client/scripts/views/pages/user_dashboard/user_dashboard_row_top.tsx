@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import moment from 'moment';
+import { formatTimestamp } from 'helpers/index';
 import { capitalize } from 'lodash';
+import m from 'mithril';
+import { AddressInfo } from 'models';
+import moment from 'moment';
 
 import 'pages/user_dashboard/user_dashboard_row_top.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
-import { formatTimestamp } from 'helpers/index';
-import { getCommentPreview } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
+import { getCommentPreview } from './helpers';
 
 type UserDashboardRowTopAttrs = {
   activityData: any;
@@ -61,7 +61,6 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         author_chain ?? chain_id,
         null
       ),
-      hideIdentityIcon: false,
       linkify: true,
       avatarSize: 16,
       onclick: (e: any) => {

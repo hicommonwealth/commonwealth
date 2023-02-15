@@ -1,22 +1,22 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/reaction_button/comment_reaction_button.scss';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import m from 'mithril';
+import type { ChainInfo, Comment } from 'models';
 
 import app from 'state';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { Comment, ChainInfo } from 'models';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import { CWText } from '../component_kit/cw_text';
+import { getClasses } from '../component_kit/helpers';
 import {
   fetchReactionsByPost,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
-import { getClasses } from '../component_kit/helpers';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWText } from '../component_kit/cw_text';
 
 type CommentReactionButtonAttrs = {
   comment: Comment<any>;
@@ -56,6 +56,12 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
       const reaction = (await fetchReactionsByPost(comment)).find((r) => {
         return r.Address.address === activeAddress;
       });
+
+      const { session, action, hash } =
+        await app.sessions.signDeleteCommentReaction({
+          comment_id: reaction.canvasId,
+        });
+
       this.loading = true;
       app.reactionCounts
         .delete(reaction, {
@@ -72,7 +78,16 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
         });
     };
 
-    const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
+    const like = async (
+      chain: ChainInfo,
+      chainId: string,
+      userAddress: string
+    ) => {
+      const { session, action, hash } = await app.sessions.signCommentReaction({
+        comment_id: comment.id,
+        like: true,
+      });
+
       this.loading = true;
       app.reactionCounts
         .create(userAddress, comment, 'like', chainId)

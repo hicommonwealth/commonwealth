@@ -1,37 +1,31 @@
-import moment from 'moment';
-import { Request, Response, NextFunction } from 'express';
+import { AppError, ServerError } from 'common-common/src/errors';
+
 import {
+  ChainNetwork,
+  ChainType,
   NotificationCategories,
   ProposalType,
-  ChainType,
-  ChainNetwork,
 } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-
-import { Action, PermissionError } from 'common-common/src/permissions';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { Action, PermissionError } from 'commonwealth/shared/permissions';
 import {
   findAllRoles,
   isAddressPermitted,
 } from 'commonwealth/server/util/roles';
-import validateTopicThreshold from '../util/validateTopicThreshold';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
-import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../models';
 import { sequelize } from '../database';
-import { ThreadInstance } from '../models/thread';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
-} from '../../shared/analytics/types';
-import checkRule from '../util/rules/checkRule';
-import RuleCache from '../util/rules/ruleCache';
-import BanCache from '../util/banCheckCache';
+import type { DB } from '../models';
+import type { ThreadInstance } from '../models/thread';
+import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { parseUserMentions } from '../util/parseUserMentions';
+import checkRule from '../util/rules/checkRule';
+import type RuleCache from '../util/rules/ruleCache';
+import validateTopicThreshold from '../util/validateTopicThreshold';
 
 export const Errors = {
   DiscussionMissingTitle: 'Discussion posts must include a title',
@@ -84,8 +78,10 @@ const dispatchHooks = async (
         SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
       ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
     )
-    INSERT INTO "Subscriptions"(subscriber_id, category_id, object_id, offchain_thread_id, chain_id, is_active, created_at, updated_at)
-    SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
+    INSERT INTO "Subscriptions"
+    (subscriber_id, category_id, object_id, offchain_thread_id, chain_id, is_active, created_at, updated_at)
+    SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as
+     chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
     FROM "Subscriptions"
     WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
   `,
@@ -212,7 +208,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const chain = req.chain
+  const chain = req.chain;
 
   const author = req.address;
 
@@ -222,11 +218,22 @@ const createThread = async (
     chain.id,
     Action.CREATE_THREAD
   );
-  if (permission_error === PermissionError.NOT_PERMITTED) {
+  if (!permission_error) {
     return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
-  const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
+  const {
+    topic_name,
+    title,
+    body,
+    kind,
+    stage,
+    url,
+    readOnly,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
   let { topic_id } = req.body;
 
   if (kind === 'discussion') {
@@ -297,6 +304,9 @@ const createThread = async (
     stage,
     url,
     read_only: readOnly || false,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
   };
 
   // begin essential database changes within transaction

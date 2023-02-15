@@ -1,18 +1,21 @@
 /* @jsx m */
 
-import m from 'mithril';
+// eslint-disable-next-line max-classes-per-file
 import ClassComponent from 'class_component';
+import app from 'state';
 
 import 'components/poll_card.scss';
+import $ from 'jquery';
+import m from 'mithril';
+import { CWButton } from './component_kit/cw_button';
 
 import { CWCard } from './component_kit/cw_card';
-import { CWButton } from './component_kit/cw_button';
-import { CWProgressBar } from './component_kit/cw_progress_bar';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWCheckbox } from './component_kit/cw_checkbox';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
+import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
-import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import { getClasses } from './component_kit/helpers';
 
 const LIVE_PREVIEW_MAX = 3;
@@ -301,12 +304,44 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
   }
 }
 
+type DeletePollModalAttrs = {
+  onClickDelete: () => void;
+};
+
+class DeletePollModal extends ClassComponent<DeletePollModalAttrs> {
+  view(vnode) {
+    const { onClickDelete } = vnode.attrs;
+    return (
+      <div class="DeleteThreadModal">
+        <div class="compact-modal-title">
+          <CWText className="modal-text">Delete this poll?</CWText>
+        </div>
+        <div class="compact-modal-body">
+          <div class="modal-body">
+            <CWText>This action cannot be reversed.</CWText>
+            <CWButton
+              label="confirm"
+              onclick={async (e) => {
+                e.preventDefault();
+                await onClickDelete();
+                $(e.target).trigger('modalexit');
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
 export type PollCardAttrs = PollOptionAttrs &
   CastVoteAttrs &
   ResultsSectionAttrs & {
     hasVoted?: boolean;
     incrementalVoteCast?: number;
     proposalTitle?: string;
+    showDeleteButton?: boolean;
+    onDeleteClick?: () => void;
   };
 
 export class PollCard extends ClassComponent<PollCardAttrs> {
@@ -340,6 +375,8 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
       voteInformation,
       tooltipErrorMessage,
       isPreview = false,
+      showDeleteButton = false,
+      onDeleteClick,
     } = vnode.attrs;
 
     const resultString = 'Results';
@@ -372,9 +409,30 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
 
     return (
       <CWCard className="PollCard">
-        <CWText type="b2" className="poll-title-text">
-          {proposalTitle}
-        </CWText>
+        <div className="poll-title-section">
+          <CWText type="b2" className="poll-title-text">
+            {proposalTitle}
+          </CWText>
+          {showDeleteButton && (
+            <CWIcon
+              iconName="close"
+              iconSize="small"
+              className="poll-delete-button"
+              onclick={(e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: DeletePollModal,
+                  data: {
+                    onClickDelete: async () => {
+                      if (onDeleteClick) onDeleteClick();
+                    },
+                  },
+                });
+              }}
+            />
+          )}
+        </div>
+
         <div class="poll-voting-section">
           {!this.hasVoted && !pollEnded && !isPreview && (
             <>

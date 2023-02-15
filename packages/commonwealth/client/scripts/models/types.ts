@@ -1,13 +1,13 @@
-import {
-  IFixedEndTime,
-  IFixedBlockEndTime,
+import type {
   IDynamicEndTime,
-  IThresholdEndTime,
+  IFixedBlockEndTime,
+  IFixedEndTime,
   INotStartedEndTime,
   IQueuedEndTime,
+  IThresholdEndTime,
   IUnavailableEndTime,
 } from './interfaces';
-import Proposal from './Proposal';
+import type Proposal from './Proposal';
 
 export enum ThreadKind {
   Discussion = 'discussion',
@@ -39,15 +39,6 @@ export enum ProposalStatus {
   None = 'none',
 }
 
-export enum BountyStatus {
-  Proposed = 'proposed',
-  Approved = 'approved',
-  Funded = 'funded',
-  CuratorProposed = 'curator_proposed',
-  Active = 'active',
-  PendingPayout = 'pending_payout',
-}
-
 export enum VotingType {
   SimpleYesNoVoting = 'binary',
   ConvictionYesNoVoting = 'binary_conviction',
@@ -61,6 +52,7 @@ export enum VotingType {
   CompoundYesNoAbstain = 'compound_yes_no_abstain',
   YesNoReject = 'yes_no_reject',
 }
+
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
   CoinVote = 'coin',

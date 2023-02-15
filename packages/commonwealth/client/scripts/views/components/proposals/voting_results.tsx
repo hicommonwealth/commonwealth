@@ -1,20 +1,20 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
-import Web3 from 'web3';
+import ClassComponent from 'class_component';
+import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
+import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
+import { MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
+import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
+import m from 'mithril';
+import type { AnyProposal } from 'models';
+import { VotingType } from 'models';
 
 import app from 'state';
-import { formatNumberLong, Coin } from 'adapters/currency';
-import { VotingType, AnyProposal } from 'models';
-import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
-import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
-import AaveProposal, {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
+import Web3 from 'web3-utils';
 import {
   AaveVotingResult,
   CompletedProposalVotingResult,
@@ -97,7 +97,7 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
       );
 
       const yesBalanceString = `${formatNumberLong(
-        +Web3.utils.fromWei(yesBalance.toString())
+        +Web3.fromWei(yesBalance.toString())
       )} ${app.chain.meta.default_symbol}`;
 
       const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
@@ -108,7 +108,7 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
       );
 
       const noBalanceString = `${formatNumberLong(
-        +Web3.utils.fromWei(noBalance.toString())
+        +Web3.fromWei(noBalance.toString())
       )} ${app.chain.meta.default_symbol}`;
 
       return (

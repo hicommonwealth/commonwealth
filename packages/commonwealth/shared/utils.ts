@@ -1,17 +1,16 @@
-import { isU8a, isHex } from '@polkadot/util';
+import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
 import {
-  BASE_PERMISSIONS,
-  computePermissions,
-  Permissions,
-} from 'common-common/src/permissions';
-
+  AccessLevel,
+  PermissionManager,
+  everyonePermissions,
+} from './permissions';
+import type { RoleObject } from './types';
 import { ProposalType } from 'common-common/src/types';
-import { Permission } from '../server/models/role';
 
 export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
@@ -65,16 +64,13 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
   return (
     type === ProposalType.SubstrateDemocracyReferendum ||
     type === ProposalType.SubstrateDemocracyProposal ||
-    type === ProposalType.SubstrateBountyProposal ||
     type === ProposalType.SubstrateTreasuryTip ||
-    type === ProposalType.SubstrateCollectiveProposal ||
     type === ProposalType.SubstrateTechnicalCommitteeMotion ||
-    type === ProposalType.PhragmenCandidacy ||
     type === ProposalType.SubstrateTreasuryProposal
   );
 };
 
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable */
 export const getProposalUrl = (type, proposal, comment?) => {
   const aId = proposal.chain;
   const tId = proposal.type_id || proposal.id;
@@ -297,35 +293,35 @@ export const addressSwapper = (options: {
   }
 };
 
-type RoleObject = {
-  permission: Permission;
-  allow: Permissions;
-  deny: Permissions;
-};
-
 export function aggregatePermissions(
   roles: RoleObject[],
-  chain_permissions: { allow: Permissions; deny: Permissions }
+  chain_permissions: { allow: bigint; deny: bigint }
 ) {
-  // sort roles by roles with highest permissions last
-  const ORDER: Permission[] = ['member', 'moderator', 'admin'];
+  const permissionsManager = new PermissionManager();
+
+  const ORDER: AccessLevel[] = [
+    AccessLevel.Member,
+    AccessLevel.Moderator,
+    AccessLevel.Admin,
+  ];
 
   function compare(o1: RoleObject, o2: RoleObject) {
     return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
   }
+
   roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{
-    allow: Permissions;
-    deny: Permissions;
-  }> = roles;
+    allow: bigint;
+    deny: bigint;
+  }> = roles.map(({ allow, deny }) => ({ allow, deny }));
 
   // add chain default permissions to beginning of permissions array
   permissionsAllowDeny.unshift(chain_permissions);
 
   // compute permissions
-  const permission: bigint = computePermissions(
-    BASE_PERMISSIONS,
+  const permission: bigint = permissionsManager.computePermissions(
+    everyonePermissions,
     permissionsAllowDeny
   );
   return permission;

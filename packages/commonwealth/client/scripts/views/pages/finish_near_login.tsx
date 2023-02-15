@@ -1,31 +1,35 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import { WalletAccount, WalletConnection } from 'near-api-js';
-import { FunctionCallOptions } from 'near-api-js/lib/account';
+import type { Chain } from '@canvas-js/interfaces';
+import { constructCanvasMessage } from 'adapters/shared';
+import { initAppState } from 'state';
+import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import $ from 'jquery';
-
-import app from 'state';
-import { initAppState, navigateToSubpage } from 'app';
+import ClassComponent from 'class_component';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import {
-  updateActiveAddresses,
+  completeClientLogin,
   createUserWithAddress,
   setActiveAccount,
-  completeClientLogin,
+  updateActiveAddresses,
 } from 'controllers/app/login';
-import { Account } from 'models';
-import Near from 'controllers/chain/near/adapter';
-import { NearAccount } from 'controllers/chain/near/account';
-import { ChainBase, WalletId } from 'common-common/src/types';
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
+import type { NearAccount } from 'controllers/chain/near/account';
+import type Near from 'controllers/chain/near/adapter';
+import $ from 'jquery';
+import m from 'mithril';
+import type { Account } from 'models';
+import type { WalletConnection } from 'near-api-js';
+import { WalletAccount } from 'near-api-js';
+import type { FunctionCallOptions } from 'near-api-js/lib/account';
+
+import app from 'state';
 import { PageNotFound } from 'views/pages/404';
-import { NewLoginModal } from '../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
-import { CWText } from '../components/component_kit/cw_text';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { NewLoginModal } from '../modals/login_modal';
 
 interface IState {
   validating: boolean;
@@ -88,18 +92,51 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       const chain =
         app.user.selectedChain ||
         app.config.chains.getById(app.activeChainId());
+
+      // create canvas thing
+      const chainId = 'mainnet';
+      const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+        ChainBase.NEAR,
+        chainId
+      );
+
+      // We do not add blockInfo for NEAR
       const newAcct = await createUserWithAddress(
         acct.address,
         WalletId.NearWallet,
-        chain.id
+        chain.id,
+        sessionPublicAddress,
+        null
       );
+
+      const canvasMessage = constructCanvasMessage(
+        'near' as Chain,
+        chainId,
+        acct.address,
+        sessionPublicAddress,
+        +new Date(),
+        null // no blockhash
+      );
+
       this.state.isNewAccount = newAcct.newlyCreated;
       // this.state.account = newAcct.account;
       acct.setValidationToken(newAcct.account.validationToken);
       acct.setWalletId(WalletId.NearWallet);
       acct.setAddressId(newAcct.account.addressId);
-      const signature = await acct.signMessage(`${acct.validationToken}\n`);
-      await acct.validate(signature);
+      acct.setSessionPublicAddress(sessionPublicAddress);
+      acct.setValidationBlockInfo(null);
+
+      const canvas = await import('@canvas-js/interfaces');
+      const signature = await acct.signMessage(
+        canvas.serializeSessionPayload(canvasMessage)
+      );
+
+      await acct.validate(signature, canvasMessage.sessionIssued, chainId);
+
+      app.sessions
+        .getSessionController(ChainBase.NEAR)
+        .authSession(chainId, canvasMessage, signature);
+
       if (!app.isLoggedIn()) {
         await initAppState();
         await updateActiveAddresses(chain);
@@ -107,6 +144,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       await setActiveAccount(acct);
       this.state.validatedAccount = acct;
     } catch (err) {
+      console.log(err.stack);
       this.state.validationError = err.responseJSON
         ? err.responseJSON.error
         : err.message;
@@ -144,6 +182,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         }
         await wallet.account().functionCall(tx as FunctionCallOptions);
       } catch (err) {
+        console.log('NEAR validationError:', err.stack);
         this.state.validationError = err.message;
       }
     }
@@ -166,6 +205,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         await initAppState(false);
         m.route.set(`${window.location.origin}/${res.result.chain.id}`);
       } catch (err) {
+        console.log(err.stack);
         this.state.validationError = `Failed to initialize chain node: ${err.message}`;
       }
     }

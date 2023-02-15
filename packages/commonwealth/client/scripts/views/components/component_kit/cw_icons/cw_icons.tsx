@@ -3,14 +3,14 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable max-len */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
+import m from 'mithril';
 
 import { getClasses } from '../helpers';
-import { IconAttrs, IconStyleAttrs } from './types';
+import type { IconAttrs, IconStyleAttrs } from './types';
 
 // ADDING ICONS: INSTRUCTIONS
 //
@@ -334,6 +334,37 @@ export class CWCheck extends ClassComponent<IconAttrs> {
           d="M27.62 6.416a1 1 0 01.165 1.405L12.426 27.25l-8.09-7.18a1 1 0 111.328-1.496l6.506 5.774L26.215 6.58a1 1 0 011.405-.164z"
           clip-rule="evenodd"
         ></path>
+      </svg>
+    );
+  }
+}
+
+export class CWCheckCircle extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...otherAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="33"
+        height="33"
+        fill="none"
+        viewBox="0 0 33 33"
+        {...otherAttrs}
+      >
+        <polygon points="10.0246914 12.9878307 7.8521164 15.0126102 14.8644621 22.5681658 31.0126102 6.42001764 28.9385362 4.34594356 14.9632275 18.3212522"></polygon>
+        <path d="M29.037037,16.0001764 C29.037037,23.2102293 23.2100529,29.0372134 16,29.0372134 C8.78994709,29.0372134 2.96296296,23.2102293 2.96296296,16.0001764 C2.96296296,8.79012346 8.78994709,2.96313933 16,2.96313933 L16,0 C7.16049383,0 0,7.16040564 0,16 C0,24.8395062 7.16075838,32 16,32 C24.8392416,32 32,24.8392416 32,16 L29.037037,16.0001764 Z"></path>
       </svg>
     );
   }
@@ -714,36 +745,6 @@ export class CWCopy extends ClassComponent<IconAttrs> {
           clip-rule="evenodd"
         ></path>
         <path d="M26 6a.5.5 0 00-.5-.5h-11a.5.5 0 00-.5.5v3.5h-2V4a.5.5 0 01.5-.5h15a.5.5 0 01.5.5v19a.5.5 0 01-.5.5H19v-2h6.5a.5.5 0 00.5-.5V6z"></path>
-      </svg>
-    );
-  }
-}
-
-export class CWCouncilProposal extends ClassComponent<IconAttrs> {
-  view(vnode: m.Vnode<IconAttrs>) {
-    const {
-      className,
-      componentType,
-      disabled,
-      iconButtonTheme,
-      iconSize,
-      selected,
-      ...otherAttrs
-    } = vnode.attrs;
-    return (
-      <svg
-        class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
-          componentType
-        )}
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        fill="none"
-        viewBox="0 0 32 32"
-        {...otherAttrs}
-      >
-        <path d="M14.586 8.914a2 2 0 012.828 0l6.364 6.364a2 2 0 010 2.829l-6.364 6.364a2 2 0 01-2.828 0l-6.364-6.364a2 2 0 010-2.829l6.364-6.364zM11 8.5a3 3 0 11-6 0 3 3 0 016 0zM27 8.5a3 3 0 11-6 0 3 3 0 016 0zM11 24.5a3 3 0 11-6 0 3 3 0 016 0zM27 24.5a3 3 0 11-6 0 3 3 0 016 0z"></path>
       </svg>
     );
   }

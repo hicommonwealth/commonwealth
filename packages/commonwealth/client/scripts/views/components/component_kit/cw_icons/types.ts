@@ -1,9 +1,16 @@
-import { ComponentType } from '../types';
-import { CustomIconName, IconName } from './cw_icon_lookup';
+import type { ComponentType } from '../types';
+import type { CustomIconName, IconName } from './cw_icon_lookup';
 
 export type IconButtonTheme = 'black' | 'neutral' | 'primary' | 'hasBackground';
 
-export type IconSize = 'small' | 'medium' | 'large' | 'xl' | 'xxl';
+export type IconSize =
+  | 'xxs'
+  | 'xs'
+  | 'small'
+  | 'medium'
+  | 'large'
+  | 'xl'
+  | 'xxl';
 
 export type IconStyleAttrs = {
   className?: string;

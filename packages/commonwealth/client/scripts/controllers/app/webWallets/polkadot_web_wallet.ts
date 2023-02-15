@@ -1,16 +1,22 @@
+import type { Signer } from '@polkadot/api/types';
+
 import {
+  isWeb3Injected,
   web3Accounts,
   web3Enable,
   web3FromAddress,
-  isWeb3Injected,
 } from '@polkadot/extension-dapp';
-import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import { Signer } from '@polkadot/api/types';
+import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
-import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+
+import type { SessionPayload } from '@canvas-js/interfaces';
+
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
+
+import type { Account, IWebWallet } from 'models';
+import app from 'state';
 
 class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>
@@ -52,24 +58,31 @@ class PolkadotWebWalletController
     return injector.signer;
   }
 
+  public getChainId() {
+    return app.chain?.id || this.defaultNetwork;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async getRecentBlock(chainIdentifier: string) {
+    return null;
+  }
+
   // ACTIONS
-  public async signWithAccount(account: Account): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: SessionPayload
+  ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
+    const message = stringToHex(canvas.serializeSessionPayload(canvasMessage));
+
     const signer = await this.getSigner(account.address);
-    const token = account.validationToken;
     const payload: SignerPayloadRaw = {
       address: account.address,
-      data: stringToHex(token),
+      data: message,
       type: 'bytes',
     };
     const signature = (await signer.signRaw(payload)).signature;
     return signature;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   public async enable() {
@@ -80,7 +93,7 @@ class PolkadotWebWalletController
     // (this needs to be called first, before other requests)
     this._enabling = true;
     try {
-      const injectedExtensionInfo = await web3Enable('commonwealth');
+      await web3Enable('commonwealth');
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account

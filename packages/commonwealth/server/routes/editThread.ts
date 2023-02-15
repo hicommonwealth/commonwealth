@@ -1,21 +1,18 @@
-import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
-import moment from 'moment';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { parseUserMentions } from '../util/parseUserMentions';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import { Op } from 'sequelize';
 import {
   getProposalUrl,
   renderQuillDeltaToText,
   validURL,
 } from '../../shared/utils';
-import { DB } from '../models';
-import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { findOneRole } from '../util/roles';
+import type { DB } from '../models';
+import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { parseUserMentions } from '../util/parseUserMentions';
+import { findOneRole } from '../util/roles';
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',
@@ -31,8 +28,17 @@ const editThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { body, title, kind, stage, thread_id, version_history, url } =
-    req.body;
+  const {
+    body,
+    title,
+    kind,
+    stage,
+    thread_id,
+    url,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
   if (!thread_id) {
     return next(new AppError(Errors.NoThreadId));
   }
@@ -141,6 +147,9 @@ const editThread = async (
     }
     thread.body = body;
     thread.stage = stage;
+    thread.canvas_action = canvas_action;
+    thread.canvas_session = canvas_session;
+    thread.canvas_hash = canvas_hash;
     thread.plaintext = (() => {
       try {
         return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));

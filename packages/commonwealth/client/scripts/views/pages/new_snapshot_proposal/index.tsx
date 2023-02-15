@@ -1,29 +1,30 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
-import moment from 'moment';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import type { SnapshotSpace } from 'helpers/snapshot_utils';
+import { getScore } from 'helpers/snapshot_utils';
+import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
+import m from 'mithril';
+import moment from 'moment';
 
 import 'pages/new_snapshot_proposal.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import { idToProposal } from 'identifiers';
-import { SnapshotSpace, getScore } from 'helpers/snapshot_utils';
-import { QuillEditor } from '../../components/quill/quill_editor';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
-import { ThreadForm } from './types';
-import { newLink } from './helpers';
-import { PageLoading } from '../loading';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import type { QuillEditor } from '../../components/quill/quill_editor';
 import Sublayout from '../../sublayout';
+import { PageLoading } from '../loading';
+import { newLink } from './helpers';
+import type { ThreadForm } from './types';
 
 type NewSnapshotProposalPageAttrs = {
   snapshotId: string;
@@ -176,7 +177,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
             oninput={(e) => {
               e.redraw = false; // do not redraw on input
 
-              this.form.name = e.target as any;
+              this.form.name = e.target.value as any;
 
               localStorage.setItem(
                 `${app.activeChainId()}-new-snapshot-proposal-name`,
@@ -244,6 +245,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
             }}
             placeholder="What is your proposal?"
             editorNamespace="new-proposal"
+            mode="markdown"
           />
           <CWButton
             label="Publish"

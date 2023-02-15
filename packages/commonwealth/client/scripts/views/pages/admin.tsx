@@ -1,26 +1,26 @@
 /* @jsx m */
 
+import type { ISubmittableResult } from '@polkadot/types/types';
+import { formatCoin } from 'adapters/currency';
+import ClassComponent from 'class_component';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { blockperiodToDuration, formatDuration } from 'helpers';
 import $ from 'jquery';
 import m from 'mithril';
-import ClassComponent from 'class_component';
-import { ISubmittableResult } from '@polkadot/types/types';
 
 import 'pages/admin.scss';
 
 import app from 'state';
-import Sublayout from 'views/sublayout';
-import { blockperiodToDuration, formatDuration } from 'helpers';
-import { formatCoin } from 'adapters/currency';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import User from 'views/components/widgets/user';
 import { PageLoading } from 'views/pages/loading';
-import { PageNotFound } from './404';
-import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWLabel } from '../components/component_kit/cw_label';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
+import { CWLabel } from '../components/component_kit/cw_label';
+import { CWText } from '../components/component_kit/cw_text';
+import { PageNotFound } from './404';
 
 class SudoForm extends ClassComponent {
   private resultText: string;
@@ -155,23 +155,6 @@ class ChainStats extends ClassComponent {
           <CWLabel label="Minimum Deposit" />
           <CWText>
             {formatCoin(substrate.democracyProposals.minimumDeposit)}
-          </CWText>
-        </div>
-        <CWText type="h5">Phragmen Elections</CWText>
-        <div class="stat">
-          <CWLabel label="Term Length" />
-          <CWText>
-            {formatBlocks(substrate.phragmenElections.termDuration)}
-          </CWText>
-        </div>
-        <div class="stat">
-          <CWLabel label="Voting Bond" />
-          <CWText>{formatCoin(substrate.phragmenElections.votingBond)}</CWText>
-        </div>
-        <div class="stat">
-          <CWLabel label="Candidacy Bond" />
-          <CWText>
-            {formatCoin(substrate.phragmenElections.candidacyBond)}
           </CWText>
         </div>
       </div>

@@ -1,10 +1,11 @@
-import moment from 'moment';
-import { VersionHistory } from '../controllers/server/threads';
-import { IUniqueId } from './interfaces';
-import Attachment from './Attachment';
+import type moment from 'moment';
+import type { VersionHistory } from '../controllers/server/threads';
+import type Attachment from './Attachment';
+import type { IUniqueId } from './interfaces';
 
 class Comment<T extends IUniqueId> {
   [x: string]: any;
+
   public readonly chain: string;
   public readonly author: string;
   public readonly text: string;
@@ -19,6 +20,10 @@ class Comment<T extends IUniqueId> {
   public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: moment.Moment;
   public readonly deleted: boolean;
+
+  public readonly canvasAction: string;
+  public readonly canvasSession: string;
+  public readonly canvasHash: string;
 
   constructor({
     chain,
@@ -36,6 +41,9 @@ class Comment<T extends IUniqueId> {
     authorChain,
     lastEdited, // moment.Moment
     deleted,
+    canvasAction,
+    canvasSession,
+    canvasHash,
   }) {
     this.chain = chain;
     this.author = author;
@@ -51,6 +59,9 @@ class Comment<T extends IUniqueId> {
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
     this.deleted = deleted;
+    this.canvasAction = canvasAction;
+    this.canvasSession = canvasSession;
+    this.canvasHash = canvasHash;
   }
 }
 

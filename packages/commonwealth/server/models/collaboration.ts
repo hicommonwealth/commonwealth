@@ -1,8 +1,8 @@
-import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { AddressInstance, AddressAttributes } from './address';
-import { ThreadInstance, ThreadAttributes } from './thread';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { AddressAttributes, AddressInstance } from './address';
+import type { ThreadAttributes, ThreadInstance } from './thread';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CollaborationAttributes = {
   address_id: number;
@@ -12,29 +12,44 @@ export type CollaborationAttributes = {
 
   Address: AddressAttributes;
   Thread: ThreadAttributes;
-}
+};
 
 export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
-  // no mixins used yet
   getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>;
-  setAddress: Sequelize.BelongsToSetAssociationMixin<AddressInstance, AddressInstance['id']>;
+  setAddress: Sequelize.BelongsToSetAssociationMixin<
+    AddressInstance,
+    AddressInstance['id']
+  >;
   getThread: Sequelize.BelongsToGetAssociationMixin<ThreadInstance>;
-  setThread: Sequelize.BelongsToSetAssociationMixin<ThreadInstance, ThreadInstance['id']>;
-}
+  setThread: Sequelize.BelongsToSetAssociationMixin<
+    ThreadInstance,
+    ThreadInstance['id']
+  >;
+};
 
 export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: typeof DataTypes
 ) => {
   const Collaboration = <CollaborationModelStatic>sequelize.define(
-    'Collaboration', {
-      address_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
-      thread_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+    'Collaboration',
+    {
+      address_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
+      thread_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-    }, {
+    },
+    {
       tableName: 'Collaborations',
       timestamps: true,
       createdAt: 'created_at',

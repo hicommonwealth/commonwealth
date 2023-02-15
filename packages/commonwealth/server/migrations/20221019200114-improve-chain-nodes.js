@@ -3,41 +3,62 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-
       // Add Columns
-      await queryInterface.addColumn('ChainNodes', 'ss58', {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      }, { transaction });
+      await queryInterface.addColumn(
+        'ChainNodes',
+        'ss58',
+        {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+        },
+        { transaction }
+      );
 
-      await queryInterface.addColumn('ChainNodes', 'bech32', {
-        type: Sequelize.STRING,
-        allowNull: true
-      }, { transaction });
+      await queryInterface.addColumn(
+        'ChainNodes',
+        'bech32',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction }
+      );
 
-      await queryInterface.addColumn('ChainNodes', 'created_at', {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: new Date(),
-      }, { transaction });
+      await queryInterface.addColumn(
+        'ChainNodes',
+        'created_at',
+        {
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: new Date(),
+        },
+        { transaction }
+      );
 
-      await queryInterface.addColumn('ChainNodes', 'updated_at', {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: new Date(),
-      }, { transaction });
+      await queryInterface.addColumn(
+        'ChainNodes',
+        'updated_at',
+        {
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: new Date(),
+        },
+        { transaction }
+      );
 
-      await queryInterface.removeColumn('ChainNodes', 'chain_base', { transaction });
+      await queryInterface.removeColumn('ChainNodes', 'chain_base', {
+        transaction,
+      });
 
       // Add entry names
       const chainNodes = [
         {
           name: 'Harmony',
-          url: 'wss://ws.s0.t.hmny.io/'
+          url: 'wss://ws.s0.t.hmny.io/',
         },
         {
           name: 'Matic',
-          url: 'wss://ws-matic-mainnet.chainstacklabs.com'
+          url: 'wss://ws-matic-mainnet.chainstacklabs.com',
         },
         {
           name: 'Straightedge',
@@ -47,48 +68,48 @@ module.exports = {
         {
           name: 'Stafi',
           url: 'wss://scan-rpc.stafi.io/',
-          ss58: 20
+          ss58: 20,
         },
         {
           name: 'xDAI',
-          url: 'wss://rpc.xdaichain.com/wss'
+          url: 'wss://rpc.xdaichain.com/wss',
         },
         {
           name: 'Polkadot',
           url: 'wss://rpc.polkadot.io',
-          ss58: 0
+          ss58: 0,
         },
         {
           name: 'Plasmnet',
           url: 'wss://rpc.plasmnet.io/',
-          ss58: 5
+          ss58: 5,
         },
         {
           name: 'Kulupu',
           url: 'wss://rpc.kulupu.corepaper.org/ws',
-          ss58: 16
+          ss58: 16,
         },
         {
           name: 'Darwinia',
           url: 'wss://rpc.darwinia.network/',
-          ss58: 18
+          ss58: 18,
         },
         {
           name: 'HydraDX',
           url: 'wss://rpc-01.snakenet.hydradx.io/',
-          ss58: 63
+          ss58: 63,
         },
         {
           name: 'Ronin',
-          url: 'wss://ronin-rpc.commonwealth.im/wss'
+          url: 'wss://ronin-rpc.commonwealth.im/wss',
         },
         {
           name: 'Polygon (Mumbai)',
-          url: 'wss://polygon-mumbai.g.alchemy.com/v2/HaGTCcKYKQyX68DYEa9_6F5E7ASxhoAS'
+          url: 'wss://polygon-mumbai.g.alchemy.com/v2/HaGTCcKYKQyX68DYEa9_6F5E7ASxhoAS',
         },
         {
           name: 'Fantom',
-          url: 'wss://misty-rough-haze.fantom.quiknode.pro/cf2cf5b4d7fbf487e2ea8affcbd876219fe6576e/'
+          url: 'wss://misty-rough-haze.fantom.quiknode.pro/cf2cf5b4d7fbf487e2ea8affcbd876219fe6576e/',
         },
         {
           name: 'ChainX',
@@ -103,24 +124,24 @@ module.exports = {
         {
           name: 'Khala Chain',
           url: 'wss://khala-api.phala.network/ws',
-          ss58: 30
+          ss58: 30,
         },
         {
           name: 'BSC',
-          url: 'wss://holy-spring-wave.bsc.quiknode.pro/a6955f0547ae82229a6379ca6f16fd672cb997eb/'
+          url: 'wss://holy-spring-wave.bsc.quiknode.pro/a6955f0547ae82229a6379ca6f16fd672cb997eb/',
         },
         {
           name: 'Centrifuge',
           url: 'wss://fullnode.centrifuge.io/',
-          ss58: 36
+          ss58: 36,
         },
         {
           name: 'Celo',
-          url: 'wss://forno.celo.org/ws'
+          url: 'wss://forno.celo.org/ws',
         },
         {
           name: 'Ethereum (Ropsten)',
-          url: 'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7'
+          url: 'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
         },
         {
           name: 'Ethereum (Mainnet)',
@@ -131,11 +152,11 @@ module.exports = {
           name: 'Edgeware (Mainnet)',
           url: 'wss://edgeware-rpc.dwellir.com',
           balance_type: 'substrate',
-          ss58: 7
+          ss58: 7,
         },
         {
           name: 'Arbitrum (Mainnet)',
-          url: 'wss://arb-mainnet.g.alchemy.com/v2/wJE2b7MRNJgk7S8dfgb_1xZNUDq7SF7G'
+          url: 'wss://arb-mainnet.g.alchemy.com/v2/wJE2b7MRNJgk7S8dfgb_1xZNUDq7SF7G',
         },
         {
           name: 'Crust Network',
@@ -145,25 +166,25 @@ module.exports = {
         {
           name: 'Kusama',
           url: 'ws://kusama-rpc.polkadot.io:9944',
-          ss58: 2
+          ss58: 2,
         },
         {
           name: 'Edgeware (Testnet)',
           url: 'ws://beresheet1.edgewa.re:9944',
-          ss58: 7
+          ss58: 7,
         },
         {
           name: 'CLV Chain (Clover)',
           url: 'ws://api.clover.finance/',
-          ss58: 42
+          ss58: 42,
         },
         {
           name: 'Solana (Testnet)',
-          url: 'testnet'
+          url: 'testnet',
         },
         {
           name: 'Solana (Mainnet beta)',
-          url: 'mainnet-beta'
+          url: 'mainnet-beta',
         },
         {
           name: 'Cosmos (localhost)',
@@ -192,7 +213,7 @@ module.exports = {
         },
         {
           name: 'NEAR (Testnet)',
-          url: 'https://rpc.testnet.near.org'
+          url: 'https://rpc.testnet.near.org',
         },
         {
           name: 'Stargaze',
@@ -216,7 +237,7 @@ module.exports = {
         },
         {
           name: 'NEAR (Mainnet)',
-          url: 'https://rpc.mainnet.near.org'
+          url: 'https://rpc.mainnet.near.org',
         },
         {
           name: 'Juno',
@@ -325,47 +346,92 @@ module.exports = {
         },
         {
           name: 'Solana (Devnet)',
-          url: 'devnet'
+          url: 'devnet',
         },
       ];
 
       // TODO: rectify balance_type, ss58, and bech32 values for each node
 
-      await Promise.all(chainNodes.map(async (cn) => {
-        const update = { name: cn.name };
-        if (cn.balance_type) update['balance_type'] = cn.balance_type;
-        if (cn.ss58 !== undefined) update['ss58'] = cn.ss58;
-        if (cn.bech32) update['bech32'] = cn.bech32;
-        await queryInterface.bulkUpdate(
-          'ChainNodes',
-          update,
-          { url: cn.url },
-          { transaction }
-        );
-      }));
+      await Promise.all(
+        chainNodes.map(async (cn) => {
+          const update = { name: cn.name };
+          if (cn.balance_type) update['balance_type'] = cn.balance_type;
+          if (cn.ss58 !== undefined) update['ss58'] = cn.ss58;
+          if (cn.bech32) update['bech32'] = cn.bech32;
+          await queryInterface.bulkUpdate(
+            'ChainNodes',
+            update,
+            { url: cn.url },
+            { transaction }
+          );
+        })
+      );
 
       // fix two chains and remove duplicates
       await queryInterface.bulkUpdate(
         'Chains',
         { chain_node_id: 17 },
         { id: 'neta-money' },
-        { transaction },
+        { transaction }
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { chain_node_id: 20 },
         { id: 'clandestina' },
-        { transaction },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'CommunityRoles',
+        { chain_id: 'ethereum-local' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'CommunityRoles',
+        { chain_id: 'ideamarket' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'CommunityContracts',
+        { chain_id: 'ethereum-local' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'CommunityContracts',
+        { chain_id: 'ideamarket' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'Chains',
+        { id: 'ethereum-local' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'Chains',
+        { id: 'ideamarket' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'Contracts',
+        { chain_node_id: 21 },
+        { transaction }
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 18 },
-        { transaction, truncate: true, cascade: true }
+        { transaction }
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 21 },
         { transaction }
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "ChainNodes" SET name = REGEXP_REPLACE(url, 'https?://', 'Imported node:');`,
+        {
+          raw: true,
+          type: 'RAW',
+          transaction,
+        }
       );
       await queryInterface.changeColumn(
         'ChainNodes',
@@ -384,16 +450,32 @@ module.exports = {
         { type: Sequelize.STRING, allowNull: true },
         { transaction }
       );
-      await queryInterface.bulkUpdate('ChainNodes', { name: null, description: null }, {}, { transaction });
+      await queryInterface.bulkUpdate(
+        'ChainNodes',
+        { name: null, description: null },
+        {},
+        { transaction }
+      );
       await queryInterface.removeColumn('ChainNodes', 'ss58', { transaction });
-      await queryInterface.removeColumn('ChainNodes', 'bech32', { transaction });
-      await queryInterface.removeColumn('ChainNodes', 'created_at', { transaction });
-      await queryInterface.removeColumn('ChainNodes', 'updated_at', { transaction });
-      await queryInterface.addColumn('ChainNodes', 'chain_base', {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: '',
-      }, { transaction });
+      await queryInterface.removeColumn('ChainNodes', 'bech32', {
+        transaction,
+      });
+      await queryInterface.removeColumn('ChainNodes', 'created_at', {
+        transaction,
+      });
+      await queryInterface.removeColumn('ChainNodes', 'updated_at', {
+        transaction,
+      });
+      await queryInterface.addColumn(
+        'ChainNodes',
+        'chain_base',
+        {
+          type: Sequelize.STRING,
+          allowNull: false,
+          defaultValue: '',
+        },
+        { transaction }
+      );
     });
-  }
+  },
 };

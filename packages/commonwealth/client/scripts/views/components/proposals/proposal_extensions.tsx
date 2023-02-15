@@ -1,24 +1,23 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/proposals/proposal_extensions.scss';
+import type Cosmos from 'controllers/chain/cosmos/adapter';
+import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import m from 'mithril';
+import type { AnyProposal } from 'models';
 
 import app from 'state';
-import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { AnyProposal } from 'models';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import Cosmos from 'controllers/chain/cosmos/adapter';
+import { BalanceInfo } from 'views/components/proposals/balance_info';
 
 import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
-import { BalanceInfo } from 'views/components/proposals/balance_info';
-import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWText } from '../component_kit/cw_text';
+import { CWTextInput } from '../component_kit/cw_text_input';
 
 type ProposalExtensionsAttrs = {
   proposal: AnyProposal;
@@ -64,16 +63,6 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
       );
     } else if (proposal instanceof SubstrateDemocracyProposal) {
       return <CWText>Cost to second: {proposal.deposit.format()}</CWText>;
-    } else if (proposal instanceof SubstratePhragmenElection) {
-      const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
-
-      return (
-        <CWText>
-          Voting on councillor candidacies requires a voting bond of{' '}
-          <strong>{votingBond ? votingBond.format() : '--'}</strong> which is
-          returned when the election is completed.
-        </CWText>
-      );
     } else if (
       proposal instanceof CosmosProposal &&
       proposal.status === 'DepositPeriod'

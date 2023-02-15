@@ -1,20 +1,20 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import moment from 'moment';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { capitalize } from 'lodash';
+import m from 'mithril';
+import { AddressInfo } from 'models';
+import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
-import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 
 type SnapshotInfoRowAttrs = {
   label: string;
@@ -79,17 +79,21 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
             <div class="info-rows-container">
               <SnapshotInfoRow
                 label="Author"
-                value={m(User, {
-                  user: new AddressInfo(
-                    null,
-                    proposal.author,
-                    app.activeChainId(),
-                    null
-                  ),
-                  hideAvatar: true,
-                  linkify: true,
-                  popover: true,
-                })}
+                value={
+                  app.chain
+                    ? m(User, {
+                        user: new AddressInfo(
+                          null,
+                          proposal.author,
+                          app.activeChainId(),
+                          null
+                        ),
+                        hideAvatar: true,
+                        linkify: true,
+                        popover: true,
+                      })
+                    : proposal.author
+                }
               />
               <SnapshotInfoLinkRow
                 label="IPFS"

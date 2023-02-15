@@ -1,5 +1,8 @@
 declare let window: any;
 
+import bs58 from 'bs58';
+import type { SessionPayload } from '@canvas-js/interfaces';
+
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 
@@ -30,23 +33,28 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
-    const encodedMessage = new TextEncoder().encode(account.validationToken);
+  public getChainId() {
+    return 'mainnet';
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async getRecentBlock(chainIdentifier: string) {
+    return null;
+  }
+
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: SessionPayload
+  ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
+    const encodedMessage = new TextEncoder().encode(
+      canvas.serializeSessionPayload(canvasMessage)
+    );
     const { signature } = await window.solana.signMessage(
       encodedMessage,
       'utf8'
     );
-    const signedMessage = Buffer.from(signature as Uint8Array).toString(
-      'base64'
-    );
-    return signedMessage;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
+    return bs58.encode(signature as Uint8Array);
   }
 
   // ACTIONS

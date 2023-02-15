@@ -1,7 +1,7 @@
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
-// eslint-disable-next-line import/prefer-default-export
+// eslint-disable-next-line
 export const NotificationCategories = {
   NewComment: 'new-comment-creation',
   NewThread: 'new-thread-creation',
@@ -22,11 +22,8 @@ export const NotificationCategories = {
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
-  SubstrateBountyProposal = 'bountyproposal',
   SubstrateTreasuryTip = 'treasurytip',
-  SubstrateCollectiveProposal = 'councilmotion',
   SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
-  PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
@@ -55,7 +52,7 @@ export enum ContractType {
   SPL = 'spl',
   MOLOCH1 = 'moloch1', // unused
   MOLOCH2 = 'moloch2', // unused
-  COMMONPROTOCOL = 'common-protocol'
+  COMMONPROTOCOL = 'common-protocol',
 }
 
 export enum ChainType {
@@ -115,6 +112,7 @@ export enum ChainNetwork {
   ALEX = 'alex',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',

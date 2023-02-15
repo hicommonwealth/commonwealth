@@ -1,34 +1,33 @@
-import 'pages/profile.scss';
-
-import m from 'mithril';
-import _ from 'lodash';
-import $ from 'jquery';
-import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
-import bs58 from 'bs58';
-
-import app from 'state';
-import { navigateToSubpage } from 'app';
-import { ChainBase } from 'common-common/src/types';
-import { Thread, Comment, Profile } from 'models';
-
-import Sublayout from 'views/sublayout';
-import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
-import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
-
 import {
-  decodeAddress,
   checkAddress,
+  decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import { navigateToSubpage } from 'router';
 import { bech32 } from 'bech32';
+import bs58 from 'bs58';
+import { ChainBase } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import ProfileHeader from './profile_header';
-import ProfileContent from './profile_content';
-import ProfileBio from './profile_bio';
+import $ from 'jquery';
+import _ from 'lodash';
+
+import m from 'mithril';
+import type { Comment, Thread } from 'models';
+import { Profile } from 'models';
+import 'pages/profile.scss';
+
+import app from 'state';
+import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
+import { PageNotFound } from 'views/pages/404';
+import { PageLoading } from 'views/pages/loading';
+
+import Sublayout from 'views/sublayout';
+import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import ProfileBanner from './profile_banner';
+import ProfileBio from './profile_bio';
+import ProfileContent from './profile_content';
+import ProfileHeader from './profile_header';
 
 const getProfileStatus = (account) => {
   const onOwnProfile =
@@ -93,8 +92,8 @@ export enum UserContent {
 
 interface IProfilePageAttrs {
   address: string;
-  setIdentity?: boolean;
 }
+
 interface IProfilePageState {
   account;
   threads: Thread[];
@@ -113,7 +112,7 @@ interface IProfilePageState {
 const checkCosmosAddress = (address: string): boolean => {
   try {
     // 50 character max string length to throw on pubkey
-    const { prefix, words } = bech32.decode(address, 50);
+    bech32.decode(address, 50);
     // TODO: should we verify prefix as well?
     return true;
   } catch (e) {
@@ -175,28 +174,14 @@ const loadProfile = async (
     if (a.OffchainProfile) {
       const profileData = JSON.parse(a.OffchainProfile.data);
       // ignore off-chain name if substrate id exists
-      if (a.OffchainProfile.identity) {
-        profile.initializeWithChain(
-          a.OffchainProfile.identity,
-          profileData?.headline,
-          profileData?.bio,
-          profileData?.avatarUrl,
-          a.OffchainProfile.judgements,
-          a.last_active,
-          a.is_councillor,
-          a.is_validator
-        );
-      } else {
-        profile.initialize(
-          profileData?.name,
-          profileData?.headline,
-          profileData?.bio,
-          profileData?.avatarUrl,
-          a.last_active,
-          a.is_councillor,
-          a.is_validator
-        );
-      }
+      profile.initialize(
+        profileData?.name,
+        profileData?.headline,
+        profileData?.bio,
+        profileData?.avatarUrl,
+        a.last_active,
+        a.is_validator
+      );
     } else {
       profile.initializeEmpty();
     }
@@ -210,7 +195,7 @@ const loadProfile = async (
       ghost_address: a.ghost_address,
     };
     state.account = account;
-    state.threads = result.threads.map((t) => modelThreadFromServer(t));
+    state.threads = result.threads.map((t) => app.threads.modelFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
     m.redraw();
   } catch (err) {
@@ -327,9 +312,9 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       }
     }
   },
-  oncreate: async (vnode) => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  oncreate: async () => {},
   view: (vnode) => {
-    const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
       loadProfile(vnode.attrs, vnode.state);
@@ -416,6 +401,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     const proposals = vnode.state.threads.sort(
       (a, b) => +b.createdAt - +a.createdAt
     );
+
     const allContent = []
       .concat(proposals || [])
       .concat(comments || [])
@@ -448,7 +434,6 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
             m('.col-xs-12 .col-md-8', [
               m(ProfileHeader, {
                 account,
-                setIdentity,
                 onOwnProfile,
                 onLinkedProfile,
                 refreshCallback: () => {
@@ -515,7 +500,6 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
             m('.xs-display-none .col-md-4', [
               m(ProfileBio, {
                 account,
-                setIdentity,
                 onOwnProfile,
                 onLinkedProfile,
                 refreshCallback: () => {

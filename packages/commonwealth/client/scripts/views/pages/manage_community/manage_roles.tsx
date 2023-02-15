@@ -1,18 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { notifyError } from 'controllers/app/notifications';
 import $ from 'jquery';
+import m from 'mithril';
+import type { RoleInfo } from 'models';
+import { AddressInfo } from 'models';
 
 import 'pages/manage_community/manage_roles.scss';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
-import { AddressInfo, RoleInfo } from 'models';
-import { notifyError } from 'controllers/app/notifications';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 type ManageRoleRowAttrs = {
   label: string;
@@ -54,7 +55,6 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                   popover: true,
                   linkify: false,
                   hideAvatar: false,
-                  hideIdentityIcon: true,
                 })}
                 <CWIcon
                   iconName="close"

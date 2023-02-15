@@ -1,7 +1,14 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .Footer {
-  background-image: url('/static/img/footer.png');
+  margin-top: auto;
+  background: linear-gradient(
+    92deg,
+    #fbfafd 0%,
+    #c4d0e6 50%,
+    #e7dee0 75%,
+    #c6d5dd 100%
+  );
   background-size: cover;
   display: flex;
   flex-wrap: wrap;

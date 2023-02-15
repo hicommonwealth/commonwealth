@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import moment from 'moment';
 
 import 'components/comments/comment.scss';
+import m from 'mithril';
+import type { Account, Comment as CommentType } from 'models';
+import moment from 'moment';
 
 import app from 'state';
-import { Account, Comment as CommentType } from 'models';
 import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
@@ -21,6 +21,8 @@ import { SharePopover } from '../share_popover';
 import User, { AnonymousUser } from '../widgets/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
+import { showCanvasVerifyDataModal } from '../../modals/canvas_verify_data_modal';
+import { verify } from '../../../helpers/canvas';
 
 type CommentAuthorAttrs = {
   comment: CommentType<any>;
@@ -74,6 +76,10 @@ export class Comment extends ClassComponent<CommentAttrs> {
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
 
+  private verificationChecked: boolean;
+  private verifiedSession: boolean;
+  private verifiedAction: boolean;
+
   view(vnode: m.Vnode<CommentAttrs>) {
     const {
       comment,
@@ -108,6 +114,32 @@ export class Comment extends ClassComponent<CommentAttrs> {
       !isLocked &&
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
+    // if (!this.verificationChecked) {
+    //   this.verificationChecked = true;
+    //   try {
+    //     const session = JSON.parse(comment.canvasSession);
+    //     const action = JSON.parse(comment.canvasAction);
+    //     const actionSignerAddress = session?.payload?.sessionAddress;
+    //     if (
+    //       !comment.canvasSession ||
+    //       !comment.canvasAction ||
+    //       !actionSignerAddress
+    //     )
+    //       return;
+    //     verify({ session })
+    //       .then((result) => (this.verifiedSession = true))
+    //       .catch((err) => console.log('Could not verify session'))
+    //       .finally(() => m.redraw());
+    //     verify({ action, actionSignerAddress })
+    //       .then((result) => (this.verifiedAction = true))
+    //       .catch((err) => console.log('Could not verify action'))
+    //       .finally(() => m.redraw());
+    //   } catch (err) {
+    //     console.log('Unexpected error while verifying action/session');
+    //     return;
+    //   }
+    // }
+
     return (
       <div class={`Comment comment-${comment.id}`}>
         {threadLevel > 0 && (
@@ -133,6 +165,16 @@ export class Comment extends ClassComponent<CommentAttrs> {
             >
               {moment(comment.createdAt).format('l')}
             </CWText>
+            {/* this.verifiedAction && this.verifiedSession && (
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="verification-icon"
+                onclick={() => showCanvasVerifyDataModal(comment)}
+              >
+                <CWIcon iconName="checkCircle" iconSize="xs" />
+              </CWText>
+            ) */}
           </div>
           {this.isEditingComment ? (
             <EditComment

@@ -1,11 +1,9 @@
 import BN from 'bn.js';
 
-import {
-  IEventLabel,
-  LabelerFilter,
-  SupportedNetwork,
-} from '../../../interfaces';
-import { BalanceString, EventKind, IEventData } from '../types';
+import type { IEventLabel, LabelerFilter } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { BalanceString, IEventData } from '../types';
+import { EventKind } from '../types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';

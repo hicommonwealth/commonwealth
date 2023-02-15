@@ -5,7 +5,9 @@ Discussions and governance for blockchain networks.
 ## Quickstart
 
 ### Install dependencies:
+
 **Postgres**
+
 ```bash
 brew install node yarn postgresql
 brew services start postgresql
@@ -48,6 +50,7 @@ nvm install
 ```
 
 - if for some reason, nvm still doesn't work, try using
+
 ```bash
     source ~/.nvm/nvm.sh
 ```
@@ -57,7 +60,7 @@ nvm install
     - This is equivalent to `yarn update`
     - Do not run `yarn upgrade` unless you are explicitly trying to upgrade packages
 - Run the development server in one terminal: `yarn start`
-- Reset the dev DB (this will wipe all data): `yarn reset-server`
+- Reset the dev DB (this will wipe all data): `yarn reset-db`
 - Connect to the dev DB: `yarn psql` (or use Postico on Mac)
 - Lint your code: `npm install -g eslint`, then `eslint [files]`
 - Lint your styles: `yarn stylelint` or `stylelint client/styles/*`
@@ -74,9 +77,13 @@ following the Production Database instructions afterwards.
 
 ## Trouble Shooting for M1 Mac Users**
 
-For development, you should follow the same steps as in the **nvm** section, except you must make sure you are using the Rosetta2 Terminal. Follow these steps to enable Rosetta 2 `https://www.courier.com/blog/tips-and-tricks-to-setup-your-apple-m1-for-development/`.
+For development, you should follow the same steps as in the **nvm** section, except you must make sure you are using the
+Rosetta2 Terminal. Follow these steps to enable Rosetta
+2 `https://www.courier.com/blog/tips-and-tricks-to-setup-your-apple-m1-for-development/`.
 
-ALL TIMES you will need to install using this following in front of brew. For example for python: `arch -arm64 brew install python@3.9`. This will allow you to install using the M1 homebrew with Rosetta. This is crucial.
+ALL TIMES you will need to install using this following in front of brew. For example for
+python: `arch -arm64 brew install python@3.9`. This will allow you to install using the M1 homebrew with Rosetta. This
+is crucial.
 
 If errors occur try these steps:
 
@@ -90,7 +97,9 @@ If errors occur try these steps:
   gyp ERR! stack Error: `make` failed with exit code: 2
 ```
 
-Make sure you have python installed in your Rosetta Terminal path. See: `https://stackoverflow.com/questions/71468590/env-python-no-such-file-or-directory-when-building-app-with-xcode`. You need to be able to call `python` in the terminal.
+Make sure you have python installed in your Rosetta Terminal path.
+See: `https://stackoverflow.com/questions/71468590/env-python-no-such-file-or-directory-when-building-app-with-xcode`.
+You need to be able to call `python` in the terminal.
 
 ## Environment Variables
 
@@ -118,11 +127,13 @@ Environment variables used for external services include:
 - DISCORD_CLIENT_SECRET: for Discord OAuth login
 - DISCORD_OAUTH_SCOPES: scopes (usually just 'identify')
 - PGPASSWORD: [OPTIONAL] avoids the password prompt for all local database commands
-- ETH_ALCHEMY_API_KEY: [OPTIONAL] if set, the load-db commands will replace production Alchemy urls with their locally supported variants
+- ETH_ALCHEMY_API_KEY: [OPTIONAL] if set, the load-db commands will replace production Alchemy urls with their locally
+  supported variants
 
 We also use certain environment variables to configure the application itself:
 
-- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "edgeware,edgeware-local")
+- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "
+  edgeware,edgeware-local")
 - NO_EVENTS: disable chain-event functionality entirely
 - NO_CLIENT: set to true to disable the front-end build
 
@@ -152,6 +163,7 @@ NODE_ENV=production yarn start
 ```
 
 To copy the production database to the staging database for testing purposes, ensuring migrations will work:
+
 ```
 # turn off the web dynos in staging
 heroku maintenance:on -a <STAGING_APP>
@@ -162,7 +174,9 @@ heroku pg:copy <PRODUCTION_APP>::<PRODUCTION_DB_URL> <STAGING_DB_URL> -a <STAGIN
 # turn on the web dynos in staging
 heroku maintenance:off -a <STAGING_APP>
 ```
+
 To copy a manageable subset of a large remote table to the local instance:
+
 ```
 # log into the remote database
 heroku pg:psql -a <APP_NAME>
@@ -191,6 +205,7 @@ CHAIN_ID=dydx yarn migrate-events
 ```
 
 ## Production Logs
+
 ## Extending Boot Timeout
 
 Heroku may need more time to boot the production server. If so, you can extend
@@ -259,6 +274,7 @@ To configure a custom domain, you should:
   that domain.
 
 To test, add a new entry to your /etc/hosts file:
+
 ```
 127.0.0.1       <custom domain>
 ```
@@ -316,20 +332,31 @@ Moloch (Eth):
 
 Install the latest for truffle and ganache-cli. Otherwise Moloch
 contract compilation may be affected.
+
 ```
 npm install -g truffle@latest
 npm install -g ethereumjs-testrpc@latest
 npm install -g ganache-cli@latest
 ```
 
-- You may need to create a Moloch endpoint in Metamask using the `127.0.0.1:9545` url. You can then add the summoner account to Metamask for testing using private key `0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d` (corresponding public key `0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1`). It should display "100 ETH" in the Metamask window.
-  - If you make any transactions and then reset the chain, you will need to reset the Metamask transaction history via "Settings -> Advanced -> Reset Account".
-- The other accounts available for testing can be found in the `eth/migrations/3_moloch_v1.js`. They are the 2nd through 6th accounts printed at the top of the `ganache-cli` output. They all have 100 ETH and 5 tokens that can be used as tribute. These private keys can also be added to Metamask.
-- You may need to transfer extra tokens (TKN) from `0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1` (the summoner) to other accounts if you wish to test delegate or creating proposals on behalf of other participants. If you do this, you'll need to go to the Commonwealth Moloch settings page and authorize additional token.
+- You may need to create a Moloch endpoint in Metamask using the `127.0.0.1:9545` url. You can then add the summoner
+  account to Metamask for testing using private
+  key `0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d` (corresponding public
+  key `0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1`). It should display "100 ETH" in the Metamask window.
+    - If you make any transactions and then reset the chain, you will need to reset the Metamask transaction history
+      via "Settings -> Advanced -> Reset Account".
+- The other accounts available for testing can be found in the `eth/migrations/3_moloch_v1.js`. They are the 2nd through
+  6th accounts printed at the top of the `ganache-cli` output. They all have 100 ETH and 5 tokens that can be used as
+  tribute. These private keys can also be added to Metamask.
+- You may need to transfer extra tokens (TKN) from `0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1` (the summoner) to other
+  accounts if you wish to test delegate or creating proposals on behalf of other participants. If you do this, you'll
+  need to go to the Commonwealth Moloch settings page and authorize additional token.
 - The "moloch-local" chain is always configured to fetch data from the chain directly.
-  - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `eth/`.
-  - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `eth/`.
-  - Initialize the app with `yarn start`.
+    - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and
+      run `truffle deploy` in `eth/`.
+    - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and
+      run `truffle deploy` in `eth/`.
+    - Initialize the app with `yarn start`.
 
 Cosmos Hub (Gaia):
 
@@ -363,19 +390,24 @@ Polkadot/Kusama:
   validator.
 
 ## Vultr Scripts
+
 ### Root/Admin ONLY
+
 **install-docker.sh**: This script installs Docker on a remote Vultr server.
+
 - Requires: the `cmn_docker_root_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the IP
   stored in the `VULTR_IP` env var defined in the `.env` file. Also requires the `VULTR_USER` env var to be set so that
   the root user can give the `VULTR_USER` permission to use Docker CLI without using `sudo`. The user of this command
   must have the `cmn_docker_root_ssh` private key in `~/.ssh/`.
 
 **update-docker-images.sh**: This script updates the required docker images (currently RabbitMQ and Redis).
+
 - Requires: the `cmn_docker_admin_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the
   IP stored in the `VULTR_IP` env var defined in the `.env` file. The user of this command must have
   the `cmn_docker_root_ssh` private key in `~/.ssh/`.
 
 ### Developer Commands
+
 Before running any of these commands, you will need `VULTR_IP`, `VULTR_USER`, and `VULTR_DOCKER_ADMIN_PASSWORD` in your
 .env file. You will also need the `cmn_docker_admin_ssh` file in your `.ssh` folder. This folder can be found at
 `~./ssh` on linux and `Users/<username>/.ssh/` on Mac.

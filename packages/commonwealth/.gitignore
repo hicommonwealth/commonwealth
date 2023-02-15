@@ -20,6 +20,7 @@ coverage/
 *.pem
 *.csv
 stats.json
+cache/
 
 # Database downloads
 latest.dump

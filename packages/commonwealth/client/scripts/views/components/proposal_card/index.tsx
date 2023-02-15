@@ -1,29 +1,29 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
+import { ProposalType } from 'common-common/src/types';
 
 import 'components/proposal_card/index.scss';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import { isNotNil } from 'helpers/typeGuards';
+import { getProposalUrlPath } from 'identifiers';
+import m from 'mithril';
+import type { AnyProposal } from 'models';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
-import { isNotNil } from 'helpers/typeGuards';
-import { AnyProposal } from 'models';
-import { ProposalType } from 'common-common/src/types';
-import { getProposalUrlPath } from 'identifiers';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CWCard } from '../component_kit/cw_card';
+import { CWDivider } from '../component_kit/cw_divider';
+import { CWText } from '../component_kit/cw_text';
 import {
+  getPrimaryTagText,
   getSecondaryTagText,
   getStatusClass,
   getStatusText,
-  getPrimaryTagText,
 } from './helpers';
-import { CWText } from '../component_kit/cw_text';
-import { CWDivider } from '../component_kit/cw_divider';
 import { ProposalTag } from './proposal_tag';
 
 type ProposalCardAttrs = {
@@ -131,15 +131,3 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
     );
   }
 }
-
-//  linked treasury proposals
-//   proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
-//      && proposal.preimage?.method === 'approveProposal'
-//     && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-//    proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
-//     && proposal.preimage?.method === 'approveProposal'
-//     && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-//    proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
-//      && proposal.call?.method === 'approveProposal'
-//      && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
-//    linked referenda

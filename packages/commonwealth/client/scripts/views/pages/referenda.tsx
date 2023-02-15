@@ -1,23 +1,23 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { ChainBase } from 'common-common/src/types';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { blockperiodToDuration } from 'helpers';
+import m from 'mithril';
 
 import 'pages/referenda.scss';
 
 import app from 'state';
-import { blockperiodToDuration } from 'helpers';
-import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/adapter';
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
-import { ProposalCard } from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import ErrorPage from './error';
-import { CardsCollection } from '../components/cards_collection';
+import { ProposalCard } from 'views/components/proposal_card';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
+import ErrorPage from './error';
 
 function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -26,12 +26,7 @@ function getModules() {
   if (app.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
 
-    return [
-      chain.treasury,
-      chain.democracy,
-      chain.democracyProposals,
-      chain.council,
-    ];
+    return [chain.treasury, chain.democracy, chain.democracyProposals];
   } else {
     throw new Error('invalid chain');
   }

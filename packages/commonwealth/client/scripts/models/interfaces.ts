@@ -1,11 +1,13 @@
-import BN from 'bn.js';
-import moment from 'moment';
-import { EventEmitter } from 'events';
-import { Coin } from 'adapters/currency';
-import { IIdentifiable } from 'adapters/shared';
-import { TransactionStatus } from './types';
-import Account from './Account';
-import StorageModule from './StorageModule';
+import type { Coin } from 'adapters/currency';
+import type { IIdentifiable } from 'adapters/shared';
+import type BN from 'bn.js';
+import type { EventEmitter } from 'events';
+import type moment from 'moment';
+import type Account from './Account';
+import type StorageModule from './StorageModule';
+import type { TransactionStatus } from './types';
+
+/* eslint-disable */
 
 export interface IBlockInfo {
   height: number;
@@ -42,6 +44,7 @@ export type ITXModalData = {
 // metadata, API, and event-handling functionality.
 export interface IChainModule<C extends Coin, A extends Account> {
   coins(n: number | BN, inDollars?: boolean): C;
+
   denom: string;
 
   // Signs and submits an on-chain transaction, wrapping it in a modal dialog that tracks its status.
@@ -92,24 +95,31 @@ export interface IFixedEndTime {
   kind: 'fixed';
   time: moment.Moment;
 }
+
 export interface IFixedBlockEndTime {
   kind: 'fixed_block';
   blocknum: number;
 }
+
 export interface IDynamicEndTime {
   kind: 'dynamic';
+
   getBlocknum(): number;
 }
+
 export interface IThresholdEndTime {
   kind: 'threshold';
   threshold: number;
 }
+
 export interface INotStartedEndTime {
   kind: 'not_started';
 }
+
 export interface IUnavailableEndTime {
   kind: 'unavailable';
 }
+
 export interface IQueuedEndTime {
   kind: 'queued';
 }

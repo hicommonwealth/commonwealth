@@ -21,7 +21,7 @@ module.exports = {
             allowNull: true,
           },
           { transaction: t }
-        )
+        ),
       ]);
     });
   },
@@ -29,17 +29,13 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction((t) => {
       return Promise.all([
-        queryInterface.removeColumn(
-          'ChainEntities',
-          'title',
-          { transaction: t }
-        ),
-        queryInterface.removeColumn(
-          'ChainEntities',
-          'author',
-          { transaction: t }
-        )
+        queryInterface.removeColumn('ChainEntities', 'title', {
+          transaction: t,
+        }),
+        queryInterface.removeColumn('ChainEntities', 'author', {
+          transaction: t,
+        }),
       ]);
     });
-  }
+  },
 };

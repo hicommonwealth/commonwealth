@@ -1,14 +1,14 @@
 /* @jsx m */
 /* eslint-disable max-len */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
-import 'pages/privacy_and_terms.scss';
-
 import { renderMultilineText } from 'helpers';
-import Sublayout from '../sublayout';
+import m from 'mithril';
+
+import 'pages/privacy_and_terms.scss';
 import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from '../sublayout';
 
 const PrivacyPolicy = `
 Last updated: January 14, 2019

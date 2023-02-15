@@ -1,22 +1,22 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
+import { ChainBase } from 'common-common/src/types';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import m from 'mithril';
 
 import 'pages/treasury.scss';
 
 import app from 'state';
-import { formatCoin } from 'adapters/currency';
-import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/adapter';
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
-import { ProposalCard } from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import ErrorPage from 'views/pages/error';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import { CardsCollection } from '../components/cards_collection';
+import { ProposalCard } from 'views/components/proposal_card';
+import ErrorPage from 'views/pages/error';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 
 function getModules() {
@@ -25,12 +25,7 @@ function getModules() {
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
-    return [
-      chain.council,
-      chain.treasury,
-      chain.democracyProposals,
-      chain.democracy,
-    ];
+    return [chain.treasury, chain.democracyProposals, chain.democracy];
   } else {
     throw new Error('invalid chain');
   }
@@ -119,7 +114,7 @@ class TreasuryPage extends ClassComponent {
                 {
                   statName: 'Treasury Proposals',
                   statDescription: `are used to request funds from the on-chain \
-                  treasury. They are approved/rejected by referendum or council.`,
+                  treasury. They are approved/rejected by referendum.`,
                 },
               ]}
               stats={[

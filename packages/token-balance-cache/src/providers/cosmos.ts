@@ -1,3 +1,4 @@
+import type { BankExtension, StakingExtension } from '@cosmjs/stargate';
 import {
   QueryClient,
   setupBankExtension,
@@ -7,12 +8,31 @@ import { Bech32 } from '@cosmjs/encoding';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { BalanceType } from 'common-common/src/types';
 
-import { BalanceProvider, IChainNode } from "../types";
+import type { IChainNode } from '../types';
+import { BalanceProvider } from '../types';
 
-export default class CosmosBalanceProvider extends BalanceProvider {
+export default class CosmosBalanceProvider extends BalanceProvider<
+  QueryClient & BankExtension & StakingExtension
+> {
   public name = 'cosmos';
   public opts = {};
   public validBases = [BalanceType.Cosmos];
+
+  public async getExternalProvider(
+    node: IChainNode
+  ): Promise<QueryClient & BankExtension & StakingExtension> {
+    /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */
+    const tmClient = await Tendermint34Client.connect(
+      node.private_url || node.url
+    );
+
+    const api = QueryClient.withExtensions(
+      tmClient,
+      setupBankExtension,
+      setupStakingExtension
+    );
+    return api;
+  }
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
     // re-encode address if necessary
@@ -22,14 +42,7 @@ export default class CosmosBalanceProvider extends BalanceProvider {
     const { data } = Bech32.decode(address);
     const encodedAddress = Bech32.encode(node.bech32, data);
 
-    /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */
-    const tmClient = await Tendermint34Client.connect(node.private_url || node.url);
-
-    const api = QueryClient.withExtensions(
-      tmClient,
-      setupBankExtension,
-      setupStakingExtension,
-    );
+    const api = await this.getExternalProvider(node);
 
     try {
       const { params } = await api.staking.params();

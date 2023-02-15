@@ -1,11 +1,11 @@
-import m from 'mithril';
+import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
 import _ from 'lodash';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import m from 'mithril';
+import { Profile } from 'models';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
-import { Profile } from 'models';
 import { ChainBase } from '../../../../../common-common/src/types';
 
 class ProfilesController {
@@ -121,31 +121,16 @@ class ProfilesController {
                 ? JSON.parse(profileData.data)
                 : {};
               const lastActive = profileData.Address.last_active;
-              const isCouncillor = profileData.Address.is_councillor;
               const isValidator = profileData.Address.is_validator;
               // ignore off-chain name if substrate id exists
-              if (profileData.identity) {
-                profile.initializeWithChain(
-                  profileData.identity,
-                  pInfo.headline,
-                  pInfo.bio,
-                  pInfo.avatarUrl,
-                  profileData.judgements,
-                  lastActive,
-                  isCouncillor,
-                  isValidator
-                );
-              } else {
-                profile.initialize(
-                  pInfo.name,
-                  pInfo.headline,
-                  pInfo.bio,
-                  pInfo.avatarUrl,
-                  lastActive,
-                  isCouncillor,
-                  isValidator
-                );
-              }
+              profile.initialize(
+                pInfo.name,
+                pInfo.headline,
+                pInfo.bio,
+                pInfo.avatarUrl,
+                lastActive,
+                isValidator
+              );
               return profile;
             })
             .filter((p) => p !== null);

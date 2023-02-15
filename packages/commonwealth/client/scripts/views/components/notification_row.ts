@@ -1,22 +1,24 @@
+import type { CWEvent } from 'chain-events/src';
+import { Label as ChainEventLabel } from 'chain-events/src';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import 'components/notification_row.scss';
+import { link, pluralize } from 'helpers';
 
 import _ from 'lodash';
 import m from 'mithril';
+import type { Notification } from 'models';
+import { AddressInfo } from 'models';
 import moment from 'moment';
-import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
-import { IPostNotificationData } from 'types';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import { Notification, AddressInfo } from 'models';
-import { link, pluralize } from 'helpers';
+import type { IPostNotificationData } from 'types';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
+import { getCommunityUrl, getProposalUrl } from '../../../../shared/utils';
+import { CWIconButton } from './component_kit/cw_icon_button';
+import { CWSpinner } from './component_kit/cw_spinner';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
-import { CWSpinner } from './component_kit/cw_spinner';
-import { CWIconButton } from './component_kit/cw_icon_button';
 
 const jumpHighlightNotification = (
   commentId,
@@ -88,7 +90,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     comment_id,
     comment_text,
     parent_comment_id,
-    parent_comment_text,
     chain_id,
     author_address,
     author_chain,
@@ -110,7 +111,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const actorName = m(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
-    hideIdentityIcon: true,
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -196,7 +196,6 @@ const getBatchNotificationFields = (
     comment_id,
     comment_text,
     parent_comment_id,
-    parent_comment_text,
     chain_id,
     author_address,
     author_chain,
@@ -222,7 +221,6 @@ const getBatchNotificationFields = (
   const actorName = m(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
-    hideIdentityIcon: true,
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -417,7 +415,6 @@ const NotificationRow: m.Component<
       const authorName = m(User, {
         user: author,
         hideAvatar: true,
-        hideIdentityIcon: true,
       });
 
       return link(
@@ -487,14 +484,15 @@ const NotificationRow: m.Component<
       const notificationData = notifications.map((notif) =>
         typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
       );
-      let {
+      const result = getBatchNotificationFields(category, notificationData);
+      const {
         authorInfo,
         createdAt,
         notificationHeader,
         notificationBody,
-        path,
         pageJump,
-      } = getBatchNotificationFields(category, notificationData);
+      } = result;
+      let { path } = result;
 
       if (app.isCustomDomain()) {
         if (
@@ -570,7 +568,7 @@ const NotificationRow: m.Component<
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
           id: notification.id,
-          onclick: (e) => {
+          onclick: () => {
             // Graham TODO 22.10.05: Temporary fix while we wait for full
             // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
             // array

@@ -1,20 +1,16 @@
+import type { ProposalType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { uniqueIdToProposal } from 'identifiers';
 import $ from 'jquery';
 import _ from 'lodash';
+import type { IUniqueId } from 'models';
+import { Attachment, Comment } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import { uniqueIdToProposal } from 'identifiers';
 import { CommentsStore } from 'stores';
-import {
-  Comment,
-  Attachment,
-  IUniqueId,
-} from 'models';
-import { notifyError } from 'controllers/app/notifications';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
-import { ProposalType } from "common-common/src/types";
-import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 // tslint:disable: object-literal-key-quotes
 
@@ -67,6 +63,7 @@ export const modelFromServer = (comment) => {
     proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
   } catch (e) {
     // no proposal
+    console.log(e);
   }
 
   const commentParams =
@@ -86,6 +83,9 @@ export const modelFromServer = (comment) => {
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
           deleted: true,
+          canvasAction: comment.canvas_action,
+          canvasSession: comment.canvas_session,
+          canvasHash: comment.canvas_hash,
         }
       : {
           chain: comment.chain,
@@ -102,6 +102,9 @@ export const modelFromServer = (comment) => {
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
           deleted: false,
+          canvasAction: comment.canvas_action,
+          canvasSession: comment.canvas_session,
+          canvasHash: comment.canvas_hash,
         };
 
   return new Comment(commentParams);
@@ -122,10 +125,6 @@ class CommentsController {
     return this._store.getByProposal(proposal);
   }
 
-  public getByAuthor(address: string, author_chain: string) {
-    return this._store.getByAuthor(address);
-  }
-
   public nComments<T extends IUniqueId>(proposal: T) {
     return this._store.nComments(proposal);
   }
@@ -143,6 +142,7 @@ class CommentsController {
     return _.uniq(authors);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async create<T extends IUniqueId>(
     address: string,
     proposalIdentifier: string,
@@ -155,19 +155,27 @@ class CommentsController {
     // TODO: is the below assumptions valid?
     // this only works if we assume that all chain-entities for the specific
     // chain are loaded when the comment is created
-    const [prefix, id] = proposalIdentifier.split('_') as [
-      ProposalType,
-      string
-    ];
+    const [prefix] = proposalIdentifier.split('_') as [ProposalType, string];
     let chainEntity;
     if (
       prefix.includes('proposal') ||
       prefix.includes('referendum') ||
       prefix.includes('motion')
     ) {
-      chainEntity = app.chainEntities.store.getByUniqueId(app.activeChainId(), proposalIdentifier);
+      chainEntity = app.chainEntities.store.getByUniqueId(
+        app.activeChainId(),
+        proposalIdentifier
+      );
     }
     try {
+      // TODO: Create a new type for proposal comments?
+      const { session, action, hash } = await app.sessions.signComment({
+        thread_id: proposalIdentifier,
+        body: unescapedText,
+        parent_comment_id: parentCommentId,
+      });
+
+      // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         author_chain: app.user.activeAccount.chain.id,
         chain,
@@ -178,6 +186,9 @@ class CommentsController {
         'attachments[]': attachments,
         text: encodeURIComponent(unescapedText),
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       const { result } = res;
       const newComment = modelFromServer(result);
@@ -203,6 +214,11 @@ class CommentsController {
     const newBody = body || comment.text;
     try {
       // TODO: Change to PUT /comment
+      const { session, action, hash } = await app.sessions.signComment({
+        thread_id: comment.rootProposal,
+        body,
+        parent_comment_id: comment.parentComment,
+      });
       const response = await $.post(`${app.serverUrl()}/editComment`, {
         address: app.user.activeAccount.address,
         author_chain: app.user.activeAccount.chain.id,
@@ -211,6 +227,9 @@ class CommentsController {
         body: encodeURIComponent(newBody),
         'attachments[]': attachments,
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -229,6 +248,9 @@ class CommentsController {
   }
 
   public async delete(comment) {
+    const { session, action, hash } = await app.sessions.signDeleteComment({
+      comment_id: comment.canvasHash,
+    });
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /comment
       $.post(`${app.serverUrl()}/deleteComment`, {
@@ -242,6 +264,9 @@ class CommentsController {
             text: '[deleted]',
             plaintext: '[deleted]',
             versionHistory: [],
+            canvas_action: action,
+            canvas_session: session,
+            canvas_hash: hash,
           });
           const softDeletion = new Comment(revisedComment);
           this._store.remove(existing);

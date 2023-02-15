@@ -1,20 +1,22 @@
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { Moloch1__factory } from 'common-common/src/eth/types';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-
-import EthereumAccount from 'controllers/chain/ethereum/account';
-import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ContractType } from 'common-common/src/types';
-import { ChainInfo, IChainAdapter } from 'models';
 
-import ChainEntityController from 'controllers/server/chain_entities';
-import { IApp } from 'state';
+import type EthereumAccount from 'controllers/chain/ethereum/account';
+import EthereumAccounts from 'controllers/chain/ethereum/accounts';
+import type { ChainInfo } from 'models';
+import { IChainAdapter } from 'models';
+import type { IApp } from 'state';
+import MolochAPI from './api';
 
 import MolochChain from './chain';
-import MolochMembers from './members';
-import MolochAPI from './api';
 import MolochGovernance from './governance';
+import MolochMembers from './members';
 
-export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Moloch extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public chain: MolochChain;
   public ethAccounts: EthereumAccounts;
@@ -38,7 +40,11 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
       throw new Error('No Mol contracts found');
     }
     const molContract = molContracts[0];
-    const api = new MolochAPI(Moloch1__factory.connect, molContract.address, this.chain.api.currentProvider as any);
+    const api = new MolochAPI(
+      Moloch1__factory.connect,
+      molContract.address,
+      this.chain.api.currentProvider as any
+    );
     await api.init();
     this.chain.molochApi = api;
     await this.accounts.init(api);

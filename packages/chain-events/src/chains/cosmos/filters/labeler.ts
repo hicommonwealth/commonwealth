@@ -1,9 +1,7 @@
-import {
-  LabelerFilter,
-  IEventLabel,
-  SupportedNetwork,
-} from '../../../interfaces';
-import { IEventData, EventKind } from '../types';
+import type { LabelerFilter, IEventLabel } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { IEventData } from '../types';
+import { EventKind } from '../types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';

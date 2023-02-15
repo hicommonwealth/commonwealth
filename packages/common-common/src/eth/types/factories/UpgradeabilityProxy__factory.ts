@@ -2,14 +2,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
+import type {
   Signer,
   BytesLike,
+  PayableOverrides} from "ethers";
+import {
   Contract,
-  ContractFactory,
-  PayableOverrides,
+  ContractFactory
 } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import type { Provider, TransactionRequest } from "@ethersproject/providers";
 
 import type { UpgradeabilityProxy } from "../UpgradeabilityProxy";
 

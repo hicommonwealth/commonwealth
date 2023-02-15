@@ -1,7 +1,15 @@
-import {RabbitMQController, RabbitMQControllerError} from "./rabbitMQController";
-import * as Rascal from "rascal";
-import {RascalPublications, RascalSubscriptions, TRmqMessages} from "./types";
+import {
+  RabbitMQController,
+  RabbitMQControllerError,
+} from './rabbitMQController';
+import type * as Rascal from 'rascal';
+import type {
+  RascalPublications,
+  RascalSubscriptions,
+  TRmqMessages,
+} from './types';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 /**
  * This is a mock RabbitMQController whose functions simply log a 'success' message when called. Used mainly for
@@ -29,17 +37,24 @@ export class MockRabbitMQController extends RabbitMQController {
     msgProcessorContext?: { [key: string]: any }
   ): Promise<any> {
     if (!this._initialized) {
-      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError(
+        'RabbitMQController is not initialized!'
+      );
     }
-    console.log("Subscription started")
+    console.log('Subscription started');
     return;
   }
 
-  public async publish(data: TRmqMessages, publisherName: RascalPublications): Promise<any> {
+  public async publish(
+    data: TRmqMessages,
+    publisherName: RascalPublications
+  ): Promise<any> {
     if (!this._initialized) {
-      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError(
+        'RabbitMQController is not initialized!'
+      );
     }
-    console.log("Message published")
+    console.log('Message published');
   }
 
   public get initialized(): boolean {
