@@ -121,25 +121,15 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
           any
         >;
 
-        console.log('c', c);
-
         if (!c) {
           return <PageNotFound message="Invalid proposal type" />;
         }
 
         if (!c.ready) {
-          console.log("module isn't ready yet");
           // TODO: perhaps we should be able to load here without fetching ALL proposal data
           // load sibling modules too
           if (app.chain.base === ChainBase.Substrate) {
             const chain = app.chain as Substrate;
-            console.log(
-              'loading modules',
-              chain.treasury,
-              chain.democracyProposals,
-              chain.democracy,
-              chain.tips
-            );
             app.chain.loadModules([
               chain.treasury,
               chain.democracyProposals,
@@ -162,7 +152,6 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
     }
 
     if (identifier !== `${proposalId}-${slugify(this.proposal.title)}`) {
-      console.log("identifier doesn't match");
       this.setRoute(
         getProposalUrlPath(
           this.proposal.slug,
@@ -175,7 +164,6 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
 
     // load comments
     if (!this.prefetch[proposalIdAndType]['commentsStarted']) {
-      console.log('loading comments');
       app.comments
         .refresh(this.proposal, app.activeChainId())
         .then(async () => {
@@ -262,7 +250,6 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
       this.votingModalOpen = false;
       this.redraw();
     };
-
     return (
       <Sublayout
       //  title={headerTitle}
