@@ -39,7 +39,7 @@
     justify-content: center;
 
     @include smallInclusive {
-      height: calc(100% - 80px);
+      height: calc(100% - 40px);
     }
   }
 
