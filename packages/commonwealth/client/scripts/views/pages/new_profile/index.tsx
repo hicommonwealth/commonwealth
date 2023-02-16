@@ -7,16 +7,13 @@ import ClassComponent from 'class_component';
 import 'pages/new_profile/index.scss';
 
 import app from 'state';
-import type { Thread} from 'models';
+import type { Thread } from 'models';
 import { ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import { NewProfileHeader } from './new_profile_header';
-import type {
-  CommentWithAssociatedThread} from './new_profile_activity';
-import {
-  NewProfileActivity,
-} from './new_profile_activity';
+import type { CommentWithAssociatedThread } from './new_profile_activity';
+import { NewProfileActivity } from './new_profile_activity';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
@@ -55,7 +52,9 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       });
 
       this.profile = new Profile(response.profile);
-      this.threads = response.threads.map((t) => app.threads.modelFromServer(t));
+      this.threads = response.threads.map((t) =>
+        app.threads.modelFromServer(t)
+      );
       const comments = response.comments.map((c) => modelCommentFromServer(c));
       const commentsWithAssociatedThread = comments.map((c) => {
         const thread = response.commentThreads.find(
