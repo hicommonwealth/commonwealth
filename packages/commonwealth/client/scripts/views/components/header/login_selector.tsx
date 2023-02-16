@@ -71,6 +71,7 @@ export const LoginSelectorMenuLeft = ({
       <div className="LoginSelectorMenu">
         {activeAddressesWithRole.map((account) => (
           <div
+            key={account.address}
             className="login-menu-item"
             onClick={async () => {
               await setActiveAccount(account);
