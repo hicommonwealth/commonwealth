@@ -1,7 +1,4 @@
 import React from 'react';
-
-import { redraw } from 'mithrilInterop';
-// import Infinite from 'mithril-infinite';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'pages/notifications/index.scss';
@@ -52,42 +49,32 @@ const nextPage = () => {
   if (numChainEventNotif < minChainEventsNotification + MAX_NOTIFS) {
     app.user.notifications.getChainEventNotifications().then(() => {
       increment('chain-event');
-      redraw();
     });
   } else {
     increment('chain-event');
-    redraw();
   }
 
   if (numDiscussionNotif < minDiscussionNotification + MAX_NOTIFS) {
     app.user.notifications.getDiscussionNotifications().then(() => {
       increment('discussion');
-      redraw();
     });
   } else {
     increment('discussion');
-    redraw();
   }
 };
 
 const previousPage = () => {
-  let flag = false;
   if (minChainEventsNotification >= MAX_NOTIFS) {
     minChainEventsNotification -= MAX_NOTIFS;
-    flag = true;
   } else if (minChainEventsNotification !== 0) {
     minChainEventsNotification = 0;
-    flag = true;
   }
 
   if (minDiscussionNotification >= MAX_NOTIFS) {
     minDiscussionNotification -= MAX_NOTIFS;
-    flag = true;
   } else if (minDiscussionNotification !== 0) {
     minDiscussionNotification = 0;
-    flag = true;
   }
-  if (flag) redraw();
 };
 
 const NotificationsPage = () => {
@@ -117,23 +104,7 @@ const NotificationsPage = () => {
             onClick={(e) => {
               e.preventDefault();
               pageKey -= 1;
-              // console.log(
-              //   'Before=\t',
-              //   `ChainEvents: ${minChainEventsNotification}-${
-              //     minChainEventsNotification + MAX_NOTIFS
-              //   }, Discussion: ${minDiscussionNotification}-${
-              //     minDiscussionNotification + MAX_NOTIFS
-              //   }`
-              // );
               previousPage();
-              // console.log(
-              //   'After=\t',
-              //   `ChainEvents: ${minChainEventsNotification}-${
-              //     minChainEventsNotification + MAX_NOTIFS
-              //   }, Discussion: ${minDiscussionNotification}-${
-              //     minDiscussionNotification + MAX_NOTIFS
-              //   }`
-              // );
             }}
           />
           <CWButton
@@ -149,34 +120,16 @@ const NotificationsPage = () => {
                 minChainEventsNotification =
                   app.user.notifications.chainEventNotifications.length;
               }
-              // console.log(
-              //   'Before=\t',
-              //   `ChainEvents: ${minChainEventsNotification}-${
-              //     minChainEventsNotification + MAX_NOTIFS
-              //   }, Discussion: ${minDiscussionNotification}-${
-              //     minDiscussionNotification + MAX_NOTIFS
-              //   }`
-              // );
               nextPage();
-              // console.log(
-              //   'After=\t',
-              //   `ChainEvents: ${minChainEventsNotification}-${
-              //     minChainEventsNotification + MAX_NOTIFS
-              //   }, Discussion: ${minDiscussionNotification}-${
-              //     minDiscussionNotification + MAX_NOTIFS
-              //   }`
-              // );
             }}
           />
           <CWButton
             label="Mark all as read"
             onClick={(e) => {
               e.preventDefault();
-              app.user.notifications
-                .markAsRead(
-                  discussionNotifications.concat(chainEventNotifications)
-                )
-                .then(() => redraw());
+              app.user.notifications.markAsRead(
+                discussionNotifications.concat(chainEventNotifications)
+              );
             }}
           />
           <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
@@ -200,11 +153,9 @@ const NotificationsPage = () => {
                             .length === 0
                         )
                           return;
-                        app.user.notifications
-                          .delete(
-                            app.user.notifications.chainEventNotifications
-                          )
-                          .then(() => redraw());
+                        app.user.notifications.delete(
+                          app.user.notifications.chainEventNotifications
+                        );
                       }}
                     />
                   </div>
@@ -226,25 +177,18 @@ const NotificationsPage = () => {
               minChainEventsNotification + MAX_NOTIFS
             );
 
-            // TODO: sort this?
             const allNotifications = discussionNotif.concat(chainEventNotif);
 
             const totalLength = allNotifications.length;
 
             if (totalLength > 0) {
-              // return m(Infinite, {
-              //   maxPages: 1, // prevents rollover/repeat
-              //   key: totalLength,
-              //   pageData: () => {
-              //     return allNotifications;
-              //   },
-              //   pageKey: () => {
-              //     return pageKey;
-              //   },
-              //   item: (data) => (
-              //     <NotificationRow notifications={[data]} onListPage />
-              //   ),
-              // });
+              return (
+                <>
+                  {allNotifications.map((n, i) => (
+                    <NotificationRow key={i} notification={n} onListPage />
+                  ))}
+                </>
+              );
             } else
               return (
                 <div className="no-notifications">

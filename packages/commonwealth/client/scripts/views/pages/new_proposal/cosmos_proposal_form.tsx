@@ -3,7 +3,6 @@ import React from 'react';
 import { ClassComponent } from 'mithrilInterop';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
-import { navigateToSubpage } from 'router';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -16,8 +15,9 @@ import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import withRouter from 'navigation/helpers';
 
-export class CosmosProposalForm extends ClassComponent {
+class CosmosProposalFormComponent extends ClassComponent {
   private cosmosProposalType: 'textProposal' | 'communitySpend';
   private deposit: number;
   private description: string;
@@ -123,7 +123,7 @@ export class CosmosProposalForm extends ClassComponent {
             cosmos.governance
               .submitProposalTx(author, deposit, prop)
               .then((result) => {
-                navigateToSubpage(`/proposal/${result}`);
+                this.setRoute(`/proposal/${result}`);
               })
               .catch((err) => notifyError(err.message));
           }}
@@ -132,3 +132,5 @@ export class CosmosProposalForm extends ClassComponent {
     );
   }
 }
+
+export const CosmosProposalForm = withRouter(CosmosProposalFormComponent);

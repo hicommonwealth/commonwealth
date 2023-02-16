@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 
 import app from 'state';
-import { useNavigate } from 'react-router-dom';
 import { PageLoading } from './loading';
 import { DefaultPage } from '../../../../../common-common/src/types';
+import { useCommonNavigate } from 'navigation/helpers';
 
 export default function DiscussionsRedirect() {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   useEffect(() => {
     if (!app.chain) return;
@@ -20,18 +20,19 @@ export default function DiscussionsRedirect() {
       view = defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions;
     }
 
+    // @TODO: make sure that this navigation does not apply to back button
     switch (view) {
       case DefaultPage.Overview:
-        navigate(`/${app.chain.id}/overview`);
+        navigate('/overview');
         break;
       case DefaultPage.Discussions:
-        navigate(`/${app.chain.id}/discussions`);
+        navigate('/discussions');
         break;
       case DefaultPage.Homepage:
-        navigate(`/${app.chain.id}/feed`);
+        navigate('/feed');
         break;
       default:
-        navigate(`/${app.chain.id}/discussions`);
+        navigate('/discussions');
     }
   });
 

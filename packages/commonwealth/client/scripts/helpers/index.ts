@@ -9,6 +9,7 @@ import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
 import type { Coin } from 'adapters/currency';
+import { NavigateFunction } from 'react-router-dom';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -43,12 +44,6 @@ export function parseCustomStages(str) {
     .map((s) => s?.toString())
     .filter((s) => s) as unknown as ThreadStage[];
 }
-
-export const modalRedirectClick = (e, redirectCb: () => void) => {
-  e.preventDefault();
-  $(e.target).trigger('modalexit');
-  redirectCb?.();
-};
 
 /*
  * mithril link helper
@@ -296,7 +291,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p) => render('p', p));
+  return paragraphs.map((p, index) => render('p', { key: index }, p));
 }
 
 /*
@@ -381,7 +376,7 @@ export const isCommandClick = (
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
-  _this,
+  navigate: any,
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
@@ -396,7 +391,7 @@ export const handleRedirectClicks = (
     return;
   }
 
-  _this.navigateToSubpage(redirectLink);
+  navigate(redirectLink);
   if (callback) {
     callback();
   }

@@ -57,9 +57,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
     // if (
-    //   this.meta.id !== (this.app.customDomainId() || getRouteParam('scope'))
+    //   this.meta.id !== (this.app.customDomainId() || _DEPRECATED_getSearchParams('scope'))
     // ) {
-    //   console.log(this.meta.id, getRouteParam('scope'));
+    //   console.log(this.meta.id, _DEPRECATED_getSearchParams('scope'));
     //   return false;
     // }
 

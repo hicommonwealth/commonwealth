@@ -1,8 +1,7 @@
 import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
-import { navigateToSubpage } from 'router';
-import { getRoute } from 'mithrilInterop';
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 
@@ -16,6 +15,8 @@ import {
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { ThreadsFilterMenuItem } from './stages_menu';
+import { Modal } from '../../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type Topic = {
   defaultOffchainTemplate?: string;
@@ -38,9 +39,9 @@ type TopicsMenuProps = {
 export const TopicsMenu = (props: TopicsMenuProps) => {
   const { featuredTopics, otherTopics, selectedTopic, topic } = props;
 
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-
+  const navigate = useCommonNavigate();
   const popoverProps = usePopover();
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
@@ -57,9 +58,11 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
             <div className="threads-filter-menu-items">
               <ThreadsFilterMenuItem
                 label="All Topics"
-                isSelected={getRoute() === `/${app.activeChainId()}` || !topic}
+                isSelected={
+                  _DEPRECATED_getRoute() === `/${app.activeChainId()}` || !topic
+                }
                 onClick={() => {
-                  navigateToSubpage('/discussions');
+                  navigate('/discussions');
                 }}
               />
               <CWDivider />
@@ -79,7 +82,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                     i
                   ) => {
                     const active =
-                      getRoute() ===
+                      _DEPRECATED_getRoute() ===
                         `/${app.activeChainId()}/discussions/${encodeURI(
                           name.toString().trim()
                         )}` ||
@@ -92,7 +95,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                         isSelected={active}
                         onClick={(e) => {
                           e.preventDefault();
-                          navigateToSubpage(`/discussions/${name}`);
+                          navigate(`/discussions/${name}`);
                         }}
                         iconRight={
                           app.roles?.isAdminOfEntity({

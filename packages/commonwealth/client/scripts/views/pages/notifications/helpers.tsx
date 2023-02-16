@@ -1,13 +1,13 @@
 import React from 'react';
-
 import _ from 'lodash';
 import moment from 'moment';
 
 import 'pages/notifications/notification_row.scss';
 
-import app from 'state';
-import { IPostNotificationData } from 'types';
+import type { IPostNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
+
+import app from 'state';
 import { AddressInfo } from 'models';
 import { pluralize } from 'helpers';
 import { User } from 'views/components/user/user';

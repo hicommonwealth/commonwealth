@@ -1,7 +1,6 @@
 /* eslint-disable no-script-url */
 import React from 'react';
 
-import { render, redraw } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
@@ -15,8 +14,8 @@ import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
-import { useNavigate } from 'react-router-dom';
 import { Modal } from '../component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -48,9 +47,10 @@ export const User = (props: UserAttrs) => {
     popover,
     showRole,
   } = props;
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [, updateState] = React.useState({});
 
   const popoverProps = usePopover();
 
@@ -105,6 +105,11 @@ export const User = (props: UserAttrs) => {
     }
 
     profile = app.profiles.getProfile(chainId.id, address);
+    if (!profile.initialized) {
+      app.profiles.isFetched.on('redraw', () => {
+        updateState({});
+      });
+    }
 
     role = adminsAndMods.find(
       (r) => r.address === address && r.address_chain === chainId.id

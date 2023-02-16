@@ -95,7 +95,7 @@ class SnapshotThreadLinkComponent extends ClassComponent<SnapshotThreadLinkAttrs
   view(vnode: ResultNode<SnapshotThreadLinkAttrs>) {
     const { id, title } = vnode.attrs.thread;
 
-    const proposalLink = getProposalUrlPath(ProposalType.Thread, id);
+    const proposalLink = getProposalUrlPath(ProposalType.Thread, id, true);
 
     return (
       <div className="HeaderLink">

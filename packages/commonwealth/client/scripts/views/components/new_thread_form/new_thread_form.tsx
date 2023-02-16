@@ -2,12 +2,11 @@ import React from 'react';
 
 import {
   ClassComponent,
-  getRoute,
-  getRouteParam,
+  _DEPRECATED_getRoute,
+  _DEPRECATED_getSearchParams,
   redraw,
 } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
-import { navigateToSubpage } from 'router';
 
 import 'components/new_thread_form.scss';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -74,7 +73,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
         form.url
       );
 
-      navigateToSubpage(`/discussion/${result.id}`);
+      this.setRoute(`/discussion/${result.id}`);
       updateTopicList(result.topic, app.chain);
     } catch (e) {
       quillEditorState.enable();
@@ -179,7 +178,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.form.topic = topic;
   }
 
-  oninit(vnode: ResultNode<NewThreadFormAttrs>) {
+  oncreate(vnode: ResultNode<NewThreadFormAttrs>) {
     const { isModal } = vnode.attrs;
     this.form = {
       topic: null,
@@ -191,7 +190,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.overwriteConfirmationModal = false;
     try {
       this.activeTopic = isModal
-        ? getRouteParam('topic')
+        ? _DEPRECATED_getSearchParams('topic')
         : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
         ? app.lastNavigatedFrom().split('/')[
             app.lastNavigatedFrom().split('/').indexOf('discussions') + 1
@@ -327,7 +326,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
               isSelected={this.form.kind === ThreadKind.Link}
             />
           </CWTabBar>
-          {isModal && getRoute() !== `${chainId}/new/discussion` && (
+          {isModal && _DEPRECATED_getRoute() !== `${chainId}/new/discussion` && (
             <CWButton
               label="Full editor"
               iconLeft="expand"
@@ -335,7 +334,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
               onClick={(e) => {
                 this.overwriteConfirmationModal = true;
                 localStorage.setItem(`${chainId}-from-draft`, `${fromDraft}`);
-                navigateToSubpage('/new/discussion');
+                this.setRoute('/new/discussion');
                 $(e.target).trigger('modalexit');
               }}
             />
