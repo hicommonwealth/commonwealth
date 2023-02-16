@@ -40,16 +40,10 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr
+  return (arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+    .filter((s) => s) as unknown) as ThreadStage[];
 }
-
-export const modalRedirectClick = (e, redirectCb: () => void) => {
-  e.preventDefault();
-  $(e.target).trigger('modalexit');
-  redirectCb?.();
-};
 
 /*
  * mithril link helper
@@ -297,7 +291,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p) => render('p', p));
+  return paragraphs.map((p, index) => render('p', { key: index }, p));
 }
 
 /*
@@ -312,7 +306,9 @@ export function blocknumToTime(blocknum: number): moment.Moment {
 }
 
 export function blocknumToDuration(blocknum: number) {
-  return moment.duration(blocknumToTime(blocknum).diff(moment()));
+  return moment
+    .duration(blocknumToTime(blocknum).diff(moment()))
+    .asMilliseconds();
 }
 
 export function blockperiodToDuration(blocknum: number) {

@@ -4,11 +4,11 @@ import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -90,7 +90,7 @@ class CosmosFormComponent extends ClassComponent {
           }}
         />
         {/* TODO: add alt wallet URL field */}
-        {...defaultChainRows(this.state.form)}
+        {defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
           disabled={this.state.saving}
@@ -105,12 +105,12 @@ class CosmosFormComponent extends ClassComponent {
               iconUrl,
             } = this.state.form;
             this.state.saving = true;
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: null,
-            });
+            // mixpanelBrowserTrack({
+            //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+            //   chainBase: null,
+            //   isCustomDomain: app.isCustomDomain(),
+            //   communityType: null,
+            // });
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 alt_wallet_url: altWalletUrl,

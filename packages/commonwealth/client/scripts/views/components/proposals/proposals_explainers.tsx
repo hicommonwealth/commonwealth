@@ -25,10 +25,7 @@ export const SubstrateProposalStats = (props: SubstrateProposalStatsProps) => {
         {
           statHeading: 'Next proposal or motion becomes a referendum:',
           stat: nextLaunchBlock ? (
-            <CountdownUntilBlock
-              block={nextLaunchBlock}
-              includeSeconds={false}
-            />
+            <CountdownUntilBlock block={nextLaunchBlock} />
           ) : (
             '--'
           ),

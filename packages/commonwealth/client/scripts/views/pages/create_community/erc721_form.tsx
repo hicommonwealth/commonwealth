@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
 import { IERC721Metadata__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { providers } from 'ethers';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
@@ -151,7 +151,7 @@ class ERC721FormComponent extends ClassComponent<EthChainAttrs> {
 
     return (
       <div className="CreateCommunityForm">
-        {...ethChainRows(vnode.attrs, this.state.form)}
+        {ethChainRows(vnode.attrs, this.state.form)}
         <CWButton
           label="Populate fields"
           disabled={
@@ -189,7 +189,7 @@ class ERC721FormComponent extends ClassComponent<EthChainAttrs> {
             this.state.form.symbol = v;
           }}
         />
-        {...defaultChainRows(this.state.form, disableField)}
+        {defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
@@ -203,12 +203,12 @@ class ERC721FormComponent extends ClassComponent<EthChainAttrs> {
               iconUrl,
             } = this.state.form;
             this.state.saving = true;
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: null,
-            });
+            // mixpanelBrowserTrack({
+            //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+            //   chainBase: null,
+            //   isCustomDomain: app.isCustomDomain(),
+            //   communityType: null,
+            // });
 
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {

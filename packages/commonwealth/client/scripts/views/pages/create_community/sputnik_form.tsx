@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
@@ -70,7 +70,7 @@ class SputnikFormComponent extends ClassComponent {
           }}
         />
         {/* TODO: add divider to distinguish on-chain data */}
-        {...defaultChainRows(this.state.form)}
+        {defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
           disabled={this.state.saving}
@@ -108,12 +108,12 @@ class SputnikFormComponent extends ClassComponent {
               type: ChainType.DAO,
               ...this.state.form,
             };
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: null,
-            });
+            // mixpanelBrowserTrack({
+            //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+            //   chainBase: null,
+            //   isCustomDomain: app.isCustomDomain(),
+            //   communityType: null,
+            // });
 
             try {
               // verify the DAO exists

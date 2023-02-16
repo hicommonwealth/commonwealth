@@ -104,6 +104,7 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
 > {
   protected readonly __props: A;
   private _isMounted = false;
+  private _isCreated = false;
 
   // props that should not trigger a redraw -- internal to React
   private static readonly IGNORED_PROPS = [
@@ -146,7 +147,6 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
   public componentDidMount() {
     this.oninit({ attrs: this.props, children: this.props.children });
     this._isMounted = true;
-    this.oncreate({ attrs: this.props, children: this.props.children });
   }
 
   // used for mithril's `onupdate` lifecycle hook
@@ -162,6 +162,10 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
 
   // used for mithril's `oncreate` lifecycle hook and for the main `view` function
   render() {
+    if (!this._isCreated) {
+      this._isCreated = true;
+      this.oncreate({ attrs: this.props, children: this.props.children });
+    }
     return this.view({ attrs: this.props, children: this.props.children });
   }
 

@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
@@ -76,15 +76,15 @@ class StarterCommunityFormComponent extends ClassComponent {
           ]}
           onSelect={(o) => {
             this.state.form.base = o.value as ChainBase;
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
-              chainBase: o.value,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: CommunityType.StarterCommunity,
-            });
+            // mixpanelBrowserTrack({
+            //   event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
+            //   chainBase: o.value,
+            //   isCustomDomain: app.isCustomDomain(),
+            //   communityType: CommunityType.StarterCommunity,
+            // });
           }}
         />
-        {...defaultChainRows(this.state.form)}
+        {defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
           disabled={this.state.saving || this.state.form.id.length < 1}
@@ -96,12 +96,12 @@ class StarterCommunityFormComponent extends ClassComponent {
               bech32_prefix?: string;
               alt_wallet_url?: string;
             } = {};
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: this.state.form.base,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: CommunityType.StarterCommunity,
-            });
+            // mixpanelBrowserTrack({
+            //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+            //   chainBase: this.state.form.base,
+            //   isCustomDomain: app.isCustomDomain(),
+            //   communityType: CommunityType.StarterCommunity,
+            // });
 
             // defaults to be overridden when chain is no longer "starter" type
             switch (this.state.form.base) {
