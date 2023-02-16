@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_truncated_address.scss';

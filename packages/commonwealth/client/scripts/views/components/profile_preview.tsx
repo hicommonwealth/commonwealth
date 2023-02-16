@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import ClassComponent from 'class_component';
 import jdenticon from 'jdenticon';
 
 import 'components/profile_preview.scss';
 
 import app from 'state';
-import { AddressInfo, NewProfile as Profile } from 'models';
-import { navigateToSubpage } from 'app';
+import type { AddressInfo, NewProfile as Profile } from 'models';
+import { navigateToSubpage } from 'router';
 import { CWText } from './component_kit/cw_text';
 import { renderQuillTextBody } from './quill/helpers';
 import { SocialAccounts } from './social_accounts';

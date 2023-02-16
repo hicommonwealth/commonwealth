@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { NewProfile as Profile } from 'models';
 import { PageLoading } from './loading';
 import { PageNotFound } from './404';

@@ -7,12 +7,12 @@ import $ from 'jquery';
 import 'pages/create_new_profile.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
 import { notifyError } from 'controllers/app/notifications';
-import { NewProfile as Profile } from '../../models';
+import type { NewProfile as Profile } from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { AvatarUpload } from '../components/avatar_upload';
@@ -22,10 +22,11 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
-import CWCoverImageUploader, {
+import type {
   ImageBehavior,
 } from '../components/component_kit/cw_cover_image_uploader';
-import { Image } from './edit_new_profile';
+import CWCoverImageUploader from '../components/component_kit/cw_cover_image_uploader';
+import type { Image } from './edit_new_profile';
 import { ConfirmCancelNewProfileModal } from '../modals/confirm_cancel_new_profile_modal';
 
 export default class CreateNewProfile extends ClassComponent {

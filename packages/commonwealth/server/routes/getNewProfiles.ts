@@ -1,10 +1,11 @@
-import {
+import type {
   GetNewProfilesReq,
   GetNewProfilesResp,
 } from 'common-common/src/api/extApiTypes';
 import { validationResult } from 'express-validator';
-import { TypedRequestQuery, TypedResponse, success, failure } from '../types';
-import { DB } from '../models';
+import type { TypedRequestQuery, TypedResponse} from '../types';
+import { success, failure } from '../types';
+import type { DB } from '../models';
 
 const getNewProfiles = async (
   models: DB,

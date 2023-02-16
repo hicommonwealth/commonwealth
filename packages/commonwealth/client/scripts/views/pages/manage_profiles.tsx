@@ -7,7 +7,7 @@ import ClassComponent from 'class_component';
 import 'pages/manage_profiles.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { AddressInfo, NewProfile as Profile } from 'models';
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';

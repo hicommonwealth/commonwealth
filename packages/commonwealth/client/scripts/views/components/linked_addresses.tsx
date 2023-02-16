@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/linked_addresses.scss';
 
 import app from 'state';
-import { AddressInfo, NewProfile as Profile } from 'models';
+import type { AddressInfo, NewProfile as Profile } from 'models';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { MoveAddressModal } from '../modals/move_address_modal';

@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
@@ -8,7 +8,7 @@ import jdenticon from 'jdenticon';
 import 'modals/delete_address_modal.scss';
 
 import app from 'state';
-import { NewProfile as Profile } from 'client/scripts/models';
+import type { NewProfile as Profile } from 'client/scripts/models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
