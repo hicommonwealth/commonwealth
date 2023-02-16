@@ -19,7 +19,6 @@ const DEFAULT_COUNT = 10;
 
 export const Feed = (props: FeedProps) => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [data, setData] = useState<DashboardActivityNotification[]>();
   const [currentCount, setCurrentCount] = useState<number>(
@@ -27,15 +26,21 @@ export const Feed = (props: FeedProps) => {
   );
   const { fetchData, onFetchedDataCallback } = props;
 
+  const Footer = () => {
+    return (
+      <div className="loading-spinner small">
+        <CWSpinner />
+      </div>
+    );
+  };
+
   const loadMore = useCallback(() => {
-    setLoadingMore(true);
     return setTimeout(() => {
       setCurrentCount(
         (currentCount) => currentCount + (props.defaultCount || DEFAULT_COUNT)
       );
-      setLoadingMore(false);
     }, 500);
-  }, [setCurrentCount, setLoadingMore]);
+  }, [setCurrentCount]);
 
   useEffect(() => {
     const getData = async () => {
@@ -89,12 +94,8 @@ export const Feed = (props: FeedProps) => {
         itemContent={(i) => {
           return <UserDashboardRow key={i} notification={data[i]} />;
         }}
+        components={{ Footer }}
       />
-      {loadingMore && (
-        <div className="loading-spinner small">
-          <CWSpinner />
-        </div>
-      )}
     </div>
   );
 };
