@@ -9,10 +9,10 @@ import app from 'state';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWSpinner } from './cw_spinner';
 import { CWText } from './cw_text';
-import { ValidationStatus } from './cw_validation_text';
 import { CWRadioGroup } from './cw_radio_group';
 import { getClasses } from './helpers';
 import { CWTextInput, MessageRow } from './cw_text_input';
+import type { ValidationStatus } from './cw_validation_text';
 import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
 

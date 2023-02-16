@@ -19,6 +19,7 @@ coverage/
 *yalc*
 *.pem
 *.csv
+cache/
 
 # Database downloads
 latest.dump

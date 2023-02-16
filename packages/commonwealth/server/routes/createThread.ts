@@ -6,8 +6,8 @@ import {
   NotificationCategories,
   ProposalType,
 } from 'common-common/src/types';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { Action, PermissionError } from '../util/permissions';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { Action, PermissionError } from 'commonwealth/shared/permissions';
 import {
   findAllRoles,
   isAddressPermitted,
@@ -222,7 +222,18 @@ const createThread = async (
     return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
-  const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
+  const {
+    topic_name,
+    title,
+    body,
+    kind,
+    stage,
+    url,
+    readOnly,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
   let { topic_id } = req.body;
 
   if (kind === 'discussion') {
@@ -293,6 +304,9 @@ const createThread = async (
     stage,
     url,
     read_only: readOnly || false,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
   };
 
   // begin essential database changes within transaction

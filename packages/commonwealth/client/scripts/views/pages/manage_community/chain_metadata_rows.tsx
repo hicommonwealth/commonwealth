@@ -4,6 +4,7 @@ import ClassComponent from 'class_component';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
 import {
@@ -14,12 +15,12 @@ import {
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo, RoleInfo } from 'models';
+import type { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
   PermissionManager,
   ToCheck,
-} from 'commonwealth/server/util/permissions';
+} from 'commonwealth/shared/permissions';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -406,17 +407,19 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               console.log(err);
             }
-           try {
+            try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.removeDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               } else {
-                this.default_deny_permissions = this.permissionsManager.addDenyPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.addDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               }
               await chain.updateChainData({
                 name,

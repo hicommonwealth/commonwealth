@@ -9,7 +9,7 @@ import type { Thread } from 'models';
 import 'pages/snapshot/snapshot_space_card.scss';
 import app from 'state';
 import { REDIRECT_ACTIONS } from '.';
-import { navigateToSubpage } from '../../../app';
+import { navigateToSubpage } from '../../../router';
 import { CWCard } from '../../components/component_kit/cw_card';
 
 function countActiveProposals(proposals: SnapshotProposal[]): number {

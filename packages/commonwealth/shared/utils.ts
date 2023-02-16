@@ -8,8 +8,8 @@ import {
   AccessLevel,
   PermissionManager,
   everyonePermissions,
-} from '../server/util/permissions';
-import { RoleObject } from './types';
+} from './permissions';
+import type { RoleObject } from './types';
 import { ProposalType } from 'common-common/src/types';
 
 export const getNextPollEndingTime = (now) => {
@@ -64,11 +64,8 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
   return (
     type === ProposalType.SubstrateDemocracyReferendum ||
     type === ProposalType.SubstrateDemocracyProposal ||
-    type === ProposalType.SubstrateBountyProposal ||
     type === ProposalType.SubstrateTreasuryTip ||
-    type === ProposalType.SubstrateCollectiveProposal ||
     type === ProposalType.SubstrateTechnicalCommitteeMotion ||
-    type === ProposalType.PhragmenCandidacy ||
     type === ProposalType.SubstrateTreasuryProposal
   );
 };
@@ -139,10 +136,10 @@ export const smartTrim = (text, maxLength = 200) => {
 export const validURL = (str) => {
   const pattern = new RegExp(
     '^(https?:\\/\\/)?' + // protocol
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
-    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$',
     'i'
   ); // fragment locator
@@ -296,7 +293,6 @@ export const addressSwapper = (options: {
   }
 };
 
-
 export function aggregatePermissions(
   roles: RoleObject[],
   chain_permissions: { allow: bigint; deny: bigint }
@@ -318,7 +314,7 @@ export function aggregatePermissions(
   const permissionsAllowDeny: Array<{
     allow: bigint;
     deny: bigint;
-  }> = roles.map(({allow, deny}) => ({allow, deny}));
+  }> = roles.map(({ allow, deny }) => ({ allow, deny }));
 
   // add chain default permissions to beginning of permissions array
   permissionsAllowDeny.unshift(chain_permissions);

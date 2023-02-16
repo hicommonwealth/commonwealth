@@ -5,7 +5,7 @@ import {
   initChain,
   initNewTokenChain,
   selectChain,
-} from 'app';
+} from 'helpers/chain';
 import ClassComponent from 'class_component';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load

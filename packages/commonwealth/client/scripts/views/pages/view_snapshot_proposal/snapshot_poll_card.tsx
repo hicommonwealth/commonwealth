@@ -85,9 +85,12 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
 
     return (
       <CWCard className="PollCard">
-        <CWText type="b2" className="poll-title-text">
-          {proposalTitle}
-        </CWText>
+        <div className="poll-title-section">
+          <CWText type="b2" className="poll-title-text">
+            {proposalTitle}
+          </CWText>
+        </div>
+
         <div class="poll-voting-section">
           {!this.hasVoted && !pollEnded && !isPreview && (
             <>

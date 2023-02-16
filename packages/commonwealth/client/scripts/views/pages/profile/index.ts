@@ -3,13 +3,12 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { ChainBase } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -93,7 +92,6 @@ export enum UserContent {
 
 interface IProfilePageAttrs {
   address: string;
-  setIdentity?: boolean;
 }
 
 interface IProfilePageState {
@@ -176,28 +174,14 @@ const loadProfile = async (
     if (a.OffchainProfile) {
       const profileData = JSON.parse(a.OffchainProfile.data);
       // ignore off-chain name if substrate id exists
-      if (a.OffchainProfile.identity) {
-        profile.initializeWithChain(
-          a.OffchainProfile.identity,
-          profileData?.headline,
-          profileData?.bio,
-          profileData?.avatarUrl,
-          a.OffchainProfile.judgements,
-          a.last_active,
-          a.is_councillor,
-          a.is_validator
-        );
-      } else {
-        profile.initialize(
-          profileData?.name,
-          profileData?.headline,
-          profileData?.bio,
-          profileData?.avatarUrl,
-          a.last_active,
-          a.is_councillor,
-          a.is_validator
-        );
-      }
+      profile.initialize(
+        profileData?.name,
+        profileData?.headline,
+        profileData?.bio,
+        profileData?.avatarUrl,
+        a.last_active,
+        a.is_validator
+      );
     } else {
       profile.initializeEmpty();
     }
@@ -211,7 +195,7 @@ const loadProfile = async (
       ghost_address: a.ghost_address,
     };
     state.account = account;
-    state.threads = result.threads.map((t) => modelThreadFromServer(t));
+    state.threads = result.threads.map((t) => app.threads.modelFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
     m.redraw();
   } catch (err) {
@@ -331,7 +315,6 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   oncreate: async () => {},
   view: (vnode) => {
-    const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {
       loadProfile(vnode.attrs, vnode.state);
@@ -418,6 +401,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     const proposals = vnode.state.threads.sort(
       (a, b) => +b.createdAt - +a.createdAt
     );
+
     const allContent = []
       .concat(proposals || [])
       .concat(comments || [])
@@ -450,7 +434,6 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
             m('.col-xs-12 .col-md-8', [
               m(ProfileHeader, {
                 account,
-                setIdentity,
                 onOwnProfile,
                 onLinkedProfile,
                 refreshCallback: () => {
@@ -517,7 +500,6 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
             m('.xs-display-none .col-md-4', [
               m(ProfileBio, {
                 account,
-                setIdentity,
                 onOwnProfile,
                 onLinkedProfile,
                 refreshCallback: () => {

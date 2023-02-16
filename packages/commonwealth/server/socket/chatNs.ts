@@ -1,12 +1,12 @@
 import { addPrefix, factory } from 'common-common/src/logging';
-import { RedisCache } from 'common-common/src/redisCache';
+import type { RedisCache } from 'common-common/src/redisCache';
 import {
   NotificationCategories,
   RedisNamespaces,
 } from 'common-common/src/types';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import { Action } from '../util/permissions';
+import { Action } from 'commonwealth/shared/permissions';
 import emitNotifications from '../util/emitNotifications';
 import {
   WebsocketEngineEvents,

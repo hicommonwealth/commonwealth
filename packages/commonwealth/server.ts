@@ -30,6 +30,8 @@ import {
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
+import { addSwagger } from './server/routing/addSwagger';
+import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
@@ -45,11 +47,20 @@ import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
+import * as v8 from 'v8';
+import { factory, formatFilename } from 'common-common/src/logging';
 
+const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
 require('express-async-errors');
 
 const app = express();
+
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
@@ -60,6 +71,7 @@ async function main() {
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+  const NO_RULE_CACHE = process.env.NO_RULE_CACHE === 'true';
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
@@ -234,7 +246,7 @@ async function main() {
   }
 
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  await ruleCache.start();
+  if (!NO_RULE_CACHE) await ruleCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 
@@ -247,6 +259,7 @@ async function main() {
     new DatabaseValidationService(models);
 
   setupAPI(
+    '/api',
     app,
     models,
     viewCountCache,
@@ -256,6 +269,11 @@ async function main() {
     globalActivityCache,
     dbValidationService
   );
+
+  // new API
+  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addSwagger('/docs', app);
+
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);

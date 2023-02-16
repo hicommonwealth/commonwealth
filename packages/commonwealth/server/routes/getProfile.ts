@@ -1,4 +1,5 @@
 import { AppError } from 'common-common/src/errors';
+import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressAttributes } from '../models/address';
 import type { CommentAttributes } from '../models/comment';
@@ -37,17 +38,24 @@ const getProfile = async (
   });
   if (!addressModel) throw new AppError(Errors.NoAddressFound);
 
-  const threads = await models.Thread.findAll({
-    where: {
-      address_id: addressModel.id,
-    },
-    include: [{ model: models.Address, as: 'Address' }],
-  });
-
   const comments = await models.Comment.findAll({
     where: {
       address_id: addressModel.id,
     },
+  });
+
+  const commentThreadIds = comments
+    .map((c) => c.root_id.split('_')[1])
+    .filter((id) => !!parseInt(id, 10)); // remove proposals from id list
+
+  const threads = await models.Thread.findAll({
+    where: {
+      [Op.or]: [
+        { id: { [Op.in]: commentThreadIds } },
+        { address_id: addressModel.id },
+      ],
+    },
+    include: [{ model: models.Address, as: 'Address' }],
   });
 
   return success(res, {

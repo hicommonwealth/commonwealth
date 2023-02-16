@@ -2,7 +2,6 @@ import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
 import type { Socket } from 'socket.io-client';
-import { io } from 'socket.io-client';
 import app from 'state';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 
@@ -29,6 +28,7 @@ export class ChatNamespace {
   public activeChannel: string;
 
   public async init() {
+    const { io } = await import('socket.io-client');
     this.chatNs = io(`/${WebsocketNamespaces.Chat}`, {
       transports: ['websocket'],
       query: { token: app.user.jwt },

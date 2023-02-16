@@ -1,8 +1,9 @@
 /* @jsx m */
 
-import { Chain } from '@canvas-js/interfaces';
+import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
-import { initAppState, navigateToSubpage } from 'app';
+import { initAppState } from 'state';
+import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
 import ClassComponent from 'class_component';
 import { ChainBase, WalletId } from 'common-common/src/types';
@@ -93,7 +94,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         app.config.chains.getById(app.activeChainId());
 
       // create canvas thing
-      const chainId = chain.id;
+      const chainId = 'mainnet';
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
         chainId
@@ -113,7 +114,8 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         chainId,
         acct.address,
         sessionPublicAddress,
-        null
+        +new Date(),
+        null // no blockhash
       );
 
       this.state.isNewAccount = newAcct.newlyCreated;
@@ -124,9 +126,17 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       acct.setSessionPublicAddress(sessionPublicAddress);
       acct.setValidationBlockInfo(null);
 
-      const signature = await acct.signMessage(JSON.stringify(canvasMessage));
+      const canvas = await import('@canvas-js/interfaces');
+      const signature = await acct.signMessage(
+        canvas.serializeSessionPayload(canvasMessage)
+      );
 
-      await acct.validate(signature, chainId);
+      await acct.validate(signature, canvasMessage.sessionIssued, chainId);
+
+      app.sessions
+        .getSessionController(ChainBase.NEAR)
+        .authSession(chainId, canvasMessage, signature);
+
       if (!app.isLoggedIn()) {
         await initAppState();
         await updateActiveAddresses(chain);
@@ -134,6 +144,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       await setActiveAccount(acct);
       this.state.validatedAccount = acct;
     } catch (err) {
+      console.log(err.stack);
       this.state.validationError = err.responseJSON
         ? err.responseJSON.error
         : err.message;
@@ -171,6 +182,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         }
         await wallet.account().functionCall(tx as FunctionCallOptions);
       } catch (err) {
+        console.log('NEAR validationError:', err.stack);
         this.state.validationError = err.message;
       }
     }
@@ -193,6 +205,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         await initAppState(false);
         m.route.set(`${window.location.origin}/${res.result.chain.id}`);
       } catch (err) {
+        console.log(err.stack);
         this.state.validationError = `Failed to initialize chain node: ${err.message}`;
       }
     }

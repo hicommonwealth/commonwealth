@@ -12,8 +12,14 @@ export type ReactionAttributes = {
   thread_id?: number;
   proposal_id?: number;
   comment_id?: number;
+
+  canvas_action: string;
+  canvas_session: string;
+  canvas_hash: string;
+
   created_at?: Date;
   updated_at?: Date;
+
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
 };
@@ -36,6 +42,10 @@ export default (
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       reaction: { type: dataTypes.STRING, allowNull: false },
+      // signed data
+      canvas_action: { type: dataTypes.JSONB, allowNull: true },
+      canvas_session: { type: dataTypes.JSONB, allowNull: true },
+      canvas_hash: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'Reactions',
@@ -59,6 +69,7 @@ export default (
         },
         { fields: ['chain', 'thread_id'] },
         { fields: ['chain', 'comment_id'] },
+        { fields: ['canvas_hash'] },
       ],
     }
   );

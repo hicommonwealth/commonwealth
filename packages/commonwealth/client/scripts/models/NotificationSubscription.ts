@@ -1,9 +1,9 @@
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
 import type { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
+import app from '../state';
 import type { IUniqueId } from './interfaces';
 
 class NotificationSubscription {
@@ -101,7 +101,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
 
   if (Thread) {
     try {
-      modeledThread = modelThreadFromServer(Thread);
+      modeledThread = app.threads.modelFromServer(Thread);
     } catch (e) {
       console.log('error', e);
     }

@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
 
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
 
 import domain from '../routes/domain';
@@ -55,9 +55,6 @@ import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import bulkMembers from '../routes/bulkMembers';
 import bulkAddresses from '../routes/bulkAddresses';
-import createInvite from '../routes/createInvite';
-import acceptInvite from '../routes/acceptInvite';
-import addMember from '../routes/addMember';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileOld from '../routes/getProfile';
@@ -73,6 +70,7 @@ import createThread from '../routes/createThread';
 import editThread from '../routes/editThread';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
+import deletePoll from '../routes/deletePoll';
 import updateThreadStage from '../routes/updateThreadStage';
 import updateThreadPrivacy from '../routes/updateThreadPrivacy';
 import updateThreadPinned from '../routes/updateThreadPinned';
@@ -127,7 +125,7 @@ import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
 import getWebhooks from '../routes/webhooks/getWebhooks';
-import ViewCountCache from '../util/viewCountCache';
+import type ViewCountCache from '../util/viewCountCache';
 import updateChainCategory from '../routes/updateChainCategory';
 import updateChainCustomDomain from '../routes/updateChainCustomDomain';
 import updateChainPriority from '../routes/updateChainPriority';
@@ -142,15 +140,15 @@ import bulkBalances from '../routes/bulkBalances';
 import getSupportedEthChains from '../routes/getSupportedEthChains';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import updateAddress from '../routes/updateAddress';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { sendMessage } from '../routes/snapshotAPI';
 import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
 import setProjectChain from '../routes/setProjectChain';
-import RuleCache from '../util/rules/ruleCache';
+import type RuleCache from '../util/rules/ruleCache';
 import banAddress from '../routes/banAddress';
 import getBannedAddresses from '../routes/getBannedAddresses';
-import BanCache from '../util/banCheckCache';
+import type BanCache from '../util/banCheckCache';
 import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
@@ -161,8 +159,8 @@ import { getChain } from '../routes/getChain';
 import { getChainNode } from '../routes/getChainNode';
 import { getChainContracts } from '../routes/getChainContracts';
 import { getSubscribedChains } from '../routes/getSubscribedChains';
-import GlobalActivityCache from '../util/globalActivityCache';
-import DatabaseValidationService from '../middleware/databaseValidationService';
+import type GlobalActivityCache from '../util/globalActivityCache';
+import type DatabaseValidationService from '../middleware/databaseValidationService';
 import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
@@ -171,6 +169,7 @@ import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
 
 function setupRouter(
+  endpoint: string,
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
@@ -309,6 +308,11 @@ function setupRouter(
     '/getPolls',
     databaseValidationService.validateChain,
     getPolls.bind(this, models)
+  );
+  router.delete(
+    '/deletePoll',
+    passport.authenticate('jwt', { session: false }),
+    deletePoll.bind(this, models)
   );
   router.post(
     '/updateThreadStage',
@@ -551,7 +555,7 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models)
   );
 
-  // roles 
+  // roles
   router.get('/roles', controllers.getRoles.bind(this, models));
   router.post('/roles', controllers.createRole.bind(this, models));
   router.patch('/roles', controllers.updateRole.bind(this, models));
@@ -564,23 +568,6 @@ function setupRouter(
     '/bulkMembers',
     databaseValidationService.validateChain,
     bulkMembers.bind(this, models)
-  );
-  router.post(
-    '/createInvite',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createInvite.bind(this, models)
-  );
-  router.post(
-    '/acceptInvite',
-    passport.authenticate('jwt', { session: false }),
-    acceptInvite.bind(this, models)
-  );
-  router.post(
-    '/addMember',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    addMember.bind(this, models)
   );
   router.post(
     '/upgradeMember',
@@ -948,13 +935,9 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post(
-    '/auth/magic',
-    passport.authenticate('magic'),
-    (req, res, next) => {
-      return res.json({ status: 'Success', result: req.user.toJSON() });
-    }
-  );
+  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
+    return res.json({ status: 'Success', result: req.user.toJSON() });
+  });
 
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(
@@ -996,11 +979,7 @@ function setupRouter(
   router.post('/getChainContracts', getChainContracts.bind(this, models));
   router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
 
-  // new API
-  addExternalRoutes(router, app, models, tokenBalanceCache);
-  addSwagger(app);
-
-  app.use('/api', router);
+  app.use(endpoint, router);
 }
 
 export default setupRouter;

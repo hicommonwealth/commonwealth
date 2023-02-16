@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
@@ -131,8 +131,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             const chain = app.chain as Substrate;
 
             app.chain.loadModules([
-              chain.council,
-              chain.technicalCommittee,
               chain.treasury,
               chain.democracyProposals,
               chain.democracy,

@@ -1,15 +1,16 @@
 import { body, validationResult } from 'express-validator';
-import {
+import type {
   PutCommunitiesReq,
   PutCommunitiesResp,
 } from 'common-common/src/api/extApiTypes';
-import { NextFunction } from 'express';
-import { TokenBalanceCache } from 'token-balance-cache/src';
+import type { NextFunction } from 'express';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import { AppError } from 'common-common/src/errors';
-import { DB } from '../../models';
-import { failure, success, TypedRequest, TypedResponse } from '../../types';
+import type { DB } from '../../models';
+import type { TypedRequest, TypedResponse } from '../../types';
+import { failure, success } from '../../types';
 import { createAddressHelper } from '../../util/createAddressHelper';
-import { CreateAddressReq } from '../createAddress';
+import type { CreateAddressReq } from '../createAddress';
 import { sequelize } from '../../database';
 
 export const Errors = {

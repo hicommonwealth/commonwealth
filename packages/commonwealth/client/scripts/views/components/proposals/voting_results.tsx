@@ -14,7 +14,7 @@ import type { AnyProposal } from 'models';
 import { VotingType } from 'models';
 
 import app from 'state';
-import Web3 from 'web3';
+import Web3 from 'web3-utils';
 import {
   AaveVotingResult,
   CompletedProposalVotingResult,
@@ -97,7 +97,7 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
       );
 
       const yesBalanceString = `${formatNumberLong(
-        +Web3.utils.fromWei(yesBalance.toString())
+        +Web3.fromWei(yesBalance.toString())
       )} ${app.chain.meta.default_symbol}`;
 
       const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
@@ -108,7 +108,7 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
       );
 
       const noBalanceString = `${formatNumberLong(
-        +Web3.utils.fromWei(noBalance.toString())
+        +Web3.fromWei(noBalance.toString())
       )} ${app.chain.meta.default_symbol}`;
 
       return (
