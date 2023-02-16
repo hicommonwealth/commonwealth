@@ -28,9 +28,7 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
-import type {
-  ImageBehavior,
-} from '../components/component_kit/cw_cover_image_uploader';
+import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
 import CWCoverImageUploader from '../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from './404';
 
@@ -48,7 +46,9 @@ export type Image = {
   imageBehavior: ImageBehavior;
 };
 
-export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
+export default class EditNewProfile extends ClassComponent<
+  EditNewProfileAttrs
+> {
   private email: string;
   private error: EditProfileError;
   private failed: boolean;
