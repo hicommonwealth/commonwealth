@@ -9,7 +9,7 @@ import m from 'mithril';
 import moment from 'moment';
 
 import app from 'state';
-import { navigateToSubpage } from '../../../app';
+import { navigateToSubpage } from '../../../router';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ProposalTag } from '../../components/proposal_card/proposal_tag';
@@ -37,9 +37,13 @@ export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAtt
         onclick={(e) => {
           e.stopPropagation();
           e.preventDefault();
-          localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-            window.scrollY;
-          navigateToSubpage(proposalLink);
+          if (app.chain) {
+            localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+              window.scrollY;
+            navigateToSubpage(proposalLink);
+          } else {
+            navigateToSubpage(proposalLink);
+          }
         }}
       >
         <div class="proposal-card-metadata">

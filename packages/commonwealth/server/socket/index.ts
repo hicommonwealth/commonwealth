@@ -16,7 +16,6 @@ import {
 import type Rollbar from 'rollbar';
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 import type { Socket } from 'socket.io';
-import { Server } from 'socket.io';
 import type { ExtendedError } from 'socket.io/dist/namespace';
 import { WebsocketNamespaces } from '../../shared/types';
 import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
@@ -60,6 +59,7 @@ export async function setupWebSocketServer(
 ) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
+  const { Server } = await import('socket.io');
   const io = new Server(httpServer, {
     transports: ['websocket'],
     cors: {

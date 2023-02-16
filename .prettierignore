@@ -2,6 +2,8 @@
 **/.github
 **/*.env
 **/node_modules
+**/android
+**/ios
 packages/chain-events/.eslintrc.js
 **/.mocharc.json
 **/.nyc_output
@@ -15,3 +17,5 @@ packages/chain-events/.eslintrc.js
 **/factories
 **/eth/types
 **/.eslintrc.js
+**/ios/App/App
+

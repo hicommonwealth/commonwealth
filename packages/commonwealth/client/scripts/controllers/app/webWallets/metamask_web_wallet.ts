@@ -1,16 +1,20 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 declare let window: any;
 
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
 import $ from 'jquery';
+
 import type { Account, BlockInfo, IWebWallet, NodeInfo } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
-import app from 'state';
-import Web3 from 'web3';
+import type Web3 from 'web3';
+
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
+
+import type { SessionPayload } from '@canvas-js/interfaces';
+
+import app from 'state';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -57,7 +61,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return this._node.ethChainId || 1;
+    return app.chain?.meta.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -76,9 +80,11 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    sessionPayload: SessionPayload
   ): Promise<string> {
-    const typedCanvasMessage = await constructTypedCanvasMessage(canvasMessage);
+    const typedCanvasMessage = await constructTypedCanvasMessage(
+      sessionPayload
+    );
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
       params: [account.address, JSON.stringify(typedCanvasMessage)],
@@ -101,13 +107,14 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       const chainId = this.getChainId();
 
       // ensure we're on the correct chain
-      this._provider = await detectEthereumProvider({ mustBeMetaMask: true });
-      this._web3 = new Web3(this._provider);
+
+      const Web3 = (await import('web3')).default;
+      this._web3 = new Web3((window as any).ethereum);
       // TODO: does this come after?
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',
       });
-      const chainIdHex = `0x${chainId.toString(16)}`;
+      const chainIdHex = `0x${parseInt(chainId, 10).toString(16)}`;
       try {
         await this._web3.givenProvider.request({
           method: 'wallet_switchEthereumChain',

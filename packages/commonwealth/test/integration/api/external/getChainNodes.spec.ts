@@ -1,6 +1,6 @@
 import 'chai/register-should';
 import chai from 'chai';
-import { GetChainNodesReq } from 'common-common/src/api/extApiTypes';
+import type { GetChainNodesReq } from 'common-common/src/api/extApiTypes';
 import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import { get } from './appHook.spec';
 

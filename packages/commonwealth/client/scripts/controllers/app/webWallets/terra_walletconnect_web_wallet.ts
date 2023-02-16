@@ -1,13 +1,11 @@
-import { LCDClient, TendermintAPI } from '@terra-money/terra.js';
-import type { ConnectedWallet } from '@terra-money/wallet-controller';
-import {
-  ConnectType,
-  getChainOptions,
+import type {
+  ConnectedWallet,
   WalletController,
 } from '@terra-money/wallet-controller';
+import type { SessionPayload } from '@canvas-js/interfaces';
+
+import { Account, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 
 // TODO: ensure this only opens on mobile
@@ -24,6 +22,7 @@ class TerraWalletConnectWebWalletController
   private _accounts: TerraAddress[];
   private _controller: WalletController;
   private _wallet: ConnectedWallet;
+  private _terra;
 
   public readonly name = WalletId.TerraWalletConnect;
   public readonly label = 'WalletConnect';
@@ -50,11 +49,11 @@ class TerraWalletConnectWebWalletController
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const client = new LCDClient({
+    const client = new this._terra.LCDClient({
       URL: app.chain.meta.ChainNode.url,
       chainID: chainIdentifier,
     });
-    const tmClient = new TendermintAPI(client);
+    const tmClient = new this._terra.TendermintAPI(client);
     const blockInfo = await tmClient.blockInfo();
 
     return {
@@ -70,26 +69,23 @@ class TerraWalletConnectWebWalletController
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
     try {
       const result = await this._wallet.signBytes(
-        Buffer.from(JSON.stringify(canvasMessage))
+        Buffer.from(canvas.serializeSessionPayload(canvasMessage))
       );
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');
       }
-      const signature = {
-        signature: {
-          pub_key: {
-            type: 'tendermint/PubKeySecp256k1',
-            // TODO: ensure single signature
-            value: result.result.public_key.toAmino().value,
-          },
-          signature: Buffer.from(result.result.signature).toString('base64'),
+      return JSON.stringify({
+        pub_key: {
+          type: 'tendermint/PubKeySecp256k1',
+          value: result.result.public_key.toAmino().value,
         },
-      };
-      return JSON.stringify(signature);
+        signature: Buffer.from(result.result.signature).toString('base64'),
+      });
     } catch (error) {
       console.error(error);
       throw new Error(`Failed to sign with account: ${error.message}`);
@@ -104,16 +100,17 @@ class TerraWalletConnectWebWalletController
 
   public async enable() {
     console.log('Attempting to enable WalletConnect');
+    this._terra = await import('@terra-money/terra.js');
     this._enabling = true;
     try {
-      // Create WalletConnect Provider
-      const chainOptions = await getChainOptions();
-      this._controller = new WalletController({
+      const terra = await import('@terra-money/wallet-controller');
+      const chainOptions = await terra.getChainOptions();
+      this._controller = new terra.WalletController({
         ...chainOptions,
       });
 
       //  Enable session (triggers QR Code modal)
-      await this._controller.connect(ConnectType.WALLETCONNECT);
+      await this._controller.connect(terra.ConnectType.WALLETCONNECT);
 
       let subscription;
       this._wallet = await new Promise((resolve) => {

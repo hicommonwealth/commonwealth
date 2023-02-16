@@ -1,7 +1,8 @@
-import { Extension, LCDClient, TendermintAPI } from '@terra-money/terra.js';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
+
+import type { SessionPayload } from '@canvas-js/interfaces';
+
 import app from 'state';
 
 type TerraAddress = {
@@ -12,7 +13,8 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
   private _accounts: TerraAddress[] = [];
   private _enabling = false;
-  private _extension = new Extension();
+  private _terra;
+  private _extension;
 
   public readonly name = WalletId.TerraStation;
   public readonly label = 'Terra Station';
@@ -21,7 +23,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   public readonly specificChains = ['terra'];
 
   public get available() {
-    return this._extension.isAvailable;
+    return this._extension && this._extension.isAvailable;
   }
 
   public get enabled() {
@@ -41,6 +43,8 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   // }
 
   public async enable() {
+    this._terra = await import('@terra-money/terra.js');
+    this._extension = new this._terra.Extension();
     console.log('Attempting to enable Terra Station');
     this._enabling = true;
 
@@ -66,11 +70,11 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const client = new LCDClient({
+    const client = new this._terra.LCDClient({
       URL: app.chain.meta.ChainNode.url,
       chainID: chainIdentifier,
     });
-    const tmClient = new TendermintAPI(client);
+    const tmClient = new this._terra.TendermintAPI(client);
     const blockInfo = await tmClient.blockInfo();
 
     return {
@@ -86,9 +90,10 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
     // timeout?
+    const canvas = await import('@canvas-js/interfaces');
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
         if (payload.result?.signature) resolve(payload.result);
@@ -96,24 +101,20 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(JSON.stringify(canvasMessage)),
+          bytes: Buffer.from(canvas.serializeSessionPayload(canvasMessage)),
         });
       } catch (error) {
         console.error(error);
       }
     });
 
-    console.log(result);
-    const signature = {
-      signature: {
-        pub_key: {
-          type: 'tendermint/PubKeySecp256k1',
-          value: result.public_key,
-        },
-        signature: result.signature,
+    return JSON.stringify({
+      pub_key: {
+        type: 'tendermint/PubKeySecp256k1',
+        value: result.public_key,
       },
-    };
-    return JSON.stringify(signature);
+      signature: result.signature,
+    });
   }
 }
 

@@ -1,18 +1,13 @@
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import type WalletConnectProvider from '@walletconnect/web3-provider';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import type {
-  Account,
-  BlockInfo,
-  ChainInfo,
-  IWebWallet,
-  NodeInfo,
-} from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
+import type { Account, BlockInfo, ChainInfo, NodeInfo, IWebWallet } from 'models';
 import app from 'state';
-import Web3 from 'web3';
+import type Web3 from 'web3';
+
 import { hexToNumber } from 'web3-utils';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -56,7 +51,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return this._chainInfo.node?.ethChainId || 1;
+    return this._chainInfo.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,9 +70,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    sessionPayload: SessionPayload
   ): Promise<string> {
-    const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
+    const typedCanvasMessage = constructTypedCanvasMessage(sessionPayload);
     const signature = await this._provider.wc.signTypedData([
       account.address,
       JSON.stringify(typedCanvasMessage),
@@ -109,6 +104,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
     const rpc = chainUrl ? { [chainId]: chainUrl } : {};
 
+    const WalletConnectProvider = (await import('@walletconnect/web3-provider'))
+      .default;
     this._provider = new WalletConnectProvider({ rpc, chainId });
 
     // destroy pre-existing session if exists
@@ -118,6 +115,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
     //  Enable session (triggers QR Code modal)
     await this._provider.enable();
+    const Web3 = (await import('web3')).default;
     this._web3 = new Web3(this._provider as any);
     this._accounts = await this._web3.eth.getAccounts();
     if (this._accounts.length === 0) {

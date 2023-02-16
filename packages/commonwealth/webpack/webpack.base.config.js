@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 
 require('dotenv').config();
 
@@ -32,7 +33,11 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
+      attributes: {
+        'data-cfasync': 'false',
+      },
     }),
+    new HtmlWebpackInjectAttributesPlugin(),
     new webpack.IgnorePlugin({
       resourceRegExp: /^\.\/locale$/,
       contextRegExp: /moment$/,
@@ -46,6 +51,7 @@ module.exports = {
   optimization: {
     splitChunks: {
       chunks: 'all',
+      // TODO: Commented out packages need to be code split. Commented out for now so that webpack can tree shake the imports
       cacheGroups: {
         bitcoin: {
           test: /[\\/]node_modules[\\/](bip39)[\\/]/,
@@ -53,13 +59,15 @@ module.exports = {
           chunks: 'all',
         },
         ethereum: {
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject|ethereumjs-abi|web3-eth-accounts|)[\\/]/,
+          // this is made into an inital chunk
+          test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
-        near: {
-          test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
-          name: 'near',
+        ethereumAsync: {
+          // this is made into an async chunk (lazy loaded)
+          test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
+          name: 'ethereumAsync',
           chunks: 'all',
         },
         terra: {
@@ -68,13 +76,8 @@ module.exports = {
           chunks: 'all',
         },
         cosmos: {
-          test: /[\\/]node_modules[\\/](cosmjs-types|@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
+          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
-          chunks: 'all',
-        },
-        polkadot: {
-          test: /[\\/]node_modules[\\/](@polkadot)[\\/]/,
-          name: 'polkadot',
           chunks: 'all',
         },
         solana: {
@@ -87,6 +90,21 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
+        // near: {
+        //   test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
+        //   name: 'near',
+        //   chunks: 'all',
+        // },
+        // cosmosTypes: {
+        //   test: /[\\/]node_modules[\\/](cosmjs-types)[\\/]/,
+        //   name: 'cosmosTypes',
+        //   chunks: 'all',
+        // },
+        // polkadot: {
+        //   test: /[\\/]node_modules[\\/](@polkadot)[\\/]/,
+        //   name: 'polkadot',
+        //   chunks: 'all',
+        // },
       },
     },
   },
@@ -117,6 +135,7 @@ module.exports = {
       vm: require.resolve('vm-browserify'),
       path: require.resolve('path-browserify'),
       stream: require.resolve('stream-browserify'),
+      zlib: require.resolve('browserify-zlib'),
     },
   },
   module: {

@@ -8,8 +8,8 @@ import {
   AccessLevel,
   PermissionManager,
   everyonePermissions,
-} from 'commonwealth/shared/permissions';
-import { RoleObject } from './types';
+} from './permissions';
+import type { RoleObject } from './types';
 import { ProposalType } from 'common-common/src/types';
 
 export const getNextPollEndingTime = (now) => {
@@ -64,11 +64,8 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
   return (
     type === ProposalType.SubstrateDemocracyReferendum ||
     type === ProposalType.SubstrateDemocracyProposal ||
-    type === ProposalType.SubstrateBountyProposal ||
     type === ProposalType.SubstrateTreasuryTip ||
-    type === ProposalType.SubstrateCollectiveProposal ||
     type === ProposalType.SubstrateTechnicalCommitteeMotion ||
-    type === ProposalType.PhragmenCandidacy ||
     type === ProposalType.SubstrateTreasuryProposal
   );
 };

@@ -138,6 +138,9 @@ class ThreadsController {
       last_commented_on,
       linked_threads,
       numberOfComments,
+      canvasAction,
+      canvasSession,
+      canvasHash,
     } = thread;
 
     const attachments = Attachments
@@ -242,6 +245,9 @@ class ThreadsController {
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
       linkedThreads,
       numberOfComments,
+      canvasAction,
+      canvasSession,
+      canvasHash,
     });
 
     ThreadsController.Instance.store.add(t);
@@ -263,6 +269,17 @@ class ThreadsController {
   ) {
     try {
       // TODO: Change to POST /thread
+      const {
+        action = null,
+        session = null,
+        hash = null,
+      } = await app.sessions.signThread({
+        community: chainId,
+        title,
+        body,
+        link: url,
+        topic: topic.id,
+      });
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
@@ -278,6 +295,9 @@ class ThreadsController {
         url,
         readOnly,
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       const result = this.modelFromServer(response.result);
 
@@ -309,6 +329,8 @@ class ThreadsController {
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
+          : err.message
+          ? err.message
           : 'Failed to create thread'
       );
     }
@@ -323,6 +345,18 @@ class ThreadsController {
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
+    const {
+      action = null,
+      session = null,
+      hash = null,
+    } = await app.sessions.signThread({
+      community: app.activeChainId(),
+      title: newTitle,
+      body: newBody,
+      link: url,
+      topic: proposal.topic.id,
+    });
+
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
@@ -339,6 +373,9 @@ class ThreadsController {
         url,
         'attachments[]': attachments,
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       },
       success: (response) => {
         const result = this.modelFromServer(response.result);

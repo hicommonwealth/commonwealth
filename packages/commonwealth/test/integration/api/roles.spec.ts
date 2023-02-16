@@ -97,7 +97,7 @@ describe('Roles Test', () => {
     let newUserId;
 
     beforeEach(
-      'Create a new user as member of community to invite or upgrade',
+      'Create a new user as member of community or upgrade',
       async () => {
         const res = await modelUtils.createAndVerifyAddress({ chain });
         newUserAddress = res.address;
@@ -374,7 +374,6 @@ describe('Roles Test', () => {
         jwt: jwtToken,
         isAuthenticatedForum: 'false',
         privacyEnabled: 'true',
-        invitesEnabled: 'true',
         id: 'test',
         name: 'test community',
         creator_address: loggedInAddr,

@@ -4,6 +4,7 @@ import passport from 'passport';
 import logger from 'morgan';
 import cors from 'cors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import v8 from 'v8';
 
 import models from '../database/database';
 import { DEFAULT_PORT } from '../config';
@@ -12,6 +13,12 @@ import setupPassport from './passport';
 import setupRouter from './router';
 
 const log = factory.getLogger(formatFilename(__filename));
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
+
 const port = process.env.PORT || DEFAULT_PORT;
 
 export const app = express();

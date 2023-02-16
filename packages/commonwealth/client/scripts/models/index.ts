@@ -8,7 +8,6 @@ export { default as DiscussionDraft } from './DiscussionDraft';
 export { default as IChainAdapter } from './IChainAdapter';
 export { default as ITokenAdapter } from './ITokenAdapter';
 export { default as IWebWallet } from './IWebWallet';
-export { default as Identity } from './Identity';
 export { default as NodeInfo } from './NodeInfo';
 export { default as Notification } from './Notification';
 export { default as DashboardActivityNotification } from './DashboardActivityNotification';

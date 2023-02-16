@@ -4,6 +4,7 @@ import ClassComponent from 'class_component';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
 import {
@@ -14,7 +15,7 @@ import {
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo, RoleInfo } from 'models';
+import type { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
   PermissionManager,

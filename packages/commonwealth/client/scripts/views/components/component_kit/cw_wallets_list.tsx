@@ -6,6 +6,9 @@ import { ChainBase } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import 'components/component_kit/cw_wallets_list.scss';
+
+import { Account, AddressInfo, IWebWallet } from 'models';
+import { signSessionWithAccount } from 'controllers/server/sessions';
 import { createUserWithAddress } from 'controllers/app/login';
 import { notifyInfo } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
@@ -15,19 +18,17 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import $ from 'jquery';
 import m from 'mithril';
 
-import type { Account, IWebWallet } from 'models';
-import { AddressInfo } from 'models';
 import app from 'state';
+import {
+  CWWalletOptionRow,
+  CWWalletMissingOptionRow,
+} from './cw_wallet_option_row';
+import { CWTooltip } from './cw_popover/cw_tooltip';
+import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
-import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWSpinner } from './cw_spinner';
 import { CWText } from './cw_text';
-import {
-  CWWalletMissingOptionRow,
-  CWWalletOptionRow,
-} from './cw_wallet_option_row';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
@@ -166,6 +167,8 @@ type WalletsListAttrs = {
   ) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   linking?: boolean;
+  useSessionKeyLoginFlow?: boolean;
+  hideConnectAnotherWayLink?: boolean;
 };
 
 export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
@@ -179,8 +182,52 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       setSelectedWallet,
       accountVerifiedCallback,
       linking,
+      useSessionKeyLoginFlow,
+      hideConnectAnotherWayLink,
     } = vnode.attrs;
 
+    // We call handleNormalWalletLogin if we're using connecting a new wallet, and
+    // handleSessionKeyRevalidation if we're regenerating a session key.
+    async function handleSessionKeyRevalidation(
+      wallet: IWebWallet<any>,
+      address: string
+    ) {
+      const timestamp = +new Date();
+      const sessionAddress = await app.sessions.getOrCreateAddress(
+        wallet.chain,
+        wallet.getChainId().toString()
+      );
+      const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
+      const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+
+      // Start the create-user flow, so validationBlockInfo gets saved to the backend
+      // This creates a new `Account` object with fields set up to be validated by verifyAddress.
+      const { account } = await createUserWithAddress(
+        address,
+        wallet.name,
+        chainIdentifier,
+        sessionAddress,
+        validationBlockInfo
+      );
+      account.setValidationBlockInfo(
+        validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
+      );
+
+      const { chainId, sessionPayload, signature } =
+        await signSessionWithAccount(wallet, account, timestamp);
+      await account.validate(signature, timestamp, chainId);
+      await app.sessions.authSession(
+        wallet.chain,
+        chainId,
+        sessionPayload,
+        signature
+      );
+      console.log('Started new session for', wallet.chain, chainId);
+
+      const newlyCreated = false;
+      const linking = false;
+      accountVerifiedCallback(account, newlyCreated, linking);
+    }
     async function handleNormalWalletLogin(
       wallet: IWebWallet<any>,
       address: string
@@ -212,9 +259,9 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       }
 
       try {
-        const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+        const sessionAddress = await app.sessions.getOrCreateAddress(
           wallet.chain,
-          wallet.getChainId()
+          wallet.getChainId().toString()
         );
         const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
         const validationBlockInfo =
@@ -225,7 +272,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
             address,
             wallet.name,
             chainIdentifier,
-            sessionPublicAddress,
+            sessionAddress,
             validationBlockInfo
           );
         accountVerifiedCallback(signerAccount, newlyCreated, linking);
@@ -288,7 +335,11 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                             address = wallet.accounts[accountIndex].address;
                           }
                           $('.AccountSelector').trigger('modalexit');
-                          await handleNormalWalletLogin(wallet, address);
+                          if (useSessionKeyLoginFlow) {
+                            await handleSessionKeyRevalidation(wallet, address);
+                          } else {
+                            await handleNormalWalletLogin(wallet, address);
+                          }
                         },
                       },
                     });
@@ -357,7 +408,11 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                         }
                       }
 
-                      await handleNormalWalletLogin(wallet, address);
+                      if (useSessionKeyLoginFlow) {
+                        await handleSessionKeyRevalidation(wallet, address);
+                      } else {
+                        await handleNormalWalletLogin(wallet, address);
+                      }
                     }
                   }
                 }}
@@ -416,15 +471,17 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
             )}
           </div>
         </div>
-        <CWText
-          type="b2"
-          className={getClasses<{ darkMode?: boolean }>(
-            { darkMode },
-            'connect-another-way-link'
-          )}
-        >
-          <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
-        </CWText>
+        {!hideConnectAnotherWayLink && (
+          <CWText
+            type="b2"
+            className={getClasses<{ darkMode?: boolean }>(
+              { darkMode },
+              'connect-another-way-link'
+            )}
+          >
+            <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
+          </CWText>
+        )}
       </div>
     );
   }

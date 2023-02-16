@@ -1,12 +1,11 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import type { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
-import { Magic } from 'magic-sdk';
 import m from 'mithril';
 import type { BlockInfo, ChainInfo } from 'models';
 import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';
@@ -254,7 +253,9 @@ export async function createUserWithAddress(
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
-    block_info: JSON.stringify(validationBlockInfo),
+    block_info: validationBlockInfo
+      ? JSON.stringify(validationBlockInfo)
+      : null,
   });
   const id = response.result.id;
   const chainInfo = app.config.chains.getById(chain);
@@ -297,6 +298,7 @@ export async function unlinkLogin(account: AddressInfo) {
 }
 
 export async function loginWithMagicLink(email: string) {
+  const { Magic } = await import('magic-sdk');
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({

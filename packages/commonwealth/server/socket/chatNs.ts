@@ -1,5 +1,5 @@
 import { addPrefix, factory } from 'common-common/src/logging';
-import { RedisCache } from 'common-common/src/redisCache';
+import type { RedisCache } from 'common-common/src/redisCache';
 import {
   NotificationCategories,
   RedisNamespaces,

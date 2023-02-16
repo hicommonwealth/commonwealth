@@ -23,8 +23,6 @@ import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
 import DiscussionDraftFactory from './models/discussion_draft';
-import IdentityCacheFactory from './models/identity_cache';
-import InviteCodeFactory from './models/invite_code';
 import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
@@ -99,8 +97,6 @@ const models: Models = {
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
-  IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
-  InviteCode: InviteCodeFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
