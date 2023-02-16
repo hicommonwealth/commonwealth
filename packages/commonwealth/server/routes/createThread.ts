@@ -1,19 +1,19 @@
 import { AppError, ServerError } from 'common-common/src/errors';
 
-import { Action, PermissionError } from 'common-common/src/permissions';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from 'common-common/src/types';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { Action, PermissionError } from 'commonwealth/shared/permissions';
 import {
   findAllRoles,
   isAddressPermitted,
 } from 'commonwealth/server/util/roles';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { sequelize } from '../database';
@@ -218,11 +218,22 @@ const createThread = async (
     chain.id,
     Action.CREATE_THREAD
   );
-  if (permission_error === PermissionError.NOT_PERMITTED) {
+  if (!permission_error) {
     return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
-  const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
+  const {
+    topic_name,
+    title,
+    body,
+    kind,
+    stage,
+    url,
+    readOnly,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
   let { topic_id } = req.body;
 
   if (kind === 'discussion') {
@@ -293,6 +304,9 @@ const createThread = async (
     stage,
     url,
     read_only: readOnly || false,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
   };
 
   // begin essential database changes within transaction

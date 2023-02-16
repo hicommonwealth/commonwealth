@@ -5,16 +5,16 @@ import JobRunner from 'common-common/src/cacheJobRunner';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNetwork } from 'common-common/src/types';
 
-import {
+import type {
   BalanceProvider,
   BalanceProviderResp,
   ChainNodeResp,
   ICache,
   IChainNode,
   ITokenBalanceCache,
-  FetchTokenBalanceErrors,
   TokenBalanceResp,
 } from './types';
+import { FetchTokenBalanceErrors } from './types';
 import { TbcStatsDSender } from './tbcStatsDSender';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -52,7 +52,7 @@ export class TokenBalanceCache
   implements ITokenBalanceCache
 {
   private _nodes: { [id: number]: IChainNode } = {};
-  private _providers: { [name: string]: BalanceProvider } = {};
+  private _providers: { [name: string]: BalanceProvider<any> } = {};
   private _lastQueryTime = 0;
   private statsDSender: TbcStatsDSender = new TbcStatsDSender();
   private cacheContents = { zero: 0, nonZero: 0 };
@@ -60,7 +60,7 @@ export class TokenBalanceCache
   constructor(
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 1 * 60 * 60,
-    providers: BalanceProvider[] = null,
+    providers: BalanceProvider<any>[] = null,
     private readonly _nodesProvider: (
       lastQueryUnixTime: number
     ) => Promise<IChainNode[]> = queryChainNodesFromDB
@@ -75,7 +75,7 @@ export class TokenBalanceCache
     }
   }
 
-  public async initBalanceProviders(providers: BalanceProvider[] = null) {
+  public async initBalanceProviders(providers: BalanceProvider<any>[] = null) {
     // lazy load import to improve test speed
     if (providers == null) {
       const p = await import('./providers');
@@ -101,7 +101,7 @@ export class TokenBalanceCache
   public async getBalanceProviders(
     nodeId?: number
   ): Promise<BalanceProviderResp[]> {
-    const formatBps = (bps: BalanceProvider[]): BalanceProviderResp[] => {
+    const formatBps = (bps: BalanceProvider<any>[]): BalanceProviderResp[] => {
       this.statsDSender.sendProviderInfo(bps, nodeId);
       return bps.map(({ name, opts }) => ({ bp: name, opts }));
     };

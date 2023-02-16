@@ -2,11 +2,9 @@ const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = merge(common, {
-  entry: {
-    app: ['webpack-hot-middleware/client?path=/__webpack_hmr&reload=true'],
-  },
   mode: 'development',
   devtool: 'eval-cheap-source-map',
   stats: {
@@ -21,8 +19,8 @@ module.exports = merge(common, {
   output: {
     publicPath: '/build',
     path: path.join(__dirname, '../build'),
-    filename: 'js/[name].js',
-    chunkFilename: 'js/[name].chunk.js',
+    filename: 'js/[name].[contenthash:8].js',
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   devServer: {
     inline: true,
@@ -35,4 +33,9 @@ module.exports = merge(common, {
     }),
     new webpack.HotModuleReplacementPlugin(), // used for hot reloading
   ],
+  optimization: {
+    minimizer: [
+      new CssMinimizerPlugin({ minimizerOptions: { preset: ['default'] } }),
+    ],
+  },
 });

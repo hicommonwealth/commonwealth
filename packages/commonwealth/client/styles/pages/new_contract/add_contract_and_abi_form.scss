@@ -1,0 +1,21 @@
+.AddContractAndAbiForm {
+  .form {
+    display: flex;
+    flex-direction: column;
+
+    .TextInput,
+    .TextArea {
+      margin: 20px 0;
+    }
+  }
+
+  .divider {
+    margin: 40px 0;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+}

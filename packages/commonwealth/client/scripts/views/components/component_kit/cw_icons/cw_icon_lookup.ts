@@ -10,6 +10,7 @@ export const iconLookup = {
   cautionCircle: Icons.CWCautionCircle,
   cautionTriangle: Icons.CWCautionTriangle,
   check: Icons.CWCheck,
+  checkCircle: Icons.CWCheckCircle,
   chevronDown: Icons.CWChevronDown,
   chevronLeft: Icons.CWChevronLeft,
   chevronRight: Icons.CWChevronRight,
@@ -21,7 +22,6 @@ export const iconLookup = {
   commonLogo: Icons.CWCommonLogo,
   compass: Icons.CWCompass,
   copy: Icons.CWCopy,
-  councilProposal: Icons.CWCouncilProposal,
   cow: Icons.CWCow,
   curator: Icons.CWCurator,
   democraticProposal: Icons.CWDemocraticProposal,
@@ -82,7 +82,6 @@ export const iconLookup = {
 export const customIconLookup = {
   'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
-  invites: CustomIcons.CWInvites,
   keplr: CustomIcons.CWKeplr,
   magic: CustomIcons.CWMagic,
   metamask: CustomIcons.CWMetaMask,

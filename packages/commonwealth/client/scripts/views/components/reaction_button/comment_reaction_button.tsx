@@ -56,6 +56,12 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
       const reaction = (await fetchReactionsByPost(comment)).find((r) => {
         return r.Address.address === activeAddress;
       });
+
+      const { session, action, hash } =
+        await app.sessions.signDeleteCommentReaction({
+          comment_id: reaction.canvasId,
+        });
+
       this.loading = true;
       app.reactionCounts
         .delete(reaction, {
@@ -72,7 +78,16 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
         });
     };
 
-    const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
+    const like = async (
+      chain: ChainInfo,
+      chainId: string,
+      userAddress: string
+    ) => {
+      const { session, action, hash } = await app.sessions.signCommentReaction({
+        comment_id: comment.id,
+        like: true,
+      });
+
       this.loading = true;
       app.reactionCounts
         .create(userAddress, comment, 'like', chainId)

@@ -2,7 +2,6 @@
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
 import type BN from 'bn.js';
 import chai from 'chai';
 import 'chai/register-should';
@@ -10,48 +9,71 @@ import { BalanceType, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
-import { constructCanvasMessage } from 'shared/adapters/shared';
+
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
-import Web3 from 'web3';
+import { constructCanvasMessage } from 'shared/adapters/shared';
+import { PermissionManager } from 'commonwealth/shared/permissions';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
+import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
+import { factory, formatFilename } from 'common-common/src/logging';
 import type { Permission } from '../../server/models/role';
+
 import {
   constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
+  TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../shared/adapters/chain/ethereum/keys';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export const generateEthAddress = () => {
   const keypair = wallet.generate();
   const lowercaseAddress = `0x${keypair.getAddress().toString('hex')}`;
-  const address = Web3.utils.toChecksumAddress(lowercaseAddress);
+  const address = Web3.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
 };
 
-export async function addAllowDenyPermissions(
+export async function addAllowDenyPermissionsForCommunityRole(
   role_name: Permission,
   chain_id: string,
-  allow_permission: number,
-  deny_permission: number
+  allow_permission: number | undefined,
+  deny_permission: number | undefined
 ) {
-  // get community role object from the database
-  const communityRole = await models.CommunityRole.findOne({
-    where: {
-      chain_id,
-      name: role_name,
-    },
-  });
-  // update allow permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.allow =
-    BigInt(communityRole.allow) | (BigInt(1) << BigInt(allow_permission));
-  // update deny permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.deny =
-    BigInt(communityRole.deny) | (BigInt(1) << BigInt(deny_permission));
-  // save community role object to the database
-  await communityRole.save();
+  try {
+    console.log('addAllowDenyPermissionsForCommunityRole');
+    const permissionsManager = new PermissionManager();
+    // get community role object from the database
+    const communityRole = await models.CommunityRole.findOne({
+      where: {
+        chain_id,
+        name: role_name,
+      },
+    });
+    let denyPermission;
+    let allowPermission;
+    if (deny_permission) {
+      denyPermission = permissionsManager.addDenyPermission(
+        BigInt(communityRole?.deny || 0),
+        deny_permission
+      );
+      communityRole.deny = denyPermission;
+    }
+    if (allow_permission) {
+      allowPermission = permissionsManager.addAllowPermission(
+        BigInt(communityRole?.allow || 0),
+        allow_permission
+      );
+      communityRole.allow = allowPermission;
+    }
+    // save community role object to the database
+    const updatedRole = await communityRole.save();
+    console.log('updatedRole', updatedRole);
+  } catch (err) {
+    throw new Error(err);
+  }
 }
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
@@ -63,15 +85,19 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+    console.log('createAndVerifyAddress res', res.body);
     const address_id = res.body.result.id;
-    const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
+    const token = res.body.result.verification_token;
+    const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
+    const timestamp = 1665083987891;
     const message = constructCanvasMessage(
-      'eth',
+      'ethereum',
       chain_id,
       address,
       sessionWallet.address,
-      TEST_BLOCK_INFO_STRING
+      timestamp,
+      TEST_BLOCK_INFO_BLOCKHASH
     );
     const data = constructTypedCanvasMessage(message);
     const privateKey = keypair.getPrivateKey();
@@ -87,12 +113,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({
         address,
         chain,
+        chain_id,
         signature,
         wallet_id,
         session_public_address: sessionWallet.address,
+        session_timestamp: timestamp,
         session_block_data: TEST_BLOCK_INFO_STRING,
       });
-    console.log(JSON.stringify(res.body));
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email };
@@ -118,12 +145,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       'ed25519'
     );
     const chain_id = ChainNetwork.Edgeware;
+    const timestamp = 1665083987891;
     const message = constructCanvasMessage(
-      'eth',
+      'ethereum',
       chain_id,
       address,
       sessionWallet.address,
-      TEST_BLOCK_INFO_STRING
+      timestamp,
+      TEST_BLOCK_INFO_BLOCKHASH
     );
 
     const signature = keyPair.sign(stringToU8a(JSON.stringify(message)));
@@ -257,6 +286,32 @@ export const editComment = async (args: EditCommentArgs) => {
       jwt,
       chain: community ? undefined : chain,
       community,
+    });
+  return res.body;
+};
+
+export interface CreateReactionArgs {
+  author_chain: string;
+  chain: string;
+  address: string;
+  reaction: string;
+  jwt: string;
+  comment_id: number;
+}
+
+export const createReaction = async (args: CreateReactionArgs) => {
+  const { chain, address, jwt, author_chain, reaction, comment_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/createReaction')
+    .set('Accept', 'application/json')
+    .send({
+      chain,
+      address,
+      reaction,
+      comment_id,
+      author_chain,
+      jwt,
     });
   return res.body;
 };
@@ -400,7 +455,6 @@ export interface CommunityArgs {
   description: string;
   default_chain: string;
   isAuthenticatedForum: string;
-  invitesEnabled: string;
   privacyEnabled: string;
 }
 
@@ -414,30 +468,14 @@ export const createCommunity = async (args: CommunityArgs) => {
   return community;
 };
 
-export interface InviteArgs {
-  jwt: string;
-  invitedEmail?: string;
-  invitedAddress?: string;
-  chain?: string;
-  community?: string;
-  address: string;
-}
-
-export const createInvite = async (args: InviteArgs) => {
-  const res = await chai
-    .request(app)
-    .post('/api/createInvite')
-    .set('Accept', 'application/json')
-    .send({ ...args });
-  const invite = res.body;
-  return invite;
-};
-
 // always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<{
-  tokenAddress: string;
-  contractType: string;
-}> {
+export class MockTokenBalanceProvider extends BalanceProvider<
+  any,
+  {
+    tokenAddress: string;
+    contractType: string;
+  }
+> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
@@ -445,6 +483,13 @@ export class MockTokenBalanceProvider extends BalanceProvider<{
   };
   public validBases = [BalanceType.Ethereum];
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
+
+  public async getExternalProvider(
+    node: IChainNode,
+    opts: { tokenAddress: string; contractType: string }
+  ): Promise<any> {
+    return;
+  }
 
   public async getBalance(
     node: IChainNode,

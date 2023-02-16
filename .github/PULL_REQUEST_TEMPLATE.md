@@ -13,12 +13,12 @@
 <!--- your change affects other areas of the code, etc. -->
 
 ## Does this PR affect any server routes?
-- [ ] yes
-- [ ] no
+chose YES or NO
+
 
 ## If this PR affects server routes, what are the security implications?
 <!--- Please describe which security concerns were considered, -->
 <!--- such as argument validation, private data leaking, etc. -->
 
-## Have proper tags been added (for bug, enhancement, breaking change)?
-- [ ] yes
+## Have you added the issue number here?
+(In the right sidebar, under "development")

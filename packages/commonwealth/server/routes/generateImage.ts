@@ -1,11 +1,11 @@
 import AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { Configuration, OpenAIApi } from 'openai';
-import request from 'request';
 import fetch from 'node-fetch';
 
-import { success, TypedRequestBody, TypedResponse } from '../types';
-import { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import type { DB } from '../models';
 import { AppError } from '../../../common-common/src/errors';
 
 const configuration = new Configuration({

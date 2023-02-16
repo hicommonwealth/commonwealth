@@ -1,25 +1,22 @@
 /* @jsx m */
 
-import {
-  chainBasetoCanvasChain,
-  constructCanvasMessage,
-} from 'adapters/shared';
-import { initAppState } from 'app';
+import m from 'mithril';
+import app, { initAppState } from 'state';
 import ClassComponent from 'class_component';
-import { ChainBase } from 'common-common/src/types';
+import $ from 'jquery';
+import _ from 'underscore';
+
 import {
   completeClientLogin,
   loginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
-import { notifyError } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import $ from 'jquery';
-import m from 'mithril';
-import type { Account, IWebWallet } from 'models';
-import app from 'state';
-import _ from 'underscore';
+import { notifyError } from 'controllers/app/notifications';
+import { signSessionWithAccount } from 'controllers/server/sessions';
+import { Account, IWebWallet } from 'models';
+import { ChainBase } from 'common-common/src/types';
 import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,
@@ -37,27 +34,6 @@ type LoginModalAttrs = {
   onSuccess?: () => void;
 };
 
-async function signWithWallet<T extends { address: string }>(
-  wallet: IWebWallet<T>,
-  account: Account
-) {
-  const chainId = wallet.getChainId();
-  const sessionPublicAddress = await app.sessions.getOrCreateAddress(
-    wallet.chain,
-    chainId
-  );
-
-  const canvasMessage = constructCanvasMessage(
-    chainBasetoCanvasChain(wallet.chain),
-    chainId,
-    account.address,
-    sessionPublicAddress,
-    account.validationBlockInfo
-  );
-
-  return wallet.signCanvasMessage(account, canvasMessage);
-}
-
 export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
@@ -70,6 +46,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private selectedWallet: IWebWallet<any>;
   private selectedLinkingWallet: IWebWallet<any>;
   private cachedWalletSignature: string;
+  private cachedTimestamp: number;
   private cachedChainId: string | number;
   private primaryAccount: Account;
   private secondaryLinkAccount: Account;
@@ -234,8 +211,16 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     ) => {
       // Handle Logged in and joining community of different chain base
       if (this.currentlyInCommunityPage && app.isLoggedIn()) {
-        const signature = await signWithWallet(this.selectedWallet, account);
-        await account.validate(signature, this.selectedWallet.getChainId());
+        const timestamp = +new Date();
+        const { signature, chainId, sessionPayload } =
+          await signSessionWithAccount(this.selectedWallet, account, timestamp);
+        await account.validate(signature, timestamp, chainId);
+        app.sessions.authSession(
+          app.chain.base,
+          chainId,
+          sessionPayload,
+          signature
+        );
         await logInWithAccount(account, true);
         return;
       }
@@ -255,15 +240,21 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           return;
         }
         this.secondaryLinkAccount = account;
-        this.secondaryChainId = this.selectedWallet.getChainId();
         this.profiles = [account.profile]; // TODO: Update when User -> Many Profiles goes in
       }
 
       // Handle receiving and caching wallet signature strings
       if (!newlyCreated && !linking) {
         try {
-          const signature = await signWithWallet(this.selectedWallet, account);
-          await account.validate(signature, this.selectedWallet.getChainId());
+          const timestamp = +new Date();
+          const { signature, sessionPayload, chainId } =
+            await signSessionWithAccount(
+              this.selectedWallet,
+              account,
+              timestamp
+            );
+          await account.validate(signature, timestamp, chainId);
+          // Can't call authSession now, since chain.base is unknown, so we wait till action
           await logInWithAccount(account, true);
         } catch (e) {
           console.log(e);
@@ -271,12 +262,16 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       } else {
         if (!linking) {
           try {
-            const signature = await signWithWallet(
+            const timestamp = +new Date();
+            const { signature, chainId } = await signSessionWithAccount(
               this.selectedWallet,
-              account
+              account,
+              timestamp
             );
+            // Can't call authSession now, since chain.base is unknown, so we wait till action
             this.cachedWalletSignature = signature;
-            this.cachedChainId = this.selectedWallet.getChainId();
+            this.cachedTimestamp = timestamp;
+            this.cachedChainId = chainId;
           } catch (e) {
             console.log(e);
           }
@@ -296,6 +291,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         if (this.selectedWallet.chain !== 'near') {
           await this.primaryAccount.validate(
             this.cachedWalletSignature,
+            this.cachedTimestamp,
             this.cachedChainId
           );
         }
@@ -323,18 +319,24 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     // Validates both linking (secondary) and primary accounts
     const performLinkingCallback = async () => {
       try {
-        const signature = await signWithWallet(
-          this.selectedLinkingWallet,
-          this.secondaryLinkAccount
-        );
+        const secondaryTimestamp = +new Date();
+        const { signature: secondarySignature, chainId: secondaryChainId } =
+          await signSessionWithAccount(
+            this.selectedLinkingWallet,
+            this.secondaryLinkAccount,
+            secondaryTimestamp
+          );
         await this.secondaryLinkAccount.validate(
-          signature,
-          this.secondaryChainId
+          secondarySignature,
+          secondaryTimestamp,
+          secondaryChainId
         );
         await this.primaryAccount.validate(
           this.cachedWalletSignature,
+          this.cachedTimestamp,
           this.cachedChainId
         );
+        // Can't call authSession now, since chain.base is unknown, so we wait till action
         await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);

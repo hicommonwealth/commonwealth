@@ -61,7 +61,6 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         author_chain ?? chain_id,
         null
       ),
-      hideIdentityIcon: false,
       linkify: true,
       avatarSize: 16,
       onclick: (e: any) => {

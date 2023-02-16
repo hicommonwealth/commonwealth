@@ -381,14 +381,57 @@ module.exports = {
         { transaction }
       );
       await queryInterface.bulkDelete(
+        'CommunityRoles',
+        { chain_id: 'ethereum-local' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'CommunityRoles',
+        { chain_id: 'ideamarket' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'CommunityContracts',
+        { chain_id: 'ethereum-local' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'CommunityContracts',
+        { chain_id: 'ideamarket' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'Chains',
+        { id: 'ethereum-local' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'Chains',
+        { id: 'ideamarket' },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'Contracts',
+        { chain_node_id: 21 },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 18 },
-        { transaction, truncate: true, cascade: true }
+        { transaction }
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 21 },
         { transaction }
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "ChainNodes" SET name = REGEXP_REPLACE(url, 'https?://', 'Imported node:');`,
+        {
+          raw: true,
+          type: 'RAW',
+          transaction,
+        }
       );
       await queryInterface.changeColumn(
         'ChainNodes',
