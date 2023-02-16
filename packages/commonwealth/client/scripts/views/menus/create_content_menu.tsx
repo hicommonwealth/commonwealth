@@ -4,7 +4,6 @@ import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import m from 'mithril';
 
@@ -16,8 +15,6 @@ import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import type { MenuItem } from '../components/component_kit/types';
 
 const getCreateContentMenuItems = (): MenuItem[] => {
-  const activeAccount = app.user.activeAccount;
-
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
@@ -104,26 +101,6 @@ const getCreateContentMenuItems = (): MenuItem[] => {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
             iconLeft: 'democraticProposal',
-          },
-          ...(((activeAccount as SubstrateAccount)?.isCouncillor
-            ? [
-                {
-                  label: 'New council motion',
-                  onclick: () =>
-                    navigateToSubpage('/new/proposal/:type', {
-                      type: ProposalType.SubstrateCollectiveProposal,
-                    }),
-                  iconLeft: 'councilProposal',
-                },
-              ]
-            : []) as MenuItem[]),
-          {
-            label: 'New bounty proposal',
-            onclick: () =>
-              navigateToSubpage('/new/proposal/:type', {
-                type: ProposalType.SubstrateBountyProposal,
-              }),
-            iconLeft: 'badge',
           },
           {
             label: 'New tip',

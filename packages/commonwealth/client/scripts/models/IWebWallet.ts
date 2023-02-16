@@ -1,10 +1,10 @@
-import type { ChainId } from '@canvas-js/interfaces';
+import type { ChainId, SessionPayload } from '@canvas-js/interfaces';
 import type {
   ChainBase,
   ChainNetwork,
   WalletId,
 } from 'common-common/src/types';
-import type { CanvasData } from 'shared/adapters/shared';
+
 import type Account from './Account';
 import type BlockInfo from './BlockInfo';
 
@@ -25,7 +25,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
 
   signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string>;
 
   chain: ChainBase;

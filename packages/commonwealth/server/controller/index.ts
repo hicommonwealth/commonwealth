@@ -56,9 +56,9 @@ export async function createRole(models: DB, req: Request, res: Response) {
 
   const result = await models.sequelize.query(
     `INSERT INTO "RoleAssignments" (
-      "address_id", 
-      "community_role_id", 
-      "created_at", 
+      "address_id",
+      "community_role_id",
+      "created_at",
       "updated_at"
     )
     SELECT "Addresses"."user_id", :role_id, NOW(), NOW()
@@ -123,7 +123,7 @@ export async function getPermissions(models: DB, req: Request, res: Response) {
     return res.status(400).json({ error: 'No query provided' });
   }
 
-  const { address, address_id, chain_id } = req.query;
+  const { address } = req.query;
   if (!address) {
     return res.status(400).json({ error: 'No address provided' });
   }
@@ -177,9 +177,9 @@ export async function createPermission(
 
   const result = await models.sequelize.query(
     `INSERT INTO "Permissions" (
-      "community_role_id", 
-      "action", 
-      "created_at", 
+      "community_role_id",
+      "action",
+      "created_at",
       "updated_at"
     )
     SELECT "CommunityRoles"."id", :permission_id, NOW(), NOW()
