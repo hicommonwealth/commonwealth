@@ -10,6 +10,7 @@ import { PageLoading } from 'views/pages/loading';
 import { NotificationRow } from './notification_row';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { byDescendingCreationDate } from 'helpers';
 
 const NotificationsPage = () => {
   if (!app.isLoggedIn()) {
@@ -27,9 +28,9 @@ const NotificationsPage = () => {
   const chainEventNotifications =
     app.user.notifications.chainEventNotifications;
 
-  const allNotifications = discussionNotifications.concat(
-    chainEventNotifications
-  );
+  const mostRecentFirst = [
+    ...discussionNotifications.concat(chainEventNotifications),
+  ].sort(byDescendingCreationDate);
 
   return (
     <Sublayout>
@@ -39,7 +40,7 @@ const NotificationsPage = () => {
             label="Mark all as read"
             onClick={(e) => {
               e.preventDefault();
-              app.user.notifications.markAsRead(allNotifications);
+              app.user.notifications.markAsRead(mostRecentFirst);
             }}
           />
           <CWButton
@@ -58,10 +59,10 @@ const NotificationsPage = () => {
           />
         </div>
         <div className="NotificationsList">
-          {allNotifications.length > 0 ? (
+          {mostRecentFirst.length > 0 ? (
             <Virtuoso
               style={{ height: '400px' }}
-              data={allNotifications}
+              data={mostRecentFirst}
               itemContent={(i, data) => (
                 <NotificationRow key={i} notification={data} onListPage />
               )}
