@@ -1,13 +1,13 @@
 import type { Transaction, FindOptions } from 'sequelize';
 import { Op } from 'sequelize';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
-import type { Action } from 'commonwealth/shared/permissions';
+import { aggregatePermissions } from '../../shared/utils';
+import type { Action } from '../../shared/permissions';
 import {
   PermissionManager,
   PermissionError,
   ToCheck,
   everyonePermissions,
-} from 'commonwealth/shared/permissions';
+} from '../../shared/permissions';
 import type { DB } from '../models';
 import type { CommunityRoleAttributes } from '../models/community_role';
 import type { Permission } from '../models/role';
