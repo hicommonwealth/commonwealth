@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
@@ -109,19 +109,24 @@ class SubstrateFormComponent extends ClassComponent {
             }
           }}
         />
-        {...defaultChainRows(this.state.form)}
+        {defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
           disabled={this.state.saving}
           onClick={async () => {
-            const { name, nodeUrl, iconUrl, substrateSpec, symbol } =
-              this.state.form;
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: null,
-            });
+            const {
+              name,
+              nodeUrl,
+              iconUrl,
+              substrateSpec,
+              symbol,
+            } = this.state.form;
+            // mixpanelBrowserTrack({
+            //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+            //   chainBase: null,
+            //   isCustomDomain: app.isCustomDomain(),
+            //   communityType: null,
+            // });
             try {
               JSON.parse(substrateSpec);
             } catch (err) {

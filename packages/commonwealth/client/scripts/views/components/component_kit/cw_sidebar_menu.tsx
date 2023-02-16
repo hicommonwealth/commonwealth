@@ -19,8 +19,14 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
   const navigate = useCommonNavigate();
 
   if (props.type === 'default') {
-    const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
-      props;
+    const {
+      disabled,
+      iconLeft,
+      iconRight,
+      isSecondary,
+      label,
+      onClick,
+    } = props;
 
     return (
       <div
@@ -66,9 +72,10 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
         <CommunityLabel community={item} />
         {app.isLoggedIn() && roles.length > 0 && (
           <div className="roles-and-star">
-            {roles.map((role) => {
+            {roles.map((role, i) => {
               return (
                 <User
+                  key={i}
                   avatarSize={18}
                   avatarOnly
                   user={
@@ -127,8 +134,8 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             </CWText>
           </div>
         )}
-        {menuItems.map((item) => (
-          <CWSidebarMenuItem type={item.type || 'default'} {...item} />
+        {menuItems.map((item, i) => (
+          <CWSidebarMenuItem key={i} type={item.type || 'default'} {...item} />
         ))}
       </div>
       <div className="sidebar-bottom">
@@ -174,8 +181,14 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               }
             },
           } as MenuItem,
-        ].map((item: MenuItem) => {
-          return <CWSidebarMenuItem type={item.type || 'default'} {...item} />;
+        ].map((item: MenuItem, i) => {
+          return (
+            <CWSidebarMenuItem
+              key={i}
+              type={item.type || 'default'}
+              {...item}
+            />
+          );
         })}
       </div>
     </div>

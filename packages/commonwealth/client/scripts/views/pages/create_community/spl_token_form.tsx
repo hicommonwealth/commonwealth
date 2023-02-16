@@ -1,11 +1,11 @@
 import React from 'react';
 
 import type * as solanaWeb3 from '@solana/web3.js';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { ClassComponent, redraw } from 'mithrilInterop';
 import $ from 'jquery';
@@ -147,19 +147,19 @@ class SplTokenFormComponent extends ClassComponent {
             this.state.form.decimals = +v;
           }}
         />
-        {...defaultChainRows(this.state.form, disableField)}
+        {defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
           disabled={this.state.saving || !this.state.loaded}
           onClick={async () => {
             const { cluster, iconUrl, mint, symbol } = this.state.form;
             this.state.saving = true;
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: null,
-            });
+            // mixpanelBrowserTrack({
+            //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+            //   chainBase: null,
+            //   isCustomDomain: app.isCustomDomain(),
+            //   communityType: null,
+            // });
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 address: mint,
