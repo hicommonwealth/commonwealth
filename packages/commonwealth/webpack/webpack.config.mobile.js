@@ -27,19 +27,4 @@ module.exports = merge(common, {
       CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com')
     }),
   ],
-  module: {
-    rules: [
-      {
-        test: /\.s?css/i,
-        use : ['style-loader', 'css-loader', 'sass-loader']
-      },
-      // patch import for process/browser, so yarn build-ios works
-      {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false,
-        },
-      },
-    ]
-  }
 });
