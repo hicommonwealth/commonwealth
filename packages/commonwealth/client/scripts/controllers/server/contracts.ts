@@ -435,6 +435,7 @@ class ContractsController {
         data: {
           ...contract,
           jwt: app.user.jwt,
+          chain_id: app.activeChainId(),
         },
         type: 'DELETE',
       });
