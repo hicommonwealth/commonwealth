@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { initAppState } from 'state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import { addressSwapper } from 'utils';
 import $ from 'jquery';
 import { redraw } from 'mithrilInterop';
 

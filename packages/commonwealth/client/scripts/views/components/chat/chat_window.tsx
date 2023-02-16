@@ -16,7 +16,7 @@ import moment from 'moment';
 
 import 'pages/chat.scss';
 
-import { Action } from 'commonwealth/shared/permissions';
+import { Action } from 'permissions';
 import app from 'state';
 import { AddressInfo } from 'models';
 import { User } from '../../components/user/user';

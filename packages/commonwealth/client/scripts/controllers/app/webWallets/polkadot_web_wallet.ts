@@ -10,7 +10,7 @@ import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import { addressSwapper } from 'utils';
 import type { Account, IWebWallet } from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
