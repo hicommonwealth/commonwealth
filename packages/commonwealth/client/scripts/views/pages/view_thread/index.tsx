@@ -544,7 +544,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
                     thread,
                   },
                 });
-                redraw();
               },
             },
           ]

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-
+import React, { useState } from 'react';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { Account } from 'models';
 import type { Component } from 'mithrilInterop';
@@ -30,13 +30,14 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     vnode.state.showProfileRight = false;
   },
   view: (vnode) => {
-    const {
-      account,
-      refreshCallback,
-      onOwnProfile,
-      onLinkedProfile,
-    } = vnode.attrs;
+    const { account, refreshCallback, onOwnProfile, onLinkedProfile } =
+      vnode.attrs;
     const showJoinCommunityButton = !onOwnProfile;
+    const [, updateState] = useState({});
+
+    app.modals.isChanged.on('redraw', () => {
+      updateState({});
+    });
 
     window.addEventListener(
       'scroll',
@@ -141,7 +142,6 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                     modal: EditProfileModal,
                     data: { account, refreshCallback },
                   });
-                  redraw();
                 },
                 label: 'Edit',
               }),

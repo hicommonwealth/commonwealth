@@ -4,7 +4,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import type { Component } from 'mithrilInterop';
 import { render, redraw } from 'mithrilInterop';
-import React from 'react';
+import React, { useState } from 'react';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
@@ -28,8 +28,12 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, onOwnProfile, onLinkedProfile } = vnode.attrs;
     const showJoinCommunityButton = !onOwnProfile;
-    const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [, updateState] = useState({});
 
+    app.modals.isChanged.on('redraw', () => {
+      updateState({});
+    });
     // For Banning
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||

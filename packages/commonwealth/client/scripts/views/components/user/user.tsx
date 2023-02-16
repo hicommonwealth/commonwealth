@@ -1,5 +1,5 @@
 /* eslint-disable no-script-url */
-import React from 'react';
+import React, { useState } from 'react';
 
 import { link } from 'helpers';
 
@@ -50,7 +50,11 @@ export const User = (props: UserAttrs) => {
   const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [, updateState] = React.useState({});
+  const [, updateState] = useState({});
+
+  app.modals.isChanged.on('redraw', () => {
+    updateState({});
+  });
 
   const popoverProps = usePopover();
 

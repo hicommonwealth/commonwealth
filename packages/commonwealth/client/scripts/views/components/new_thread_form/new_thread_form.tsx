@@ -351,7 +351,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         refreshCallback: () => this.redraw(),
                       },
                     });
-                    // this.redraw();
+                    this.redraw();
                   }}
                 >
                   Set a display name

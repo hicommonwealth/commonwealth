@@ -389,6 +389,7 @@ export default class QuillEditorInternal {
               : JSON.stringify(this._quill.getContents()),
           },
         });
+        // TODO: Add redraw downstream
         redraw();
       });
   }

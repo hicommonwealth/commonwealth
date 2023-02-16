@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
+import { redraw, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/alert_modal.scss';
@@ -53,6 +53,8 @@ export const alertModalWithText = (text: string, primaryButton?: string) => {
         modal: AlertModal,
         data: { text, primaryButton },
       });
+      // TODO Add a redraw downstream
+      redraw();
     });
   };
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { _DEPRECATED_getRoute } from 'mithrilInterop';
@@ -42,6 +42,11 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
   const navigate = useCommonNavigate();
   const popoverProps = usePopover();
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [, updateState] = useState({});
+
+  app.modals.isChanged.on('redraw', () => {
+    updateState({});
+  });
 
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>

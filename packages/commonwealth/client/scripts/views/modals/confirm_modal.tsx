@@ -83,6 +83,7 @@ export const confirmationModalWithText = (
         },
         exitCallback: () => resolve(confirmed),
       });
+      // TODO Add a redraw downstream
       redraw();
     });
   };
