@@ -22,6 +22,7 @@ import { showConfirmationModal } from '../../modals/confirmation_modal';
 import type Contract from 'client/scripts/models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
+import validateType from 'helpers/validateTypes';
 
 enum TemplateComponents {
   DIVIDER = 'divider',
@@ -230,6 +231,9 @@ class ViewTemplatePage extends ClassComponent {
                               }
                             );
                           }}
+                          inputValidationFn={(val) =>
+                            validateType(val, field[component].formatter)
+                          }
                         />
                       );
                     case TemplateComponents.DROPDOWN:
