@@ -4,20 +4,19 @@ import m from 'mithril';
 import $ from 'jquery';
 import ClassComponent from 'class_component';
 
-import 'pages/new_profile/index.scss';
+import 'components/profile/index.scss';
 
 import app from 'state';
 import type { Thread } from 'models';
 import { ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
-import { NewProfileHeader } from './new_profile_header';
-import type { CommentWithAssociatedThread } from './new_profile_activity';
-import { NewProfileActivity } from './new_profile_activity';
-import Sublayout from '../../sublayout';
+import { NewProfileHeader } from './profile_header';
+import type { CommentWithAssociatedThread } from './profile_activity';
+import { NewProfileActivity } from './profile_activity';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
-import { PageNotFound } from '../404';
+import { PageNotFound } from '../../pages/404';
 
 enum ProfileError {
   None,
@@ -26,13 +25,13 @@ enum ProfileError {
 }
 
 type NewProfileAttrs = {
-  placeholder?: string;
+  username?: string;
+  profileId?: string;
 };
 
 const NoProfileFoundError = 'No profile found';
 
-export default class NewProfile extends ClassComponent<NewProfileAttrs> {
-  private address: string;
+export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
   private addresses: AddressInfo[];
   private chains: ChainInfo[];
   private content: m.Vnode;
@@ -44,10 +43,10 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
   private username: string;
   private isOwner: boolean;
 
-  private getProfileData = async (username: string) => {
+  private getProfileData = async (query: string, type: string) => {
     try {
       const response = await $.get(`${app.serverUrl()}/profile/v2`, {
-        username,
+        [type]: query,
         jwt: app.user.jwt,
       });
 
@@ -80,6 +79,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
           )
       );
       this.isOwner = response.isOwner;
+      this.loading = false;
     } catch (err) {
       if (
         err.status === 500 &&
@@ -87,18 +87,26 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       ) {
         this.error = ProfileError.NoProfileFound;
       }
+      this.loading = false;
     }
     m.redraw();
   };
 
-  oninit() {
-    this.username = m.route.param('username');
+  oninit(vnode) {
+    // this.username = m.route.param('username');
     this.loading = true;
     this.error = ProfileError.None;
     this.comments = [];
     this.threads = [];
-    this.getProfileData(this.username);
-    this.loading = false;
+    if (vnode.attrs.username) {
+      this.getProfileData(vnode.attrs.username, 'username');
+      return;
+    }
+
+    if (vnode.attrs.profileId) {
+      this.getProfileData(vnode.attrs.profileId, 'profileId');
+      return;
+    }
   }
 
   view() {
@@ -136,7 +144,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
 
       this.content = (
         <div
-          className="ProfilePage"
+          className="Profile"
           style={
             this.profile.backgroundImage
               ? {
@@ -209,6 +217,6 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       );
     }
 
-    return <Sublayout>{this.content}</Sublayout>;
+    return this.content;
   }
 }

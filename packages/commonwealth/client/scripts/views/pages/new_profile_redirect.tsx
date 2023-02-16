@@ -5,23 +5,25 @@ import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import { NewProfile as Profile } from 'models';
+import { navigateToSubpage } from 'router';
 import { PageLoading } from './loading';
 import { PageNotFound } from './404';
+import ProfileComponent from '../components/profile';
+import EditProfileComponent from '../components/edit_profile';
 
-// TODO: this is a temporary solution to redirect old profile links (using address)
+// TODO: this is a temporary solution to redirect old profile links (using profileId)
 // to new profile links (using username). this should be removed once PR4 is merged
 class NewProfileRedirect extends ClassComponent {
   private profile: Profile;
   private loading: boolean;
   private error: boolean;
 
-  private getLinkedProfile = async (address: string) => {
+  private getLinkedProfile = async (profileId: string) => {
     this.loading = true;
     try {
       const response = await $.get(`${app.serverUrl()}/profile/v2`, {
-        address,
+        profileId,
         jwt: app.user.jwt,
       });
 
@@ -34,7 +36,7 @@ class NewProfileRedirect extends ClassComponent {
   };
 
   oninit() {
-    this.getLinkedProfile(m.route.param('address'));
+    this.getLinkedProfile(m.route.param('profileId'));
   }
 
   view() {
@@ -46,13 +48,21 @@ class NewProfileRedirect extends ClassComponent {
       return <PageNotFound message="We cannot find this profile." />;
     }
 
-    if (this.profile) {
+    if (this.profile.username) {
       if (m.route.get().includes('/edit')) {
         navigateToSubpage(`/profile/${this.profile.username}/edit`);
       } else {
         navigateToSubpage(`/profile/${this.profile.username}`);
       }
     }
+
+    if (m.route.get().includes('/edit')) {
+      return <EditProfileComponent profileId={m.route.param('profileId')} />;
+    }
+
+    return (
+      <ProfileComponent profileId={m.route.param('profileId')} />
+    );
   }
 }
 

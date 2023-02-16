@@ -4,6 +4,7 @@ import { Popover, Tag } from 'construct-ui';
 import { link } from 'helpers';
 import jdenticon from 'jdenticon';
 import { capitalize } from 'lodash';
+import $ from 'jquery';
 
 import m from 'mithril';
 import type { Account } from 'models';
@@ -23,6 +24,15 @@ export interface IAddressDisplayOptions {
   maxCharLength?: number;
 }
 
+const getProfileId = async (address: string) => {
+  const { result } = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
+    address: address,
+    chain: app.activeChainId(),
+    jwt: app.user.jwt,
+  });
+  return result.profileId;
+};
+
 const User: m.Component<{
   user: Account | AddressInfo | Profile;
   avatarSize?: number;
@@ -34,7 +44,14 @@ const User: m.Component<{
   onclick?: any;
   popover?: boolean;
   showRole?: boolean;
+}, {
+  profileId: number;
 }> = {
+  oninit: (vnode) => {
+    getProfileId(vnode.attrs.user.address).then((profileId) => {
+      vnode.state.profileId = profileId;
+    });
+  },
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
@@ -175,7 +192,7 @@ const User: m.Component<{
                     'a.user-display-name.username',
                     profile
                       ? // TODO: switch to profile.username once PR4 is merged
-                        `/profile/a/${profile.address}`
+                        `/profile/id/${vnode.state.profileId}`
                       : 'javascript:',
                     [
                       !profile
@@ -236,7 +253,7 @@ const User: m.Component<{
             'a.user-display-name',
             profile
               ? // TODO: switch to profile.username once PR4 is merged
-                `/profile/a/${profile.address}`
+                `/profile/id/${vnode.state.profileId}`
               : 'javascript:',
             !profile
               ? addrShort
@@ -308,7 +325,14 @@ export const UserBlock: m.Component<{
   compact?: boolean;
   linkify?: boolean;
   avatarSize?: number;
+}, {
+  profileId: string;
 }> = {
+  oninit: (vnode) => {
+    getProfileId(vnode.attrs.user.address).then((profileId) => {
+      vnode.state.profileId = profileId;
+    });
+  },
   view: (vnode) => {
     const {
       user,
@@ -409,7 +433,7 @@ export const UserBlock: m.Component<{
 
     const userLink = profile
       ? // TODO: switch to profile.username once PR4 is merged
-        `/profile/a/${profile.address}`
+        `/profile/id/${vnode.state.profileId}`
       : 'javascript:';
 
     return linkify

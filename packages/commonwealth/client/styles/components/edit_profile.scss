@@ -1,6 +1,6 @@
 @import '../shared';
 
-.EditProfilePage {
+.EditProfile {
   padding: 50px;
 
   &.full-height {
@@ -105,6 +105,14 @@
     .info-section {
       .TextInput {
         margin-bottom: 16px;
+
+        .username {
+          color: $neutral-500;
+
+          .blue-star {
+            color: $primary-500;
+          }
+        }
       }
     }
 

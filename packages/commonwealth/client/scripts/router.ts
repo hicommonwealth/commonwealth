@@ -580,7 +580,11 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/profile/a/:address': importRoute(import('views/pages/new_profile_redirect'), {
+  '/profile/id/:profileId': importRoute(import('views/pages/new_profile_redirect'), {
+    scoped: true,
+    deferChain: true,
+  }),
+  '/profile/id/:profileId/edit': importRoute(import('views/pages/new_profile_redirect'), {
     scoped: true,
     deferChain: true,
   }),

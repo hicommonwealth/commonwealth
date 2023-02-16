@@ -13,8 +13,8 @@ const getNewProfile = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { username, address } = req.query;
-  if (!username && !address)
+  const { username, profileId } = req.query;
+  if (!username && !profileId)
     return next(new Error(Errors.NoIdentifierProvided));
 
   let profile;
@@ -27,19 +27,10 @@ const getNewProfile = async (
     });
   }
 
-  if (address) {
-    const addressModel = await models.Address.findOne({
-      where: {
-        address,
-      },
-      include: [models.Profile],
-    });
-
-    if (!addressModel) return next(new Error(Errors.NoProfileFound));
-
+  if (!username && profileId) {
     profile = await models.Profile.findOne({
       where: {
-        id: addressModel.profile_id,
+        id: profileId,
       },
     });
   }

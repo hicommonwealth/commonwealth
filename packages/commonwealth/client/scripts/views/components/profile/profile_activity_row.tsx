@@ -1,20 +1,20 @@
 /* @jsx m */
 
-import type m from 'mithril';
+import m from 'mithril';
 import moment from 'moment';
 import ClassComponent from 'class_component';
 
-import 'pages/new_profile/new_profile_activity_row.scss';
+import 'components/profile/profile_activity_row.scss';
 
 import { link } from 'helpers';
 import type Thread from 'client/scripts/models/Thread';
 import type { ChainInfo } from 'client/scripts/models';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWTag } from '../../components/component_kit/cw_tag';
-import { renderQuillTextBody } from '../../components/quill/helpers';
-import type { CommentWithAssociatedThread } from './new_profile_activity';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWText } from '../component_kit/cw_text';
+import { CWTag } from '../component_kit/cw_tag';
+import { renderQuillTextBody } from '../quill/helpers';
+import type { CommentWithAssociatedThread } from './profile_activity';
+import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 
 type NewProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
