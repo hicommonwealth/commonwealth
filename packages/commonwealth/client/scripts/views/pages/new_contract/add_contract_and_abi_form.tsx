@@ -54,8 +54,8 @@ class AddContractAndAbiForm extends ClassComponent {
       <div class="AddContractAndAbiForm">
         <div class="form">
           <CWTextInput
-            inputValidationFn={() => {
-              if (isAddressValid) {
+            inputValidationFn={(value: string) => {
+              if (isAddress(value)) {
                 return [];
               }
               return ['failure', 'Invalid Input'];
@@ -82,12 +82,12 @@ class AddContractAndAbiForm extends ClassComponent {
 
         <div class="buttons">
           <CWButton
-            buttonType="mini-white"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={this.handleCancel}
           />
           <CWButton
-            buttonType="mini-black"
+            buttonType="primary-black"
             label="Add"
             disabled={isAddingDisabled}
             onclick={() => this.handleAddContract()}

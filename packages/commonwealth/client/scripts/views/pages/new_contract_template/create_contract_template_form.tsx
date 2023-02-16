@@ -78,12 +78,12 @@ class CreateContractTemplateForm extends ClassComponent {
 
         <div class="buttons">
           <CWButton
-            buttonType="mini-white"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={this.handleCancel}
           />
           <CWButton
-            buttonType="mini-black"
+            buttonType="primary-black"
             label="Create"
             disabled={isCreatingDisabled}
             onclick={() => this.createContractTemplate()}
