@@ -229,34 +229,34 @@ export const renderQuillDelta = (
               `${child.insert}`
             );
           } else {
-            result = render('span', `${child.insert}`);
+            result = render('span', {}, `${child.insert}`);
           }
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if (k !== 'color' && k !== 'background' && v !== true) return;
             switch (k) {
               case 'bold':
-                result = render('strong', result);
+                result = render('strong', {}, result);
                 return;
               case 'italic':
-                result = render('em', result);
+                result = render('em', {}, result);
                 return;
               case 'strike':
-                result = render('s', result);
+                result = render('s', {}, result);
                 return;
               case 'underline':
-                result = render('u', result);
+                result = render('u', {}, result);
                 return;
               case 'code':
-                result = render('code', result);
+                result = render('code', {}, result);
                 return;
               case 'added':
-                result = render('span.added', result);
+                result = render('span.added', {}, result);
                 return;
               case 'deleted':
-                result = render('span.deleted', result);
+                result = render('span.deleted', {}, result);
                 return;
               default:
-                result = render('span', result);
+                result = render('span', {}, result);
             }
           });
           return result;
@@ -297,6 +297,7 @@ export const renderQuillDelta = (
               : parent.attributes && parent.attributes.list === 'unchecked'
               ? `li.unchecked`
               : 'div',
+            {},
             parent.children.map(renderChild)
           );
         };
@@ -329,6 +330,7 @@ export const renderQuillDelta = (
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   render(
                     getGroupTag(_group),
+                    {},
                     temp.pop().map((data) => {
                       return render(data.tag, data.content);
                     })
@@ -345,6 +347,7 @@ export const renderQuillDelta = (
             outdentBuffer[outdentBuffer.length - 1].content.push(
               render(
                 getGroupTag(_group),
+                {},
                 temp.pop().map(({ tag, content }) => {
                   return render(tag, content);
                 })
@@ -353,8 +356,9 @@ export const renderQuillDelta = (
           }
           return render(
             getGroupTag(_group),
+            {},
             temp[0].map(({ tag, content }) => {
-              return render(tag, content);
+              return render(tag, {}, content);
             })
           );
         };
