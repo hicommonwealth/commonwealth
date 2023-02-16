@@ -32,7 +32,9 @@ class SocialAccount extends ClassComponent<NewProfileSocialAccountAttrs> {
   }
 }
 
-export class SocialAccounts extends ClassComponent<NewProfileSocialAccountsAttrs> {
+export class SocialAccounts extends ClassComponent<
+  NewProfileSocialAccountsAttrs
+> {
   view(vnode: m.Vnode<NewProfileSocialAccountsAttrs>) {
     const { profile } = vnode.attrs;
 
