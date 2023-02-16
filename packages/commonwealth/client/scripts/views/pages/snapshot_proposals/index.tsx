@@ -140,6 +140,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
                     ? 'Remove Subscription'
                     : 'Subscribe to Notifications'
                 }
+                iconLeft={spaceSubscription !== undefined ? 'mute' : 'bell'}
                 onclick={() => {
                   if (spaceSubscription !== undefined) {
                     app.user.notifications
