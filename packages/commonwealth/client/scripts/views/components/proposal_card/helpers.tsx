@@ -64,7 +64,9 @@ export const getStatusText = (proposal: AnyProposal) => {
     proposal.endTime.kind === 'fixed'
       ? [
           <Countdown
-            duration={moment.duration(proposal.endTime.time.diff(moment()))}
+            duration={moment
+              .duration(proposal.endTime.time.diff(moment()))
+              .asMilliseconds()}
           />,
           ' left',
         ]

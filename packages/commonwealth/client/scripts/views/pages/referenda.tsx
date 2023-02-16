@@ -127,7 +127,6 @@ class ReferendaPage extends ClassComponent {
                         (app.chain as Substrate).democracyProposals
                           .nextLaunchBlock
                       }
-                      includeSeconds={false}
                     />
                   ) : (
                     '--'

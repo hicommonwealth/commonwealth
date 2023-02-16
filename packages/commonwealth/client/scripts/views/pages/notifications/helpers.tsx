@@ -1,6 +1,6 @@
 import React from 'react';
-import _ from 'lodash';
 import moment from 'moment';
+import _ from 'lodash';
 
 import 'pages/notifications/notification_row.scss';
 

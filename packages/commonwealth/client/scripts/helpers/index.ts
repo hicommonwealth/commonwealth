@@ -40,9 +40,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr
+  return (arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+    .filter((s) => s) as unknown) as ThreadStage[];
 }
 
 /*
@@ -306,7 +306,9 @@ export function blocknumToTime(blocknum: number): moment.Moment {
 }
 
 export function blocknumToDuration(blocknum: number) {
-  return moment.duration(blocknumToTime(blocknum).diff(moment()));
+  return moment
+    .duration(blocknumToTime(blocknum).diff(moment()))
+    .asMilliseconds();
 }
 
 export function blockperiodToDuration(blocknum: number) {
