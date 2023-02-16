@@ -1,8 +1,10 @@
 import { redraw } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
+import { EventEmitter } from 'events';
 
 export class ModalStore {
   private _modals: any[];
+  public isChanged = new EventEmitter();
 
   constructor() {
     this._modals = [];
@@ -11,6 +13,7 @@ export class ModalStore {
   public create(modalspec) {
     modalspec.id = uuidv4();
     this._modals.push(modalspec);
+    this.isChanged.emit('redraw');
   }
 
   public remove(modalspec) {
@@ -19,6 +22,7 @@ export class ModalStore {
       throw new Error('Invalid modal');
     }
     this._modals.splice(index, 1);
+    this.isChanged.emit('redraw');
   }
 
   public getList() {

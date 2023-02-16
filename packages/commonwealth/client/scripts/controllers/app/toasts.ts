@@ -8,9 +8,11 @@ import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import app from 'state';
 
 const timeout = 3000;
+import { EventEmitter } from 'events';
 
 export class ToastStore {
   private _toasts: any[];
+  public isChanged = new EventEmitter();
 
   constructor() {
     this._toasts = [];
@@ -20,6 +22,7 @@ export class ToastStore {
     const index = this._toasts.findIndex((t) => t.key === key);
     if (index === -1) return;
     this._toasts.splice(index, 1);
+    this.isChanged.emit('redraw');
   }
 
   public createSuccess(message) {
@@ -36,6 +39,7 @@ export class ToastStore {
     // });
     // toast['_message'] = message;
     // this._toasts.push(toast);
+    this.isChanged.emit('redraw');
   }
 
   public createError(message) {
@@ -58,6 +62,7 @@ export class ToastStore {
     // });
     // toast['_message'] = message;
     // this._toasts.push(toast);
+    this.isChanged.emit('redraw');
   }
 
   public createInfo(message) {
@@ -74,6 +79,7 @@ export class ToastStore {
     // });
     // toast['_message'] = message;
     // this._toasts.push(toast);
+    this.isChanged.emit('redraw');
   }
 
   public getList() {
