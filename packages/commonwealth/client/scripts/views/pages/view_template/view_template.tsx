@@ -10,7 +10,6 @@ import Sublayout from '../../sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
-import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import isValidJson from 'helpers/validateJson';
 import {
   CWTextInput,
@@ -18,90 +17,11 @@ import {
 } from 'views/components/component_kit/cw_text_input';
 import produce from 'immer';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { showConfirmationModal } from '../../modals/confirmation_modal';
 import type Contract from 'client/scripts/models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
-import { constructProjectApi } from '../../../../../../chain-events/src/chains/commonwealth';
-
-const jsonExample = {
-  form_fields: [
-    {
-      text: {
-        field_name: 'title',
-        field_type: 'h1',
-        field_value: 'Create a New Treasury Spend Proposal',
-      },
-    },
-    {
-      input: {
-        field_name: 'name',
-        field_label: 'Enter a name for your (beer related) proposal',
-        field_ref: 'name-ref',
-        formatter: 'string',
-      },
-    },
-    {
-      input: {
-        field_name: 'description',
-        field_label: 'Enter a short description for your proposal',
-        field_ref: 'description-ref',
-      },
-    },
-    {
-      divider: {
-        field_name: 'divider',
-      },
-    },
-    {
-      dropdown: {
-        field_name: 'treasury dropdown',
-        field_label: 'Select which Treasury to spend from',
-        field_options: [
-          { label: 'Treasury1', value: '0x123' },
-          { label: "Rhys' Wallet", value: '0xRhys' },
-        ],
-        formatter: 'address',
-        field_ref: 'treasury-select-ref',
-      },
-    },
-    {
-      text: {
-        field_name: 'subtitle',
-        field_type: 'h2',
-        field_value: 'Treasury Spend',
-      },
-    },
-    {
-      input: {
-        field_name: 'address',
-        field_label: "Who's the recipient?",
-        field_ref: 'address-ref',
-        formatter: 'address',
-      },
-    },
-    {
-      input: {
-        field_name: 'amount',
-        field_label: 'How much are they getting for beer?',
-        field_ref: 'amount-ref',
-        formatter: 'token',
-      },
-    },
-  ],
-  tx_template: {
-    method: 'propose',
-    args: {
-      target: ['0x0urdaotrez'],
-      calldata: ['sendTo'],
-      values: [['$address-ref', '$amount-ref']],
-      description: '$description-ref',
-    },
-  },
-};
 
 enum TemplateComponents {
   DIVIDER = 'divider',

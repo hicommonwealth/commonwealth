@@ -34,7 +34,7 @@ export async function createTemplate(
     throw new AppError('Must provide contract_id, name, and template');
   }
 
-  const templateJson = JSON.parse(template);
+  const templateJson = JSON.parse(template.replace(/\s/g, ''));
 
   if (!isValidJson(templateJson)) {
     throw new AppError('Template must be valid JSON');
