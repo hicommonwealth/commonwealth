@@ -74,6 +74,11 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   const [initializedComments, setInitializedComments] =
     useState<boolean>(false);
   const [initializedPolls, setInitializedPolls] = useState<boolean>(false);
+  const [, updateState] = useState({});
+
+  app.modals.isChanged.on('redraw', () => {
+    updateState({});
+  });
 
   // editorListener(e) {
   //   if (this.isGloballyEditing || activeQuillEditorHasText()) {
@@ -518,7 +523,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
                     thread,
                   },
                 });
-                redraw();
               },
             },
           ]
