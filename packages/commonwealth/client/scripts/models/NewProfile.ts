@@ -1,4 +1,4 @@
-import { Image } from '../views/pages/edit_new_profile';
+import type { Image } from '../views/pages/edit_new_profile';
 
 class NewProfile {
   private _name: string;

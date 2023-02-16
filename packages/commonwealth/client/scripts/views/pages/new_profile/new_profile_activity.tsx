@@ -5,11 +5,11 @@ import ClassComponent from 'class_component';
 
 import 'pages/new_profile/new_profile_activity.scss';
 
-import Thread from 'client/scripts/models/Thread';
-import ChainInfo from 'client/scripts/models/ChainInfo';
-import Comment from 'client/scripts/models/Comment';
-import AddressInfo from 'client/scripts/models/AddressInfo';
-import { IUniqueId } from 'client/scripts/models/interfaces';
+import type Thread from 'client/scripts/models/Thread';
+import type ChainInfo from 'client/scripts/models/ChainInfo';
+import type Comment from 'client/scripts/models/Comment';
+import type AddressInfo from 'client/scripts/models/AddressInfo';
+import type { IUniqueId } from 'client/scripts/models/interfaces';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { NewProfileActivityContent } from './new_profile_activity_content';
 

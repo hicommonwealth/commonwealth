@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import ClassComponent from 'class_component';
 import jdenticon from 'jdenticon';
 
 import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { NewProfile as Profile } from 'client/scripts/models';
+import { navigateToSubpage } from 'router';
+import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';

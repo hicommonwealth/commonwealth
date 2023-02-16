@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/social_accounts.scss';
 
-import { NewProfile as Profile } from 'client/scripts/models';
+import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import { IconName } from './component_kit/cw_icons/cw_icon_lookup';
+import type { IconName } from './component_kit/cw_icons/cw_icon_lookup';
 
 type SocialAccountsAttrs = {
   profile: Profile;

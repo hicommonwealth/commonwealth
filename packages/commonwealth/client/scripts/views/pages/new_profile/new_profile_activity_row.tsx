@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import moment from 'moment';
 import ClassComponent from 'class_component';
 
 import 'pages/new_profile/new_profile_activity_row.scss';
 
 import { link } from 'helpers';
-import Thread from 'client/scripts/models/Thread';
-import { ChainInfo } from 'client/scripts/models';
+import type Thread from 'client/scripts/models/Thread';
+import type { ChainInfo } from 'client/scripts/models';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import { CommentWithAssociatedThread } from './new_profile_activity';
+import type { CommentWithAssociatedThread } from './new_profile_activity';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
