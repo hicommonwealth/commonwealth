@@ -67,7 +67,7 @@ module.exports = {
           decimals: { type: Sequelize.INTEGER, allowNull: true },
           token_name: { type: Sequelize.STRING, allowNull: true },
           symbol: { type: Sequelize.STRING, allowNull: true },
-          type: { type: Sequelize.STRING, allowNull: false }, // for governance erc20, etc.
+          type: { type: Sequelize.STRING, allowNull: true }, // for governance erc20, etc.
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
