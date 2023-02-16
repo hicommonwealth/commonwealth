@@ -7,13 +7,14 @@ import ClassComponent from 'class_component';
 import 'pages/new_profile/index.scss';
 
 import app from 'state';
-import { Thread, ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
+import type { Thread} from 'models';
+import { ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import { NewProfileHeader } from './new_profile_header';
+import type {
+  CommentWithAssociatedThread} from './new_profile_activity';
 import {
-  CommentWithAssociatedThread,
   NewProfileActivity,
 } from './new_profile_activity';
 import Sublayout from '../../sublayout';
@@ -53,7 +54,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       });
 
       this.profile = new Profile(response.profile);
-      this.threads = response.threads.map((t) => modelThreadFromServer(t));
+      this.threads = response.threads.map((t) => app.threads.modelFromServer(t));
       const comments = response.comments.map((c) => modelCommentFromServer(c));
       const commentsWithAssociatedThread = comments.map((c) => {
         const thread = response.commentThreads.find(

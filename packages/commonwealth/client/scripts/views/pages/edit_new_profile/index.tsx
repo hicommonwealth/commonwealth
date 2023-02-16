@@ -10,7 +10,7 @@ import 'pages/edit_new_profile.scss';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
 import {
   NewProfile as Profile,
   Account,
@@ -25,9 +25,10 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWForm } from '../../components/component_kit/cw_form';
 import { CWFormSection } from '../../components/component_kit/cw_form_section';
 import { CWSocials } from '../../components/component_kit/cw_socials';
-import CWCoverImageUploader, {
+import type {
   ImageBehavior,
 } from '../../components/component_kit/cw_cover_image_uploader';
+import CWCoverImageUploader from '../../components/component_kit/cw_cover_image_uploader';
 
 enum EditProfileError {
   None,

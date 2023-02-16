@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import ClassComponent from 'class_component';
 
-import Thread from 'client/scripts/models/Thread';
-import { ChainInfo } from 'client/scripts/models';
+import type Thread from 'client/scripts/models/Thread';
+import type { ChainInfo } from 'client/scripts/models';
 import { NewProfileActivityRow } from './new_profile_activity_row';
-import { CommentWithAssociatedThread } from './new_profile_activity';
+import type { CommentWithAssociatedThread } from './new_profile_activity';
 
 enum ProfileActivity {
   Addresses,

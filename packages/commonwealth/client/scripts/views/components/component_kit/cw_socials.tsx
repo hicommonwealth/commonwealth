@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_socials.scss';
@@ -9,7 +9,7 @@ import { ComponentType } from './types';
 import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
 import { CWIconButton } from './cw_icon_button';
-import { IconName } from './cw_icons/cw_icon_lookup';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
 
 type SocialsAttrs = {

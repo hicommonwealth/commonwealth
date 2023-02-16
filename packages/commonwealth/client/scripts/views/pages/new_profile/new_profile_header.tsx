@@ -7,7 +7,7 @@ import jdenticon from 'jdenticon';
 import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
-import { NewProfile as Profile } from 'client/scripts/models';
+import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
