@@ -84,9 +84,6 @@ class ViewTemplatePage extends ClassComponent {
           this.templateError = !isValidJson(this.json);
         } catch (err) {
           console.log('err', err);
-
-          // TODO: Handle errors here- probably have to send some kind of error message to the view
-          return;
         }
 
         for (const field of this.json.form_fields) {
