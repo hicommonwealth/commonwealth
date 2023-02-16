@@ -75,7 +75,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
       display_name: displayName,
       display_options: displayOption,
       community_id: communityId,
-      template_id: templateId,
+      template_id: parseInt(templateId),
       contract_id: contractId,
     };
 

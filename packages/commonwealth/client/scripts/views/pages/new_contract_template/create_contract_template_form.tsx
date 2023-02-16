@@ -11,6 +11,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWText } from 'views/components/component_kit/cw_text';
 import app from 'state';
+import isValidJson from 'helpers/validateJson';
 
 class CreateContractTemplateForm extends ClassComponent {
   private saving = false;
@@ -71,6 +72,18 @@ class CreateContractTemplateForm extends ClassComponent {
             oninput={(e) => {
               this.form.template = e.target.value;
             }}
+            inputValidationFn={(value: string) => {
+              try {
+                const jsonValid = isValidJson(
+                  JSON.parse(value.replace(/\s/g, ''))
+                );
+                if (jsonValid) {
+                  return [];
+                }
+              } catch (e) {
+                return ['failure', 'Invalid Input JSON'];
+              }
+            }}
           />
         </div>
 
@@ -78,12 +91,12 @@ class CreateContractTemplateForm extends ClassComponent {
 
         <div class="buttons">
           <CWButton
-            buttonType="mini-white"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={this.handleCancel}
           />
           <CWButton
-            buttonType="mini-black"
+            buttonType="primary-black"
             label="Create"
             disabled={isCreatingDisabled}
             onclick={() => this.createContractTemplate()}

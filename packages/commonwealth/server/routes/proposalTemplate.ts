@@ -62,13 +62,26 @@ export async function createCommunityContractTemplateAndMetadata(
     );
   }
 
-  // TODO something is off here
   const communityContract = await models.CommunityContract.findOne({
     where: { contract_id: contract_id, chain_id },
   });
 
   if (!communityContract) {
-    throw new AppError('Failed to create community contract');
+    throw new AppError('Community Contract does not exist');
+  }
+
+  // Iterate through all ccts and check if their cctmds have the same slug
+  const ccts = await models.CommunityContractTemplate.findAll({
+    where: { community_contract_id: communityContract.id },
+  });
+
+  for (const cct of ccts) {
+    const cctmd = await models.CommunityContractTemplateMetadata.findOne({
+      where: { id: cct.cctmd_id },
+    });
+    if (cctmd.slug === slug) {
+      throw new AppError('Slug already exists');
+    }
   }
 
   try {
