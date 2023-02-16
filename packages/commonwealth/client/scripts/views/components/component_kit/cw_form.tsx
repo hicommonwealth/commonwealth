@@ -3,7 +3,7 @@
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_form.scss';
-import type m from 'mithril';
+import m from 'mithril';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';
 

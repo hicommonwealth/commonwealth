@@ -3,7 +3,7 @@
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_tabs.scss';
-import type m from 'mithril';
+import m from 'mithril';
 import { CWText } from './cw_text';
 
 import { getClasses } from './helpers';
