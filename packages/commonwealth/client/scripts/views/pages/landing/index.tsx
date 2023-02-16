@@ -19,6 +19,7 @@ import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import useForceRerender from 'hooks/useForceRerender';
 
 export type Chain = {
   chainInfo: ChainInfo;
@@ -64,6 +65,7 @@ const betaChainsAndCommunities = sortedChains.filter(
 const chains = [...sortedChainsAndCommunities, ...betaChainsAndCommunities];
 
 const LandingPage = () => {
+  const forceRerender = useForceRerender();
   //   if (!app.isLoggedIn()) {
   //     mixpanelBrowserTrack({
   //       event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
@@ -77,6 +79,7 @@ const LandingPage = () => {
       <div className="LandingPage bg-primary">
         <div className="absolute w-screen z-20">
           <HeaderLandingPage
+            onLogin={forceRerender}
             scrollHeader
             navs={[
               { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
