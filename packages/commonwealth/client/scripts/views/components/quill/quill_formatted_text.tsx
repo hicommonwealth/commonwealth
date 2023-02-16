@@ -12,7 +12,6 @@ import { renderQuillDelta } from './render_quill_delta';
 import { useCommonNavigate } from 'navigation/helpers';
 
 export type QuillTextParams = {
-  collapse?: boolean;
   hideFormatting?: boolean;
   cutoffLines?: number;
   openLinksInNewTab?: boolean;
@@ -23,7 +22,7 @@ type QuillFormattedTextAttrs = {
   doc;
 } & QuillTextParams;
 
-export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, collapse, hideFormatting, cutoffLines, openLinksInNewTab, searchTerm }) => {
+export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hideFormatting, cutoffLines, openLinksInNewTab, searchTerm }) => {
   const navigate = useCommonNavigate();
   const [cachedDocWithHighlights, setCachedDocWithHighlights] = useState();
   const [cachedResultWithHighlights, setCachedResultWithHighlights] = useState();;
@@ -104,7 +103,7 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, col
     return (
       <div
       className={getClasses<{ collapsed?: boolean }>(
-        { collapsed: collapse },
+        { collapsed: isTruncated },
         'QuillFormattedText'
       )}
         >
@@ -115,7 +114,7 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, col
     return (
       <div
       className={getClasses<{ collapsed?: boolean }>(
-        { collapsed: collapse },
+        { collapsed: isTruncated },
         'QuillFormattedText'
       )}
       // oncreate={() => {
@@ -129,7 +128,7 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, col
           renderQuillDelta(
             truncatedDoc,
             hideFormatting,
-            collapse,
+            isTruncated,
             openLinksInNewTab,
             navigate
           )}
