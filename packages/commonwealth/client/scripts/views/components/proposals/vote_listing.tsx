@@ -18,6 +18,39 @@ import app from 'state';
 import { User } from '../../components/user/user';
 import { CWText } from '../component_kit/cw_text';
 
+const getBalance = (vote: IVote<any>) => {
+  let balancesCache = {};
+  let balancesCacheInitialized = {};
+  let balance;
+
+  if (balancesCache[vote.account.address]) {
+    balance = balancesCache[vote.account.address];
+  } else if (balancesCacheInitialized[vote.account.address]) {
+    // do nothing, fetch already in progress
+    balance = '--';
+  } else {
+    // fetch balance and store in cache
+    balancesCacheInitialized = { [vote.account.address]: true };
+    if (vote instanceof AaveProposalVote) {
+      balance = vote.power;
+      balancesCache = { [vote.account.address]: vote.format() };
+    } else if (vote instanceof CompoundProposalVote) {
+      balance = formatCoin(app.chain.chain.coins(vote.power), true);
+      balancesCache = { [vote.account.address]: balance };
+    } else {
+      vote.account.balance.then((b) => {
+        balance = b;
+        balancesCache = {
+          [vote.account.address]: formatCoin(b, true),
+        };
+      });
+      balance = '--';
+    }
+  }
+
+  return balance;
+};
+
 type VoteListingProps = {
   proposal: AnyProposal;
   votes: Array<IVote<any>>;
@@ -25,10 +58,6 @@ type VoteListingProps = {
 
 export const VoteListing = (props: VoteListingProps) => {
   const { proposal, votes } = props;
-
-  const [balancesCache, setBalancesCache] = React.useState<any>({});
-  const [balancesCacheInitialized, setBalancesCacheInitialized] =
-    React.useState<any>({});
 
   const balanceWeighted =
     proposal.votingUnit === VotingUnit.CoinVote ||
@@ -54,30 +83,7 @@ export const VoteListing = (props: VoteListingProps) => {
 
           if (balanceWeighted && !(vote instanceof CosmosVote)) {
             // fetch and display balances
-            if (balancesCache[vote.account.address]) {
-              balance = balancesCache[vote.account.address];
-            } else if (balancesCacheInitialized[vote.account.address]) {
-              // do nothing, fetch already in progress
-              balance = '--';
-            } else {
-              // fetch balance and store in cache
-              setBalancesCacheInitialized({ [vote.account.address]: true });
-              if (vote instanceof AaveProposalVote) {
-                balance = vote.power;
-                setBalancesCache({ [vote.account.address]: vote.format() });
-              } else if (vote instanceof CompoundProposalVote) {
-                balance = formatCoin(app.chain.chain.coins(vote.power), true);
-                setBalancesCache({ [vote.account.address]: balance });
-              } else {
-                vote.account.balance.then((b) => {
-                  balance = b;
-                  setBalancesCache({
-                    [vote.account.address]: formatCoin(b, true),
-                  });
-                });
-                balance = '--';
-              }
-            }
+            balance = getBalance(vote);
           }
 
           switch (true) {
@@ -85,7 +91,7 @@ export const VoteListing = (props: VoteListingProps) => {
               return (
                 <div className="vote" key={i}>
                   <User user={vote.account} linkify popover />
-                  {/* {balanceWeighted && balance && <CWText>{balance}</CWText>} */}
+                  {balanceWeighted && balance && <CWText>{balance}</CWText>}
                 </div>
               );
 
