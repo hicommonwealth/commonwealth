@@ -7,14 +7,16 @@ import 'pages/abi_factory_form.scss';
 
 import app from 'state';
 import { ChainNetwork } from 'common-common/src/types';
-import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
+import type { AbiInput, AbiItem, AbiOutput} from 'web3-utils';
+import { isAddress } from 'web3-utils';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
+import type {
+  ValidationStatus} from 'views/components/component_kit/cw_validation_text';
 import {
-  CWValidationText,
-  ValidationStatus,
+  CWValidationText
 } from 'views/components/component_kit/cw_validation_text';
 
 import {
@@ -23,9 +25,9 @@ import {
   ethChainRows,
 } from 'views/pages/create_community/chain_input_rows';
 
-import { EthChainAttrs } from 'views/pages/create_community/types';
+import type { EthChainAttrs } from 'views/pages/create_community/types';
 
-import { Contract } from 'models';
+import type { Contract } from 'models';
 import {
   handleMappingAbiInputs,
   validateAbiInput,
