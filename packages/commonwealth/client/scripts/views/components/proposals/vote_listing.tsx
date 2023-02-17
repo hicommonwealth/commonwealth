@@ -9,7 +9,6 @@ import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
-import { MolochProposalVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import type { AnyProposal, IVote } from 'models';
 import { BinaryVote, DepositVote, VotingUnit } from 'models';
@@ -86,20 +85,6 @@ export const VoteListing = (props: VoteListingProps) => {
                 <div className="vote">
                   <User user={vote.account} linkify popover />
                   {/* {balanceWeighted && balance && <CWText>{balance}</CWText>} */}
-                </div>
-              );
-
-            case vote instanceof MolochProposalVote:
-              return (
-                <div className="vote">
-                  <User user={vote.account} linkify />
-                  {balance && typeof balance === 'string' && (
-                    <div className="vote-right-container">
-                      <CWText noWrap title={balance}>
-                        {balance}
-                      </CWText>
-                    </div>
-                  )}
                 </div>
               );
 
