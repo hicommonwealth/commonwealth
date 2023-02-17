@@ -158,7 +158,11 @@ class ViewTemplatePage extends ClassComponent {
     });
     // output an array that will be used in callContactFun
     return outputArr.map((outputVal) => {
-      return JSON.stringify(outputVal);
+      if (Array.isArray(outputVal)) {
+        return JSON.stringify(outputVal);
+      } else {
+        return outputVal;
+      }
     });
   }
 
