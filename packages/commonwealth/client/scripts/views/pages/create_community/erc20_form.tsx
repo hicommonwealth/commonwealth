@@ -53,7 +53,9 @@ export const ERC20Form = (props: EthChainFormState) => {
   const disableField = !validAddress || !chainFormState.loaded;
 
   const updateTokenForum = async () => {
-    if (!ethChainFormFields.address || !ethChainFormFields.ethChainId) return;
+    if (!ethChainFormFields.address || !ethChainFormFields.ethChainId) {
+      return;
+    }
 
     chainFormState.setStatus(undefined);
     chainFormState.setMessage('');
