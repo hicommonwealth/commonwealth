@@ -6,9 +6,9 @@ import ClassComponent from 'class_component';
 
 import 'components/profile/profile_activity_row.scss';
 
+import app from 'state';
 import { link } from 'helpers';
 import type Thread from 'client/scripts/models/Thread';
-import type { ChainInfo } from 'client/scripts/models';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/cw_tag';
 import { renderQuillTextBody } from '../quill/helpers';
@@ -19,22 +19,21 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 type NewProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
   address: string;
-  chains: ChainInfo[];
 };
 
 export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
-    const { activity, chains } = vnode.attrs;
+    const { activity } = vnode.attrs;
     const { chain, createdAt, author, title, id, body } = activity;
     const isThread = !!(activity as Thread).kind;
     const comment = activity as CommentWithAssociatedThread;
-    const chainInfo = chains.find((c) => c.id === chain);
     const domain = document.location.origin;
+    const iconUrl = app.config.chains.getById(chain)?.iconUrl;
 
     return (
       <div className="ProfileActivityRow">
         <div className="chain-info">
-          <img src={chainInfo.iconUrl} />
+          <img src={iconUrl} />
           <CWText fontWeight="semiBold" className="link">
             {link('a', `/${chain}/discussions`, [`${chain}`])}
           </CWText>

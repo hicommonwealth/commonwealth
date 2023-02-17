@@ -73,7 +73,8 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
         jwt: app.user.jwt,
       });
 
-      this.profile = new Profile(response.profile);
+      const { result } = response;
+      this.profile = new Profile(result.profile);
       this.name = this.profile.name;
       this.email = this.profile.email;
       this.socials = this.profile.socials;
@@ -81,7 +82,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       this.coverImage = this.profile.coverImage;
       this.backgroundImage = this.profile.backgroundImage;
       this.username = this.profile.username;
-      this.addresses = response.addresses.map(
+      this.addresses = result.addresses.map(
         (a) =>
           new AddressInfo(
             a.id,
@@ -92,7 +93,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
             a.ghost_address
           )
       );
-      this.isOwner = response.isOwner;
+      this.isOwner = result.isOwner;
     } catch (err) {
       if (
         err.status === 500 &&
@@ -116,7 +117,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
         }
       );
 
-      if (response?.status === 'Success') {
+      if (response?.result?.status === 'Success') {
         setTimeout(() => {
           this.loading = false;
           navigateToSubpage(`/profile/${this.username}`);

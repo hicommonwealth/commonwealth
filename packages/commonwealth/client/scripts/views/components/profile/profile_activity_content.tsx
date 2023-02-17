@@ -4,7 +4,6 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import type Thread from 'client/scripts/models/Thread';
-import type { ChainInfo } from 'client/scripts/models';
 import { NewProfileActivityRow } from './profile_activity_row';
 import type { CommentWithAssociatedThread } from './profile_activity';
 
@@ -20,22 +19,17 @@ type NewProfileActivityContentAttrs = {
   option: ProfileActivity;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
-  chains: ChainInfo[];
 };
 
 export class NewProfileActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
   view(vnode: m.Vnode<NewProfileActivityContentAttrs>) {
-    const { option, address, comments, threads, chains } = vnode.attrs;
+    const { option, address, comments, threads } = vnode.attrs;
 
     if (option === ProfileActivity.Threads) {
       return threads
         .sort((a, b) => +b.createdAt - +a.createdAt)
         .map((thread) => (
-          <NewProfileActivityRow
-            activity={thread}
-            address={address}
-            chains={chains}
-          />
+          <NewProfileActivityRow activity={thread} address={address} />
         ));
     }
 
@@ -45,13 +39,7 @@ export class NewProfileActivityContent extends ClassComponent<NewProfileActivity
     ].sort((a, b) => +b.createdAt - +a.createdAt);
 
     return allActivities.map((activity) => {
-      return (
-        <NewProfileActivityRow
-          activity={activity}
-          address={address}
-          chains={chains}
-        />
-      );
+      return <NewProfileActivityRow activity={activity} address={address} />;
     });
   }
 }

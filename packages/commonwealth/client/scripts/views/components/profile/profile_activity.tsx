@@ -6,7 +6,6 @@ import ClassComponent from 'class_component';
 import 'components/profile/profile_activity.scss';
 
 import type Thread from 'client/scripts/models/Thread';
-import type ChainInfo from 'client/scripts/models/ChainInfo';
 import type Comment from 'client/scripts/models/Comment';
 import type AddressInfo from 'client/scripts/models/AddressInfo';
 import type { IUniqueId } from 'client/scripts/models/interfaces';
@@ -27,7 +26,6 @@ export type CommentWithAssociatedThread = Comment<IUniqueId> & {
 type NewProfileActivityAttrs = {
   addresses: AddressInfo[];
   comments: CommentWithAssociatedThread[];
-  chains: ChainInfo[];
   threads: Thread[];
 };
 
@@ -88,7 +86,6 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
             address={this.address}
             threads={vnode.attrs.threads}
             comments={vnode.attrs.comments}
-            chains={vnode.attrs.chains}
           />
         </div>
       </div>

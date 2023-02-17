@@ -8,7 +8,7 @@ import 'components/profile/index.scss';
 
 import app from 'state';
 import type { Thread } from 'models';
-import { ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
+import { AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import { NewProfileHeader } from './profile_header';
@@ -33,7 +33,6 @@ const NoProfileFoundError = 'No profile found';
 
 export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
   private addresses: AddressInfo[];
-  private chains: ChainInfo[];
   private content: m.Vnode;
   private comments: CommentWithAssociatedThread[];
   private error: ProfileError;
@@ -50,24 +49,20 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
         jwt: app.user.jwt,
       });
 
-      this.profile = new Profile(response.profile);
-      this.threads = response.threads.map((t) =>
-        app.threads.modelFromServer(t)
-      );
-      const comments = response.comments.map((c) => modelCommentFromServer(c));
+      const { result } = response;
+
+      this.profile = new Profile(result.profile);
+      this.threads = result.threads.map((t) => app.threads.modelFromServer(t));
+      const comments = result.comments.map((c) => modelCommentFromServer(c));
       const commentsWithAssociatedThread = comments.map((c) => {
-        const thread = response.commentThreads.find(
+        const thread = result.commentThreads.find(
           (t) =>
             t.id === parseInt(c.rootProposal.replace('discussion_', ''), 10)
         );
         return { ...c, thread };
       });
       this.comments = commentsWithAssociatedThread;
-      this.chains = response.chains.map((c) => ({
-        ...new ChainInfo(c),
-        iconUrl: c.icon_url,
-      }));
-      this.addresses = response.addresses.map(
+      this.addresses = result.addresses.map(
         (a) =>
           new AddressInfo(
             a.id,
@@ -112,7 +107,7 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
   view() {
     if (this.loading)
       this.content = (
-        <div class="ProfilePage">
+        <div class="NewProfilePage">
           <div class="loading-spinner">
             <CWSpinner />
           </div>
@@ -195,7 +190,6 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
             <NewProfileActivity
               threads={this.threads}
               comments={this.comments}
-              chains={this.chains}
               addresses={this.addresses}
             />
           </div>
@@ -203,13 +197,12 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
       );
     } else {
       this.content = (
-        <div className="ProfilePage">
+        <div className="NewProfilePage">
           <div className="ProfilePageContainer">
             <NewProfileHeader profile={this.profile} isOwner={this.isOwner} />
             <NewProfileActivity
               threads={this.threads}
               comments={this.comments}
-              chains={this.chains}
               addresses={this.addresses}
             />
           </div>

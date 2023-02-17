@@ -1,16 +1,35 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
+import type { TypedRequestQuery, TypedResponse } from '../types';
 import type { DB } from '../models';
+import type { AddressAttributes } from '../models/address';
+import type { CommentAttributes } from '../models/comment';
+import type { ThreadAttributes } from '../models/thread';
+import type { ProfileInstance } from '..//models/profile';
+import { success } from '../types';
 
 export const Errors = {
-  NoIdentifierProvided: 'No username or address provided in query',
+  NoIdentifierProvided: 'No username or profile id provided in query',
   NoProfileFound: 'No profile found',
+};
+
+type GetNewProfileReq = {
+  username: string;
+  profileId: string;
+};
+type GetNewProfileResp = {
+  profile: ProfileInstance;
+  addresses: AddressAttributes[];
+  threads: ThreadAttributes[];
+  comments: CommentAttributes[];
+  commentThreads: ThreadAttributes[];
+  isOwner: boolean;
 };
 
 const getNewProfile = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestQuery<GetNewProfileReq>,
+  res: TypedResponse<GetNewProfileResp>,
   next: NextFunction
 ) => {
   const { username, profileId } = req.query;
@@ -38,15 +57,6 @@ const getNewProfile = async (
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
   const addresses = await profile.getAddresses();
-
-  const chainIds = [...new Set<string>(addresses.map((a) => a.chain))];
-  const chains = await models.Chain.findAll({
-    where: {
-      id: {
-        [Op.in]: chainIds,
-      },
-    },
-  });
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
   const threads = await models.Thread.findAll({
@@ -80,13 +90,12 @@ const getNewProfile = async (
     },
   });
 
-  return res.status(200).json({
+  return success(res, {
     profile,
     addresses: addresses.map((a) => a.toJSON()),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
-    chains: chains.map((c) => c.toJSON()),
     isOwner: req.user.id === profile.user_id,
   });
 };
