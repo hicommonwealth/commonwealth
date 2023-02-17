@@ -45,14 +45,6 @@ export default class SolanaAccounts
     return acct;
   }
 
-  public fromAddressIfExists(address: string): SolanaAccount | null {
-    try {
-      return this._store.getByAddress(address);
-    } catch (e) {
-      return null;
-    }
-  }
-
   public deinit() {
     this._initialized = false;
     this.store.clear();
