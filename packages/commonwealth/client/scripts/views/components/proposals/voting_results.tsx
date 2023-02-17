@@ -1,5 +1,7 @@
 /* @jsx m */
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import m from 'mithril';
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
 import ClassComponent from 'class_component';
@@ -8,7 +10,6 @@ import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal'
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
 import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import type m from 'mithril';
 import type { AnyProposal } from 'models';
 import { VotingType } from 'models';
 
