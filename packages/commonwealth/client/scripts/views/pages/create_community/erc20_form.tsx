@@ -154,7 +154,6 @@ export const ERC20Form = (props: EthChainFormState) => {
         err.responseJSON?.error || 'Failed to load Token Information'
       );
     }
-
     chainFormState.setLoading(false);
   };
 
