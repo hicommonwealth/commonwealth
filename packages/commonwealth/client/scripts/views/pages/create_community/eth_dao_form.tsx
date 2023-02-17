@@ -36,7 +36,7 @@ import {
 import type {
   ChainFormFields,
   ChainFormState,
-  EthChainAttrs,
+  EthChainFormState,
   EthFormFields,
 } from 'views/pages/create_community/types';
 import { isAddress } from 'web3-utils';
@@ -52,7 +52,7 @@ type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
 
 type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
 
-class EthDaoFormComponent extends ClassComponent<EthChainAttrs> {
+class EthDaoFormComponent extends ClassComponent<EthChainFormState> {
   public state: CreateEthDaoState = {
     message: '',
     loaded: false,
@@ -73,11 +73,11 @@ class EthDaoFormComponent extends ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode: ResultNode<EthChainAttrs>) {
+  oninit(vnode: ResultNode<EthChainFormState>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode: ResultNode<EthChainAttrs>) {
+  view(vnode: ResultNode<EthChainFormState>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 

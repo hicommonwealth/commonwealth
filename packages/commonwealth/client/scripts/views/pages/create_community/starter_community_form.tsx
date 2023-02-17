@@ -27,7 +27,7 @@ import {
 } from './hooks';
 
 export const StarterCommunityForm = () => {
-  const [base, setBase] = useState(ChainBase.Ethereum);
+  const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
 
   const { id, setId, name, setName, symbol, setSymbol } =
     useChainFormIdFields();
@@ -105,18 +105,22 @@ export const StarterCommunityForm = () => {
                 'https://lcd-osmosis.blockapsis.com';
               break;
             }
+
             case ChainBase.NEAR: {
               additionalArgs.node_url = 'https://rpc.mainnet.near.org';
               break;
             }
+
             case ChainBase.Solana: {
               additionalArgs.node_url = 'https://api.mainnet-beta.solana.com';
               break;
             }
+
             case ChainBase.Substrate: {
               additionalArgs.node_url = 'wss://mainnet.edgewa.re';
               break;
             }
+
             case ChainBase.Ethereum:
             default: {
               additionalArgs.eth_chain_id = 1;
@@ -147,6 +151,7 @@ export const StarterCommunityForm = () => {
               website: chainFormDefaultFields.website,
               ...additionalArgs,
             });
+
             if (res.result.admin_address) {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
@@ -154,10 +159,13 @@ export const StarterCommunityForm = () => {
                 res.result.role.chain_id
               );
             }
+
             await initAppState(false);
+
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {
             console.log(err);
+
             notifyError(
               err.responseJSON?.error || 'Creating new starter community failed'
             );

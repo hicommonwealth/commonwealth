@@ -15,7 +15,7 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 import type {
   ChainFormDefaultFields,
   ChainFormState,
-  EthChainAttrs,
+  EthChainFormState,
   EthFormFields,
   UseChainFormDefaultFieldsHookType,
 } from './types';
@@ -120,7 +120,10 @@ export const defaultChainRows = <T extends UseChainFormDefaultFieldsHookType>(
 
 type EthChainState = EthFormFields & ChainFormState;
 
-export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
+export const ethChainRows = (
+  attrs: EthChainFormState,
+  state: EthChainState
+) => {
   const options = [
     ...Object.keys(attrs.ethChains).map(
       (c) =>

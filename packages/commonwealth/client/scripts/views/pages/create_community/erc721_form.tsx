@@ -30,7 +30,7 @@ import {
 import type {
   ChainFormFields,
   ChainFormState,
-  EthChainAttrs,
+  EthChainFormState,
   EthFormFields,
 } from './types';
 import withRouter from 'navigation/helpers';
@@ -39,7 +39,7 @@ type CreateERC721Form = ChainFormFields & EthFormFields;
 
 type CreateERC721State = ChainFormState & { form: CreateERC721Form };
 
-class ERC721FormComponent extends ClassComponent<EthChainAttrs> {
+class ERC721FormComponent extends ClassComponent<EthChainFormState> {
   public state: CreateERC721State = {
     message: '',
     loaded: false,
@@ -59,11 +59,11 @@ class ERC721FormComponent extends ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode: ResultNode<EthChainAttrs>) {
+  oninit(vnode: ResultNode<EthChainFormState>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode: ResultNode<EthChainAttrs>) {
+  view(vnode: ResultNode<EthChainFormState>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 

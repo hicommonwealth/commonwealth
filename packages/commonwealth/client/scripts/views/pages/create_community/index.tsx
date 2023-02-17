@@ -6,8 +6,6 @@ import $ from 'jquery';
 
 import 'pages/create_community.scss';
 
-import type { EthChainNamesType, EthChainsType } from './types';
-
 import app from 'state';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -20,6 +18,7 @@ import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
+import { useEthChainFormState } from './hooks';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -44,8 +43,8 @@ const CreateCommunity = () => {
   const [currentForm, setCurrentForm] = useState<CommunityType>(
     CommunityType.StarterCommunity
   );
-  const [ethChains, setEthChains] = useState<EthChainsType>({});
-  const [ethChainNames, setEthChainNames] = useState<EthChainNamesType>({});
+  const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
+    useEthChainFormState();
 
   useEffect(() => {
     const fetchEthChains = async () => {

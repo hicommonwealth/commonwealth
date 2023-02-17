@@ -2,9 +2,13 @@ import { useState } from 'react';
 
 import type { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import type {
+  EthChainNamesType,
+  EthChainsType,
   UseChainFormDefaultFieldsHookType,
   UseChainFormIdFieldsHookType,
   UseChainFormStateHookType,
+  UseEthChainFormFieldsHookType,
+  UseEthChainFormStateHookType,
 } from './types';
 
 export const useChainFormIdFields = (): UseChainFormIdFieldsHookType => {
@@ -71,5 +75,38 @@ export const useChainFormState = (): UseChainFormStateHookType => {
     setMessage,
     status,
     setStatus,
+  };
+};
+
+export const useEthChainFormState = (): UseEthChainFormStateHookType => {
+  const [ethChains, setEthChains] = useState<EthChainsType>({});
+  const [ethChainNames, setEthChainNames] = useState<EthChainNamesType>({});
+
+  return {
+    ethChains,
+    setEthChains,
+    ethChainNames,
+    setEthChainNames,
+  };
+};
+
+export const useEthChainFormFields = (): UseEthChainFormFieldsHookType => {
+  const [address, setAddress] = useState('');
+  const [altWalletUrl, setAltWalletUrl] = useState('');
+  const [chainString, setChainString] = useState('');
+  const [ethChainId, setEthChainId] = useState('');
+  const [nodeUrl, setNodeUrl] = useState('');
+
+  return {
+    address,
+    altWalletUrl,
+    chainString,
+    ethChainId,
+    nodeUrl,
+    setAddress,
+    setAltWalletUrl,
+    setChainString,
+    setEthChainId,
+    setNodeUrl,
   };
 };

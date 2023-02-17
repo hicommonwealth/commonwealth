@@ -1,4 +1,3 @@
-import type { ChainNetwork } from 'common-common/src/types';
 import type {
   ValidationStatus,
   ValidationTextProps,
@@ -7,7 +6,7 @@ import type {
 export type ChainFormIdFields = {
   id: string;
   name: string;
-  symbol?: string;
+  symbol: string;
 };
 
 export type ChainFormIdFieldSetters = {
@@ -47,9 +46,9 @@ export type UseChainFormDefaultFieldsHookType = ChainFormDefaultFields &
 export type ChainFormFields = ChainFormIdFields & ChainFormDefaultFields;
 
 export type ChainFormState = {
-  loaded?: boolean;
-  loading?: boolean;
-  saving?: boolean;
+  loaded: boolean;
+  loading: boolean;
+  saving: boolean;
 } & ValidationTextProps;
 
 export type ChainFormStateSetters = {
@@ -68,24 +67,42 @@ export type EthChainsType = {
 
 export type EthChainNamesType = { [id: number]: string };
 
-export type EthChainAttrs = {
+export type EthChainFormState = {
   ethChains: EthChainsType;
   ethChainNames: EthChainNamesType;
 };
 
+export type EthChainFormStateSetters = {
+  setEthChains: React.Dispatch<React.SetStateAction<EthChainsType>>;
+  setEthChainNames: React.Dispatch<React.SetStateAction<EthChainNamesType>>;
+};
+
+export type UseEthChainFormStateHookType = EthChainFormState &
+  EthChainFormStateSetters;
+
 export type EthFormFields = {
-  address?: string;
-  altWalletUrl?: string;
-  chainString?: string;
-  ethChainId?: string | number;
-  nodeUrl?: string;
+  address: string;
+  altWalletUrl: string;
+  chainString: string;
+  ethChainId: string | number;
+  nodeUrl: string;
 };
 
-export type EthDaoFormFields = {
-  network: ChainNetwork.Ethereum;
-  tokenName: string;
+export type EthFormFieldSetters = {
+  setAddress: React.Dispatch<React.SetStateAction<string>>;
+  setAltWalletUrl: React.Dispatch<React.SetStateAction<string>>;
+  setChainString: React.Dispatch<React.SetStateAction<string>>;
+  setEthChainId: React.Dispatch<React.SetStateAction<string | number>>;
+  setNodeUrl: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export type CreateFactoryEthDaoForm = ChainFormFields &
-  EthFormFields &
-  EthDaoFormFields;
+export type UseEthChainFormFieldsHookType = EthFormFields & EthFormFieldSetters;
+
+// export type EthDaoFormFields = {
+//   network: ChainNetwork.Ethereum;
+//   tokenName: string;
+// };
+
+// export type CreateFactoryEthDaoForm = ChainFormFields &
+//   EthFormFields &
+//   EthDaoFormFields;
