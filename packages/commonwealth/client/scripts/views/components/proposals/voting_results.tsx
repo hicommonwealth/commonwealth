@@ -1,5 +1,7 @@
 /* @jsx m */
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import m from 'mithril';
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
 import ClassComponent from 'class_component';
@@ -7,9 +9,7 @@ import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
-import { MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import m from 'mithril';
 import type { AnyProposal } from 'models';
 import { VotingType } from 'models';
 
@@ -40,14 +40,6 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
         <VotingResult
           yesVotes={votes.filter((v) => v.choice === true)}
           noVotes={votes.filter((v) => v.choice === false)}
-          proposal={proposal}
-        />
-      );
-    } else if (proposal.votingType === VotingType.MolochYesNo) {
-      return (
-        <VotingResult
-          yesVotes={votes.filter((v) => v.choice === MolochVote.YES)}
-          noVotes={votes.filter((v) => v.choice === MolochVote.NO)}
           proposal={proposal}
         />
       );

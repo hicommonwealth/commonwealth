@@ -32,9 +32,6 @@ class SubstrateDemocracyProposals extends ProposalModule<
 
   // Period in blocks where an external proposal may not be re-submitted after being vetoed.
   private _cooloffPeriod: number = null;
-  get cooloffPeriod() {
-    return this._cooloffPeriod;
-  }
 
   // The minimum amount to be used as a deposit for a public referendum proposal.
   private _minimumDeposit: SubstrateCoin = null;
