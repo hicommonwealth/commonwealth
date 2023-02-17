@@ -8,7 +8,6 @@ import type Contract from 'client/scripts/models/Contract';
 import type { IWebWallet } from 'client/scripts/models';
 import { ethers } from 'ethers';
 import type { Result } from 'ethers/lib/utils';
-import BN = require('bn.js');
 
 async function sendFunctionCall({
   fn,
@@ -16,16 +15,12 @@ async function sendFunctionCall({
   contract,
   functionTx,
   web3,
-  gas,
-  gasPrice,
 }: {
   fn: AbiItem;
   signingWallet: IWebWallet<any>;
   contract: Contract;
   functionTx: any;
   web3: Web3;
-  gas?: number | string;
-  gasPrice?: number | string | BN;
 }) {
   let txReceipt: TransactionReceipt | any;
   if (
@@ -39,8 +34,10 @@ async function sendFunctionCall({
       to: contract.address,
       data: functionTx,
     };
-    if (gas) tx.gas = gas;
-    if (gasPrice) tx.gasPrice = gasPrice;
+    const estimate = await web3.eth.estimateGas(tx);
+    console.log('estimate', estimate, 'gas');
+    tx.gas = estimate;
+    tx.gasPrice = ethers.utils.parseUnits('53', 'gwei').toString();
     txReceipt = await web3.eth.sendTransaction(tx);
   } else {
     // send call transaction
@@ -70,14 +67,10 @@ export async function callContractFunction({
   contract,
   fn,
   inputArgs,
-  gas,
-  gasPrice,
 }: {
   contract: Contract;
   fn: AbiItem;
   inputArgs: string[];
-  gas?: number | string;
-  gasPrice?: number | string | BN;
 }): Promise<Result> {
   const sender = app.user.activeAccount;
   // get querying wallet
@@ -100,8 +93,6 @@ export async function callContractFunction({
     contract: Contract;
     functionTx: any;
     web3: Web3;
-    gas?: number | string;
-    gasPrice?: number | string | BN;
   } = {
     fn,
     signingWallet,
@@ -109,8 +100,6 @@ export async function callContractFunction({
     functionTx,
     web3,
   };
-  if (gas) functionConfig.gas = gas;
-  if (gasPrice) functionConfig.gasPrice = gasPrice;
   const txReceipt: TransactionReceipt | any = await sendFunctionCall(
     functionConfig
   );
