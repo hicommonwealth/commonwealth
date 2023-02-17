@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import m from 'mithril';
 
@@ -7,8 +9,6 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import type Web3 from 'web3';
 import type EthereumAccount from './account';
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 const ETHEREUM_BLOCK_TIME = 13;
 
@@ -51,15 +51,6 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   private _api: Web3;
   private _metadataInitialized = false;
-  private _totalbalance: EthereumCoin;
-
-  public get metadataInitialized() {
-    return this._metadataInitialized;
-  }
-
-  public get totalbalance() {
-    return this._totalbalance;
-  }
 
   public async _initApi(node: NodeInfo): Promise<Web3> {
     try {

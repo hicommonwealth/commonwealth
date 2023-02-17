@@ -1,8 +1,11 @@
-import type { ConnectedWallet } from '@terra-money/wallet-controller';
-import type { WalletController } from '@terra-money/wallet-controller';
+import type {
+  ConnectedWallet,
+  WalletController,
+} from '@terra-money/wallet-controller';
+import type { SessionPayload } from '@canvas-js/interfaces';
+
+import { Account, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 
 // TODO: ensure this only opens on mobile
@@ -66,26 +69,23 @@ class TerraWalletConnectWebWalletController
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
     try {
       const result = await this._wallet.signBytes(
-        Buffer.from(JSON.stringify(canvasMessage))
+        Buffer.from(canvas.serializeSessionPayload(canvasMessage))
       );
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');
       }
-      const signature = {
-        signature: {
-          pub_key: {
-            type: 'tendermint/PubKeySecp256k1',
-            // TODO: ensure single signature
-            value: result.result.public_key.toAmino().value,
-          },
-          signature: Buffer.from(result.result.signature).toString('base64'),
+      return JSON.stringify({
+        pub_key: {
+          type: 'tendermint/PubKeySecp256k1',
+          value: result.result.public_key.toAmino().value,
         },
-      };
-      return JSON.stringify(signature);
+        signature: Buffer.from(result.result.signature).toString('base64'),
+      });
     } catch (error) {
       console.error(error);
       throw new Error(`Failed to sign with account: ${error.message}`);
