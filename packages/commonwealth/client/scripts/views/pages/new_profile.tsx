@@ -17,6 +17,6 @@ export default class NewProfile extends ClassComponent {
       <Sublayout>
         <ProfileComponent username={this.username} />
       </Sublayout>
-    )
+    );
   }
 }

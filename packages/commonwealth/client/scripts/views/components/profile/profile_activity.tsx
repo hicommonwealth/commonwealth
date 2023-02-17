@@ -31,9 +31,7 @@ type NewProfileActivityAttrs = {
   threads: Thread[];
 };
 
-export class NewProfileActivity extends ClassComponent<
-  NewProfileActivityAttrs
-> {
+export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
   private address: string;
   private selectedActivity: ProfileActivity;
 

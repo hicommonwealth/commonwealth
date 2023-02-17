@@ -1,9 +1,7 @@
-import type {
-  GetNewProfilesResp,
-} from 'common-common/src/api/extApiTypes';
+import type { GetNewProfilesResp } from 'common-common/src/api/extApiTypes';
 import { validationResult } from 'express-validator';
 import type { Request } from 'express';
-import type { TypedResponse} from '../types';
+import type { TypedResponse } from '../types';
 import { success, failure } from '../types';
 import type { DB } from '../models';
 

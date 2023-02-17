@@ -48,9 +48,7 @@ export type Image = {
   imageBehavior: ImageBehavior;
 };
 
-export default class EditProfileComponent extends ClassComponent<
-  EditNewProfileAttrs
-> {
+export default class EditProfileComponent extends ClassComponent<EditNewProfileAttrs> {
   private email: string;
   private error: EditProfileError;
   private failed: boolean;
@@ -413,8 +411,8 @@ export default class EditProfileComponent extends ClassComponent<
               <div className="socials-section">
                 <CWText type="b1">Social Links</CWText>
                 <CWText type="caption">
-                  Add any of your community's links (Websites, social
-                  platforms, etc) These can be added and edited later.
+                  Add any of your community's links (Websites, social platforms,
+                  etc) These can be added and edited later.
                 </CWText>
                 <CWSocials
                   socials={this.profile?.socials}

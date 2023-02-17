@@ -23,9 +23,7 @@ type NewProfileActivityContentAttrs = {
   chains: ChainInfo[];
 };
 
-export class NewProfileActivityContent extends ClassComponent<
-  NewProfileActivityContentAttrs
-> {
+export class NewProfileActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
   view(vnode: m.Vnode<NewProfileActivityContentAttrs>) {
     const { option, address, comments, threads, chains } = vnode.attrs;
 

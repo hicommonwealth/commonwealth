@@ -24,6 +24,6 @@ export default class EditNewProfile extends ClassComponent {
       <Sublayout>
         <EditProfileComponent username={this.username} />
       </Sublayout>
-    )
+    );
   }
 }

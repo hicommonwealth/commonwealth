@@ -22,9 +22,7 @@ type NewProfileActivityRowAttrs = {
   chains: ChainInfo[];
 };
 
-export class NewProfileActivityRow extends ClassComponent<
-  NewProfileActivityRowAttrs
-> {
+export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
     const { activity, chains } = vnode.attrs;
     const { chain, createdAt, author, title, id, body } = activity;

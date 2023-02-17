@@ -33,20 +33,23 @@ const getProfileId = async (address: string) => {
   return result.profileId;
 };
 
-const User: m.Component<{
-  user: Account | AddressInfo | Profile;
-  avatarSize?: number;
-  avatarOnly?: boolean; // overrides most other properties
-  hideAvatar?: boolean;
-  showAddressWithDisplayName?: boolean; // show address inline with the display name
-  addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
-  linkify?: boolean;
-  onclick?: any;
-  popover?: boolean;
-  showRole?: boolean;
-}, {
-  profileId: number;
-}> = {
+const User: m.Component<
+  {
+    user: Account | AddressInfo | Profile;
+    avatarSize?: number;
+    avatarOnly?: boolean; // overrides most other properties
+    hideAvatar?: boolean;
+    showAddressWithDisplayName?: boolean; // show address inline with the display name
+    addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
+    linkify?: boolean;
+    onclick?: any;
+    popover?: boolean;
+    showRole?: boolean;
+  },
+  {
+    profileId: number;
+  }
+> = {
   oninit: (vnode) => {
     getProfileId(vnode.attrs.user.address).then((profileId) => {
       vnode.state.profileId = profileId;
@@ -312,22 +315,25 @@ const User: m.Component<{
   },
 };
 
-export const UserBlock: m.Component<{
-  user: Account | AddressInfo | Profile;
-  popover?: boolean;
-  showRole?: boolean;
-  showAddressWithDisplayName?: boolean;
-  addressDisplayOptions?: IAddressDisplayOptions;
-  searchTerm?: string;
-  showChainName?: boolean;
-  hideOnchainRole?: boolean;
-  selected?: boolean;
-  compact?: boolean;
-  linkify?: boolean;
-  avatarSize?: number;
-}, {
-  profileId: string;
-}> = {
+export const UserBlock: m.Component<
+  {
+    user: Account | AddressInfo | Profile;
+    popover?: boolean;
+    showRole?: boolean;
+    showAddressWithDisplayName?: boolean;
+    addressDisplayOptions?: IAddressDisplayOptions;
+    searchTerm?: string;
+    showChainName?: boolean;
+    hideOnchainRole?: boolean;
+    selected?: boolean;
+    compact?: boolean;
+    linkify?: boolean;
+    avatarSize?: number;
+  },
+  {
+    profileId: string;
+  }
+> = {
   oninit: (vnode) => {
     getProfileId(vnode.attrs.user.address).then((profileId) => {
       vnode.state.profileId = profileId;

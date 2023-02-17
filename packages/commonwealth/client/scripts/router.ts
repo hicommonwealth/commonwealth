@@ -576,18 +576,27 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/profile/:username/edit': importRoute(import('views/pages/edit_new_profile'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/profile/id/:profileId': importRoute(import('views/pages/new_profile_redirect'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/profile/id/:profileId/edit': importRoute(import('views/pages/new_profile_redirect'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  '/profile/:username/edit': importRoute(
+    import('views/pages/edit_new_profile'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
+  '/profile/id/:profileId': importRoute(
+    import('views/pages/new_profile_redirect'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
+  '/profile/id/:profileId/edit': importRoute(
+    import('views/pages/new_profile_redirect'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
 
   // Governance
   '/:scope/referenda': importRoute(import('views/pages/referenda'), {

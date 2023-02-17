@@ -47,7 +47,10 @@ const moveAddress = async (
     },
   });
 
-  if (req.user.id !== oldProfile.user_id || req.user.id !== newProfile.user_id) {
+  if (
+    req.user.id !== oldProfile.user_id ||
+    req.user.id !== newProfile.user_id
+  ) {
     return next(new Error(Errors.NotAuthorized));
   }
 
