@@ -37,21 +37,6 @@ export const CosmosForm = () => {
   const { altWalletUrl, chainString, ethChainId, nodeUrl, setNodeUrl } =
     useEthChainFormFields();
 
-  // public state: CreateCosmosState = {
-  //   message: '',
-  //   saving: false,
-  //   form: {
-  //     altWalletUrl: '',
-  //     bech32Prefix: '',
-  //     decimals: 6,
-  //     id: '',
-  //     name: '',
-  //     symbol: 'XYZ',
-  //     nodeUrl: '',
-  //     ...initChainForm(),
-  //   },
-  // };
-
   const navigate = useCommonNavigate();
 
   return (
@@ -97,7 +82,6 @@ export const CosmosForm = () => {
           setDecimals(+v);
         }}
       />
-      {/* TODO: add alt wallet URL field */}
       {defaultChainRows(chainFormDefaultFields)}
       <CWButton
         label="Save changes"
