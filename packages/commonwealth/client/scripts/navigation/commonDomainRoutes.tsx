@@ -44,7 +44,7 @@ const TreasuryPage = lazy(() => import('views/pages/treasury'));
 const TipsPage = lazy(() => import('views/pages/tips'));
 
 const ManageCommunityPage = lazy(
-  () => import('views/pages/manage_community/index')
+  () => import('views/pages/manage_community/ManageCommunityPage')
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 const SnapshotProposalPage = lazy(
