@@ -1,7 +1,6 @@
 import { bech32 } from 'bech32';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import { Address } from 'ethereumjs-util';
 import type { Account, IWebWallet } from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
@@ -17,7 +16,7 @@ declare let window: any;
 function encodeEthAddress(bech32Prefix: string, address: string): string {
   return bech32.encode(
     bech32Prefix,
-    bech32.toWords(Address.fromString(address).toBuffer())
+    bech32.toWords(Buffer.from(address.slice(2), 'hex'))
   );
 }
 
