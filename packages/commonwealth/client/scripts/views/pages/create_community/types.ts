@@ -26,9 +26,15 @@ export type ChainFormState = {
   saving?: boolean;
 } & ValidationTextProps;
 
+export type EthChainsType = {
+  [id: number]: { url: string; alt_wallet_url: string };
+};
+
+export type EthChainNamesType = { [id: number]: string };
+
 export type EthChainAttrs = {
-  ethChains: { [id: number]: { url: string; alt_wallet_url: string } };
-  ethChainNames: { [id: number]: string };
+  ethChains: EthChainsType;
+  ethChainNames: EthChainNamesType;
 };
 
 export type EthFormFields = {
