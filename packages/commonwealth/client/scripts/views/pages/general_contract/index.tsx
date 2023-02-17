@@ -69,7 +69,11 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
           }
         }
 
-        const result = await callContractFunction(contract, fn, inputArgsArray);
+        const result = await callContractFunction({
+          contract,
+          fn,
+          inputArgs: inputArgsArray,
+        });
 
         this.functionNameToFunctionOutput.set(fn.name, result);
         this.saving = false;

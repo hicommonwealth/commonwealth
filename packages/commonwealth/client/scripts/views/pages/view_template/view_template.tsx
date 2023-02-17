@@ -280,7 +280,7 @@ class ViewTemplatePage extends ClassComponent {
                       label: 'confirm',
                       onConfirm: async () => {
                         try {
-                          const abiItem = parseFunctionFromABI(
+                          const functionAbi = parseFunctionFromABI(
                             this.currentContract.abi,
                             this.json.tx_template?.method as string
                           );
@@ -289,11 +289,11 @@ class ViewTemplatePage extends ClassComponent {
                             this.formState
                           );
 
-                          await callContractFunction(
-                            this.currentContract,
-                            abiItem,
-                            functionArgs
-                          );
+                          await callContractFunction({
+                            contract: this.currentContract,
+                            fn: functionAbi,
+                            inputArgs: functionArgs,
+                          });
                         } catch (e) {
                           console.log(e);
                         }

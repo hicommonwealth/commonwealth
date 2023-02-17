@@ -66,13 +66,19 @@ async function sendFunctionCall({
  * if there is a web3 api calls are misconfigured or fail.
  * // TODO: add formInputMap shape for clarity
  */
-export async function callContractFunction(
-  contract: Contract,
-  fn: AbiItem,
-  inputArgs: string[],
-  gas?: number | string,
-  gasPrice?: number | string | BN
-): Promise<Result> {
+export async function callContractFunction({
+  contract,
+  fn,
+  inputArgs,
+  gas,
+  gasPrice,
+}: {
+  contract: Contract;
+  fn: AbiItem;
+  inputArgs: string[];
+  gas?: number | string;
+  gasPrice?: number | string | BN;
+}): Promise<Result> {
   const sender = app.user.activeAccount;
   // get querying wallet
   const signingWallet = await app.wallets.locateWallet(
