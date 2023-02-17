@@ -35,9 +35,7 @@ async function sendFunctionCall({
       data: functionTx,
     };
     const estimate = await web3.eth.estimateGas(tx);
-    console.log('estimate', estimate, 'gas');
     tx.gas = estimate;
-    tx.gasPrice = ethers.utils.parseUnits('53', 'gwei').toString();
     txReceipt = await web3.eth.sendTransaction(tx);
   } else {
     // send call transaction
@@ -104,4 +102,9 @@ export async function callContractFunction({
     functionConfig
   );
   return ethersInterface.decodeFunctionResult(fn.name, txReceipt);
+}
+
+export function encodeParameters(types, values) {
+  const abi = new ethers.utils.AbiCoder();
+  return abi.encode(types, values);
 }
