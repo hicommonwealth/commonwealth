@@ -38,6 +38,8 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
     try {
       await app.topics.updateFeaturedOrder(topics);
       onModalClose();
+      app.sidebarRedraw.emit('redraw');
+      app.threads.isFetched.emit('redraw');
     } catch (err) {
       notifyError('Failed to update order');
     }
