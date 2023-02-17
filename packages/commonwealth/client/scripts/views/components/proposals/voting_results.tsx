@@ -1,5 +1,7 @@
 import React from 'react';
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import m from 'mithril';
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
