@@ -40,27 +40,29 @@ const deleteProfile = async (
     (p) => p.id !== parseInt(profileId, 10)
   );
 
-  const updateProfileStatus = await models.Profile.destroy({
-    where: {
-      id: profileId,
-    },
-  });
-
-  const updateUserStatus = await models.User.update(
-    {
-      Profiles: newProfiles,
-    },
-    {
+  try {
+    await models.Profile.destroy({
       where: {
-        id: req.user.id,
+        id: profileId,
       },
-    }
-  );
-
-  if (!updateProfileStatus && !updateUserStatus) {
-    return res.json({
-      status: 'Failed',
     });
+  } catch (err) {
+    return next(new Error(err));
+  }
+
+  try {
+    await models.User.update(
+      {
+        Profiles: newProfiles,
+      },
+      {
+        where: {
+          id: req.user.id,
+        },
+      }
+    );
+  } catch (err) {
+    return next(new Error(err));
   }
 
   return res.json({

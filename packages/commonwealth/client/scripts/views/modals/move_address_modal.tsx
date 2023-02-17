@@ -64,7 +64,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
 
     try {
       const response: any = await $.post(`${app.serverUrl()}/moveAddress`, {
-        addressHash: address,
+        address,
         oldProfileId: profile.id,
         newProfileId: this.selectedProfile.id,
         jwt: app.user.jwt,

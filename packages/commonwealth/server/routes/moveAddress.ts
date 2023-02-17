@@ -15,7 +15,7 @@ const moveAddress = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.body.addressHash) {
+  if (!req.body.address) {
     return next(new Error(Errors.NoAddressProvided));
   }
 
@@ -27,11 +27,11 @@ const moveAddress = async (
     return next(new Error(Errors.NoNewProfileProvided));
   }
 
-  const { addressHash, oldProfileId, newProfileId } = req.body;
+  const { address, oldProfileId, newProfileId } = req.body;
 
-  const address = await models.Address.findOne({
+  const addressToMove = await models.Address.findOne({
     where: {
-      address: addressHash,
+      address: address,
     },
   });
 
@@ -41,27 +41,30 @@ const moveAddress = async (
     },
   });
 
-  const oldProfilesAddresses = await oldProfile.getAddresses();
-
   const newProfile = await models.Profile.findOne({
     where: {
       id: newProfileId,
     },
   });
 
+  if (req.user.id !== oldProfile.user_id || req.user.id !== newProfile.user_id) {
+    return next(new Error(Errors.NotAuthorized));
+  }
+
+  const oldProfilesAddresses = await oldProfile.getAddresses();
   const newProfilesAddresses = await newProfile.getAddresses();
 
-  const addressUpdate = await address.update({
+  const addressUpdate = await addressToMove.update({
     profile_id: newProfileId,
   });
 
   const oldProfileUpdate = await oldProfile.update({
     user_id: req.user.id,
-    Addresses: oldProfilesAddresses.filter((a) => a.address !== addressHash),
+    Addresses: oldProfilesAddresses.filter((a) => a.address !== address),
   });
 
   const newProfileUpdate = await newProfile.update({
-    Addresses: [...newProfilesAddresses, address],
+    Addresses: [...newProfilesAddresses, addressToMove],
   });
 
   if (!addressUpdate && !oldProfileUpdate && !newProfileUpdate) {
