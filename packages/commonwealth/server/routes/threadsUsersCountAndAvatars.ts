@@ -14,7 +14,7 @@ type UniqueAddresses = {
   chain;
 };
 
-const fetchUniqueAddressesByRootIds = async (
+const fetchUniqueAddressesByThreadIds = async (
   models: DB,
   { chain, thread_ids }
 ) => {
@@ -23,7 +23,7 @@ const fetchUniqueAddressesByRootIds = async (
     SELECT distinct cts.address_id, address, thread_id, cts.chain
     FROM "Comments" cts INNER JOIN "Addresses" adr
     ON adr.id = cts.address_id
-    WHERE thread_id IN ($thread_ids)
+    WHERE thread_id = ANY($thread_ids)
     AND cts.chain = $chain
     AND deleted_at IS NULL
     ORDER BY thread_id
@@ -55,7 +55,7 @@ const threadsUsersCountAndAvatar = async (
   try {
     if (chain && threads.length) {
       const thread_ids = threads.map(({ thread_id }) => thread_id);
-      const uniqueAddressesByRootIds = await fetchUniqueAddressesByRootIds(
+      const uniqueAddressesByRootIds = await fetchUniqueAddressesByThreadIds(
         models,
         { chain, thread_ids }
       );
@@ -64,22 +64,22 @@ const threadsUsersCountAndAvatar = async (
         ({ thread_id }) => thread_id
       );
       return res.json(
-        threads.map(({ thread_id: rootId, author: authorAddress }) => {
+        threads.map(({ thread_id: thread_id, author: authorAddress }) => {
           const uniqueAddresses = (
-            uniqueAddressesByThread[rootId] || []
+            uniqueAddressesByThread[thread_id] || []
           ).filter(({ address }) => address !== authorAddress);
           const addressesCount = uniqueAddresses.length + 1;
           const addresses = uniqueAddresses
             .concat({
-              thread_id: rootId,
+              thread_id: thread_id,
               address: authorAddress,
               address_id: null,
               chain,
             })
             .slice(0, 2);
           return {
-            id: rootId,
-            rootId,
+            id: thread_id,
+            thread_id,
             addresses,
             count: addressesCount > 2 ? addressesCount - 2 : 0,
           };

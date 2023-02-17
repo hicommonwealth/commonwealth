@@ -58,14 +58,6 @@ export const modelFromServer = (comment) => {
     ? versionHistory[0].timestamp
     : null;
 
-  let proposal;
-  try {
-    proposal = uniqueIdToProposal(decodeURIComponent(comment.thread_id));
-  } catch (e) {
-    // no proposal
-    console.log(e);
-  }
-
   const commentParams =
     comment.deleted_at?.length > 0
       ? {
@@ -75,7 +67,7 @@ export const modelFromServer = (comment) => {
           plaintext: '[deleted]',
           versionHistory: [],
           attachments: [],
-          proposal,
+          threadId: comment.threadId,
           id: comment.id,
           createdAt: moment(comment.created_at),
           rootProposal: comment.thread_id,
@@ -94,7 +86,7 @@ export const modelFromServer = (comment) => {
           plaintext: comment.plaintext,
           versionHistory,
           attachments,
-          proposal,
+          threadId: comment.threadId,
           id: comment.id,
           createdAt: moment(comment.created_at),
           rootProposal: comment.thread_id,
@@ -281,18 +273,18 @@ class CommentsController {
     });
   }
 
-  public async refresh(proposal, chainId: string) {
+  public async refresh(thread, chainId: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
-          thread_id: encodeURIComponent(proposal.uniqueIdentifier),
+          thread_id: thread.id,
         });
         if (response.status !== 'Success') {
           reject(new Error(`Unsuccessful status: ${response.status}`));
         }
-        this._store.clearProposal(proposal);
+        this._store.clearProposal(thread.id);
         response.result.forEach((comment) => {
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');
