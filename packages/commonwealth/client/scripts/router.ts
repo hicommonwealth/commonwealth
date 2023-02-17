@@ -245,14 +245,6 @@ const getCustomDomainRoutes = (importRoute) => ({
 
   // Discussions
   '/home': _DEPRECATED_redirectRoute((attrs) => `/${attrs.scope}/`),
-  '/discussions': importRoute(import('views/pages/discussions'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/discussions/:topic': importRoute(import('views/pages/discussions'), {
-    scoped: true,
-    deferChain: true,
-  }),
   '/overview': importRoute(import('views/pages/overview'), {
     scoped: true,
     deferChain: true,
@@ -363,11 +355,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/finishNearLogin': _DEPRECATED_redirectRoute(() => '/finishNearLogin'),
   '/:scope/finishaxielogin': _DEPRECATED_redirectRoute(() => '/finishaxielogin'),
   '/:scope/home': _DEPRECATED_redirectRoute(() => '/'),
-  '/:scope/discussions': _DEPRECATED_redirectRoute(() => '/discussions'),
   '/:scope': _DEPRECATED_redirectRoute(() => '/'),
-  '/:scope/discussions/:topic': _DEPRECATED_redirectRoute(
-    (attrs) => `/discussions/${attrs.topic}/`
-  ),
   '/:scope/search': _DEPRECATED_redirectRoute(() => '/search'),
   '/:scope/members': _DEPRECATED_redirectRoute(() => '/members'),
   '/:scope/sputnik-daos': _DEPRECATED_redirectRoute(() => '/sputnik-daos'),
@@ -403,8 +391,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/login': _DEPRECATED_redirectRoute(() => '/login'),
   '/:scope/settings': _DEPRECATED_redirectRoute(() => '/settings'),
   '/:scope/admin': _DEPRECATED_redirectRoute(() => '/admin'),
-  '/:scope/manage': _DEPRECATED_redirectRoute(() => '/manage'),
-  '/:scope/analytics': _DEPRECATED_redirectRoute(() => '/analytics'),
   '/:scope/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/snapshot/${attrs.snapshotId}`
   ),
