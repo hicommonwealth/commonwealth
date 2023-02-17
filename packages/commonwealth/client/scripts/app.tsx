@@ -10,12 +10,10 @@ const App = () => {
   const { customDomain } = useInitApp();
 
   return (
-    <React.StrictMode>
-      <BrowserRouter>
-        <AppNavigator customDomain={customDomain} />
-        <ToastContainer />
-      </BrowserRouter>
-    </React.StrictMode>
+    <BrowserRouter>
+      <AppNavigator customDomain={customDomain} />
+      <ToastContainer />
+    </BrowserRouter>
   );
 };
 
