@@ -7,25 +7,25 @@ import type Thread from 'client/scripts/models/Thread';
 import { NewProfileActivityRow } from './profile_activity_row';
 import type { CommentWithAssociatedThread } from './profile_activity';
 
-enum ProfileActivity {
+enum ProfileActivityType {
   Addresses,
   Comments,
   Communities,
   Threads,
 }
 
-type NewProfileActivityContentAttrs = {
+type ProfileActivityContentAttrs = {
   address: string;
-  option: ProfileActivity;
+  option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
 };
 
-export class NewProfileActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
-  view(vnode: m.Vnode<NewProfileActivityContentAttrs>) {
+export class ProfileActivityContent extends ClassComponent<ProfileActivityContentAttrs> {
+  view(vnode: m.Vnode<ProfileActivityContentAttrs>) {
     const { option, address, comments, threads } = vnode.attrs;
 
-    if (option === ProfileActivity.Threads) {
+    if (option === ProfileActivityType.Threads) {
       return threads
         .sort((a, b) => +b.createdAt - +a.createdAt)
         .map((thread) => (

@@ -23,12 +23,12 @@ class NewProfileRedirect extends ClassComponent {
   private getLinkedProfile = async (profileId: string) => {
     this.loading = true;
     try {
-      const response = await $.get(`${app.serverUrl()}/profile/v2`, {
+      const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
         profileId,
         jwt: app.user.jwt,
       });
 
-      this.profile = new Profile(response.profile);
+      this.profile = new Profile(result.profile);
     } catch (err) {
       this.error = true;
     }

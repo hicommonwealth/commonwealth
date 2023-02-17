@@ -14,19 +14,19 @@ import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
 import { SocialAccounts } from '../social_accounts';
 
-type NewProfileHeaderAttrs = {
+type ProfileHeaderAttrs = {
   profile: Profile;
   isOwner: boolean;
 };
 
-export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
+export class ProfileHeader extends ClassComponent<ProfileHeaderAttrs> {
   private defaultAvatar: string;
 
-  oninit(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+  oninit(vnode: m.Vnode<ProfileHeaderAttrs>) {
     this.defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
   }
 
-  view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+  view(vnode: m.Vnode<ProfileHeaderAttrs>) {
     const { profile, isOwner } = vnode.attrs;
 
     if (!profile) return;

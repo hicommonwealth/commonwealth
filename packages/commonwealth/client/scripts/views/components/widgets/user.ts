@@ -24,10 +24,10 @@ export interface IAddressDisplayOptions {
   maxCharLength?: number;
 }
 
-const getProfileId = async (address: string) => {
+const getProfileId = async (user: Account | AddressInfo | Profile) => {
   const { result } = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
-    address: address,
-    chain: app.activeChainId(),
+    address: user.address,
+    chain: typeof user.chain === 'string' ? user.chain : user.chain?.id,
     jwt: app.user.jwt,
   });
   return result.profileId;
@@ -51,7 +51,7 @@ const User: m.Component<
   }
 > = {
   oninit: (vnode) => {
-    getProfileId(vnode.attrs.user.address).then((profileId) => {
+    getProfileId(vnode.attrs.user).then((profileId) => {
       vnode.state.profileId = profileId;
     });
   },
@@ -335,7 +335,7 @@ export const UserBlock: m.Component<
   }
 > = {
   oninit: (vnode) => {
-    getProfileId(vnode.attrs.user.address).then((profileId) => {
+    getProfileId(vnode.attrs.user).then((profileId) => {
       vnode.state.profileId = profileId;
     });
   },

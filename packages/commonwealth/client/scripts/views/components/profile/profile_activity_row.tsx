@@ -16,13 +16,13 @@ import type { CommentWithAssociatedThread } from './profile_activity';
 import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 
-type NewProfileActivityRowAttrs = {
+type ProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
   address: string;
 };
 
-export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
-  view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
+export class NewProfileActivityRow extends ClassComponent<ProfileActivityRowAttrs> {
+  view(vnode: m.Vnode<ProfileActivityRowAttrs>) {
     const { activity } = vnode.attrs;
     const { chain, createdAt, author, title, id, body } = activity;
     const isThread = !!(activity as Thread).kind;

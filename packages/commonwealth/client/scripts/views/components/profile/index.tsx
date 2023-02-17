@@ -11,9 +11,9 @@ import type { Thread } from 'models';
 import { AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
-import { NewProfileHeader } from './profile_header';
+import { ProfileHeader } from './profile_header';
 import type { CommentWithAssociatedThread } from './profile_activity';
-import { NewProfileActivity } from './profile_activity';
+import { ProfileActivity } from './profile_activity';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../../pages/404';
@@ -39,17 +39,14 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
   private loading: boolean;
   private profile: Profile;
   private threads: Thread[];
-  private username: string;
   private isOwner: boolean;
 
   private getProfileData = async (query: string, type: string) => {
     try {
-      const response = await $.get(`${app.serverUrl()}/profile/v2`, {
+      const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
         [type]: query,
         jwt: app.user.jwt,
       });
-
-      const { result } = response;
 
       this.profile = new Profile(result.profile);
       this.threads = result.threads.map((t) => app.threads.modelFromServer(t));
@@ -73,7 +70,7 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
             a.ghost_address
           )
       );
-      this.isOwner = response.isOwner;
+      this.isOwner = result.isOwner;
       this.loading = false;
     } catch (err) {
       if (
@@ -88,16 +85,18 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
   };
 
   oninit(vnode) {
-    // this.username = m.route.param('username');
     this.loading = true;
     this.error = ProfileError.None;
     this.comments = [];
     this.threads = [];
+
+    // when a user navigates from /profile/:username/edit
     if (vnode.attrs.username) {
       this.getProfileData(vnode.attrs.username, 'username');
       return;
     }
 
+    // when a user navigates from /profile/id/:profileId/edit
     if (vnode.attrs.profileId) {
       this.getProfileData(vnode.attrs.profileId, 'profileId');
       return;
@@ -186,8 +185,8 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
                 : 'ProfilePageContainer smaller-margins'
             }
           >
-            <NewProfileHeader profile={this.profile} isOwner={this.isOwner} />
-            <NewProfileActivity
+            <ProfileHeader profile={this.profile} isOwner={this.isOwner} />
+            <ProfileActivity
               threads={this.threads}
               comments={this.comments}
               addresses={this.addresses}
@@ -197,10 +196,10 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
       );
     } else {
       this.content = (
-        <div className="NewProfilePage">
+        <div className="Profile">
           <div className="ProfilePageContainer">
-            <NewProfileHeader profile={this.profile} isOwner={this.isOwner} />
-            <NewProfileActivity
+            <ProfileHeader profile={this.profile} isOwner={this.isOwner} />
+            <ProfileActivity
               threads={this.threads}
               comments={this.comments}
               addresses={this.addresses}

@@ -68,12 +68,11 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
   private getProfile = async (query: string, type: string) => {
     this.loading = true;
     try {
-      const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
+      const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
         [type]: query,
         jwt: app.user.jwt,
       });
 
-      const { result } = response;
       this.profile = new Profile(result.profile);
       this.name = this.profile.name;
       this.email = this.profile.email;
@@ -204,7 +203,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
   };
 
   oninit(vnode) {
-    this.username = m.route.param('username');
     this.error = EditProfileError.None;
     // when a user navigates from /profile/:username/edit
     if (vnode.attrs.username) {
@@ -224,7 +222,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
   view() {
     if (this.loading) {
       return (
-        <div class="EditProfilePage full-height">
+        <div class="EditProfile full-height">
           <div class="loading-spinner">
             <CWSpinner />
           </div>
