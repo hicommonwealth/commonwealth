@@ -8,14 +8,25 @@ import type Contract from 'client/scripts/models/Contract';
 import type { IWebWallet } from 'client/scripts/models';
 import { ethers } from 'ethers';
 import type { Result } from 'ethers/lib/utils';
+import BN = require('bn.js');
 
-async function sendFunctionCall(
-  fn: AbiItem,
-  signingWallet: IWebWallet<any>,
-  contract: Contract,
-  functionTx: any,
-  web3: Web3
-) {
+async function sendFunctionCall({
+  fn,
+  signingWallet,
+  contract,
+  functionTx,
+  web3,
+  gas,
+  gasPrice,
+}: {
+  fn: AbiItem;
+  signingWallet: IWebWallet<any>;
+  contract: Contract;
+  functionTx: any;
+  web3: Web3;
+  gas?: number | string;
+  gasPrice?: number | string | BN;
+}) {
   let txReceipt: TransactionReceipt | any;
   if (
     fn.stateMutability !== 'view' &&
@@ -28,6 +39,8 @@ async function sendFunctionCall(
       to: contract.address,
       data: functionTx,
     };
+    if (gas) tx.gas = gas;
+    if (gasPrice) tx.gasPrice = gasPrice;
     txReceipt = await web3.eth.sendTransaction(tx);
   } else {
     // send call transaction
@@ -56,7 +69,9 @@ async function sendFunctionCall(
 export async function callContractFunction(
   contract: Contract,
   fn: AbiItem,
-  inputArgs: string[]
+  inputArgs: string[],
+  gas?: number | string,
+  gasPrice?: number | string | BN
 ): Promise<Result> {
   const sender = app.user.activeAccount;
   // get querying wallet
@@ -73,12 +88,25 @@ export async function callContractFunction(
   const processedArgs = processAbiInputsToDataTypes(fn.inputs, inputArgs);
   const ethersInterface = new ethers.utils.Interface(contract.abi);
   const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
-  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
+  const functionConfig: {
+    fn: AbiItem;
+    signingWallet: IWebWallet<any>;
+    contract: Contract;
+    functionTx: any;
+    web3: Web3;
+    gas?: number | string;
+    gasPrice?: number | string | BN;
+  } = {
     fn,
     signingWallet,
     contract,
     functionTx,
-    web3
+    web3,
+  };
+  if (gas) functionConfig.gas = gas;
+  if (gasPrice) functionConfig.gasPrice = gasPrice;
+  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
+    functionConfig
   );
   return ethersInterface.decodeFunctionResult(fn.name, txReceipt);
 }
