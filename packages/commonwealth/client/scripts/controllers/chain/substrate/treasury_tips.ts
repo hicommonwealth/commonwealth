@@ -1,10 +1,7 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Vec } from '@polkadot/types';
 import type { AccountId } from '@polkadot/types/interfaces';
-import type {
-  ISubstrateTreasuryTip,
-  SubstrateCoin,
-} from 'adapters/chain/substrate/types';
+import type { ISubstrateTreasuryTip } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';

@@ -9,7 +9,6 @@ import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
 import type SubstrateChain from './shared';
 

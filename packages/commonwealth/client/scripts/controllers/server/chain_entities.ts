@@ -11,7 +11,8 @@ import {
   SupportedNetwork,
 } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import type { ProposalType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { getBaseUrl, getFetch } from 'helpers/getUrl';
 import type { ChainInfo } from 'models';
 import { ChainEntity, ChainEvent, ChainEventType } from 'models';
