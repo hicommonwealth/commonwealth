@@ -1,10 +1,19 @@
 import type { ChainNetwork } from 'common-common/src/types';
-import type { ValidationTextProps } from '../../components/component_kit/cw_validation_text';
+import type {
+  ValidationStatus,
+  ValidationTextProps,
+} from '../../components/component_kit/cw_validation_text';
 
 export type ChainFormIdFields = {
-  id?: string;
+  id: string;
   name: string;
   symbol?: string;
+};
+
+export type ChainFormIdFieldSetters = {
+  setId: React.Dispatch<React.SetStateAction<string>>;
+  setName: React.Dispatch<React.SetStateAction<string>>;
+  setSymbol: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export type ChainFormDefaultFields = {
@@ -18,6 +27,23 @@ export type ChainFormDefaultFields = {
   website: string;
 };
 
+export type UseChainFormIdFieldsHookType = ChainFormIdFields &
+  ChainFormIdFieldSetters;
+
+export type ChainFormDefaultFieldSetters = {
+  setDescription: React.Dispatch<React.SetStateAction<string>>;
+  setDiscord: React.Dispatch<React.SetStateAction<string>>;
+  setElement: React.Dispatch<React.SetStateAction<string>>;
+  setGithub: React.Dispatch<React.SetStateAction<string>>;
+  setIconUrl: React.Dispatch<React.SetStateAction<string>>;
+  setTelegram: React.Dispatch<React.SetStateAction<string>>;
+  setUploadInProgress: React.Dispatch<React.SetStateAction<boolean>>;
+  setWebsite: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export type UseChainFormDefaultFieldsHookType = ChainFormDefaultFields &
+  ChainFormDefaultFieldSetters;
+
 export type ChainFormFields = ChainFormIdFields & ChainFormDefaultFields;
 
 export type ChainFormState = {
@@ -25,6 +51,16 @@ export type ChainFormState = {
   loading?: boolean;
   saving?: boolean;
 } & ValidationTextProps;
+
+export type ChainFormStateSetters = {
+  setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setSaving: React.Dispatch<React.SetStateAction<boolean>>;
+  setMessage: React.Dispatch<React.SetStateAction<string>>;
+  setStatus: React.Dispatch<React.SetStateAction<ValidationStatus>>;
+};
+
+export type UseChainFormStateHookType = ChainFormState & ChainFormStateSetters;
 
 export type EthChainsType = {
   [id: number]: { url: string; alt_wallet_url: string };

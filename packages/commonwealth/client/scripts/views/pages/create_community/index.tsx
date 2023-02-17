@@ -81,8 +81,6 @@ const CreateCommunity = () => {
     fetchEthChainNames();
   }, [ethChains]);
 
-  console.log(ethChains, ethChainNames);
-
   const getCurrentForm = () => {
     switch (currentForm) {
       case CommunityType.StarterCommunity:

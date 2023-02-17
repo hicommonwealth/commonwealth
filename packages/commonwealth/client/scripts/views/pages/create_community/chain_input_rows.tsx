@@ -17,6 +17,7 @@ import type {
   ChainFormState,
   EthChainAttrs,
   EthFormFields,
+  UseChainFormDefaultFieldsHookType,
 } from './types';
 
 export const initChainForm = (): ChainFormDefaultFields => {
@@ -32,7 +33,7 @@ export const initChainForm = (): ChainFormDefaultFields => {
   };
 };
 
-export const defaultChainRows = <T extends ChainFormDefaultFields>(
+export const defaultChainRows = <T extends UseChainFormDefaultFieldsHookType>(
   state: T,
   disabled = false
 ) => {
@@ -43,7 +44,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         disabled={disabled}
         value={state.description}
         onChangeHandler={(v) => {
-          state.description = v;
+          state.setDescription(v);
         }}
         textarea
       />
@@ -58,7 +59,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.iconUrl}
         placeholder="https://"
         onChangeHandler={(v) => {
-          state.iconUrl = v;
+          state.setIconUrl(v);
         }}
       />
       <InputRow
@@ -67,7 +68,8 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.website}
         placeholder="https://example.com"
         onChangeHandler={(v) => {
-          state.website = v;
+          state.setWebsite(v);
+
           // mixpanelBrowserTrack({
           //   event: MixpanelCommunityCreationEvent.WEBSITE_ADDED,
           //   chainBase: this.state.form.base,
@@ -82,7 +84,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.discord}
         placeholder="https://discord.com/invite"
         onChangeHandler={(v) => {
-          state.discord = v;
+          state.setDiscord(v);
         }}
       />
       <InputRow
@@ -91,7 +93,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.element}
         placeholder="https://matrix.to/#"
         onChangeHandler={(v) => {
-          state.element = v;
+          state.setElement(v);
         }}
       />
       <InputRow
@@ -100,7 +102,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.telegram}
         placeholder="https://t.me"
         onChangeHandler={(v) => {
-          state.telegram = v;
+          state.setTelegram(v);
         }}
       />
       <InputRow
@@ -109,7 +111,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.github}
         placeholder="https://github.com"
         onChangeHandler={(v) => {
-          state.github = v;
+          state.setGithub(v);
         }}
       />
     </>
@@ -152,6 +154,7 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
             state.altWalletUrl = '';
           }
           state.loaded = false;
+
           // mixpanelBrowserTrack({
           //   event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
           //   chainBase: o.value,
