@@ -33,11 +33,6 @@ export default function (app: IApp, chain: string, identifier: string) {
       return findEntity(SubstrateTypes.EntityKind.DemocracyProposal.toString());
     }
     case ProposalType.SubstrateTechnicalCommitteeMotion:
-    case ProposalType.SubstrateCollectiveProposal: {
-      return findEntity(
-        SubstrateTypes.EntityKind.CollectiveProposal.toString()
-      );
-    }
     case ProposalType.SubstrateTreasuryProposal: {
       return findEntity(SubstrateTypes.EntityKind.TreasuryProposal.toString());
     }

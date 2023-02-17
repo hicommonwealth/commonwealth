@@ -125,6 +125,7 @@ export default class QuillEditorInternal {
         'link',
         'blockquote',
         'code-block',
+        'image',
         'header',
         'list',
         'twitter',

@@ -43,9 +43,6 @@ class SubstrateTreasury extends ProposalModule<
 
   // The percentage of treasury funds that are burnt every spend period, if left unspent
   private _burnPct: number = null;
-  get burnPct() {
-    return this._burnPct;
-  }
 
   // How often (in blocks) spend periods occur
   private _spendPeriod: number = null;
@@ -58,13 +55,6 @@ class SubstrateTreasury extends ProposalModule<
       (Math.floor(this.app.chain.block.height / this.spendPeriod) + 1) *
       this.spendPeriod
     );
-  }
-
-  public computeBond(amount: SubstrateCoin): SubstrateCoin {
-    const computed = amount.muln(this.bondPct);
-    return this.bondMinimum.gt(computed)
-      ? this.bondMinimum
-      : this._Chain.coins(computed);
   }
 
   private _Chain: SubstrateChain;

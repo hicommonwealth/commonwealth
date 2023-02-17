@@ -16,11 +16,6 @@ import CompoundProposal, {
   BravoVote,
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import MolochProposal, {
-  MolochProposalState,
-  MolochProposalVote,
-  MolochVote,
-} from 'controllers/chain/ethereum/moloch/proposal';
 import type { NearAccount } from 'controllers/chain/near/account';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
@@ -28,13 +23,11 @@ import {
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import {
   convictionToWeight,
   SubstrateDemocracyReferendum,
 } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import m from 'mithril';
 import type { AnyProposal } from 'models';
@@ -43,10 +36,7 @@ import { BinaryVote, DepositVote, VotingType } from 'models';
 import app from 'state';
 
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import {
-  CompoundCancelButton,
-  MolochCancelButton,
-} from '../../pages/view_proposal/proposal_components';
+import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { getCanVote, getVotingResults } from './helpers';
@@ -93,15 +83,12 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
 
     if (
       proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateDemocracyReferendum ||
-      proposal instanceof SubstratePhragmenElection ||
-      proposal instanceof SubstrateCollectiveProposal
+      proposal instanceof SubstrateDemocracyReferendum
     ) {
       user = app.user.activeAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
       user = app.user.activeAccount as CosmosAccount;
     } else if (
-      proposal instanceof MolochProposal ||
       proposal instanceof CompoundProposal ||
       proposal instanceof AaveProposal
     ) {
@@ -145,10 +132,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             onModalClose
           )
         );
-      } else if (proposal instanceof SubstrateCollectiveProposal) {
-        createTXModal(
-          proposal.submitVoteTx(new BinaryVote(user, true), onModalClose)
-        );
       } else if (proposal instanceof CosmosProposal) {
         if (proposal.status === 'DepositPeriod') {
           // TODO: configure deposit amount
@@ -165,11 +148,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             .then(() => m.redraw())
             .catch((err) => notifyError(err.toString()));
         }
-      } else if (proposal instanceof MolochProposal) {
-        proposal
-          .submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof CompoundProposal) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
@@ -187,11 +165,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           )
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
-      } else if (proposal instanceof SubstratePhragmenElection) {
-        toggleVotingModal(false);
-        return notifyError(
-          'Unimplemented proposal type - use election voting modal'
-        );
       } else {
         toggleVotingModal(false);
         return notifyError('Invalid proposal type');
@@ -224,19 +197,11 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             onModalClose
           )
         );
-      } else if (proposal instanceof SubstrateCollectiveProposal) {
-        createTXModal(
-          proposal.submitVoteTx(new BinaryVote(user, false), onModalClose)
-        );
       } else if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'No'))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
-      } else if (proposal instanceof MolochProposal) {
-        proposal
-          .submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO))
-          .then(() => m.redraw());
       } else if (proposal instanceof CompoundProposal) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.NO))
@@ -254,27 +219,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           )
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
-      } else {
-        toggleVotingModal(false);
-        return notifyError('Invalid proposal type');
-      }
-    };
-
-    const processProposal = (e) => {
-      e.preventDefault();
-      toggleVotingModal(true);
-
-      if (proposal instanceof MolochProposal) {
-        proposal
-          .processTx()
-          .then(() => {
-            onModalClose();
-            m.redraw();
-          })
-          .catch((err) => {
-            onModalClose();
-            notifyError(err.toString());
-          });
       } else {
         toggleVotingModal(false);
         return notifyError('Invalid proposal type');
@@ -399,18 +343,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       />
     );
 
-    // moloch: process
-    const processButton = proposal instanceof MolochProposal && (
-      <CWButton
-        disabled={
-          proposal.state !== MolochProposalState.ReadyToProcess ||
-          votingModalOpen
-        }
-        onclick={processProposal}
-        label={proposal.data.processed ? 'Processed' : 'Process'}
-      />
-    );
-
     // near: remove
     const removeButton = proposal instanceof NearSputnikProposal && (
       <CWButton
@@ -477,23 +409,6 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             {noButton}
             {abstainButton}
             {noWithVetoButton}
-          </div>
-          <ProposalExtensions proposal={proposal} />
-        </>
-      );
-    } else if (proposal.votingType === VotingType.MolochYesNo) {
-      votingActionObj = (
-        <>
-          <div class="button-row">
-            {yesButton}
-            {noButton}
-            {processButton}
-            <MolochCancelButton
-              molochMember={user}
-              onModalClose={onModalClose}
-              proposal={proposal as MolochProposal}
-              votingModalOpen={votingModalOpen}
-            />
           </div>
           <ProposalExtensions proposal={proposal} />
         </>

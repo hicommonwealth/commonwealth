@@ -10,8 +10,6 @@ import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
-import { MolochProposalVote } from 'controllers/chain/ethereum/moloch/proposal';
-import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import m from 'mithril';
 import type { AnyProposal, IVote } from 'models';
@@ -103,20 +101,6 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   </div>
                 );
 
-              case vote instanceof MolochProposalVote:
-                return (
-                  <div class="vote">
-                    {m(User, { user: vote.account, linkify: true })}
-                    {balance && typeof balance === 'string' && (
-                      <div class="vote-right-container">
-                        <CWText noWrap title={balance}>
-                          {balance}
-                        </CWText>
-                      </div>
-                    )}
-                  </div>
-                );
-
               case vote instanceof CompoundProposalVote:
                 return (
                   <div class="vote">
@@ -181,18 +165,6 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                         </div>
                       </div>
                     );
-
-                  case vote instanceof SubstrateCollectiveVote:
-                    return (
-                      <div class="vote">
-                        {m(User, {
-                          user: vote.account,
-                          linkify: true,
-                          popover: true,
-                        })}
-                      </div>
-                    );
-
                   default:
                     return (
                       <div class="vote">
