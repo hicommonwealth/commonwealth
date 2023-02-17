@@ -11,6 +11,7 @@ import { PageLoading } from './loading';
 import { PageNotFound } from './404';
 import ProfileComponent from '../components/profile';
 import EditProfileComponent from '../components/edit_profile';
+import Sublayout from '../sublayout';
 
 // TODO: this is a temporary solution to redirect old profile links (using profileId)
 // to new profile links (using username). this should be removed once PR4 is merged
@@ -57,11 +58,17 @@ class NewProfileRedirect extends ClassComponent {
     }
 
     if (m.route.get().includes('/edit')) {
-      return <EditProfileComponent profileId={m.route.param('profileId')} />;
+      return (
+        <Sublayout>
+          <EditProfileComponent profileId={m.route.param('profileId')} />
+        </Sublayout>
+      );
     }
 
     return (
-      <ProfileComponent profileId={m.route.param('profileId')} />
+      <Sublayout>
+        <ProfileComponent profileId={m.route.param('profileId')} />
+      </Sublayout>
     );
   }
 }
