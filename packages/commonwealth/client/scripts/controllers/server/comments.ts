@@ -60,7 +60,7 @@ export const modelFromServer = (comment) => {
 
   let proposal;
   try {
-    proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+    proposal = uniqueIdToProposal(decodeURIComponent(comment.thread_id));
   } catch (e) {
     // no proposal
     console.log(e);
@@ -78,7 +78,7 @@ export const modelFromServer = (comment) => {
           proposal,
           id: comment.id,
           createdAt: moment(comment.created_at),
-          rootProposal: comment.root_id,
+          rootProposal: comment.thread_id,
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
@@ -97,7 +97,7 @@ export const modelFromServer = (comment) => {
           proposal,
           id: comment.id,
           createdAt: moment(comment.created_at),
-          rootProposal: comment.root_id,
+          rootProposal: comment.thread_id,
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
@@ -182,7 +182,7 @@ class CommentsController {
         address,
         parent_id: parentCommentId,
         chain_entity_id: chainEntity?.id,
-        root_id: proposalIdentifier,
+        thread_id: proposalIdentifier,
         'attachments[]': attachments,
         text: encodeURIComponent(unescapedText),
         jwt: app.user.jwt,
@@ -287,7 +287,7 @@ class CommentsController {
         // TODO: Change to GET /comments
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
-          root_id: encodeURIComponent(proposal.uniqueIdentifier),
+          thread_id: encodeURIComponent(proposal.uniqueIdentifier),
         });
         if (response.status !== 'Success') {
           reject(new Error(`Unsuccessful status: ${response.status}`));

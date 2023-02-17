@@ -4,7 +4,7 @@ import type { DB } from '../models';
 import { getLastEdited } from '../util/getLastEdited';
 
 export const Errors = {
-  NoRootId: 'Must provide root_id',
+  NoRootId: 'Must provide thread_id',
 };
 
 const viewComments = async (
@@ -15,12 +15,12 @@ const viewComments = async (
 ) => {
   const chain = req.chain;
 
-  if (!req.query.root_id) {
+  if (!req.query.thread_id) {
     return next(new AppError(Errors.NoRootId));
   }
 
   const comments = await models.Comment.findAll({
-    where: { chain: chain.id, root_id: req.query.root_id },
+    where: { chain: chain.id, thread_id: req.query.thread_id },
     include: [
       models.Address,
       models.Attachment,

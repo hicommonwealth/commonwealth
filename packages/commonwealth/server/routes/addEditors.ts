@@ -131,7 +131,7 @@ const addEditors = async (
         `user-${collaborator.User.id}`,
         {
           created_at: new Date(),
-          root_id: +thread.id,
+          thread_id: +thread.id,
           root_type: ProposalType.Thread,
           root_title: thread.title,
           comment_text: thread.body,

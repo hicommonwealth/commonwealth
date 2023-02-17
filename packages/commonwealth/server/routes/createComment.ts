@@ -32,7 +32,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
-  MissingRootId: 'Must provide valid root_id',
+  MissingRootId: 'Must provide valid thread_id',
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
@@ -59,14 +59,14 @@ const createComment = async (
 
   const {
     parent_id,
-    root_id,
+    thread_id,
     text,
     canvas_action,
     canvas_session,
     canvas_hash,
   } = req.body;
 
-  if (!root_id || root_id.indexOf('_') === -1) {
+  if (!thread_id || thread_id.indexOf('_') === -1) {
     return next(new AppError(Errors.MissingRootId));
   }
   if (
@@ -111,7 +111,6 @@ const createComment = async (
     }
   }
 
-  const thread_id = root_id.substring(root_id.indexOf('_') + 1);
   const thread = await models.Thread.findOne({
     where: { id: thread_id },
   });
@@ -197,7 +196,7 @@ const createComment = async (
   };
   const version_history: string[] = [JSON.stringify(firstVersion)];
   const commentContent = {
-    root_id,
+    thread_id,
     text,
     plaintext,
     version_history,
@@ -255,7 +254,7 @@ const createComment = async (
   // get parent entity if the comment is on a thread
   // no parent entity if the comment is on an onchain entity
   let proposal;
-  const [prefix, id] = finalComment.root_id.split('_') as [
+  const [prefix, id] = finalComment.thread_id.split('_') as [
     ProposalType,
     string
   ];
@@ -273,7 +272,7 @@ const createComment = async (
     proposal = id;
   } else {
     log.error(
-      `No matching proposal of thread for root_id ${finalComment.root_id}`
+      `No matching proposal of thread for thread_id ${finalComment.thread_id}`
     );
   }
 
@@ -348,10 +347,10 @@ const createComment = async (
   emitNotifications(
     models,
     NotificationCategories.NewComment,
-    root_id,
+    thread_id,
     {
       created_at: new Date(),
-      root_id: id,
+      thread_id: id,
       root_title,
       root_type: prefix,
       comment_id: +finalComment.id,
@@ -379,7 +378,7 @@ const createComment = async (
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id: +id,
+        thread_id: +id,
         root_title,
         root_type: prefix,
         comment_id: +finalComment.id,
@@ -415,7 +414,7 @@ const createComment = async (
           `user-${mentionedAddress.User.id}`,
           {
             created_at: new Date(),
-            root_id: +id,
+            thread_id: +id,
             root_title,
             root_type: prefix,
             comment_id: +finalComment.id,

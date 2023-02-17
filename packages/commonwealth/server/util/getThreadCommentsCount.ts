@@ -13,21 +13,21 @@ const getThreadsWithCommentCount = async ({
   models,
   chainId,
 }: GetThreadsWithCommentCount) => {
-  const rootIds = threads.map((thread) => `${thread.kind}_${thread.id}`);
+  const rootIds = threads.map((thread) => thread.id);
 
   const commentsCount = await models.Comment.count({
-    attributes: ['root_id'],
+    attributes: ['thread_id'],
     where: {
       chain: chainId,
-      root_id: { [Op.in]: rootIds },
+      thread_id: { [Op.in]: rootIds },
       deleted_at: null,
     },
-    group: 'root_id',
+    group: 'thread_id',
   });
 
   return threads.map((thread) => {
     const numberOfComment = commentsCount.find(
-      (el) => el.root_id === `${thread.kind}_${thread.id}`
+      (el) => el.thread_id === `${thread.kind}_${thread.id}`
     );
 
     return {

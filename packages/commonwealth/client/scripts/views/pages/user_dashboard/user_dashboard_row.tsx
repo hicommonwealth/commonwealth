@@ -51,11 +51,11 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
       );
     }
 
-    const { chain_id, root_id, root_type } = JSON.parse(
+    const { chain_id, thread_id, root_type } = JSON.parse(
       vnode.attrs.notification.notificationData
     );
 
-    const path = getProposalUrlPath(root_type, root_id, false, chain_id);
+    const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
 
     return (
       <div

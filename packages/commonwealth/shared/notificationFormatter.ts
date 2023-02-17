@@ -17,7 +17,7 @@ export const getForumNotificationCopy = async (
 ) => {
   // unpack notification_data
   const {
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -106,7 +106,7 @@ export const getForumNotificationCopy = async (
 
   // link to proposal
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
     chain: chain_id,
   };

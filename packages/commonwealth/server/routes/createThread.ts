@@ -146,7 +146,7 @@ const dispatchHooks = async (
     location,
     {
       created_at: new Date(),
-      root_id: finalThread.id,
+      thread_id: finalThread.id,
       root_type: ProposalType.Thread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
@@ -178,7 +178,7 @@ const dispatchHooks = async (
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: finalThread.id,
+          thread_id: finalThread.id,
           root_type: ProposalType.Thread,
           root_title: finalThread.title,
           comment_text: finalThread.body,

@@ -84,7 +84,7 @@ const getCommentPreview = (comment_text) => {
 const getNotificationFields = (category, data: IPostNotificationData) => {
   const {
     created_at,
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -158,7 +158,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
         ]);
   }
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
     chain: chain_id,
   };
@@ -190,7 +190,7 @@ const getBatchNotificationFields = (
 
   const {
     created_at,
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -275,7 +275,7 @@ const getBatchNotificationFields = (
         ]);
   }
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
     chain: chain_id,
   };

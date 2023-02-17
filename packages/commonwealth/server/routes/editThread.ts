@@ -192,7 +192,7 @@ const editThread = async (
       '',
       {
         created_at: new Date(),
-        root_id: +finalThread.id,
+        thread_id: +finalThread.id,
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
@@ -258,7 +258,7 @@ const editThread = async (
           `user-${mentionedAddress.User.id}`,
           {
             created_at: new Date(),
-            root_id: +finalThread.id,
+            thread_id: +finalThread.id,
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,

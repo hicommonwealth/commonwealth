@@ -73,10 +73,10 @@ const createReaction = async (
       where: { id: thread_id },
     });
   } else if (comment_id) {
-    const root_id = (
+    const thread_id = (
       await models.Comment.findOne({ where: { id: comment_id } })
-    ).root_id;
-    const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
+    ).thread_id;
+    const comment_thread_id = thread_id.substring(thread_id.indexOf('_') + 1);
     thread = await models.Thread.findOne({
       where: { id: comment_thread_id },
     });
@@ -192,7 +192,7 @@ const createReaction = async (
     if (!comment) return next(new AppError(Errors.NoCommentMatch));
 
     // Test on variety of comments to ensure root relation + type
-    const [prefix, id] = comment.root_id.split('_');
+    const [prefix, id] = comment.thread_id.split('_');
     if (prefix === 'discussion') {
       proposal = await models.Thread.findOne({
         where: { id },
@@ -221,11 +221,11 @@ const createReaction = async (
   // dispatch notifications
   const notification_data = {
     created_at: new Date(),
-    root_id: comment
-      ? comment.root_id.split('_')[1]
+    thread_id: comment
+      ? comment.thread_id.split('_')[1]
       : proposal instanceof models.Thread
       ? proposal.id
-      : proposal?.root_id,
+      : proposal?.thread_id,
     root_title,
     root_type,
     chain_id: finalReaction.chain,

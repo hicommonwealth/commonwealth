@@ -115,7 +115,7 @@ const editComment = async (
     });
     // get thread for crafting commonwealth url
     let proposal;
-    const [prefix, id] = comment.root_id.split('_');
+    const [prefix, id] = comment.thread_id.split('_');
     if (prefix === 'discussion') {
       proposal = await models.Thread.findOne({
         where: { id },
@@ -129,7 +129,7 @@ const editComment = async (
       proposal = id;
     } else {
       log.error(
-        `No matching proposal of thread for root_id ${comment.root_id}`
+        `No matching proposal of thread for thread_id ${comment.thread_id}`
       );
     }
     if (!proposal) {
@@ -154,7 +154,7 @@ const editComment = async (
       '',
       {
         created_at: new Date(),
-        root_id: comment.root_id,
+        thread_id: comment.thread_id,
         root_title,
         root_type: prefix,
         comment_id: +finalComment.id,
@@ -228,7 +228,7 @@ const editComment = async (
           `user-${mentionedAddress.User.id}`,
           {
             created_at: new Date(),
-            root_id: +id,
+            thread_id: +id,
             root_title,
             root_type: prefix,
             comment_id: +finalComment.id,

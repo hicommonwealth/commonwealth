@@ -43,7 +43,7 @@ class ThreadUniqueAddressesCountController {
       data: JSON.stringify({
         threads: threads.map(
           ({ id, Address: { address = null } = {}, author }) => ({
-            root_id: `discussion_${id}`,
+            thread_id: id,
             author: address || author,
           })
         ),
