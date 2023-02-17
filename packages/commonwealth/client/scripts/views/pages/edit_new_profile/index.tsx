@@ -44,9 +44,7 @@ export type Image = {
   imageBehavior: ImageBehavior;
 };
 
-export default class EditNewProfile extends ClassComponent<
-  EditNewProfileAttrs
-> {
+export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
   private address: string;
   private email: string;
   private error: EditProfileError;
@@ -77,7 +75,9 @@ export default class EditNewProfile extends ClassComponent<
       }
       m.redraw();
     });
-    this.profile = new Profile(response.profile);
+
+    const { result } = response;
+    this.profile = new Profile(result.profile);
     this.username = this.profile.name;
     this.email = this.profile.email;
     this.socials = this.profile.socials;
@@ -102,7 +102,7 @@ export default class EditNewProfile extends ClassComponent<
       }, 2500);
     });
 
-    if (response?.status === 'Success') {
+    if (response?.result?.status === 'Success') {
       // Redirect
       setTimeout(() => {
         m.route.set(`/profile/${this.address}`);

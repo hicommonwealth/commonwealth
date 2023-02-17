@@ -1,6 +1,12 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
+import type { TypedRequestQuery, TypedResponse } from '../types';
 import type { DB } from '../models';
+import type { AddressAttributes } from '../models/address';
+import type { CommentAttributes } from '../models/comment';
+import type { ThreadAttributes } from '../models/thread';
+import type { ProfileInstance } from '..//models/profile';
+import { success } from '../types';
 
 export const Errors = {
   NoAddressProvided: 'No address provided in query',
@@ -8,10 +14,19 @@ export const Errors = {
   NoProfileFound: 'No profile found',
 };
 
+type GetNewProfileReq = { address: string };
+type GetNewProfileResp = {
+  profile: ProfileInstance;
+  addresses: AddressAttributes[];
+  threads: ThreadAttributes[];
+  comments: CommentAttributes[];
+  commentThreads: ThreadAttributes[];
+};
+
 const getNewProfile = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestQuery<GetNewProfileReq>,
+  res: TypedResponse<GetNewProfileResp>,
   next: NextFunction
 ) => {
   const { address } = req.query;
@@ -21,30 +36,18 @@ const getNewProfile = async (
     where: {
       address,
     },
-    include: [models.Profile],
+    include: [{ model: models.Profile, required: true }],
   });
   if (!addressModel) return next(new Error(Errors.NoAddressFound));
 
-  const profile = await models.Profile.findOne({
-    where: {
-      id: addressModel.profile_id,
-    },
-  });
+  const profile = await addressModel.getProfile();
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
   const addresses = await models.Address.findAll({
     where: {
       profile_id: profile.id,
     },
-  });
-
-  const chainIds = [...new Set<string>(addresses.map((a) => a.chain))];
-  const chains = await models.Chain.findAll({
-    where: {
-      id: {
-        [Op.in]: chainIds,
-      },
-    },
+    include: [models.Chain],
   });
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
@@ -79,13 +82,12 @@ const getNewProfile = async (
     },
   });
 
-  return res.status(200).json({
+  return success(res, {
     profile,
     addresses: addresses.map((a) => a.toJSON()),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
-    chains: chains.map((c) => c.toJSON()),
   });
 };
 

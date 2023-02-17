@@ -1,5 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction } from 'express';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import type { DB } from '../models';
+import { success, failure } from '../types';
 
 export const Errors = {
   NotAuthorized: 'Not authorized',
@@ -9,10 +11,26 @@ export const Errors = {
   NoAddressProvided: 'No address provided in query',
 };
 
+type UpdateNewProfileReq = {
+  address: string;
+  email: string;
+  slug: string;
+  name: string;
+  bio: string;
+  website: string;
+  avatarUrl: string;
+  socials: string;
+  coverImage: string;
+  backgroundImage: string;
+};
+type UpdateNewProfileResp = {
+  status: string;
+};
+
 const updateNewProfile = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<UpdateNewProfileReq>,
+  res: TypedResponse<UpdateNewProfileResp>,
   next: NextFunction
 ) => {
   if (!req.body.address) {
@@ -50,7 +68,7 @@ const updateNewProfile = async (
     where: {
       address,
     },
-    include: [models.OffchainProfile],
+    include: [models.OffchainProfile, models.Profile],
   });
   if (!addressModel) return next(new Error(Errors.NoAddressFound));
 
@@ -58,11 +76,7 @@ const updateNewProfile = async (
     return next(new Error(Errors.NotAuthorized));
   }
 
-  const profile = await models.Profile.findOne({
-    where: {
-      id: addressModel.profile_id,
-    },
-  });
+  const profile = await addressModel.getProfile();
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
   const updateStatus = await models.Profile.update(
@@ -85,12 +99,12 @@ const updateNewProfile = async (
   );
 
   if (!updateStatus) {
-    return res.json({
+    return failure(res.status(400), {
       status: 'Failed',
     });
   }
 
-  return res.json({
+  return success(res, {
     status: 'Success',
   });
 };

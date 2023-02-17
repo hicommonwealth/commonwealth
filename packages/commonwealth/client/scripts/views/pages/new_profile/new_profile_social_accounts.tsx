@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import type m from 'mithril';
+import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'pages/new_profile/new_profile_social_accounts.scss';
@@ -32,9 +32,7 @@ class SocialAccount extends ClassComponent<NewProfileSocialAccountAttrs> {
   }
 }
 
-export class SocialAccounts extends ClassComponent<
-  NewProfileSocialAccountsAttrs
-> {
+export class SocialAccounts extends ClassComponent<NewProfileSocialAccountsAttrs> {
   view(vnode: m.Vnode<NewProfileSocialAccountsAttrs>) {
     const { profile } = vnode.attrs;
 
