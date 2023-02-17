@@ -59,7 +59,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
     // TODO Gabe 9/7/22 - comment headers should link to comments
 
     // const parentThread = app.threads.getById(
-    //   Number(subscription.Comment.rootProposal.slice(-4))
+    //   Number(subscription.comment.threadId.slice(-4))
     // );
 
     // const commentUrl = getProposalUrlPath(

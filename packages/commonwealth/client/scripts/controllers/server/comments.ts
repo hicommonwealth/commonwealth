@@ -1,7 +1,5 @@
-import type { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
-import { uniqueIdToProposal } from 'identifiers';
 import $ from 'jquery';
 import _ from 'lodash';
 import type { IUniqueId } from 'models';
@@ -10,14 +8,8 @@ import moment from 'moment';
 
 import app from 'state';
 import { CommentsStore } from 'stores';
+import type Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
-
-// tslint:disable: object-literal-key-quotes
-
-export enum CommentRefreshOption {
-  ResetAndLoadComments = 'ResetAndLoadComments',
-  LoadProposalComments = 'LoadProposalComments',
-}
 
 export const modelFromServer = (comment) => {
   const attachments = comment.Attachments
@@ -70,7 +62,7 @@ export const modelFromServer = (comment) => {
           threadId: comment.threadId,
           id: comment.id,
           createdAt: moment(comment.created_at),
-          rootProposal: comment.thread_id,
+          rootThread: comment.thread_id,
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
@@ -89,7 +81,7 @@ export const modelFromServer = (comment) => {
           threadId: comment.threadId,
           id: comment.id,
           createdAt: moment(comment.created_at),
-          rootProposal: comment.thread_id,
+          rootThread: comment.thread_id,
           parentComment: Number(comment.parent_id) || null,
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
@@ -113,23 +105,23 @@ class CommentsController {
     return this._store.getById(id);
   }
 
-  public getByProposal<T extends IUniqueId>(proposal: T) {
-    return this._store.getByProposal(proposal);
+  public getByThread(thread: Thread) {
+    return this._store.getByThread(thread);
   }
 
-  public nComments<T extends IUniqueId>(proposal: T) {
-    return this._store.nComments(proposal);
+  public nComments(thread: Thread) {
+    return this._store.nComments(thread);
   }
 
-  public lastCommented<T extends IUniqueId>(proposal: T) {
-    const comments = this._store.getByProposal(proposal);
+  public lastCommented(thread: Thread) {
+    const comments = this._store.getByThread(thread);
     if (comments.length === 0) return null;
     return moment(Math.max(...comments.map((c) => +c.createdAt)));
   }
 
-  public commenters<T extends IUniqueId>(proposal: T) {
+  public commenters(thread: Thread) {
     const authors = this._store
-      .getByProposal(proposal)
+      .getByThread(thread)
       .map((comment) => comment.author);
     return _.uniq(authors);
   }
@@ -137,32 +129,16 @@ class CommentsController {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async create<T extends IUniqueId>(
     address: string,
-    proposalIdentifier: string,
+    threadId: number,
     chain: string,
     unescapedText: string,
     parentCommentId: any = null,
     attachments?: string[]
   ) {
-    // attempt to find the chain-entity associated with this proposal
-    // TODO: is the below assumptions valid?
-    // this only works if we assume that all chain-entities for the specific
-    // chain are loaded when the comment is created
-    const [prefix] = proposalIdentifier.split('_') as [ProposalType, string];
     let chainEntity;
-    if (
-      prefix.includes('proposal') ||
-      prefix.includes('referendum') ||
-      prefix.includes('motion')
-    ) {
-      chainEntity = app.chainEntities.store.getByUniqueId(
-        app.activeChainId(),
-        proposalIdentifier
-      );
-    }
     try {
-      // TODO: Create a new type for proposal comments?
       const { session, action, hash } = await app.sessions.signComment({
-        thread_id: proposalIdentifier,
+        thread_id: threadId,
         body: unescapedText,
         parent_comment_id: parentCommentId,
       });
@@ -174,7 +150,7 @@ class CommentsController {
         address,
         parent_id: parentCommentId,
         chain_entity_id: chainEntity?.id,
-        thread_id: proposalIdentifier,
+        thread_id: threadId,
         'attachments[]': attachments,
         text: encodeURIComponent(unescapedText),
         jwt: app.user.jwt,
@@ -207,7 +183,7 @@ class CommentsController {
     try {
       // TODO: Change to PUT /comment
       const { session, action, hash } = await app.sessions.signComment({
-        thread_id: comment.rootProposal,
+        thread_id: comment.threadId,
         body,
         parent_comment_id: comment.parentComment,
       });
@@ -284,7 +260,7 @@ class CommentsController {
         if (response.status !== 'Success') {
           reject(new Error(`Unsuccessful status: ${response.status}`));
         }
-        this._store.clearProposal(thread.id);
+        this._store.clearByThread(thread.id);
         response.result.forEach((comment) => {
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');
