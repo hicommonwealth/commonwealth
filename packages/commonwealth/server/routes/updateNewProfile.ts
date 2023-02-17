@@ -1,5 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
+import type { NextFunction } from 'express';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { failure, success } from '../types';
+import type { DB } from '../models';
 
 export const Errors = {
   NotAuthorized: 'Not authorized',
@@ -9,10 +11,27 @@ export const Errors = {
   NoProfileIdProvided: 'No profile id provided in query',
 };
 
+type UpdateNewProfileReq = {
+  profileId: string;
+  username: string;
+  email: string;
+  slug: string;
+  name: string;
+  bio: string;
+  website: string;
+  avatarUrl: string;
+  socials: string;
+  coverImage: string;
+  backgroundImage: string;
+};
+type UpdateNewProfileResp = {
+  status: string;
+};
+
 const updateNewProfile = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<UpdateNewProfileReq>,
+  res: TypedResponse<UpdateNewProfileResp>,
   next: NextFunction
 ) => {
   if (!req.body.profileId) {
@@ -92,12 +111,11 @@ const updateNewProfile = async (
   );
 
   if (!updateStatus) {
-    return res.json({
+    return failure(res.status(400), {
       status: 'Failed',
     });
   }
-
-  return res.json({
+  return success(res, {
     status: 'Success',
   });
 };

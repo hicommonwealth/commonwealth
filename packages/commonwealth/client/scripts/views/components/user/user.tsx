@@ -1,7 +1,7 @@
 /* eslint-disable no-script-url */
-import React from 'react';
+import React, { useEffect } from 'react';
+import $ from 'jquery';
 
-import { render, redraw } from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
@@ -53,6 +53,7 @@ export const User = (props: UserAttrs) => {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [profileId, setProfileId] = React.useState<string>();
 
   const popoverProps = usePopover();
 
@@ -67,6 +68,22 @@ export const User = (props: UserAttrs) => {
   let account: Account;
 
   let profile: Profile;
+
+  useEffect(() => {
+    getProfileId(user);
+  }, []);
+
+  const getProfileId = async (passedUser: Account | AddressInfo | Profile) => {
+    const { result } = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
+      address: passedUser.address,
+      chain:
+        typeof passedUser.chain === 'string'
+          ? passedUser.chain
+          : passedUser.chain?.id,
+      jwt: app.user.jwt,
+    });
+    setProfileId(result.profileId);
+  };
 
   const loggedInUserIsAdmin =
     app.user.isSiteAdmin ||
@@ -180,7 +197,7 @@ export const User = (props: UserAttrs) => {
               'a.user-display-name.username',
               profile
                 ? // TODO: switch to profile.username once PR4 is merged
-                `/profile/a/${profile.address}`
+                  `/profile/id/${profileId}`
                 : 'javascript:',
               <>
                 {!profile ? (
@@ -253,9 +270,9 @@ export const User = (props: UserAttrs) => {
             link(
               'a.user-display-name',
               profile
-                  ? // TODO: switch to profile.username once PR4 is merged
-                  `/profile/a/${profile.address}`
-                  : 'javascript:',
+                ? // TODO: switch to profile.username once PR4 is merged
+                  `/profile/id/${profileId}`
+                : 'javascript:',
               !profile ? (
                 addrShort
               ) : !showAddressWithDisplayName ? (

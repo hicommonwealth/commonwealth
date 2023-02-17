@@ -65,6 +65,20 @@ const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
     React.useState<boolean>(false);
   const [isSelectAddressModalOpen, setIsSelectAddressModalOpen] =
     React.useState<boolean>(false);
+  const [profileId, setProfileId] = React.useState<string>();
+
+  React.useEffect(() => {
+    getProfileId();
+  }, []);
+
+  const getProfileId = async () => {
+    const { result } = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
+      address: app.user.activeAccount.profile.address,
+      chain: app.activeChainId(),
+      jwt: app.user.jwt,
+    });
+    setProfileId(result.profileId);
+  };
 
   return (
     <>
@@ -91,10 +105,9 @@ const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
           <div
             className="login-menu-item"
             onClick={() => {
-              const pf = app.user.activeAccount.profile;
-              if (pf) {
+              if (profileId) {
                 // TODO: switch to profile.username once PR4 is merged
-                navigate(`/profile/a/${pf.address}`);
+                navigate(`/profile/id/${profileId}`);
               }
             }}
           >
@@ -105,10 +118,9 @@ const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
           <div
             className="login-menu-item"
             onClick={() => {
-              const pf = app.user.activeAccount.profile;
-              if (pf) {
+              if (profileId) {
                 // TODO: switch to profile.username once PR4 is merged
-                navigate(`/profile/a/${pf.address}/edit`);
+                navigate(`/profile/id/${profileId}/edit`);
               }
             }}
           >

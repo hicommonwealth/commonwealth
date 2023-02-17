@@ -2,21 +2,21 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import jdenticon from 'jdenticon';
 
-import 'pages/new_profile/new_profile_header.scss';
+import 'components/profile/profile_header.scss';
 
 import app from 'state';
 import type { NewProfile as Profile } from 'client/scripts/models';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWText } from '../../components/component_kit/cw_text';
-import { renderQuillTextBody } from '../../components/quill/helpers';
-import { SocialAccounts } from '../../components/social_accounts';
+import { CWButton } from '../component_kit/cw_button';
+import { CWText } from '../component_kit/cw_text';
+import { renderQuillTextBody } from '../quill/helpers';
+import { SocialAccounts } from '../social_accounts';
 
-type NewProfileHeaderProps = {
+type ProfileHeaderProps = {
   profile: Profile;
   isOwner: boolean;
 };
 
-const NewProfileHeader = (props: NewProfileHeaderProps) => {
+const ProfileHeader = (props: ProfileHeaderProps) => {
   const navigate = useNavigate();
   const [defaultAvatar, setDefaultAvatar] = React.useState<string>();
 
@@ -54,7 +54,7 @@ const NewProfileHeader = (props: NewProfileHeaderProps) => {
       </div>
       <div className="profile-name-and-bio">
         <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
-          {name || username}
+          {name || username || 'Anonymous user'}
         </CWText>
         <div className="buttons">
           {/* TODO: Add delegate and follow buttons */}
@@ -73,4 +73,4 @@ const NewProfileHeader = (props: NewProfileHeaderProps) => {
   );
 };
 
-export default NewProfileHeader;
+export default ProfileHeader;

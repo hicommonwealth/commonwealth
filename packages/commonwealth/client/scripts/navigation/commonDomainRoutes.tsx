@@ -465,7 +465,7 @@ const getCommonDomainsRoutes = () => (
     {/* TODO: remove route when PR4 is merged
     should be able to use /profile/:username instead */}
     <Route
-      path="/profile/a/:address"
+      path="/profile/id/:profileId"
       element={withLayout(NewProfileRedirect, {
         scoped: true,
         deferChain: true,
@@ -474,7 +474,7 @@ const getCommonDomainsRoutes = () => (
     {/* TODO: remove route when PR4 is merged
     should be able to use /profile/:username/edit instead */}
     <Route
-      path="/profile/a/:address/edit"
+      path="/profile/id/:profileId/edit"
       element={withLayout(NewProfileRedirect, {
         scoped: true,
         deferChain: true,

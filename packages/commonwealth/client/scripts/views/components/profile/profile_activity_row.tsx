@@ -4,31 +4,30 @@ import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent } from 'mithrilInterop';
 import moment from 'moment';
 
-import 'pages/new_profile/new_profile_activity_row.scss';
+import 'components/profile/profile_activity_row.scss';
 
+import app from 'state';
 import type Thread from 'client/scripts/models/Thread';
-import type { ChainInfo } from 'client/scripts/models';
 import withRouter from 'navigation/helpers';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWTag } from '../../components/component_kit/cw_tag';
-import { renderQuillTextBody } from '../../components/quill/helpers';
-import type { CommentWithAssociatedThread } from './new_profile_activity';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWText } from '../component_kit/cw_text';
+import { CWTag } from '../component_kit/cw_tag';
+import { renderQuillTextBody } from '../quill/helpers';
+import type { CommentWithAssociatedThread } from './profile_activity';
+import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 
-type NewProfileActivityRowAttrs = {
+type ProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
   address: string;
-  chains: ChainInfo[];
 };
 
-class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
-  view(vnode: ResultNode<NewProfileActivityRowAttrs>) {
-    const { activity, chains } = vnode.attrs;
+class ProfileActivityRow extends ClassComponent<ProfileActivityRowAttrs> {
+  view(vnode: ResultNode<ProfileActivityRowAttrs>) {
+    const { activity } = vnode.attrs;
     const { chain, createdAt, author, title, id, body } = activity;
     const isThread = !!(activity as Thread).kind;
     const comment = activity as CommentWithAssociatedThread;
-    const chainInfo = chains.find((c) => c.id === chain);
+    const { iconUrl } = app.config.chains.getById(chain);
     const domain = document.location.origin;
     const renderTrigger = (onclick) => (
       <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
@@ -37,7 +36,7 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
     return (
       <div className="ProfileActivityRow">
         <div className="chain-info">
-          <img src={chainInfo.iconUrl} />
+          <img src={iconUrl} />
           <CWText fontWeight="semiBold" className="link">
             <a
               onClick={(e) => {
@@ -141,4 +140,4 @@ class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   }
 }
 
-export default withRouter(NewProfileActivityRow);
+export default withRouter(ProfileActivityRow);

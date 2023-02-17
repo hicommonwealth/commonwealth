@@ -3,17 +3,16 @@ import React from 'react';
 import type { ResultNode } from 'mithrilInterop';
 import { ClassComponent, getRouteParam } from 'mithrilInterop';
 
-import 'pages/new_profile/new_profile_activity.scss';
+import 'components/profile/profile_activity.scss';
 
 import type Thread from 'client/scripts/models/Thread';
-import type ChainInfo from 'client/scripts/models/ChainInfo';
 import type Comment from 'client/scripts/models/Comment';
 import type AddressInfo from 'client/scripts/models/AddressInfo';
 import type { IUniqueId } from 'client/scripts/models/interfaces';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import NewProfileActivityContent from './new_profile_activity_content';
+import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
+import ProfileActivityContent from './profile_activity_content';
 
-enum ProfileActivity {
+enum ProfileActivityType {
   Addresses,
   Comments,
   Communities,
@@ -24,23 +23,22 @@ export type CommentWithAssociatedThread = Comment<IUniqueId> & {
   thread: Thread;
 };
 
-type NewProfileActivityAttrs = {
+type ProfileActivityAttrs = {
   addresses: AddressInfo[];
   comments: CommentWithAssociatedThread[];
-  chains: ChainInfo[];
   threads: Thread[];
 };
 
-class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
+class ProfileActivity extends ClassComponent<ProfileActivityAttrs> {
   private address: string;
-  private selectedActivity: ProfileActivity;
+  private selectedActivity: ProfileActivityType;
 
   oninit() {
     this.address = getRouteParam('address');
-    this.selectedActivity = ProfileActivity.Comments;
+    this.selectedActivity = ProfileActivityType.Comments;
   }
 
-  view(vnode: ResultNode<NewProfileActivityAttrs>) {
+  view(vnode: ResultNode<ProfileActivityAttrs>) {
     return (
       <div className="ProfileActivity">
         <div className="activity-nav">
@@ -48,9 +46,11 @@ class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
             <CWTab
               label="All Activity"
               onClick={() => {
-                this.selectedActivity = ProfileActivity.Comments;
+                this.selectedActivity = ProfileActivityType.Comments;
               }}
-              isSelected={this.selectedActivity === ProfileActivity.Comments}
+              isSelected={
+                this.selectedActivity === ProfileActivityType.Comments
+              }
             />
             <CWTab
               label={
@@ -60,9 +60,9 @@ class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
                 </div>
               }
               onClick={() => {
-                this.selectedActivity = ProfileActivity.Threads;
+                this.selectedActivity = ProfileActivityType.Threads;
               }}
-              isSelected={this.selectedActivity === ProfileActivity.Threads}
+              isSelected={this.selectedActivity === ProfileActivityType.Threads}
             />
             {/* TODO: uncomment when communities are ready */}
             {/* <div className="divider" />
@@ -83,12 +83,11 @@ class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
           </CWTabBar>
         </div>
         <div className="activity-content">
-          <NewProfileActivityContent
+          <ProfileActivityContent
             option={this.selectedActivity}
             address={this.address}
             threads={vnode.attrs.threads}
             comments={vnode.attrs.comments}
-            chains={vnode.attrs.chains}
           />
         </div>
       </div>
@@ -96,4 +95,4 @@ class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
   }
 }
 
-export default NewProfileActivity;
+export default ProfileActivity;
