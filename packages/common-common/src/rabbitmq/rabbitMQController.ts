@@ -141,6 +141,9 @@ export class RabbitMQController {
               ackOrNack(e, { strategy: 'nack' });
             } else {
               log.error(`Unknown Error - ${errorMsg}`, e);
+              // log.error doesn't log full sequelize errors e.g. only logs 'Validation Error' but not what
+              // that error is actually about
+              console.error(e);
               this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e);
               ackOrNack(e, [
                 { strategy: 'republish', defer: 2000, attempts: 3 },
