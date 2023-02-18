@@ -22,26 +22,10 @@ import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import SubstrateChain from './shared';
 
-export interface IValidators {
-  [address: string]: {
-    exposure: Exposure;
-    controller: string;
-    isElected: boolean;
-    prefs; // TODO
-  };
-}
-
 type Delegation = [AccountId, Conviction] & Codec;
 
 export class SubstrateAccount extends Account {
   // GETTERS AND SETTERS
-  // staking
-  public get stakedBalance(): Promise<SubstrateCoin> {
-    if (!this._Chain?.apiInitialized) return;
-    return this.stakingExposure.then((exposure) =>
-      this._Chain.coins(exposure ? exposure.total.toBn() : NaN)
-    );
-  }
 
   // The total balance
   public get balance(): Promise<SubstrateCoin> {
@@ -76,50 +60,6 @@ export class SubstrateAccount extends Account {
     );
   }
 
-  // The coin locks this account has on them
-  public get locks(): Promise<(BalanceLock | BalanceLockTo212)[]> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.derive.balances
-      .all(this.address)
-      .then(({ lockedBreakdown }) =>
-        lockedBreakdown.length > 0 ? lockedBreakdown : []
-      );
-  }
-
-  // True iff this account is on the main substrate council
-  // TODO: this only checks the council collective, we may want to include a list of all
-  //   collective memberships.
-  public get isCouncillor(): Promise<boolean> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.council
-      .members()
-      .then(
-        (members: Vec<AccountId>) =>
-          undefined !== members.find((m) => m.toString() === this.address)
-      );
-  }
-
-  // The amount staked by this account & accounts who have nominated it
-  public get stakingExposure(): Promise<Exposure> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.staking
-      .currentEra<EraIndex>()
-      .then((era: EraIndex) => {
-        // Different runtimes call for different access to stakers: old vs. new
-        const stakersCall = this._Chain.api.query.staking.stakers
-          ? this._Chain.api.query.staking.stakers
-          : this._Chain.api.query.staking.erasStakers;
-        // Different staking functions call for different function arguments: old vs. new
-        const stakersCallArgs = (account) =>
-          this._Chain.api.query.staking.stakers
-            ? [account]
-            : [era.toString(), account];
-        return stakersCall(
-          ...stakersCallArgs(this.address)
-        ) as Promise<Exposure>;
-      });
-  }
-
   public get bonded(): Promise<SubstrateAccount> {
     if (!this._Chain?.apiInitialized) return;
     return this._Chain.api.query.staking
@@ -131,17 +71,6 @@ export class SubstrateAccount extends Account {
           return null;
         }
       });
-  }
-
-  public get stakingLedger(): Promise<StakingLedger> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.staking.ledger(this.address).then((ledger) => {
-      if (ledger && ledger.isSome) {
-        return ledger.unwrap();
-      } else {
-        return null;
-      }
-    });
   }
 
   // Accounts may delegate their voting power for democracy referenda. This always incurs the maximum locktime
@@ -162,20 +91,6 @@ export class SubstrateAccount extends Account {
           ];
         }
       });
-  }
-
-  // returns all stash keys of validators that the account has nominated
-  public get nominees(): Promise<SubstrateAccount[]> {
-    return this._Accounts.validators.then((validators: IValidators) =>
-      Object.entries(validators)
-        .filter(
-          ([, { exposure }]) =>
-            exposure.others.findIndex(
-              ({ who }) => who.toString() === this.address
-            ) !== -1
-        )
-        .map(([stash]) => this._Accounts.get(stash))
-    );
   }
 
   private _Chain: SubstrateChain;
@@ -210,127 +125,12 @@ export class SubstrateAccount extends Account {
     this._Accounts = Accounts;
     this._Accounts.store.add(this);
   }
-
-  // TRANSACTIONS
-  public get balanceTransferFee(): Promise<SubstrateCoin> {
-    const txFee = this._Chain.api.consts.balances.transferFee as Balance;
-    if (txFee) return Promise.resolve(this._Chain.coins(txFee));
-    const dummyTxFunc = (api: ApiPromise) =>
-      api.tx.balances.transfer(this.address, '0');
-    return this._Chain.computeFees(this.address, dummyTxFunc);
-  }
-
-  public nominateTx(nominees: SubstrateAccount[]) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) =>
-        api.tx.staking.nominate(nominees.map((n) => n.address)),
-      'nominate',
-      `${this.address} updates nominations`
-    );
-  }
-
-  public chillTx() {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.chill(),
-      'chill',
-      `${this.address} is chilling`
-    );
-  }
-
-  public bondTx(
-    controller: SubstrateAccount,
-    amount: SubstrateCoin,
-    rewardDestination: number | string
-  ) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) =>
-        api.tx.staking.bond(
-          controller.address,
-          amount,
-          this._Chain.createType('RewardDestination', rewardDestination)
-        ),
-      'bond',
-      `${this.address} bonds ${amount.toString()} to controller ${
-        controller.address
-      }`
-    );
-  }
-
-  public bondExtraTx(amount: SubstrateCoin) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.bondExtra(amount),
-      'bondExtra',
-      `${this.address} bonds additional ${amount.toString()}`
-    );
-  }
-
-  public unbond(amount: SubstrateCoin) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.unbond(amount),
-      'unbond',
-      `${this.address} unbonds ${amount.toString()}`
-    );
-  }
-
-  public setController(controller: SubstrateAccount) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.setController(controller.address),
-      'setController',
-      `${this.address} sets controller ${controller.address}`
-    );
-  }
-
-  public setPayee(rewardDestination: number | string) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) =>
-        api.tx.staking.setPayee(
-          this._Chain.createType('RewardDestination', rewardDestination)
-        ),
-      'setPayee',
-      `${this.address} sets reward destination ${rewardDestination}`
-    );
-  }
-
-  public unlockTx() {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.democracy.unlock(this.address),
-      'unlock',
-      `${this.address} attempts to unlock from democracy`
-    );
-  }
-
-  public claimNominatorPayoutTx(era, validators) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.payoutNominator(era, validators),
-      'unlock',
-      `${this.address} attempts to unlock from democracy`
-    );
-  }
-
-  public claimValidatorPayoutTx(era) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.payoutValidator(era),
-      'unlock',
-      `${this.address} attempts to unlock from democracy`
-    );
-  }
 }
 
 class SubstrateAccounts
   implements IAccountsModule<SubstrateCoin, SubstrateAccount>
 {
   private _initialized = false;
-  private cachedValidators;
 
   public get initialized() {
     return this._initialized;
@@ -395,95 +195,6 @@ class SubstrateAccounts
         isEd25519
       );
     }
-  }
-
-  public getValidators() {
-    return new Promise(async (resolve) => {
-      if (this.cachedValidators) {
-        resolve(this.cachedValidators);
-      }
-
-      this.validators.then((results) => {
-        console.log(results);
-        this.cachedValidators = Object.entries(results).map(
-          ([address, info]) => ({
-            chain: this._Chain.app.chain?.meta?.id,
-            stash: address,
-            controller: info.controller,
-            isElected: info.isElected,
-            total: this._Chain.coins(info.exposure.total.toBn()),
-            own: this._Chain.coins(info.exposure.own.toBn()),
-            commission: info.prefs.commission?.toHuman(),
-            nominators: info.exposure.others.length,
-          })
-        );
-        resolve(this.cachedValidators);
-      });
-    });
-  }
-
-  public get validators(): Promise<IValidators> {
-    return new Promise(async (resolve) => {
-      const res = await this._Chain.api.derive.staking.validators();
-      const { nextElected, validators: currentSet } = res;
-      const era = await this._Chain.api.query.staking.currentEra<EraIndex>();
-
-      // set of not yet but future validators
-      const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
-      // Different runtimes call for different access to stakers: old vs. new
-      const stakersCall = this._Chain.api.query.staking.stakers
-        ? this._Chain.api.query.staking.stakers
-        : this._Chain.api.query.staking.erasStakers;
-
-      // Different staking functions call for different function arguments: old vs. new
-      const stakersCallArgs = (account) =>
-        this._Chain.api.query.staking.stakers
-          ? account
-          : [era.toString(), account];
-      const controllers = await this._Chain.api.query.staking.bonded.multi(
-        currentSet.map((elt) => elt.toString())
-      );
-      const exposures: Exposure[] = await stakersCall.multi(
-        currentSet.map((elt) => stakersCallArgs(elt.toString()))
-      );
-      const validatorPrefs =
-        await this._Chain.api.query.staking.erasValidatorPrefs.multi(
-          currentSet.map((elt) => stakersCallArgs(elt.toString()))
-        );
-
-      const nextUpControllers =
-        await this._Chain.api.query.staking.bonded.multi(
-          toBeElected.map((elt) => elt.toString())
-        );
-      const nextUpExposures: Exposure[] = await stakersCall.multi(
-        toBeElected.map((elt) => stakersCallArgs(elt.toString()))
-      );
-      const nextUpValidatorPrefs =
-        await this._Chain.api.query.staking.erasValidatorPrefs.multi(
-          toBeElected.map((elt) => stakersCallArgs(elt.toString()))
-        );
-
-      const result: IValidators = {};
-      for (let i = 0; i < currentSet.length; ++i) {
-        result[currentSet[i].toString()] = {
-          exposure: exposures[i],
-          controller: controllers[i].toString(),
-          prefs: validatorPrefs[i],
-          isElected: true,
-        };
-      }
-
-      // add set of next elected
-      for (let i = 0; i < toBeElected.length; ++i) {
-        result[toBeElected[i].toString()] = {
-          exposure: nextUpExposures[i],
-          controller: nextUpControllers[i].toString(),
-          prefs: nextUpValidatorPrefs[i],
-          isElected: false,
-        };
-      }
-      resolve(result);
-    });
   }
 
   // TODO: can we remove these functions?

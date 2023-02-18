@@ -111,7 +111,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const actorName = m(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
-    hideIdentityIcon: true,
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -222,7 +221,6 @@ const getBatchNotificationFields = (
   const actorName = m(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
-    hideIdentityIcon: true,
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -417,7 +415,6 @@ const NotificationRow: m.Component<
       const authorName = m(User, {
         user: author,
         hideAvatar: true,
-        hideIdentityIcon: true,
       });
 
       return link(
