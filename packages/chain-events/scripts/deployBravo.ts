@@ -124,6 +124,7 @@ async function findOrCreateChainAndChainNode() {
       chain_node_id: chainNode.id,
       ce_verbose: true,
       type: ChainType.DAO,
+      token_name: 'MPOND'
     });
   } else console.log('\tChain found!');
 
