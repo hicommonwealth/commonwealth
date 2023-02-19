@@ -12,7 +12,6 @@
   "keywords": [],
   "scripts": {
     "build-contracts": "cd src/eth && npx hardhat compile",
-    "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "lint": "../../scripts/lint-new-work.sh",
     "lint-all": "eslint './**/*.ts'",
     "check-types": "tsc --noEmit",

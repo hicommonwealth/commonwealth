@@ -5,7 +5,6 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
-import type Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import m from 'mithril';
@@ -36,13 +35,7 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
-    return [
-      chain.council,
-      chain.technicalCommittee,
-      chain.treasury,
-      chain.democracyProposals,
-      chain.democracy,
-    ];
+    return [chain.treasury, chain.democracyProposals, chain.democracy];
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     const chain = app.chain as Cosmos;
     return [chain.governance];
@@ -113,12 +106,6 @@ class ProposalsPage extends ClassComponent {
         .getAll()
         .filter((p) => !p.completed);
 
-    const activeCouncilProposals =
-      onSubstrate &&
-      (app.chain as Substrate).council.store
-        .getAll()
-        .filter((p) => !p.completed);
-
     const activeCosmosProposals =
       app.chain &&
       app.chain.base === ChainBase.CosmosSDK &&
@@ -126,13 +113,6 @@ class ProposalsPage extends ClassComponent {
         .getAll()
         .filter((p) => !p.completed)
         .sort((a, b) => +b.identifier - +a.identifier);
-
-    const activeMolochProposals =
-      onMoloch &&
-      (app.chain as Moloch).governance.store
-        .getAll()
-        .filter((p) => !p.completed)
-        .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
     const activeCompoundProposals =
       onCompound &&
@@ -157,9 +137,7 @@ class ProposalsPage extends ClassComponent {
 
     const activeProposalContent =
       !activeDemocracyProposals?.length &&
-      !activeCouncilProposals?.length &&
       !activeCosmosProposals?.length &&
-      !activeMolochProposals?.length &&
       !activeCompoundProposals?.length &&
       !activeAaveProposals?.length &&
       !activeSputnikProposals?.length
@@ -167,17 +145,7 @@ class ProposalsPage extends ClassComponent {
         : (activeDemocracyProposals || [])
             .map((proposal) => <ProposalCard proposal={proposal} />)
             .concat(
-              (activeCouncilProposals || []).map((proposal) => (
-                <ProposalCard proposal={proposal} />
-              ))
-            )
-            .concat(
               (activeCosmosProposals || []).map((proposal) => (
-                <ProposalCard proposal={proposal} />
-              ))
-            )
-            .concat(
-              (activeMolochProposals || []).map((proposal) => (
                 <ProposalCard proposal={proposal} />
               ))
             )
@@ -212,12 +180,6 @@ class ProposalsPage extends ClassComponent {
         .getAll()
         .filter((p) => p.completed);
 
-    const inactiveCouncilProposals =
-      onSubstrate &&
-      (app.chain as Substrate).council.store
-        .getAll()
-        .filter((p) => p.completed);
-
     const inactiveCosmosProposals =
       app.chain &&
       app.chain.base === ChainBase.CosmosSDK &&
@@ -225,13 +187,6 @@ class ProposalsPage extends ClassComponent {
         .getAll()
         .filter((p) => p.completed)
         .sort((a, b) => +b.identifier - +a.identifier);
-
-    const inactiveMolochProposals =
-      onMoloch &&
-      (app.chain as Moloch).governance.store
-        .getAll()
-        .filter((p) => p.completed)
-        .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
     const inactiveCompoundProposals =
       onCompound &&
@@ -256,9 +211,7 @@ class ProposalsPage extends ClassComponent {
 
     const inactiveProposalContent =
       !inactiveDemocracyProposals?.length &&
-      !inactiveCouncilProposals?.length &&
       !inactiveCosmosProposals?.length &&
-      !inactiveMolochProposals?.length &&
       !inactiveCompoundProposals?.length &&
       !inactiveAaveProposals?.length &&
       !inactiveSputnikProposals?.length
@@ -266,17 +219,7 @@ class ProposalsPage extends ClassComponent {
         : (inactiveDemocracyProposals || [])
             .map((proposal) => <ProposalCard proposal={proposal} />)
             .concat(
-              (inactiveCouncilProposals || []).map((proposal) => (
-                <ProposalCard proposal={proposal} />
-              ))
-            )
-            .concat(
               (inactiveCosmosProposals || []).map((proposal) => (
-                <ProposalCard proposal={proposal} />
-              ))
-            )
-            .concat(
-              (inactiveMolochProposals || []).map((proposal) => (
                 <ProposalCard proposal={proposal} />
               ))
             )

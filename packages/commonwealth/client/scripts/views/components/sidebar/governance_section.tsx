@@ -95,30 +95,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       app.chain?.network === ChainNetwork.Compound ||
       app.chain?.network === ChainNetwork.Aave;
 
-    const showCouncillors =
-      isNotOffchain && app.chain?.base === ChainBase.Substrate;
-
     const showTreasury =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge;
 
-    const showBounties =
-      isNotOffchain &&
-      app.chain?.base === ChainBase.Substrate &&
-      app.chain.network !== ChainNetwork.Centrifuge &&
-      app.chain.network !== ChainNetwork.HydraDX;
-
     const showTips =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge;
-
-    const showValidators =
-      isNotOffchain &&
-      app.chain?.base === ChainBase.Substrate &&
-      app.chain?.network !== ChainNetwork.Kulupu &&
-      app.chain?.network !== ChainNetwork.Darwinia;
 
     // ---------- Build Toggle Tree ---------- //
     const governanceDefaultToggleTree: ToggleTree = {
@@ -152,12 +137,6 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
             children: {},
           },
         }),
-        ...(showBounties && {
-          Bounties: {
-            toggledState: false,
-            children: {},
-          },
-        }),
         ...(showReferenda && {
           Referenda: {
             toggledState: false,
@@ -172,18 +151,6 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         }),
         ...(showTips && {
           Tips: {
-            toggledState: false,
-            children: {},
-          },
-        }),
-        ...(showCouncillors && {
-          Councillors: {
-            toggledState: false,
-            children: {},
-          },
-        }),
-        ...(showValidators && {
-          Validators: {
             toggledState: false,
             children: {},
           },
@@ -233,20 +200,11 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         }`
       );
 
-    const onBountiesPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/bounties`);
-
     const onTipsPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/tips`) ||
       p.startsWith(
         `/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`
       );
-
-    const onCouncilPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/council`);
-
-    const onValidatorsPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/validators`);
 
     const onNotificationsPage = (p) => p.startsWith('/notifications');
 
@@ -377,24 +335,6 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       displayData: null,
     };
 
-    const bountyData: SectionGroupAttrs = {
-      title: 'Bounties',
-      containsChildren: false,
-      hasDefaultToggle: showBounties
-        ? toggleTreeState['children']['Bounties']['toggledState']
-        : false,
-      onclick: (e, toggle: boolean) => {
-        e.preventDefault();
-        handleRedirectClicks(e, '/bounties', app.activeChainId(), () => {
-          setGovernanceToggleTree('children.Bounties.toggledState', toggle);
-        });
-      },
-      isVisible: showBounties,
-      isUpdated: true,
-      isActive: onBountiesPage(m.route.get()),
-      displayData: null,
-    };
-
     const referendaData: SectionGroupAttrs = {
       title: 'Referenda',
       containsChildren: false,
@@ -431,42 +371,6 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       displayData: null,
     };
 
-    const councillorsData: SectionGroupAttrs = {
-      title: 'Councillors',
-      containsChildren: false,
-      hasDefaultToggle: showCouncillors
-        ? toggleTreeState['children']['Councillors']['toggledState']
-        : false,
-      onclick: (e, toggle: boolean) => {
-        e.preventDefault();
-        handleRedirectClicks(e, '/council', app.activeChainId(), () => {
-          setGovernanceToggleTree('children.Councillors.toggledState', toggle);
-        });
-      },
-      isVisible: showCouncillors,
-      isUpdated: true,
-      isActive: onCouncilPage(m.route.get()),
-      displayData: null,
-    };
-
-    const validatorsData: SectionGroupAttrs = {
-      title: 'Validators',
-      containsChildren: false,
-      hasDefaultToggle: showValidators
-        ? toggleTreeState['children']['Validators']['toggledState']
-        : false,
-      onclick: (e, toggle: boolean) => {
-        e.preventDefault();
-        handleRedirectClicks(e, '/validators', app.activeChainId(), () => {
-          setGovernanceToggleTree('children.Validators.toggledState', toggle);
-        });
-      },
-      isVisible: showValidators,
-      isUpdated: true,
-      isActive: onValidatorsPage(m.route.get()),
-      displayData: null,
-    };
-
     // Delegate
     const delegateData: SectionGroupAttrs = {
       title: 'Delegate',
@@ -492,12 +396,9 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       snapshotData,
       delegateData,
       treasuryData,
-      bountyData,
       referendaData,
       proposalsData,
       tipsData,
-      councillorsData,
-      validatorsData,
     ];
 
     if (!hasProposals) governanceGroupData = [membersData];

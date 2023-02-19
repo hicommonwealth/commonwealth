@@ -69,6 +69,7 @@ import createThread from '../routes/createThread';
 import editThread from '../routes/editThread';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
+import deletePoll from '../routes/deletePoll';
 import updateThreadStage from '../routes/updateThreadStage';
 import updateThreadPrivacy from '../routes/updateThreadPrivacy';
 import updateThreadPinned from '../routes/updateThreadPinned';
@@ -308,6 +309,11 @@ function setupRouter(
     '/getPolls',
     databaseValidationService.validateChain,
     getPolls.bind(this, models)
+  );
+  router.delete(
+    '/deletePoll',
+    passport.authenticate('jwt', { session: false }),
+    deletePoll.bind(this, models)
   );
   router.post(
     '/updateThreadStage',
@@ -929,13 +935,9 @@ function setupRouter(
     startOAuthLogin.bind(this, models, 'discord')
   );
 
-  router.post(
-    '/auth/magic',
-    passport.authenticate('magic'),
-    (req, res, next) => {
-      return res.json({ status: 'Success', result: req.user.toJSON() });
-    }
-  );
+  router.post('/auth/magic', passport.authenticate('magic'), (req, res) => {
+    return res.json({ status: 'Success', result: req.user.toJSON() });
+  });
 
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(
