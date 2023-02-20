@@ -154,12 +154,21 @@ async function migrateChainEntity(
     events.sort((a, b) => a.blockNumber - b.blockNumber);
     log.info(`Writing chain events to db... (count: ${events.length})`);
     for (const event of events) {
+      let dbEvent;
       try {
         // eslint-disable-next-line no-await-in-loop
-        const dbEvent = await migrationHandler.handle(event);
+        dbEvent = await migrationHandler.handle(event);
+      } catch (e) {
+        console.log(e);
+        log.error(`Migration Event handle failure: ${e.message}`);
+      }
+      if (!dbEvent) continue;
+
+      try {
         await entityArchivalHandler.handle(event, dbEvent);
       } catch (e) {
-        log.error(`Event handle failure: ${e.message}`);
+        console.log(e);
+        log.error(`Entity Event handle failure: ${e.message}`);
       }
     }
   } catch (e) {
