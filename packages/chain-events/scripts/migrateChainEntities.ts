@@ -167,7 +167,7 @@ async function migrateChainEntity(
       try {
         await entityArchivalHandler.handle(event, dbEvent);
       } catch (e) {
-        console.log(e);
+        console.log(e.message, e);
         log.error(`Entity Event handle failure: ${e.message}`);
       }
     }
