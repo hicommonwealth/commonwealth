@@ -15,6 +15,7 @@ import {
   ChainNetwork,
   ChainType,
 } from 'common-common/src/types';
+import {BIGINT} from "sequelize";
 
 async function deployGovBravo(
   signer: JsonRpcSigner,
@@ -128,6 +129,28 @@ async function findOrCreateChainAndChainNode() {
       type: ChainType.DAO,
       token_name: 'comp'
     });
+
+    console.log('\tCreating new community roles...');
+    await cwModels.CommunityRole.bulkCreate([
+      {
+        chain_id: 'hardhat-local',
+        name: 'member',
+        allow: BigInt('0'),
+        deny: BigInt('0')
+      },
+      {
+        chain_id: 'hardhat-local',
+        name: 'admin',
+        allow: BigInt('0'),
+        deny: BigInt('0')
+      },
+      {
+        chain_id: 'hardhat-local',
+        name: 'moderator',
+        allow: BigInt('0'),
+        deny: BigInt('0')
+      }
+    ]);
   } else console.log('\tChain found!');
 
   console.log();
