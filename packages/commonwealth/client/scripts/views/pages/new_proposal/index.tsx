@@ -1,5 +1,8 @@
 /* @jsx m */
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import type m from 'mithril';
+
 import ClassComponent from 'class_component';
 import { ChainNetwork, ProposalType } from 'common-common/src/types';
 import {
@@ -7,7 +10,6 @@ import {
   proposalSlugToClass,
   proposalSlugToFriendlyName,
 } from 'identifiers';
-import type m from 'mithril';
 import type { ProposalModule } from 'models';
 
 import 'pages/new_proposal/index.scss';

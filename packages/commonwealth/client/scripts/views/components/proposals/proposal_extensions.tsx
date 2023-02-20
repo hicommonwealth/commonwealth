@@ -1,5 +1,8 @@
 /* @jsx m */
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import m from 'mithril';
+
 import ClassComponent from 'class_component';
 
 import 'components/proposals/proposal_extensions.scss';
@@ -7,7 +10,6 @@ import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import type m from 'mithril';
 import type { AnyProposal } from 'models';
 
 import app from 'state';

@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
-import { AddressAccount } from 'models';
+import type { AddressAccount } from 'models';
 
 import ClassComponent from 'class_component';
 
