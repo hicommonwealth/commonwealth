@@ -159,7 +159,6 @@ async function migrateChainEntity(
         // eslint-disable-next-line no-await-in-loop
         dbEvent = await migrationHandler.handle(event);
       } catch (e) {
-        console.log(e);
         log.error(`Migration Event handle failure: ${e.message}`);
       }
       if (!dbEvent) continue;
@@ -167,7 +166,6 @@ async function migrateChainEntity(
       try {
         await entityArchivalHandler.handle(event, dbEvent);
       } catch (e) {
-        console.log(e.message, e);
         log.error(`Entity Event handle failure: ${e.message}`);
       }
     }
