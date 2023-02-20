@@ -3,11 +3,20 @@ import ceModels from '../services/database/database';
 import {BalanceType} from "common-common/src/types";
 
 async function main() {
+  console.log("Starting clean-up:")
+
   await ceModels.sequelize.transaction(async (t) => {
-    console.log("Starting clean-up:")
-    const ceDeleted = await ceModels.ChainEvent.destroy({
+    const cetsToDelete = (await ceModels.ChainEventType.findAll({
       where: {
         chain: 'hardhat-local'
+      },
+      transaction: t
+    })).map(x => x.id);
+    console.log("\tCETs to delete", cetsToDelete);
+
+    const ceDeleted = await ceModels.ChainEvent.destroy({
+      where: {
+        chain_event_type_id: cetsToDelete
       },
       transaction: t
     });
@@ -20,6 +29,13 @@ async function main() {
       transaction: t
     });
     console.log(`\tDeleted ${entitiesDeleted} chain-entities`);
+
+    // const typesDeleted = await ceModels.ChainEventType.destroy({
+    //   where: {
+    //     id: cetsToDelete
+    //   }
+    // });
+    // console.log(`\tDeleted ${typesDeleted} chain-event-types`);
 
     await cwModels.sequelize.transaction(async (t2) => {
       const entityMetaDeleted = await cwModels.ChainEntityMeta.destroy({
@@ -45,6 +61,13 @@ async function main() {
           },
           transaction: t2
         });
+
+        const offChainProfiles = await cwModels.OffchainProfile.destroy({
+          where: {
+            address_id: addressesToDelete.map(x => x.id)
+          }
+        });
+        console.log(`\tDeleted ${offChainProfiles} off-chain-profiles`);
 
         const roleAssignmentsDeleted = await cwModels.RoleAssignment.destroy({
           where: {
@@ -78,13 +101,14 @@ async function main() {
         });
         console.log(`\tDeleted ${subscriptionsDeleted} subscriptions`);
 
-        const usersDeleted = await cwModels.User.destroy({
+        const usersModified = await cwModels.User.update({
+          selected_chain_id: 'ethereum'
+        }, {
           where: {
             selected_chain_id: 'hardhat-local'
-          },
-          transaction: t2
+          }
         });
-        console.log(`\tDeleted ${usersDeleted} users`);
+        console.log(`\tUpdated ${usersModified} users`);
 
         const communityContractDeleted = await cwModels.CommunityContract.destroy({
           where: {

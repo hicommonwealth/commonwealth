@@ -51,7 +51,7 @@ export class RolesController {
   }
 
   public createRole(options: {
-    address: AddressAccount | Omit<AddressAccount, 'chain'>;
+    address: AddressAccount;
     chain?: string;
     community?: string;
   }): JQueryPromise<void> {

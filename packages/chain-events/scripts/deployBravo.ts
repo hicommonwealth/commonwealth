@@ -37,7 +37,7 @@ async function deployGovBravo(
     timelock.address,
     comp.address,
     member,
-    10,
+    30,
     1,
     1
   );
@@ -115,7 +115,7 @@ async function findOrCreateChainAndChainNode() {
     chain = await cwModels.Chain.create({
       id: 'hardhat-local',
       name: 'Hardhat Testing Community',
-      default_symbol: 'MPOND',
+      default_symbol: 'COMP',
       active: true,
       has_chain_events_listener: true,
       network: ChainNetwork.Compound,
@@ -124,7 +124,7 @@ async function findOrCreateChainAndChainNode() {
       chain_node_id: chainNode.id,
       ce_verbose: true,
       type: ChainType.DAO,
-      token_name: 'MPOND'
+      token_name: 'comp'
     });
   } else console.log('\tChain found!');
 
@@ -144,7 +144,7 @@ async function findOrCreateDbContracts(
       chain_node_id: chainNodeId,
       address: contractAddress,
       decimals: 18,
-      symbol: 'MPOND',
+      symbol: 'COMP',
       type: 'compound',
       is_factory: false,
     },

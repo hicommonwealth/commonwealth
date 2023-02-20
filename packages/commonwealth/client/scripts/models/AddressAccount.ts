@@ -80,7 +80,7 @@ export default class AddressAccount {
     }
   }
 
-  get addressId() {
+  get addressId(): number {
     return this._addressId;
   }
 

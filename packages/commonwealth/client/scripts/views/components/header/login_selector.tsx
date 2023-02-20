@@ -14,7 +14,6 @@ import {
 import { notifySuccess } from 'controllers/app/notifications';
 import { isSameAccount, pluralize } from 'helpers';
 import $ from 'jquery';
-import _ from 'lodash';
 import m from 'mithril';
 import { ITokenAdapter } from 'models';
 
@@ -394,7 +393,7 @@ export class LoginSelector extends ClassComponent {
               })
             ) {
               await app.roles.createRole({
-                address: _.omit(addressAccount, 'chain'),
+                address: addressAccount,
                 chain: activeChainId,
               });
             }

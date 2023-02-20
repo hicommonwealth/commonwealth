@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import type m from 'mithril';
+import m from 'mithril';
 
 import app from 'state';
 import { isNonEmptyString } from '../helpers/typeGuards';

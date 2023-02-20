@@ -14,4 +14,12 @@ build/
 .yalc/
 yalc.lock
 /dist/
+
+# Database downloads
 latest.dump
+latest.dump.*
+out.dump
+out.dump.*
+redacted.dump
+redacted.dump.*
+*.dat
