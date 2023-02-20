@@ -52,6 +52,8 @@ async function deployGovBravo(
 
   // transfer COMP to the give address
   await comp.transfer(process.argv[2], BigNumber.from(10).pow(21));
+  await comp.transfer('0xCC8D47D441D1e2b477B322C9243f814D8A609808', BigNumber.from(10).pow(21));
+
   const balance = await comp.balanceOf(process.argv[2]);
   console.log(
     `\t${process.argv[2]} COMP Balance:`,
@@ -191,6 +193,7 @@ async function main() {
   const signer = provider.getSigner(member);
 
   await sendEthers(signer, process.argv[2]);
+  await sendEthers(signer, '0xCC8D47D441D1e2b477B322C9243f814D8A609808');
 
   const { comp, bravo } = await deployGovBravo(signer, member, bridge);
 

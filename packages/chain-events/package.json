@@ -15,6 +15,7 @@
     "check-services-types": "tsc --noEmit --project tsconfig.services.json",
     "deploy-bravo": "ts-node -T scripts/deployBravo.ts",
     "create-bravo-proposal": "ts-node -T ./scripts/create-bravo-proposal.ts",
+    "time-travel": "ts-node -T ./scripts/hardhatTimeTravel.ts",
     "clean-up-bravo": "ts-node -T ./scripts/cleanUpBravo.ts",
     "check-src-types": "tsc --noEmit --project tsconfig.src.json",
     "check-types": "tsc --noEmit --project tsconfig.json",

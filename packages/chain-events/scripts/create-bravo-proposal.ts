@@ -3,11 +3,12 @@ import {JsonRpcSigner} from "@ethersproject/providers";
 import BravoABI from '../eth/artifacts/contracts/Compound/GovernorBravoImmutable.sol/GovernorBravoImmutable.json';
 import CompABI from '../eth/artifacts/contracts/Compound/MPond.sol/MPond.json';
 import {ProposalState} from "../src/chains/compound/types";
+import {timeTravel} from "./utils/timeTravel";
 
 async function createProposal(signer: JsonRpcSigner, bravo: any, comp: any) {
   console.log("Creating Proposal:");
-  const proposalMinimum = await bravo.proposalThreshold();
-  const delegateAmount = proposalMinimum.mul(3);
+  // const proposalMinimum = await bravo.proposalThreshold();
+  const delegateAmount = BigNumber.from(10).pow(19);
   console.log("\tSelf delegating", ethers.utils.formatUnits(delegateAmount, 18), "COMP...");
   await comp.delegate(signer._address, delegateAmount, { from: signer._address });
 
@@ -31,20 +32,14 @@ async function createProposal(signer: JsonRpcSigner, bravo: any, comp: any) {
   console.log(`\tLatest proposal state = ${ProposalState[state]}\n`);
 }
 
-async function timeTravel(provider: providers.JsonRpcProvider, bravo: any, from: string) {
+async function startProposal(provider: providers.JsonRpcProvider, bravo: any, from: string) {
   console.log("Time travelling until the proposal is active:")
   const activeProposals = await bravo.latestProposalIds(from);
   const { startBlock } = await bravo.proposals(activeProposals);
   const currentBlock = await provider.getBlockNumber();
   console.log(`\tCurrent block = ${currentBlock}`);
   const blockDelta = startBlock.sub(currentBlock).add(1);
-  console.log(`\tTime travelling through ${blockDelta} blocks!`);
-  const timeDelta = blockDelta.mul(15);
-  await provider.send('evm_increaseTime', [+timeDelta]);
-  for (let i = 0; i < +blockDelta; ++i) {
-    await provider.send('evm_mine', []);
-  }
-  console.log(`\tWelcome to the future!\n`);
+  await timeTravel(provider, blockDelta);
 }
 
 async function main() {
@@ -75,7 +70,7 @@ async function main() {
   const comp = new ethers.Contract(process.argv[3], CompABI.abi, signer);
 
   await createProposal(signer, bravo, comp);
-  await timeTravel(provider, bravo, signer._address);
+  await startProposal(provider, bravo, signer._address);
 
   console.log("Re-checking proposal state:");
   const activeProposals = await bravo.latestProposalIds(signer._address);
