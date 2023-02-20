@@ -132,13 +132,22 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
     const events = await fetcher.fetch(range, true);
     events.sort((a, b) => a.blockNumber - b.blockNumber);
     log.info(`Writing chain events to db... (count: ${events.length})`);
+    let dbEvent;
     for (const event of events) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        const dbEvent = await migrationHandler.handle(event);
+        dbEvent = await migrationHandler.handle(event);
+      } catch (e) {
+        log.error(`Migration handle failure: ${e.message}`);
+      }
+
+      if (!dbEvent) continue;
+
+      try {
+        // eslint-disable-next-line no-await-in-loop
         await entityArchivalHandler.handle(event, dbEvent);
       } catch (e) {
-        log.error(`Event handle failure: ${e.message}`);
+        log.error(`Entity handle failure: ${e.message}`);
       }
     }
   } catch (e) {
