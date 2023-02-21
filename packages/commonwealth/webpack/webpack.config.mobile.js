@@ -24,7 +24,6 @@ module.exports = merge(common, {
       // SERVICE_URL: JSON.stringify((process.env.NODE_ENV ==='production') ? 'https://commonwealth.im' :
       //   (process.env.NODE_ENV ==='staging') ? `https://commonwealth-staging.herokuapp.com` :
       //     (process.env.NODE_ENV ==='device') ? process.env.SERVICE_URL : `http://localhost:8080`),
-      // CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com'),
     }),
   ],
 });
