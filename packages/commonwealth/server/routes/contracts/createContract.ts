@@ -164,8 +164,6 @@ const createContract = async (
         transaction: t,
       });
 
-      console.log('contract', contract);
-
       await models.CommunityContract.create(
         {
           chain_id,
