@@ -8,7 +8,6 @@ import 'pages/notifications_page.scss';
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';
 import PageError from 'views/pages/error';
-import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 
 let minDiscussionNotification = 0;
@@ -93,19 +92,6 @@ const NotificationsPage: m.Component = {
           }),
         ],
         message: 'This page requires you to be logged in.',
-      });
-
-    const activeEntity = app.chain;
-    if (!activeEntity)
-      return m(PageLoading, {
-        // title: [
-        //   'Notifications ',
-        //   m(Tag, {
-        //     size: 'xs',
-        //     label: 'Beta',
-        //     style: 'position: relative; top: -2px; margin-left: 6px',
-        //   }),
-        // ],
       });
 
     const discussionNotifications =
