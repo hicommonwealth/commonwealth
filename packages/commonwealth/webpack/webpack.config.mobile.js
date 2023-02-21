@@ -16,7 +16,7 @@ module.exports = merge(common, {
     publicPath: '/',
     path: path.join(__dirname, '../build'),
     filename: 'js/[name].[hash:8].js',
-    chunkFilename: 'js/[name].[chunkhash:8].chunk.js'
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -24,7 +24,7 @@ module.exports = merge(common, {
       // SERVICE_URL: JSON.stringify((process.env.NODE_ENV ==='production') ? 'https://commonwealth.im' :
       //   (process.env.NODE_ENV ==='staging') ? `https://commonwealth-staging.herokuapp.com` :
       //     (process.env.NODE_ENV ==='device') ? process.env.SERVICE_URL : `http://localhost:8080`),
-      CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com')
+      CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com'),
     }),
   ],
 });

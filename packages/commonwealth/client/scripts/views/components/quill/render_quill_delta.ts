@@ -112,7 +112,7 @@ export const renderQuillDelta = (
                         console.log('click');
                         console.log(app.isNative(window));
                         if (app.isNative(window)) {
-                          await Browser.open({ url: child.attributes.link});
+                          await Browser.open({ url: child.attributes.link });
                         }
                         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
                           return;

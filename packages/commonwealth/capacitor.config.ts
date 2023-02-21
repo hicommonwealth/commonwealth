@@ -8,14 +8,14 @@ const baseConfig: CapacitorConfig = {
   webDir: 'build',
   bundledWebRuntime: false,
   plugins: {
-    "SplashScreen": {
-      "launchShowDuration": 5000,
-      "launchAutoHide": true,
-    }
+    SplashScreen: {
+      launchShowDuration: 5000,
+      launchAutoHide: true,
+    },
   },
   ios: {
-    allowsLinkPreview: true
-  }
+    allowsLinkPreview: true,
+  },
 };
 
 switch (process.env.NODE_ENV) {
@@ -50,6 +50,5 @@ switch (process.env.NODE_ENV) {
     };
     break;
 }
-
 
 export default config;

@@ -13,9 +13,9 @@ export const NODE_URL =
 
 export const SERVER_URL =
   process.env.SERVER_URL ||
-    (process.env.NODE_ENV === 'production'
-      ? 'https://commonwealth.im' :
-      'http://localhost:8080');
+  (process.env.NODE_ENV === 'production'
+    ? 'https://commonwealth.im'
+    : 'http://localhost:8080');
 
 export const ENTITIES_URL =
   process.env.ENTITIES_URL ||
@@ -47,17 +47,21 @@ export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 export const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 export const GITHUB_OAUTH_CALLBACK =
   process.env.GITHUB_OAUTH_CALLBACK ||
-  (process.env.NODE_ENV === 'production' ? 'https://commonwealth.im' :
-    process.env.NODE_ENV === 'mobile' ?  'capacitor://localhost' :
-    'http://localhost:8080') + '/api/auth/github/callback';
+  (process.env.NODE_ENV === 'production'
+    ? 'https://commonwealth.im'
+    : process.env.NODE_ENV === 'mobile'
+    ? 'capacitor://localhost'
+    : 'http://localhost:8080') + '/api/auth/github/callback';
 
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 export const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 export const DISCORD_OAUTH_CALLBACK =
   process.env.DISCORD_OAUTH_CALLBACK ||
-  (process.env.NODE_ENV === 'production' ? 'https://commonwealth.im' :
-    process.env.NODE_ENV === 'mobile' ?  'capacitor://localhost' :
-    'http://localhost:8080') + '/api/auth/discord/callback';
+  (process.env.NODE_ENV === 'production'
+    ? 'https://commonwealth.im'
+    : process.env.NODE_ENV === 'mobile'
+    ? 'capacitor://localhost'
+    : 'http://localhost:8080') + '/api/auth/discord/callback';
 export const DISCORD_OAUTH_SCOPES =
   process.env.DISCORD_OAUTH_SCOPES?.split(' ');
 
