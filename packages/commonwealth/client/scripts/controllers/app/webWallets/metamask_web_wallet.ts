@@ -86,9 +86,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  private async switchWalletNetworks(
-    ethChainId: string | number
-  ): Promise<void> {
+  private async switchWalletNetworks(ethChainId: string): Promise<void> {
     // ACTIONS
     // TODO: use https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods to switch active
     // chain according to currently active node, if one exists
@@ -160,10 +158,10 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   // ACTIONS
   public async enable() {
-    this.switchWalletNetworks(app.chain?.meta.node.ethChainId);
+    this.switchWalletNetworks(app.chain?.meta.node.ethChainId.toString());
   }
 
-  public async enableForEthChainId(ethChainId: string | number) {
+  public async enableForEthChainId(ethChainId: string) {
     this.switchWalletNetworks(ethChainId);
   }
 

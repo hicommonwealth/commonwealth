@@ -250,10 +250,21 @@ const getCustomDomainRoutes = (importRoute) => ({
   }),
 
   // General Contracts
+  '/contracts': importRoute(import('views/pages/contracts'), {
+    scoped: true,
+    deferChain: true,
+  }),
   '/new/contract': importRoute(import('views/pages/new_contract'), {
     scoped: true,
     deferChain: true,
   }),
+  '/new/contract_template': importRoute(
+    import('views/pages/new_contract_template'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
   '/contract/:contractAddress': importRoute(
     import('views/pages/general_contract'),
     {
@@ -514,13 +525,31 @@ const getCommonDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
+  '/:scope/contracts': importRoute(import('views/pages/contracts'), {
+    scoped: true,
+    deferChain: true,
+  }),
   '/:scope/new/contract': importRoute(import('views/pages/new_contract'), {
     scoped: true,
     deferChain: true,
   }),
+  '/:scope/new/contract_template/:contract_id': importRoute(
+    import('views/pages/new_contract_template'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
   '/:scope/contract/:contractAddress': importRoute(
-    'views/pages/general_contract',
+    import('views/pages/general_contract'),
     { scoped: true }
+  ),
+  // TODO temporary route name
+  '/:scope/:contract_address/:slug': importRoute(
+    import('views/pages/view_template'),
+    {
+      scoped: true,
+    }
   ),
   '/:scope/discussions/:topic': importRoute(import('views/pages/discussions'), {
     scoped: true,

@@ -5,17 +5,13 @@ import type { Express } from 'express';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
 import domain from '../routes/domain';
-import status from '../routes/status';
 import createAddress from '../routes/createAddress';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
-import selectChain from '../routes/selectChain';
-import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
 import finishOAuthLogin from '../routes/finishOAuthLogin';
-import startOAuthLogin from '../routes/startOAuthLogin';
 import createComment from '../routes/createComment';
 import editComment from '../routes/editComment';
 import deleteComment from '../routes/deleteComment';
@@ -27,7 +23,6 @@ import viewReactions from '../routes/viewReactions';
 import bulkReactions from '../routes/bulkReactions';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
-import starCommunity from '../routes/starCommunity';
 import createChain from '../routes/createChain';
 import createContract from '../routes/contracts/createContract';
 import getContracts, {
@@ -41,12 +36,6 @@ import communityStats from '../routes/communityStats';
 import fetchEtherscanContract from '../routes/etherscanAPI';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
-import createSubscription from '../routes/subscription/createSubscription';
-import deleteSubscription from '../routes/subscription/deleteSubscription';
-import enableSubscriptions from '../routes/subscription/enableSubscriptions';
-import disableSubscriptions from '../routes/subscription/disableSubscriptions';
-import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
-import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
 import viewNotifications, {
   NotificationCategories,
 } from '../routes/viewNotifications';
@@ -63,7 +52,6 @@ import getProfileOld from '../routes/getProfile';
 
 import createRole from '../routes/createRole';
 import deleteRole from '../routes/deleteRole';
-import setDefaultRole from '../routes/setDefaultRole';
 
 import getUploadSignature from '../routes/getUploadSignature';
 import activeThreads from '../routes/activeThreads';
@@ -88,8 +76,6 @@ import addEditors from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import bulkThreads from '../routes/bulkThreads';
 import getThreadsOld from '../routes/getThreads';
-import searchDiscussions from '../routes/searchDiscussions';
-import searchComments from '../routes/searchComments';
 import createDraft from '../routes/drafts/createDraft';
 import deleteDraft from '../routes/drafts/deleteDraft';
 import editDraft from '../routes/drafts/editDraft';
@@ -99,7 +85,6 @@ import updateChain from '../routes/updateChain';
 import bulkProfiles from '../routes/bulkProfiles';
 import updateProfile from '../routes/updateProfile';
 import writeUserSetting from '../routes/writeUserSetting';
-import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
 import createTopic from '../routes/createTopic';
 import updateTopic from '../routes/updateTopic';
@@ -108,7 +93,6 @@ import editTopic from '../routes/editTopic';
 import deleteTopic from '../routes/deleteTopic';
 import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
-import setTopicThreshold from '../routes/setTopicThreshold';
 import getChatMessages from '../routes/chat/getChatMessages';
 import getChatChannel from '../routes/chat/getChatChannel';
 import createChatChannel from '../routes/chat/createChatChannel';
@@ -120,6 +104,34 @@ import editChatCategory from '../routes/chat/editChatCategory';
 import createRule from '../routes/rules/createRule';
 import deleteRule from '../routes/rules/deleteRule';
 import getRuleTypes from '../routes/rules/getRuleTypes';
+import searchComments from '../routes/searchComments';
+import searchDiscussions from '../routes/searchDiscussions';
+import selectChain from '../routes/selectChain';
+import sendFeedback from '../routes/sendFeedback';
+import setDefaultRole from '../routes/setDefaultRole';
+import setTopicThreshold from '../routes/setTopicThreshold';
+import starCommunity from '../routes/starCommunity';
+import startEmailLogin from '../routes/startEmailLogin';
+import startOAuthLogin from '../routes/startOAuthLogin';
+
+import {
+  createCommunityContractTemplateAndMetadata,
+  getCommunityContractTemplate,
+  updateCommunityContractTemplate,
+  deleteCommunityContractTemplate,
+  getCommunityContractTemplateMetadata,
+  updateCommunityContractTemplateMetadata,
+  deleteCommunityContractTemplateMetadata,
+} from '../routes/proposalTemplate';
+import { createTemplate, getTemplates } from '../routes/templates';
+
+import status from '../routes/status';
+import createSubscription from '../routes/subscription/createSubscription';
+import deleteSubscription from '../routes/subscription/deleteSubscription';
+import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
+import disableSubscriptions from '../routes/subscription/disableSubscriptions';
+import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
+import enableSubscriptions from '../routes/subscription/enableSubscriptions';
 
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
@@ -258,6 +270,60 @@ function setupRouter(
     '/contract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
+  );
+
+  // Templates
+  router.post(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    createTemplate.bind(this, models)
+  );
+
+  router.get(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    getTemplates.bind(this, models)
+  );
+
+  // community contract
+  router.post(
+    '/contract/community_template_and_metadata',
+    passport.authenticate('jwt', { session: false }),
+    createCommunityContractTemplateAndMetadata.bind(this, models)
+  );
+  router.get(
+    '/contract/community_template',
+    getCommunityContractTemplate.bind(this, models)
+  );
+
+  router.put(
+    '/contract/community_template',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityContractTemplate.bind(this, models)
+  );
+
+  router.delete(
+    '/contract/community_template',
+    passport.authenticate('jwt', { session: false }),
+    deleteCommunityContractTemplate.bind(this, models)
+  );
+
+  // community contract metadata
+  router.get(
+    '/contract/community_template/metadata',
+    getCommunityContractTemplateMetadata.bind(this, models)
+  );
+
+  router.put(
+    '/contract/community_template/metadata',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityContractTemplateMetadata.bind(this, models)
+  );
+
+  router.delete(
+    '/contract/community_template/metadata',
+    passport.authenticate('jwt', { session: false }),
+    deleteCommunityContractTemplateMetadata.bind(this, models)
   );
 
   router.post(

@@ -314,3 +314,28 @@
 
   @include iconAndText($neutral-800);
 }
+
+@mixin miniRed {
+  align-items: center;
+  padding: 4px 12px;
+  background: $white;
+  border: 1px solid $rorange-600;
+  border-radius: $border-radius-rounded-corners;
+
+  &:hover {
+    border-color: $rorange-500;
+  }
+
+  &:active {
+    border-color: $rorange-300;
+  }
+
+  &.disabled {
+    border: 1px solid $rorange-200;
+    pointer-events: none;
+
+    @include iconAndText($rorange-200);
+  }
+
+  @include iconAndText($rorange-600);
+}

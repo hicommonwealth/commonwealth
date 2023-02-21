@@ -12,8 +12,6 @@ import m from 'mithril';
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { ContractsViewable } from 'common-common/src/types';
-import { DiscussionSection } from './discussion_section';
-import { GovernanceSection } from './governance_section';
 import { ContractSection } from './contract_section';
 import { ExternalLinksModule } from './external_links_module';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
@@ -21,6 +19,8 @@ import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { DiscussionSection } from './discussion_section';
+import { GovernanceSection } from './governance_section';
 
 export type SidebarMenuName =
   | 'default'

@@ -6,7 +6,7 @@ import type { ContractAttributes } from './contract';
 export type ContractAbiAttributes = {
   id: number;
   nickname?: string;
-  abi: Array<Record<string, unknown>>;
+  abi: string; // Array<Record<string, unknown>>;
   verified?: boolean;
   created_at?: Date;
   updated_at?: Date;

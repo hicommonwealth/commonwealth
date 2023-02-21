@@ -19,6 +19,20 @@ class Contract {
   public readonly contractAbi?: ContractAbi;
 
   public readonly ethChainId?: number;
+  // Not attached to db model, but used for UI
+  public readonly ccts?: Array<{
+    id: number;
+    communityContractId: number;
+    templateId: number;
+
+    cctmd: {
+      id: number;
+      slug: string;
+      nickname: string;
+      display_name: string;
+      display_options: string;
+    };
+  }>;
 
   constructor({
     id,
@@ -35,6 +49,7 @@ class Contract {
     nickname,
     contractAbi,
     ethChainId,
+    ccts,
   }: {
     id: number;
     address: string;
@@ -49,7 +64,20 @@ class Contract {
     isFactory?: boolean;
     nickname?: string;
     contractAbi?: ContractAbi;
-    ethChainId: number;
+    ethChainId?: number;
+    ccts?: Array<{
+      id: number;
+      communityContractId: number;
+      templateId: number;
+
+      cctmd: {
+        id: number;
+        slug: string;
+        nickname: string;
+        display_name: string;
+        display_options: string;
+      };
+    }>;
   }) {
     this.id = id;
     this.address = address;
@@ -65,6 +93,7 @@ class Contract {
     this.nickname = nickname;
     this.contractAbi = contractAbi;
     this.ethChainId = ethChainId;
+    this.ccts = ccts;
   }
 
   public static fromJSON({
@@ -82,6 +111,7 @@ class Contract {
     nickname,
     contractAbi,
     ethChainId,
+    ccts,
   }) {
     return new Contract({
       id,
@@ -98,6 +128,7 @@ class Contract {
       nickname,
       contractAbi,
       ethChainId,
+      ccts,
     });
   }
 }

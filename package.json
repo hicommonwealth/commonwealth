@@ -41,6 +41,7 @@
     "@types/moment": "^2.13.0",
     "axios": "^0.21.2",
     "ethers": "5.7.2",
+    "@ethersproject/hash": "^5.7.0",
     "moment": "^2.23.0",
     "pg": "^8.7.1",
     "stylelint": "^14.14.1",

@@ -3,7 +3,7 @@ import IdStore from './IdStore';
 
 // Models a store of all the contracts
 class ContractsStore extends IdStore<Contract> {
-  private _storeAddress: { [address: string]: Contract } = {};
+  public _storeAddress: { [address: string]: Contract } = {};
   private _storeType: { [type: string]: Array<Contract> } = {};
   private _storeFactories: Array<Contract> = [];
 
@@ -32,7 +32,8 @@ class ContractsStore extends IdStore<Contract> {
     this._storeType[contract.type].splice(typeIndex, 1);
     return this;
   }
-  public getFactoryContractByNickname(nickname: string): Contract {
+
+  public getContractByNickname(nickname: string): Contract {
     // filter through the _storeId map for a contract with a specified nickname
     const contracts = this._storeFactories.filter(
       (c) => c.nickname === nickname
@@ -60,6 +61,11 @@ class ContractsStore extends IdStore<Contract> {
   }
 
   public getContractByAddress(address: string): Contract {
+    console.log(
+      'getContractByAddress',
+      address,
+      Object.keys(this._storeAddress)
+    );
     return this._storeAddress[address] || null;
   }
 }
