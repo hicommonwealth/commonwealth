@@ -20,8 +20,8 @@ import {
   NotificationCategories,
   WalletId,
 } from 'common-common/src/types';
-
 import type { NextFunction, Request, Response } from 'express';
+import Web3 from 'web3';
 
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
@@ -144,28 +144,16 @@ const verifySignature = async (
     //
     // ethereum address handling on cosmos chains via metamask
     //
-    const msgBuffer = Buffer.from(sortedStringify(canvasMessage));
-
-    // toBuffer() doesn't work if there is a newline
-    const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-    const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
-    const publicKey = ethUtil.ecrecover(
-      msgHash,
-      ethSignatureParams.v,
-      ethSignatureParams.r,
-      ethSignatureParams.s
+    const web3 = new Web3();
+    const address = web3.eth.accounts.recover(
+      sortedStringify(canvasMessage),
+      signatureString.trim()
     );
 
-    const addressBuffer = ethUtil.publicToAddress(publicKey);
-    const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
     try {
-      // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
-      const b32AddrBuf = ethUtil.Address.fromString(
-        lowercaseAddress.toString()
-      ).toBuffer();
       const b32Address = bech32.encode(
         chain.bech32_prefix,
-        bech32.toWords(b32AddrBuf)
+        bech32.toWords(Buffer.from(address.slice(2), 'hex'))
       );
       if (addressModel.address === b32Address) isValid = true;
     } catch (e) {
