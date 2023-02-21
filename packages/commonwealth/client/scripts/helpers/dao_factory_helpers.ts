@@ -32,7 +32,7 @@ export function decodeTxParameterFromEvent(
 export async function createCuratedProjectDao(
   contract: Contract,
   fn: AbiItem,
-  formInputMap: Map<string, Map<number, string>>,
+  formInputs: string[],
   daoForm: CreateFactoryEthDaoForm
 ) {
   const signingWallet: IWebWallet<any> =
@@ -47,15 +47,11 @@ export async function createCuratedProjectDao(
   }
   const web3: Web3 = signingWallet.api;
 
-  if (formInputMap.size === 0) {
+  if (formInputs.length === 0) {
     throw new Error('Must Insert Inputs');
   }
   // handle processing the forms inputs into their proper data types
-  const processedArgs = processAbiInputsToDataTypes(
-    fn.name,
-    fn.inputs,
-    formInputMap
-  );
+  const processedArgs = processAbiInputsToDataTypes(fn.inputs, formInputs);
 
   const ethersInterface = new ethers.utils.Interface(contract.abi);
   const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);

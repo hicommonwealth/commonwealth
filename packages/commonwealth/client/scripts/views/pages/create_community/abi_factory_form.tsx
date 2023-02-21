@@ -7,17 +7,14 @@ import 'pages/abi_factory_form.scss';
 
 import app from 'state';
 import { ChainNetwork } from 'common-common/src/types';
-import type { AbiInput, AbiItem, AbiOutput} from 'web3-utils';
+import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils';
 import { isAddress } from 'web3-utils';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
-import type {
-  ValidationStatus} from 'views/components/component_kit/cw_validation_text';
-import {
-  CWValidationText
-} from 'views/components/component_kit/cw_validation_text';
+import type { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
+import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 
 import {
   initChainForm,
@@ -101,12 +98,16 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
       }
       try {
         this.loading = true;
-        await createCuratedProjectDao(
-          contract,
-          fn,
-          this.functionNameToFunctionInputArgs,
-          this.form
-        );
+        // Get the function inputs string array from the map
+        // Convert map of number to string to array of string
+        const inputArgs = this.functionNameToFunctionInputArgs.get(fn.name);
+        const inputArgsArray = [];
+        if (inputArgs && inputArgs.size > 0) {
+          for (let i = 0; i < inputArgs.size; i++) {
+            inputArgsArray.push(inputArgs.get(i));
+          }
+        }
+        await createCuratedProjectDao(contract, fn, inputArgsArray, this.form);
         this.saving = false;
         this.loaded = true;
         this.loading = false;
