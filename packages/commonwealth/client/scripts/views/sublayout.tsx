@@ -16,9 +16,12 @@ type SublayoutProps = {
   onScroll?: () => void; // lazy loading for page content
 } & React.PropsWithChildren;
 
-const Sublayout = (props: SublayoutProps) => {
-  const { hideFooter = false, hideSearch, onScroll } = props;
-
+const Sublayout = ({
+  children,
+  hideFooter = false,
+  hideSearch,
+  onScroll,
+}: SublayoutProps) => {
   const [isWindowSmall, setIsWindowSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
   );
@@ -65,7 +68,7 @@ const Sublayout = (props: SublayoutProps) => {
               <AppMobileMenus />
             ) : (
               <div className="Body" onScroll={onScroll}>
-                {props.children}
+                {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>
             )}

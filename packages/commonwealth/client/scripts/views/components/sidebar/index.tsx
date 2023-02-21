@@ -1,5 +1,5 @@
 import React from 'react';
-import { _DEPRECATED_getRoute } from 'mithrilInterop';
+import { useLocation } from 'react-router-dom';
 
 import 'components/sidebar/index.scss';
 
@@ -25,6 +25,7 @@ export type SidebarMenuName =
 
 export const Sidebar = () => {
   const navigate = useCommonNavigate();
+  const { pathname } = useLocation();
 
   const activeAddressRoles = app.roles.getAllRolesInCommunity({
     chain: app.activeChainId(),
@@ -32,7 +33,7 @@ export const Sidebar = () => {
 
   const currentChainInfo = app.chain?.meta;
 
-  const onHomeRoute = _DEPRECATED_getRoute() === `/${app.activeChainId()}/feed`;
+  const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
   const hideChat =
     !currentChainInfo ||

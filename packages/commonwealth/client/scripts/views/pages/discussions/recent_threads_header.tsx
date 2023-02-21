@@ -21,9 +21,11 @@ type RecentThreadsHeaderProps = {
   totalThreadCount: number;
 };
 
-export const RecentThreadsHeader = (props: RecentThreadsHeaderProps) => {
-  const { topic, stage, totalThreadCount } = props;
-
+export const RecentThreadsHeader = ({
+  stage,
+  topic,
+  totalThreadCount,
+}: RecentThreadsHeaderProps) => {
   const navigate = useCommonNavigate();
 
   const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(

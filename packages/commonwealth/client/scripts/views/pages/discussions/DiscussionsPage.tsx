@@ -10,7 +10,12 @@ import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
 import { Footer } from '../../footer';
 
-function DiscussionsPage({ topicName, stageName }) {
+type DiscussionsPageProps = {
+  topicName?: string;
+  stageName?: string;
+};
+
+const DiscussionsPage = ({ topicName, stageName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
   const [initializing, setInitializing] = useState(true);
 
@@ -77,6 +82,6 @@ function DiscussionsPage({ topicName, stageName }) {
       </div>
     </Sublayout>
   );
-}
+};
 
 export default DiscussionsPage;
