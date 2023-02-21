@@ -231,6 +231,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
                 model: models.ContractAbi,
                 required: false,
               },
+              { model: models.ChainNode, required: false },
             ],
           });
 

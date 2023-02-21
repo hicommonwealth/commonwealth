@@ -71,7 +71,7 @@ const createContract = async (
     abi,
     abiNickname,
     balance_type,
-    eth_chain_id,
+    eth_chain_id = 1,
     symbol = '',
     token_name = '',
     decimals = 0,
