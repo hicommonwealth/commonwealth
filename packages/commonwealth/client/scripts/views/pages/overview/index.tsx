@@ -34,6 +34,10 @@ const OverviewPage = () => {
     };
   }, []);
 
+  // app.threads.isFetched.on('redraw', () => {
+  //   this.redraw();
+  // });
+
   const allMonthlyThreads = app.threads.overviewStore.getAll();
   const allPinnedThreads = app.threads.listingStore.getThreads({
     pinned: true,
