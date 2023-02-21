@@ -41,7 +41,7 @@ type FetchEtherscanContractResp = {
   contractAbi: ContractAbiAttributes;
 };
 
-const fetchEtherscanContract = async (
+export const fetchEtherscanContract = async (
   models: DB,
   req: TypedRequestBody<FetchEtherscanContractReq>,
   res: TypedResponse<FetchEtherscanContractResp>
@@ -107,4 +107,61 @@ const fetchEtherscanContract = async (
   }
 };
 
-export default fetchEtherscanContract;
+type FetchEtherscanContractAbiReq = {
+  address: string;
+  chain_node_id: number;
+};
+
+type FetchEtherscanContractAbiResp = {
+  contractAbi: string;
+};
+
+export const fetchEtherscanContractAbi = async (
+  models: DB,
+  req: TypedRequestBody<FetchEtherscanContractAbiReq>,
+  res: TypedResponse<FetchEtherscanContractAbiResp>
+) => {
+  if (!ETHERSCAN_JS_API_KEY) {
+    throw new AppError(Errors.NoEtherscanApiKey);
+  }
+
+  const { address, chain_node_id } = req.body;
+
+  // First check if the contract already has an abi entry in the database
+  // get Contract Object from Db by address
+
+  // get chain node of contract from DB
+  const chainNode = await models.ChainNode.findOne({
+    where: { id: chain_node_id },
+  });
+  if (
+    !chainNode ||
+    !chainNode.eth_chain_id ||
+    !networkIdToName[chainNode.eth_chain_id]
+  ) {
+    return new AppError(Errors.InvalidChainNode);
+  }
+
+  const network = networkIdToName[chainNode.eth_chain_id];
+
+  const fqdn = network === 'Mainnet' ? 'api' : `api-${network.toLowerCase()}`;
+
+  // eslint-disable-next-line max-len
+  const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${ETHERSCAN_JS_API_KEY}`;
+
+  const response = await axios.get(url, { timeout: 3000 });
+  if (response.status === 200) {
+    // Checks if etherscan abi is available by calling the fetchEtherscanContract api route
+    const etherscanContract = response.data.result[0];
+    if (etherscanContract && etherscanContract['ABI'] !== '') {
+      const abiString = etherscanContract['ABI'];
+      validateAbi(abiString);
+
+      return success(res, {
+        contractAbi: abiString,
+      });
+    }
+  } else {
+    throw new AppError(Errors.EtherscanResponseFailed);
+  }
+};

@@ -31,6 +31,44 @@ enum TemplateComponents {
   DROPDOWN = 'dropdown',
 }
 
+const goerli_compound_governor_alpha = {
+  form_fields: [
+    {
+      text: {
+        field_name: 'subtitle',
+        field_type: 'h2',
+        field_value: 'Transfer Tokens',
+      },
+    },
+    {
+      input: {
+        field_name: 'address',
+        field_label: "Who's the recipient?",
+        field_ref: 'address-ref',
+        formatter: 'address',
+      },
+    },
+    {
+      input: {
+        field_name: 'amount',
+        field_label: 'How much should we transfer to them (decimal 18)?',
+        field_ref: 'amount-ref',
+        formatter: 'token',
+      },
+    },
+  ],
+  tx_template: {
+    method: 'propose',
+    args: {
+      targets: ['$target-address-ref'],
+      values: ['$amount-ref'],
+      signatures: ['transfer(address,uint256)'],
+      calldatas: [''],
+      description: '$description-ref',
+    },
+  },
+};
+
 class ViewTemplatePage extends ClassComponent {
   private formState = {};
   private json: {

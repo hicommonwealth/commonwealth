@@ -84,6 +84,20 @@ class ContractsController {
     this.update(resultAbi.abi, resultContract);
   }
 
+  public async getAbiFromEtherscan(address: string) {
+    const response: Response = await $.post(
+      `${app.serverUrl()}/etherscanAPI/fetchEtherscanContractAbi`,
+      {
+        address,
+        chain_node_id: app.chain.meta.ChainNode.id,
+        jwt: app.user.jwt,
+      }
+    );
+    const resultAbi = response['result']['contractAbi'];
+
+    return resultAbi;
+  }
+
   public async update(
     abi: Array<Record<string, unknown>>,
     contractAttributes: any

@@ -63,8 +63,16 @@ class AddContractAndAbiForm extends ClassComponent {
             label="Contract Address"
             value={this.form.address}
             placeholder="Enter contract address"
-            oninput={(e) => {
+            oninput={async (e) => {
               this.form.address = e.target.value;
+
+              if (isAddress(this.form.address)) {
+                const fetchedAbi = await app.contracts.getAbiFromEtherscan(
+                  this.form.address
+                );
+                this.form.abi = fetchedAbi;
+                m.redraw();
+              }
             }}
           />
 

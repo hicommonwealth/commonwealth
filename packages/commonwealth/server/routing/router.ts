@@ -30,7 +30,10 @@ import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
 import updateBanner from '../routes/updateBanner';
 import communityStats from '../routes/communityStats';
-import fetchEtherscanContract from '../routes/etherscanAPI';
+import {
+  fetchEtherscanContract,
+  fetchEtherscanContractAbi,
+} from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
@@ -320,6 +323,12 @@ function setupRouter(
     '/etherscanAPI/fetchEtherscanContract',
     passport.authenticate('jwt', { session: false }),
     fetchEtherscanContract.bind(this, models)
+  );
+
+  router.post(
+    '/etherscanAPI/fetchEtherscanContractAbi',
+    passport.authenticate('jwt', { session: false }),
+    fetchEtherscanContractAbi.bind(this, models)
   );
 
   router.post(
