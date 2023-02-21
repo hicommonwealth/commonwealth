@@ -4,8 +4,33 @@
   flex: 1;
   padding: 24px;
 
-  .h3 {
-    margin-bottom: 24px;
+  .description {
+    margin: 8px 0 32px;
+    color: $neutral-500;
+  }
+
+  .overview-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .view-table-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 32px;
+
+    .Button {
+      padding: 0;
+    }
   }
 
   .table {
