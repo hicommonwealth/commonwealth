@@ -14,9 +14,11 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
 import { useCommonNavigate } from 'navigation/helpers';
+import useForceRerender from 'hooks/useForceRerender';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
 
   const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
     isWindowExtraSmall(window.innerWidth)
@@ -34,9 +36,13 @@ const OverviewPage = () => {
     };
   }, []);
 
-  // app.threads.isFetched.on('redraw', () => {
-  //   this.redraw();
-  // });
+  useEffect(() => {
+    app.threads.isFetched.on('redraw', () => forceRerender());
+
+    return () => {
+      app.threads.isFetched.off('redraw', () => forceRerender());
+    };
+  }, []);
 
   const allMonthlyThreads = app.threads.overviewStore.getAll();
   const allPinnedThreads = app.threads.listingStore.getThreads({
