@@ -1,11 +1,14 @@
 node_modules
 test
 static
+ios
+android
 *build
 *.github
 *.env
 *node_modules
 packages/chain-events/.eslintrc.js
+capacitor.config.ts
 *.mocharc.json
 *.nycrc
 *.stylelintrc

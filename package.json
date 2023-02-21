@@ -35,6 +35,11 @@
     "packages/commonwealth"
   ],
   "dependencies": {
+    "@capacitor/android": "^4.3.0",
+    "@capacitor/cli": "^4.3.0",
+    "@capacitor/core": "^4.3.0",
+    "@capacitor/ios": "^4.3.0",
+    "@capacitor/splash-screen": "^4.1.0",
     "@cosmjs/stargate": "^0.26.1",
     "@cosmjs/tendermint-rpc": "^0.26.1",
     "@solana/web3.js": "^1.30.2",

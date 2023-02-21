@@ -2,6 +2,8 @@ import { render } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
+import app from 'state';
+import { Browser } from '@capacitor/browser';
 
 export const renderQuillDelta = (
   delta,
@@ -110,7 +112,10 @@ export const renderQuillDelta = (
                       target: openLinksInNewTab ? '_blank' : '',
                       noreferrer: 'noreferrer',
                       noopener: 'noopener',
-                      onClick: (e) => {
+                      onclick: async (e) => {
+                        if (app.isNative(window)) {
+                          await Browser.open({ url: child.attributes.link });
+                        }
                         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
                           return;
                         if (
