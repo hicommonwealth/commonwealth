@@ -34,12 +34,8 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
   }
 
   view(vnode: m.Vnode<CommentsTreeAttrs>) {
-    const {
-      comments,
-      thread,
-      setIsGloballyEditing,
-      updatedCommentsCallback,
-    } = vnode.attrs;
+    const { comments, thread, setIsGloballyEditing, updatedCommentsCallback } =
+      vnode.attrs;
 
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale

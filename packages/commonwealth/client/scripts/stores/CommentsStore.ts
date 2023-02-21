@@ -45,10 +45,7 @@ class CommentsStore extends IdStore<Comment<any>> {
           'Attempting to remove a comment that was not found in the proposals store'
         );
       }
-      this._storeProposal[comment.threadId].splice(
-        proposalIndex,
-        1
-      );
+      this._storeProposal[comment.threadId].splice(proposalIndex, 1);
     }
     return this;
   }
@@ -82,9 +79,7 @@ class CommentsStore extends IdStore<Comment<any>> {
 
   public nComments(thread: Thread): number {
     if (this._storeProposal[thread.id]) {
-      return this._storeProposal[thread.id].filter(
-        (c) => !c.deleted
-      ).length;
+      return this._storeProposal[thread.id].filter((c) => !c.deleted).length;
     } else {
       return 0;
     }

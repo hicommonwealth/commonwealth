@@ -3,7 +3,6 @@
 import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
