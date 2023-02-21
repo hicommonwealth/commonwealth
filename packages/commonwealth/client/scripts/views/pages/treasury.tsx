@@ -72,9 +72,7 @@ const TreasuryPage = () => {
   );
 
   return (
-    <Sublayout
-    // title={<BreadcrumbsTitleTag title="Referenda" />}
-    >
+    <Sublayout>
       <div className="TreasuryPage">
         {onSubstrate && (
           <GovExplainer

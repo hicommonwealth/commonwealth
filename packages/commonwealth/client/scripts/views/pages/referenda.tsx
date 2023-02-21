@@ -12,7 +12,6 @@ import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { ProposalCard } from 'views/components/proposal_card';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 import ErrorPage from './error';
@@ -36,12 +35,7 @@ const ReferendaPage = () => {
       app.chain?.base === ChainBase.Substrate &&
       (app.chain as Substrate).chain?.timedOut
     ) {
-      return (
-        <ErrorPage
-          message="Could not connect to chain"
-          title={<BreadcrumbsTitleTag title="Referenda" />}
-        />
-      );
+      return <ErrorPage message="Could not connect to chain" />;
     }
 
     return <PageLoading message="Connecting to chain" />;

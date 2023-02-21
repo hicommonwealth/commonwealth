@@ -19,7 +19,6 @@ import { AddressInfo, SearchQuery } from 'models';
 import type { Profile } from 'models';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
@@ -311,10 +310,7 @@ class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
     };
 
     return this.errorText?.length > 0 ? (
-      <ErrorPage
-        message={this.errorText}
-        title={<BreadcrumbsTitleTag title="Search" />}
-      />
+      <ErrorPage message={this.errorText} />
     ) : (
       <Sublayout>
         <div className="SearchPage">

@@ -6,7 +6,6 @@ import type { ProposalModule } from 'models';
 import app from 'state';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import { BreadcrumbsTitleTag } from './breadcrumbs_title_tag';
 
 export const loadSubstrateModules = (
   name: string,
@@ -26,7 +25,6 @@ export const loadSubstrateModules = (
             message={`Failed to initialize chain modules: ${errors.join(
               ', '
             )}.`}
-            title={<BreadcrumbsTitleTag title={name} />}
           />
         );
       }
