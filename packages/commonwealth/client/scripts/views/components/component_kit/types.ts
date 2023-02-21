@@ -28,6 +28,7 @@ export enum ComponentType {
   MessageBanner = 'MessageBanner',
   MobileMenu = 'MobileMenu',
   Modal = 'Modal',
+  OverviewCard = 'OverviewCard',
   Popover = 'Popover',
   PopoverMenu = 'PopoverMenu',
   ProgressBar = 'ProgressBar',

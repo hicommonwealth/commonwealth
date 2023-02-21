@@ -1,0 +1,24 @@
+@import '../../shared';
+
+.OverviewCard {
+  border: 1px solid $neutral-200;
+  padding: 16px;
+  max-width: 320px;
+  border-radius: $border-radius-corners;
+
+  .top-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bottom-row-title {
+    margin-top: 8px;
+    color: $neutral-600;
+  }
+  
+  img {
+    width: 36px;
+    height: 36px;
+  }
+}
