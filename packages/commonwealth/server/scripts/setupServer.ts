@@ -44,7 +44,7 @@ const setupServer = (
     if (typeof addr === 'string') {
       log.info(`Listening on ${addr}`);
     } else {
-      log.info(`Listening on port ${addr?.port}`);
+      log.info(`Listening on port ${addr.port}`);
     }
   };
 

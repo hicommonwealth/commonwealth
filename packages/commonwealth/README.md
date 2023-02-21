@@ -93,7 +93,7 @@ If errors occur try these steps:
 ```bash
   env: python: No such file or directory
   make: *** [Release/sass.a] Error 127
-  gyp ERR! build error 
+  gyp ERR! build error
   gyp ERR! stack Error: `make` failed with exit code: 2
 ```
 
