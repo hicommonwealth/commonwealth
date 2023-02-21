@@ -2,14 +2,12 @@
 
 import BN from 'bn.js';
 import ClassComponent from 'class_component';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/comments/create_comment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { getDecimals, weiToTokens } from 'helpers';
 import m from 'mithril';
-import type { AnyProposal } from 'models';
 import { Thread } from 'models';
 
 import app from 'state';

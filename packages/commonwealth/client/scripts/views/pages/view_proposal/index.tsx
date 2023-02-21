@@ -13,7 +13,7 @@ import {
   proposalSlugToClass,
 } from 'identifiers';
 import m from 'mithril';
-import type { AnyProposal, Comment, ProposalModule } from 'models';
+import type { AnyProposal, ProposalModule } from 'models';
 import { Account } from 'models';
 
 import app from 'state';

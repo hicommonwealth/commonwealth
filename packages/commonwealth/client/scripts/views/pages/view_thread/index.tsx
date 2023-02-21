@@ -11,7 +11,6 @@ import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 import m from 'mithril';
 import type {
-  Account,
   ChainEntity,
   Comment,
   Poll,

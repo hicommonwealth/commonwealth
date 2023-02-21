@@ -3,6 +3,7 @@ import type { VersionHistory } from '../controllers/server/threads';
 import type Attachment from './Attachment';
 import type { IUniqueId } from './interfaces';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Comment<T extends IUniqueId> {
   [x: string]: any;
 
