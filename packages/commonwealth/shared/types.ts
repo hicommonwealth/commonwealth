@@ -1,5 +1,4 @@
 import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
-import type { ChainAttributes } from '../server/models/chain';
 import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 import type { AccessLevel } from 'commonwealth/shared/permissions';
 
@@ -42,6 +41,13 @@ export interface SnapshotNotification {
   event?: string;
   start?: string;
   expire?: string;
+}
+
+export const enum SnapshotEventType {
+  Created = 'proposal/created',
+  Deleted = 'proposal/deleted',
+  Ended = 'proposal/end',
+  Started = 'proposal/start',
 }
 
 export interface INotification {
