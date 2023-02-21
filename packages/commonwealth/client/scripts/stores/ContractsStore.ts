@@ -33,6 +33,20 @@ class ContractsStore extends IdStore<Contract> {
     return this;
   }
 
+  public getFactoryContractByNickname(nickname: string): Contract {
+    // filter through the _storeId map for a contract with a specified nickname
+    const contracts = this._storeFactories.filter(
+      (c) => c.nickname === nickname
+    );
+    // if there is more than one contract with the same nickname, return the first one
+    if (contracts.length > 0) {
+      return contracts[0];
+    } else {
+      console.log('No contract found with nickname: ', nickname);
+      return null;
+    }
+  }
+
   public getContractByNickname(nickname: string): Contract {
     // filter through the _storeId map for a contract with a specified nickname
     const contracts = this._storeFactories.filter(
