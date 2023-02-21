@@ -4,10 +4,42 @@
   flex: 1;
   padding: 24px;
 
-  .stat-row {
-    border-bottom: 1px solid $neutral-300;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    padding: 8px;
+  .h3 {
+    margin-bottom: 24px;
+  }
+
+  .table {
+    border: 1px solid $neutral-100;
+    border-radius: $border-radius-corners;
+    width: 100%;
+  
+    .stat-row {
+      border-bottom: 1px solid $neutral-100;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      padding: 12px 24px;
+  
+      &.title {
+        padding: 18px 24px;
+        background-color: $neutral-100;
+  
+        .Text {
+          color: $neutral-500;
+        }
+      }
+
+      &.totals {
+        background-color: $neutral-25;
+      }
+    }
+
+    .Text {
+      display: flex;
+      justify-content: flex-end;
+
+      &.align-left {
+        justify-content: flex-start;
+      }
+    }
   }
 }

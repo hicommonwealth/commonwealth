@@ -84,15 +84,18 @@ const StatsPage = () => {
           });
 
           result.comments.forEach(({ date, new_items }) => {
-            if (data[date]) {
+            if (data?.date) {
               setData[date].comments = new_items;
             } else {
-              setData[date] = { comments: new_items };
+              setData({
+                ...data,
+                [date]: { comments: new_items }
+              })
             }
           });
 
           result.roles.forEach(({ date, new_items }) => {
-            if (data[date]) {
+            if (data?.date) {
               setData[date].roles = new_items;
             } else {
               setData[date] = { roles: new_items };
@@ -100,7 +103,7 @@ const StatsPage = () => {
           });
 
           result.threads.forEach(({ date, new_items }) => {
-            if (data[date]) {
+            if (data?.date) {
               setData[date].threads = new_items;
             } else {
               setData[date] = { threads: new_items };
@@ -108,7 +111,7 @@ const StatsPage = () => {
           });
 
           (result.activeAccounts || []).forEach(({ date, new_items }) => {
-            if (data[date]) {
+            if (data?.date) {
               setData[date].activeAccounts = new_items;
             } else {
               setData[date] = { activeAccounts: new_items };
@@ -142,46 +145,50 @@ const StatsPage = () => {
   return (
     <Sublayout>
       <div className="StatsPage">
-        <div className="stat-row">
-          <CWText fontWeight="medium">Duration</CWText>
-          <CWText fontWeight="medium">New Addresses</CWText>
-          <CWText fontWeight="medium">New Comments</CWText>
-          <CWText fontWeight="medium">New Threads</CWText>
-          <CWText fontWeight="medium">Active Addresses</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText>24 hours</CWText>
-          <CWText>{batchedRoles['day']}</CWText>
-          <CWText>{batchedComments['day']}</CWText>
-          <CWText>{batchedThreads['day']}</CWText>
-          <CWText>{batchedActiveAccounts['day']}</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText>1 week</CWText>
-          <CWText>{batchedRoles['week']}</CWText>
-          <CWText>{batchedComments['week']}</CWText>
-          <CWText>{batchedThreads['week']}</CWText>
-          <CWText>{batchedActiveAccounts['week']}</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText>2 weeks</CWText>
-          <CWText>{batchedRoles['2week']}</CWText>
-          <CWText>{batchedComments['2week']}</CWText>
-          <CWText>{batchedThreads['2week']}</CWText>
-          <CWText>{batchedActiveAccounts['2week']}</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText>1 month</CWText>
-          <CWText>{batchedRoles['month']}</CWText>
-          <CWText>{batchedComments['month']}</CWText>
-          <CWText>{batchedThreads['month']}</CWText>
-          <CWText>{batchedActiveAccounts['month']}</CWText>
-        </div>
-        <div className="stat-row">
-          <CWText fontWeight="medium">{'Total (all time)'}</CWText>
-          <CWText fontWeight="medium">{totalData.totalRoles}</CWText>
-          <CWText fontWeight="medium">{totalData.totalComments}</CWText>
-          <CWText fontWeight="medium">{totalData.totalThreads}</CWText>
+        <CWText type="h3" fontWeight="medium">Analytics</CWText>
+        <div className="table">
+          <div className="stat-row title">
+            <CWText fontWeight="semiBold" type="h5" className="align-left">Time period</CWText>
+            <CWText fontWeight="semiBold" type="h5">Active Addresses</CWText>
+            <CWText fontWeight="semiBold" type="h5">New Threads</CWText>
+            <CWText fontWeight="semiBold" type="h5">New Comments</CWText>
+            <CWText fontWeight="semiBold" type="h5">New Addresses</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText className="align-left">Last 24 hours</CWText>
+            <CWText>{batchedRoles['day']}</CWText>
+            <CWText>{batchedComments['day']}</CWText>
+            <CWText>{batchedThreads['day']}</CWText>
+            <CWText>{batchedActiveAccounts['day']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText className="align-left">Last week</CWText>
+            <CWText>{batchedRoles['week']}</CWText>
+            <CWText>{batchedComments['week']}</CWText>
+            <CWText>{batchedThreads['week']}</CWText>
+            <CWText>{batchedActiveAccounts['week']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText className="align-left">Last 2 weeks</CWText>
+            <CWText>{batchedRoles['2week']}</CWText>
+            <CWText>{batchedComments['2week']}</CWText>
+            <CWText>{batchedThreads['2week']}</CWText>
+            <CWText>{batchedActiveAccounts['2week']}</CWText>
+          </div>
+          <div className="stat-row">
+            <CWText className="align-left">Last month</CWText>
+            <CWText>{batchedRoles['month']}</CWText>
+            <CWText>{batchedComments['month']}</CWText>
+            <CWText>{batchedThreads['month']}</CWText>
+            <CWText>{batchedActiveAccounts['month']}</CWText>
+          </div>
+          <div className="stat-row totals">
+            <CWText fontWeight="medium" className="align-left">All time</CWText>
+            <CWText fontWeight="medium">N/A</CWText>
+            <CWText fontWeight="medium">{totalData.totalRoles}</CWText>
+            <CWText fontWeight="medium">{totalData.totalComments}</CWText>
+            <CWText fontWeight="medium">{totalData.totalThreads}</CWText>
+          </div>
         </div>
       </div>
     </Sublayout>
