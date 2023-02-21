@@ -46,6 +46,7 @@ module.exports = {
             address_id: 1,
             title: `Thread for ${c.chain}'s ${rootParts[0]} ${rootParts[1]}`,
             kind: 'link',
+            body: '',
             url: `https://commonwealth.im/${c.chain}/${rootParts[0]}/${rootParts[1]}`,
             chain: c.chain,
             read_only: true,

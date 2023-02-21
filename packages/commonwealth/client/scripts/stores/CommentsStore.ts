@@ -1,4 +1,5 @@
 import { byAscendingCreationDate } from '../helpers';
+import type { AbridgedThread } from '../models';
 import type { Comment } from '../models';
 import type Thread from '../models/Thread';
 import IdStore from './IdStore';
@@ -75,7 +76,7 @@ class CommentsStore extends IdStore<Comment<any>> {
     return this._storeAuthor[address] || [];
   }
 
-  public getByThread(thread: Thread): Array<Comment<any>> {
+  public getByThread(thread: Thread | AbridgedThread): Array<Comment<any>> {
     return this._storeProposal[thread.id] || [];
   }
 

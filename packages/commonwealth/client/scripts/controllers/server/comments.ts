@@ -2,7 +2,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import $ from 'jquery';
 import _ from 'lodash';
-import type { IUniqueId } from 'models';
+import type { IUniqueId , AbridgedThread} from 'models';
 import { Attachment, Comment } from 'models';
 import moment from 'moment';
 
@@ -105,7 +105,7 @@ class CommentsController {
     return this._store.getById(id);
   }
 
-  public getByThread(thread: Thread) {
+  public getByThread(thread: Thread | AbridgedThread) {
     return this._store.getByThread(thread);
   }
 
