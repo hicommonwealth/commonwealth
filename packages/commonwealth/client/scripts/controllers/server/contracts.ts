@@ -122,7 +122,10 @@ class ContractsController {
         symbol,
         isFactory: is_factory,
         nickname,
-        abi: ContractAbi.abi,
+        abi:
+          typeof ContractAbi.abi === 'string'
+            ? JSON.parse(ContractAbi.abi)
+            : ContractAbi.abi,
         contractAbi: ContractAbi,
         ethChainId: ChainNode.eth_chain_id,
       });
