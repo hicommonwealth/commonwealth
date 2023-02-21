@@ -1,6 +1,10 @@
 import React from 'react';
 
-import { ClassComponent, _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
+import {
+  ClassComponent,
+  _DEPRECATED_getSearchParams,
+  redraw,
+} from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -67,7 +71,6 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
         <CWText noWrap>
           {renderQuillTextBody(thread.body, {
             hideFormatting: true,
-            collapse: true,
             searchTerm,
           })}
         </CWText>
@@ -119,7 +122,6 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
         <CWText noWrap>
           {renderQuillTextBody(comment.text, {
             hideFormatting: true,
-            collapse: true,
             searchTerm,
           })}
         </CWText>
@@ -225,7 +227,9 @@ class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
-    const searchQuery = SearchQuery.fromUrlParams({ url: _DEPRECATED_getSearchParams() });
+    const searchQuery = SearchQuery.fromUrlParams({
+      url: _DEPRECATED_getSearchParams(),
+    });
 
     const { chainScope, searchTerm } = searchQuery;
     const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
