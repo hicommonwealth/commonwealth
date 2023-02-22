@@ -23,7 +23,9 @@ type RecentThreadsHeaderAttrs = {
   totalThreadCount: number;
 };
 
-class RecentThreadsHeaderComponent extends ClassComponent<RecentThreadsHeaderAttrs> {
+class RecentThreadsHeaderComponent extends ClassComponent<
+  RecentThreadsHeaderAttrs
+> {
   private isWindowExtraSmall: boolean;
 
   onResize() {
@@ -102,7 +104,7 @@ class RecentThreadsHeaderComponent extends ClassComponent<RecentThreadsHeaderAtt
                 ) : (
                   <CWButton
                     buttonType="mini-black"
-                    label="Create Threadasd"
+                    label="Create Thread"
                     iconLeft="plus"
                     onClick={() => {
                       this.setRoute('/new/discussion');

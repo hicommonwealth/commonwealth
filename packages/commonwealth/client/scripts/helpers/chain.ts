@@ -108,15 +108,6 @@ export const selectChain = async (
     ).default;
     newChain = new Sputnik(chain, app);
     initApi = true;
-  } else if (chain.network === ChainNetwork.Moloch) {
-    const Moloch = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "moloch-main" */
-        '../controllers/chain/ethereum/moloch/adapter'
-      )
-    ).default;
-    newChain = new Moloch(chain, app);
   } else if (chain.network === ChainNetwork.Compound) {
     const Compound = (
       await import(

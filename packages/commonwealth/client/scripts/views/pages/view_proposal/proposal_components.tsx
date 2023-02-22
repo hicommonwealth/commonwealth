@@ -2,9 +2,6 @@ import React from 'react';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import type MolochMember from 'controllers/chain/ethereum/moloch/member';
-
-import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
 
 import 'pages/view_proposal/proposal_components.scss';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -24,35 +21,6 @@ type BaseCancelButtonProps = {
   onModalClose?: () => void;
   toggleVotingModal?: (newModalState: boolean) => void;
   votingModalOpen?: boolean;
-};
-
-type MolochCancelButtonProps = {
-  proposal: MolochProposal;
-  molochMember: MolochMember;
-} & BaseCancelButtonProps;
-
-export const MolochCancelButton = (props: MolochCancelButtonProps) => {
-  const {
-    proposal,
-    votingModalOpen,
-    molochMember,
-    onModalClose,
-    toggleVotingModal,
-  } = props;
-
-  return (
-    <CWButton
-      buttonType="primary-red"
-      disabled={
-        !(proposal.canAbort(molochMember) && !proposal.completed) ||
-        votingModalOpen
-      }
-      onClick={(e) =>
-        cancelProposal(e, toggleVotingModal, proposal, onModalClose)
-      }
-      label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
-    />
-  );
 };
 
 type AaveCancelButtonProps = {
@@ -93,19 +61,14 @@ export const CompoundCancelButton = (props: CompoundCancelButtonProps) => {
   );
 };
 
-export type SubheaderProposalType =
-  | AaveProposal
-  | CompoundProposal
-  | MolochProposal;
+export type SubheaderProposalType = AaveProposal | CompoundProposal;
 
 type ProposalSubheaderProps = {
   proposal: SubheaderProposalType;
-  molochMember?: MolochMember;
 } & BaseCancelButtonProps;
 
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const {
-    molochMember,
     onModalClose,
     proposal,
     toggleVotingModal,
@@ -188,14 +151,6 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
             votingModalOpen={votingModalOpen}
           />
         </div>
-      )}
-      {proposal instanceof MolochProposal && (
-        <MolochCancelButton
-          molochMember={molochMember}
-          onModalClose={onModalClose}
-          proposal={proposal}
-          toggleVotingModal={toggleVotingModal}
-        />
       )}
     </div>
   );

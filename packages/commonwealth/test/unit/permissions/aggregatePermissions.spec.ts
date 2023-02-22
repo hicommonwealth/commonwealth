@@ -4,9 +4,9 @@ import {
   AccessLevel,
   PermissionManager,
   ToCheck,
-} from 'commonwealth/shared/permissions';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
-import type { RoleObject } from 'commonwealth/shared/types';
+} from 'shared/permissions';
+import { aggregatePermissions } from 'shared/utils';
+import type { RoleObject } from 'shared/types';
 
 describe('aggregatePermissions() unit tests', () => {
   let base_permission;

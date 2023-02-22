@@ -382,6 +382,18 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
       app.profiles.getProfile(comment.authorChain, comment.author);
     });
 
+    app.profiles.isFetched.on('redraw', () => {
+      if (!prefetch[threadIdAndType]['profilesFinished']) {
+        setPrefetch({
+          ...prefetch,
+          [threadIdAndType]: {
+            ...prefetch[threadIdAndType],
+            profilesFinished: true,
+          },
+        });
+      }
+    })
+
     setPrefetch({
       ...prefetch,
       [threadIdAndType]: {
@@ -400,21 +412,6 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
     !app.profiles.allLoaded() &&
     !prefetch[threadIdAndType]['profilesFinished']
   ) {
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
-  }
-
-  if (!prefetch[threadIdAndType]['profilesFinished']) {
-    setPrefetch({
-      ...prefetch,
-      [threadIdAndType]: {
-        ...prefetch[threadIdAndType],
-        profilesFinished: true,
-      },
-    });
     return (
       <PageLoading
       //  title={headerTitle}

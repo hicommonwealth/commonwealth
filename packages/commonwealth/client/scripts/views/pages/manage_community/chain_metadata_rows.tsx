@@ -19,7 +19,7 @@ import {
   Action,
   PermissionManager,
   ToCheck,
-} from 'commonwealth/shared/permissions';
+} from 'permissions';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';

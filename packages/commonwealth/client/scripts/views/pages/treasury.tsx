@@ -127,7 +127,6 @@ class TreasuryPage extends ClassComponent {
                   stat: (app.chain as Substrate).treasury.nextSpendBlock ? (
                     <CountdownUntilBlock
                       block={(app.chain as Substrate).treasury.nextSpendBlock}
-                      includeSeconds={false}
                     />
                   ) : (
                     '--'

@@ -3,7 +3,7 @@ import {
   PermissionManager,
   Action,
   ToCheck,
-} from 'commonwealth/shared/permissions';
+} from 'shared/permissions';
 
 describe('hasPermissions() unit tests', () => {
   const permissionsManager = new PermissionManager();

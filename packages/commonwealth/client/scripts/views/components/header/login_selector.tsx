@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { initAppState } from 'state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import { addressSwapper } from 'utils';
 import $ from 'jquery';
 import { redraw } from 'mithrilInterop';
 
@@ -35,6 +35,7 @@ import { CWDivider } from '../component_kit/cw_divider';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
+import useForceRerender from 'hooks/useForceRerender';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -54,22 +55,23 @@ type LoginSelectorMenuLeftAttrs = {
   nAccountsWithoutRole: number;
 };
 
-export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
-  const { activeAddressesWithRole, nAccountsWithoutRole } = props;
+export const LoginSelectorMenuLeft = ({
+  activeAddressesWithRole,
+  nAccountsWithoutRole,
+}: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
 
-  const [isEditProfileModalOpen, setIsEditProfileModalOpen] =
-    React.useState<boolean>(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] =
-    React.useState<boolean>(false);
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSelectAddressModalOpen, setIsSelectAddressModalOpen] =
-    React.useState<boolean>(false);
+    useState(false);
 
   return (
     <>
       <div className="LoginSelectorMenu">
         {activeAddressesWithRole.map((account) => (
           <div
+            key={account.address}
             className="login-menu-item"
             onClick={async () => {
               await setActiveAccount(account);
@@ -157,10 +159,15 @@ export const LoginSelectorMenuLeft = (props: LoginSelectorMenuLeftAttrs) => {
   );
 };
 
-export const LoginSelectorMenuRight = () => {
-  const navigate = useCommonNavigate();
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+interface LoginSelectorMenuRightProps {
+  onLogout: () => void;
+}
 
+export const LoginSelectorMenuRight = ({
+  onLogout,
+}: LoginSelectorMenuRightProps) => {
+  const navigate = useCommonNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
   return (
@@ -209,7 +216,7 @@ export const LoginSelectorMenuRight = () => {
               .then(async () => {
                 await initAppState();
                 notifySuccess('Logged out');
-                redraw();
+                onLogout();
               })
               .catch(() => {
                 // eslint-disable-next-line no-restricted-globals
@@ -234,8 +241,7 @@ type TOSModalProps = {
   onModalClose: () => void;
 };
 
-// TODO: Replace this with a proper TOS Compoment when we have one
-const TOSModal = (props: TOSModalProps) => {
+const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
   return (
     <div className="TOSModal">
       <div className="close-button-wrapper">
@@ -244,30 +250,34 @@ const TOSModal = (props: TOSModalProps) => {
           iconName="close"
           iconSize="small"
           className="close-icon"
-          onClick={() => props.onModalClose()}
+          onClick={onModalClose}
         />
       </div>
       <div className="content-wrapper">
         <CWText>
           By clicking accept you agree to the community's Terms of Service
         </CWText>
-        <CWButton onClick={props.onAccept} label="Accept" />
+        <CWButton onClick={onAccept} label="Accept" />
       </div>
     </div>
   );
 };
 
 export const LoginSelector = () => {
-  const [profileLoadComplete, setProfileLoadComplete] =
-    React.useState<boolean>(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] =
-    React.useState<boolean>(false);
+  const forceRerender = useForceRerender();
+  const [profileLoadComplete, setProfileLoadComplete] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
-    React.useState<boolean>(false);
-  const [isTOSModalOpen, setIsTOSModalOpen] = React.useState<boolean>(false);
+    useState(false);
+  const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
+
+  const onLogout = () => {
+    forceRerender();
+    rightMenuProps.setAnchorEl?.(null);
+  };
 
   if (!app.isLoggedIn()) {
     return (
@@ -518,7 +528,10 @@ export const LoginSelector = () => {
         >
           <CWIconButton iconName="person" iconButtonTheme="black" />
         </div>
-        <Popover content={<LoginSelectorMenuRight />} {...rightMenuProps} />
+        <Popover
+          content={<LoginSelectorMenuRight onLogout={onLogout} />}
+          {...rightMenuProps}
+        />
       </div>
       <Modal
         content={

@@ -18,6 +18,10 @@ type CollapsibleThreadBodyProps = {
   thread: Thread;
 };
 
+// 1) TODO: Port CollapsibleProposalBody to React.FC.
+// 2) This component is not actually used to dynamically collapse threads.
+// That happens entirely in QuillFormattedText.
+
 export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
   const { thread } = props;
 
@@ -68,7 +72,7 @@ export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
       <QuillFormattedText
         doc={doc}
         cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-        collapse={collapsed}
+        collapse={false}
         hideFormatting={false}
       />
     );

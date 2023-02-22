@@ -3,7 +3,7 @@ import React from 'react';
 import { ClassComponent, _DEPRECATED_getRoute } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
-import { Action } from 'commonwealth/shared/permissions';
+import { Action } from 'permissions';
 
 import 'components/sidebar/index.scss';
 import { isActiveAddressPermitted } from 'controllers/server/roles';

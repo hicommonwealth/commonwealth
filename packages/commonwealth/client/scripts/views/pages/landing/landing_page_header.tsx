@@ -23,9 +23,13 @@ const triggerMenu = () => {
 type HeaderLandingPageProps = {
   navs: Array<{ text: string; redirectTo: string }>;
   scrollHeader: boolean;
+  onLogin: () => void;
 };
 
-export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
+export const HeaderLandingPage = ({
+  navs,
+  onLogin,
+}: HeaderLandingPageProps) => {
   const navigate = useCommonNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
@@ -64,7 +68,12 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
   return (
     <>
       <Modal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+        content={
+          <LoginModal
+            onSuccess={onLogin}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
@@ -81,7 +90,7 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
           />
           <nav className="lg:block hidden">
             <ul className="lg:flex lg:flex-row lg:items-center">
-              {props.navs.map((nav: any, i) => {
+              {navs.map((nav: any, i) => {
                 return (
                   <li
                     className="LandingPageHeaderLinks ml-10 py-8 lg:flex"

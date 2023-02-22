@@ -5,9 +5,6 @@ import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
 import 'components/proposal_card/index.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import MolochProposal, {
-  MolochProposalState,
-} from 'controllers/chain/ethereum/moloch/proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
@@ -64,7 +61,9 @@ export const getStatusText = (proposal: AnyProposal) => {
     proposal.endTime.kind === 'fixed'
       ? [
           <Countdown
-            duration={moment.duration(proposal.endTime.time.diff(moment()))}
+            duration={moment
+              .duration(proposal.endTime.time.diff(moment()))
+              .asMilliseconds()}
           />,
           ' left',
         ]
@@ -95,21 +94,6 @@ export const getStatusText = (proposal: AnyProposal) => {
       : proposal.endTime.kind === 'unavailable'
       ? ''
       : '';
-
-  if (proposal instanceof MolochProposal) {
-    if (proposal.state === MolochProposalState.NotStarted)
-      return 'Waiting to start';
-    if (proposal.state === MolochProposalState.GracePeriod)
-      return [
-        proposal.isPassing === ProposalStatus.Passed ? 'Passed, ' : 'Failed, ',
-        countdown,
-        ' in grace period',
-      ];
-    if (proposal.state === MolochProposalState.InProcessingQueue)
-      return 'In processing queue';
-    if (proposal.state === MolochProposalState.ReadyToProcess)
-      return 'Ready to process';
-  }
 
   if (proposal instanceof AaveProposal) {
     if (proposal.state === AaveTypes.ProposalState.ACTIVE)
