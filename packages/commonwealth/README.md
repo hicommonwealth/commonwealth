@@ -186,7 +186,7 @@ heroku pg:psql -a <APP_NAME>
 # exit the remote server and log in to local instance
 exit
 psql -d commonwealth -U commonwealth
-# load the local .csv to the local database
+# load the local .csv to the local database 
 # example: \COPY "ChainEvents" FROM '/var/www/html/commonwealth/ChainEvents.csv' CSV;
 \COPY "<TABLE_NAME>" FROM '<LOCAL_PATH><FILENAME>.csv' CSV;
 
