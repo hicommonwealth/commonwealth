@@ -564,34 +564,15 @@ const getCommonDomainRoutes = (importRoute) => ({
   ),
 
   // New Profiles
-  '/profile/manage': importRoute(import('views/pages/manage_profiles'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/profile/new': importRoute(import('views/pages/create_new_profile'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/profile/:username': importRoute(import('views/pages/new_profile'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/profile/:username/edit': importRoute(
-    import('views/pages/edit_new_profile'),
-    {
-      scoped: true,
-      deferChain: true,
-    }
-  ),
   '/profile/id/:profileId': importRoute(
-    import('views/pages/new_profile_redirect'),
+    import('views/pages/new_profile'),
     {
       scoped: true,
       deferChain: true,
     }
   ),
   '/profile/id/:profileId/edit': importRoute(
-    import('views/pages/new_profile_redirect'),
+    import('views/pages/edit_new_profile'),
     {
       scoped: true,
       deferChain: true,
