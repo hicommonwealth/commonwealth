@@ -118,7 +118,7 @@ class SessionsController {
     // chainID for non-eth, non-cosmos chains.
     const idOrPrefix =
       chainBase == ChainBase.CosmosSDK
-        ? app.chain?.meta.bech32Prefix
+        ? app.chain?.meta.bech32_prefix
         : app.chain?.meta.node?.ethChainId;
     const chainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
 
