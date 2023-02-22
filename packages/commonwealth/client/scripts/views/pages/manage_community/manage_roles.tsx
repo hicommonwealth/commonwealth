@@ -20,7 +20,7 @@ type ManageRoleRowProps = {
   roledata?: Array<RoleInfo>;
 };
 
-export const ManageRolesComponent = ({
+export const ManageRoles = ({
   label,
   onRoleUpdate,
   roledata,

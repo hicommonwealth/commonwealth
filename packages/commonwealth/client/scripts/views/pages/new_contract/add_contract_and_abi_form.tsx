@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'pages/new_contract/add_contract_and_abi_scss';
+import 'pages/new_contract/add_contract_and_abi_form.scss';
 
 import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
