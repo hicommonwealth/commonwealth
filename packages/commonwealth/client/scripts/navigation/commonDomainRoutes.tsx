@@ -46,7 +46,8 @@ const TipsPage = lazy(() => import('views/pages/tips'));
 const ManageCommunityPage = lazy(
   () => import('views/pages/manage_community/ManageCommunityPage')
 );
-const AnalyticsPage = lazy(() => import('views/pages/stats'));
+const AnalyticsPage = lazy(() => import('views/pages/analytics'));
+const AnalyticsTable = lazy(() => import('views/pages/analytics/table'));
 const SnapshotProposalPage = lazy(
   () => import('views/pages/snapshot_proposals')
 );
@@ -318,6 +319,13 @@ const getCommonDomainsRoutes = () => (
     <Route
       path="/:scope/analytics"
       element={withLayout(AnalyticsPage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />
+    <Route
+      path="/:scope/analytics/table"
+      element={withLayout(AnalyticsTable, {
         scoped: true,
         deferChain: true,
       })}
