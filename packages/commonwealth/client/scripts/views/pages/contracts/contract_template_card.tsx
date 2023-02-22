@@ -38,7 +38,6 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
   async handleEditTemplate(contractId, templateId, template) {
     try {
       const templates = await app.contracts.getTemplatesForContract(contractId);
-      console.log({ templates });
       showManageContractTemplateModal({
         contractId,
         templateId,

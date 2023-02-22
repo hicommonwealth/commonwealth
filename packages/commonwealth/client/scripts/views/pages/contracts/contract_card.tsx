@@ -20,6 +20,8 @@ type ContractCardAttrs = {
 };
 
 export class ContractCard extends ClassComponent<ContractCardAttrs> {
+  private globalTemplatesExist: boolean;
+
   handleDeleteContract(address: string, id: number) {
     showConfirmationModal({
       title: 'Delete Contract',
@@ -56,6 +58,18 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
       template: null,
       templates,
     });
+  }
+
+  async hasGlobalTemplates(contractId) {
+    const globalTemplates = await app.contracts.getTemplatesForContract(
+      contractId
+    );
+    this.globalTemplatesExist = globalTemplates.length > 0;
+  }
+
+  oninit(vnode: m.VnodeDOM<ContractCardAttrs>) {
+    const { id } = vnode.attrs;
+    this.hasGlobalTemplates(id);
   }
 
   view(vnode: m.Vnode<ContractCardAttrs>) {
@@ -102,24 +116,26 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
               </CWText>
             </div>
           )}
-          <CWButton
-            className="add-template-btn"
-            buttonType="tertiary-black"
-            label="Add Template"
-            iconLeft="plus"
-            onclick={() => this.handleAddTemplate(id)}
-          />
-          <CWText className="create-template-info" type="caption">
-            Don’t see a template that fits your needs?
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className="cta"
-              onclick={(e) => this.handleCreateNewTemplate(e, id)}
-            >
-              Create a New Template
+          {this.globalTemplatesExist ? (
+            <CWButton
+              className="add-template-btn"
+              buttonType="tertiary-black"
+              label="Connect Template"
+              iconLeft="plus"
+              onclick={() => this.handleAddTemplate(id)}
+            />
+          ) : (
+            <CWText className="create-template-info" type="caption">
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="cta"
+                onclick={(e) => this.handleCreateNewTemplate(e, id)}
+              >
+                Create a New Template
+              </CWText>
             </CWText>
-          </CWText>
+          )}
         </div>
       </CWCard>
     );
