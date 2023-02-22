@@ -39,8 +39,7 @@ enum EditProfileError {
 const NoProfileFoundError = 'No profile found';
 
 type EditNewProfileAttrs = {
-  username?: string;
-  profileId?: string;
+  profileId: string;
 };
 
 export type Image = {
@@ -51,12 +50,10 @@ export type Image = {
 export default class EditProfileComponent extends ClassComponent<EditNewProfileAttrs> {
   private email: string;
   private error: EditProfileError;
-  private failed: boolean;
   private loading: boolean;
   private profile: Profile;
   private profileUpdate: any;
   private socials: string[];
-  private username: string;
   private name: string;
   private bio: QuillEditor;
   private avatarUrl: string;
@@ -65,11 +62,11 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
   private coverImage: Image;
   private backgroundImage: Image;
 
-  private getProfile = async (query: string, type: string) => {
+  private getProfile = async (profileId: string) => {
     this.loading = true;
     try {
       const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
-        [type]: query,
+        profileId,
         jwt: app.user.jwt,
       });
 
@@ -80,7 +77,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       this.avatarUrl = this.profile.avatarUrl;
       this.coverImage = this.profile.coverImage;
       this.backgroundImage = this.profile.backgroundImage;
-      this.username = this.profile.username;
       this.addresses = result.addresses.map(
         (a) =>
           new AddressInfo(
@@ -119,7 +115,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       if (response?.result?.status === 'Success') {
         setTimeout(() => {
           this.loading = false;
-          navigateToSubpage(`/profile/${this.username}`);
+          navigateToSubpage(`/profile/id/${this.profile.id}`);
         }, 1500);
       }
     } catch (err) {
@@ -132,9 +128,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
 
   private checkForUpdates = () => {
     this.profileUpdate = {};
-
-    if (!_.isEqual(this.username, this.profile?.username))
-      this.profileUpdate.username = this.username;
 
     if (!_.isEqual(this.name, this.profile?.name))
       this.profileUpdate.name = this.name;
@@ -204,22 +197,11 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
 
   oninit(vnode) {
     this.error = EditProfileError.None;
-    // when a user navigates from /profile/:username/edit
-    if (vnode.attrs.username) {
-      this.getProfile(vnode.attrs.username, 'username');
-      return;
-    }
-
-    // when a user navigates from /profile/id/:profileId/edit
-    if (vnode.attrs.profileId) {
-      this.getProfile(vnode.attrs.profileId, 'profileId');
-      return;
-    }
+    this.getProfile(vnode.attrs.profileId);
     this.profileUpdate = {};
-    this.failed = false;
   }
 
-  view() {
+  view(vnode) {
     if (this.loading) {
       return (
         <div class="EditProfile full-height">
@@ -235,7 +217,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
 
     if (this.error === EditProfileError.None) {
       if (!this.isOwner) {
-        navigateToSubpage(`/profile/${this.username}`);
+        navigateToSubpage(`/profile/id/${vnode.attrs.profileId}`);
       }
 
       // need to create an account to pass to AvatarUpload to see last upload
@@ -249,7 +231,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
         );
 
         oldProfile.initialize(
-          this.username,
+          this.name,
           null,
           this.bio,
           this.avatarUrl,
@@ -274,43 +256,24 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               <div className="buttons-container">
                 <div className="buttons">
                   <CWButton
-                    label="Delete profile"
-                    onclick={() => this.handleDeleteProfile()}
-                    buttonType="tertiary-black"
+                    label="Cancel Edits"
+                    onclick={() => {
+                      this.loading = true;
+                      setTimeout(() => {
+                        navigateToSubpage(`/profile/id/${this.profile.id}`);
+                      }, 1000);
+                    }}
+                    className="save-button"
+                    buttonType="mini-white"
                   />
-                  <div className="buttons-right">
-                    <CWButton
-                      label="Cancel Edits"
-                      onclick={() => {
-                        this.loading = true;
-                        setTimeout(() => {
-                          navigateToSubpage(`/profile/${this.username}`);
-                        }, 1000);
-                      }}
-                      className="save-button"
-                      buttonType="mini-white"
-                    />
-                    <CWButton
-                      label="Save"
-                      onclick={() => {
-                        this.handleSaveProfile();
-                      }}
-                      className="save-button"
-                      buttonType="mini-black"
-                      disabled={!this.username}
-                    />
-                  </div>
-                </div>
-                <div className="status">
-                  <div
-                    className={
-                      this.failed
-                        ? 'save-button-message show'
-                        : 'save-button-message'
-                    }
-                  >
-                    <CWText> No changes saved.</CWText>
-                  </div>
+                  <CWButton
+                    label="Save"
+                    onclick={() => {
+                      this.handleSaveProfile();
+                    }}
+                    className="save-button"
+                    buttonType="mini-black"
+                  />
                 </div>
               </div>
             }
@@ -342,26 +305,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                 </div>
               </div>
               <div className="info-section">
-                <CWTextInput
-                  name="username-form-field"
-                  inputValidationFn={(val: string) => {
-                    if (val.match(/[^A-Za-z0-9]/)) {
-                      return ['failure', 'Must enter characters A-Z, 0-9'];
-                    } else {
-                      return ['success', 'Input validated'];
-                    }
-                  }}
-                  label={
-                    <CWText type="caption" className="username">
-                      Username <span className="blue-star">&nbsp;*</span>
-                    </CWText>
-                  }
-                  value={this.username}
-                  placeholder="username"
-                  oninput={(e) => {
-                    this.username = e.target.value;
-                  }}
-                />
                 <CWTextInput
                   name="name-form-field"
                   inputValidationFn={(val: string) => {

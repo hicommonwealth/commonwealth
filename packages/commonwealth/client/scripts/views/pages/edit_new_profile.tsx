@@ -9,20 +9,20 @@ import Sublayout from 'views/sublayout';
 import EditProfileComponent from '../components/edit_profile';
 
 export default class EditNewProfile extends ClassComponent {
-  private username: string;
+  private profileId: string;
 
   oninit() {
-    this.username = m.route.param('username');
+    this.profileId = m.route.param('profileId');
 
     if (!app.isLoggedIn()) {
-      navigateToSubpage(`/profile/${this.username}`);
+      navigateToSubpage(`/profile/id/${this.profileId}`);
     }
   }
 
   view() {
     return (
       <Sublayout>
-        <EditProfileComponent username={this.username} />
+        <EditProfileComponent profileId={this.profileId} />
       </Sublayout>
     );
   }

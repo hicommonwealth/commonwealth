@@ -25,7 +25,7 @@ export type BaseTextInputAttrs = {
   iconRight?: IconName;
   iconRightonclick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
-  label?: string | m.Vnode;
+  label?: string;
   maxlength?: number;
   name?: string;
   oninput?: (e) => void;
@@ -51,7 +51,7 @@ type InputInternalStyleAttrs = {
 
 type MessageRowAttrs = {
   hasFeedback?: boolean;
-  label: string | m.Vnode;
+  label: string;
   statusMessage?: string;
   validationStatus?: ValidationStatus;
 };

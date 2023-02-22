@@ -15,52 +15,16 @@
   }
 
   .buttons-container {
-    justify-content: space-between;
+    display: flex;
+    justify-content: flex-end;
 
     .buttons {
       display: flex;
-      justify-content: space-between;
+      gap: 16px;
       align-items: center;
 
       .tertiary-black {
         padding-left: 0;
-      }
-
-      .buttons-right {
-        display: flex;
-        gap: 16px;
-
-        .save-button {
-          &.confirm {
-            background-color: green;
-            color: white;
-          }
-
-          &.fail {
-            background-color: red;
-            color: white;
-          }
-        }
-      }
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      margin-top: 8px;
-
-      @include smallInclusive {
-        margin-top: 0;
-      }
-
-      .save-button-message {
-        opacity: 0;
-        transition: opacity 0.25s ease;
-
-        &.show {
-          opacity: 1;
-        }
       }
     }
   }
