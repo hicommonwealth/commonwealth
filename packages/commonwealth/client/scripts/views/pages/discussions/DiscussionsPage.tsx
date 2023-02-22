@@ -1,15 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
+
+import 'pages/discussions/index.scss';
+
 import app from '../../../state';
-import { Footer } from '../../footer';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
+import { Footer } from '../../footer';
 
-import 'pages/discussions/index.scss';
+type DiscussionsPageProps = {
+  topicName?: string;
+  stageName?: string;
+};
 
-function DiscussionsPage({ topicName, stageName }) {
+const DiscussionsPage = ({ topicName, stageName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
   const [initializing, setInitializing] = useState(true);
 
@@ -51,31 +57,31 @@ function DiscussionsPage({ topicName, stageName }) {
   if (initializing) {
     return <PageLoading />;
   }
-  return <Sublayout hideFooter={true}>
-    <Virtuoso
-      style={{ height: '100%', width: '100%' }}
-      data={threads}
-      itemContent={(i, thread) => {
-        return <ThreadPreview thread={thread} key={`${i}`}/>;
-      }}
-      endReached={loadMore}
-      overscan={200}
-      components={{
-        Header: () => {
-          return <div className="DiscussionsPage">
-            <RecentThreadsHeader
-              topic={topicName}
-              stage={stageName}
-              totalThreadCount={threads.length}
-            />
-          </div>;
-        },
-        Footer: () => {
-          return <Footer/>;
-        }
-      }}
-    />
-  </Sublayout>;
-}
+  return (
+    <Sublayout hideFooter>
+      <div className="DiscussionsPage">
+        <RecentThreadsHeader
+          topic={topicName}
+          stage={stageName}
+          totalThreadCount={threads.length}
+        />
+        <Virtuoso
+          style={{ height: '100%', width: '100%' }}
+          data={threads}
+          itemContent={(i, thread) => {
+            return <ThreadPreview thread={thread} key={`${i}`} />;
+          }}
+          endReached={loadMore}
+          overscan={200}
+          components={{
+            Footer: () => {
+              return <Footer />;
+            },
+          }}
+        />
+      </div>
+    </Sublayout>
+  );
+};
 
 export default DiscussionsPage;

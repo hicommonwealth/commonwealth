@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
-
 import 'pages/feed/index.scss';
 
 import app from 'state';
@@ -13,8 +11,8 @@ import { CWText } from '../../components/component_kit/cw_text';
 import ErrorPage from '../error';
 import { Feed } from '../../components/feed';
 
-class FeedPage extends ClassComponent {
-  private getGlobalFeed = async () => {
+const FeedPage = () => {
+  const getGlobalFeed = async () => {
     try {
       const activity = await fetchActivity(DashboardViews.Global);
       const formattedData = activity.result
@@ -29,7 +27,7 @@ class FeedPage extends ClassComponent {
     }
   };
 
-  private getChainEvents = async () => {
+  const getChainEvents = async () => {
     try {
       const activity = await fetchActivity(DashboardViews.Chain);
       const formattedData = activity.result
@@ -41,11 +39,11 @@ class FeedPage extends ClassComponent {
     }
   };
 
-  private getCombinedFeed = async () => {
-    return Promise.all([this.getGlobalFeed(), this.getChainEvents()])
+  const getCombinedFeed = async () => {
+    return Promise.all([getGlobalFeed(), getChainEvents()])
       .then((result) => {
         return {
-          result: this.sortFeed(result[0], result[1]),
+          result: sortFeed(result[0], result[1]),
         };
       })
       .catch((err) => {
@@ -53,7 +51,7 @@ class FeedPage extends ClassComponent {
       });
   };
 
-  private sortFeed = (globalFeed, chainEvents) => {
+  const sortFeed = (globalFeed, chainEvents) => {
     let sortedFeed = [];
     if (globalFeed?.length > 0 && chainEvents?.length > 0) {
       sortedFeed = globalFeed.concat(chainEvents).sort((a, b) => {
@@ -69,27 +67,22 @@ class FeedPage extends ClassComponent {
     return sortedFeed;
   };
 
-  view() {
-    if (!app.chain.meta.hasHomepage) {
-      return (
-        <ErrorPage message="The Homepage feature has not been enabled for this community." />
-      );
-    }
-
+  if (!app.chain.meta.hasHomepage) {
     return (
-      <Sublayout>
-        <div className="FeedPage">
-          <CWText type="h3" fontWeight="semiBold">
-            Home
-          </CWText>
-          <Feed
-            fetchData={this.getCombinedFeed}
-            noFeedMessage="No activity yet"
-          />
-        </div>
-      </Sublayout>
+      <ErrorPage message="The Homepage feature has not been enabled for this community." />
     );
   }
-}
+
+  return (
+    <Sublayout>
+      <div className="FeedPage">
+        <CWText type="h3" fontWeight="semiBold">
+          Home
+        </CWText>
+        <Feed fetchData={getCombinedFeed} noFeedMessage="No activity yet" />
+      </div>
+    </Sublayout>
+  );
+};
 
 export default FeedPage;

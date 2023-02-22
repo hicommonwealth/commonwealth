@@ -660,7 +660,6 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                           {draft.body.length > 0 &&
                             renderQuillTextBody(draft.body, {
                               hideFormatting: true,
-                              collapse: true,
                             })}
                           <CWText
                             className="draft-delete-text"

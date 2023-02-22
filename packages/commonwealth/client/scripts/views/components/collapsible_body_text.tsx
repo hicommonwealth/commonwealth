@@ -72,7 +72,6 @@ export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
       <QuillFormattedText
         doc={doc}
         cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-        collapse={false}
         hideFormatting={false}
       />
     );
@@ -119,6 +118,7 @@ export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalB
         this.collapsed = true;
       }
     }
+    this.redraw();
   }
 
   onupdate(vnode: ResultNode<CollapsibleProposalBodyAttrs>) {
@@ -140,7 +140,6 @@ export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalB
           <QuillFormattedText
             doc={doc}
             cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-            collapse={false}
             hideFormatting={false}
           />
         );
