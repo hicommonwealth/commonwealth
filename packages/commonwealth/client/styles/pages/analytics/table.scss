@@ -1,7 +1,11 @@
 @import '../../shared';
 
 .AnalyticsTable {
-  padding: 56px;
+  padding: 16px 56px 92px;
+
+  .h2 {
+    margin: 32px 0 24px;
+  }
 
   .table {
     border: 1px solid $neutral-100;

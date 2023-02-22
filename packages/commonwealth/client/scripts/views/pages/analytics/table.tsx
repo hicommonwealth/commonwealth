@@ -9,6 +9,7 @@ import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWBreadcrumbs } from '../../components/component_kit/cw_breadcrumbs';
 
 const AnalyticsPage = () => {
   const [data, setData] = React.useState<any>();
@@ -145,6 +146,13 @@ const AnalyticsPage = () => {
   return (
     <Sublayout>
       <div className="AnalyticsTable">
+        <CWBreadcrumbs
+          breadcrumbs={[
+            { label: 'Analytics', path: '/analytics' },
+            { label: 'Table', path: '/analytics/table' },
+          ]}
+        />
+        <CWText type="h2" className="title">Table</CWText>
         <div className="table">
           <div className="stat-row title">
             <CWText fontWeight="semiBold" type="h5" className="align-left">Time period</CWText>

@@ -2,7 +2,7 @@
 
 .AnalyticsPage {
   flex: 1;
-  padding: 24px;
+  padding: 16px 144px 92px;
 
   .description {
     margin: 8px 0 32px;
@@ -20,6 +20,16 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 16px;
     margin: 16px 0;
+
+    @include mediumSmallInclusive {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @include smallInclusive {
+      grid-template-columns: 1fr;
+      align-items: center;
+      justify-content: center;
+    }
   }
 
   .view-table-button-container {

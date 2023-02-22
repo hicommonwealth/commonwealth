@@ -14,6 +14,7 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import { OverviewTable } from '../../components/overview_table';
+import { CWBreadcrumbs } from '../../components/component_kit/cw_breadcrumbs';
 
 const AnalyticsPage = () => {
   const [totalData, setTotalData] = React.useState<any>();
@@ -59,6 +60,11 @@ const AnalyticsPage = () => {
   return (
     <Sublayout>
       <div className="AnalyticsPage">
+        <CWBreadcrumbs
+          breadcrumbs={[
+            { label: 'Analytics', path: '/analytics' },
+          ]}
+        />
         <CWText type="h1" fontWeight="semiBold">Analytics</CWText>
         <CWText className="description">Track your community's growth and engagement</CWText>
         <div className="overview-title">
