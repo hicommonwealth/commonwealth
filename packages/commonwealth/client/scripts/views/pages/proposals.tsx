@@ -49,7 +49,7 @@ const ProposalsPage = () => {
     app.chainAdapterReady.on('ready', () => forceRerender());
 
     return () => {
-      app.chainAdapterReady.on('ready', () => forceRerender());
+      app.chainAdapterReady.off('ready', () => forceRerender());
     };
   });
 

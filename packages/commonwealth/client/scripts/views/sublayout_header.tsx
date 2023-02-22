@@ -19,9 +19,10 @@ type SublayoutHeaderProps = {
   onMobile: boolean;
 };
 
-export const SublayoutHeader = (props: SublayoutHeaderProps) => {
-  const { hideSearch, onMobile } = props;
-
+export const SublayoutHeader = ({
+  hideSearch,
+  onMobile,
+}: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
 
   return (

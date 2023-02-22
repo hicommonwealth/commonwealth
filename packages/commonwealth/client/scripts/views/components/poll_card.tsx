@@ -32,10 +32,12 @@ export type PollOptionProps = {
   disableVoteOptions?: boolean;
 };
 
-export const PollOptions = (props: PollOptionProps) => {
-  const { multiSelect, voteInformation, selectedOptions, disableVoteOptions } =
-    props;
-
+export const PollOptions = ({
+  disableVoteOptions,
+  multiSelect,
+  selectedOptions,
+  voteInformation,
+}: PollOptionProps) => {
   return (
     <div className="PollOptions">
       {multiSelect
@@ -81,10 +83,12 @@ export type CastVoteProps = {
   ) => void;
 };
 
-export const CastVoteSection = (props: CastVoteProps) => {
-  const { disableVoteButton, timeRemaining, onVoteCast, tooltipErrorMessage } =
-    props;
-
+export const CastVoteSection = ({
+  disableVoteButton,
+  onVoteCast,
+  timeRemaining,
+  tooltipErrorMessage,
+}: CastVoteProps) => {
   return (
     <div className="CastVoteSection">
       {disableVoteButton ? (
@@ -123,10 +127,12 @@ export type VoteDisplayProps = {
   voteInformation: Array<VoteInformation>;
 };
 
-export const VoteDisplay = (props: VoteDisplayProps) => {
-  const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
-    props;
-
+export const VoteDisplay = ({
+  pollEnded,
+  timeRemaining,
+  voteDirectionString,
+  voteInformation,
+}: VoteDisplayProps) => {
   const topResponse = voteInformation.sort(
     (option1, option2) => option2.voteCount - option1.voteCount
   )[0].label;
@@ -177,18 +183,16 @@ export type ResultsSectionProps = {
   isPreview: boolean;
 };
 
-export const ResultsSection = (props: ResultsSectionProps) => {
-  const {
-    resultString,
-    onResultsClick,
-    totalVoteCount,
-    tokenSymbol,
-    voteInformation,
-    pollEnded,
-    votedFor,
-    isPreview,
-  } = props;
-
+export const ResultsSection = ({
+  isPreview,
+  onResultsClick,
+  pollEnded,
+  resultString,
+  tokenSymbol,
+  totalVoteCount,
+  votedFor,
+  voteInformation,
+}: ResultsSectionProps) => {
   const calculateProgressStatus = (option: VoteInformation, index: number) => {
     if (!pollEnded) {
       return 'ongoing';
@@ -283,28 +287,27 @@ export type PollCardProps = PollOptionProps &
     proposalTitle?: string;
   };
 
-export const PollCard = (props: PollCardProps) => {
-  const {
-    disableVoteButton = false,
-    incrementalVoteCast,
-    multiSelect,
-    onResultsClick,
-    onVoteCast,
-    pollEnded,
-    proposalTitle,
-    timeRemaining,
-    tokenSymbol,
-    votedFor,
-    voteInformation,
-    tooltipErrorMessage,
-    isPreview = false,
-  } = props;
-
+export const PollCard = ({
+  disableVoteButton = false,
+  incrementalVoteCast,
+  isPreview = false,
+  multiSelect,
+  onResultsClick,
+  onVoteCast,
+  pollEnded,
+  proposalTitle,
+  timeRemaining,
+  tokenSymbol,
+  tooltipErrorMessage,
+  votedFor,
+  voteInformation,
+  ...props
+}: PollCardProps) => {
   const [hasVoted, setHasVoted] = useState(props.hasVoted);
   const [selectedOptions, setSelectedOptions] = useState<Array<string>>([]);
   const [totalVoteCount, setTotalVoteCount] = useState(props.totalVoteCount);
   const [voteDirectionString, setVoteDirectionString] = useState(
-    props.votedFor ? buildVoteDirectionString(props.votedFor) : ''
+    votedFor ? buildVoteDirectionString(votedFor) : ''
   );
 
   const resultString = 'Results';

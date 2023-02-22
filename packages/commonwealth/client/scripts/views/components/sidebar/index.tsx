@@ -1,5 +1,5 @@
-import React from 'react';
-import { _DEPRECATED_getRoute } from 'mithrilInterop';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import 'components/sidebar/index.scss';
 
@@ -17,6 +17,7 @@ import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { useCommonNavigate } from '../../../navigation/helpers';
+import useForceRerender from 'hooks/useForceRerender';
 
 export type SidebarMenuName =
   | 'default'
@@ -25,6 +26,16 @@ export type SidebarMenuName =
 
 export const Sidebar = () => {
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    app.sidebarRedraw.on('redraw', () => forceRerender());
+
+    return () => {
+      app.sidebarRedraw.off('redraw', () => forceRerender());
+    };
+  });
 
   const activeAddressRoles = app.roles.getAllRolesInCommunity({
     chain: app.activeChainId(),
@@ -32,7 +43,7 @@ export const Sidebar = () => {
 
   const currentChainInfo = app.chain?.meta;
 
-  const onHomeRoute = _DEPRECATED_getRoute() === `/${app.activeChainId()}/feed`;
+  const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
   const hideChat =
     !currentChainInfo ||
