@@ -9,12 +9,11 @@ import type { ProfileInstance } from '..//models/profile';
 import { success } from '../types';
 
 export const Errors = {
-  NoIdentifierProvided: 'No username or profile id provided in query',
+  NoIdentifierProvided: 'No profile id provided in query',
   NoProfileFound: 'No profile found',
 };
 
 type GetNewProfileReq = {
-  username: string;
   profileId: string;
 };
 type GetNewProfileResp = {
@@ -32,27 +31,15 @@ const getNewProfile = async (
   res: TypedResponse<GetNewProfileResp>,
   next: NextFunction
 ) => {
-  const { username, profileId } = req.query;
-  if (!username && !profileId)
+  const { profileId } = req.query;
+  if (!profileId)
     return next(new Error(Errors.NoIdentifierProvided));
 
-  let profile;
-
-  if (username) {
-    profile = await models.Profile.findOne({
-      where: {
-        username,
-      },
-    });
-  }
-
-  if (!username && profileId) {
-    profile = await models.Profile.findOne({
-      where: {
-        id: profileId,
-      },
-    });
-  }
+  const profile = await models.Profile.findOne({
+    where: {
+      id: profileId,
+    },
+  });
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 

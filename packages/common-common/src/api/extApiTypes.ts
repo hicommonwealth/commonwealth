@@ -161,9 +161,4 @@ export type PostRulesReq = {
 
 export type OnlyErrorResp = { error?: string | object };
 
-export type GetNewProfilesResp = {
-  profiles?: ProfileAttributes[];
-  addresses?: AddressAttributes[];
-};
-
 export const needParamErrMsg = 'Please provide a parameter to query by';

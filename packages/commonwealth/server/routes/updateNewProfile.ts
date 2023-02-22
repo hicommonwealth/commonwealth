@@ -7,13 +7,11 @@ export const Errors = {
   NotAuthorized: 'Not authorized',
   InvalidUpdate: 'Invalid update',
   NoProfileFound: 'No profile found',
-  UsernameAlreadyExists: 'Username already exists',
   NoProfileIdProvided: 'No profile id provided in query',
 };
 
 type UpdateNewProfileReq = {
   profileId: string;
-  username: string;
   email: string;
   slug: string;
   name: string;
@@ -39,7 +37,6 @@ const updateNewProfile = async (
   }
 
   if (
-    !req.body.username &&
     !req.body.email &&
     !req.body.slug &&
     !req.body.name &&
@@ -55,7 +52,6 @@ const updateNewProfile = async (
 
   const {
     profileId,
-    username,
     email,
     slug,
     name,
@@ -78,21 +74,8 @@ const updateNewProfile = async (
     return next(new Error(Errors.NotAuthorized));
   }
 
-  if (username && username !== profile.username) {
-    const existingProfile = await models.Profile.findOne({
-      where: {
-        username,
-      },
-    });
-
-    if (existingProfile) {
-      return next(new Error(Errors.UsernameAlreadyExists));
-    }
-  }
-
   const updateStatus = await models.Profile.update(
     {
-      ...(username && { username }),
       ...(email && { email }),
       ...(slug && { slug }),
       ...(name && { profile_name: name }),
