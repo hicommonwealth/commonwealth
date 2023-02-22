@@ -140,6 +140,12 @@ export const User = (props: UserAttrs) => {
 
     profile = account.profile;
 
+    if (!profile.initialized) {
+      app.profiles.isFetched.on('redraw', () => {
+        updateState({});
+      });
+    }
+
     role = adminsAndMods.find(
       (r) => r.address === account.address && r.address_chain === chainId
     );
