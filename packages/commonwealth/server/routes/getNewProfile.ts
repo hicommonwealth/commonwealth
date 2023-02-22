@@ -83,7 +83,7 @@ const getNewProfile = async (
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
-    isOwner: req.user.id === profile.user_id,
+    isOwner: req.user?.id === profile.user_id,
   });
 };
 
