@@ -69,8 +69,6 @@ const createContract = async (
     address,
     contractType = '',
     abi,
-    abiNickname,
-    balance_type,
     eth_chain_id = 1,
     symbol = '',
     token_name = '',
