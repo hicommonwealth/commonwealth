@@ -60,12 +60,12 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
-      return (
-        <PageLoading
-        // title="Loading..."
-        />
-      );
+      return <PageLoading message="Loading..." />;
     }
+
+    app.chainAdapterReady.on('ready', () => {
+      this.redraw();
+    });
 
     const type = vnode.attrs.type || chainToProposalSlug(app.chain.meta);
 
@@ -130,7 +130,6 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
           // load sibling modules too
           if (app.chain.base === ChainBase.Substrate) {
             const chain = app.chain as Substrate;
-
             app.chain.loadModules([
               chain.treasury,
               chain.democracyProposals,
@@ -172,12 +171,12 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
             .getByProposal(this.proposal)
             .filter((c) => c.parentComment === null);
 
-          redraw();
+          this.redraw();
         })
         .catch(() => {
           notifyError('Failed to load comments');
           this.comments = [];
-          redraw();
+          this.redraw();
         });
 
       this.prefetch[proposalIdAndType]['commentsStarted'] = true;
@@ -197,7 +196,7 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
       this.comments = app.comments
         .getByProposal(this.proposal)
         .filter((c) => c.parentComment === null);
-      redraw();
+      this.redraw();
     };
 
     if (this.comments === undefined) {
@@ -244,14 +243,13 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
 
     const toggleVotingModal = (newModalState: boolean) => {
       this.votingModalOpen = newModalState;
-      redraw();
+      this.redraw();
     };
 
     const onModalClose = () => {
       this.votingModalOpen = false;
-      redraw();
+      this.redraw();
     };
-
     return (
       <Sublayout
       //  title={headerTitle}
