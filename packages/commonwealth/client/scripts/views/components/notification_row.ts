@@ -14,7 +14,7 @@ import app from 'state';
 import type { IPostNotificationData } from 'types';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { getCommunityUrl, getProposalUrl } from '../../../../shared/utils';
+import { getCommunityUrl, getThreadUrl } from '../../../../shared/utils';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
@@ -165,7 +165,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const args = comment_id
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
-  const path = (getProposalUrl as any)(...args);
+  const path = (getThreadUrl as any)(...args);
   const pageJump = comment_id
     ? () => jumpHighlightNotification(comment_id)
     : () => jumpHighlightNotification('parent');
@@ -285,7 +285,7 @@ const getBatchNotificationFields = (
   const path =
     category === NotificationCategories.NewThread
       ? (getCommunityUrl as any)(chain_id)
-      : (getProposalUrl as any)(...args);
+      : (getThreadUrl as any)(...args);
   const pageJump = comment_id
     ? () => jumpHighlightNotification(comment_id)
     : () => jumpHighlightNotification('parent');

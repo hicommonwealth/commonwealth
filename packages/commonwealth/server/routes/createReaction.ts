@@ -10,8 +10,8 @@ import type { NextFunction, Request, Response } from 'express';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import {
-  getProposalUrl,
-  getProposalUrlWithoutObject,
+  getThreadUrl,
+  getThreadUrlWithoutObject,
 } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
@@ -197,13 +197,13 @@ const createReaction = async (
       proposal = await models.Thread.findOne({
         where: { id },
       });
-      cwUrl = getProposalUrl(prefix, proposal, comment);
+      cwUrl = getThreadUrl(proposal, comment);
     } else if (
       prefix.includes('proposal') ||
       prefix.includes('referendum') ||
       prefix.includes('motion')
     ) {
-      cwUrl = getProposalUrlWithoutObject(prefix, chain.id, id, comment);
+      cwUrl = getThreadUrlWithoutObject(chain.id, id, comment);
       proposal = id;
     } else {
       proposal = undefined;
@@ -212,7 +212,7 @@ const createReaction = async (
   } else if (thread_id) {
     proposal = await models.Thread.findByPk(Number(thread_id));
     if (!proposal) return next(new AppError(Errors.NoProposalMatch));
-    cwUrl = getProposalUrl('discussion', proposal, comment);
+    cwUrl = getThreadUrl(proposal, comment);
     root_type = 'discussion';
   }
 

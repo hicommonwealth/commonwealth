@@ -4,8 +4,8 @@ import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import {
-  getProposalUrl,
-  getProposalUrlWithoutObject,
+  getThreadUrl,
+  getThreadUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
 import type { DB } from '../models';
@@ -138,13 +138,13 @@ const editComment = async (
 
     const cwUrl =
       typeof proposal === 'string'
-        ? getProposalUrlWithoutObject(
+        ? getThreadUrlWithoutObject(
             prefix,
             comment.chain,
             proposal,
             finalComment
           )
-        : getProposalUrl(prefix, proposal, comment);
+        : getThreadUrl(prefix, proposal, comment);
     const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
     // dispatch notifications to subscribers of the comment/thread

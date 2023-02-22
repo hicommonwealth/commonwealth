@@ -2,7 +2,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import type { IPostNotificationData } from './types';
 import {
   formatAddressShort,
-  getProposalUrl,
+  getThreadUrl,
   renderQuillDeltaToText,
   smartTrim,
 } from './utils';
@@ -113,7 +113,7 @@ export const getForumNotificationCopy = async (
   const proposalUrlArgs = comment_id
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
-  const proposalPath = (getProposalUrl as any)(...proposalUrlArgs);
+  const proposalPath = (getThreadUrl as any)(...proposalUrlArgs);
   return [
     emailSubjectLine,
     authorName,

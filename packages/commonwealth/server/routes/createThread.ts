@@ -15,7 +15,7 @@ import {
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
+import { getThreadUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
@@ -157,7 +157,7 @@ const dispatchHooks = async (
     {
       user: finalThread.Address.address,
       author_chain: finalThread.Address.chain,
-      url: getProposalUrl('discussion', finalThread),
+      url: getThreadUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
@@ -188,7 +188,7 @@ const dispatchHooks = async (
         },
         {
           user: finalThread.Address.address,
-          url: getProposalUrl('discussion', finalThread),
+          url: getThreadUrl('discussion', finalThread),
           title: req.body.title,
           bodyUrl: req.body.url,
           chain: finalThread.chain,
