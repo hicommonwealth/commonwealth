@@ -32,7 +32,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
   // However, also handle the case where app.chain is empty.
   const idOrPrefix =
     wallet.chain === ChainBase.CosmosSDK
-      ? app.chain?.meta.bech32Prefix || 'cosmos'
+      ? app.chain?.meta.bech32_prefix || 'cosmos'
       : app.chain?.meta.node?.ethChainId || 1;
   const canvasChain = chainBaseToCanvasChain(wallet.chain);
   const canvasChainId = chainBaseToCanvasChainId(wallet.chain, idOrPrefix);
