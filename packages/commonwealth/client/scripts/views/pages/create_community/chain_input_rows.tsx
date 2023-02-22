@@ -14,9 +14,10 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import type {
   ChainFormDefaultFields,
-  ChainFormState,
-  EthChainAttrs,
-  EthFormFields,
+  EthChainFormState,
+  UseChainFormDefaultFieldsHookType,
+  UseChainFormStateHookType,
+  UseEthChainFormFieldsHookType,
 } from './types';
 
 export const initChainForm = (): ChainFormDefaultFields => {
@@ -32,7 +33,7 @@ export const initChainForm = (): ChainFormDefaultFields => {
   };
 };
 
-export const defaultChainRows = <T extends ChainFormDefaultFields>(
+export const defaultChainRows = <T extends UseChainFormDefaultFieldsHookType>(
   state: T,
   disabled = false
 ) => {
@@ -43,7 +44,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         disabled={disabled}
         value={state.description}
         onChangeHandler={(v) => {
-          state.description = v;
+          state.setDescription(v);
         }}
         textarea
       />
@@ -58,7 +59,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.iconUrl}
         placeholder="https://"
         onChangeHandler={(v) => {
-          state.iconUrl = v;
+          state.setIconUrl(v);
         }}
       />
       <InputRow
@@ -67,7 +68,8 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.website}
         placeholder="https://example.com"
         onChangeHandler={(v) => {
-          state.website = v;
+          state.setWebsite(v);
+
           // mixpanelBrowserTrack({
           //   event: MixpanelCommunityCreationEvent.WEBSITE_ADDED,
           //   chainBase: this.state.form.base,
@@ -82,7 +84,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.discord}
         placeholder="https://discord.com/invite"
         onChangeHandler={(v) => {
-          state.discord = v;
+          state.setDiscord(v);
         }}
       />
       <InputRow
@@ -91,7 +93,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.element}
         placeholder="https://matrix.to/#"
         onChangeHandler={(v) => {
-          state.element = v;
+          state.setElement(v);
         }}
       />
       <InputRow
@@ -100,7 +102,7 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.telegram}
         placeholder="https://t.me"
         onChangeHandler={(v) => {
-          state.telegram = v;
+          state.setTelegram(v);
         }}
       />
       <InputRow
@@ -109,22 +111,25 @@ export const defaultChainRows = <T extends ChainFormDefaultFields>(
         value={state.github}
         placeholder="https://github.com"
         onChangeHandler={(v) => {
-          state.github = v;
+          state.setGithub(v);
         }}
       />
     </>
   );
 };
 
-type EthChainState = EthFormFields & ChainFormState;
+type EthChainState = UseEthChainFormFieldsHookType & UseChainFormStateHookType;
 
-export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
+export const ethChainRows = (
+  props: EthChainFormState,
+  state: EthChainState
+) => {
   const options = [
-    ...Object.keys(attrs.ethChains).map(
+    ...Object.keys(props.ethChains).map(
       (c) =>
         ({
-          label: attrs.ethChainNames[c],
-          value: attrs.ethChainNames[c],
+          label: props.ethChainNames[c],
+          value: props.ethChainNames[c],
         } || { label: c, value: c })
     ),
     app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
@@ -136,22 +141,25 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
         label="Chain"
         options={options}
         onSelect={(o) => {
-          state.chainString = o.value;
+          state.setChainString(o.value);
+
           if (o.value !== 'Custom') {
             const [id] =
-              Object.entries(attrs.ethChainNames).find(
+              Object.entries(props.ethChainNames).find(
                 ([, name]) => name === o.value
               ) ||
-              Object.keys(attrs.ethChains).find((cId) => `${cId}` === o.value);
-            state.ethChainId = id;
-            state.nodeUrl = attrs.ethChains[id].url;
-            state.altWalletUrl = attrs.ethChains[id].alt_wallet_url;
+              Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
+
+            state.setEthChainId(id);
+            state.setNodeUrl(props.ethChains[id].url);
+            state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
           } else {
-            state.ethChainId = '';
-            state.nodeUrl = '';
-            state.altWalletUrl = '';
+            state.setEthChainId('');
+            state.setNodeUrl('');
+            state.setAltWalletUrl('');
           }
           state.loaded = false;
+
           // mixpanelBrowserTrack({
           //   event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
           //   chainBase: o.value,
@@ -166,8 +174,8 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
           value={state.ethChainId}
           placeholder="1"
           onChangeHandler={async (v) => {
-            state.ethChainId = v;
-            state.loaded = false;
+            state.setEthChainId(v);
+            state.setLoaded(false);
           }}
         />
       )}
@@ -177,8 +185,8 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
           value={state.nodeUrl}
           placeholder="wss://... (leave empty for default)"
           onChangeHandler={async (v) => {
-            state.nodeUrl = v;
-            state.loaded = false;
+            state.setNodeUrl(v);
+            state.setLoaded(false);
           }}
         />
       )}
@@ -188,8 +196,8 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
           value={state.altWalletUrl}
           placeholder="https://...  (leave empty for default)"
           onChangeHandler={async (v) => {
-            state.altWalletUrl = v;
-            state.loaded = false;
+            state.setAltWalletUrl(v);
+            state.setLoaded(false);
           }}
         />
       )}
@@ -198,8 +206,9 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
         value={state.address}
         placeholder="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
         onChangeHandler={(v) => {
-          state.address = v;
-          state.loaded = false;
+          state.setAddress(v);
+          state.setLoaded(false);
+
           // mixpanelBrowserTrack({
           //   event: MixpanelCommunityCreationEvent.ADDRESS_ADDED,
           //   chainBase: ChainBase.Ethereum,
