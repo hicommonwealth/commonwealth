@@ -60,9 +60,15 @@ const AdminSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(navigate, e, `/manage`, app.activeChainId(), () => {
-          setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
-        });
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/manage`,
+          app.activeChainId(),
+          () => {
+            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+          }
+        );
       },
     },
     {
@@ -75,9 +81,15 @@ const AdminSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(navigate, e, `/analytics`, app.activeChainId(), () => {
-          setAdminToggleTree(`children.analytics.toggledState`, toggle);
-        });
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/analytics`,
+          app.activeChainId(),
+          () => {
+            setAdminToggleTree(`children.analytics.toggledState`, toggle);
+          }
+        );
       },
     },
     {

@@ -5,7 +5,7 @@ import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 
 import type {
-  PollCardAttrs,
+  PollCardProps,
   VoteInformation,
 } from '../../components/poll_card';
 import {
@@ -17,7 +17,7 @@ import {
 } from '../../components/poll_card';
 
 export type SnapshotPollCardProps = Omit<
-  PollCardAttrs,
+  PollCardProps,
   'multiSelect' | 'onResultsClick'
 >;
 

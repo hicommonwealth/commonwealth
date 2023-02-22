@@ -53,7 +53,6 @@ const getTextRows = (
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Thread.body, {
-            collapse: true,
             hideFormatting: true,
           })}
         </CWText>
@@ -107,7 +106,6 @@ const getTextRows = (
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Comment.text, {
-            collapse: true,
             hideFormatting: true,
           })}
         </CWText>
