@@ -1,7 +1,4 @@
-import React from 'react';
-
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
+import React, { useState, useEffect } from 'react';
 
 import 'pages/discussions/thread_preview.scss';
 import {
@@ -37,205 +34,195 @@ import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-type ThreadPreviewAttrs = {
+type ThreadPreviewProps = {
   thread: Thread;
 };
 
-class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
-  private isWindowSmallInclusive: boolean;
+export const ThreadPreview = (props: ThreadPreviewProps) => {
+  const { thread } = props;
 
-  onResize() {
-    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
-    redraw();
-  }
+  const [windowIsSmall, setWindowIsSmall] = useState(
+    isWindowSmallInclusive(window.innerWidth)
+  );
 
-  oninit() {
-    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+  const navigate = useCommonNavigate();
 
-    window.addEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+  useEffect(() => {
+    if (localStorage.getItem('dark-mode-state') === 'on') {
+      document.getElementsByTagName('html')[0].classList.add('invert');
+    }
 
-  onremove() {
-    window.removeEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+    const onResize = () => {
+      setWindowIsSmall(isWindowSmallInclusive(window.innerWidth));
+    };
 
-  view(vnode: ResultNode<ThreadPreviewAttrs>) {
-    const { thread } = vnode.attrs;
+    window.addEventListener('resize', onResize);
 
-    const isSubscribed =
-      getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive;
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
-    const hasAdminPermissions =
-      app.user.activeAccount &&
-      (app.roles.isRoleOfCommunity({
-        role: 'admin',
+  const isSubscribed =
+    getCommentSubscription(thread)?.isActive &&
+    getReactionSubscription(thread)?.isActive;
+
+  const hasAdminPermissions =
+    app.user.activeAccount &&
+    (app.roles.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+    }) ||
+      app.roles.isRoleOfCommunity({
+        role: 'moderator',
         chain: app.activeChainId(),
-      }) ||
-        app.roles.isRoleOfCommunity({
-          role: 'moderator',
-          chain: app.activeChainId(),
-        }));
+      }));
 
-    const isAuthor =
-      app.user.activeAccount &&
-      thread.author === app.user.activeAccount.address;
+  const isAuthor =
+    app.user.activeAccount && thread.author === app.user.activeAccount.address;
 
-    return (
-      <div
-        className={getClasses<{ isPinned?: boolean }>(
-          { isPinned: thread.pinned },
-          'ThreadPreview'
-        )}
-        onClick={(e) => {
-          const discussionLink = getProposalUrlPath(
-            thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
-          );
+  return (
+    <div
+      className={getClasses<{ isPinned?: boolean }>(
+        { isPinned: thread.pinned },
+        'ThreadPreview'
+      )}
+      onClick={(e) => {
+        const discussionLink = getProposalUrlPath(
+          thread.slug,
+          `${thread.identifier}-${slugify(thread.title)}`
+        );
 
-          if (isCommandClick(e)) {
-            window.open(discussionLink, '_blank');
-            return;
-          }
+        if (isCommandClick(e)) {
+          window.open(discussionLink, '_blank');
+          return;
+        }
 
-          e.preventDefault();
+        e.preventDefault();
 
-          const scrollEle = document.getElementsByClassName('Body')[0];
+        const scrollEle = document.getElementsByClassName('Body')[0];
 
-          localStorage[`${app.activeChainId()}-discussions-scrollY`] =
-            scrollEle.scrollTop;
+        localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+          scrollEle.scrollTop;
 
-          this.setRoute(discussionLink);
-        }}
-        key={thread.id}
-      >
-        {!this.isWindowSmallInclusive && (
-          <ThreadPreviewReactionButton thread={thread} />
-        )}
-        <div className="main-content">
-          <div className="top-row">
-            <div className="user-and-date">
-              <User
-                avatarSize={24}
-                user={
-                  new AddressInfo(null, thread.author, thread.authorChain, null)
-                }
-                linkify
-                showAddressWithDisplayName
-              />
-              {!this.isWindowSmallInclusive && (
-                <CWText className="last-updated-text">•</CWText>
-              )}
-              <CWText
-                type="caption"
-                fontWeight="medium"
-                className="last-updated-text"
-              >
-                {moment(thread.createdAt).format('l')}
-              </CWText>
-              {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
-            </div>
-            <div className="top-row-icons">
-              {isHot(thread) && <div className="flame" />}
-              {thread.pinned && (
-                <CWIcon
-                  iconName="pin"
-                  iconSize={this.isWindowSmallInclusive ? 'small' : 'medium'}
-                />
-              )}
-            </div>
-          </div>
-          <div className="title-row">
-            <CWText type="h5" fontWeight="semiBold">
-              {thread.title}
+        navigate(discussionLink);
+      }}
+      key={thread.id}
+    >
+      {!windowIsSmall && <ThreadPreviewReactionButton thread={thread} />}
+      <div className="main-content">
+        <div className="top-row">
+          <div className="user-and-date">
+            <User
+              avatarSize={24}
+              user={
+                new AddressInfo(null, thread.author, thread.authorChain, null)
+              }
+              linkify
+              showAddressWithDisplayName
+            />
+            {!windowIsSmall && <CWText className="last-updated-text">•</CWText>}
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="last-updated-text"
+            >
+              {moment(thread.createdAt).format('l')}
             </CWText>
-            {thread.hasPoll && <CWTag label="Poll" type="poll" />}
-
-            {thread.snapshotProposal && (
-              <CWTag
-                type="active"
-                label={`Snap ${thread.snapshotProposal.slice(0, 4)}…`}
+            {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
+          </div>
+          <div className="top-row-icons">
+            {isHot(thread) && <div className="flame" />}
+            {thread.pinned && (
+              <CWIcon
+                iconName="pin"
+                iconSize={windowIsSmall ? 'small' : 'medium'}
               />
             )}
           </div>
-          <CWText type="caption" className="thread-preview">
-            {thread.plaintext}
+        </div>
+        <div className="title-row">
+          <CWText type="h5" fontWeight="semiBold">
+            {thread.title}
           </CWText>
-          {thread.chainEntities?.length > 0 && (
-            <div className="tags-row">
-              {thread.chainEntities
-                .sort((a, b) => {
-                  return +a.typeId - +b.typeId;
-                })
-                .map((ce) => {
-                  if (!chainEntityTypeToProposalShortName(ce.type)) return;
-                  return (
-                    <CWTag
-                      type="proposal"
-                      label={`${chainEntityTypeToProposalShortName(ce.type)} 
+          {thread.hasPoll && <CWTag label="Poll" type="poll" />}
+
+          {thread.snapshotProposal && (
+            <CWTag
+              type="active"
+              label={`Snap ${thread.snapshotProposal.slice(0, 4)}…`}
+            />
+          )}
+        </div>
+        <CWText type="caption" className="thread-preview">
+          {thread.plaintext}
+        </CWText>
+        {thread.chainEntities?.length > 0 && (
+          <div className="tags-row">
+            {thread.chainEntities
+              .sort((a, b) => {
+                return +a.typeId - +b.typeId;
+              })
+              .map((ce) => {
+                if (!chainEntityTypeToProposalShortName(ce.type)) return;
+                return (
+                  <CWTag
+                    type="proposal"
+                    label={`${chainEntityTypeToProposalShortName(ce.type)} 
                         ${
                           Number.isNaN(parseInt(ce.typeId, 10))
                             ? ''
                             : ` #${ce.typeId}`
                         }`}
-                    />
-                  );
-                })}
+                  />
+                );
+              })}
+          </div>
+        )}
+        <div className="row-bottom">
+          <div className="comments-count">
+            {windowIsSmall && <ThreadReactionButton thread={thread} />}
+            <CWIcon iconName="feedback" iconSize="small" />
+            <CWText type="caption">
+              {pluralize(thread.numberOfComments, 'comment')}
+            </CWText>
+          </div>
+          <div className="row-bottom-menu">
+            <div
+              onClick={(e) => {
+                // prevent clicks from propagating to discussion row
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <SharePopover />
             </div>
-          )}
-          <div className="row-bottom">
-            <div className="comments-count">
-              {this.isWindowSmallInclusive && (
-                <ThreadReactionButton thread={thread} />
-              )}
-              <CWIcon iconName="feedback" iconSize="small" />
-              <CWText type="caption">
-                {pluralize(thread.numberOfComments, 'comment')}
-              </CWText>
+            <div
+              onClick={(e) => {
+                // prevent clicks from propagating to discussion row
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <PopoverMenu
+                menuItems={[getThreadSubScriptionMenuItem(thread)]}
+                renderTrigger={(onclick) => (
+                  <CWIconButton
+                    iconName={isSubscribed ? 'unsubscribe' : 'bell'}
+                    iconSize="small"
+                    onClick={onclick}
+                  />
+                )}
+              />
             </div>
-            <div className="row-bottom-menu">
-              <div
-                onClick={(e) => {
-                  // prevent clicks from propagating to discussion row
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                <SharePopover />
-              </div>
-              <div
-                onClick={(e) => {
-                  // prevent clicks from propagating to discussion row
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                <PopoverMenu
-                  menuItems={[getThreadSubScriptionMenuItem(thread)]}
-                  renderTrigger={(onclick) => (
-                    <CWIconButton
-                      iconName={isSubscribed ? 'unsubscribe' : 'bell'}
-                      iconSize="small"
-                      onClick={onclick}
-                    />
-                  )}
-                />
-              </div>
-              {app.isLoggedIn() && (isAuthor || hasAdminPermissions) && (
-                <ThreadPreviewMenu thread={thread} />
-              )}
-            </div>
+            {app.isLoggedIn() && (isAuthor || hasAdminPermissions) && (
+              <ThreadPreviewMenu thread={thread} />
+            )}
           </div>
         </div>
       </div>
-    );
-  }
-}
-
-export const ThreadPreview = withRouter(ThreadPreviewComponent);
+    </div>
+  );
+};

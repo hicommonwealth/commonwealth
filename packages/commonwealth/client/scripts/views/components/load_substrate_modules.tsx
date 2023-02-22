@@ -10,7 +10,7 @@ import { PageLoading } from 'views/pages/loading';
 export const loadSubstrateModules = (
   name: string,
   getModules: () => ProposalModule<any, any, any>[]
-): React.ReactNode | undefined => {
+) => {
   const onSubstrate = app.chain?.base === ChainBase.Substrate;
 
   if (onSubstrate) {
