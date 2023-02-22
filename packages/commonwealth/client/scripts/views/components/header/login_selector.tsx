@@ -52,6 +52,22 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftAttrs> {
+  private profileId: string;
+
+  private getProfileId = async (user: Account) => {
+    const { result } = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
+      address: user.address,
+      chain: typeof user.chain === 'string' ? user.chain : user.chain?.id,
+      jwt: app.user.jwt,
+    });
+
+    this.profileId = result.profileId;
+  };
+
+  oninit() {
+    this.getProfileId(app.user.activeAccount);
+  }
+
   view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
     const { activeAddressesWithRole, nAccountsWithoutRole } = vnode.attrs;
 
@@ -79,11 +95,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
           <div
             class="login-menu-item"
             onclick={() => {
-              const pf = app.user.activeAccount.profile;
-              if (pf) {
-                // TODO: switch to profile.username once PR4 is merged
-                m.route.set(`/profile/a/${pf.address}`);
-              }
+              m.route.set(`/profile/id/${this.profileId}`);
             }}
           >
             <CWText type="caption">View profile</CWText>
@@ -93,24 +105,12 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
           <div
             class="login-menu-item"
             onclick={() => {
-              const pf = app.user.activeAccount.profile;
-              if (pf) {
-                // TODO: switch to profile.username once PR4 is merged
-                m.route.set(`/profile/a/${pf.address}/edit`);
-              }
+              m.route.set(`/profile/id/${this.profileId}/edit`);
             }}
           >
             <CWText type="caption">Edit profile</CWText>
           </div>
         )}
-        <div
-          class="login-menu-item"
-          onclick={() => {
-            m.route.set(`/profile/manage`);
-          }}
-        >
-          <CWText type="caption">Manage profiles</CWText>
-        </div>
         <div
           class="login-menu-item"
           onclick={() => {
