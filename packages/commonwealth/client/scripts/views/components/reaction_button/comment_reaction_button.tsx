@@ -75,7 +75,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
       chainId: string,
       userAddress: string
     ) => {
-      const { session, action, hash } = await app.sessions.signCommentReaction({
+      await app.sessions.signCommentReaction({
         comment_id: comment.id,
         like: true,
       });

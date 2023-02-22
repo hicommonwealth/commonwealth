@@ -3,7 +3,7 @@
 import ClassComponent from 'class_component';
 
 import 'components/comments/comments_tree.scss';
-import m from 'mithril';
+import type m from 'mithril';
 import type { Comment as CommentType } from 'models';
 import { Thread } from 'models';
 
