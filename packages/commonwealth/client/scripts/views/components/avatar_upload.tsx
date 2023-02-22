@@ -1,8 +1,5 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
-
 import 'components/avatar_upload.scss';
 import Dropzone from 'dropzone';
 import { isUndefined } from 'helpers/typeGuards';
@@ -18,7 +15,7 @@ type AvatarUploadStyleAttrs = {
   size?: 'small' | 'large';
 };
 
-type AvatarUploadAttrs = {
+type AvatarUploadProps = {
   account?: Account;
   darkMode?: boolean;
   scope: 'community' | 'user';
@@ -26,17 +23,15 @@ type AvatarUploadAttrs = {
   uploadStartedCallback?: CallableFunction;
 } & AvatarUploadStyleAttrs;
 
-export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
-  private dropzone?: any;
-  private uploaded: boolean;
+export const AvatarUpload = (props: AvatarUploadProps) => {
+  const [dropzone, setDropzone] = React.useState<any>();
+  const [uploaded, setUploaded] = React.useState<boolean>();
+  const nodeRef = React.useRef<HTMLDivElement>(null);
 
-  oncreate(vnode: ResultNode<AvatarUploadAttrs>) {
-    // TODO: @ZAK @REACT
-    $(vnode.dom).on('cleardropzone', () => {
-      this.dropzone.files.map((file) => this.dropzone.removeFile(file));
-    });
-    // TODO: @ZAK @REACT
-    this.dropzone = new Dropzone(vnode.dom, {
+  React.useEffect(() => {
+    if (Dropzone.instances.length > 0) return;
+
+    const newDropzone = new Dropzone(nodeRef.current, {
       clickable: '.icon-button-container',
       previewsContainer: '.AvatarUpload .dropzone-preview-container',
       // configuration for direct upload to s3
@@ -57,7 +52,6 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
           jwt: app.user.jwt,
         })
           .then((response) => {
-            console.log(response);
             if (response.status !== 'Success') {
               return done(
                 'Failed to get an S3 signed upload URL',
@@ -65,9 +59,9 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
               );
             }
             file.uploadURL = response.result;
-            this.uploaded = true;
+            setUploaded(true);
             done();
-            setTimeout(() => this.dropzone.processFile(file));
+            setTimeout(() => newDropzone.processFile(file));
           })
           .catch((err: any) => {
             done(
@@ -84,75 +78,85 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
       },
     });
 
-    this.dropzone.on('processing', (file) => {
-      this.dropzone.options.url = file.uploadURL;
-      if (vnode.attrs.uploadStartedCallback) {
-        vnode.attrs.uploadStartedCallback();
+    newDropzone.on('processing', (file) => {
+      newDropzone.options.url = file.uploadURL;
+      if (props.uploadStartedCallback) {
+        props.uploadStartedCallback();
       }
     });
 
-    this.dropzone.on('complete', () => {
-      if (vnode.attrs.uploadCompleteCallback) {
-        vnode.attrs.uploadCompleteCallback(this.dropzone.files);
+    newDropzone.on('complete', (file) => {
+      if (props.uploadCompleteCallback) {
+        props.uploadCompleteCallback(file);
       }
     });
-  }
 
-  view(vnode: ResultNode<AvatarUploadAttrs>) {
-    const { account, darkMode, scope, size = 'small' } = vnode.attrs;
+    setDropzone(newDropzone);
 
-    const avatarSize = size === 'small' ? 60 : 108;
-    const forUser = scope === 'user';
-    const forCommunity = scope === 'community';
+    const cleanUpFiles = () => {
+      dropzone.files.map((file) => dropzone.removeFile(file));
+    };
 
-    const avatar = forUser
-      ? account?.profile?.getAvatar(avatarSize)
-      : forCommunity
-      ? app.chain?.meta.getAvatar(avatarSize)
-      : undefined;
+    nodeRef.current.addEventListener('cleardropzone', cleanUpFiles);
+    return () => {
+      nodeRef.current.removeEventListener('cleardropzone', cleanUpFiles);
+    };
+  }, []);
 
-    const localUploadURL = this.dropzone?.option?.url;
+  const { account, darkMode, scope, size = 'small' } = props;
 
-    return (
+  const avatarSize = size === 'small' ? 60 : 108;
+  const forUser = scope === 'user';
+  const forCommunity = scope === 'community';
+
+  const avatar = forUser
+    ? account?.profile?.getAvatar(avatarSize)
+    : forCommunity
+    ? app.chain?.meta.getAvatar(avatarSize)
+    : undefined;
+
+  const localUploadURL = dropzone?.option?.url;
+
+  return (
+    <div
+      className={getClasses<AvatarUploadStyleAttrs>(
+        { size },
+        ComponentType.AvatarUpload
+      )}
+      ref={nodeRef}
+    >
       <div
-        className={getClasses<AvatarUploadStyleAttrs>(
-          { size },
-          ComponentType.AvatarUpload
+        className={getClasses<{ darkMode?: boolean }>(
+          { darkMode },
+          'icon-button-container dz-clickable'
         )}
       >
-        <div
-          className={getClasses<{ darkMode?: boolean }>(
-            { darkMode },
-            'icon-button-container'
-          )}
-        >
-          <CWIconButton
-            iconButtonTheme="primary"
-            iconName="plusCircle"
-            iconSize={size === 'small' ? 'small' : 'medium'}
-          />
-        </div>
-        {!this.uploaded && (
-          <div
-            className={getClasses<{ hasNoAvatar: boolean }>(
-              { hasNoAvatar: isUndefined(avatar) },
-              'dropzone-attach'
-            )}
-          >
-            {avatar}
-          </div>
-        )}
-        <div
-          className={getClasses<{ hidden: boolean }>(
-            { hidden: !this.uploaded },
-            'dropzone-preview-container'
-          )}
-          style={{
-            backgroundImage: `url(${localUploadURL})`,
-            backgroundSize: `${avatarSize}px;`,
-          }}
+        <CWIconButton
+          iconButtonTheme="primary"
+          iconName="plusCircle"
+          iconSize={size === 'small' ? 'small' : 'medium'}
         />
       </div>
-    );
-  }
-}
+      {!uploaded && (
+        <div
+          className={getClasses<{ hasNoAvatar: boolean }>(
+            { hasNoAvatar: isUndefined(avatar) },
+            'dropzone-attach'
+          )}
+        >
+          {avatar}
+        </div>
+      )}
+      <div
+        className={getClasses<{ hidden: boolean }>(
+          { hidden: !uploaded },
+          'dropzone-preview-container'
+        )}
+        style={{
+          backgroundImage: `url(${localUploadURL})`,
+          backgroundSize: `${avatarSize}px`,
+        }}
+      />
+    </div>
+  );
+};
