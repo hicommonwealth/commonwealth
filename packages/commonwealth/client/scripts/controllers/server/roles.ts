@@ -3,15 +3,15 @@ import app from 'state';
 
 import type { AddressInfo, RoleInfo, ChainInfo } from 'models';
 import { Account } from 'models';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
-import type { Action } from 'commonwealth/shared/permissions';
+import { aggregatePermissions } from 'utils';
+import type { Action } from 'permissions';
 import {
   AccessLevel,
   PermissionManager,
   ToCheck,
   everyonePermissions,
-} from 'commonwealth/shared/permissions';
-import type { RoleObject } from 'commonwealth/shared/types';
+} from 'permissions';
+import type { RoleObject } from 'types';
 import type { UserController } from './user';
 
 const getPermissionLevel = (permission: AccessLevel | undefined) => {

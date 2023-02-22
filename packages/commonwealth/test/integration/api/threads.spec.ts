@@ -13,11 +13,11 @@ import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPi
 import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
-import app, { resetDatabase } from 'commonwealth/server-test';
-import { JWT_SECRET } from 'commonwealth/server/config';
-import * as modelUtils from 'commonwealth/test/util/modelUtils';
-import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
-import { Action } from 'commonwealth/shared/permissions';
+import app, { resetDatabase } from '../../../server-test';
+import { JWT_SECRET } from 'server/config';
+import * as modelUtils from 'test/util/modelUtils';
+import { addAllowDenyPermissionsForCommunityRole } from 'test/util/modelUtils';
+import { Action } from 'shared/permissions';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
