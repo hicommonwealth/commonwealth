@@ -30,6 +30,21 @@
 
     .Button {
       padding: 0;
+
+      .Text {
+        font-weight: 400;
+        letter-spacing: normal;
+      }
+    }
+  }
+
+  .highlights {
+    display: flex;
+    width: 100%;
+    gap: 16px;
+
+    @include mediumSmallInclusive {
+      flex-direction: column;
     }
   }
 

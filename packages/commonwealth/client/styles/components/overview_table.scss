@@ -1,0 +1,51 @@
+@import '../shared';
+
+.OverviewTable {
+  border: 1px solid $neutral-200;
+  border-radius: $border-radius-corners;
+  width: 100%;
+
+  .title {
+    background-color: $neutral-25;
+    padding: 16px;
+    border-bottom: 1px solid $neutral-200;
+  }
+
+  .row {
+    border-bottom: 1px solid $neutral-200;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    justify-content: space-between;
+    padding: 12px 24px;
+
+    .column {
+      text-transform: uppercase;
+      color: $neutral-500;
+    }
+
+    .member {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+      }
+
+      .profile-name {
+        color: $neutral-500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        max-width: 70px;
+
+        @include mediumSmallInclusive {
+          max-width: none;
+        }
+      }
+    }
+  }
+}

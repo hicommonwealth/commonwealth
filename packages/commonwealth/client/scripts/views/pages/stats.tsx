@@ -13,6 +13,7 @@ import { CWOverviewCard } from '../components/component_kit/cw_overview_card';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
 import { CWButton } from '../components/component_kit/cw_button';
 import { useCommonNavigate } from 'navigation/helpers';
+import { OverviewTable } from '../components/overview_table';
 
 const StatsPage = () => {
   const [data, setData] = React.useState<any>();
@@ -204,6 +205,80 @@ const StatsPage = () => {
             iconRight="arrowRight"
             buttonType="tertiary-blue"
             onClick={() => navigate(`/analytics/table`)}
+          />
+        </div>
+        <div className="highlights">
+          <OverviewTable
+            title="Trending topics"
+            columns={[{
+              label: 'Topic Name',
+              key: 'topic',
+            }, {
+              label: 'Posts',
+              key: 'posts',
+            }, {
+              label: 'Comments',
+              key: 'comments',
+            }]}
+            data={[
+              {
+                topic: 'Topic 1',
+                posts: 100,
+                comments: 100,
+              },
+              {
+                topic: 'Topic 2',
+                posts: 200,
+                comments: 200,
+              },
+              {
+                topic: 'Topic 3',
+                posts: 300,
+                comments: 300,
+              },
+            ]}
+          />
+          <OverviewTable
+            title="Most active users"
+            columns={[{
+              label: 'Member',
+              key: 'member',
+            }, {
+              label: 'Posts',
+              key: 'posts',
+            }, {
+              label: 'Comments',
+              key: 'comments',
+            }]}
+            data={[
+              {
+                member: {
+                  iconUrl: app.config.chains.getById(app.activeChainId())?.iconUrl,
+                  profileName: 'Member 1',
+                  username: 'member1'
+                },
+                posts: 3,
+                comments: 12,
+              },
+              {
+                member: {
+                  iconUrl: app.config.chains.getById(app.activeChainId())?.iconUrl,
+                  profileName: 'Member 2',
+                  username: 'member2'
+                },
+                posts: 5,
+                comments: 20,
+              },
+              {
+                member: {
+                  iconUrl: app.config.chains.getById(app.activeChainId())?.iconUrl,
+                  profileName: 'Member 3',
+                  username: 'member3'
+                },
+                posts: 1,
+                comments: 300,
+              },
+            ]}
           />
         </div>
         <div className="table">
