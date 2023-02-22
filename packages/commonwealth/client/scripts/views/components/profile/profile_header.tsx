@@ -30,7 +30,7 @@ export class ProfileHeader extends ClassComponent<ProfileHeaderAttrs> {
     const { profile, isOwner } = vnode.attrs;
 
     if (!profile) return;
-    const { bio, name, username } = profile;
+    const { bio, name } = profile;
 
     const isCurrentUser = app.isLoggedIn() && isOwner;
 
@@ -42,7 +42,7 @@ export class ProfileHeader extends ClassComponent<ProfileHeaderAttrs> {
               label="Edit"
               buttonType="mini-white"
               iconLeft="write"
-              onclick={() => navigateToSubpage(`/profile/${username}/edit`)}
+              onclick={() => navigateToSubpage(`/profile/id/${profile.id}/edit`)}
             />
           )}
         </div>
@@ -59,7 +59,7 @@ export class ProfileHeader extends ClassComponent<ProfileHeaderAttrs> {
         </div>
         <div class="profile-name-and-bio">
           <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
-            {name || username || 'Anonymous user'}
+            {name || 'Anonymous user'}
           </CWText>
           <div class="buttons">
             {/* TODO: Add delegate and follow buttons */}

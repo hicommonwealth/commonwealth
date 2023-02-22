@@ -2,21 +2,18 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import Sublayout from '../sublayout';
 import ProfileComponent from '../components/profile';
 
 export default class NewProfile extends ClassComponent {
-  private username: string;
+  private profileId: string;
 
   oninit() {
-    this.username = m.route.param('username');
+    this.profileId = m.route.param('profileId');
   }
 
   view() {
     return (
-      <Sublayout>
-        <ProfileComponent username={this.username} />
-      </Sublayout>
+      <ProfileComponent profileId={this.profileId} />
     );
   }
 }

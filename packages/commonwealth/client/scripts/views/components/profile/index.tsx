@@ -17,6 +17,7 @@ import { ProfileActivity } from './profile_activity';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../../pages/404';
+import Sublayout from '../../sublayout';
 
 enum ProfileError {
   None,
@@ -25,8 +26,7 @@ enum ProfileError {
 }
 
 type NewProfileAttrs = {
-  username?: string;
-  profileId?: string;
+  profileId: string;
 };
 
 const NoProfileFoundError = 'No profile found';
@@ -41,10 +41,10 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
   private threads: Thread[];
   private isOwner: boolean;
 
-  private getProfileData = async (query: string, type: string) => {
+  private getProfileData = async (profileId: string) => {
     try {
       const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
-        [type]: query,
+        profileId,
         jwt: app.user.jwt,
       });
 
@@ -89,18 +89,7 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
     this.error = ProfileError.None;
     this.comments = [];
     this.threads = [];
-
-    // when a user navigates from /profile/:username/edit
-    if (vnode.attrs.username) {
-      this.getProfileData(vnode.attrs.username, 'username');
-      return;
-    }
-
-    // when a user navigates from /profile/id/:profileId/edit
-    if (vnode.attrs.profileId) {
-      this.getProfileData(vnode.attrs.profileId, 'profileId');
-      return;
-    }
+    this.getProfileData(vnode.attrs.profileId);
   }
 
   view() {
@@ -209,6 +198,10 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
       );
     }
 
-    return this.content;
+    return (
+      <Sublayout>
+        {this.content}
+      </Sublayout>
+    );
   }
 }
