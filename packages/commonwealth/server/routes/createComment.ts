@@ -106,26 +106,28 @@ const createComment = async (
     where: { id: thread_id },
   });
 
-  if (thread?.id) {
-    const topic = await models.Topic.findOne({
-      include: {
-        model: models.Thread,
-        where: { id: thread.id },
-        required: true,
-        as: 'threads',
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        ruleCache,
-        models,
-        topic.rule_id,
-        author.address
-      );
-      if (!passesRules) {
-        return next(new AppError(Errors.RuleCheckFailed));
-      }
+  if (!thread) {
+    return next(new AppError(Errors.MissingRootId));
+  }
+
+  const topic = await models.Topic.findOne({
+    include: {
+      model: models.Thread,
+      where: { id: thread.id },
+      required: true,
+      as: 'threads',
+    },
+    attributes: ['rule_id'],
+  });
+  if (topic?.rule_id) {
+    const passesRules = await checkRule(
+      ruleCache,
+      models,
+      topic.rule_id,
+      author.address
+    );
+    if (!passesRules) {
+      return next(new AppError(Errors.RuleCheckFailed));
     }
   }
 

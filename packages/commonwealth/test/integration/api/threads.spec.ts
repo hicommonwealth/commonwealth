@@ -649,7 +649,7 @@ describe('Thread Tests', () => {
         address: res.address,
         jwt: newUserJWT,
         text: 'hello world',
-        thread_id: `discussion_${tempThread.id}`,
+        thread_id: tempThread.id,
       });
       expect(cRes.result).to.be.undefined;
       expect(cRes.error).to.be.equal(CreateCommentErrors.CantCommentOnReadOnly);
@@ -749,7 +749,7 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
-        thread_id: `discussion_${tRes.result.id}`,
+        thread_id: tRes.result.id,
       });
       const eRes = await modelUtils.editComment({
         text,
@@ -762,7 +762,7 @@ describe('Thread Tests', () => {
       expect(eRes.status).to.be.equal('Success');
       expect(eRes.result).not.to.be.null;
       expect(eRes.result.chain).to.be.equal(chain);
-      expect(eRes.result.thread_id).to.be.equal(`discussion_${tRes.result.id}`);
+      expect(eRes.result.thread_id).to.be.equal(tRes.result.id);
     });
   });
 
