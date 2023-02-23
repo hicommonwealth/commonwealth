@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
 
@@ -84,6 +83,7 @@ export const QuillEditorComponent = ({
     initEditor();
   }, []);
 
+  //  @REACT TODO:
   // need to refactor QuillEditorInternal for this code to work
   // const [unsavedChanges, setUnsavedChanges] = useState([]);
 
@@ -148,33 +148,34 @@ export const QuillEditorComponent = ({
     }
   };
 
-  const confirmRemoveFormatting = async () => {
-    let confirmed = false;
+  //  @REACT TODO: not needed if we don't support markdown
+  // const confirmRemoveFormatting = async () => {
+  //   let confirmed = false;
 
-    // If contents pre- and post-formatting are identical, then nothing will be lost,
-    // and there's no reason to confirm the switch.
-    setDefaultContents(editor.contents);
+  //   // If contents pre- and post-formatting are identical, then nothing will be lost,
+  //   // and there's no reason to confirm the switch.
+  //   setDefaultContents(editor.contents);
 
-    editor.removeFormat(0, editor.endIndex);
+  //   editor.removeFormat(0, editor.endIndex);
 
-    if (
-      typeof defaultContents !== 'string' &&
-      editor.contents.ops.length === defaultContents.ops.length
-    ) {
-      confirmed = true;
-    } else {
-      confirmed = await confirmationModalWithText(
-        'All formatting and images will be lost. Continue?'
-      )();
-    }
+  //   if (
+  //     typeof defaultContents !== 'string' &&
+  //     editor.contents.ops.length === defaultContents.ops.length
+  //   ) {
+  //     confirmed = true;
+  //   } else {
+  //     confirmed = await confirmationModalWithText(
+  //       'All formatting and images will be lost. Continue?'
+  //     )();
+  //   }
 
-    if (!confirmed && typeof defaultContents !== 'string') {
-      // Restore formatted contents
-      editor.contents = defaultContents;
-    }
+  //   if (!confirmed && typeof defaultContents !== 'string') {
+  //     // Restore formatted contents
+  //     editor.contents = defaultContents;
+  //   }
 
-    return confirmed;
-  };
+  //   return confirmed;
+  // };
 
   if (!loaded) {
     loadSavedState();
@@ -212,14 +213,14 @@ export const QuillEditorComponent = ({
           title="Switch to Markdown mode"
           onClick={async () => {
             // Confirm before removing formatting and switching to Markdown mode.
-            const confirmed = await confirmRemoveFormatting();
-
-            if (confirmed) {
-              // Remove formatting, switch to Markdown.
-              editor.removeFormat(0, editor.endIndex);
-              setActiveMode('markdown');
-              editor.activeMode = activeMode;
-            }
+            //  @REACT TODO:
+            // const confirmed = await confirmRemoveFormatting();
+            // if (confirmed) {
+            //   // Remove formatting, switch to Markdown.
+            //   editor.removeFormat(0, editor.endIndex);
+            //   setActiveMode('markdown');
+            //   editor.activeMode = activeMode;
+            // }
           }}
         >
           M
@@ -232,15 +233,16 @@ export const QuillEditorComponent = ({
         onClick={(e) => {
           e.preventDefault();
 
-          app.modals.create({
-            modal: PreviewModal,
-            data: {
-              doc:
-                activeMode === 'markdown'
-                  ? editor.text
-                  : JSON.stringify(editor.contents),
-            },
-          });
+          //  @REACT TODO: new modal pattern
+          // app.modals.create({
+          //   modal: PreviewModal,
+          //   data: {
+          //     doc:
+          //       activeMode === 'markdown'
+          //         ? editor.text
+          //         : JSON.stringify(editor.contents),
+          //   },
+          // });
         }}
       />
     </div>
