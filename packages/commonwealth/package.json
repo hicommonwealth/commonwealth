@@ -216,6 +216,7 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-jdenticon": "^1.0.0",
+    "react-quill": "^2.0.0",
     "react-router": "^6.6.1",
     "react-router-dom": "^6.6.1",
     "react-toastify": "^9.1.1",
