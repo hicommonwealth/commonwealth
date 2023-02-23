@@ -78,7 +78,6 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
       <CWText type="caption" className="excerpt-text" fontWeight="medium">
         {renderQuillTextBody(searchResult.body, {
           hideFormatting: true,
-          collapse: true,
           searchTerm,
         })}
       </CWText>
@@ -111,7 +110,6 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
       <CWText type="caption" className="excerpt-text">
         {renderQuillTextBody(searchResult.text, {
           hideFormatting: true,
-          collapse: true,
           searchTerm,
         })}
       </CWText>

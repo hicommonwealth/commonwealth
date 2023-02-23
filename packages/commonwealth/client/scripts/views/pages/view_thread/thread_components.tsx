@@ -1,6 +1,4 @@
 import React from 'react';
-import { ClassComponent } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
 
 import app from 'state';
 import {
@@ -20,7 +18,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadComponentProps = {
   thread: Thread;
@@ -97,22 +95,15 @@ export const ThreadStage = (props: ThreadComponentProps) => {
   );
 };
 
-class ExternalLinkComponent extends ClassComponent<ThreadComponentProps> {
-  view(vnode: ResultNode<ThreadComponentProps>) {
-    const { thread } = vnode.attrs;
+export const ExternalLink = (props: ThreadComponentProps) => {
+  const { thread } = props;
 
-    return (
-      <div className="HeaderLink">
-        {externalLink(
-          'a',
-          thread.url,
-          [extractDomain(thread.url)],
-          this.setRoute
-        )}
-        <CWIcon iconName="externalLink" iconSize="small" />
-      </div>
-    );
-  }
-}
+  const navigate = useCommonNavigate();
 
-export const ExternalLink = withRouter(ExternalLinkComponent);
+  return (
+    <div className="HeaderLink">
+      {externalLink('a', thread.url, [extractDomain(thread.url)], navigate)}
+      <CWIcon iconName="externalLink" iconSize="small" />
+    </div>
+  );
+};
