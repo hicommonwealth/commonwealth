@@ -125,6 +125,10 @@ const linkExistingAddressToChain = async (
       //   we can just update with userId. this covers both edge case (1) & (2)
       // Address.updateWithTokenProvided
       existingAddress.user_id = userId;
+      const profileId = await models.Profile.findOne({
+        where: { user_id: userId }
+      });
+      existingAddress.profile_id = profileId?.id;
       existingAddress.keytype = req.body.keytype;
       existingAddress.verification_token = verificationToken;
       existingAddress.verification_token_expires = verificationTokenExpires;
