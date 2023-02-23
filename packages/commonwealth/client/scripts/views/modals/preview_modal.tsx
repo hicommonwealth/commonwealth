@@ -1,31 +1,30 @@
 import React from 'react';
 
 import 'modals/preview_modal.scss';
+
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
-
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { CWText } from '../components/component_kit/cw_text';
 
 type PreviewModalProps = {
   doc: string;
-  title: string;
 };
 
-export const PreviewModal = (props: PreviewModalProps) => {
-  const { doc, title } = props;
-
+export const PreviewModal = ({ doc }: PreviewModalProps) => {
   return (
     <div className="PreviewModal">
       <div className="compact-modal-title">
-        <h3>{title ? `Preview: ${title}` : 'Preview'}</h3>
+        <h3>Preview</h3>
         <ModalExitButton />
       </div>
       <div className="compact-modal-body">
         {(() => {
           try {
             const internalDoc = JSON.parse(doc);
+
             if (!internalDoc.ops) throw new Error();
+
             if (
               internalDoc.ops.length === 1 &&
               internalDoc.ops[0].insert === '\n'
@@ -57,6 +56,7 @@ export const PreviewModal = (props: PreviewModalProps) => {
                 </div>
               );
             }
+
             return doc && <MarkdownFormattedText doc={doc} />;
           }
         })()}
