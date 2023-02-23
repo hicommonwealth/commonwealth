@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
@@ -30,7 +30,20 @@ function getModules() {
 }
 
 const ReferendaPage = () => {
-  if (!app.chain || !app.chain.loaded) {
+  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded)
+  const [isSubstrateLoading, setSubstrateLoading] = useState(false);
+
+  useEffect(() => {
+    app.chainAdapterReady.on('ready', () => setLoading(false));
+    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
+
+    return () => {
+      app.chainAdapterReady.off('ready', () => setLoading(false));
+      app.chainModuleReady.off('ready', () => setSubstrateLoading(false));
+    };
+  }, [setLoading, setSubstrateLoading]);
+
+  if (isLoading) {
     if (
       app.chain?.base === ChainBase.Substrate &&
       (app.chain as Substrate).chain?.timedOut
@@ -45,7 +58,7 @@ const ReferendaPage = () => {
 
   const modLoading = loadSubstrateModules('Referenda', getModules);
 
-  if (modLoading) return modLoading;
+  if (isSubstrateLoading) return modLoading;
 
   // active proposals
   const activeDemocracyReferenda =
