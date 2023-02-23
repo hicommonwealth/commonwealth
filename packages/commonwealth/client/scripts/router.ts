@@ -309,9 +309,12 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
 
   // Admin
-  '/manage': importRoute(import('views/pages/manage_community/index'), {
-    scoped: true,
-  }),
+  '/manage': importRoute(
+    import('views/pages/manage_community/ManageCommunityPage'),
+    {
+      scoped: true,
+    }
+  ),
   '/settings': importRoute(import('views/pages/settings'), { scoped: true }),
   '/analytics': importRoute(import('views/pages/stats'), {
     scoped: true,

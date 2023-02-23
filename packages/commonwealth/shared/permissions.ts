@@ -10,6 +10,7 @@ export enum PermissionError {
 }
 
 export enum Action {
+  CREATE_CHAT = 0,
   CREATE_REACTION = 1,
   VIEW_REACTIONS = 2,
   DELETE_REACTION = 3,
@@ -20,6 +21,7 @@ export enum Action {
   CREATE_POLL = 8,
   VIEW_POLLS = 9,
   VOTE_ON_POLLS = 10,
+  VIEW_CHAT_CHANNELS = 11,
   CREATE_THREAD = 12,
   VIEW_THREADS = 13,
   EDIT_THREAD = 14,

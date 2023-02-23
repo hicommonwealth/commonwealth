@@ -88,6 +88,11 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
   );
 };
 
+type ExtendedNotificationRowProps = NotificationRowProps & {
+  handleSetMarkingRead: (isMarkingRead: boolean) => void;
+  markingRead: boolean;
+};
+
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const { handleSetMarkingRead, markingRead, notification } = props;
 
