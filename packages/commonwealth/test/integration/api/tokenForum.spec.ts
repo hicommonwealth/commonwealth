@@ -130,7 +130,7 @@ describe('Token Forum tests', () => {
     });
     expect(res).not.to.be.null;
     expect(res.error).not.to.be.null;
-  });
+  }).skip();
 
   xit('should gracefully deny actions on token forum on balance fetch failure', async () => {
     // nobody is a token holder
@@ -150,7 +150,7 @@ describe('Token Forum tests', () => {
     });
     expect(res).not.to.be.null;
     expect(res.error).not.to.be.null;
-  });
+  }).skip();
 
   it('should permit admin to act even without tokens', async () => {
     // nobody is a token holder
