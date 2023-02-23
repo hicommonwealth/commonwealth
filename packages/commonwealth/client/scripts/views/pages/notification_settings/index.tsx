@@ -23,7 +23,16 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs } from './helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
+const emailIntervalFrequencyMap = {
+  never: 'Never',
+  weekly: 'Once a week',
+  daily: 'Everyday',
+  biweekly: 'Every two weeks',
+  monthly: 'Once a month',
+};
 class NotificationSettingsPage extends ClassComponent {
   view() {
     if (!app.loginStatusLoaded()) {
@@ -39,6 +48,8 @@ class NotificationSettingsPage extends ClassComponent {
 
     const bundledSubs = bundleSubs(app.user.notifications.subscriptions);
 
+    const currentFrequency = app.user.emailInterval;
+
     return (
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Notification Settings" />}
@@ -51,6 +62,38 @@ class NotificationSettingsPage extends ClassComponent {
             Notification settings for all new threads, comments, mentions,
             likes, and chain events in the following communities.
           </CWText>
+          <div class="email-management-section">
+            <div class="text-description">
+              <CWText type="h5">Scheduled Email Digest</CWText>
+              <CWText type="b2" className="subtitle-text">
+                Bundle top posts from all your communities via email as often as
+                you need it.
+              </CWText>
+            </div>
+            <CWPopoverMenu
+              trigger={
+                <CWButton
+                  buttonType="mini-white"
+                  label={emailIntervalFrequencyMap[currentFrequency]}
+                  iconRight="chevronDown"
+                />
+              }
+              menuItems={[
+                {
+                  label: 'Once a week',
+                  onclick: () => {
+                    app.user.setEmailInterval('weekly');
+                  },
+                },
+                {
+                  label: 'Never',
+                  onclick: () => {
+                    app.user.setEmailInterval('never');
+                  },
+                },
+              ]}
+            />
+          </div>
           <div class="column-header-row">
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}

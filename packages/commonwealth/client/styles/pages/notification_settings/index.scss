@@ -29,6 +29,30 @@
     padding: 16px;
   }
 
+  .email-management-section {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 12px;
+
+    .text-description {
+      margin-left: 42px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .subtitle-text {
+        color: $neutral-500;
+        max-width: 400px;
+      }
+    }
+  }
+
+  .trigger-wrapper {
+    height: fit-content !important;
+  }
+
   .page-header-text.Text {
     margin-bottom: 16px;
   }
