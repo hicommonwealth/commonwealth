@@ -387,7 +387,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
           },
         });
       }
-    })
+    });
 
     setPrefetch({
       ...prefetch,
@@ -656,7 +656,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
               </>
             ) : (
               <>
-                <CollapsibleThreadBody thread={thread} />
+                {/* <CollapsibleThreadBody thread={thread} /> */}
                 {thread.readOnly ? (
                   <CWText type="h5" className="callout-text">
                     Commenting is disabled because this post has been locked.

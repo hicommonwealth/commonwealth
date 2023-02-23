@@ -41,7 +41,7 @@ export const PreviewModal = ({ doc }: PreviewModalProps) => {
                 </div>
               );
             }
-            return <QuillFormattedText doc={internalDoc} />;
+            // return <QuillFormattedText doc={internalDoc} />;
           } catch (e) {
             if (doc.trim() === '') {
               return (

@@ -656,10 +656,10 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                               </CWText>
                             )}
                           </div>
-                          {draft.body.length > 0 &&
+                          {/* {draft.body.length > 0 &&
                             renderQuillTextBody(draft.body, {
                               hideFormatting: true,
-                            })}
+                            })} */}
                           <CWText
                             className="draft-delete-text"
                             onClick={async (e) => {

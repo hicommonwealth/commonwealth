@@ -51,9 +51,9 @@ const getTextRows = (
           </CWText>
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
-          {renderQuillTextBody(subscription.Thread.body, {
+          {/* {renderQuillTextBody(subscription.Thread.body, {
             hideFormatting: true,
-          })}
+          })} */}
         </CWText>
       </>
     );
@@ -104,9 +104,9 @@ const getTextRows = (
           </CWText>
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
-          {renderQuillTextBody(subscription.Comment.text, {
+          {/* {renderQuillTextBody(subscription.Comment.text, {
             hideFormatting: true,
-          })}
+          })} */}
         </CWText>
       </>
     );

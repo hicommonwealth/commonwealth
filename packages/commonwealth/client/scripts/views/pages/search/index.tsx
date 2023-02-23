@@ -68,10 +68,10 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
           </CWText>
         </div>
         <CWText noWrap>
-          {renderQuillTextBody(thread.body, {
+          {/* {renderQuillTextBody(thread.body, {
             hideFormatting: true,
             searchTerm,
-          })}
+          })} */}
         </CWText>
       </div>
     </div>
@@ -119,10 +119,10 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
           </CWText>
         </div>
         <CWText noWrap>
-          {renderQuillTextBody(comment.text, {
+          {/* {renderQuillTextBody(comment.text, {
             hideFormatting: true,
             searchTerm,
-          })}
+          })} */}
         </CWText>
       </div>
     </div>

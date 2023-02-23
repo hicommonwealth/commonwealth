@@ -76,10 +76,10 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
         {decodeURIComponent(searchResult.title)}
       </CWText>
       <CWText type="caption" className="excerpt-text" fontWeight="medium">
-        {renderQuillTextBody(searchResult.body, {
+        {/* {renderQuillTextBody(searchResult.body, {
           hideFormatting: true,
           searchTerm,
-        })}
+        })} */}
       </CWText>
     </div>
   );
@@ -108,10 +108,10 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
           {decodeURIComponent(searchResult.title)}
         </CWText> */}
       <CWText type="caption" className="excerpt-text">
-        {renderQuillTextBody(searchResult.text, {
+        {/* {renderQuillTextBody(searchResult.text, {
           hideFormatting: true,
           searchTerm,
-        })}
+        })} */}
       </CWText>
     </div>
   );

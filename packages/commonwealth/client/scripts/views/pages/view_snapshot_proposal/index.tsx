@@ -156,7 +156,8 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
               <ClosedProposalPill proposalState={this.proposal.state} />
             )
           }
-          body={renderQuillTextBody(this.proposal.body)}
+          // body={renderQuillTextBody(this.proposal.body)}
+          body={<div></div>}
           subBody={
             this.votes.length > 0 && (
               <SnapshotVotesTable

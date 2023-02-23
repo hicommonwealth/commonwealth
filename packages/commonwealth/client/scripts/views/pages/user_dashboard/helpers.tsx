@@ -20,7 +20,7 @@ export const getCommentPreview = (commentText) => {
 
     if (!doc.ops) throw new Error();
 
-    decodedCommentText = <QuillFormattedText doc={doc} />;
+    // decodedCommentText = <QuillFormattedText doc={doc} />;
   } catch (e) {
     let doc = decodeURIComponent(commentText);
 

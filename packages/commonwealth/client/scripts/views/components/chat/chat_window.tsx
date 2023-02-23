@@ -102,7 +102,9 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     if (this.hideChat) return;
 
     this.shouldScroll = true;
-    this.shouldScrollToHighlight = Boolean(_DEPRECATED_getSearchParams('message'));
+    this.shouldScrollToHighlight = Boolean(
+      _DEPRECATED_getSearchParams('message')
+    );
 
     this.scrollToBottom = () => {
       const scroller = $(vnode.dom).find('.chat-messages')[0];
@@ -212,9 +214,9 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
               <div className="clear" />
               {grp.messages.map((msg) => (
                 <div className="chat-message-text">
-                  {renderQuillTextBody(msg.message, {
+                  {/* {renderQuillTextBody(msg.message, {
                     openLinksInNewTab: true,
-                  })}
+                  })} */}
                 </div>
               ))}
             </div>
