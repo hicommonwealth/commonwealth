@@ -3,7 +3,7 @@
 import ClassComponent from 'class_component';
 
 import 'components/comments/comments_tree.scss';
-import type m from 'mithril';
+import m from 'mithril'; // eslint-disable-line @typescript-eslint/consistent-type-imports
 import type { Comment as CommentType } from 'models';
 import { Thread } from 'models';
 

@@ -261,10 +261,11 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  if (!NO_RULE_CACHE) await ruleCache.start();
-  const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
+  try {
+    if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
+    if (!NO_RULE_CACHE) await ruleCache.start();
+    const banCache = new BanCache(models);
+    const globalActivityCache = new GlobalActivityCache(models);
 
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
@@ -298,6 +299,9 @@ async function main() {
   setupErrorHandlers(app, rollbar);
 
   setupServer(app, rollbar, models, rabbitMQController);
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 main();
