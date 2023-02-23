@@ -102,7 +102,16 @@ const createContract = async (
         contract_id: oldContract.id,
       },
     });
-    return success(res, { contract: oldContract.toJSON() });
+
+    const globalTemplate = await models.Template.findOne({
+      where: {
+        abi_id: oldContract.abi_id,
+      },
+    });
+    return success(res, {
+      contract: oldContract.toJSON(),
+      hasGlobalTemplate: !!globalTemplate,
+    });
   }
 
   // override provided URL for eth chains (typically ERC20) with stored, unless none found
@@ -196,6 +205,7 @@ const createContract = async (
         abi_id: contract.abi_id,
       },
     });
+
     return success(res, {
       contract: contract.toJSON(),
       hasGlobalTemplate: !!globalTemplate,
