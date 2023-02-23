@@ -186,7 +186,7 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
-        thread_id: `discussion_${tRes.result.id}`,
+        thread_id: tRes.result.id,
       });
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;

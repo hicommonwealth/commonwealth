@@ -34,7 +34,7 @@ const viewCount = async (
   let count = await models.Thread.findOne({
     where: {
       chain: req.body.chain,
-      id: req.body.thread_id,
+      id: req.body.object_id,
     },
   });
   if (!count) {
