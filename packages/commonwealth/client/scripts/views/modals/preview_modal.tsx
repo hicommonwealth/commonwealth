@@ -1,9 +1,9 @@
 import React from 'react';
 
 import 'modals/preview_modal.scss';
+
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
-
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { CWText } from '../components/component_kit/cw_text';
 

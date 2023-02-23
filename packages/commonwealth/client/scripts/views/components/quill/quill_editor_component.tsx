@@ -1,10 +1,7 @@
-import React from 'react';
-
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
+import React, { useEffect, useState } from 'react';
+import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
-import $ from 'jquery';
 
 import app from 'state';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -25,7 +22,7 @@ import type { QuillActiveMode, QuillMode, QuillTextContents } from './types';
 // `formats` and the rich text toolbar (there doesn't appear to be a
 // way to unregister formats once the editor has been initialized)
 
-type QuillEditorComponentAttrs = {
+type QuillEditorComponentProps = {
   className?: string;
   contentsDoc?;
   editorNamespace: string;
@@ -42,70 +39,96 @@ type QuillEditorComponentAttrs = {
 // - Audit and fix image, video, & Twitter blots as necessary
 // - Convert generic HTML tags to CWText components in QuillFormattedText
 
-export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAttrs> {
-  unsavedChanges;
-  $editor: JQuery<HTMLElement>;
-  editor: QuillEditor;
-  activeMode: QuillActiveMode;
-  defaultContents: QuillTextContents;
-  loaded: boolean;
+export const QuillEditorComponent = ({
+  className,
+  contentsDoc,
+  editorNamespace,
+  imageUploader,
+  onkeyboardSubmit,
+  mode = 'hybrid',
+  placeholder,
+  tabIndex,
+  theme = 'snow',
+  oncreateBind,
+}: QuillEditorComponentProps) => {
+  const [unsavedChanges, setUnsavedChanges] = useState([]);
+  const [$editor, set$editor] = useState<JQuery<HTMLElement>>();
+  const [editor, setEditor] = useState<QuillEditor>();
+  const [activeMode, setActiveMode] = useState<QuillActiveMode>();
+  const [defaultContents, setDefaultContents] = useState<QuillTextContents>();
+  const [loaded, setLoaded] = useState(false);
 
-  private _beforeunloadHandler: () => void | string;
+  useEffect(() => {
+    const beforeunloadHandler = () => {
+      if (unsavedChanges.length > 0) {
+        return 'There are unsaved changes. Are you sure you want to leave?';
+      }
+    };
 
-  private _loadSavedState(
-    contentsDoc?: string,
-    editorNamespace?: string,
-    mode?: QuillMode
-  ) {
+    // Only bind the alert if we are actually trying to persist the user's changes
+    if (!contentsDoc) {
+      $(window).on('beforeunload', beforeunloadHandler);
+    }
+
+    return () => {
+      $(window).off('beforeunload', beforeunloadHandler);
+    };
+  }, []);
+
+  const loadSavedState = () => {
     const storedDoc: string = localStorage.getItem(
       `${app.activeChainId()}-${editorNamespace}-storedText`
     );
+
     const storedMode = localStorage.getItem(
       `${editorNamespace}-activeMode`
     ) as QuillActiveMode;
 
     if (contentsDoc) {
       try {
-        this.defaultContents = JSON.parse(contentsDoc);
+        setDefaultContents(JSON.parse(contentsDoc));
       } catch (e) {
-        this.defaultContents = contentsDoc;
+        setDefaultContents(contentsDoc);
       }
     } else if (storedDoc) {
       try {
-        this.defaultContents = JSON.parse(storedDoc);
-        this.activeMode = 'richText';
+        setDefaultContents(JSON.parse(storedDoc));
+        setActiveMode('richText');
       } catch (e) {
         contentsDoc = localStorage.getItem(
           `${app.activeChainId()}-${editorNamespace}-storedText`
         );
-        this.activeMode = 'markdown';
+
+        setActiveMode('markdown');
       }
     }
 
     if (mode === 'hybrid') {
       if (storedMode === 'markdown') {
-        this.activeMode = 'markdown';
+        setActiveMode('markdown');
       } else if (storedMode === 'richText') {
-        this.activeMode = 'richText';
+        setActiveMode('richText');
       } else {
-        // Otherwise, set this.activeMode based on the app setting
-        this.activeMode = app.user?.disableRichText ? 'markdown' : 'richText';
+        // Otherwise, set activeMode based on the app setting
+        setActiveMode(app.user?.disableRichText ? 'markdown' : 'richText');
       }
     } else if (mode === 'markdown') {
-      this.activeMode = 'markdown';
+      setActiveMode('markdown');
     } else {
-      this.activeMode = 'richText';
+      setActiveMode('richText');
     }
-  }
+  };
 
-  private async _confirmRemoveFormatting() {
+  const confirmRemoveFormatting = async () => {
     let confirmed = false;
 
     // If contents pre- and post-formatting are identical, then nothing will be lost,
     // and there's no reason to confirm the switch.
-    this.defaultContents = this.editor.contents;
-    this.editor.removeFormat(0, this.editor.endIndex);
-    if (this.editor.contents.ops.length === this.defaultContents.ops.length) {
+    setDefaultContents(editor.contents);
+
+    editor.removeFormat(0, editor.endIndex);
+
+    if (editor.contents.ops.length === defaultContents.ops.length) {
       confirmed = true;
     } else {
       confirmed = await confirmationModalWithText(
@@ -115,128 +138,100 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
 
     if (!confirmed) {
       // Restore formatted contents
-      this.editor.contents = this.defaultContents;
+      editor.contents = defaultContents;
     }
     return confirmed;
+  };
+
+  if (!loaded) {
+    loadSavedState();
+    setLoaded(true);
   }
 
-  // LIFECYCLE HELPERS
+  return (
+    <div
+      className={getClasses<{ mode: string; className?: string }>(
+        { mode: `${activeMode}-mode`, className },
+        'QuillEditor'
+      )}
+      oncreate={async (childVnode) => {
+        set$editor($(childVnode.dom).find('.quill-editor'));
 
-  oncreate(vnode: ResultNode<QuillEditorComponentAttrs>) {
-    // Only bind the alert if we are actually trying to persist the user's changes
-    if (!vnode.attrs.contentsDoc) {
-      this._beforeunloadHandler = () => {
-        if (this.unsavedChanges && this.unsavedChanges.length() > 0) {
-          return 'There are unsaved changes. Are you sure you want to leave?';
-        }
-      };
-      $(window).on('beforeunload', this._beforeunloadHandler);
-    }
-  }
-
-  onremove(vnode: ResultNode<QuillEditorComponentAttrs>) {
-    if (!vnode.attrs.contentsDoc) {
-      $(window).off('beforeunload', this._beforeunloadHandler);
-    }
-  }
-
-  view(vnode: ResultNode<QuillEditorComponentAttrs>) {
-    const {
-      className,
-      contentsDoc,
-      editorNamespace,
-      imageUploader,
-      onkeyboardSubmit,
-      mode = 'hybrid',
-      placeholder,
-      tabIndex,
-      theme = 'snow',
-      oncreateBind,
-    } = vnode.attrs;
-
-    const editorClass = getClasses<{ mode: string; className?: string }>(
-      { mode: `${this.activeMode}-mode`, className },
-      'QuillEditor'
-    );
-
-    if (!this.loaded) {
-      this._loadSavedState(contentsDoc, editorNamespace, mode);
-      this.loaded = true;
-    }
-
-    return (
-      <div
-        className={editorClass}
-        oncreate={async (childVnode) => {
-          this.$editor = $(childVnode.dom).find('.quill-editor');
-          this.editor = new QuillEditor(
-            this.$editor,
-            this.activeMode,
+        setEditor(
+          new QuillEditor(
+            $editor,
+            activeMode,
             theme,
             imageUploader,
             placeholder,
             editorNamespace,
             onkeyboardSubmit,
-            this.defaultContents,
+            defaultContents,
             tabIndex
-          );
-          await this.editor.initialize();
-          if (oncreateBind) oncreateBind(this.editor);
-        }}
-      >
-        <div className="quill-editor" />
-        {this.activeMode === 'markdown' && (
-          <CWText
-            type="h5"
-            fontWeight="semiBold"
-            className="mode-switcher"
-            title="Switch to RichText mode"
-            onClick={(e) => {
-              this.activeMode = 'richText';
-              this.editor.activeMode = this.activeMode;
-            }}
-          >
-            R
-          </CWText>
-        )}
-        {this.activeMode === 'richText' && (
-          <CWText
-            type="h5"
-            fontWeight="semiBold"
-            className="mode-switcher"
-            title="Switch to Markdown mode"
-            onClick={async () => {
-              // Confirm before removing formatting and switching to Markdown mode.
-              const confirmed = await this._confirmRemoveFormatting();
-              if (!confirmed) return;
+          )
+        );
 
-              // Remove formatting, switch to Markdown.
-              this.editor.removeFormat(0, this.editor.endIndex);
-              this.activeMode = 'markdown';
-              this.editor.activeMode = this.activeMode;
-            }}
-          >
-            M
-          </CWText>
-        )}
-        <CWIconButton
-          iconName="search"
-          iconSize="small"
-          iconButtonTheme="primary"
-          onClick={(e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: PreviewModal,
-              data: {
-                doc:
-                  this.activeMode === 'markdown'
-                    ? this.editor.text
-                    : JSON.stringify(this.editor.contents),
-              },
-            });
+        await editor.initialize();
+
+        if (oncreateBind) {
+          oncreateBind(editor);
+        }
+      }}
+    >
+      <div className="quill-editor" />
+      {activeMode === 'markdown' && (
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="mode-switcher"
+          title="Switch to RichText mode"
+          onClick={() => {
+            setActiveMode('richText');
+            editor.activeMode = activeMode;
           }}
-        />
-      </div>
-    );
-  }
-}
+        >
+          R
+        </CWText>
+      )}
+      {activeMode === 'richText' && (
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="mode-switcher"
+          title="Switch to Markdown mode"
+          onClick={async () => {
+            // Confirm before removing formatting and switching to Markdown mode.
+            const confirmed = await confirmRemoveFormatting();
+
+            if (confirmed) {
+              // Remove formatting, switch to Markdown.
+              editor.removeFormat(0, editor.endIndex);
+              setActiveMode('markdown');
+              editor.activeMode = activeMode;
+            }
+          }}
+        >
+          M
+        </CWText>
+      )}
+      <CWIconButton
+        iconName="search"
+        iconSize="small"
+        iconButtonTheme="primary"
+        onClick={(e) => {
+          e.preventDefault();
+
+          app.modals.create({
+            modal: PreviewModal,
+            data: {
+              doc:
+                activeMode === 'markdown'
+                  ? editor.text
+                  : JSON.stringify(editor.contents),
+            },
+          });
+        }}
+      />
+    </div>
+  );
+};
