@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import type m from 'mithril';
+import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
@@ -26,7 +26,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
     e: Event,
     vnode: m.Vnode<DeleteAddressModalAttrs>
   ) => {
-    const { address, chain, profile } = vnode.attrs;
+    const { address, chain } = vnode.attrs;
 
     e.preventDefault();
 
@@ -38,12 +38,8 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
       });
 
       if (response?.status === 'Success') {
-        const { name, username } = profile;
-        const displayName = name || username;
         setTimeout(() => {
-          notifySuccess(
-            `Address has been successfully removed from profile '${displayName}'`
-          );
+          notifySuccess('Address has been successfully removed.');
         }, 1000);
       }
     } catch (err) {
@@ -58,7 +54,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
 
   view(vnode: m.Vnode<DeleteAddressModalAttrs>) {
     const { profile, address } = vnode.attrs;
-    const { name, username } = profile;
+    const { name } = profile;
     const defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
 
     return (
@@ -89,7 +85,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
                 )}`}
               />
             )}
-            <CWText fontWeight="bold">{name || username}</CWText>
+            <CWText fontWeight="bold">{name || 'Anonymous user'}</CWText>
           </div>
           <div className="confirmation">
             <CWText>Are you sure you want to remove this address?</CWText>

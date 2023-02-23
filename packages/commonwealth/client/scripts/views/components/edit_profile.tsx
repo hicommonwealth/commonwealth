@@ -11,7 +11,7 @@ import app from 'state';
 import { navigateToSubpage } from 'router';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import type { QuillEditor } from 'views/components/quill/quill_editor';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
   Account,
@@ -30,6 +30,8 @@ import { CWSocials } from '../components/component_kit/cw_socials';
 import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
 import CWCoverImageUploader from '../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../pages/404';
+import { LinkedAddresses } from './linked_addresses';
+import { NewLoginModal } from '../modals/login_modal';
 
 enum EditProfileError {
   None,
@@ -419,6 +421,35 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                 defaultImageUrl={this.backgroundImage?.url}
                 defaultImageBehavior={this.backgroundImage?.imageBehavior}
               />
+            </CWFormSection>
+            <CWFormSection
+              title="Linked Addresses"
+              description="Manage your addresses."
+            >
+              <LinkedAddresses
+                addresses={this.addresses}
+                profile={this.profile}
+                refreshProfiles={() => this.getProfile(vnode.attrs.profileId)}
+              />
+              <CWDivider />
+              <div className="connect-address-container">
+                <CWButton
+                  label="Connect Address"
+                  buttonType="mini-white"
+                  onclick={() => {
+                    app.modals.create({
+                      modal: NewLoginModal,
+                      exitCallback: () => {
+                        setTimeout(() => {
+                          notifySuccess('Address has been successfully connected.');
+                        }, 1000);
+                        this.getProfile(vnode.attrs.profileId);
+                      },
+                    });
+                  }}
+                  iconLeft="plus"
+                />
+              </div>
             </CWFormSection>
           </CWForm>
         </div>
