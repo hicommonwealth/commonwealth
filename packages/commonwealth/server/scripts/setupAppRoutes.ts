@@ -104,6 +104,7 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image);
   });
 
+  /* TODO: replace with (new) profile URL
   app.get('/:scope/account/:address', async (req, res) => {
     // Retrieve title, description, and author from the database
     let title, description, author, profileData, image;
@@ -132,6 +133,7 @@ const setupAppRoutes = (
     }
     renderWithMetaTags(res, title, description, author, image);
   });
+  */
 
   const renderProposal = async (
     scope: string,

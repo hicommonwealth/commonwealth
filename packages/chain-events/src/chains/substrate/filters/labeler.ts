@@ -202,8 +202,6 @@ export const Label: LabelerFilter = (
         label: `${balanceFormatter(amount)} was bonded by controller ${fmtAddr(
           controller
         )} on stash ${fmtAddr(stash)}.`,
-        // TODO: should this link to controller or stash?
-        linkUrl: chainId ? `/${chainId}/account/${stash}` : null,
       };
     }
     case EventKind.Unbonded: {
@@ -215,8 +213,6 @@ export const Label: LabelerFilter = (
         )} was unbonded by controller ${fmtAddr(controller)} on stash ${fmtAddr(
           stash
         )}.`,
-        // TODO: should this link to controller or stash?
-        linkUrl: chainId ? `/${chainId}/account/${stash}` : null,
       };
     }
     case EventKind.StakingElection: {
@@ -236,8 +232,7 @@ export const Label: LabelerFilter = (
         heading: 'Vote Delegated',
         label: `${fmtAddr(target)} received a voting delegation from ${fmtAddr(
           who
-        )}.`,
-        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
+        )}.`
       };
     }
     case EventKind.DemocracyProposed: {
@@ -805,7 +800,6 @@ export const Label: LabelerFilter = (
         label: `${fmtAddr(
           who
         )} set their identity with display name "${displayName}".`,
-        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
       };
     }
     case EventKind.JudgementGiven: {
@@ -815,7 +809,6 @@ export const Label: LabelerFilter = (
         label: `Registrar ${fmtAddr(
           registrar
         )} passed judgement '${judgement}' on ${fmtAddr(who)}.`,
-        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
       };
     }
     case EventKind.IdentityCleared: {
@@ -823,7 +816,6 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Identity Cleared',
         label: `${fmtAddr(who)} cleared their identity.`,
-        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
       };
     }
     case EventKind.IdentityKilled: {
@@ -831,7 +823,6 @@ export const Label: LabelerFilter = (
       return {
         heading: 'Identity Killed',
         label: `${fmtAddr(who)}'s identity was removed.`,
-        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
       };
     }
 
