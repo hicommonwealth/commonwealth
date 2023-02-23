@@ -60,7 +60,9 @@ const getCommentPreview = (commentText) => {
 
     if (!doc.ops) throw new Error();
 
-    decodedCommentText = <QuillFormattedText doc={doc} hideFormatting />;
+    decodedCommentText = (
+      <QuillFormattedText doc={doc} hideFormatting collapse />
+    );
   } catch (e) {
     // TODO Graham 22-6-5: What does this do? How can we simplify to use helper?
     let doc = decodeURIComponent(commentText);
