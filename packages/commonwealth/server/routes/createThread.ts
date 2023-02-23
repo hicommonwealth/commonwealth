@@ -421,16 +421,6 @@ const createThread = async (
       return next(err);
     }
 
-    // initialize view count
-    await models.ViewCount.create(
-      {
-        chain: thread.chain,
-        object_id: thread.id,
-        view_count: 0,
-      },
-      { transaction }
-    );
-
     // update author's last activity based on thread creation
     author.last_active = new Date();
     await author.save({ transaction });
