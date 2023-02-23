@@ -1,5 +1,4 @@
 import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
-import type { ChainAttributes } from '../server/models/chain';
 import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 import type { AccessLevel } from './permissions';
 
@@ -9,9 +8,6 @@ export enum WebsocketMessageNames {
   SnapshotListener = 'snapshot-listener',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
-  ChatMessage = 'chat-message',
-  JoinChatChannel = 'join-chat-channel',
-  LeaveChatChannel = 'leave-chat-channel',
   Error = 'exception',
 }
 
@@ -52,7 +48,6 @@ export enum WebsocketNamespaces {
   SnapshotProposals = 'snapshot-proposals',
   ChainEvents = 'chain-events',
   SnapshotListener = 'snapshot-listener',
-  Chat = 'chat',
 }
 
 export enum WebsocketEngineEvents {
@@ -95,14 +90,6 @@ export interface ISnapshotNotificationData {
   snapshot_id: string;
   chain_id: string;
   snapshotEventType: string;
-}
-
-export interface IChatNotification {
-  message_id: string | number;
-  channel_id: string | number;
-  chain_id: string;
-  author_address: string;
-  created_at: any;
 }
 
 export enum ContentType {

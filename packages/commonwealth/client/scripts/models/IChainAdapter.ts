@@ -80,7 +80,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       admins,
       activeUsers,
       numVotingThreads,
-      chatChannels,
       communityBanner,
       contracts,
       communityRoles,
@@ -96,9 +95,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.meta.communityRoles = communityRoles;
 
     await this.app.recentActivity.getRecentTopicActivity(this.id);
-
-    // parse/save the chat channels
-    await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));
 
     if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
       this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
@@ -122,7 +118,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
     this.app.reactionCounts.deinit();
     this.app.threadUniqueAddressesCount.deinit();
-    if (this.app.socket) this.app.socket.chatNs.deinit();
     console.log(`${this.meta.name} stopped`);
   }
 
