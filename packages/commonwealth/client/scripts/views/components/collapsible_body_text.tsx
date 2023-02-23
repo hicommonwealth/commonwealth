@@ -136,13 +136,13 @@ export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalB
 
         if (!doc.ops) throw new Error();
 
-        return (
-          <QuillFormattedText
-            doc={doc}
-            cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-            hideFormatting={false}
-          />
-        );
+        // return (
+        //   <QuillFormattedText
+        //     doc={doc}
+        //     cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+        //     hideFormatting={false}
+        //   />
+        // );
       } catch (e) {
         return (
           body && (
