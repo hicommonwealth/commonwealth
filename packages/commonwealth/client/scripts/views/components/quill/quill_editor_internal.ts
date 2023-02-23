@@ -66,8 +66,9 @@ export default class QuillEditorInternal {
     this.Delta = Quill.import('delta');
     this.Clipboard = Quill.import('modules/clipboard') as any;
     // Remove existing editor, if there is one
-    this._$editor.empty();
-    this._$editor.siblings('.ql-toolbar').remove();
+    // @REACT @TODO: commenting out since it errors without the jquery and we're gonna delete it anyway
+    // this._$editor.empty();
+    // this._$editor.siblings('.ql-toolbar').remove();
 
     // Register modules and blots (Twitter, Video, Block etc)
     this._registerModules();
@@ -150,10 +151,11 @@ export default class QuillEditorInternal {
     // Set tab index
     if (tabIndex) {
       // TODO: Are both of these necessary?
-      this._$editor
-        .closest('.QuillEditor')
-        .find('.ql-editor')
-        .attr('tabIndex', tabIndex);
+      // @REACT @TODO: commenting out since it errors without the jquery and we're gonna delete it anyway
+      // this._$editor
+      //   .closest('.QuillEditor')
+      //   .find('.ql-editor')
+      //   .attr('tabIndex', tabIndex);
     }
 
     this._unsavedChanges = new this.Delta();
@@ -375,21 +377,22 @@ export default class QuillEditorInternal {
       }
     });
 
+    // @REACT @TODO: commenting out since it errors without the jquery and we're gonna delete it anyway
     // Set up preview button in toolbar
-    this._$editor
-      .parent()
-      .find('button.ql-preview')
-      .on('click', (e) => {
-        const markdownMode = this._activeMode === 'markdown';
-        app.modals.create({
-          modal: PreviewModal,
-          data: {
-            doc: markdownMode
-              ? this._quill.getText()
-              : JSON.stringify(this._quill.getContents()),
-          },
-        });
-      });
+    // this._$editor
+    //   .parent()
+    //   .find('button.ql-preview')
+    //   .on('click', (e) => {
+    //     const markdownMode = this._activeMode === 'markdown';
+    //     app.modals.create({
+    //       modal: PreviewModal,
+    //       data: {
+    //         doc: markdownMode
+    //           ? this._quill.getText()
+    //           : JSON.stringify(this._quill.getContents()),
+    //       },
+    //     });
+    //   });
   }
 
   // Setup custom keyboard bindings, override Quill default bindings where necessary
