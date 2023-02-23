@@ -4,12 +4,12 @@ import 'modals/edit_profile_modal.scss';
 import type { Account } from 'models';
 
 import app from 'state';
-// import { AvatarUpload } from 'views/components/avatar_upload';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { AvatarUpload } from 'views/components/avatar_upload';
 
 type EditProfileModalProps = {
   account: Account;
@@ -31,25 +31,19 @@ export const EditProfileModal = (props: EditProfileModalProps) => {
   const [name, setName] = React.useState<string>(account.profile.name);
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
 
-  // TODO uncomment when the avatar upload will be fixed
-  // const avatarUpload = (
-  //   <AvatarUpload
-  //     scope="user"
-  //     account={account}
-  //     uploadStartedCallback={() => {
-  //       redraw();
-  //     }}
-  //     uploadCompleteCallback={(files) => {
-  //       files.forEach((f) => {
-  //         if (!f.uploadURL) return;
-  //         const url = f.uploadURL.replace(/\?.*/, '').trim();
-  //         setAvatarUrl(url);
-  //       });
-  //
-  //       redraw();
-  //     }}
-  //   />
-  // );
+  const avatarUpload = (
+    <AvatarUpload
+      scope="user"
+      account={account}
+      uploadCompleteCallback={(files) => {
+        files.forEach((f) => {
+          if (!f.uploadURL) return;
+          const url = f.uploadURL.replace(/\?.*/, '').trim();
+          setAvatarUrl(url);
+        });
+      }}
+    />
+  );
 
   return (
     <div className="EditProfileModal">
@@ -58,7 +52,7 @@ export const EditProfileModal = (props: EditProfileModalProps) => {
         <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
-        {/*{avatarUpload}*/}
+        {avatarUpload}
         <CWTextInput
           label="Name"
           name="name"
