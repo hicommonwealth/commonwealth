@@ -53,6 +53,7 @@ const User: m.Component<
   oninit: (vnode) => {
     getProfileId(vnode.attrs.user).then((profileId) => {
       vnode.state.profileId = profileId;
+      m.redraw();
     });
   },
   view: (vnode) => {
