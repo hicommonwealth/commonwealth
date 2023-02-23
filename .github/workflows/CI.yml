@@ -55,10 +55,10 @@ jobs:
         run: yarn check-types
 
       - name: Run unit tests
-        run: yarn unit-test
+        run: timeout 15m yarn unit-test
 
       - name: Run API tests
-        run: yarn test-api
+        run: timeout 15m yarn test-api
         env:
           NO_CLIENT: true
 
