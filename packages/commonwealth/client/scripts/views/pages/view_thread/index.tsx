@@ -387,7 +387,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
           },
         });
       }
-    })
+    });
 
     setPrefetch({
       ...prefetch,

@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
 import { capitalize } from 'lodash';
-import type { DeltaStatic } from 'quill';
 
 import 'components/new_thread_form.scss';
 
 import { notifyError } from 'controllers/app/notifications';
-import type { Topic, Account } from 'models';
 import { ThreadKind, ThreadStage } from 'models';
 import app from 'state';
 import { detectURL } from 'helpers/threads';
@@ -17,72 +15,72 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { useCommonNavigate } from 'navigation/helpers';
-import type { NewThreadFormType } from 'views/components/new_thread_form/types';
+
 import {
+  useNewThreadForm,
+  useAuthorName,
   checkNewThreadErrors,
   updateTopicList,
-} from 'views/components/new_thread_form/helpers';
+} from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
+
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
-  const [form, setForm] = useState<NewThreadFormType>({
-    // TODO topic - this is temporary just to make submit pass
-    topic: app.topics.getByCommunity(app.activeChainId())[0],
-    // topic: null,
-    title: localStorage.getItem(`${app.activeChainId()}-new-link-storedTitle`),
-    url: localStorage.getItem(`${app.activeChainId()}-new-link-storedLink`),
-    kind: ThreadKind.Discussion,
-  });
-  const [authorName, setAuthorName] = useState(
-    app.user.activeAccount?.profile?.name
-  );
-  const [activeTopic, setActiveTopic] = useState<Topic>(null);
-  const [saving, setSaving] = useState(false);
-  const [value1, setValue1] = useState<DeltaStatic>();
 
-  const chainId = app.activeChainId();
-  const author = app.user.activeAccount;
-  const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
   const hasTopics = !!app.topics.getByCommunity(app.chain.id).length;
+  const author = app.user.activeAccount;
+  const { authorName } = useAuthorName();
 
-  const disableSave = !author || saving;
-  const topicMissing = hasTopics && !form?.topic;
-  const linkContentMissing = form.kind === ThreadKind.Link && !form.url;
-  const discussionContentMissing =
-    form.kind === ThreadKind.Discussion && (!value1 || !form?.title);
+  const {
+    threadTitle,
+    setThreadTitle,
+    threadKind,
+    setThreadKind,
+    threadTopic,
+    threadUrl,
+    setThreadUrl,
+    threadContentDelta,
+    setThreadContentDelta,
+    setIsSaving,
+    isDisabled,
+  } = useNewThreadForm(authorName, hasTopics);
 
-  const disableSubmission =
-    disableSave ||
-    topicMissing ||
-    linkContentMissing ||
-    discussionContentMissing;
+  const isDiscussion = threadKind === ThreadKind.Discussion;
 
-  const _newThread = async (
-    _form: NewThreadFormType,
-    _value1: DeltaStatic,
-    _author: Account,
-    stage = ThreadStage.Discussion
-  ) => {
-    const deltaString = JSON.stringify(_value1);
-    checkNewThreadErrors(_form, deltaString);
+  const handleNewThreadCreation = async () => {
+    if (!isDiscussion && !detectURL(threadUrl)) {
+      notifyError('Must provide a valid URL.');
+      return;
+    }
+
+    const deltaString = JSON.stringify(threadContentDelta);
+
+    checkNewThreadErrors(
+      { threadKind, threadUrl, threadTitle, threadTopic },
+      deltaString
+    );
+
+    setIsSaving(true);
 
     try {
       const result = await app.threads.create(
-        _author.address,
-        _form.kind,
-        stage,
+        author.address,
+        threadKind,
+        ThreadStage.Discussion,
         app.activeChainId(),
-        _form.title,
-        _form.topic,
+        threadTitle,
+        threadTopic,
         deltaString,
-        form.url
+        threadUrl
       );
 
       navigate(`/discussion/${result.id}`);
       updateTopicList(result.topic, app.chain);
-    } catch (e) {
-      throw new Error(e);
+    } catch (err) {
+      console.log('err');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -93,23 +91,13 @@ export const NewThreadForm = () => {
           <CWTabBar>
             <CWTab
               label={capitalize(ThreadKind.Discussion)}
-              isSelected={form.kind === ThreadKind.Discussion}
-              onClick={() => {
-                setForm((prevState) => ({
-                  ...prevState,
-                  kind: ThreadKind.Discussion,
-                }));
-              }}
+              isSelected={threadKind === ThreadKind.Discussion}
+              onClick={() => setThreadKind(ThreadKind.Discussion)}
             />
             <CWTab
               label={capitalize(ThreadKind.Link)}
-              isSelected={form.kind === ThreadKind.Link}
-              onClick={() => {
-                setForm((prevState) => ({
-                  ...prevState,
-                  kind: ThreadKind.Link,
-                }));
-              }}
+              isSelected={threadKind === ThreadKind.Link}
+              onClick={() => setThreadKind(ThreadKind.Link)}
             />
           </CWTabBar>
         </div>
@@ -124,126 +112,56 @@ export const NewThreadForm = () => {
               </div>
             )}
 
-            {form.kind === ThreadKind.Discussion && (
-              <>
-                <div className="topics-and-title-row">
-                  <CWTextInput
-                    autoFocus
-                    name="new-thread-title"
-                    placeholder="Title"
-                    value={form.title}
-                    tabIndex={2}
-                    onInput={(e) => {
-                      const { value } = e.target;
-                      setForm((prevState) => ({ ...prevState, title: value }));
-                      localStorage.setItem(
-                        `${chainId}-new-discussion-storedTitle`,
-                        form.title
-                      );
-                    }}
-                  />
-                </div>
+            <>
+              <div className="topics-and-title-row">
+                <CWTextInput
+                  autoFocus
+                  placeholder="Title"
+                  value={threadTitle}
+                  tabIndex={2}
+                  onInput={(e) => setThreadTitle(e.target.value)}
+                />
+              </div>
 
-                <div>
-                  <ReactQuill
-                    theme="snow"
-                    onChange={(value, delta, source, editor) => {
-                      setValue1(editor.getContents());
-                    }}
-                  />
-                </div>
-
-                <div className="buttons-row">
-                  <CWButton
-                    disabled={disableSubmission}
-                    onClick={async () => {
-                      setSaving(true);
-
-                      try {
-                        await _newThread(form, value1, author);
-                        setSaving(false);
-                      } catch (err) {
-                        setSaving(false);
-                        notifyError(err.message);
-                      }
-                    }}
-                    label="Create thread"
-                    tabIndex={4}
-                  />
-                </div>
-              </>
-            )}
-
-            {form.kind === ThreadKind.Link && hasTopics && (
-              <>
-                <div className="topics-and-title-row">
-                  <CWTextInput
-                    placeholder="Title"
-                    name="new-link-title"
-                    value={form.title}
-                    tabIndex={3}
-                    onInput={(e) => {
-                      const { value } = e.target;
-                      setForm((prevState) => ({ ...prevState, title: value }));
-                      localStorage.setItem(
-                        `${chainId}-new-link-storedTitle`,
-                        form.title
-                      );
-                    }}
-                  />
-                </div>
+              {!isDiscussion && (
                 <CWTextInput
                   placeholder="https://"
-                  value={form.url}
-                  tabIndex={2}
-                  onInput={(e) => {
-                    const { value } = e.target;
-                    setForm((prevState) => ({ ...prevState, url: value }));
-                    localStorage.setItem(
-                      `${chainId}-new-link-storedLink`,
-                      form.url
-                    );
-                  }}
+                  value={threadUrl}
+                  tabIndex={3}
+                  onInput={(e) => setThreadUrl(e.target.value)}
                 />
+              )}
 
+              <div>
+                <ReactQuill
+                  className="QuillEditor"
+                  onChange={(value, delta, source, editor) =>
+                    setThreadContentDelta(editor.getContents())
+                  }
+                />
+              </div>
+
+              <div className="buttons-row">
                 <CWButton
                   label="Create thread"
-                  disabled={disableSubmission}
-                  onClick={async () => {
-                    if (!detectURL(form.url)) {
-                      notifyError('Must provide a valid URL.');
-                      return;
-                    }
-
-                    setSaving(true);
-
-                    try {
-                      await _newThread(form, value1, author);
-                      setSaving(false);
-                    } catch (err) {
-                      setSaving(false);
-                      notifyError(err.message);
-                    }
-                  }}
+                  disabled={isDisabled}
+                  onClick={handleNewThreadCreation}
+                  tabIndex={4}
                 />
-              </>
-            )}
+              </div>
+            </>
           </div>
         </div>
       </div>
       <Modal
+        onClose={() => setIsEditProfileModalOpen(false)}
+        open={isEditProfileModalOpen}
         content={
           <EditProfileModal
-            onModalClose={() => {
-              setIsEditProfileModalOpen(false);
-            }}
+            onModalClose={() => setIsEditProfileModalOpen(false)}
             account={app.user.activeAccount}
           />
         }
-        onClose={() => {
-          setIsEditProfileModalOpen(false);
-        }}
-        open={isEditProfileModalOpen}
       />
     </>
   );
