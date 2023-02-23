@@ -49,6 +49,32 @@
     }
   }
 
+  .email-input-section {
+    margin-left: 42px;
+    margin-right: 12px;
+    margin-bottom: 40px;
+
+    .email-input-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .email-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      gap: 24px;
+    }
+
+    .email-input {
+      width: 70%;
+    }
+  }
+
   .trigger-wrapper {
     height: fit-content !important;
   }

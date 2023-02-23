@@ -174,6 +174,20 @@ export class UserController {
     this._setEmail(email);
   }
 
+  public updateEmail(email: string): void {
+    this._setEmail(email);
+
+    try {
+      $.post(`${app.serverUrl()}/updateEmail`, {
+        email: email,
+        jwt: app.user.jwt,
+      });
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to update email');
+    }
+  }
+
   public setEmailInterval(emailInterval: string): void {
     this._setEmailInterval(emailInterval);
     try {
