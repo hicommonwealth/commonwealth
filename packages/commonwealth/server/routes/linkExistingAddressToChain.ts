@@ -126,7 +126,7 @@ const linkExistingAddressToChain = async (
       // Address.updateWithTokenProvided
       existingAddress.user_id = userId;
       const profileId = await models.Profile.findOne({
-        where: { user_id: userId }
+        where: { user_id: userId },
       });
       existingAddress.profile_id = profileId?.id;
       existingAddress.keytype = req.body.keytype;

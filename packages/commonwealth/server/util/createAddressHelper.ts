@@ -111,7 +111,7 @@ export async function createAddressHelper(
     if (updatedId) {
       existingAddress.user_id = updatedId;
       const profileId = await models.Profile.findOne({
-        where: { user_id: updatedId }
+        where: { user_id: updatedId },
       });
       existingAddress.profile_id = profileId?.id;
     }
