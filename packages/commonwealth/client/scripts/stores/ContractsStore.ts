@@ -61,11 +61,6 @@ class ContractsStore extends IdStore<Contract> {
   }
 
   public getContractByAddress(address: string): Contract {
-    console.log(
-      'getContractByAddress',
-      address,
-      Object.keys(this._storeAddress)
-    );
     return this._storeAddress[address] || null;
   }
 }

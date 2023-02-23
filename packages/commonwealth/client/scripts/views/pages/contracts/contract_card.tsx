@@ -60,16 +60,10 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
     });
   }
 
-  async hasGlobalTemplates(contractId) {
-    const globalTemplates = await app.contracts.getTemplatesForContract(
-      contractId
-    );
-    this.globalTemplatesExist = globalTemplates.length > 0;
-  }
-
-  oninit(vnode: m.VnodeDOM<ContractCardAttrs>) {
-    const { id } = vnode.attrs;
-    this.hasGlobalTemplates(id);
+  oninit(vnode) {
+    const { address } = vnode.attrs;
+    this.globalTemplatesExist =
+      app.contracts.store.getContractByAddress(address).hasGlobalTemplate;
   }
 
   view(vnode: m.Vnode<ContractCardAttrs>) {
@@ -91,24 +85,26 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
           />
         </div>
         <div className="templates">
-          <CWText type="caption" className="label">
-            Templates
-          </CWText>
           {templates?.length ? (
-            <div className="templates-container">
-              {templates.map((template) => (
-                <ContractTemplateCard
-                  contractId={id}
-                  id={template.id}
-                  title={template.cctmd.display_name}
-                  displayName={template.cctmd.display_name}
-                  nickname={template.cctmd.nickname}
-                  slug={template.cctmd.slug}
-                  display={template.cctmd.display_options}
-                  cctmd_id={template.cctmd.id}
-                />
-              ))}
-            </div>
+            <>
+              <CWText type="caption" className="label">
+                Templates
+              </CWText>
+              <div className="templates-container">
+                {templates.map((template) => (
+                  <ContractTemplateCard
+                    contractId={id}
+                    id={template.templateId}
+                    title={template.cctmd.display_name}
+                    displayName={template.cctmd.display_name}
+                    nickname={template.cctmd.nickname}
+                    slug={template.cctmd.slug}
+                    display={template.cctmd.display_options}
+                    cctmd_id={template.cctmd.id}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
             <div className="no-templates-container">
               <CWText className="no-templates-info" type="b1">

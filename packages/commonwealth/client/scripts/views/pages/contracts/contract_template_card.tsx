@@ -13,6 +13,7 @@ import {
   displayOptions,
   showManageContractTemplateModal,
 } from 'views/modals/manage_contract_template_modal';
+import User from '../../components/widgets/user';
 
 type ContractTemplateCardAttrs = {
   contractId: number;

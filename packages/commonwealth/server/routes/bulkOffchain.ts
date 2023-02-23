@@ -271,7 +271,11 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
-        return { contract: c.contract.toJSON(), ccts: c.ccts };
+        return {
+          contract: c.contract.toJSON(),
+          ccts: c.ccts,
+          hasGlobalTemplate: c.hasGlobalTemplate,
+        };
       }),
       communityRoles: communityRoles.map((r) => r.toJSON()),
     },

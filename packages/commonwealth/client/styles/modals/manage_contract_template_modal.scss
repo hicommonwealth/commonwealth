@@ -27,7 +27,7 @@
     .form {
       display: flex;
       flex-direction: column;
-      margin-top: 20px;
+      margin-top: 4px;
 
       .dropdown-options-display {
         margin-top: -20px;
@@ -45,6 +45,10 @@
         }
       }
 
+      .divider {
+        margin-top: 20px;
+      }
+
       .TextInput {
         margin-bottom: 20px;
       }
@@ -52,7 +56,7 @@
       .input-label {
         color: $neutral-600;
         margin-bottom: 4px;
-        margin-top: 20px;
+        margin-top: 12px;
       }
     }
 
