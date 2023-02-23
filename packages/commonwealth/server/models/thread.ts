@@ -79,7 +79,11 @@ export default (
         allowNull: false,
       },
       chain: { type: dataTypes.STRING, allowNull: false },
-      view_count: { type: dataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+      view_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,

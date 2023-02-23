@@ -267,38 +267,38 @@ async function main() {
     const banCache = new BanCache(models);
     const globalActivityCache = new GlobalActivityCache(models);
 
-  // TODO: should we await this? it will block server startup -- but not a big deal locally
-  if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
+    // TODO: should we await this? it will block server startup -- but not a big deal locally
+    if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
 
-  // Declare Validation Middleware Service
-  // middleware to use for all requests
-  const dbValidationService: DatabaseValidationService =
-    new DatabaseValidationService(models);
+    // Declare Validation Middleware Service
+    // middleware to use for all requests
+    const dbValidationService: DatabaseValidationService =
+      new DatabaseValidationService(models);
 
-  setupAPI(
-    '/api',
-    app,
-    models,
-    viewCountCache,
-    tokenBalanceCache,
-    ruleCache,
-    banCache,
-    globalActivityCache,
-    dbValidationService
-  );
+    setupAPI(
+      '/api',
+      app,
+      models,
+      viewCountCache,
+      tokenBalanceCache,
+      ruleCache,
+      banCache,
+      globalActivityCache,
+      dbValidationService
+    );
 
-  // new API
-  addExternalRoutes('/external', app, models, tokenBalanceCache);
-  addSwagger('/docs', app);
+    // new API
+    addExternalRoutes('/external', app, models, tokenBalanceCache);
+    addSwagger('/docs', app);
 
-  setupCosmosProxy(app, models);
-  setupIpfsProxy(app);
-  setupEntityProxy(app);
-  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+    setupCosmosProxy(app, models);
+    setupIpfsProxy(app);
+    setupEntityProxy(app);
+    setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 
-  setupErrorHandlers(app, rollbar);
+    setupErrorHandlers(app, rollbar);
 
-  setupServer(app, rollbar, models, rabbitMQController);
+    setupServer(app, rollbar, models, rabbitMQController);
   } catch (e) {
     console.log(e);
   }

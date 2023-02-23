@@ -58,8 +58,12 @@ module.exports = {
           canvas_hash: null,
           canvas_session: null,
           // set the dates to a year back so they dont spam chain's home page
-          created_at: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
-          updated_at: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+          created_at: new Date(
+            new Date().setFullYear(new Date().getFullYear() - 1)
+          ),
+          updated_at: new Date(
+            new Date().setFullYear(new Date().getFullYear() - 1)
+          ),
         });
       });
 
