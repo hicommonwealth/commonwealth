@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
@@ -51,29 +51,58 @@ export const QuillEditorComponent = ({
   theme = 'snow',
   oncreateBind,
 }: QuillEditorComponentProps) => {
-  const [unsavedChanges, setUnsavedChanges] = useState([]);
-  const [$editor, set$editor] = useState<JQuery<HTMLElement>>();
   const [editor, setEditor] = useState<QuillEditor>();
   const [activeMode, setActiveMode] = useState<QuillActiveMode>();
   const [defaultContents, setDefaultContents] = useState<QuillTextContents>();
   const [loaded, setLoaded] = useState(false);
 
+  const nodeRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const beforeunloadHandler = () => {
-      if (unsavedChanges.length > 0) {
-        return 'There are unsaved changes. Are you sure you want to leave?';
+    const initEditor = async () => {
+      setEditor(
+        new QuillEditor(
+          nodeRef.current,
+          activeMode,
+          theme,
+          imageUploader,
+          placeholder,
+          editorNamespace,
+          onkeyboardSubmit,
+          defaultContents,
+          tabIndex
+        )
+      );
+
+      await editor.initialize();
+
+      if (oncreateBind) {
+        oncreateBind(editor);
       }
     };
 
-    // Only bind the alert if we are actually trying to persist the user's changes
-    if (!contentsDoc) {
-      $(window).on('beforeunload', beforeunloadHandler);
-    }
-
-    return () => {
-      $(window).off('beforeunload', beforeunloadHandler);
-    };
+    initEditor();
   }, []);
+
+  // need to refactor QuillEditorInternal for this code to work
+  // const [unsavedChanges, setUnsavedChanges] = useState([]);
+
+  // useEffect(() => {
+  //   const beforeunloadHandler = () => {
+  //     if (unsavedChanges.length > 0) {
+  //       return 'There are unsaved changes. Are you sure you want to leave?';
+  //     }
+  //   };
+
+  //   // Only bind the alert if we are actually trying to persist the user's changes
+  //   if (!contentsDoc) {
+  //     $(window).on('beforeunload', beforeunloadHandler);
+  //   }
+
+  //   return () => {
+  //     $(window).off('beforeunload', beforeunloadHandler);
+  //   };
+  // }, []);
 
   const loadSavedState = () => {
     const storedDoc: string = localStorage.getItem(
@@ -128,7 +157,10 @@ export const QuillEditorComponent = ({
 
     editor.removeFormat(0, editor.endIndex);
 
-    if (editor.contents.ops.length === defaultContents.ops.length) {
+    if (
+      typeof defaultContents !== 'string' &&
+      editor.contents.ops.length === defaultContents.ops.length
+    ) {
       confirmed = true;
     } else {
       confirmed = await confirmationModalWithText(
@@ -136,10 +168,11 @@ export const QuillEditorComponent = ({
       )();
     }
 
-    if (!confirmed) {
+    if (!confirmed && typeof defaultContents !== 'string') {
       // Restore formatted contents
       editor.contents = defaultContents;
     }
+
     return confirmed;
   };
 
@@ -154,29 +187,7 @@ export const QuillEditorComponent = ({
         { mode: `${activeMode}-mode`, className },
         'QuillEditor'
       )}
-      oncreate={async (childVnode) => {
-        set$editor($(childVnode.dom).find('.quill-editor'));
-
-        setEditor(
-          new QuillEditor(
-            $editor,
-            activeMode,
-            theme,
-            imageUploader,
-            placeholder,
-            editorNamespace,
-            onkeyboardSubmit,
-            defaultContents,
-            tabIndex
-          )
-        );
-
-        await editor.initialize();
-
-        if (oncreateBind) {
-          oncreateBind(editor);
-        }
-      }}
+      ref={nodeRef}
     >
       <div className="quill-editor" />
       {activeMode === 'markdown' && (

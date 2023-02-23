@@ -35,12 +35,12 @@ export default class QuillEditorInternal {
   protected _quill: Quill;
   protected _unsavedChanges; // TODO: Figure out type
 
-  private readonly _$editor: JQuery<HTMLElement>;
+  private readonly _$editor: HTMLElement;
   private readonly _editorNamespace: string;
   private readonly _onkeyboardSubmit: () => void;
 
   constructor(
-    $editor: JQuery<HTMLElement>,
+    $editor: HTMLElement,
     defaultMode: QuillActiveMode,
     editorNamespace: string,
     onkeyboardSubmit: () => void

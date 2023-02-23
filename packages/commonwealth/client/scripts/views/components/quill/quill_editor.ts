@@ -74,7 +74,7 @@ export class QuillEditor extends QuillEditorInternal {
   }
 
   constructor(
-    $editor: JQuery<HTMLElement>,
+    $editor: HTMLElement,
     defaultMode: QuillActiveMode,
     theme: string,
     imageUploader: boolean,
