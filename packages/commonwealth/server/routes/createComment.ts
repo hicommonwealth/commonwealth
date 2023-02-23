@@ -417,7 +417,7 @@ const createComment = async (
   author.save();
 
   // update proposal updated_at timestamp
-  thread.last_commented_on = Date.now();
+  thread.last_commented_on = new Date();
   thread.save();
 
   if (process.env.NODE_ENV !== 'test') {
