@@ -232,13 +232,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
           this.addresses[0].address
         );
 
-        oldProfile.initialize(
-          this.name,
-          null,
-          this.bio,
-          this.avatarUrl,
-          null
-        );
+        oldProfile.initialize(this.name, null, this.bio, this.avatarUrl, null);
 
         account = new Account({
           chain: this.addresses[0].chain,
@@ -441,7 +435,9 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                       modal: NewLoginModal,
                       exitCallback: () => {
                         setTimeout(() => {
-                          notifySuccess('Address has been successfully connected.');
+                          notifySuccess(
+                            'Address has been successfully connected.'
+                          );
                         }, 1000);
                         this.getProfile(vnode.attrs.profileId);
                       },

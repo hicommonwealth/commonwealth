@@ -12,8 +12,6 @@ export default class NewProfile extends ClassComponent {
   }
 
   view() {
-    return (
-      <ProfileComponent profileId={this.profileId} />
-    );
+    return <ProfileComponent profileId={this.profileId} />;
   }
 }

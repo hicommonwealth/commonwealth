@@ -232,7 +232,7 @@ export const Label: LabelerFilter = (
         heading: 'Vote Delegated',
         label: `${fmtAddr(target)} received a voting delegation from ${fmtAddr(
           who
-        )}.`
+        )}.`,
       };
     }
     case EventKind.DemocracyProposed: {

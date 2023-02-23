@@ -32,8 +32,7 @@ const getNewProfile = async (
   next: NextFunction
 ) => {
   const { profileId } = req.query;
-  if (!profileId)
-    return next(new Error(Errors.NoIdentifierProvided));
+  if (!profileId) return next(new Error(Errors.NoIdentifierProvided));
 
   const profile = await models.Profile.findOne({
     where: {

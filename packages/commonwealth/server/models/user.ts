@@ -138,10 +138,6 @@ export default (
     const profile = await models.Profile.create(
       {
         user_id: newUser.id,
-        username: generateUsername({
-          useHyphen: false,
-          useRandomNumber: false,
-        }),
       },
       options
     );

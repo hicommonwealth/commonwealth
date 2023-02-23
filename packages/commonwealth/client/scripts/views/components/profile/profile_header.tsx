@@ -42,7 +42,9 @@ export class ProfileHeader extends ClassComponent<ProfileHeaderAttrs> {
               label="Edit"
               buttonType="mini-white"
               iconLeft="write"
-              onclick={() => navigateToSubpage(`/profile/id/${profile.id}/edit`)}
+              onclick={() =>
+                navigateToSubpage(`/profile/id/${profile.id}/edit`)
+              }
             />
           )}
         </div>

@@ -50,7 +50,7 @@ export const Label: LabelerFilter = (
         heading: 'Member Ragequit',
         label: `Member ${fmtAddr(data.member)} ragequit and burned ${
           data.sharesToBurn
-        } shares.`
+        } shares.`,
       };
     case EventKind.Abort:
       return {
@@ -67,7 +67,7 @@ export const Label: LabelerFilter = (
         heading: 'Delegate Key Updated',
         label: `Member ${fmtAddr(
           data.member
-        )} updated their delegate to ${fmtAddr(data.newDelegateKey)}.`
+        )} updated their delegate to ${fmtAddr(data.newDelegateKey)}.`,
       };
     // this event should never appear
     case EventKind.SummonComplete:
@@ -75,7 +75,7 @@ export const Label: LabelerFilter = (
         heading: 'Summon Complete',
         label: `Moloch is summoned, by user ${fmtAddr(data.summoner)} with ${
           data.shares
-        }!`
+        }!`,
       };
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases

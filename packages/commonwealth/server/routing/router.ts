@@ -672,7 +672,6 @@ function setupRouter(
     updateProfileNew.bind(this, models)
   );
 
-
   router.post(
     '/deleteProfile',
     passport.authenticate('jwt', { session: false }),
