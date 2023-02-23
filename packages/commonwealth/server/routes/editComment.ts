@@ -4,7 +4,11 @@ import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import { getThreadUrl, getThreadUrlWithoutObject, renderQuillDeltaToText, } from '../../shared/utils';
+import {
+  getThreadUrl,
+  getThreadUrlWithoutObject,
+  renderQuillDeltaToText,
+} from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
@@ -117,11 +121,7 @@ const editComment = async (
 
     const cwUrl =
       typeof proposal === 'string'
-        ? getThreadUrlWithoutObject(
-          comment.chain,
-          proposal,
-          finalComment
-        )
+        ? getThreadUrlWithoutObject(comment.chain, proposal, finalComment)
         : getThreadUrl(proposal, comment);
     const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 

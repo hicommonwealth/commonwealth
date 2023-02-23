@@ -84,9 +84,7 @@ const getCommentResult = (comment, searchTerm) => {
     <div
       class="search-result-row"
       onclick={() => {
-        m.route.set(
-          `/${chain}/discussion/${proposalId}`
-        );
+        m.route.set(`/${chain}/discussion/${proposalId}`);
       }}
     >
       <CWIcon iconName="feedback" />
@@ -331,31 +329,30 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                     </a>
                   )}
                 </CWText>
-                {tabScopedListing.length > 0 &&
-                  this.activeTab === 'Threads' && (
-                    <div class="search-results-filters">
-                      <CWText type="h5">Sort By:</CWText>
-                      <CWDropdown
-                        label=""
-                        initialValue={{
-                          label: this.searchQuery.sort,
-                          value: this.searchQuery.sort,
-                        }}
-                        options={[
-                          { label: 'Best', value: 'Best' },
-                          { label: 'Newest', value: 'Newest' },
-                          { label: 'Oldest', value: 'Oldest' },
-                        ]}
-                        onSelect={(o) => {
-                          searchQuery.sort = SearchSort[o.value];
-                          m.route.set(`/search?${searchQuery.toUrlParams()}`);
-                          setTimeout(() => {
-                            this.refreshResults = true;
-                          }, 0);
-                        }}
-                      />
-                    </div>
-                  )}
+                {tabScopedListing.length > 0 && this.activeTab === 'Threads' && (
+                  <div class="search-results-filters">
+                    <CWText type="h5">Sort By:</CWText>
+                    <CWDropdown
+                      label=""
+                      initialValue={{
+                        label: this.searchQuery.sort,
+                        value: this.searchQuery.sort,
+                      }}
+                      options={[
+                        { label: 'Best', value: 'Best' },
+                        { label: 'Newest', value: 'Newest' },
+                        { label: 'Oldest', value: 'Oldest' },
+                      ]}
+                      onSelect={(o) => {
+                        searchQuery.sort = SearchSort[o.value];
+                        m.route.set(`/search?${searchQuery.toUrlParams()}`);
+                        setTimeout(() => {
+                          this.refreshResults = true;
+                        }, 0);
+                      }}
+                    />
+                  </div>
+                )}
                 <div class="search-results-list">{tabScopedListing}</div>
               </div>
             )}

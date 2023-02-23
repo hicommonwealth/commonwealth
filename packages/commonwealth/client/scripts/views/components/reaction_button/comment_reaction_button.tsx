@@ -12,7 +12,11 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
 import { getClasses } from '../component_kit/helpers';
-import { fetchReactionsByPost, getDisplayedReactorsForPopup, onReactionClick, } from './helpers';
+import {
+  fetchReactionsByPost,
+  getDisplayedReactorsForPopup,
+  onReactionClick,
+} from './helpers';
 
 type CommentReactionButtonAttrs = {
   comment: Comment<any>;

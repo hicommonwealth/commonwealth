@@ -1,7 +1,15 @@
 import { isHex, isU8a } from '@polkadot/util';
-import { checkAddress, decodeAddress, encodeAddress, } from '@polkadot/util-crypto';
+import {
+  checkAddress,
+  decodeAddress,
+  encodeAddress,
+} from '@polkadot/util-crypto';
 import { ProposalType } from 'common-common/src/types';
-import { AccessLevel, everyonePermissions, PermissionManager, } from './permissions';
+import {
+  AccessLevel,
+  everyonePermissions,
+  PermissionManager,
+} from './permissions';
 import type { RoleObject } from './types';
 
 export const getNextPollEndingTime = (now) => {
@@ -70,8 +78,8 @@ export const getThreadUrl = (proposal, comment?) => {
   const cId = comment ? `?comment=${comment.id}` : '';
 
   return process.env.NODE_ENV === 'production'
-      ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
-      : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+    ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
+    : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
 };
 
 export const getThreadUrlWithoutObject = (
@@ -107,11 +115,11 @@ export const smartTrim = (text, maxLength = 200) => {
 export const validURL = (str) => {
   const pattern = new RegExp(
     '^(https?:\\/\\/)?' + // protocol
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
-    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-    '(\\#[-a-z\\d_]*)?$',
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
     'i'
   ); // fragment locator
   return !!pattern.test(str);
@@ -150,8 +158,8 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
       ) {
         parent.children.push({ insert: node.insert });
         result[result.length - 1].children = result[
-        result.length - 1
-          ].children.concat(parent.children);
+          result.length - 1
+        ].children.concat(parent.children);
       } else {
         parent.children.push({ insert: node.insert });
         result.push(parent);
@@ -174,7 +182,7 @@ export const preprocessQuillDeltaForRendering = (nodes) => {
     typeof result[result.length - 1].children[0].insert === 'string' &&
     result[result.length - 1].children[0].insert === '\n' &&
     result[result.length - 1].children[0].attributes === undefined
-    ) {
+  ) {
     result.pop();
   }
 

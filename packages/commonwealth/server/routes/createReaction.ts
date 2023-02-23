@@ -9,10 +9,7 @@ import {
 import type { NextFunction, Request, Response } from 'express';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import {
-  getThreadUrl,
-  getThreadUrlWithoutObject,
-} from '../../shared/utils';
+import { getThreadUrl, getThreadUrlWithoutObject } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';

@@ -1,13 +1,22 @@
 import sgMail from '@sendgrid/mail';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainNetwork, ChainType, NotificationCategories, ProposalType, } from 'common-common/src/types';
+import {
+  ChainNetwork,
+  ChainType,
+  NotificationCategories,
+  ProposalType,
+} from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
-import { getThreadUrl, getThreadUrlWithoutObject, renderQuillDeltaToText, } from '../../shared/utils';
+import {
+  getThreadUrl,
+  getThreadUrlWithoutObject,
+  renderQuillDeltaToText,
+} from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
@@ -29,7 +38,7 @@ export const Errors = {
   ThreadNotFound: 'Cannot comment; thread not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance:
-    'Users need to hold some of the community\'s tokens to comment',
+    "Users need to hold some of the community's tokens to comment",
   BalanceCheckFailed: 'Could not verify user token balance',
   NestingTooDeep: 'Comments can only be nested 2 levels deep',
   RuleCheckFailed: 'Rule check failed',
@@ -260,11 +269,7 @@ const createComment = async (
   // craft commonwealth url
   const cwUrl =
     typeof thread === 'string'
-      ? getThreadUrlWithoutObject(
-        finalComment.chain,
-        thread,
-        finalComment
-      )
+      ? getThreadUrlWithoutObject(finalComment.chain, thread, finalComment)
       : getThreadUrl(thread, finalComment);
   const root_title = typeof thread === 'string' ? '' : thread.title || '';
 

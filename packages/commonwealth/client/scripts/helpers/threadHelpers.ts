@@ -1,5 +1,3 @@
 export class ThreadHelpers {
-  public static getUrl(){
-
-  }
+  public static getUrl() {}
 }
