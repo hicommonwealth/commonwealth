@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
@@ -72,26 +72,41 @@ function getModules() {
 }
 
 const TipsPage = () => {
-  if (!app.chain || !app.chain.loaded) {
+  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded)
+  const [isSubstrateLoading, setSubstrateLoading] = useState(false);
+
+  useEffect(() => {
+    app.chainAdapterReady.on('ready', () => setLoading(false));
+    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
+
+    return () => {
+      app.chainAdapterReady.off('ready', () => setLoading(false));
+      app.chainModuleReady.off('ready', () => setSubstrateLoading(false));
+    };
+  }, [setLoading, setSubstrateLoading]);
+
+  if (isLoading) {
     if (
       app.chain?.base === ChainBase.Substrate &&
       (app.chain as Substrate).chain?.timedOut
     ) {
-      return <ErrorPage message="Chain connection timed out" />;
+      return <ErrorPage message="Could not connect to chain" />;
     }
 
     return <PageLoading message="Connecting to chain" />;
   }
 
+  const onSubstrate = app.chain?.base === ChainBase.Substrate;
+
   const modLoading = loadSubstrateModules('Tips', getModules);
 
-  if (modLoading) return <div>{modLoading}</div>;
+  if (isSubstrateLoading) return modLoading;
 
-  const activeTips = (app.chain as Substrate).tips.store
+  const activeTips = onSubstrate && (app.chain as Substrate).tips.store
     .getAll()
     .filter((p) => !p.completed);
 
-  const inactiveTips = (app.chain as Substrate).tips.store
+  const inactiveTips = onSubstrate && (app.chain as Substrate).tips.store
     .getAll()
     .filter((p) => p.completed);
 

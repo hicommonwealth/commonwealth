@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -24,7 +24,6 @@ import {
   CompoundProposalStats,
   SubstrateProposalStats,
 } from '../components/proposals/proposals_explainers';
-import useForceRerender from 'hooks/useForceRerender';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -43,17 +42,20 @@ function getModules(): ProposalModule<any, any, any>[] {
 }
 
 const ProposalsPage = () => {
-  const forceRerender = useForceRerender();
+  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded)
+  const [isSubstrateLoading, setSubstrateLoading] = useState(false);
 
   useEffect(() => {
-    app.chainAdapterReady.on('ready', () => forceRerender());
+    app.chainAdapterReady.on('ready', () => setLoading(false));
+    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
 
     return () => {
-      app.chainAdapterReady.off('ready', () => forceRerender());
+      app.chainAdapterReady.off('ready', () => setLoading(false));
+      app.chainModuleReady.off('ready', () => setSubstrateLoading(false));
     };
-  });
+  }, [setLoading, setSubstrateLoading]);
 
-  if (!app.chain || !app.chain.loaded) {
+  if (isLoading) {
     if (
       app.chain?.base === ChainBase.Substrate &&
       (app.chain as Substrate).chain?.timedOut
@@ -80,7 +82,7 @@ const ProposalsPage = () => {
 
   const modLoading = loadSubstrateModules('Proposals', getModules);
 
-  if (modLoading) return modLoading;
+  if (isSubstrateLoading) return modLoading;
 
   // active proposals
   const activeDemocracyProposals =
