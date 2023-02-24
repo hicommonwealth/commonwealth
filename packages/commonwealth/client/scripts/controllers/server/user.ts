@@ -11,6 +11,7 @@ import type {
   StarredCommunity,
 } from 'models';
 import app from 'state';
+import { notifyError } from '../app/notifications';
 import DraftsController from './drafts';
 
 // eslint-disable-next-line
@@ -173,8 +174,32 @@ export class UserController {
     this._setEmail(email);
   }
 
+  public updateEmail(email: string): void {
+    this._setEmail(email);
+
+    try {
+      $.post(`${app.serverUrl()}/updateEmail`, {
+        email: email,
+        jwt: app.user.jwt,
+      });
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to update email');
+    }
+  }
+
   public setEmailInterval(emailInterval: string): void {
     this._setEmailInterval(emailInterval);
+    try {
+      $.post(`${app.serverUrl()}/writeUserSetting`, {
+        jwt: app.user.jwt,
+        key: 'updateEmailInterval',
+        value: emailInterval,
+      });
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to set email interval');
+    }
   }
 
   public setEmailVerified(verified: boolean): void {
