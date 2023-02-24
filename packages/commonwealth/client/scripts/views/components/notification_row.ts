@@ -111,7 +111,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const actorName = m(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
-    hideIdentityIcon: true,
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -222,7 +221,6 @@ const getBatchNotificationFields = (
   const actorName = m(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
-    hideIdentityIcon: true,
   });
 
   if (category === NotificationCategories.NewComment) {
@@ -417,7 +415,6 @@ const NotificationRow: m.Component<
       const authorName = m(User, {
         user: author,
         hideAvatar: true,
-        hideIdentityIcon: true,
       });
 
       return link(
@@ -482,6 +479,68 @@ const NotificationRow: m.Component<
             const el = document.getElementById('highlighted');
             if (el) el.scrollIntoView({ behavior: 'smooth' });
           }, 200)
+      );
+    } else if (category === NotificationCategories.SnapshotProposal) {
+      const notificationData = JSON.parse(notification.data);
+      const header = `Update in Snapshot Space: ${notificationData.space}`;
+      let body = '';
+
+      switch (notificationData.eventType) {
+        case 'proposal/created':
+          body = `New proposal created: ${notificationData.title}`;
+          break;
+        case 'proposal/end':
+          body = `Proposal ended: ${notificationData.title}`;
+          break;
+        case 'proposal/deleted':
+          body = `Proposal deleted: ${notificationData.title}`;
+          break;
+        case 'proposal/start':
+          body = `Proposal started: ${notificationData.title}`;
+          break;
+        default:
+          break;
+      }
+
+      return link(
+        'a.NotificationRow',
+        `/snapshot/${notificationData.space}/${notificationData.id}`,
+        [
+          m('.comment-body', [
+            m('.comment-body-top.chain-event-notification-top', [
+              header,
+              !vnode.attrs.onListPage &&
+                m(CWIconButton, {
+                  iconName: 'close',
+                  onclick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    vnode.state.scrollOrStop = true;
+                    app.user.notifications.delete([notification]).then(() => {
+                      m.redraw();
+                    });
+                  },
+                }),
+            ]),
+            m('.comment-body-excerpt', body),
+          ]),
+        ],
+        {
+          class: notification.isRead ? '' : 'unread',
+          key: notification.id,
+          id: notification.id,
+        },
+        null,
+        () => {
+          if (vnode.state.scrollOrStop) {
+            vnode.state.scrollOrStop = false;
+            return;
+          }
+          app.user.notifications
+            .markAsRead([notification])
+            .then(() => m.redraw());
+        },
+        () => m.redraw.sync()
       );
     } else {
       const notificationData = notifications.map((notif) =>

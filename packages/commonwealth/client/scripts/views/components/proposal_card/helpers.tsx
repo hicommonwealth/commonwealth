@@ -5,10 +5,6 @@ import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
 import 'components/proposal_card/index.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import MolochProposal, {
-  MolochProposalState,
-} from 'controllers/chain/ethereum/moloch/proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
@@ -41,25 +37,6 @@ export const getStatusText = (proposal: AnyProposal) => {
     if (proposal.isPassing === ProposalStatus.Passed)
       return 'Passed, moved to referendum';
     return 'Cancelled';
-  } else if (
-    proposal.completed &&
-    proposal instanceof SubstrateCollectiveProposal
-  ) {
-    if (
-      proposal.isPassing === ProposalStatus.Passed &&
-      proposal.call.section === 'treasury' &&
-      proposal.call.method === 'approveProposal'
-    )
-      return 'Passed';
-    if (
-      proposal.isPassing === ProposalStatus.Passed &&
-      proposal.call.section === 'democracy' &&
-      proposal.call.method.startsWith('externalPropose')
-    )
-      return 'Passed, moved to referendum';
-    if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
-    if (proposal.isPassing === ProposalStatus.Failed) return 'Motion closed';
-    return 'Completed';
   } else if (proposal.completed && proposal instanceof AaveProposal) {
     if (proposal.state === AaveTypes.ProposalState.CANCELED) return 'Cancelled';
     if (proposal.state === AaveTypes.ProposalState.EXECUTED) return 'Executed';
@@ -116,21 +93,6 @@ export const getStatusText = (proposal: AnyProposal) => {
       : proposal.endTime.kind === 'unavailable'
       ? ''
       : '';
-
-  if (proposal instanceof MolochProposal) {
-    if (proposal.state === MolochProposalState.NotStarted)
-      return 'Waiting to start';
-    if (proposal.state === MolochProposalState.GracePeriod)
-      return [
-        proposal.isPassing === ProposalStatus.Passed ? 'Passed, ' : 'Failed, ',
-        countdown,
-        ' in grace period',
-      ];
-    if (proposal.state === MolochProposalState.InProcessingQueue)
-      return 'In processing queue';
-    if (proposal.state === MolochProposalState.ReadyToProcess)
-      return 'Ready to process';
-  }
 
   if (proposal instanceof AaveProposal) {
     if (proposal.state === AaveTypes.ProposalState.ACTIVE)
@@ -192,8 +154,7 @@ export const getPrimaryTagText = (proposal: AnyProposal) => `
 
 export const getSecondaryTagText = (proposal: AnyProposal) => {
   if (
-    (proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateCollectiveProposal) &&
+    proposal instanceof SubstrateDemocracyProposal &&
     proposal.getReferendum()
   ) {
     return `REF #${proposal.getReferendum().identifier}`;
@@ -204,8 +165,6 @@ export const getSecondaryTagText = (proposal: AnyProposal) => {
 
     return originatingProposalOrMotion instanceof SubstrateDemocracyProposal
       ? `PROP #${originatingProposalOrMotion.identifier}`
-      : originatingProposalOrMotion instanceof SubstrateCollectiveProposal
-      ? `MOT #${originatingProposalOrMotion.identifier}`
       : 'MISSING PROP';
   } else if (
     proposal instanceof SubstrateTreasuryProposal &&

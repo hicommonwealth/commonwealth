@@ -117,6 +117,7 @@ export interface IApp {
   isLoggedIn(): boolean;
 
   isProduction(): boolean;
+  isNative(win): boolean;
 
   serverUrl(): string;
 
@@ -136,8 +137,6 @@ export interface IApp {
   lastNavigatedBack(): boolean;
 
   lastNavigatedFrom(): string;
-
-  cachedIdentityWidget: any; // lazy loaded substrate identity widget
 }
 
 // INJECT DEPENDENCIES
@@ -212,9 +211,22 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
+  isNative: (win: Window) => {
+    const capacitor = window['Capacitor'];
+    return !!(capacitor && capacitor.isNative);
+  },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
-  serverUrl: () => '/api',
+  serverUrl: () => {
+    //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
+    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
+
+    if (app.isNative(window)) {
+      return mobileUrl;
+    } else {
+      return '/api';
+    }
+  },
 
   loadingError: null,
 
@@ -231,8 +243,6 @@ const app: IApp = {
   _lastNavigatedBack: false,
   lastNavigatedBack: () => app._lastNavigatedBack,
   lastNavigatedFrom: () => app._lastNavigatedFrom,
-
-  cachedIdentityWidget: null,
 };
 
 function handleLoginSockets(user_data: any) {
