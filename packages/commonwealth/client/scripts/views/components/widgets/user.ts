@@ -4,17 +4,17 @@ import { Popover, Tag } from 'construct-ui';
 import { link } from 'helpers';
 import jdenticon from 'jdenticon';
 import { capitalize } from 'lodash';
-import $ from 'jquery';
 
 import m from 'mithril';
 import type { Account } from 'models';
-import { AddressInfo, Profile } from 'models';
+import { AddressInfo, MinimumProfile } from 'models';
 
 import app from 'state';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWAvatar, CWJdenticon } from '../component_kit/cw_avatar';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -24,18 +24,9 @@ export interface IAddressDisplayOptions {
   maxCharLength?: number;
 }
 
-const getProfileId = async (user: Account | AddressInfo | Profile) => {
-  const { result } = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
-    address: user.address,
-    chain: typeof user.chain === 'string' ? user.chain : user.chain?.id,
-    jwt: app.user.jwt,
-  });
-  return result.profileId;
-};
-
 const User: m.Component<
   {
-    user: Account | AddressInfo | Profile;
+    user: Account | AddressInfo | MinimumProfile;
     avatarSize?: number;
     avatarOnly?: boolean; // overrides most other properties
     hideAvatar?: boolean;
@@ -50,12 +41,6 @@ const User: m.Component<
     profileId: number;
   }
 > = {
-  oninit: (vnode) => {
-    getProfileId(vnode.attrs.user).then((profileId) => {
-      vnode.state.profileId = profileId;
-      m.redraw();
-    });
-  },
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
@@ -77,7 +62,7 @@ const User: m.Component<
     if (!user) return;
 
     let account: Account;
-    let profile: Profile;
+    let profile: MinimumProfile;
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
@@ -112,13 +97,15 @@ const User: m.Component<
         }
       }
 
-      profile = app.profiles.getProfile(chainId.id, address);
+      profile = app.newProfiles.getProfile(address, chainId.id);
 
       role = adminsAndMods.find(
         (r) => r.address === address && r.address_chain === chainId.id
       );
-    } else if (vnode.attrs.user instanceof Profile) {
+    } else if (vnode.attrs.user instanceof MinimumProfile) {
+      console.log('it is a minimum prOFFIELEEE');
       profile = vnode.attrs.user;
+      console.log(profile);
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
         try {
@@ -137,7 +124,7 @@ const User: m.Component<
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
       const chainId = account.chain.id;
-      profile = account.profile;
+      profile = app.newProfiles.getProfile(account.address, chainId);
       role = adminsAndMods.find(
         (r) => r.address === account.address && r.address_chain === chainId
       );
@@ -162,17 +149,17 @@ const User: m.Component<
       }
     );
 
+    const profileAvatar = profile?.avatarUrl
+      ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize })
+      : m(CWJdenticon, { address: profile.address, size: avatarSize });
+
     const userFinal = avatarOnly
       ? m(
           '.User.avatar-only',
           {
             key: profile?.address || '-',
           },
-          !profile
-            ? null
-            : profile.avatarUrl
-            ? profile.getAvatar(avatarSize)
-            : profile.getAvatar(avatarSize - 4)
+          !profile ? null : profileAvatar
         )
       : m(
           '.User',
@@ -187,24 +174,21 @@ const User: m.Component<
                 {
                   style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
                 },
-                profile && profile.getAvatar(avatarSize)
+                profile && profileAvatar
               ),
             [
               // non-substrate name
               linkify
                 ? link(
                     'a.user-display-name.username',
-                    profile
-                      ? // TODO: switch to profile.username once PR4 is merged
-                        `/profile/id/${vnode.state.profileId}`
-                      : 'javascript:',
+                    profile ? `/profile/id/${profile.id}` : 'javascript:',
                     [
                       !profile
                         ? addrShort
                         : !showAddressWithDisplayName
-                        ? profile.displayName
+                        ? profile.name
                         : [
-                            profile.displayName,
+                            profile.name,
                             m(
                               '.id-short',
                               formatAddressShort(profile.address, profile.chain)
@@ -217,9 +201,9 @@ const User: m.Component<
                     !profile
                       ? addrShort
                       : !showAddressWithDisplayName
-                      ? profile.displayName
+                      ? profile.name
                       : [
-                          profile.displayName,
+                          profile.name,
                           m(
                             '.id-short',
                             formatAddressShort(profile.address, profile.chain)
@@ -245,26 +229,17 @@ const User: m.Component<
         },
       },
       [
-        m('.user-avatar', [
-          !profile
-            ? null
-            : profile.avatarUrl
-            ? profile.getAvatar(36)
-            : profile.getAvatar(32),
-        ]),
+        m('.user-avatar', [!profile ? null : profileAvatar]),
         m('.user-name', [
           link(
             'a.user-display-name',
-            profile
-              ? // TODO: switch to profile.username once PR4 is merged
-                `/profile/id/${vnode.state.profileId}`
-              : 'javascript:',
+            profile ? `/profile/id/${profile.id}` : 'javascript:',
             !profile
               ? addrShort
               : !showAddressWithDisplayName
-              ? profile.displayName
+              ? profile.name
               : [
-                  profile.displayName,
+                  profile.name,
                   m(
                     '.id-short',
                     formatAddressShort(profile.address, profile.chain)
@@ -318,7 +293,7 @@ const User: m.Component<
 
 export const UserBlock: m.Component<
   {
-    user: Account | AddressInfo | Profile;
+    user: Account | AddressInfo | MinimumProfile;
     popover?: boolean;
     showRole?: boolean;
     showAddressWithDisplayName?: boolean;
@@ -332,14 +307,9 @@ export const UserBlock: m.Component<
     avatarSize?: number;
   },
   {
-    profileId: string;
+    profileId: number;
   }
 > = {
-  oninit: (vnode) => {
-    getProfileId(vnode.attrs.user).then((profileId) => {
-      vnode.state.profileId = profileId;
-    });
-  },
   view: (vnode) => {
     const {
       user,
@@ -355,17 +325,9 @@ export const UserBlock: m.Component<
     } = vnode.attrs;
 
     const { showFullAddress } = vnode.attrs.addressDisplayOptions || {};
+    const chain = typeof user.chain === 'string' ? user.chain : user.chain?.id;
 
-    let profile;
-
-    if (user instanceof AddressInfo) {
-      if (!user.chain || !user.address) return;
-      profile = app.profiles.getProfile(user.chain.id, user.address);
-    } else if (user instanceof Profile) {
-      profile = user;
-    } else {
-      profile = app.profiles.getProfile(user.chain.id, user.address);
-    }
+    const profile = app.newProfiles.getProfile(user.address, chain);
 
     const highlightSearchTerm =
       profile?.address &&
@@ -438,10 +400,7 @@ export const UserBlock: m.Component<
       ]),
     ];
 
-    const userLink = profile
-      ? // TODO: switch to profile.username once PR4 is merged
-        `/profile/id/${vnode.state.profileId}`
-      : 'javascript:';
+    const userLink = profile ? `/profile/id/${profile.id}` : 'javascript:';
 
     return linkify
       ? link('.UserBlock', userLink, children)

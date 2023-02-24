@@ -1,0 +1,51 @@
+// Only to be used in User component to render minimum new profile
+
+class MinimumProfile {
+  private _name: string;
+  private _address: string;
+  private _avatarUrl: string;
+  private _id: number;
+  private _chain: string;
+  private _initialized: boolean;
+
+  get name() {
+    if (!this._initialized) return 'Loading...';
+    return this._name || 'Anonymous';
+  }
+
+  get address() {
+    return this._address;
+  }
+
+  get avatarUrl() {
+    return this._avatarUrl;
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  get chain() {
+    return this._chain;
+  }
+
+  constructor({ address, chain }) {
+    this._address = address;
+    this._chain = chain;
+  }
+
+  public initialize(name, address, avatarUrl, id, chain) {
+    this._name = name;
+    this._address = address;
+    this._avatarUrl = avatarUrl;
+    this._id = id;
+    this._chain = chain;
+    this._initialized = true;
+  }
+
+  public static fromJSON(json) {
+    return new MinimumProfile(json);
+  }
+}
+
+export default MinimumProfile;

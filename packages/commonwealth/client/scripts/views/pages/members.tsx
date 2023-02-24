@@ -4,7 +4,7 @@ import ClassComponent from 'class_component';
 import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
-import type { Profile } from 'models';
+import type { MinimumProfile } from 'models';
 
 import 'pages/members.scss';
 
@@ -25,11 +25,6 @@ type MemberInfo = {
   count: number;
 };
 
-type ProfileInfo = {
-  postCount: number;
-  profile: Profile;
-};
-
 class MembersPage extends ClassComponent {
   private initialProfilesLoaded: boolean;
   private initialScrollFinished: boolean;
@@ -38,7 +33,7 @@ class MembersPage extends ClassComponent {
   private numProfilesLoaded: number;
   private onscroll: any;
   private profilesFinishedLoading: boolean;
-  private profilesLoaded: ProfileInfo[];
+  private profilesLoaded: MinimumProfile[];
   private totalMembersCount: number;
 
   view() {
@@ -124,13 +119,21 @@ class MembersPage extends ClassComponent {
       this.profilesFinishedLoading =
         this.numProfilesLoaded >= this.membersLoaded.length;
 
-      const profileInfos: ProfileInfo[] = this.membersLoaded
+      const profileInfos: MinimumProfile[] = this.membersLoaded
         .slice(0, this.numProfilesLoaded)
         .map((member) => {
-          return {
-            profile: app.profiles.getProfile(member.chain, member.address),
-            postCount: member.count,
-          };
+          const profile = app.newProfiles.getProfile(
+            member.address,
+            member.chain
+          );
+          profile.initialize(
+            profile.name,
+            profile.address,
+            profile.avatarUrl,
+            profile.id,
+            profile.chain
+          );
+          return profile;
         });
 
       this.profilesLoaded = profileInfos;
@@ -172,11 +175,18 @@ class MembersPage extends ClassComponent {
 
         for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
           const member = this.membersLoaded[i];
-          const profileInfo: ProfileInfo = {
-            profile: app.profiles.getProfile(member.chain, member.address),
-            postCount: member.count,
-          };
-          this.profilesLoaded.push(profileInfo);
+          const profile = app.newProfiles.getProfile(
+            member.address,
+            member.chain
+          );
+          profile.initialize(
+            profile.name,
+            profile.address,
+            profile.avatarUrl,
+            profile.id,
+            profile.chain
+          );
+          this.profilesLoaded.push(profile);
         }
 
         this.numProfilesLoaded += newBatchSize;
@@ -206,13 +216,12 @@ class MembersPage extends ClassComponent {
             <CWText type="h5">Posts / Month</CWText>
           </div>
           <div class="members-container">
-            {profilesLoaded.map((profileInfo) => {
-              const { address } = profileInfo.profile;
+            {profilesLoaded.map((profile) => {
+              const { id } = profile;
               return (
                 <div class="member-row">
                   <a
-                    // TODO: switch to profile.username once PR4 is merged
-                    href={`/profile/a/${address}`}
+                    href={`/profile/id/${id}`}
                     onclick={(e) => {
                       e.preventDefault();
                       localStorage[`${app.activeChainId()}-members-scrollY`] =
@@ -220,13 +229,11 @@ class MembersPage extends ClassComponent {
                       localStorage[
                         `${app.activeChainId()}-members-numProfilesLoaded`
                       ] = numProfilesLoaded;
-                      // TODO: switch to profile.username once PR4 is merged
-                      m.route.set(`/profile/a/${address}`);
+                      m.route.set(`/profile/id/${id}`);
                     }}
                   >
-                    {m(User, { user: profileInfo.profile, showRole: true })}
+                    {m(User, { user: profile, showRole: true })}
                   </a>
-                  <CWText>{profileInfo.postCount}</CWText>
                 </div>
               );
             })}

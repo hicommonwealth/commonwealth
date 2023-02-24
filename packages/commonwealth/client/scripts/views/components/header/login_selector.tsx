@@ -52,20 +52,16 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftAttrs> {
-  private profileId: string;
-
-  private getProfileId = async (user: Account) => {
-    const { result } = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
-      address: user.address,
-      chain: typeof user.chain === 'string' ? user.chain : user.chain?.id,
-      jwt: app.user.jwt,
-    });
-
-    this.profileId = result.profileId;
-  };
+  private profileId: number;
 
   oninit() {
-    this.getProfileId(app.user.activeAccount);
+    const { activeAccount } = app.user;
+    const chain =
+      typeof activeAccount.chain === 'string'
+        ? activeAccount.chain
+        : activeAccount.chain?.id;
+    const profile = app.newProfiles.getProfile(activeAccount.address, chain);
+    this.profileId = profile.id;
   }
 
   view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {

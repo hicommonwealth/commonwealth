@@ -6,9 +6,10 @@ export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
   InvalidChain: 'Invalid chain',
+  InvalidAddress: 'Invalid address',
 };
 
-const getAddressProfileId = async (
+const getAddressProfile = async (
   models: DB,
   req: Request,
   res: Response,
@@ -33,16 +34,24 @@ const getAddressProfileId = async (
       chain: req.body.chain,
       address: req.body.address,
     },
+    include: [models.Profile],
   });
 
-  let result;
-  if (address) {
-    result = { profileId: address.profile_id };
-  } else {
-    result = { profileId: null };
+  if (!address) {
+    return next(new AppError(Errors.InvalidAddress));
   }
 
-  return res.json({ status: 'Success', result });
+  const profile = await address.getProfile();
+
+  return res.json({
+    status: 'Success',
+    result: {
+      profileId: address.profile_id,
+      name: address.name,
+      address: address.address,
+      avatarUrl: profile?.avatar_url,
+    },
+  });
 };
 
-export default getAddressProfileId;
+export default getAddressProfile;

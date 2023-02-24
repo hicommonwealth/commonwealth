@@ -3,6 +3,7 @@ export { default as ChainStore } from './ChainStore';
 export { default as CommentsStore } from './CommentsStore';
 export { default as ContractsStore } from './ContractsStore';
 export { default as IdStore } from './IdStore';
+export { default as NewProfileStore } from './NewProfileStore';
 export { default as NodeStore } from './NodeStore';
 export { default as NotificationStore } from './NotificationStore';
 export { default as ProfileStore } from './ProfileStore';

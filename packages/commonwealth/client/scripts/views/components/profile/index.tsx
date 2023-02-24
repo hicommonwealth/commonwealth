@@ -29,8 +29,6 @@ type NewProfileAttrs = {
   profileId: string;
 };
 
-const NoProfileFoundError = 'No profile found';
-
 export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
   private addresses: AddressInfo[];
   private content: m.Vnode;
@@ -71,16 +69,10 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
           )
       );
       this.isOwner = result.isOwner;
-      this.loading = false;
     } catch (err) {
-      if (
-        err.status === 500 &&
-        err.responseJSON.error === NoProfileFoundError
-      ) {
-        this.error = ProfileError.NoProfileFound;
-      }
-      this.loading = false;
+      this.error = ProfileError.NoProfileFound;
     }
+    this.loading = false;
     m.redraw();
   };
 
