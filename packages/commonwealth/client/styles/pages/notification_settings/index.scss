@@ -68,10 +68,19 @@
       justify-content: space-between;
       padding-bottom: 16px;
       gap: 24px;
+      min-height: fit-content;
     }
 
     .email-input {
       width: 70%;
+    }
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
     }
   }
 

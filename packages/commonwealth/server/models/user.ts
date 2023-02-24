@@ -85,8 +85,7 @@ export default (
         defaultValue: false,
       },
       emailNotificationInterval: {
-        type: dataTypes.ENUM,
-        values: ['daily', 'never'],
+        type: dataTypes.STRING,
         defaultValue: 'never',
         allowNull: false,
       },

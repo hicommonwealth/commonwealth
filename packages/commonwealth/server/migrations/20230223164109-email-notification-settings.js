@@ -22,8 +22,7 @@ module.exports = {
         'Users',
         'emailNotificationInterval',
         {
-          type: Sequelize.ENUM,
-          values: ['never', 'weekly', 'daily', 'biweekly', 'monthly'],
+          type: Sequelize.STRING,
           allowNull: false,
           defaultValue: 'never',
         },

@@ -6,7 +6,7 @@ const VALID_DIGEST_INTERVALS = [
   'never',
   'weekly',
   'daily',
-  'biweekly',
+  'twoweeks',
   'monthly',
 ];
 
