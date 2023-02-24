@@ -25,6 +25,11 @@ type MemberInfo = {
   count: number;
 };
 
+type ProfileInfo = {
+  postCount: number;
+  profile: MinimumProfile;
+};
+
 class MembersPage extends ClassComponent {
   private initialProfilesLoaded: boolean;
   private initialScrollFinished: boolean;
@@ -33,7 +38,7 @@ class MembersPage extends ClassComponent {
   private numProfilesLoaded: number;
   private onscroll: any;
   private profilesFinishedLoading: boolean;
-  private profilesLoaded: MinimumProfile[];
+  private profilesLoaded: ProfileInfo[];
   private totalMembersCount: number;
 
   view() {
@@ -119,7 +124,7 @@ class MembersPage extends ClassComponent {
       this.profilesFinishedLoading =
         this.numProfilesLoaded >= this.membersLoaded.length;
 
-      const profileInfos: MinimumProfile[] = this.membersLoaded
+      const profileInfos: ProfileInfo[] = this.membersLoaded
         .slice(0, this.numProfilesLoaded)
         .map((member) => {
           const profile = app.newProfiles.getProfile(
@@ -133,7 +138,10 @@ class MembersPage extends ClassComponent {
             profile.id,
             profile.chain
           );
-          return profile;
+          return {
+            profile,
+            postCount: member.count,
+          };
         });
 
       this.profilesLoaded = profileInfos;
@@ -186,7 +194,11 @@ class MembersPage extends ClassComponent {
             profile.id,
             profile.chain
           );
-          this.profilesLoaded.push(profile);
+          const profileInfo: ProfileInfo = {
+            profile,
+            postCount: member.count,
+          };
+          this.profilesLoaded.push(profileInfo);
         }
 
         this.numProfilesLoaded += newBatchSize;
@@ -216,8 +228,8 @@ class MembersPage extends ClassComponent {
             <CWText type="h5">Posts / Month</CWText>
           </div>
           <div class="members-container">
-            {profilesLoaded.map((profile) => {
-              const { id } = profile;
+            {profilesLoaded.map((profileInfo) => {
+              const { id } = profileInfo.profile;
               return (
                 <div class="member-row">
                   <a
@@ -232,8 +244,9 @@ class MembersPage extends ClassComponent {
                       m.route.set(`/profile/id/${id}`);
                     }}
                   >
-                    {m(User, { user: profile, showRole: true })}
+                    {m(User, { user: profileInfo.profile, showRole: true })}
                   </a>
+                  <CWText>{profileInfo.postCount}</CWText>
                 </div>
               );
             })}

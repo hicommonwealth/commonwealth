@@ -103,9 +103,7 @@ const User: m.Component<
         (r) => r.address === address && r.address_chain === chainId.id
       );
     } else if (vnode.attrs.user instanceof MinimumProfile) {
-      console.log('it is a minimum prOFFIELEEE');
       profile = vnode.attrs.user;
-      console.log(profile);
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
         try {
