@@ -128,7 +128,7 @@ export class ComponentShowcase extends ClassComponent {
             label="run"
             onclick={async () => {
               const res = await $.post(`${app.serverUrl()}/runDigestScript`, {
-                id: 'lol',
+                digestLevel: 3,
               });
               console.log('huh', res.result);
             }}

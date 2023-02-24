@@ -207,6 +207,14 @@ export type CommunityDigestInfo = {
   };
 };
 
+// Defines which emails should get sent
+export const digestLevels = {
+  '0': ['monthly'],
+  '1': ['twoweeks', 'monthly'],
+  '2': ['weekly', 'twoweeks', 'monthly'],
+  '3': ['daily', 'weekly', 'twoweeks', 'monthly'],
+};
+
 export const getTopThreads = async (
   models: DB,
   communityId: string
@@ -264,7 +272,7 @@ const getCommunityActivityScore = async (
   return (activityScore[1] as any)?.rows?.[0]?.activity_score as number;
 };
 
-export const emailDigestBuilder = async (models: DB) => {
+export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
   // Go through each community on CW
   const communities = await models.Chain.findAll();
 
@@ -297,8 +305,15 @@ export const emailDigestBuilder = async (models: DB) => {
 
   console.log('Finished community digest builder...');
 
+  const intervalsArray = digestLevels[digestLevel];
+  console.log('Digest level: ', intervalsArray);
+
   const usersWithEmailDigestOn = await models.User.findAll({
-    where: { emailNotificationInterval: 'weekly' },
+    where: {
+      emailNotificationInterval: {
+        [Op.in]: intervalsArray,
+      },
+    },
   });
 
   const allEmailObjects = [];

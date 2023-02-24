@@ -6,10 +6,11 @@ import type { DB } from '../models';
 
 const runDigestScript = async (
   models: DB,
-  req: TypedRequestBody<{ id: string }>,
+  req: TypedRequestBody<{ digestLevel: number }>,
   res: TypedResponse<{ data: Array<any> }>
 ) => {
-  const digestInfo = await emailDigestBuilder(models);
+  const { digestLevel } = req.body;
+  const digestInfo = await emailDigestBuilder(models, digestLevel);
   return success(res, { data: digestInfo });
 };
 
