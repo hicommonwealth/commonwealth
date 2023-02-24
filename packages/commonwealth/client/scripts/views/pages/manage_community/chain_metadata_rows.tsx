@@ -14,7 +14,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import type { ChainInfo, RoleInfo } from 'models';
-import { Action, PermissionManager, ToCheck } from 'permissions';
+import { PermissionManager } from 'permissions';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -52,7 +52,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   iconUrl: string;
   stagesEnabled: boolean;
   customStages: string;
-  chatEnabled: boolean;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
   customDomain: string;
@@ -89,11 +88,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !this.permissionsManager.hasPermission(
-      chain.defaultDenyPermissions,
-      Action.VIEW_CHAT_CHANNELS,
-      ToCheck.Allow
-    );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -282,18 +276,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             }
           />
         )}
-        <ToggleRow
-          title="Chat Enabled"
-          defaultValue={this.chatEnabled}
-          onToggle={(checked) => {
-            this.chatEnabled = !!checked;
-          }}
-          caption={(checked) =>
-            checked
-              ? "Don't enable chat feature for this community"
-              : 'Enable chat feature for this community '
-          }
-        />
         <InputRow
           title="Custom Stages"
           value={this.customStages}
@@ -454,19 +436,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               console.log(err);
             }
             try {
-              if (this.chatEnabled) {
-                this.default_deny_permissions =
-                  this.permissionsManager.removeDenyPermission(
-                    default_deny_permissions,
-                    Action.VIEW_CHAT_CHANNELS
-                  );
-              } else {
-                this.default_deny_permissions =
-                  this.permissionsManager.addDenyPermission(
-                    default_deny_permissions,
-                    Action.VIEW_CHAT_CHANNELS
-                  );
-              }
               await chain.updateChainData({
                 name,
                 description,
