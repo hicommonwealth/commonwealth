@@ -9,6 +9,7 @@ import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
 import type { Account } from 'models';
+import { notifyError } from 'controllers/app/notifications';
 
 type AvatarUploadStyleProps = {
   size?: 'small' | 'large';
@@ -18,7 +19,7 @@ type AvatarUploadProps = {
   account?: Account;
   darkMode?: boolean;
   scope: 'community' | 'user';
-  uploadCompleteCallback?: () => void;
+  uploadCompleteCallback?: (file: Array<any>) => void;
   uploadStartedCallback?: () => void;
 } & AvatarUploadStyleProps;
 
@@ -27,13 +28,21 @@ export const AvatarUpload = ({
   darkMode,
   scope,
   size = 'small',
+  uploadCompleteCallback,
+  uploadStartedCallback,
 }: AvatarUploadProps) => {
   const [files, setFiles] = useState([]);
   const { getRootProps, getInputProps } = useDropzone({
+    maxFiles: 1,
+    maxSize: 10000000,
     accept: {
       'image/*': [],
     },
     onDrop: (acceptedFiles) => {
+      if (uploadStartedCallback) {
+        uploadStartedCallback();
+      }
+
       setFiles(
         acceptedFiles.map((file) =>
           Object.assign(file, {
@@ -41,6 +50,27 @@ export const AvatarUpload = ({
           })
         )
       );
+    },
+    onDropAccepted: (acceptedFiles: any) => {
+      $.post(`${app.serverUrl()}/getUploadSignature`, {
+        name: acceptedFiles[0].name, // imageName.png
+        mimetype: acceptedFiles[0].type, // image/png
+        auth: true,
+        jwt: app.user.jwt,
+      })
+        .then((response) => {
+          acceptedFiles[0].uploadURL = response.result;
+
+          if (uploadCompleteCallback) {
+            uploadCompleteCallback(acceptedFiles);
+          }
+        })
+        .catch((err: any) => {
+          notifyError(
+            'Failed to get an S3 signed upload URL',
+            err.responseJSON ? err.responseJSON.error : err.responseText
+          );
+        });
     },
   });
 

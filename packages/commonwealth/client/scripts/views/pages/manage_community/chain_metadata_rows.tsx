@@ -1,14 +1,13 @@
 import React from 'react';
+import { uuidv4 } from 'lib/util';
+import $ from 'jquery';
 
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
-import _ from 'underscore';
-import $ from 'jquery';
 import app from 'state';
-import { uuidv4 } from 'lib/util';
 import { ChainBase, DefaultPage } from 'common-common/src/types';
 import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -141,7 +140,20 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     return (
       <div className="ChainMetadataRows">
         <div className="AvatarUploadRow">
-          {/* @TODO Replace AvatarUploader here */}
+          <AvatarUpload
+            scope="community"
+            uploadStartedCallback={() => {
+              this.uploadInProgress = true;
+            }}
+            uploadCompleteCallback={(files) => {
+              files.forEach((f) => {
+                if (!f.uploadURL) return;
+                const url = f.uploadURL.replace(/\?.*/, '');
+                this.iconUrl = url;
+              });
+              this.uploadInProgress = false;
+            }}
+          />
         </div>
         <InputRow
           title="Name"
