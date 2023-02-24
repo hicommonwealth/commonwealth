@@ -11,6 +11,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import type { DropdownItemType } from 'views/components/component_kit/cw_dropdown';
 import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { notifyError } from 'controllers/app/notifications';
+import { CWDivider } from '../components/component_kit/cw_divider';
 
 export const displayOptions = [
   { value: '2', label: 'In Create Dropdown' },
@@ -149,10 +150,10 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     const { contractId, templateId } = vnode.attrs;
 
     const isEditMode = !!templateId;
-    const modalTitle = isEditMode ? 'Edit Template' : 'Add Template';
-    const modalSubtitle = isEditMode
-      ? 'Change the metadata associated with your template.'
-      : 'Add a template to contract for your community to use.';
+    const modalTitle = isEditMode
+      ? 'Edit Template Metadata'
+      : 'Connect Template';
+    const modalSubtitle = 'Select a template';
     const confirmButtonLabel = isEditMode ? 'Save' : 'Add';
 
     // disable if at least one input is not filled
@@ -176,24 +177,43 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
     return (
       <div class="ManageContractTemplateModal">
         <CWText type="h4">{modalTitle}</CWText>
-        <CWText type="b1" className="subtitle">
-          {modalSubtitle}
-        </CWText>
+        {!isEditMode && (
+          <CWText type="b1" className="subtitle">
+            {modalSubtitle}
+          </CWText>
+        )}
 
         <div className="form">
-          <CWText type="caption" fontWeight="medium" className="input-label">
-            Template
-          </CWText>
-          <CWDropdown
-            {...(isEditMode ? { containerClassName: 'disabled-dropdown' } : {})}
-            initialValue={initialTemplateName}
-            label="Choose a template for your proposal"
-            options={templateOptions}
-            onSelect={(item) =>
-              this.handleSelectTemplate(item, this.contractTemplates)
-            }
-          />
-          {isEditMode && (
+          {!isEditMode ? (
+            <>
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="input-label"
+              >
+                Template
+              </CWText>
+              <CWDropdown
+                {...(isEditMode
+                  ? { containerClassName: 'disabled-dropdown' }
+                  : {})}
+                initialValue={initialTemplateName}
+                label="Choose a template to base your proposal on"
+                options={templateOptions}
+                onSelect={(item) =>
+                  this.handleSelectTemplate(item, this.contractTemplates)
+                }
+              />
+            </>
+          ) : (
+            <CWTextInput
+              containerClassNamee="input-label"
+              disabled
+              value={initialTemplateName.label}
+              label="Template"
+            />
+          )}
+          {!isEditMode && (
             <CWText className="create-template-info" type="caption">
               Don’t see a template that fits your needs?
               <CWText
@@ -206,11 +226,15 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
               </CWText>
             </CWText>
           )}
+          <CWDivider className="divider" />
+          <CWText type="b1" className="subtitle">
+            Set metadata for template instance
+          </CWText>
           <CWText type="caption" fontWeight="medium" className="input-label">
             Display Name
           </CWText>
           <CWTextInput
-            label="An official name to identify this kind of template"
+            label="Give your template instance an official new name"
             value={this.form.displayName}
             placeholder="Enter display name"
             oninput={(e) => {
@@ -221,7 +245,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
             Nickname
           </CWText>
           <CWTextInput
-            label="A name that your community can easily remember and identify"
+            label="Give your template instance a name that your community can easily identify"
             value={this.form.nickname}
             placeholder="Enter nickname"
             oninput={(e) => {
@@ -232,6 +256,7 @@ export class ManageContractTemplateModal extends ClassComponent<ManageContractTe
             Slug
           </CWText>
           <CWTextInput
+            label="Last part of the URL address that serves as a unique identifier of this template"
             value={this.form.slug}
             placeholder="/placeholder-is-display-name-without-spaces"
             oninput={(e) => {

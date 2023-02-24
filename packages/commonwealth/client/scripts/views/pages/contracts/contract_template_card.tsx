@@ -13,6 +13,7 @@ import {
   displayOptions,
   showManageContractTemplateModal,
 } from 'views/modals/manage_contract_template_modal';
+import User from '../../components/widgets/user';
 
 type ContractTemplateCardAttrs = {
   contractId: number;
@@ -38,7 +39,6 @@ export class ContractTemplateCard extends ClassComponent<ContractTemplateCardAtt
   async handleEditTemplate(contractId, templateId, template) {
     try {
       const templates = await app.contracts.getTemplatesForContract(contractId);
-      console.log({ templates });
       showManageContractTemplateModal({
         contractId,
         templateId,

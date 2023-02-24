@@ -304,7 +304,10 @@ class ContractsController {
         type,
         abi: abiParsed,
         isFactory: is_factory,
+        hasGlobalTemplate: response.result.hasGlobalTemplate,
       });
+
+      console.log('result', response.result);
 
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
@@ -334,6 +337,10 @@ class ContractsController {
         template,
         contract_id,
       });
+
+      const contract = this._store.getById(contract_id);
+      this._store.remove(this._store.getById(contract_id));
+      this._store.add(new Contract({ ...contract, hasGlobalTemplate: true }));
     } catch (err) {
       console.log(err);
       throw new Error('Failed to create template');
@@ -501,11 +508,14 @@ class ContractsController {
           });
         }
 
+        console.log('contractWithTemplate', contractWithTemplate);
+
         this._store.add(
           Contract.fromJSON({
             ...contractWithTemplate.contract,
             abi: abiJson,
             ccts: ccts,
+            hasGlobalTemplate: contractWithTemplate.hasGlobalTemplate,
           })
         );
       } catch (e) {

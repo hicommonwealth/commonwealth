@@ -56,6 +56,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         Array<{
           contract: ContractInstance;
           ccts: Array<CommunityContractTemplateInstance>;
+          hasGlobalTemplate: boolean;
         }>,
         CommunityRoleInstance[]
       ]
@@ -211,6 +212,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         const contractsWithTemplates: Array<{
           contract: ContractInstance;
           ccts: Array<CommunityContractTemplateInstance>;
+          hasGlobalTemplate: boolean;
         }> = [];
         for (const cc of communityContracts) {
           const ccts = await models.CommunityContractTemplate.findAll({
@@ -234,7 +236,15 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
             ],
           });
 
-          contractsWithTemplates.push({ contract, ccts });
+          const globalTemplate = await models.Template.findOne({
+            where: {
+              abi_id: contract.abi_id,
+            },
+          });
+
+          const hasGlobalTemplate = !!globalTemplate;
+
+          contractsWithTemplates.push({ contract, ccts, hasGlobalTemplate });
         }
         resolve(contractsWithTemplates);
       } catch (e) {
@@ -261,7 +271,11 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
-        return { contract: c.contract.toJSON(), ccts: c.ccts };
+        return {
+          contract: c.contract.toJSON(),
+          ccts: c.ccts,
+          hasGlobalTemplate: c.hasGlobalTemplate,
+        };
       }),
       communityRoles: communityRoles.map((r) => r.toJSON()),
     },

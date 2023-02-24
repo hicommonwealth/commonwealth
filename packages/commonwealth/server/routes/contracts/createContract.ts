@@ -46,6 +46,7 @@ export type CreateContractReq = ContractAttributes &
 
 export type CreateContractResp = {
   contract: ContractAttributes;
+  hasGlobalTemplate?: boolean;
 };
 
 const createContract = async (
@@ -101,7 +102,16 @@ const createContract = async (
         contract_id: oldContract.id,
       },
     });
-    return success(res, { contract: oldContract.toJSON() });
+
+    const globalTemplate = await models.Template.findOne({
+      where: {
+        abi_id: oldContract.abi_id,
+      },
+    });
+    return success(res, {
+      contract: oldContract.toJSON(),
+      hasGlobalTemplate: !!globalTemplate,
+    });
   }
 
   // override provided URL for eth chains (typically ERC20) with stored, unless none found
@@ -157,7 +167,17 @@ const createContract = async (
         { transaction: t }
       );
     });
-    return success(res, { contract: contract.toJSON() });
+
+    const globalTemplate = await models.Template.findOne({
+      where: {
+        abi_id: contract.abi_id,
+      },
+    });
+
+    return success(res, {
+      contract: contract.toJSON(),
+      hasGlobalTemplate: !!globalTemplate,
+    });
   } else {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
@@ -180,7 +200,16 @@ const createContract = async (
         { transaction: t }
       );
     });
-    return success(res, { contract: contract.toJSON() });
+    const globalTemplate = await models.Template.findOne({
+      where: {
+        abi_id: contract.abi_id,
+      },
+    });
+
+    return success(res, {
+      contract: contract.toJSON(),
+      hasGlobalTemplate: !!globalTemplate,
+    });
   }
 };
 

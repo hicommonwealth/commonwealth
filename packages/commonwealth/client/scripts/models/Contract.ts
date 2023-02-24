@@ -29,6 +29,7 @@ class Contract {
       display_options: string;
     };
   }>;
+  public readonly hasGlobalTemplate: boolean;
 
   constructor({
     id,
@@ -44,6 +45,7 @@ class Contract {
     nickname,
     abi,
     ccts,
+    hasGlobalTemplate,
   }: {
     id: number;
     address: string;
@@ -70,6 +72,7 @@ class Contract {
         display_options: string;
       };
     }>;
+    hasGlobalTemplate?: boolean;
   }) {
     this.id = id;
     this.address = address;
@@ -84,6 +87,7 @@ class Contract {
     this.nickname = nickname;
     this.abi = abi;
     this.ccts = ccts;
+    this.hasGlobalTemplate = hasGlobalTemplate;
   }
 
   public static fromJSON({
@@ -100,6 +104,7 @@ class Contract {
     nickname,
     abi,
     ccts,
+    hasGlobalTemplate,
   }) {
     return new Contract({
       id,
@@ -115,6 +120,7 @@ class Contract {
       nickname,
       abi,
       ccts,
+      hasGlobalTemplate,
     });
   }
 }

@@ -20,6 +20,8 @@ type ContractCardAttrs = {
 };
 
 export class ContractCard extends ClassComponent<ContractCardAttrs> {
+  private globalTemplatesExist: boolean;
+
   handleDeleteContract(address: string, id: number) {
     showConfirmationModal({
       title: 'Delete Contract',
@@ -58,6 +60,12 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
     });
   }
 
+  oninit(vnode) {
+    const { address } = vnode.attrs;
+    this.globalTemplatesExist =
+      app.contracts.store.getContractByAddress(address).hasGlobalTemplate;
+  }
+
   view(vnode: m.Vnode<ContractCardAttrs>) {
     const { address, templates, id } = vnode.attrs;
 
@@ -77,24 +85,26 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
           />
         </div>
         <div className="templates">
-          <CWText type="caption" className="label">
-            Templates
-          </CWText>
           {templates?.length ? (
-            <div className="templates-container">
-              {templates.map((template) => (
-                <ContractTemplateCard
-                  contractId={id}
-                  id={template.id}
-                  title={template.cctmd.display_name}
-                  displayName={template.cctmd.display_name}
-                  nickname={template.cctmd.nickname}
-                  slug={template.cctmd.slug}
-                  display={template.cctmd.display_options}
-                  cctmd_id={template.cctmd.id}
-                />
-              ))}
-            </div>
+            <>
+              <CWText type="caption" className="label">
+                Templates
+              </CWText>
+              <div className="templates-container">
+                {templates.map((template) => (
+                  <ContractTemplateCard
+                    contractId={id}
+                    id={template.templateId}
+                    title={template.cctmd.display_name}
+                    displayName={template.cctmd.display_name}
+                    nickname={template.cctmd.nickname}
+                    slug={template.cctmd.slug}
+                    display={template.cctmd.display_options}
+                    cctmd_id={template.cctmd.id}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
             <div className="no-templates-container">
               <CWText className="no-templates-info" type="b1">
@@ -102,24 +112,26 @@ export class ContractCard extends ClassComponent<ContractCardAttrs> {
               </CWText>
             </div>
           )}
-          <CWButton
-            className="add-template-btn"
-            buttonType="tertiary-black"
-            label="Add Template"
-            iconLeft="plus"
-            onclick={() => this.handleAddTemplate(id)}
-          />
-          <CWText className="create-template-info" type="caption">
-            Don’t see a template that fits your needs?
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className="cta"
-              onclick={(e) => this.handleCreateNewTemplate(e, id)}
-            >
-              Create a New Template
+          {this.globalTemplatesExist ? (
+            <CWButton
+              className="add-template-btn"
+              buttonType="tertiary-black"
+              label="Connect Template"
+              iconLeft="plus"
+              onclick={() => this.handleAddTemplate(id)}
+            />
+          ) : (
+            <CWText className="create-template-info" type="caption">
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="cta"
+                onclick={(e) => this.handleCreateNewTemplate(e, id)}
+              >
+                Create a New Template
+              </CWText>
             </CWText>
-          </CWText>
+          )}
         </div>
       </CWCard>
     );
