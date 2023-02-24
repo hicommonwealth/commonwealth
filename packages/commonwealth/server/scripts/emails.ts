@@ -199,11 +199,12 @@ export type ThreadData = {
 };
 
 export type CommunityDigestInfo = {
-  community_id: string;
-  community_name: string;
-  community_icon: string;
-  topThreads: ThreadData[];
-  activityScore: number;
+  [communityId: string]: {
+    community_name: string;
+    community_icon: string;
+    topThreads: ThreadData[];
+    activityScore: number;
+  };
 };
 
 export const getTopThreads = async (
@@ -267,23 +268,39 @@ export const emailDigestBuilder = async (models: DB) => {
   // Go through each community on CW
   const communities = await models.Chain.findAll();
 
-  const communityDigestInfo: CommunityDigestInfo[] = [];
+  const communityDigestInfo: CommunityDigestInfo = {};
 
+  console.log('Starting community digest builder...');
   for (const community of communities) {
     // if community includes a ' character skip it- SQL queries break and these are fake communities
     if (community.id.includes("'")) continue;
 
-    const topThreads = await getTopThreads(models, community.id);
+    try {
+      const topThreads = await getTopThreads(models, community.id);
 
-    const activityScore = await getCommunityActivityScore(models, community.id);
+      const activityScore = await getCommunityActivityScore(
+        models,
+        community.id
+      );
 
-    communityDigestInfo.push({
-      community_id: community.id,
-      community_name: community.name,
-      community_icon: community.icon_url,
-      topThreads,
-      activityScore,
-    });
+      communityDigestInfo[community.id] = {
+        community_name: community.name,
+        community_icon: community.icon_url,
+        topThreads,
+        activityScore,
+      };
+    } catch (e) {
+      console.log(e);
+      console.log("couldn't get top threads for community", community.id);
+    }
+  }
+
+  const usersWithEmailDigestOn = await models.User.findAll({
+    where: { emailNotificationInterval: 'weekly' },
+  });
+
+  for (const user of usersWithEmailDigestOn) {
+    const memberOfCommunities = await models.Chain.findAll({ where: {} });
   }
 
   return communityDigestInfo;

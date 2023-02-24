@@ -130,7 +130,7 @@ export class ComponentShowcase extends ClassComponent {
               const res = await $.post(`${app.serverUrl()}/runDigestScript`, {
                 id: 'lol',
               });
-              console.log(res.result);
+              console.log('huh', res.result);
             }}
           />
           <CWText type="h4">Content Page Card</CWText>
