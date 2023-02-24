@@ -127,7 +127,10 @@ export class ComponentShowcase extends ClassComponent {
           <CWButton
             label="run"
             onclick={async () => {
-              await $.post(`${app.serverUrl()}/runDigestScript`, { id: 'lol' });
+              const res = await $.post(`${app.serverUrl()}/runDigestScript`, {
+                id: 'lol',
+              });
+              console.log(res.result);
             }}
           />
           <CWText type="h4">Content Page Card</CWText>
