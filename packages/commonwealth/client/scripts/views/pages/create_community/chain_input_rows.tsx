@@ -2,13 +2,12 @@ import React from 'react';
 
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { ChainBase } from 'common-common/src/types';
+// import { ChainBase } from 'common-common/src/types';
+// import { CommunityType } from '.';
 
 import app from 'state';
 import { AvatarUpload } from 'views/components/avatar_upload';
-
 import { InputRow } from 'views/components/metadata_rows';
-import { CommunityType } from '.';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWLabel } from '../../components/component_kit/cw_label';
@@ -50,8 +49,21 @@ export const defaultChainRows = <T extends UseChainFormDefaultFieldsHookType>(
       />
       <div className="AvatarUploadRow">
         <CWLabel label="Upload Icon" />
-        {/* fully deleted because regex made commenting it out
-        impossible, can restore from master whenever */}
+        <AvatarUpload
+          scope="community"
+          uploadStartedCallback={() => {
+            state.uploadInProgress = true;
+          }}
+          uploadCompleteCallback={(files) => {
+            files.forEach((f) => {
+              if (!f.uploadURL) return;
+              const url = f.uploadURL.replace(/\?.*/, '');
+              state.iconUrl = url;
+            });
+
+            state.uploadInProgress = false;
+          }}
+        />
       </div>
       <InputRow
         title="Icon URL"

@@ -15,11 +15,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import type { ChainInfo, RoleInfo } from 'models';
-import {
-  Action,
-  PermissionManager,
-  ToCheck,
-} from 'permissions';
+import { Action, PermissionManager, ToCheck } from 'permissions';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -344,20 +340,23 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="tag-row">
           <CWLabel label="Community Tags" />
           <div className="tag-group">
-            {this.selectedTags && Object.keys(this.selectedTags).map((key) => {
-              return (
-                <CWButton
-                  key={key}
-                  label={key}
-                  buttonType={
-                    this.selectedTags[key] ? 'primary-black' : 'secondary-black'
-                  }
-                  onClick={() => {
-                    this.selectedTags[key] = !this.selectedTags[key];
-                  }}
-                />
-              );
-            })}
+            {this.selectedTags &&
+              Object.keys(this.selectedTags).map((key) => {
+                return (
+                  <CWButton
+                    key={key}
+                    label={key}
+                    buttonType={
+                      this.selectedTags[key]
+                        ? 'primary-black'
+                        : 'secondary-black'
+                    }
+                    onClick={() => {
+                      this.selectedTags[key] = !this.selectedTags[key];
+                    }}
+                  />
+                );
+              })}
           </div>
         </div>
 
