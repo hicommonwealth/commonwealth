@@ -4,8 +4,6 @@ import { useLocation } from 'react-router-dom';
 import 'components/sidebar/index.scss';
 
 import app from 'state';
-import { Action } from 'permissions';
-import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { AdminSection } from './admin_section';
@@ -37,22 +35,7 @@ export const Sidebar = () => {
     };
   });
 
-  const activeAddressRoles = app.roles.getAllRolesInCommunity({
-    chain: app.activeChainId(),
-  });
-
-  const currentChainInfo = app.chain?.meta;
-
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
-
-  const hideChat =
-    !currentChainInfo ||
-    !activeAddressRoles ||
-    !isActiveAddressPermitted(
-      activeAddressRoles,
-      currentChainInfo,
-      Action.VIEW_CHAT_CHANNELS
-    );
 
   const isAdmin =
     app.user.isSiteAdmin ||
@@ -86,7 +69,6 @@ export const Sidebar = () => {
               )}
               <DiscussionSection />
               <GovernanceSection />
-              {/* app.socket && !hideChat && <ChatSection /> */}
               <ExternalLinksModule />
               <div className="buttons-container">
                 {app.isLoggedIn() && app.chain && (

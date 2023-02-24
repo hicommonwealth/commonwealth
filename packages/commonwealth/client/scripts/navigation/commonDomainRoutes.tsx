@@ -12,7 +12,6 @@ const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(() => import('views/pages/members'));
-const ChatPage = lazy(() => import('views/pages/chat'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
@@ -27,7 +26,9 @@ const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
-const DiscussionsPage = lazy(() => import('views/pages/discussions/DiscussionsPage'));
+const DiscussionsPage = lazy(
+  () => import('views/pages/discussions/DiscussionsPage')
+);
 const ViewThreadPage = lazy(() => import('views/pages/view_thread/index'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
@@ -116,13 +117,6 @@ const getCommonDomainsRoutes = () => (
     <Route
       path="/:scope/members"
       element={withLayout(MembersPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/chat/:channel"
-      element={withLayout(ChatPage, {
         scoped: true,
         deferChain: true,
       })}
