@@ -137,6 +137,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                 }, 250);
               }}
             />
+            {/*// TODO*/}
             {/* {m(QueryList, {
               filterable: false,
               checkmark: true,
