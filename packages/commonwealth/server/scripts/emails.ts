@@ -8,7 +8,8 @@ import { Label as ChainEventLabel } from 'chain-events/src';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
+import type { DB } from '../models';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import type { IPostNotificationData } from '../../shared/types';
 import { DynamicTemplate } from '../../shared/types';
@@ -186,4 +187,45 @@ export const sendBatchedNotificationEmails = async (
     console.log(e.message);
     return 1;
   }
+};
+
+export const emailDigestBuilder = async (models: DB) => {
+  // Go through each community on CW
+  const communities = await models.Chain.findOne({ where: { id: 'dydx' } });
+
+  if (!communities) {
+    console.log('No communities found');
+    return [];
+  }
+
+  const threads = await models.sequelize.query(`SELECT 
+          t.title,
+          SUBSTRING(t.body, 1, 300) AS body,
+          COUNT(DISTINCT c.id) AS comment_count,
+          COUNT(DISTINCT r.id) AS view_count,
+          a.address AS author_address,
+          t.id AS thread_id
+        FROM 
+          "Threads" t
+          LEFT JOIN "Comments" c ON t.id = CAST(substring(c.root_id from '[0-9]+$') AS INTEGER)
+          LEFT JOIN "Reactions" r ON t.id = r.thread_id
+          INNER JOIN "Addresses" a ON t.address_id = a.id
+        WHERE 
+          t.chain='${communities.id}' AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
+        GROUP BY 
+          t.id, a.address
+        ORDER BY 
+          0.6 * COUNT(DISTINCT c.id) + 0.4 * COUNT(DISTINCT r.id) DESC
+        LIMIT 3;`);
+
+  // const result = threads.map((thread) => ({
+  //   id: thread.id,
+  //   title: thread.title,
+  //   body: thread.body.slice(0, 300),
+  //   comment_count: thread.getDataValue('comment_count'),
+  //   view_count: thread.getDataValue('view_count'),
+  //   author_address: thread.address_id,
+  // }));
+
+  return threads;
 };

@@ -36,6 +36,8 @@ import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
 import type { ValidationStatus } from './cw_validation_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
+import $ from 'jquery';
+import app from 'state';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, _]) => {
@@ -122,6 +124,12 @@ export class ComponentShowcase extends ClassComponent {
           />
         </div> */}
         <div class="basic-gallery">
+          <CWButton
+            label="run"
+            onclick={async () => {
+              await $.post(`${app.serverUrl()}/runDigestScript`, { id: 'lol' });
+            }}
+          />
           <CWText type="h4">Content Page Card</CWText>
           <CWContentPageCard
             header="Information"
