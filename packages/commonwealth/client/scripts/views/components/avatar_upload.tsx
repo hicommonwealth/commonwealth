@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
-import $ from 'jquery';
 
 import 'components/avatar_upload.scss';
 
@@ -51,26 +51,27 @@ export const AvatarUpload = ({
         )
       );
     },
-    onDropAccepted: (acceptedFiles: any) => {
-      $.post(`${app.serverUrl()}/getUploadSignature`, {
-        name: acceptedFiles[0].name, // imageName.png
-        mimetype: acceptedFiles[0].type, // image/png
-        auth: true,
-        jwt: app.user.jwt,
-      })
-        .then((response) => {
-          acceptedFiles[0].uploadURL = response.result;
-
-          if (uploadCompleteCallback) {
-            uploadCompleteCallback(acceptedFiles);
+    onDropAccepted: async (acceptedFiles: any) => {
+      try {
+        const response = await axios.post(
+          `${app.serverUrl()}/getUploadSignature`,
+          {
+            name: acceptedFiles[0].name, // imageName.png
+            mimetype: acceptedFiles[0].type, // image/png
+            auth: true,
+            jwt: app.user.jwt,
           }
-        })
-        .catch((err: any) => {
-          notifyError(
-            'Failed to get an S3 signed upload URL',
-            err.responseJSON ? err.responseJSON.error : err.responseText
-          );
-        });
+        );
+
+        if (uploadCompleteCallback) {
+          uploadCompleteCallback([response]);
+        }
+      } catch (e) {
+        notifyError(
+          'Failed to get an S3 signed upload URL',
+          e.responseJSON ? e.responseJSON.error : e.responseText
+        );
+      }
     },
   });
 
