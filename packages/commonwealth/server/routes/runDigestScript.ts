@@ -7,7 +7,7 @@ import type { DB } from '../models';
 const runDigestScript = async (
   models: DB,
   req: TypedRequestBody<{ id: string }>,
-  res: TypedResponse<{ data: CommunityDigestInfo }>
+  res: TypedResponse<{ data: Array<any> }>
 ) => {
   const digestInfo = await emailDigestBuilder(models);
   return success(res, { data: digestInfo });

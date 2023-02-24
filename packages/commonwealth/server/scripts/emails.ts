@@ -295,13 +295,42 @@ export const emailDigestBuilder = async (models: DB) => {
     }
   }
 
+  console.log('Finished community digest builder...');
+
   const usersWithEmailDigestOn = await models.User.findAll({
     where: { emailNotificationInterval: 'weekly' },
   });
 
+  const allEmailObjects = [];
+
+  console.log('Starting email generation...');
+
   for (const user of usersWithEmailDigestOn) {
-    const memberOfCommunities = await models.Chain.findAll({ where: {} });
+    const emailObject = []; // TODO: Decide what this looks like
+    const userAddresses = await models.Address.findAll({
+      where: {
+        user_id: user.id,
+      },
+    });
+
+    const userCommunities = userAddresses.reduce((acc, address) => {
+      if (address.chain && !acc.includes(address.chain)) {
+        acc.push(address.chain);
+      }
+      return acc;
+    }, [] as string[]);
+
+    for (const chain_id of userCommunities) {
+      const communityDigest = communityDigestInfo[chain_id];
+      if (!communityDigest || communityDigest.topThreads.length < 1) continue;
+      emailObject.push(communityDigest);
+    }
+
+    // Fire off Email?
+    allEmailObjects.push(
+      emailObject.sort((a, b) => b.activityScore - a.activityScore)
+    );
   }
 
-  return communityDigestInfo;
+  return allEmailObjects;
 };
