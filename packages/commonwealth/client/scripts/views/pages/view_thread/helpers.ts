@@ -3,7 +3,6 @@ import type { Poll } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const handlePollVote = async (
@@ -36,10 +35,10 @@ export const handlePollVote = async (
       callback();
       redraw();
     })
-    .catch(async () => {
-      await alertModalWithText(
+    .catch(() => {
+      window.confirm(
         'Error submitting vote. Maybe the poll has already ended?'
-      )();
+      );
     });
 };
 
