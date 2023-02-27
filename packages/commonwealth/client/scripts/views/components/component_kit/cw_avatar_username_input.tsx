@@ -51,7 +51,7 @@ export const CWAvatarUsernameInput = (props: AvatarUsernameInputProps) => {
             }
 
             const url = f.uploadURL.replace(/\?.*/, '');
-            onAvatarChangeHandler(url.trim);
+            onAvatarChangeHandler(url.trim());
           });
         }}
       />
