@@ -474,50 +474,50 @@ export const LoginSelector = () => {
 
   return (
     <>
-      <ClickAwayListener
-        onClickAway={() => {
-          leftMenuProps.setAnchorEl(null);
-          rightMenuProps.setAnchorEl(null);
-        }}
-      >
-        <div className="LoginSelector">
-          {app.chain &&
-            !app.chainPreloading &&
-            profileLoadComplete &&
-            !app.user.activeAccount && (
-              <div className="join-button-container">
-                <CWButton
-                  buttonType="tertiary-black"
-                  onClick={async () => {
-                    if (hasTermsOfService) {
-                      setIsTOSModalOpen(true);
-                    } else {
-                      await performJoinCommunityLinking();
-                    }
-                  }}
-                  label={
-                    sameBaseAddressesRemoveDuplicates.length === 0
-                      ? `No ${
-                          CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                          CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                          ''
-                        } address`
-                      : 'Join'
+      <div className="LoginSelector">
+        {app.chain &&
+          !app.chainPreloading &&
+          profileLoadComplete &&
+          !app.user.activeAccount && (
+            <div className="join-button-container">
+              <CWButton
+                buttonType="tertiary-black"
+                onClick={async () => {
+                  if (hasTermsOfService) {
+                    setIsTOSModalOpen(true);
+                  } else {
+                    await performJoinCommunityLinking();
                   }
-                />
-              </div>
-            )}
-          {app.chain &&
-            !app.chainPreloading &&
-            profileLoadComplete &&
-            app.user.activeAccount && (
-              <>
+                }}
+                label={
+                  sameBaseAddressesRemoveDuplicates.length === 0
+                    ? `No ${
+                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                        ''
+                      } address`
+                    : 'Join'
+                }
+              />
+            </div>
+          )}
+        {app.chain &&
+          !app.chainPreloading &&
+          profileLoadComplete &&
+          app.user.activeAccount && (
+            <ClickAwayListener
+              onClickAway={() => {
+                leftMenuProps.setAnchorEl(null);
+              }}
+            >
+              <div className="button-container">
                 <div
                   className="left-button"
                   onClick={leftMenuProps.handleInteraction}
                 >
                   <User user={app.user.activeAccount} />
                 </div>
+
                 <Popover
                   content={
                     <LoginSelectorMenuLeft
@@ -527,20 +527,28 @@ export const LoginSelector = () => {
                   }
                   {...leftMenuProps}
                 />
-              </>
-            )}
-          <div
-            className="right-button"
-            onClick={rightMenuProps.handleInteraction}
-          >
-            <CWIconButton iconName="person" iconButtonTheme="black" />
+              </div>
+            </ClickAwayListener>
+          )}
+        <ClickAwayListener
+          onClickAway={() => {
+            rightMenuProps.setAnchorEl(null);
+          }}
+        >
+          <div className="button-container">
+            <div
+              className="right-button"
+              onClick={rightMenuProps.handleInteraction}
+            >
+              <CWIconButton iconName="person" iconButtonTheme="black" />
+            </div>
+            <Popover
+              content={<LoginSelectorMenuRight onLogout={onLogout} />}
+              {...rightMenuProps}
+            />
           </div>
-          <Popover
-            content={<LoginSelectorMenuRight onLogout={onLogout} />}
-            {...rightMenuProps}
-          />
-        </div>
-      </ClickAwayListener>
+        </ClickAwayListener>
+      </div>
       <Modal
         content={
           <AccountSelector
