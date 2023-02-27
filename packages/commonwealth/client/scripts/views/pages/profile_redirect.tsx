@@ -17,8 +17,8 @@ class ProfileRedirect extends ClassComponent {
     this.loading = true;
     try {
       const res = await $.post(`${app.serverUrl()}/getAddressProfile`, {
-        address: address ? address : app.user.activeAccount?.address,
-        chain: chain ? chain : app.activeChainId(),
+        address,
+        chain,
       });
       if (res.status === 'Success' && res.result) {
         this.profileId = res.result.profileId;
@@ -27,6 +27,13 @@ class ProfileRedirect extends ClassComponent {
       this.error = true;
     }
     this.loading = false;
+    m.redraw();
+  }
+
+  oninit() {
+    this.profileId = null;
+    this.loading = false;
+    this.error = false;
   }
 
   view(vnode) {

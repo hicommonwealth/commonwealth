@@ -301,6 +301,17 @@ const getCustomDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
+  '/:scope/account/:address': importRoute(
+    import('views/pages/profile_redirect'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
+  '/:scope/account': importRoute(import('views/pages/profile_redirect'), {
+    scoped: true,
+    deferChain: true,
+  }),
 
   // Governance
   '/referenda': importRoute(import('views/pages/referenda'), {
@@ -397,12 +408,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
   '/:scope/chat/:channel': redirectRoute((attrs) => `/chat/${attrs.channel}`),
   '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
-  '/:scope/account/:address': redirectRoute(
-    (attrs) => `/account/${attrs.address}/`
-  ),
-  '/:scope/account': redirectRoute(() =>
-    app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
-  ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
   '/:scope/delegate': redirectRoute(() => '/delegate'),
