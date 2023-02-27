@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { initAppState } from 'state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -473,66 +474,73 @@ export const LoginSelector = () => {
 
   return (
     <>
-      <div className="LoginSelector">
-        {app.chain &&
-          !app.chainPreloading &&
-          profileLoadComplete &&
-          !app.user.activeAccount && (
-            <div className="join-button-container">
-              <CWButton
-                buttonType="tertiary-black"
-                onClick={async () => {
-                  if (hasTermsOfService) {
-                    setIsTOSModalOpen(true);
-                  } else {
-                    await performJoinCommunityLinking();
+      <ClickAwayListener
+        onClickAway={() => {
+          leftMenuProps.setAnchorEl(null);
+          rightMenuProps.setAnchorEl(null);
+        }}
+      >
+        <div className="LoginSelector">
+          {app.chain &&
+            !app.chainPreloading &&
+            profileLoadComplete &&
+            !app.user.activeAccount && (
+              <div className="join-button-container">
+                <CWButton
+                  buttonType="tertiary-black"
+                  onClick={async () => {
+                    if (hasTermsOfService) {
+                      setIsTOSModalOpen(true);
+                    } else {
+                      await performJoinCommunityLinking();
+                    }
+                  }}
+                  label={
+                    sameBaseAddressesRemoveDuplicates.length === 0
+                      ? `No ${
+                          CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                          CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                          ''
+                        } address`
+                      : 'Join'
                   }
-                }}
-                label={
-                  sameBaseAddressesRemoveDuplicates.length === 0
-                    ? `No ${
-                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                        ''
-                      } address`
-                    : 'Join'
-                }
-              />
-            </div>
-          )}
-        {app.chain &&
-          !app.chainPreloading &&
-          profileLoadComplete &&
-          app.user.activeAccount && (
-            <>
-              <div
-                className="left-button"
-                onClick={leftMenuProps.handleInteraction}
-              >
-                <User user={app.user.activeAccount} />
+                />
               </div>
-              <Popover
-                content={
-                  <LoginSelectorMenuLeft
-                    activeAddressesWithRole={activeAddressesWithRole}
-                    nAccountsWithoutRole={nAccountsWithoutRole}
-                  />
-                }
-                {...leftMenuProps}
-              />
-            </>
-          )}
-        <div
-          className="right-button"
-          onClick={rightMenuProps.handleInteraction}
-        >
-          <CWIconButton iconName="person" iconButtonTheme="black" />
+            )}
+          {app.chain &&
+            !app.chainPreloading &&
+            profileLoadComplete &&
+            app.user.activeAccount && (
+              <>
+                <div
+                  className="left-button"
+                  onClick={leftMenuProps.handleInteraction}
+                >
+                  <User user={app.user.activeAccount} />
+                </div>
+                <Popover
+                  content={
+                    <LoginSelectorMenuLeft
+                      activeAddressesWithRole={activeAddressesWithRole}
+                      nAccountsWithoutRole={nAccountsWithoutRole}
+                    />
+                  }
+                  {...leftMenuProps}
+                />
+              </>
+            )}
+          <div
+            className="right-button"
+            onClick={rightMenuProps.handleInteraction}
+          >
+            <CWIconButton iconName="person" iconButtonTheme="black" />
+          </div>
+          <Popover
+            content={<LoginSelectorMenuRight onLogout={onLogout} />}
+            {...rightMenuProps}
+          />
         </div>
-        <Popover
-          content={<LoginSelectorMenuRight onLogout={onLogout} />}
-          {...rightMenuProps}
-        />
-      </div>
+      </ClickAwayListener>
       <Modal
         content={
           <AccountSelector
