@@ -13,95 +13,6 @@ import { AdminPanelTabs } from './admin_panel_tabs';
 import { ChainMetadataRows } from './chain_metadata_rows';
 import { sortAdminsAndModsFirst } from './helpers';
 
-const ManageCommunityPage = () => {
-  const [initialized, setInitialized] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [roleData, setRoleData] = useState([]);
-  const [webhooks, setWebhooks] = useState([]);
-  const [admins, setAdmins] = useState([]);
-  const [mods, setMods] = useState([]);
-
-  useEffect(() => {
-      if (!app.activeChainId()) {
-        return;
-      }
-
-      setIsAdmin(
-        app.user.isSiteAdmin ||
-        app.roles.isAdminOfEntity({
-          chain: app.activeChainId(),
-        })
-      );
-
-      const chainOrCommObj = { chain: app.activeChainId() };
-      Promise.all([
-        // TODO: Change to GET /members
-        $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj),
-        // TODO: Change to GET /webhooks
-        $.get(`${app.serverUrl()}/getWebhooks`, { ...chainOrCommObj, auth: true, jwt: app.user.jwt })
-      ]).then(([bulkMembers, webhooksResp]) => {
-        if (bulkMembers.status !== 'Success') {
-          throw new Error('Could not fetch members');
-        }
-
-        if (webhooksResp.status !== 'Success') {
-          throw new Error('Could not fetch community webhooks');
-        }
-
-        setWebhooks(webhooksResp);
-
-        const memberAdmins = [];
-        const memberMods = [];
-
-        if (bulkMembers?.length > 0) {
-          bulkMembers.sort(sortAdminsAndModsFirst).forEach((role) => {
-            if (role.permission === AccessLevel.Admin) {
-              memberAdmins.push(role);
-            } else if (role.permission === AccessLevel.Moderator) {
-              memberMods.push(role);
-            }
-          });
-        }
-
-        setAdmins(memberAdmins);
-        setMods(memberMods);
-
-        setRoleData(bulkMembers);
-        setInitialized(true);
-      }).catch(() => {
-        setRoleData([]);
-        setWebhooks([]);
-        setInitialized(true);
-      });
-
-    },
-    []);
-
-  if (!initialized) return <PageLoading/>;
-  if (!isAdmin) return <ErrorPage message={'Must be admin'}/>;
-
-  return <Sublayout
-    // title="Manage Community"
-  >
-    <div className="ManageCommunityPage">
-      <ChainMetadataRows
-        admins={admins}
-        chain={app.config.chains.getById(app.activeChainId())}
-        mods={mods}
-        onRoleUpdate={(oldRole, newRole) => onRoleUpdate(oldRole, newRole, (r) => setRoleData(r), roleData)}
-        onSave={() => {
-          setAdmins(admins); // dummy state update to make react refresh
-        }}
-      />
-      <AdminPanelTabs
-        onRoleUpgrade={(oldRole, newRole) => onRoleUpdate(oldRole, newRole, (r) => setRoleData(r), roleData)}
-        roleData={roleData}
-        webhooks={webhooks}
-      />
-    </div>
-  </Sublayout>;
-};
-
 const onRoleUpdate = (oldRole, newRole, setRoleData, roleData) => {
   // newRole doesn't have the Address property that oldRole has,
   // Add the missing Address property to the newRole, then splice it into the array.
@@ -140,6 +51,103 @@ const onRoleUpdate = (oldRole, newRole, setRoleData, roleData) => {
       )
     );
   }
+};
+
+const ManageCommunityPage = () => {
+  const [initialized, setInitialized] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [roleData, setRoleData] = useState([]);
+  const [webhooks, setWebhooks] = useState([]);
+  const [admins, setAdmins] = useState([]);
+  const [mods, setMods] = useState([]);
+
+  useEffect(() => {
+    if (!app.activeChainId()) {
+      return;
+    }
+
+    setIsAdmin(
+      app.user.isSiteAdmin ||
+        app.roles.isAdminOfEntity({
+          chain: app.activeChainId(),
+        })
+    );
+
+    const chainOrCommObj = { chain: app.activeChainId() };
+    Promise.all([
+      // TODO: Change to GET /members
+      $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj),
+      // TODO: Change to GET /webhooks
+      $.get(`${app.serverUrl()}/getWebhooks`, {
+        ...chainOrCommObj,
+        auth: true,
+        jwt: app.user.jwt,
+      }),
+    ])
+      .then(([bulkMembers, webhooksResp]) => {
+        if (bulkMembers.status !== 'Success') {
+          throw new Error('Could not fetch members');
+        }
+
+        if (webhooksResp.status !== 'Success') {
+          throw new Error('Could not fetch community webhooks');
+        }
+
+        setWebhooks(webhooksResp);
+
+        const memberAdmins = [];
+        const memberMods = [];
+
+        if (bulkMembers?.length > 0) {
+          bulkMembers.sort(sortAdminsAndModsFirst).forEach((role) => {
+            if (role.permission === AccessLevel.Admin) {
+              memberAdmins.push(role);
+            } else if (role.permission === AccessLevel.Moderator) {
+              memberMods.push(role);
+            }
+          });
+        }
+
+        setAdmins(memberAdmins);
+        setMods(memberMods);
+
+        setRoleData(bulkMembers.result);
+        setInitialized(true);
+      })
+      .catch(() => {
+        setRoleData([]);
+        setWebhooks([]);
+        setInitialized(true);
+      });
+  }, []);
+
+  if (!initialized) return <PageLoading />;
+  if (!isAdmin) return <ErrorPage message={'Must be admin'} />;
+
+  return (
+    <Sublayout>
+      <div className="ManageCommunityPage">
+        <ChainMetadataRows
+          admins={admins}
+          chain={app.config.chains.getById(app.activeChainId())}
+          mods={mods}
+          onRoleUpdate={(oldRole, newRole) =>
+            onRoleUpdate(oldRole, newRole, (r) => setRoleData(r), roleData)
+          }
+          onSave={() => {
+            setAdmins(admins); // dummy state update to make react refresh
+          }}
+        />
+        <AdminPanelTabs
+          onRoleUpgrade={(oldRole, newRole) =>
+            onRoleUpdate(oldRole, newRole, (r) => setRoleData(r), roleData)
+          }
+          roleData={roleData}
+          webhooks={webhooks}
+        />
+      </div>
+    </Sublayout>
+  );
 };
 
 export default ManageCommunityPage;
