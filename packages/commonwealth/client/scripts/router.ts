@@ -1,10 +1,6 @@
-import { alertModalWithText } from 'views/modals/alert_modal';
 import app from 'state';
 import { ChainType } from 'common-common/src/types';
-import {
-  APPLICATION_UPDATE_ACTION,
-  APPLICATION_UPDATE_MESSAGE,
-} from 'helpers/constants';
+import { APPLICATION_UPDATE_MESSAGE } from 'helpers/constants';
 import {
   _DEPRECATED_getRoute,
   _DEPRECATED_getSearchParams,
@@ -171,10 +167,7 @@ const renderRoute = (
         console.error(err);
 
         if (err.name === 'ChunkLoadError') {
-          alertModalWithText(
-            APPLICATION_UPDATE_MESSAGE,
-            APPLICATION_UPDATE_ACTION
-          )();
+          window.confirm(APPLICATION_UPDATE_MESSAGE);
         }
 
         // return to the last page, if it was on commonwealth

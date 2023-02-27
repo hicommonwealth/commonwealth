@@ -30,7 +30,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 import { EditBody } from './edit_body';
@@ -40,6 +39,7 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { useCommonNavigate } from 'navigation/helpers';
+import { Modal } from '../../components/component_kit/cw_modal';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -74,6 +74,10 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   const [initializedComments, setInitializedComments] =
     useState<boolean>(false);
   const [initializedPolls, setInitializedPolls] = useState<boolean>(false);
+  const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] =
+    React.useState<boolean>(false);
+  const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
+    React.useState<boolean>(false);
 
   // editorListener(e) {
   //   if (this.isGloballyEditing || activeQuillEditorHasText()) {
@@ -487,13 +491,10 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
 
                 if (savedEdits) {
                   clearEditingLocalStorage(thread.id, ContentType.Thread);
-                  setShouldRestoreEdits(
-                    await confirmationModalWithText(
-                      'Previous changes found. Restore edits?',
-                      'Yes',
-                      'No'
-                    )()
+                  const confirmation = window.confirm(
+                    'Previous changes found. Restore edits?'
                   );
+                  setShouldRestoreEdits(confirmation);
                 }
 
                 setIsGloballyEditing(true);
@@ -509,12 +510,8 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
               iconLeft: 'write' as const,
               onClick: async (e) => {
                 e.preventDefault();
-                app.modals.create({
-                  modal: EditCollaboratorsModal,
-                  data: {
-                    thread,
-                  },
-                });
+
+                setIsEditCollaboratorsModalOpen(true);
               },
             },
           ]
@@ -526,16 +523,8 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
               iconLeft: 'write' as const,
               onClick: (e) => {
                 e.preventDefault();
-                app.modals.create({
-                  modal: ChangeTopicModal,
-                  data: {
-                    onChangeHandler: (topic: Topic) => {
-                      thread.topic = topic;
-                      setThread(thread);
-                    },
-                    thread,
-                  },
-                });
+
+                setIsChangeTopicModalOpen(true);
               },
             },
           ]
@@ -548,9 +537,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
               onClick: async (e) => {
                 e.preventDefault();
 
-                const confirmed = await confirmationModalWithText(
-                  'Delete this entire thread?'
-                )();
+                const confirmed = window.confirm('Delete this entire thread?');
 
                 if (!confirmed) return;
 
@@ -751,6 +738,30 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
               : []),
           ] as SidebarComponents
         }
+      />
+      <Modal
+        content={
+          <ChangeTopicModal
+            onChangeHandler={(topic: Topic) => {
+              thread.topic = topic;
+              setThread(thread);
+            }}
+            thread={thread}
+            onModalClose={() => setIsChangeTopicModalOpen(false)}
+          />
+        }
+        onClose={() => setIsChangeTopicModalOpen(false)}
+        open={isChangeTopicModalOpen}
+      />
+      <Modal
+        content={
+          <EditCollaboratorsModal
+            onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
+            thread={thread}
+          />
+        }
+        onClose={() => setIsEditCollaboratorsModalOpen(false)}
+        open={isEditCollaboratorsModalOpen}
       />
     </Sublayout>
   );

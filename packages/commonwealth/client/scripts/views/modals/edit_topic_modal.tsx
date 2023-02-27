@@ -10,7 +10,6 @@ import { Topic } from 'models';
 import app from 'state';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -206,10 +205,10 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
             disabled={isSaving}
             onClick={async (e) => {
               e.preventDefault();
-              const confirmed = await confirmationModalWithText(
-                'Delete this topic?'
-              )();
+              const confirmed = window.confirm('Delete this topic?');
+
               if (!confirmed) return;
+
               deleteTopic()
                 .then(() => {
                   $(e.target).trigger('modalexit');

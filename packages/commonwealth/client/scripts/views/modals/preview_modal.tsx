@@ -1,25 +1,28 @@
 import React from 'react';
 
 import 'modals/preview_modal.scss';
-import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 
+import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 type PreviewModalProps = {
   doc: string;
+  onModalClose: () => void;
   title: string;
 };
 
-export const PreviewModal = (props: PreviewModalProps) => {
-  const { doc, title } = props;
-
+export const PreviewModal = ({
+  doc,
+  onModalClose,
+  title,
+}: PreviewModalProps) => {
   return (
     <div className="PreviewModal">
       <div className="compact-modal-title">
         <h3>{title ? `Preview: ${title}` : 'Preview'}</h3>
-        <ModalExitButton />
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
         {(() => {

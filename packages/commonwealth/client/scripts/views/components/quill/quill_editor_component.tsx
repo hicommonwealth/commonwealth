@@ -7,7 +7,6 @@ import 'components/quill/quill_editor.scss';
 import $ from 'jquery';
 
 import app from 'state';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { PreviewModal } from 'views/modals/preview_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
@@ -108,9 +107,9 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
     if (this.editor.contents.ops.length === this.defaultContents.ops.length) {
       confirmed = true;
     } else {
-      confirmed = await confirmationModalWithText(
+      confirmed = window.confirm(
         'All formatting and images will be lost. Continue?'
-      )();
+      );
     }
 
     if (!confirmed) {
@@ -225,15 +224,8 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
           iconButtonTheme="primary"
           onClick={(e) => {
             e.preventDefault();
-            app.modals.create({
-              modal: PreviewModal,
-              data: {
-                doc:
-                  this.activeMode === 'markdown'
-                    ? this.editor.text
-                    : JSON.stringify(this.editor.contents),
-              },
-            });
+            // @REACT @TODO: Re-add PreviewModal using new pattern
+            return null;
           }}
         />
       </div>

@@ -8,7 +8,6 @@ import type { SocialAccount } from 'models';
 import 'pages/settings/email_section.scss';
 
 import app from 'state';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -60,9 +59,9 @@ export const EmailSection = () => {
             onClick={async () => {
               setErrorMessage(null);
 
-              const confirmed = await confirmationModalWithText(
+              const confirmed = window.confirm(
                 'You will be required to confirm your new email address. Continue?'
-              )();
+              );
 
               if (!confirmed) return;
 

@@ -1,5 +1,3 @@
-import type { ModalStore } from 'controllers/app/modals';
-import { getModalStore } from 'controllers/app/modals';
 import type { ToastStore } from 'controllers/app/toasts';
 import { getToastStore } from 'controllers/app/toasts';
 import ChainEntityController from 'controllers/server/chain_entities';
@@ -95,7 +93,6 @@ export interface IApp {
   snapshot: SnapshotController;
 
   toasts: ToastStore;
-  modals: ModalStore;
 
   mobileMenu: MobileMenuName;
   mobileMenuRedraw: EventEmitter;
@@ -205,7 +202,6 @@ const app: IApp = {
   sidebarToggled: false,
 
   toasts: getToastStore(),
-  modals: getModalStore(),
 
   config: {
     chains: new ChainStore(),
