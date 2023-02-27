@@ -15,6 +15,8 @@ import type { IPostNotificationData } from '../../shared/types';
 import { DynamicTemplate } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import type { UserAttributes } from '../models/user';
+import { formatAddressShort } from '../../shared/utils';
+import moment from 'moment';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -193,8 +195,12 @@ export type ThreadData = {
   title: string;
   body: string;
   comment_count: number;
-  reaction_count: number;
+  view_count: number;
   author_address: string;
+  author_address_short: string;
+  author_name: string;
+  author_profile_img_url: string;
+  publish_date_string: string;
   thread_id: number;
 };
 
@@ -223,7 +229,7 @@ export const getTopThreads = async (
         t.title,
         SUBSTRING(t.body, 1, 300) AS body,
         COUNT(DISTINCT c.id) AS comment_count,
-        COUNT(DISTINCT r.id) AS reaction_count,
+        COUNT(DISTINCT r.id) AS view_count,
         a.address AS author_address,
         t.id AS thread_id
       FROM 
@@ -239,16 +245,69 @@ export const getTopThreads = async (
         0.6 * COUNT(DISTINCT c.id) + 0.4 * COUNT(DISTINCT r.id) DESC
       LIMIT 3;`);
 
-  return (res[1] as any)?.rows?.map((row) => {
-    return {
-      title: row.title,
-      body: row.body,
-      comment_count: row.comment_count,
-      reaction_count: row.reaction_count,
-      author_address: row.author_address,
-      thread_id: row.thread_id,
-    };
-  });
+  const threadData: ThreadData[] = [];
+
+  if ((res[1] as any)?.rows) {
+    const rows = (res[1] as any)?.rows;
+    for (const row of rows) {
+      const shortAddress = formatAddressShort(
+        row.author_address,
+        communityId,
+        false,
+        4
+      );
+
+      const addressData = await models.Address.findOne({
+        where: {
+          address: row.author_address,
+          chain: communityId,
+        },
+      });
+
+      // TODO: When new profiles are created, this will need to be swapped in
+      // const profile = await models.Profile.findOne({
+      //   where: {
+      //     id: addressData.profile_id,
+      //     user_id: addressData.user_id,
+      //   },
+      // });
+
+      const profile = await models.OffchainProfile.findOne({
+        where: {
+          address_id: addressData.id,
+        },
+      });
+
+      let profileData;
+
+      if (!profile) {
+        console.log(
+          'missing profile for ',
+          row.author_address,
+          ' in ',
+          communityId
+        );
+      } else {
+        profileData = JSON.parse(profile.data);
+      }
+
+      const data: ThreadData = {
+        title: row.title,
+        body: row.plaintext,
+        comment_count: row.comment_count,
+        view_count: row.view_count,
+        author_address: row.author_address,
+        author_address_short: shortAddress,
+        author_name: profileData ? profileData.name : 'Anonymous',
+        author_profile_img_url: profileData ? profileData.avatarUrl : '',
+        thread_id: row.thread_id,
+        publish_date_string: moment(row.created_at).format('MM/DD/YY'),
+      };
+      threadData.push(data);
+    }
+  }
+
+  return threadData;
 };
 
 const getCommunityActivityScore = async (
@@ -345,6 +404,16 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
     allEmailObjects.push(
       emailObject.sort((a, b) => b.activityScore - a.activityScore)
     );
+
+    const msg = {
+      to: user.email,
+      from: 'Commonwealth <no-reply@commonwealth.im>',
+      templateId: DynamicTemplate.EmailDigest,
+      dynamic_template_data: emailObject.sort(
+        (a, b) => b.activityScore - a.activityScore
+      ),
+    };
+    // await sgMail.send(msg);
   }
 
   return allEmailObjects;
