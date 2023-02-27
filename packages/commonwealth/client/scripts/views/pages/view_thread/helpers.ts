@@ -3,7 +3,6 @@ import type { Poll } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const handlePollVote = async (
   poll: Poll,
@@ -25,7 +24,7 @@ export const handlePollVote = async (
     confirmationText = `Submit a vote for '${option}'?`;
   }
 
-  const confirmed = await confirmationModalWithText(confirmationText)();
+  const confirmed = window.confirm(confirmationText);
 
   if (!confirmed) return;
   // submit vote

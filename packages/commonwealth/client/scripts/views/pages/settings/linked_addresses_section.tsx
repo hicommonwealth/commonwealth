@@ -10,7 +10,6 @@ import type { AddressInfo } from 'models';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
@@ -55,9 +54,9 @@ export const AccountRow = (props: AccountRowProps) => {
       <CWButton
         buttonType="primary-red"
         onClick={async () => {
-          const confirmed = await confirmationModalWithText(
+          const confirmed = window.confirm(
             'Are you sure you want to remove this account?'
-          )();
+          );
           if (confirmed) {
             setIsRemoving(true);
             if (

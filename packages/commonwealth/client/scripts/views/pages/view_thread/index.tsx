@@ -30,7 +30,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 import { EditBody } from './edit_body';
@@ -492,13 +491,10 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
 
                 if (savedEdits) {
                   clearEditingLocalStorage(thread.id, ContentType.Thread);
-                  setShouldRestoreEdits(
-                    await confirmationModalWithText(
-                      'Previous changes found. Restore edits?',
-                      'Yes',
-                      'No'
-                    )()
+                  const confirmation = window.confirm(
+                    'Previous changes found. Restore edits?'
                   );
+                  setShouldRestoreEdits(confirmation);
                 }
 
                 setIsGloballyEditing(true);
@@ -541,9 +537,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
               onClick: async (e) => {
                 e.preventDefault();
 
-                const confirmed = await confirmationModalWithText(
-                  'Delete this entire thread?'
-                )();
+                const confirmed = window.confirm('Delete this entire thread?');
 
                 if (!confirmed) return;
 

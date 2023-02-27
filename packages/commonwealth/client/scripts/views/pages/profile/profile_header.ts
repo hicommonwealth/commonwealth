@@ -112,10 +112,8 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         loggedInUserIsAdmin &&
           render(CWButton, {
             onClick: () => {
-              app.modals.create({
-                modal: BanUserModal,
-                data: { profile: account.profile },
-              });
+              // @REACT @TODO: Re-add BanUserModal using new pattern
+              return null;
             },
             label: 'Ban User',
             buttonType: 'primary-red',

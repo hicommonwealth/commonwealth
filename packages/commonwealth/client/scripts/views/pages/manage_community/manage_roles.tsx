@@ -11,7 +11,6 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 
 type ManageRoleRowProps = {
@@ -100,19 +99,11 @@ export const ManageRoles = ({
 
                   if (isLosingAdminPermissions) {
                     const query = `You will lose all ${role.permission} permissions in this community. Continue?`;
-                    const confirmed = await confirmationModalWithText(
-                      query,
-                      'Yes',
-                      'No'
-                    )();
+                    const confirmed = window.confirm(query);
                     if (!confirmed) return;
                   } else {
                     const query = `Remove this ${role.permission}?`;
-                    const confirmed = await confirmationModalWithText(
-                      query,
-                      'Yes',
-                      'No'
-                    )();
+                    const confirmed = window.confirm(query);
                     if (!confirmed) return;
                   }
 

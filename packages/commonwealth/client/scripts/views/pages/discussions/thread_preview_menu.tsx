@@ -3,7 +3,6 @@ import React from 'react';
 import { redraw } from 'mithrilInterop';
 import type { Thread, ThreadStage, Topic } from 'models';
 import app from 'state';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
@@ -114,9 +113,9 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
                     onClick: async (e) => {
                       e.preventDefault();
 
-                      const confirmed = await confirmationModalWithText(
+                      const confirmed = window.confirm(
                         'Delete this entire thread?'
-                      )();
+                      );
 
                       if (!confirmed) return;
 
