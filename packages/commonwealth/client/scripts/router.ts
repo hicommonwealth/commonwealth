@@ -108,7 +108,6 @@ const redirectRoute = (
   path: string | ((attrs: Record<string, unknown>) => string)
 ) => ({
   render: (vnode) => {
-    console.log('path', path, 'attrs', vnode.attrs);
     m.route.set(
       typeof path === 'string' ? path : path(vnode.attrs),
       {},
