@@ -108,6 +108,7 @@ const redirectRoute = (
   path: string | ((attrs: Record<string, unknown>) => string)
 ) => ({
   render: (vnode) => {
+    console.log('path', path, 'attrs', vnode.attrs);
     m.route.set(
       typeof path === 'string' ? path : path(vnode.attrs),
       {},
@@ -293,13 +294,14 @@ const getCustomDomainRoutes = (importRoute) => ({
   }),
 
   // Profiles
-  '/account/:address': importRoute(import('views/pages/profile'), {
+  '/account/:address': importRoute(import('views/pages/profile_redirect'), {
     scoped: true,
     deferChain: true,
   }),
-  '/account': redirectRoute(() =>
-    app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
-  ),
+  '/account': importRoute(import('views/pages/profile_redirect'), {
+    scoped: true,
+    deferChain: true,
+  }),
 
   // Governance
   '/referenda': importRoute(import('views/pages/referenda'), {
@@ -553,15 +555,17 @@ const getCommonDomainRoutes = (importRoute) => ({
   }),
 
   // Profiles
-  '/:scope/account/:address': importRoute(import('views/pages/profile'), {
+  '/:scope/account/:address': importRoute(
+    import('views/pages/profile_redirect'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
+  '/:scope/account': importRoute(import('views/pages/profile_redirect'), {
     scoped: true,
     deferChain: true,
   }),
-  '/:scope/account': redirectRoute((a) =>
-    app.user.activeAccount
-      ? `/${a.scope}/account/${app.user.activeAccount.address}`
-      : `/${a.scope}/`
-  ),
 
   // New Profiles
   '/profile/id/:profileId': importRoute(import('views/pages/new_profile'), {
