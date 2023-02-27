@@ -77,12 +77,14 @@ export const Label: LabelerFilter = (
         label: `User ${fmtAddr(data.delegator)} delegated to ${fmtAddr(
           data.delegatee
         )}.`,
+        linkUrl: chainId ? `/${chainId}/account/${data.delegator}` : null,
       };
     }
     case EventKind.DelegatedPowerChanged: {
       return {
         heading: 'Delegated Power Changed',
         label: `User ${fmtAddr(data.who)} updated their delegation power.`,
+        linkUrl: chainId ? `/${chainId}/account/${data.who}` : null,
       };
     }
     case EventKind.Transfer: {

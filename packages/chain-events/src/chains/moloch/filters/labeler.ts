@@ -51,6 +51,7 @@ export const Label: LabelerFilter = (
         label: `Member ${fmtAddr(data.member)} ragequit and burned ${
           data.sharesToBurn
         } shares.`,
+        linkUrl: chainId ? `/${chainId}/account/${data.member}` : null,
       };
     case EventKind.Abort:
       return {
@@ -68,6 +69,7 @@ export const Label: LabelerFilter = (
         label: `Member ${fmtAddr(
           data.member
         )} updated their delegate to ${fmtAddr(data.newDelegateKey)}.`,
+        linkUrl: chainId ? `/${chainId}/account/${data.member}` : null,
       };
     // this event should never appear
     case EventKind.SummonComplete:
@@ -76,6 +78,7 @@ export const Label: LabelerFilter = (
         label: `Moloch is summoned, by user ${fmtAddr(data.summoner)} with ${
           data.shares
         }!`,
+        linkUrl: chainId ? `/${chainId}/account/${data.summoner}` : null,
       };
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
