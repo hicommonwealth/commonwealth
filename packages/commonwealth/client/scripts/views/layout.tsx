@@ -19,7 +19,6 @@ import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import { UserSurveyPopup } from './components/user_survey_popup';
-import { UnifiedUserFlowModal } from './modals/unified_user_flow_modal';
 import { UnifiedUserFlow } from './components/unified_user_profiles_flow';
 
 class LoadingLayout extends ClassComponent {

@@ -16,7 +16,7 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { UnifiedUserFlowModal } from '../modals/unified_user_flow_modal';
 
-const DISPLAY_INTERVAL = 20 * 1000; // 1 Hour wait
+const DISPLAY_INTERVAL = 10 * 1000; // TODO: make 1 Hour wait
 
 // Exists only to abstract user profile modal logic outside of Layout
 export class UnifiedUserFlow extends ClassComponent {
@@ -24,6 +24,8 @@ export class UnifiedUserFlow extends ClassComponent {
 
   view(vnode) {
     const userHasDisplayName = app.user.hasDisplayName;
+
+    console.log(app.user);
 
     if (!this.unifyProfileModalOn && !userHasDisplayName) {
       const lastShownProfileModal = localStorage.getItem(

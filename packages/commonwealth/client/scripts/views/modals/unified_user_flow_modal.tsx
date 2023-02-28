@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
+import { notifyError } from 'controllers/app/notifications';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import $ from 'jquery';
@@ -16,9 +17,11 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 
 class EntryPage extends ClassComponent<{
-  onSave: () => void;
   onCancel: () => void;
+  onSave: () => void;
 }> {
+  private displayNameValue = '';
+
   view(vnode) {
     const { onSave, onCancel } = vnode.attrs;
 
@@ -47,6 +50,10 @@ class EntryPage extends ClassComponent<{
           <CWTextInput
             label="Enter a display name"
             placeholder="ex: commoncow123"
+            value={this.displayNameValue}
+            oninput={(e) => {
+              this.displayNameValue = e.target.value;
+            }}
           />
         </div>
         <div class="Callout">
@@ -71,8 +78,21 @@ class EntryPage extends ClassComponent<{
           <CWButton
             buttonType="primary-black"
             label="Save"
-            onclick={() => {
-              onSave();
+            onclick={async () => {
+              try {
+                const res = await $.post(
+                  `${app.serverUrl()}/updateProfile/v2`,
+                  {
+                    name: this.displayNameValue,
+                    jwt: app.user.jwt,
+                  }
+                );
+                console.log(res);
+                m.redraw();
+                onSave();
+              } catch (e) {
+                notifyError('Error updating profile. Please try again later.');
+              }
             }}
           />
         </div>
