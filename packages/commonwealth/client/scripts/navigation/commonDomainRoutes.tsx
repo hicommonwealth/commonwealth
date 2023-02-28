@@ -61,6 +61,10 @@ const NewSnapshotProposalPage = lazy(
   () => import('views/pages/new_snapshot_proposal')
 );
 
+const PollPage = lazy(
+  () => import('views/pages/poll')
+);
+
 const ProfilePage = lazy(() => import('views/pages/profile'));
 
 const getCommonDomainsRoutes = () => (
@@ -422,6 +426,15 @@ const getCommonDomainsRoutes = () => (
       }
     />
     {/* PROFILES END*/}
+    {/* TESTING */}
+    <Route
+      path="/:scope/poll/:thread_id"
+      element={withLayout(PollPage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />
+    {/* TESTING END*/}
     {/*  LEGACY REDIRECTS */}
     {/*//here for compatibility only*/}
     <Route path="/discussions" element={<Navigate to="/" />} />
