@@ -1,5 +1,6 @@
 import { AppError } from 'common-common/src/errors';
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction } from 'express';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import type { DB } from '../models';
 
 export const Errors = {
@@ -9,10 +10,23 @@ export const Errors = {
   InvalidAddress: 'Invalid address',
 };
 
+type GetAddressProfileReq = {
+  address: string;
+  chain: string;
+};
+
+type GetAddressProfileResp = {
+  profileId: number;
+  name: string;
+  address: string;
+  lastActive: Date;
+  avatarUrl: string;
+};
+
 const getAddressProfile = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<GetAddressProfileReq>,
+  res: TypedResponse<GetAddressProfileResp>,
   next: NextFunction
 ) => {
   if (!req.body.address) {
@@ -49,6 +63,7 @@ const getAddressProfile = async (
       profileId: address.profile_id,
       name: address.name,
       address: address.address,
+      lastActive: address.last_active,
       avatarUrl: profile?.avatar_url,
     },
   });

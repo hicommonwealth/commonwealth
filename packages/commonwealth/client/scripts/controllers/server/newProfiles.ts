@@ -53,6 +53,7 @@ class NewProfilesController {
             result.address,
             result.avatarUrl,
             result.profileId,
+            result.lastActive,
             profile.chain
           );
           return profile;

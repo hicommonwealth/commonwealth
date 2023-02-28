@@ -6,6 +6,7 @@ class MinimumProfile {
   private _avatarUrl: string;
   private _id: number;
   private _chain: string;
+  private _lastActive: Date;
   private _initialized: boolean;
 
   get name() {
@@ -25,6 +26,10 @@ class MinimumProfile {
     return this._id;
   }
 
+  get lastActive() {
+    return this._lastActive;
+  }
+
   get chain() {
     return this._chain;
   }
@@ -34,12 +39,13 @@ class MinimumProfile {
     this._chain = chain;
   }
 
-  public initialize(name, address, avatarUrl, id, chain) {
+  public initialize(name, address, avatarUrl, id, chain, lastActive) {
     this._name = name;
     this._address = address;
     this._avatarUrl = avatarUrl;
     this._id = id;
     this._chain = chain;
+    this._lastActive = lastActive;
     this._initialized = true;
   }
 
