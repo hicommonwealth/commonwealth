@@ -12,6 +12,14 @@ import { CWTextArea } from '../components/component_kit/cw_text_area';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
+const errorMessage = (err) => {
+  return err.status == 400
+    ? 'Please enter the feedback message.'
+    : err.status >= 401
+    ? 'Something went wrong. Please try again later.'
+    : err.responseJSON?.message || err.responseText;
+};
+
 export class FeedbackModal extends ClassComponent {
   private feedbackText: string;
   private message: string;
@@ -55,7 +63,7 @@ export class FeedbackModal extends ClassComponent {
                 (err) => {
                   this.sending = false;
                   this.status = 'failure';
-                  this.message = err.responseJSON?.message || err.responseText;
+                  this.message = errorMessage(err);
                   m.redraw();
                 }
               );
