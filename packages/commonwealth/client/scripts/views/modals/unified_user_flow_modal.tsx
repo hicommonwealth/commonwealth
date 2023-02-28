@@ -149,7 +149,7 @@ class Alert extends ClassComponent<{
         <div class="Callout">
           <CWText fontWeight="bold">Multipe Profiles</CWText>
           <CWText>
-            If you have multiple profiles and you don't specify a username, each
+            If you have multiple profiles and you don't specify a display name, each
             of your profiles will be converted to different accounts. This means
             that you will no longer have access to all of your profiles under a
             single account.
@@ -180,7 +180,7 @@ class Alert extends ClassComponent<{
           />
           <CWButton
             buttonType="primary-black"
-            label="Set Username"
+            label="Set display name"
             onclick={() => {
               onSetUsername();
             }}
