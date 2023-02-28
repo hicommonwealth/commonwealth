@@ -21,7 +21,7 @@ class EntryPage extends ClassComponent<{
   onSave: () => void;
 }> {
   private displayNameValue = '';
-
+  private validatedName = false;
   view(vnode) {
     const { onSave, onCancel } = vnode.attrs;
 
@@ -40,34 +40,50 @@ class EntryPage extends ClassComponent<{
             With this update you'll have a single display name across all your
             communities, making it easier to connect and engage with others.
           </CWText>
-          <CWText type="b1">
-            This change will go into effect March 8th, 2023. To prepare, provide
-            a display name below.
+          <CWText type="b1" className="bold-section">
+            This change will go into effect
+            <span class="bold"> March 8th, 2023. </span>
+            To prepare, provide a display name below.
           </CWText>
         </div>
         <div class="Inputs">
-          <CWText type="caption" fontWeight="bold">
-            Display Name
-          </CWText>
+          <CWText type="caption">Display Name</CWText>
           <CWTextInput
             placeholder="ex: Common Cow"
             value={this.displayNameValue}
             oninput={(e) => {
               this.displayNameValue = e.target.value;
             }}
+            inputValidationFn={(val) => {
+              const regex = /^([a-zA-Z0-9\s\_\-]+)$/;
+
+              if (regex.test(val)) {
+                this.validatedName = true;
+                return ['success', 'Success!'];
+              } else {
+                this.validatedName = false;
+                return [
+                  'failure',
+                  'Only alphanumeric characters, underscores, and dashes are allowed.',
+                ];
+              }
+            }}
           />
         </div>
         <div class="Callout">
-          <CWText>
-            Please note that your current activity and actions will NOT be
-            erased. Only your current profile name will be replaced by your new
-            display name.
+          <CWText className="bold-section">
+            Please note that your current activity and actions
+            <span class="bold"> will not </span>
+            be erased. Only your current profile name will be replaced by your
+            new display name.
           </CWText>
         </div>
         <div class="MoreInfo">
           <CWText>Want a deeper understanding of this change?</CWText>
-
-          <CWText className="blue-text">Learn more</CWText>
+          <div class="learn-more">
+            <CWText className="blue-text">Learn more</CWText>
+            <CWIcon iconName="blueExternalLink" iconSize="small" />
+          </div>
         </div>
         <div class="ButtonRow">
           <CWButton
@@ -80,6 +96,7 @@ class EntryPage extends ClassComponent<{
           <CWButton
             buttonType="primary-black"
             label="Save"
+            disabled={!this.validatedName && this.displayNameValue.length === 0}
             onclick={async () => {
               try {
                 const res = await $.post(
@@ -148,7 +165,10 @@ class Alert extends ClassComponent<{
         <div class="MoreInfo">
           <CWText>Want a deeper understanding of this change?</CWText>
 
-          <CWText className="blue-text">Learn more</CWText>
+          <div class="learn-more">
+            <CWText className="blue-text">Learn more</CWText>
+            <CWIcon iconName="blueExternalLink" iconSize="small" />
+          </div>
         </div>
         <div class="ButtonRow">
           <CWButton
@@ -183,10 +203,10 @@ class Success extends ClassComponent<{ onClose: () => void }> {
           </CWText>
         </div>
         <div class="Description">
-          <CWText type="b1">
+          <CWText type="b1" className="bold-section">
             Great news! You've just submitted your new display name. Starting
-            March 8th, your current profile name will be replaced with the
-            display name you provided.
+            <span class="bold"> March 8</span>, your current profile name will
+            be replaced with the display name you provided.
           </CWText>
         </div>
 

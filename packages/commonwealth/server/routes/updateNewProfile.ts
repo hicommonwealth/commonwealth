@@ -9,6 +9,7 @@ export const Errors = {
   InvalidUpdate: 'Invalid update',
   NoProfileFound: 'No profile found',
   NoProfileIdProvided: 'No profile id provided in query',
+  ProfileNameInvalid: 'Profile name invalid',
 };
 
 type UpdateNewProfileReq = {
@@ -90,7 +91,12 @@ const updateNewProfile = async (
     return next(new Error(Errors.NotAuthorized));
   }
 
-  console.log('profileId', profileId);
+  if (name) {
+    const regex = /^([a-zA-Z0-9\s\_\-]+)$/;
+    if (!regex.test(name)) {
+      return next(new Error(Errors.ProfileNameInvalid));
+    }
+  }
 
   const updateStatus = await models.Profile.update(
     {

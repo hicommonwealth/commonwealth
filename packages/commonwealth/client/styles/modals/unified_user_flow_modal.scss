@@ -23,6 +23,14 @@
         display: flex;
         flex-direction: row;
       }
+
+      .bold-section {
+        display: inline-block;
+
+        .bold {
+          font-weight: 700;
+        }
+      }
     }
 
     .Inputs {
@@ -38,6 +46,15 @@
       border-radius: 6px;
       background: $neutral-100;
       margin-bottom: 24px;
+      flex-direction: row;
+
+      .bold-section {
+        display: inline-block;
+
+        .bold {
+          font-weight: 700;
+        }
+      }
     }
 
     .MoreInfo {
@@ -45,8 +62,20 @@
       gap: 4px;
       margin-bottom: 24px;
 
-      .blue-text {
-        color: $primary-500;
+      .learn-more {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        align-items: center;
+
+        .blue-text {
+          color: $primary-500;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
       }
     }
 
@@ -98,8 +127,20 @@
       gap: 4px;
       margin-bottom: 24px;
 
-      .blue-text {
-        color: $primary-500;
+      .learn-more {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        align-items: center;
+
+        .blue-text {
+          color: $primary-500;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
       }
     }
 
@@ -123,6 +164,14 @@
       flex-direction: column;
       gap: 16px;
       margin-bottom: 24px;
+
+      .bold-section {
+        display: inline-block;
+
+        .bold {
+          font-weight: 700;
+        }
+      }
     }
 
     .ButtonRow {

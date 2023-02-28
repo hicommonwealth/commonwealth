@@ -1111,6 +1111,40 @@ export class CWExternalLink extends ClassComponent<IconAttrs> {
   }
 }
 
+export class CWBlueExternalLink extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...otherAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M2.5 2C2.22386 2 2 2.22386 2 2.5V13.5C2 13.7761 2.22386 14 2.5 14H13.5C13.7761 14 14 13.7761 14 13.5V10.3214C14 10.0453 14.2239 9.82143 14.5 9.82143C14.7761 9.82143 15 10.0453 15 10.3214V13.5C15 14.3284 14.3284 15 13.5 15H2.5C1.67157 15 1 14.3284 1 13.5V2.5C1 1.67157 1.67157 1 2.5 1H5.67857C5.95471 1 6.17857 1.22386 6.17857 1.5C6.17857 1.77614 5.95471 2 5.67857 2H2.5ZM7.5 1.5C7.5 1.22386 7.72386 1 8 1H14.5C14.7761 1 15 1.22386 15 1.5V8C15 8.27614 14.7761 8.5 14.5 8.5C14.2239 8.5 14 8.27614 14 8V2.70711L8.35355 8.35355C8.15829 8.54882 7.84171 8.54882 7.64645 8.35355C7.45118 8.15829 7.45118 7.84171 7.64645 7.64645L13.2929 2H8C7.72386 2 7.5 1.77614 7.5 1.5Z"
+          fill="#338FFF"
+        />
+      </svg>
+    );
+  }
+}
+
 export class CWFeedback extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
