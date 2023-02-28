@@ -9,7 +9,6 @@ import { JWT_SECRET } from '../../../server/config';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
 import * as modelUtils from '../../util/modelUtils';
 
-const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
 const markdownThread = require('../../util/fixtures/markdownThread');

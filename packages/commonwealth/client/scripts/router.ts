@@ -319,7 +319,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/proposals': importRoute(import('views/pages/proposals'), {
     scoped: true,
   }),
-  '/council': importRoute(import('views/pages/council'), { scoped: true }),
   '/delegate': importRoute(import('views/pages/delegate'), { scoped: true }),
   '/proposal/:type/:identifier': importRoute(
     import('views/pages/view_proposal/index'),
@@ -349,11 +348,7 @@ const getCustomDomainRoutes = (importRoute) => ({
 
   // Treasury
   '/treasury': importRoute(import('views/pages/treasury'), { scoped: true }),
-  '/bounties': importRoute(import('views/pages/bounties'), { scoped: true }),
   '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
-  '/validators': importRoute(import('views/pages/validators'), {
-    scoped: true,
-  }),
 
   // Admin
   '/admin': importRoute(import('views/pages/admin'), { scoped: true }),
@@ -399,7 +394,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/overview': redirectRoute(() => '/overview'),
   '/:scope/projects': redirectRoute(() => '/projects'),
   '/:scope/backers': redirectRoute(() => '/backers'),
-  '/:scope/collectives': redirectRoute(() => '/collectives'),
   '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
   '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
   '/:scope/home': redirectRoute(() => '/'),
@@ -421,7 +415,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
-  '/:scope/council': redirectRoute(() => '/council'),
   '/:scope/delegate': redirectRoute(() => '/delegate'),
   '/:scope/proposal/:type/:identifier': redirectRoute(
     (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
@@ -437,9 +430,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
   '/:scope/new/proposal': redirectRoute(() => '/new/proposal'),
   '/:scope/treasury': redirectRoute(() => '/treasury'),
-  '/:scope/bounties': redirectRoute(() => '/bounties'),
   '/:scope/tips': redirectRoute(() => '/tips'),
-  '/:scope/validators': redirectRoute(() => '/validators'),
   '/:scope/login': redirectRoute(() => '/login'),
   '/:scope/settings': redirectRoute(() => '/settings'),
   '/:scope/admin': redirectRoute(() => '/admin'),
@@ -493,14 +484,9 @@ const getCommonDomainRoutes = (importRoute) => ({
   ),
 
   // Notifications
-  '/:scope/notifications': importRoute(
-    import('views/pages/notifications_page'),
-    {
-      scoped: true,
-      deferChain: true,
-    }
-  ),
-  '/notifications': redirectRoute(() => '/edgeware/notifications'),
+  '/notifications': importRoute(import('views/pages/notifications_page'), {
+    deferChain: true,
+  }),
   '/notification-settings': importRoute(
     import('views/pages/notification_settings'),
     {
@@ -608,9 +594,6 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/:scope/proposals': importRoute(import('views/pages/proposals'), {
     scoped: true,
   }),
-  '/:scope/council': importRoute(import('views/pages/council'), {
-    scoped: true,
-  }),
   '/:scope/delegate': importRoute(import('views/pages/delegate'), {
     scoped: true,
   }),
@@ -643,13 +626,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   '/:scope/treasury': importRoute(import('views/pages/treasury'), {
     scoped: true,
   }),
-  '/:scope/bounties': importRoute(import('views/pages/bounties'), {
-    scoped: true,
-  }),
   '/:scope/tips': importRoute(import('views/pages/tips'), { scoped: true }),
-  '/:scope/validators': importRoute(import('views/pages/validators'), {
-    scoped: true,
-  }),
 
   // Admin
   '/:scope/admin': importRoute(import('views/pages/admin'), { scoped: true }),
