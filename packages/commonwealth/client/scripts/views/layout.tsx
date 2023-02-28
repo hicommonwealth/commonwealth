@@ -135,7 +135,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
         <AppModals />
         <AppToasts />
         <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
-        <UnifiedUserFlow />
+        {app.isLoggedIn() && <UnifiedUserFlow />}
       </div>
     );
   }
