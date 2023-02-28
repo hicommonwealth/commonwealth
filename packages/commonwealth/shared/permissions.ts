@@ -50,11 +50,9 @@ export const everyonePermissions: Permissions = {
     Action.VIEW_REACTIONS,
   ],
   [Action.CREATE_THREAD]: [Action.CREATE_THREAD, Action.VIEW_THREADS],
-  [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
 };
 
 export const impliedAllowPermissionsByAction: Permissions = {
-  [Action.CREATE_CHAT]: [Action.CREATE_CHAT, Action.VIEW_CHAT_CHANNELS],
   [Action.VIEW_THREADS]: [Action.VIEW_THREADS, Action.VIEW_COMMENTS],
   [Action.VIEW_COMMENTS]: [Action.VIEW_COMMENTS, Action.VIEW_REACTIONS],
   [Action.CREATE_THREAD]: [
@@ -68,7 +66,6 @@ export const impliedAllowPermissionsByAction: Permissions = {
     Action.CREATE_REACTION,
     Action.VIEW_COMMENTS,
   ],
-  [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
   [Action.CREATE_REACTION]: [Action.CREATE_REACTION, Action.VIEW_REACTIONS],
   [Action.VOTE_ON_POLLS]: [Action.VOTE_ON_POLLS, Action.VIEW_POLLS],
   [Action.DELETE_THREAD]: [Action.DELETE_THREAD, Action.EDIT_THREAD],
@@ -79,7 +76,6 @@ export const impliedAllowPermissionsByAction: Permissions = {
 };
 
 export const impliedDenyPermissionsByAction: Permissions = {
-  [Action.CREATE_CHAT]: [Action.CREATE_CHAT, Action.VIEW_CHAT_CHANNELS],
   [Action.VIEW_THREADS]: [
     Action.VIEW_THREADS,
     Action.VIEW_COMMENTS,
@@ -112,7 +108,6 @@ export const impliedDenyPermissionsByAction: Permissions = {
     Action.VIEW_POLLS,
     Action.CREATE_POLL,
   ],
-  [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
   [Action.DELETE_THREAD]: [Action.DELETE_THREAD, Action.EDIT_THREAD],
   [Action.DELETE_COMMENT]: [Action.DELETE_COMMENT, Action.EDIT_COMMENT],
   [Action.DELETE_TOPIC]: [

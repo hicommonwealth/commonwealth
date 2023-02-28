@@ -7,7 +7,6 @@ import moment from 'moment';
 import app from 'state';
 import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
@@ -185,13 +184,12 @@ export const Comment = (props: CommentProps) => {
                                 comment.id,
                                 ContentType.Comment
                               );
-                              setShouldRestoreEdits(
-                                await confirmationModalWithText(
-                                  'Previous changes found. Restore edits?',
-                                  'Yes',
-                                  'No'
-                                )()
+
+                              const confirmationResult = window.confirm(
+                                'Previous changes found. Restore edits?'
                               );
+
+                              setShouldRestoreEdits(confirmationResult);
                             }
                             handleSetIsEditingComment(true);
                           },

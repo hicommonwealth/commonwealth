@@ -1,10 +1,6 @@
-import { alertModalWithText } from 'views/modals/alert_modal';
 import app from 'state';
 import { ChainType } from 'common-common/src/types';
-import {
-  APPLICATION_UPDATE_ACTION,
-  APPLICATION_UPDATE_MESSAGE,
-} from 'helpers/constants';
+import { APPLICATION_UPDATE_MESSAGE } from 'helpers/constants';
 import {
   _DEPRECATED_getRoute,
   _DEPRECATED_getSearchParams,
@@ -171,10 +167,7 @@ const renderRoute = (
         console.error(err);
 
         if (err.name === 'ChunkLoadError') {
-          alertModalWithText(
-            APPLICATION_UPDATE_MESSAGE,
-            APPLICATION_UPDATE_ACTION
-          )();
+          window.confirm(APPLICATION_UPDATE_MESSAGE);
         }
 
         // return to the last page, if it was on commonwealth
@@ -257,10 +250,6 @@ const getCustomDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/chat/:channel': importRoute(import('views/pages/chat'), {
-    scoped: true,
-    deferChain: true,
-  }),
   '/new/discussion': importRoute(import('views/pages/new_thread'), {
     scoped: true,
     deferChain: true,
@@ -313,9 +302,12 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
 
   // Admin
-  '/manage': importRoute(import('views/pages/manage_community/index'), {
-    scoped: true,
-  }),
+  '/manage': importRoute(
+    import('views/pages/manage_community/ManageCommunityPage'),
+    {
+      scoped: true,
+    }
+  ),
   '/settings': importRoute(import('views/pages/settings'), { scoped: true }),
   '/analytics': importRoute(import('views/pages/stats'), {
     scoped: true,
@@ -352,16 +344,17 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/projects': _DEPRECATED_redirectRoute(() => '/projects'),
   '/:scope/backers': _DEPRECATED_redirectRoute(() => '/backers'),
   '/:scope/collectives': _DEPRECATED_redirectRoute(() => '/collectives'),
-  '/:scope/finishNearLogin': _DEPRECATED_redirectRoute(() => '/finishNearLogin'),
-  '/:scope/finishaxielogin': _DEPRECATED_redirectRoute(() => '/finishaxielogin'),
+  '/:scope/finishNearLogin': _DEPRECATED_redirectRoute(
+    () => '/finishNearLogin'
+  ),
+  '/:scope/finishaxielogin': _DEPRECATED_redirectRoute(
+    () => '/finishaxielogin'
+  ),
   '/:scope/home': _DEPRECATED_redirectRoute(() => '/'),
   '/:scope': _DEPRECATED_redirectRoute(() => '/'),
   '/:scope/search': _DEPRECATED_redirectRoute(() => '/search'),
   '/:scope/members': _DEPRECATED_redirectRoute(() => '/members'),
   '/:scope/sputnik-daos': _DEPRECATED_redirectRoute(() => '/sputnik-daos'),
-  '/:scope/chat/:channel': _DEPRECATED_redirectRoute(
-    (attrs) => `/chat/${attrs.channel}`
-  ),
   // '/:scope/new/discussion': _DEPRECATED_redirectRoute(() => '/new/discussion'),
   '/:scope/account/:address': _DEPRECATED_redirectRoute(
     (attrs) => `/account/${attrs.address}/`
@@ -394,9 +387,10 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/snapshot/${attrs.snapshotId}`
   ),
-  '/:scope/snapshot-proposal/:snapshotId/:identifier': _DEPRECATED_redirectRoute(
-    (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-  ),
+  '/:scope/snapshot-proposal/:snapshotId/:identifier':
+    _DEPRECATED_redirectRoute(
+      (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+    ),
   '/:scope/new/snapshot-proposal/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/new/snapshot/${attrs.snapshotId}`
   ),
@@ -498,10 +492,6 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   deferChain: true,
   // }),
   // '/:scope/sputnik-daos': importRoute(import('views/pages/sputnikdaos'), {
-  //   scoped: true,
-  //   deferChain: true,
-  // }),
-  // '/:scope/chat/:channel': importRoute(import('views/pages/chat'), {
   //   scoped: true,
   //   deferChain: true,
   // }),

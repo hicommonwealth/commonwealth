@@ -93,64 +93,6 @@ type ExtendedNotificationRowProps = NotificationRowProps & {
   markingRead: boolean;
 };
 
-export const NewChatMentionNotificationRow = (
-  props: ExtendedNotificationRowProps
-) => {
-  const { handleSetMarkingRead, markingRead, notification } = props;
-
-  const navigate = useCommonNavigate();
-
-  const { chain_id, author_address, created_at, message_id, channel_id } =
-    JSON.parse(notification.data);
-
-  const route = app.socket.chatNs.getRouteToMessage(
-    channel_id,
-    message_id,
-    chain_id
-  );
-
-  const author = new AddressInfo(null, author_address, chain_id, null);
-
-  const authorName = <User user={author} hideAvatar />;
-
-  return (
-    <div className="NotificationRow" onClick={() => navigate(route)}>
-      <User user={author} avatarOnly avatarSize={26} />
-      <div className="comment-body">
-        <div className="comment-body-title">
-          {authorName} mentioned you in {chain_id} chat
-        </div>
-        <div className="comment-body-bottom-wrap">
-          <div className="comment-body-created">
-            {moment(created_at).fromNow()}
-          </div>
-          {!notification.isRead && (
-            <div
-              className="comment-body-mark-as-read"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleSetMarkingRead(true);
-
-                app.user.notifications
-                  .markAsRead([notification])
-                  ?.then(() => {
-                    handleSetMarkingRead(false);
-                  })
-                  .catch(() => {
-                    handleSetMarkingRead(false);
-                  });
-              }}
-            >
-              {markingRead ? <CWSpinner size="small" /> : 'Mark as read'}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const { handleSetMarkingRead, markingRead, notification } = props;
 

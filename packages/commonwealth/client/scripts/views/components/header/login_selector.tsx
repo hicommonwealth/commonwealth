@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { initAppState } from 'state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -504,34 +505,49 @@ export const LoginSelector = () => {
           !app.chainPreloading &&
           profileLoadComplete &&
           app.user.activeAccount && (
-            <>
-              <div
-                className="left-button"
-                onClick={leftMenuProps.handleInteraction}
-              >
-                <User user={app.user.activeAccount} />
+            <ClickAwayListener
+              onClickAway={() => {
+                leftMenuProps.setAnchorEl(null);
+              }}
+            >
+              <div className="button-container">
+                <div
+                  className="left-button"
+                  onClick={leftMenuProps.handleInteraction}
+                >
+                  <User user={app.user.activeAccount} />
+                </div>
+
+                <Popover
+                  content={
+                    <LoginSelectorMenuLeft
+                      activeAddressesWithRole={activeAddressesWithRole}
+                      nAccountsWithoutRole={nAccountsWithoutRole}
+                    />
+                  }
+                  {...leftMenuProps}
+                />
               </div>
-              <Popover
-                content={
-                  <LoginSelectorMenuLeft
-                    activeAddressesWithRole={activeAddressesWithRole}
-                    nAccountsWithoutRole={nAccountsWithoutRole}
-                  />
-                }
-                {...leftMenuProps}
-              />
-            </>
+            </ClickAwayListener>
           )}
-        <div
-          className="right-button"
-          onClick={rightMenuProps.handleInteraction}
+        <ClickAwayListener
+          onClickAway={() => {
+            rightMenuProps.setAnchorEl(null);
+          }}
         >
-          <CWIconButton iconName="person" iconButtonTheme="black" />
-        </div>
-        <Popover
-          content={<LoginSelectorMenuRight onLogout={onLogout} />}
-          {...rightMenuProps}
-        />
+          <div className="button-container">
+            <div
+              className="right-button"
+              onClick={rightMenuProps.handleInteraction}
+            >
+              <CWIconButton iconName="person" iconButtonTheme="black" />
+            </div>
+            <Popover
+              content={<LoginSelectorMenuRight onLogout={onLogout} />}
+              {...rightMenuProps}
+            />
+          </div>
+        </ClickAwayListener>
       </div>
       <Modal
         content={

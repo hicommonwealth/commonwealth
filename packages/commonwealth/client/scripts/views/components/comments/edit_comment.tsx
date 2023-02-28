@@ -5,7 +5,6 @@ import type { Comment } from 'models';
 
 import app from 'state';
 import { ContentType } from 'types';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWButton } from '../component_kit/cw_button';
 import type { QuillEditor } from '../quill/quill_editor';
 import { QuillEditorComponent } from '../quill/quill_editor_component';
@@ -57,11 +56,9 @@ export const EditComment = (props: EditCommentProps) => {
             const commentText = quillEditorState.textContentsAsString;
 
             if (commentText !== body) {
-              confirmed = await confirmationModalWithText(
-                'Cancel editing? Changes will not be saved.',
-                'Delete changes',
-                'Keep editing'
-              )();
+              confirmed = window.confirm(
+                'Cancel editing? Changes will not be saved.'
+              );
             }
 
             if (confirmed) {

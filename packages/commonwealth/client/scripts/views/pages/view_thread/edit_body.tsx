@@ -9,7 +9,6 @@ import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import type { QuillEditor } from '../../components/quill/quill_editor';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 
 type EditBodyProps = {
@@ -52,11 +51,9 @@ export const EditBody = (props: EditBodyProps) => {
             const threadText = quillEditorState.textContentsAsString;
 
             if (threadText !== body) {
-              confirmed = await confirmationModalWithText(
-                'Cancel editing? Changes will not be saved.',
-                'Delete changes',
-                'Keep editing'
-              )();
+              confirmed = window.confirm(
+                'Cancel editing? Changes will not be saved.'
+              );
             }
 
             if (confirmed) {

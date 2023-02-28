@@ -29,7 +29,6 @@ class LoadingLayout extends ClassComponent {
         <div className="spinner-container">
           <CWSpinner size="xl" />
         </div>
-        {/*<AppModals />*/}
         <AppToasts />
       </div>
     );
@@ -89,7 +88,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
               </div>
             }
           />
-          {/*<AppModals />*/}
           <AppToasts />
         </div>
       );
@@ -106,7 +104,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       return (
         <div className="Layout">
           <PageNotFound />
-          {/*<AppModals />*/}
           <AppToasts />
         </div>
       );
@@ -149,7 +146,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     return (
       <div className="Layout">
         {vnode.children}
-        {/*<AppModals />*/}
         <AppToasts />
         {/*<UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />*/}
       </div>

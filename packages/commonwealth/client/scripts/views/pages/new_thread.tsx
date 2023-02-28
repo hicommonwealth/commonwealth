@@ -21,13 +21,9 @@ const NewThreadPage = () => {
 
   if (!app.chain) return <PageLoading />;
 
-  const hasTopics = !!app.topics.getByCommunity(app.chain.id).length;
-
   return (
-    <Sublayout
-    // title="New Thread"
-    >
-      <NewThreadForm isModal={false} hasTopics={hasTopics} />
+    <Sublayout>
+      <NewThreadForm />
     </Sublayout>
   );
 };
