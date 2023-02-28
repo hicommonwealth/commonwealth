@@ -5,12 +5,12 @@ import Sublayout from 'views/sublayout';
 import { PageLoading } from './loading';
 import { ThreadPollCard } from './view_thread/poll_cards';
 
-const PollPage = ({ thread_id }) => {
+const PollPage = ({ scope, thread_id }) => {
   const [poll, setPoll] = React.useState(null);
 
   useEffect(() => {
     const fetch = async () => {
-      await app.polls.fetchPolls(app.activeChainId(), thread_id);
+      await app.polls.fetchPolls(scope, thread_id);
       const polls = app.polls.getByThreadId(thread_id);
       if (polls.length > 0) {
         setPoll(polls[0]);
