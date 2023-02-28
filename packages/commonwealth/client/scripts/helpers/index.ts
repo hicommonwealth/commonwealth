@@ -1,4 +1,4 @@
-import type { ClassComponent } from 'mithrilInterop';
+import type { To, NavigateOptions } from 'react-router-dom';
 import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -9,7 +9,6 @@ import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
 import type { Coin } from 'adapters/currency';
-import { NavigateFunction } from 'react-router-dom';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -40,9 +39,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return (arr
+  return arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown) as ThreadStage[];
+    .filter((s) => s) as unknown as ThreadStage[];
 }
 
 /*
@@ -77,7 +76,7 @@ export function link(
   selector: string,
   target: string,
   children,
-  setRoute: ClassComponent['setRoute'],
+  setRoute: (url: To, options?: NavigateOptions, prefix?: string) => void,
   extraAttrs?: object,
   saveScrollPositionAs?: string,
   beforeRouteSet?: () => void,
