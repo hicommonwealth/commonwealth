@@ -127,24 +127,30 @@ class Alert extends ClassComponent<{
         <div class="Callout">
           <CWText fontWeight="bold">One Profile</CWText>
           <CWText>
-            If you have only one profile, your current profile name will be used
-            as your default username. However, keep in mind that you won't be
-            able to change it later.
+            If you have only one profile, your current profile name will be
+            automatically used as your default display name.
           </CWText>
         </div>
         <div class="Callout">
           <CWText fontWeight="bold">Multipe Profiles</CWText>
           <CWText>
             If you have multiple profiles and you don't specify a username, each
-            of your profiles will be converted to different accounts.
+            of your profiles will be converted to different accounts. This means
+            that you will no longer have access to all of your profiles under a
+            single account.
           </CWText>
         </div>
         <div class="Description">
           <CWText type="b1">
             To avoid any confusion or inconvenience, please make sure to provide
-            a unique and memorable username when prompted. Thank you for your
-            cooperation.
+            a unique and memorable display name when prompted. Thank you for
+            your cooperation.
           </CWText>
+        </div>
+        <div class="MoreInfo">
+          <CWText>Want a deeper understanding of this change?</CWText>
+
+          <CWText className="blue-text">Learn more</CWText>
         </div>
         <div class="ButtonRow">
           <CWButton
@@ -180,9 +186,9 @@ class Success extends ClassComponent<{ onClose: () => void }> {
         </div>
         <div class="Description">
           <CWText type="b1">
-            Great news! You've just created your unique username. Starting March
-            8th, your current profile name will be replaced with the new
-            username you provided.
+            Great news! You've just submitted your new display name. Starting
+            March 8th, your current profile name will be replaced with the
+            display name you provided.
           </CWText>
         </div>
 
