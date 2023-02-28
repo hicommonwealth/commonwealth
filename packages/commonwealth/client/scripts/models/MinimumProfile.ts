@@ -40,7 +40,7 @@ class MinimumProfile {
     return this._chain;
   }
 
-  constructor({ address, chain }) {
+  constructor(address, chain) {
     this._address = address;
     this._chain = chain;
   }

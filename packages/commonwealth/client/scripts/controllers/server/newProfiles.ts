@@ -33,7 +33,7 @@ class NewProfilesController {
     if (existingProfile !== undefined) {
       return existingProfile;
     }
-    const profile = new Profile({ address, chain });
+    const profile = new Profile(address, chain);
     this._store.add(profile);
     this._unfetched.push(profile);
     this._fetchNewProfiles();

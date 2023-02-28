@@ -15,7 +15,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
   Account,
-  Profile as OldProfile,
+  MinimumProfile,
   AddressInfo,
 } from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -227,12 +227,19 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       // should refactor AvatarUpload to make it work with new profiles
       let account: Account | null;
       if (this.addresses.length > 0) {
-        const oldProfile = new OldProfile(
+        const oldProfile = new MinimumProfile(
           this.addresses[0].chain.name,
           this.addresses[0].address
         );
 
-        oldProfile.initialize(this.name, null, this.bio, this.avatarUrl, null);
+        oldProfile.initialize(
+          this.name,
+          this.addresses[0].address,
+          this.avatarUrl,
+          this.profile.id,
+          this.addresses[0].chain.name,
+          null,
+        );
 
         account = new Account({
           chain: this.addresses[0].chain,
