@@ -283,7 +283,7 @@ export class LoginSelector extends ClassComponent {
       ([role]) => !role
     ).length;
 
-    if (!this.profileLoadComplete && app.profiles.allLoaded()) {
+    if (!this.profileLoadComplete && app.newProfiles.allLoaded()) {
       this.profileLoadComplete = true;
     }
 

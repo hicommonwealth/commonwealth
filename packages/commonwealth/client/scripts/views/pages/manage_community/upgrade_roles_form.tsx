@@ -37,7 +37,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
       // @TODO: @Profiles upgrade, clean this up
       const chainId = role.chain_id ? role.chain_id : role.Address?.chain?.id;
 
-      const displayName = app.profiles.getProfile(
+      const displayName = app.newProfiles.getProfile(
         chainId as string,
         role.Address.address
       ).displayName;
