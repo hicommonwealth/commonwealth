@@ -24,7 +24,7 @@ class NewProfilesController {
     }, 50);
   }
 
-  public getProfile(address: string, chain: string) {
+  public getProfile(chain: string, address: string) {
     const existingProfile = this._store.getByAddress(address);
     if (existingProfile !== undefined) {
       return existingProfile;

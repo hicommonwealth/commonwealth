@@ -128,8 +128,8 @@ class MembersPage extends ClassComponent {
         .slice(0, this.numProfilesLoaded)
         .map((member) => {
           const profile = app.newProfiles.getProfile(
-            member.address,
-            member.chain
+            member.chain,
+            member.address
           );
           profile.initialize(
             profile.name,
@@ -184,8 +184,8 @@ class MembersPage extends ClassComponent {
         for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
           const member = this.membersLoaded[i];
           const profile = app.newProfiles.getProfile(
-            member.address,
-            member.chain
+            member.chain,
+            member.address
           );
           profile.initialize(
             profile.name,

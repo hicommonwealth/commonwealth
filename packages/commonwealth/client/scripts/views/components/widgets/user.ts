@@ -97,7 +97,7 @@ const User: m.Component<
         }
       }
 
-      profile = app.newProfiles.getProfile(address, chainId.id);
+      profile = app.newProfiles.getProfile(chainId.id, address);
 
       role = adminsAndMods.find(
         (r) => r.address === address && r.address_chain === chainId.id
@@ -122,7 +122,7 @@ const User: m.Component<
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
       const chainId = account.chain.id;
-      profile = app.newProfiles.getProfile(account.address, chainId);
+      profile = app.newProfiles.getProfile(chainId, account.address);
       role = adminsAndMods.find(
         (r) => r.address === account.address && r.address_chain === chainId
       );
@@ -325,7 +325,7 @@ export const UserBlock: m.Component<
     const { showFullAddress } = vnode.attrs.addressDisplayOptions || {};
     const chain = typeof user.chain === 'string' ? user.chain : user.chain?.id;
 
-    const profile = app.newProfiles.getProfile(user.address, chain);
+    const profile = app.newProfiles.getProfile(chain, user.address);
 
     const highlightSearchTerm =
       profile?.address &&

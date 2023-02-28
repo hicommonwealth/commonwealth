@@ -60,7 +60,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
       typeof activeAccount.chain === 'string'
         ? activeAccount.chain
         : activeAccount.chain?.id;
-    const profile = app.newProfiles.getProfile(activeAccount.address, chain);
+    const profile = app.newProfiles.getProfile(chain, activeAccount.address);
     this.profileId = profile.id;
   }
 
