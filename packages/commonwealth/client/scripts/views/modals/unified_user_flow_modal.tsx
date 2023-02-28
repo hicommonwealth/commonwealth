@@ -46,10 +46,11 @@ class EntryPage extends ClassComponent<{
           </CWText>
         </div>
         <div class="Inputs">
-          <CWText type="caption">Display Name</CWText>
+          <CWText type="caption" fontWeight="bold">
+            Display Name
+          </CWText>
           <CWTextInput
-            label="Enter a display name"
-            placeholder="ex: commoncow123"
+            placeholder="ex: Common Cow"
             value={this.displayNameValue}
             oninput={(e) => {
               this.displayNameValue = e.target.value;
@@ -65,6 +66,7 @@ class EntryPage extends ClassComponent<{
         </div>
         <div class="MoreInfo">
           <CWText>Want a deeper understanding of this change?</CWText>
+
           <CWText className="blue-text">Learn more</CWText>
         </div>
         <div class="ButtonRow">
