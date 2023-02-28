@@ -1,17 +1,15 @@
-import React from 'react';
-
-import { ClassComponent } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
+import React, { useState } from 'react';
+import _ from 'underscore';
+import moment from 'moment';
 import $ from 'jquery';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { pluralize } from 'helpers';
 
 import 'modals/poll_editor_modal.scss';
-import type { Thread } from 'models';
-import moment from 'moment';
-import app from 'state';
-import _ from 'underscore';
 
+import type { Thread } from 'models';
+
+import app from 'state';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { pluralize } from 'helpers';
 import { getNextPollEndingTime } from 'utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
@@ -20,7 +18,7 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
-type PollEditorAttrs = {
+type PollEditorProps = {
   onModalClose: () => void;
   thread: Thread;
 };
@@ -43,150 +41,154 @@ const getPollDurationCopy = (
   }
 };
 
-export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
-  private customDuration: string;
-  private customDurationEnabled: boolean;
-  private options: Array<string>;
-  private prompt: string;
+export const PollEditorModal = ({ onModalClose, thread }: PollEditorProps) => {
+  const [customDuration, setCustomDuration] = useState('');
+  const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
+  const [options, setOptions] = useState<Array<string>>();
+  const [prompt, setPrompt] = useState();
 
-  view(vnode: ResultNode<PollEditorAttrs>) {
-    const { onModalClose, thread } = vnode.attrs;
-    const { customDurationEnabled, customDuration } = this;
+  // reset options when initializing
+  if (!options || options.length === 0) {
+    setOptions(['', '']);
+  }
 
-    // reset options when initializing
-    if (!this.options || this.options.length === 0) {
-      this.options = ['', ''];
-    }
-
-    return (
-      <div className="PollEditorModal">
-        <div className="compact-modal-title">
-          <h3>Create Poll</h3>
-          <CWIconButton iconName="close" onClick={() => onModalClose()} />
-        </div>
-        <div className="compact-modal-body">
-          <CWTextInput
-            label="Question"
-            placeholder="Do you support this proposal?"
-            defaultValue={this.prompt}
-            onInput={(e) => {
-              this.prompt = (e.target as HTMLInputElement).value;
-            }}
-          />
-          <div className="options-and-label-container">
-            <CWLabel label="Options" />
-            <div className="options-container">
-              {this.options?.map((_choice: string, index: number) => (
-                <CWTextInput
-                  placeholder={`${index + 1}.`}
-                  defaultValue={this.options[index]}
-                  onInput={(e) => {
-                    this.options[index] = (e.target as HTMLInputElement).value;
-                  }}
-                />
-              ))}
-            </div>
-            <div className="buttons-row">
-              <CWButton
-                label="Remove choice"
-                buttonType="secondary-red"
-                disabled={this.options.length <= 2}
-                onClick={() => {
-                  this.options.pop();
+  return (
+    <div className="PollEditorModal">
+      <div className="compact-modal-title">
+        <h3>Create Poll</h3>
+        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+      </div>
+      <div className="compact-modal-body">
+        <CWTextInput
+          label="Question"
+          placeholder="Do you support this proposal?"
+          defaultValue={prompt}
+          onInput={(e) => {
+            setPrompt(e.target.value);
+          }}
+        />
+        <div className="options-and-label-container">
+          <CWLabel label="Options" />
+          <div className="options-container">
+            {options?.map((_choice: string, index: number) => (
+              <CWTextInput
+                placeholder={`${index + 1}.`}
+                defaultValue={options[index]}
+                onInput={(e) => {
+                  setOptions((prevState) => ({
+                    ...prevState,
+                    [index]: e.target.value,
+                  }));
                 }}
               />
-              <CWButton
-                label="Add choice"
-                disabled={this.options.length >= 6}
-                onClick={() => {
-                  this.options.push('');
-                }}
-              />
-            </div>
+            ))}
           </div>
-          <div className="duration-row">
-            <CWText type="caption" className="poll-duration-text">
-              {getPollDurationCopy(customDuration, customDurationEnabled)}
-            </CWText>
-            <div className="duration-row-actions">
-              <CWCheckbox
-                label="Custom duration"
-                checked={this.customDurationEnabled}
-                onChange={() => {
-                  this.customDurationEnabled = !this.customDurationEnabled;
-                  this.customDuration = 'Infinite';
-                }}
-                value=""
-              />
-              {/* {m(SelectList, { // @TODO @REACT FIX ME
+          <div className="buttons-row">
+            <CWButton
+              label="Remove choice"
+              buttonType="secondary-red"
+              disabled={options.length <= 2}
+              onClick={() => {
+                const newOptions = options.filter(
+                  (o, i) => i !== options.length - 1
+                );
+
+                setOptions(newOptions);
+              }}
+            />
+            <CWButton
+              label="Add choice"
+              disabled={options.length >= 6}
+              onClick={() => {
+                const newOptions = options.concat(['']);
+
+                setOptions(newOptions);
+              }}
+            />
+          </div>
+        </div>
+        <div className="duration-row">
+          <CWText type="caption" className="poll-duration-text">
+            {getPollDurationCopy(customDuration, customDurationEnabled)}
+          </CWText>
+          <div className="duration-row-actions">
+            <CWCheckbox
+              label="Custom duration"
+              checked={customDurationEnabled}
+              onChange={() => {
+                setCustomDurationEnabled(!customDurationEnabled);
+                setCustomDuration('Infinite');
+              }}
+              value=""
+            />
+            {/* {m(SelectList, { // @TODO @REACT FIX ME
                 filterable: false,
                 items: ['Infinite'].concat(
                   _.range(1, 31).map((n) => pluralize(Number(n), 'day'))
                 ),
                 itemRender: (n) => <div className="duration-item">{n}</div>,
                 onSelect: (e) => {
-                  this.customDuration = e as string;
+                  customDuration = e as string;
                 },
                 trigger: (
                   <CWButton
                     disabled={!customDurationEnabled}
                     iconLeft="chevronDown"
-                    label={this.customDuration || 'Infinite'}
+                    label={customDuration || 'Infinite'}
                   />
                 ),
               })} */}
-            </div>
-          </div>
-          <div className="buttons-row">
-            <CWButton
-              label="Cancel"
-              buttonType="secondary-blue"
-              onClick={() => {
-                onModalClose();
-              }}
-            />
-            <CWButton
-              label="Save changes"
-              onClick={async (e) => {
-                if (!this.prompt) {
-                  notifyError('Must set poll prompt');
-                  return;
-                }
-
-                if (
-                  !this.options?.length ||
-                  !this.options[0]?.length ||
-                  !this.options[1]?.length
-                ) {
-                  notifyError('Must set poll options');
-                  return;
-                }
-
-                if (this.options.length !== [...new Set(this.options)].length) {
-                  notifyError('Poll options must be unique');
-                  return;
-                }
-
-                try {
-                  await app.polls.setPolling({
-                    threadId: thread.id,
-                    prompt: this.prompt,
-                    options: this.options,
-                    customDuration: this.customDuration,
-                    address: app.user.activeAccount.address,
-                    authorChain: app.user.activeAccount.chain.id,
-                  });
-                  notifySuccess('Poll creation succeeded');
-                } catch (err) {
-                  console.error(err);
-                }
-
-                onModalClose();
-              }}
-            />
           </div>
         </div>
+        <div className="buttons-row">
+          <CWButton
+            label="Cancel"
+            buttonType="secondary-blue"
+            onClick={() => {
+              onModalClose();
+            }}
+          />
+          <CWButton
+            label="Save changes"
+            onClick={async () => {
+              if (!prompt) {
+                notifyError('Must set poll prompt');
+                return;
+              }
+
+              if (
+                !options?.length ||
+                !options[0]?.length ||
+                !options[1]?.length
+              ) {
+                notifyError('Must set poll options');
+                return;
+              }
+
+              if (options.length !== [...new Set(options)].length) {
+                notifyError('Poll options must be unique');
+                return;
+              }
+
+              try {
+                await app.polls.setPolling({
+                  threadId: thread.id,
+                  prompt: prompt,
+                  options: options,
+                  customDuration: customDuration,
+                  address: app.user.activeAccount.address,
+                  authorChain: app.user.activeAccount.chain.id,
+                });
+                notifySuccess('Poll creation succeeded');
+              } catch (err) {
+                console.error(err);
+              }
+
+              onModalClose();
+            }}
+          />
+        </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
