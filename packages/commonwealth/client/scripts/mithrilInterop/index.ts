@@ -198,17 +198,6 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
   }
 }
 
-// m.rendraw() shim. NO-OP.
-export function redraw(sync = false, component?: any) {
-  // TODO
-  if (component) {
-    console.log(component);
-    component.forceUpdate();
-  } else {
-    // console.trace('no-op redraw called!');
-  }
-}
-
 // m.mount() shim
 export function rootMount(element: Element, component?: any | null) {
   return createRoot(element).render(component);
