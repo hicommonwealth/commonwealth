@@ -25,8 +25,6 @@ export class UnifiedUserFlow extends ClassComponent {
   view(vnode) {
     const userHasDisplayName = app.user.hasDisplayName;
 
-    console.log(app.user);
-
     if (!this.unifyProfileModalOn && !userHasDisplayName) {
       const lastShownProfileModal = localStorage.getItem(
         'user-profile-modal-last-displayed'

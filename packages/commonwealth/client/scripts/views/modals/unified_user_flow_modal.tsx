@@ -89,8 +89,6 @@ class EntryPage extends ClassComponent<{
                     jwt: app.user.jwt,
                   }
                 );
-                console.log(res);
-                m.redraw();
                 onSave();
               } catch (e) {
                 notifyError('Error updating profile. Please try again later.');
@@ -220,9 +218,11 @@ export class UnifiedUserFlowModal extends ClassComponent<UnifiedUserFlowModalAtt
           <EntryPage
             onCancel={() => {
               this.modalStage = 'alert';
+              m.redraw();
             }}
             onSave={() => {
               this.modalStage = 'success';
+              m.redraw();
             }}
           />
         )}
