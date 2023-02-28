@@ -6,13 +6,18 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import $ from 'jquery';
 import m from 'mithril';
 
+import 'modals/unified_user_flow_modal.scss';
+
 import app from 'state';
+import { CWCard } from '../components/component_kit/cw_card';
 
 class EntryPage extends ClassComponent<{
   onSave: () => void;
   onCancel: () => void;
 }> {
   view() {
+    console.log('im here');
+
     return (
       <div class="entry-page">
         <h1>Entry Page</h1>
@@ -49,38 +54,40 @@ type UnifiedUserFlowModalAttrs = {};
 type modalStages = 'entry-page' | 'alert' | 'success';
 
 export class UnifiedUserFlowModal extends ClassComponent<UnifiedUserFlowModalAttrs> {
-  private modalStage: modalStages;
+  private modalStage: modalStages = 'entry-page';
 
   view(vnode) {
     return (
       <div class="UnifiedUserFlowModal">
-        {this.modalStage === 'entry-page' && (
-          <EntryPage
-            onCancel={() => {
-              this.modalStage = 'alert';
-            }}
-            onSave={() => {
-              this.modalStage = 'success';
-            }}
-          />
-        )}
-        {this.modalStage === 'alert' && (
-          <Alert
-            onSetUsername={() => {
-              this.modalStage === 'entry-page';
-            }}
-            onClose={() => {
-              console.log('hi');
-            }}
-          />
-        )}
-        {this.modalStage === 'success' && (
-          <Success
-            onClose={() => {
-              console.log('closed');
-            }}
-          />
-        )}
+        <CWCard>
+          {this.modalStage === 'entry-page' && (
+            <EntryPage
+              onCancel={() => {
+                this.modalStage = 'alert';
+              }}
+              onSave={() => {
+                this.modalStage = 'success';
+              }}
+            />
+          )}
+          {this.modalStage === 'alert' && (
+            <Alert
+              onSetUsername={() => {
+                this.modalStage === 'entry-page';
+              }}
+              onClose={() => {
+                console.log('hi');
+              }}
+            />
+          )}
+          {this.modalStage === 'success' && (
+            <Success
+              onClose={() => {
+                console.log('closed');
+              }}
+            />
+          )}
+        </CWCard>
       </div>
     );
   }

@@ -129,13 +129,14 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
 
-    app.modals.create({ modal: UnifiedUserFlowModal });
+    // app.modals.create({ modal: UnifiedUserFlowModal });
     return (
       <div class="Layout">
         {vnode.children}
         <AppModals />
         <AppToasts />
         <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
+        <UnifiedUserFlowModal />
       </div>
     );
   }
