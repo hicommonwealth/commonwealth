@@ -46,6 +46,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
   private deferred: boolean;
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
+  private unifyProfileModalOn = false;
 
   view(vnode: m.Vnode<LayoutAttrs>) {
     const { scope, deferChain } = vnode.attrs;
@@ -129,14 +130,16 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
 
-    // app.modals.create({ modal: UnifiedUserFlowModal });
+    if (!this.unifyProfileModalOn) {
+      this.unifyProfileModalOn = true;
+      app.modals.create({ modal: UnifiedUserFlowModal });
+    }
     return (
       <div class="Layout">
         {vnode.children}
         <AppModals />
         <AppToasts />
         <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
-        <UnifiedUserFlowModal />
       </div>
     );
   }

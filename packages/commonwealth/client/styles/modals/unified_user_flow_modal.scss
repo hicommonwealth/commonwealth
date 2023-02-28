@@ -1,7 +1,133 @@
 @import '../shared';
 
 .UnifiedUserFlowModal {
-  width: 480px;
-  position: fixed;
-  top: 50%;
+  max-width: 720px;
+  min-width: 480px;
+  padding: 24px;
+
+  .EntryModal {
+    .Header {
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .Description {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .section {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+
+    .Inputs {
+      margin-bottom: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .Callout {
+      display: flex;
+      padding: 16px;
+      border-radius: 6px;
+      background: $neutral-100;
+      margin-bottom: 24px;
+    }
+
+    .MoreInfo {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+
+      .blue-text {
+        color: $primary-500;
+      }
+    }
+
+    .ButtonRow {
+      display: flex;
+      gap: 16px;
+      justify-content: flex-end;
+    }
+  }
+
+  .AlertDangerModal {
+    .Header {
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+
+    .Description {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .section {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+
+    .Inputs {
+      margin-bottom: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .Callout {
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      border-radius: 6px;
+      background: $neutral-100;
+      margin-bottom: 24px;
+    }
+
+    .MoreInfo {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+
+      .blue-text {
+        color: $primary-500;
+      }
+    }
+
+    .ButtonRow {
+      display: flex;
+      gap: 16px;
+      justify-content: flex-end;
+    }
+  }
+
+  .SuccessProfileModal {
+    .Header {
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+
+    .Description {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .ButtonRow {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
 }
