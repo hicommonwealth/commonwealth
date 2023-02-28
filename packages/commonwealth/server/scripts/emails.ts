@@ -221,6 +221,7 @@ export const digestLevels = {
   '3': ['daily', 'weekly', 'twoweeks', 'monthly'],
 };
 
+// TODO: CHANGE TO 1 WEEK
 export const getTopThreads = async (
   models: DB,
   communityId: string
@@ -401,19 +402,20 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
     }
 
     // Fire off Email?
-    allEmailObjects.push(
-      emailObject.sort((a, b) => b.activityScore - a.activityScore)
-    );
+    allEmailObjects.push({
+      data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
+    });
+
+    console.log('message to ', user, user.email);
 
     const msg = {
       to: user.email,
       from: 'Commonwealth <no-reply@commonwealth.im>',
       templateId: DynamicTemplate.EmailDigest,
-      dynamic_template_data: emailObject.sort(
-        (a, b) => b.activityScore - a.activityScore
-      ),
+      dynamic_template_data: {
+        data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
+      },
     };
-    // await sgMail.send(msg);
   }
 
   return allEmailObjects;
