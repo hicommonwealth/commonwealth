@@ -20,6 +20,7 @@ import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import { UserSurveyPopup } from './components/user_survey_popup';
 import { UnifiedUserFlowModal } from './modals/unified_user_flow_modal';
+import { UnifiedUserFlow } from './components/unified_user_profiles_flow';
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -46,7 +47,6 @@ export class Layout extends ClassComponent<LayoutAttrs> {
   private deferred: boolean;
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
-  private unifyProfileModalOn = false;
 
   view(vnode: m.Vnode<LayoutAttrs>) {
     const { scope, deferChain } = vnode.attrs;
@@ -130,16 +130,13 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
 
-    if (!this.unifyProfileModalOn) {
-      this.unifyProfileModalOn = true;
-      app.modals.create({ modal: UnifiedUserFlowModal });
-    }
     return (
       <div class="Layout">
         {vnode.children}
         <AppModals />
         <AppToasts />
         <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
+        <UnifiedUserFlow />
       </div>
     );
   }

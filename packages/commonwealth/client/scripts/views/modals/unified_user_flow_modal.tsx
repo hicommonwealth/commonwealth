@@ -202,18 +202,17 @@ export class UnifiedUserFlowModal extends ClassComponent<UnifiedUserFlowModalAtt
           <Alert
             onSetUsername={() => {
               this.modalStage = 'entry-page';
-              console.log('hu');
               m.redraw();
             }}
             onClose={() => {
-              console.log('hi');
+              $('.UnifiedUserFlowModal').trigger('modalexit');
             }}
           />
         )}
         {this.modalStage === 'success' && (
           <Success
             onClose={() => {
-              console.log('closed');
+              $('.UnifiedUserFlowModal').trigger('modalexit');
             }}
           />
         )}
