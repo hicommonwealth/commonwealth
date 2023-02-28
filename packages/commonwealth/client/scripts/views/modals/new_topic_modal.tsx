@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
@@ -77,7 +75,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             if (currentCommunityTopicNames.includes(text.toLowerCase())) {
               const err = 'Topic name already used within community.';
               setErrorMsg(err);
-              redraw();
               return ['failure', err];
             }
 
@@ -90,7 +87,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
               )} 
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(err);
-              redraw();
               return ['failure', err];
             }
 
@@ -177,7 +173,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
               );
 
               setIsSaving(false);
-              redraw();
               onModalClose();
             } catch (err) {
               setErrorMsg('Error creating topic');
@@ -185,7 +180,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
               if (quillEditorState) {
                 quillEditorState.enable();
               }
-              redraw();
             }
           }}
         />

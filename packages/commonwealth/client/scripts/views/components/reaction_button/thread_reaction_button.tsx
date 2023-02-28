@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import type { ChainInfo } from 'models';
@@ -70,8 +68,6 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
         );
 
         setIsLoading(false);
-
-        redraw();
       });
   };
 
@@ -87,8 +83,6 @@ export const ThreadReactionButton = (props: ThreadReactionButtonProps) => {
       ]);
 
       setIsLoading(false);
-
-      redraw();
     });
   };
 

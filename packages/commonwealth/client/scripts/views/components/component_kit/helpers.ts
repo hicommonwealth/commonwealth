@@ -1,4 +1,3 @@
-import { redraw } from 'mithrilInterop';
 import { isBoolean, isNotNil } from 'helpers/typeGuards';
 
 import breakpoints from 'mixins/breakpoints.scss';
@@ -56,6 +55,5 @@ export const breakpointFnValidator = (
 
   if (widthState !== breakPointState) {
     setWidthState(breakPointState);
-    redraw();
   }
 };

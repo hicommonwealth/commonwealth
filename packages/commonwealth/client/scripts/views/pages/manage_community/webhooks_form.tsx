@@ -2,7 +2,6 @@ import React from 'react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { link, pluralize } from 'helpers';
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { Webhook } from 'models';
 
@@ -56,13 +55,10 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
         } else {
           notifyError(result.message);
         }
-
-        redraw();
       },
       (err) => {
         setDisabled(false);
         notifyError(err?.responseJSON?.error || 'Unknown error');
-        redraw();
       }
     );
   };
@@ -131,7 +127,6 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
                         } else {
                           notifyError(result.message);
                         }
-                        redraw();
                       },
                       (err) => {
                         setDisabled(false);
@@ -139,8 +134,6 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
                         notifyError(
                           err?.responseJSON?.error || 'Unknown error'
                         );
-
-                        redraw();
                       }
                     );
                   }}

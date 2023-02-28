@@ -2,7 +2,7 @@ import React from 'react';
 
 import { link } from 'helpers';
 
-import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
+import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/web3login.scss';
@@ -62,8 +62,6 @@ const Web3LoginPage = () => {
       }
     } catch (e) {
       setErrorMsg(e.responseJSON.error);
-
-      redraw();
     }
   };
 

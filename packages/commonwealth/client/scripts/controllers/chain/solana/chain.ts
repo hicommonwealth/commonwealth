@@ -1,7 +1,6 @@
 import type * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 
-import { redraw } from 'mithrilInterop';
 import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
@@ -60,7 +59,6 @@ export default class SolanaChain
     );
     this.app.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
     this.app.chain.networkStatus = ApiStatus.Connected;
-    redraw();
   }
 
   public async deinit() {

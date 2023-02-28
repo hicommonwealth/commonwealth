@@ -8,7 +8,6 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 
-import { redraw } from 'mithrilInterop';
 import type { ChainEntity, Profile, Topic } from 'models';
 import {
   Attachment,
@@ -377,7 +376,6 @@ class ThreadsController {
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
-          redraw();
           resolve(result);
         })
         .catch((e) => {

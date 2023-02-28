@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';

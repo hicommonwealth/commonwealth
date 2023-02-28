@@ -1,10 +1,6 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  _DEPRECATED_getSearchParams,
-  redraw,
-} from 'mithrilInterop';
+import { ClassComponent, _DEPRECATED_getSearchParams } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -209,8 +205,6 @@ const search = async (searchQuery: SearchQuery, state) => {
   state.results = app.search.getByQuery(searchQuery).results;
 
   app.search.addToHistory(searchQuery);
-
-  redraw();
 };
 
 type SearchPageAttrs = {

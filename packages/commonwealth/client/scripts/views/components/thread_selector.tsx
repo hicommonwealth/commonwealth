@@ -1,10 +1,12 @@
 import React from 'react';
+import { ClassComponent, render } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
 
 import 'components/thread_selector.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type { Thread } from 'models';
 import type { SearchParams } from 'models/SearchQuery';
-import { ClassComponent, ResultNode, render, redraw } from 'mithrilInterop';
+
 import app from 'state';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { CWTextInput } from './component_kit/cw_text_input';
@@ -126,7 +128,6 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                             thread.author
                           );
                         });
-                        redraw();
                       })
                       .catch(() => {
                         notifyError('Could not find matching thread');

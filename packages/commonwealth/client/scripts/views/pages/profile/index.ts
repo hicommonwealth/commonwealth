@@ -3,7 +3,6 @@ import {
   render,
   _DEPRECATED_getRoute,
   _DEPRECATED_getSearchParams,
-  redraw,
 } from 'mithrilInterop';
 
 import {
@@ -205,7 +204,6 @@ const loadProfile = async (
     state.account = account;
     state.threads = result.threads.map((t) => app.threads.modelFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
-    redraw();
   } catch (err) {
     // for certain chains, display addresses not in db if formatted properly
     if (chainInfo?.base === ChainBase.Substrate) {
@@ -258,7 +256,6 @@ const loadProfile = async (
     }
     state.loaded = true;
     state.loading = false;
-    redraw();
     if (!state.account)
       throw new Error(
         err.responseJSON && err.responseJSON.error
@@ -359,11 +356,7 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
       loadProfile(vnode.attrs, vnode.state);
       vnode.state.refreshProfile = false;
       if (onOwnProfile) {
-        setActiveAccount(account).then(() => {
-          redraw();
-        });
-      } else {
-        redraw();
+        setActiveAccount(account);
       }
     }
 
@@ -400,7 +393,6 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
           if (_DEPRECATED_getRoute() === thisUrl)
             window.location.hash = vnode.state.commentsContentCount.toString();
         }
-        redraw();
       }
     }, 400);
 

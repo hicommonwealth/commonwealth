@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import type {
   SnapshotProposal,
   SnapshotProposalVote,
@@ -120,8 +119,6 @@ export const SnapshotPollCardContainer = (
           if (choice && callback) {
             setIsModalOpen(true);
           }
-
-          redraw();
         }}
         incrementalVoteCast={totalScore}
         tooltipErrorMessage={voteErrorText}

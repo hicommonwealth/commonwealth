@@ -1,4 +1,3 @@
-import { redraw } from 'mithrilInterop';
 import { addressSwapper } from 'utils';
 import $ from 'jquery';
 import _ from 'lodash';

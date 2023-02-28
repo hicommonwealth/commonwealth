@@ -1,7 +1,5 @@
 import $ from 'jquery';
 import app from 'state';
-
-import { redraw } from 'mithrilInterop';
 import { StarredCommunity } from 'models';
 
 class CommunitiesController {
@@ -43,7 +41,6 @@ class CommunitiesController {
             app.user.removeStarredCommunity(star);
           }
           resolve();
-          redraw();
         })
         .catch(() => {
           reject();

@@ -2,7 +2,7 @@ import React from 'react';
 /* eslint-disable no-useless-escape */
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, render, redraw, rootRender } from 'mithrilInterop';
+import { ClassComponent, render, rootRender } from 'mithrilInterop';
 
 import 'components/quill/markdown_formatted_text.scss';
 import DOMPurify from 'dompurify';
@@ -75,7 +75,6 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
       } else {
         this.truncatedDoc = doc;
       }
-      redraw();
     };
 
     renderer.link = (href, title, text) => {

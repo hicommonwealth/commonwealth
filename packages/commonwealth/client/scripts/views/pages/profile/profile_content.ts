@@ -5,7 +5,7 @@ import { Thread } from 'models';
 import app from 'state';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import type { Component } from 'mithrilInterop';
-import { render, redraw } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 
 import type { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
@@ -35,7 +35,6 @@ const ProfileContent: Component<
       if (!matches || isNaN(+matches[1])) return;
 
       vnode.attrs.count = +matches[1];
-      redraw();
       const scrollY = localStorage[vnode.attrs.localStorageScrollYKey];
       setTimeout(() => {
         if (app.lastNavigatedBack() && Number(scrollY)) {

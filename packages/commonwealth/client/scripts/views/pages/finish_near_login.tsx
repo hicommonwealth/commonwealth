@@ -1,10 +1,9 @@
 import React from 'react';
-import type { NavigateFunction } from 'react-router-dom';
 import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
 import BN from 'bn.js';
-import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
+import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -277,13 +276,11 @@ const FinishNearLogin = () => {
       validate(wallet).then(() => {
         setValidationCompleted(true);
         setValidating(false);
-        redraw();
       });
     } else {
       setValidationError('Sign-in failed.');
       setValidating(false);
       setValidationCompleted(true);
-      redraw();
     }
   } else {
     // validation in progress

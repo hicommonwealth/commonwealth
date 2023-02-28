@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/select_address_modal.scss';
@@ -50,7 +49,6 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
       })
       .then(() => {
         setIsLoading(false);
-        redraw();
         setSelectedIndex(null);
         // select the address, and close the form
         notifySuccess(
@@ -61,13 +59,11 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
           )}`
         );
         setActiveAccount(account).then(() => {
-          redraw();
           $(e.target).trigger('modalexit');
         });
       })
       .catch((err: any) => {
         setIsLoading(false);
-        redraw();
         notifyError(err.responseJSON.error);
       });
   };
@@ -86,7 +82,6 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
 
     if (!confirmed) {
       setIsLoading(false);
-      redraw();
       return;
     }
 
@@ -97,7 +92,6 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
       })
       .then(() => {
         setIsLoading(false);
-        redraw();
         setSelectedIndex(null);
         // unset activeAccount, or set it to the next activeAccount
         if (isSameAccount(app.user.activeAccount, account)) {
@@ -106,7 +100,6 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
       })
       .catch((err: any) => {
         setIsLoading(false);
-        redraw();
         notifyError(err.responseJSON.error);
       });
   };

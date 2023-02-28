@@ -3,7 +3,7 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { Account } from 'models';
 import type { Component } from 'mithrilInterop';
-import { render, redraw } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 import { setActiveAccount } from '../../../controllers/app/login';
 import app from '../../../state';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -37,13 +37,11 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       () => {
         if (window.scrollY > 142 && vnode.state.showProfileRight === false) {
           vnode.state.showProfileRight = true;
-          redraw();
         } else if (
           window.scrollY < 142 &&
           vnode.state.showProfileRight === true
         ) {
           vnode.state.showProfileRight = false;
-          redraw();
         }
       },
       { passive: true }
@@ -63,7 +61,6 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
-        redraw();
         notifySuccess('Joined community');
       } catch (err) {
         vnode.state.loading = false;
@@ -144,7 +141,6 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   vnode.state.loading = true;
                   try {
                     await setActiveAccount(account);
-                    redraw();
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);
@@ -152,7 +148,6 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 } else {
                   try {
                     await joinCommunity();
-                    redraw();
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);

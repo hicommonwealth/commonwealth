@@ -1,4 +1,3 @@
-import { redraw } from 'mithrilInterop';
 import type { Poll } from 'models';
 import moment from 'moment';
 
@@ -32,7 +31,6 @@ export const handlePollVote = async (
     .submitVote(...userInfo, option)
     .then(() => {
       callback();
-      redraw();
     })
     .catch(() => {
       window.confirm(

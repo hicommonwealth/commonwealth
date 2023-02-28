@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import {
@@ -81,7 +80,6 @@ export const LinkedProposalsCard = (props: LinkedProposalsCardProps) => {
 
       setSnapshotProposalsLoaded(true);
       setInitialized(false);
-      redraw();
     });
   }
 

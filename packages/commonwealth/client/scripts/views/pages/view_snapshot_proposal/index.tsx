@@ -9,7 +9,7 @@ import type {
 import { getPower, getResults } from 'helpers/snapshot_utils';
 import { AddressInfo } from 'models';
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 import app from 'state';
@@ -68,8 +68,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         this.totals = res.results;
       });
 
-      redraw();
-
       getPower(
         this.space,
         this.proposal,
@@ -78,7 +76,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         this.validatedAgainstStrategies = vals.totalScore > 0;
         this.totalScore = vals.totalScore;
         this.fetchedPower = true;
-        redraw();
       });
 
       try {
@@ -87,7 +84,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
             .then((res) => {
               this.threads = res;
-              redraw();
             });
         }
       } catch (e) {

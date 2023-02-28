@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/component_kit/cw_sidebar_menu.scss';
 import { AddressInfo } from 'models';
 
@@ -19,14 +17,8 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
   const navigate = useCommonNavigate();
 
   if (props.type === 'default') {
-    const {
-      disabled,
-      iconLeft,
-      iconRight,
-      isSecondary,
-      label,
-      onClick,
-    } = props;
+    const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
+      props;
 
     return (
       <div
@@ -98,7 +90,6 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
               onClick={async (e) => {
                 e.stopPropagation();
                 await app.communities.setStarred(item.id);
-                redraw();
               }}
             />
           </div>

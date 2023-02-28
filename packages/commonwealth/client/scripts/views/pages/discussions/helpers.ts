@@ -1,11 +1,10 @@
 import { notifySuccess } from 'controllers/app/notifications';
-import { redraw } from 'mithrilInterop';
 import type { NotificationSubscription, Thread } from 'models';
 import moment from 'moment';
 
 import app from 'state';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
-import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {
   const { lastCommentedOn } = thread;
@@ -69,8 +68,6 @@ const handleToggleSubscription = async (
     ]);
     notifySuccess('Subscribed!');
   }
-
-  redraw();
 };
 
 export const getCommentSubscription = (thread: Thread) => {
@@ -107,7 +104,6 @@ export const getThreadSubScriptionMenuItem = (
         getReactionSubscription(thread),
         isSubscribed
       );
-      redraw();
     },
     label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
     iconLeft: isSubscribed ? 'unsubscribe' : 'bell',

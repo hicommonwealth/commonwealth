@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode, ClassComponentRouter } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
@@ -138,7 +138,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       if (!app.isCustomDomain()) {
         deinitChainOrCommunity().then(() => {
           this.loadingScope = null;
-          redraw();
         });
       }
       return <LoadingLayout />;

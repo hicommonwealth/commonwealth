@@ -20,7 +20,7 @@ import { ApiStatus } from 'state';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import { redraw, _DEPRECATED_dangerouslySetRoute } from 'mithrilInterop';
+import { _DEPRECATED_dangerouslySetRoute } from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;
@@ -129,13 +129,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         +latest_block_time - prevBlock.header.timestamp;
       if (this.app.chain.networkStatus !== ApiStatus.Connected) {
         this.app.chain.networkStatus = ApiStatus.Connected;
-        redraw();
       }
     } catch (e) {
       if (this.app.chain.networkStatus !== ApiStatus.Disconnected) {
         console.error(`failed to query NEAR status: ${JSON.stringify(e)}`);
         this.app.chain.networkStatus = ApiStatus.Disconnected;
-        redraw();
       }
     }
   }

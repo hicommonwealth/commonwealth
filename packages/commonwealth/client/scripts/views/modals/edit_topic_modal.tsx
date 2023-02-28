@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
@@ -92,7 +91,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
       return true;
     } catch (err) {
       setErrorMsg(err.message || err);
-      redraw();
       return false;
     }
   };
@@ -133,7 +131,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
               )} 
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
-              redraw();
               return ['failure', newErrorMsg];
             }
 
@@ -195,7 +192,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
                 })
                 .catch(() => {
                   setIsSaving(false);
-                  redraw();
                 });
             }}
             label="Save changes"
@@ -216,7 +212,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
                 })
                 .catch(() => {
                   setIsSaving(false);
-                  redraw();
                 });
             }}
             label="Delete topic"

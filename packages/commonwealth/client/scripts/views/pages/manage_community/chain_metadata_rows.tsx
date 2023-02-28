@@ -2,7 +2,7 @@ import React from 'react';
 import { uuidv4 } from 'lib/util';
 import $ from 'jquery';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
@@ -461,7 +461,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               notifyError(err || 'Chain update failed');
             }
-            redraw();
           }}
         />
         <div className="commonbot-section">

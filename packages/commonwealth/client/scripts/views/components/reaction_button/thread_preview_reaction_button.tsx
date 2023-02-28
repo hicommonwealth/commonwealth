@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import 'components/reaction_button/thread_preview_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import type { ChainInfo, Thread } from 'models';
@@ -67,7 +65,6 @@ export const ThreadPreviewReactionButton = (
           reactors.filter(({ Address }) => Address.address !== userAddress)
         );
         setIsLoading(false);
-        redraw();
       });
   };
 
@@ -83,8 +80,6 @@ export const ThreadPreviewReactionButton = (
       ]);
 
       setIsLoading(false);
-
-      redraw();
     });
   };
 

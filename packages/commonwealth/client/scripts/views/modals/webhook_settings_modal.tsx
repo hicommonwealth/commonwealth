@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import { NotificationCategories } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import {
@@ -70,14 +68,12 @@ export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
             setSelectedCategories(
               selectedCategories.filter((v) => !values.includes(v))
             );
-            redraw();
           } else {
             values.forEach((v) => {
               if (!selectedCategories.includes(v)) {
                 selectedCategories.push(v);
               }
             });
-            redraw();
           }
         }}
       />
@@ -132,7 +128,6 @@ export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
               },
               error: (err) => {
                 notifyError(err.statusText);
-                redraw();
               },
             });
           }}

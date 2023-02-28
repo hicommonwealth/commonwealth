@@ -1,6 +1,4 @@
 import React from 'react';
-
-import { redraw } from 'mithrilInterop';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -87,8 +85,6 @@ export const CreateComment = (props: CreateCommmentProps) => {
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
 
-      redraw();
-
       jumpHighlightComment(res.id);
     } catch (err) {
       console.log(err);
@@ -100,14 +96,11 @@ export const CreateComment = (props: CreateCommmentProps) => {
       setErrorMsg(err.message);
 
       setSendingComment(false);
-
-      redraw();
     }
 
     if (handleIsReplying) {
       handleIsReplying(false);
     }
-    redraw();
   };
 
   const activeTopicName =
@@ -137,7 +130,6 @@ export const CreateComment = (props: CreateCommmentProps) => {
               <EditProfileModal
                 onModalClose={() => setIsModalOpen(false)}
                 account={app.user.activeAccount}
-                refreshCallback={() => redraw()}
               />
             }
             onClose={() => setIsModalOpen(false)}
@@ -198,13 +190,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
               )}
             </CWText>
           )}
-          <div
-            className="form-bottom"
-            onMouseOver={() => {
-              // keeps Quill's isBlank up to date
-              return redraw();
-            }}
-          >
+          <div className="form-bottom">
             <div className="form-buttons">
               <CWButton
                 disabled={

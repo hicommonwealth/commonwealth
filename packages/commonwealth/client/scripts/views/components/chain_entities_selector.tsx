@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render, redraw } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 
 import 'components/chain_entities_selector.scss';
 import type { ChainEntity, Thread } from 'models';
@@ -27,7 +27,6 @@ export const ChainEntitiesSelector = (props: ChainEntitiesSelectorProps) => {
     app.chainEntities?.refresh(app.chain.id).then(() => {
       // refreshing loads the latest chain entities into app.chainEntities store
       setChainEntitiesLoaded(true);
-      redraw();
     });
   }
 

@@ -1,4 +1,3 @@
-import { redraw } from 'mithrilInterop';
 import QuillEditorInternal from './quill_editor_internal';
 import type { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 
@@ -158,6 +157,5 @@ export class QuillEditor extends QuillEditorInternal {
     this._alteredText = false;
     this._quill.setContents(doc);
     this._clearLocalStorage();
-    redraw();
   }
 }

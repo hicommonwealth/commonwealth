@@ -3,7 +3,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import type { Component } from 'mithrilInterop';
-import { render, redraw } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
@@ -48,7 +48,6 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
-        redraw();
         notifySuccess('Joined community');
       } catch (err) {
         vnode.state.loading = false;
@@ -127,7 +126,6 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                     vnode.state.loading = true;
                     try {
                       await setActiveAccount(account);
-                      redraw();
                     } catch (e) {
                       vnode.state.loading = false;
                       notifyError(e);
@@ -135,7 +133,6 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   } else {
                     try {
                       await joinCommunity();
-                      redraw();
                     } catch (e) {
                       vnode.state.loading = false;
                       notifyError(e);

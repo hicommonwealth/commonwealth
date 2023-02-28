@@ -5,7 +5,6 @@ import { initAppState } from 'state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
 import $ from 'jquery';
-import { redraw } from 'mithrilInterop';
 
 import _ from 'lodash';
 
@@ -76,7 +75,6 @@ export const LoginSelectorMenuLeft = ({
             className="login-menu-item"
             onClick={async () => {
               await setActiveAccount(account);
-              redraw();
             }}
           >
             <UserBlock
@@ -135,7 +133,6 @@ export const LoginSelectorMenuLeft = ({
           <EditProfileModal
             onModalClose={() => setIsEditProfileModalOpen(false)}
             account={app.user.activeAccount}
-            refreshCallback={() => redraw()}
           />
         }
         onClose={() => setIsEditProfileModalOpen(false)}
@@ -201,7 +198,6 @@ export const LoginSelectorMenuRight = ({
                 localStorage.setItem('user-dark-mode-state', 'on');
               }
               e.stopPropagation();
-              redraw();
             }}
           />
           <CWText type="caption">Dark mode</CWText>
@@ -447,7 +443,6 @@ export const LoginSelector = () => {
         if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
-        redraw();
       } catch (err) {
         console.error(err);
       }

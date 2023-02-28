@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import type { Thread, ThreadStage, Topic } from 'models';
 import app from 'state';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
@@ -57,7 +56,6 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
 
                       app.threads.pin({ proposal: thread }).then(() => {
                         navigate('/discussions');
-                        redraw();
                       });
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
@@ -71,12 +69,10 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
                     onClick: (e) => {
                       e.preventDefault();
 
-                      app.threads
-                        .setPrivacy({
-                          threadId: thread.id,
-                          readOnly: !thread.readOnly,
-                        })
-                        .then(() => redraw());
+                      app.threads.setPrivacy({
+                        threadId: thread.id,
+                        readOnly: !thread.readOnly,
+                      });
                     },
                     label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                     iconLeft: 'lock' as const,
@@ -143,7 +139,6 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
           <ChangeTopicModal
             onChangeHandler={(topic: Topic) => {
               thread.topic = topic;
-              redraw();
             }}
             thread={thread}
             onModalClose={() => setIsChangeTopicModalOpen(false)}
@@ -157,7 +152,6 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
           <UpdateProposalStatusModal
             onChangeHandler={(stage: ThreadStage) => {
               thread.stage = stage;
-              redraw();
             }}
             thread={thread}
             onModalClose={() => setIsUpdateProposalStatusModalOpen(false)}

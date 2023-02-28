@@ -2,7 +2,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { Account, AddressInfo } from 'models';
 import app from 'state';
-import { render, redraw, Component } from 'mithrilInterop';
+import { render, Component } from 'mithrilInterop';
 
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -27,7 +27,6 @@ const ProfileBanner: Component<
       );
       if (!confirmed) {
         vnode.state.loading = false;
-        redraw();
         return;
       }
 
@@ -38,16 +37,13 @@ const ProfileBanner: Component<
         })
         .then(() => {
           vnode.state.loading = false;
-          redraw();
           notifySuccess(`Joined with ${addrShort}`); // ${addrShort} is now a member of the [Edgeware] community!
           setActiveAccount(account).then(() => {
-            redraw();
             $(e.target).trigger('modalexit');
           });
         })
         .catch((err: any) => {
           vnode.state.loading = false;
-          redraw();
           notifyError(err.responseJSON.error);
         });
     };

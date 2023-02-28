@@ -1,4 +1,3 @@
-import { redraw } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import { loadScript } from 'helpers';
 import { detectURL } from 'helpers/threads';
@@ -173,7 +172,6 @@ export default class QuillEditorInternal {
           );
           this._unsavedChanges = new this.Delta();
         }
-        redraw();
       }
     }, 250);
 
@@ -189,7 +187,6 @@ export default class QuillEditorInternal {
       // newThread draft system prompts w/ save confirmation modal
       if (source === 'user' && !this._alteredText) {
         this._alteredText = true;
-        redraw();
       }
     });
   }

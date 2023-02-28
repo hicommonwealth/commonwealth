@@ -203,9 +203,6 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
                                       threadId: thread.id,
                                       readOnly: !thread.readOnly,
                                     })
-                                    .then(() => {
-                                      redraw();
-                                    });
                                 },
                               },
                             ]}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ClassComponent, redraw, parsePathname } from 'mithrilInterop';
+import { ClassComponent, parsePathname } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
