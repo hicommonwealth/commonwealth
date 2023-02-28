@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
 import type { AnyProposal, Thread } from 'models';
 
 import app from 'state';
@@ -91,70 +89,52 @@ export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
   }
 };
 
-type CollapsibleProposalBodyAttrs = {
+type CollapsibleProposalBodyProps = {
   proposal: AnyProposal;
 };
 
-export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalBodyAttrs> {
-  private body: any;
-  private collapsed: boolean;
+export const CollapsibleProposalBody = ({
+  proposal,
+}: CollapsibleProposalBodyProps) => {
+  const [body, setBody] = useState(proposal.description);
+  const [collapsed, setCollapsed] = useState(false);
 
-  oninit(vnode: ResultNode<CollapsibleProposalBodyAttrs>) {
-    const { proposal } = vnode.attrs;
-
-    this.collapsed = false;
-    this.body = proposal.description;
-
+  useEffect(() => {
     try {
       const doc = JSON.parse(proposal.description);
       if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
-        this.collapsed = true;
+        setCollapsed(true);
       }
     } catch (e) {
       if (
         countLinesMarkdown(proposal.description) >
         MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
       ) {
-        this.collapsed = true;
+        setCollapsed(true);
       }
     }
-    this.redraw();
+  }, []);
+
+  try {
+    const doc = JSON.parse(body);
+
+    if (!doc.ops) throw new Error();
+
+    return (
+      <QuillFormattedText
+        doc={doc}
+        cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+        hideFormatting={false}
+      />
+    );
+  } catch (e) {
+    return (
+      body && (
+        <MarkdownFormattedText
+          doc={body}
+          cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+        />
+      )
+    );
   }
-
-  onupdate(vnode: ResultNode<CollapsibleProposalBodyAttrs>) {
-    const { proposal } = vnode.attrs;
-
-    this.body = proposal.description;
-  }
-
-  view() {
-    const { body } = this;
-
-    const text = () => {
-      try {
-        const doc = JSON.parse(body);
-
-        if (!doc.ops) throw new Error();
-
-        return (
-          <QuillFormattedText
-            doc={doc}
-            cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-            hideFormatting={false}
-          />
-        );
-      } catch (e) {
-        return (
-          body && (
-            <MarkdownFormattedText
-              doc={body}
-              cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
-            />
-          )
-        );
-      }
-    };
-
-    return text();
-  }
-}
+};
