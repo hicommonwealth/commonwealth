@@ -15,6 +15,7 @@ import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { openAlert } from 'views/modals/alert_modal';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
@@ -107,10 +108,17 @@ const OverviewPage = () => {
           ) : (
             <CWButton
               buttonType="mini-black"
-              label="Create Thread"
+              label="Create aaaThread"
               iconLeft="plus"
               onClick={() => {
-                navigate('/new/discussion');
+                openAlert({
+                  title: 'title',
+                  message: 'string message',
+                  buttons: [
+                    { label: 'Label', onClick: () => console.log('test') },
+                  ],
+                });
+                // navigate('/new/discussion');
               }}
             />
           )}

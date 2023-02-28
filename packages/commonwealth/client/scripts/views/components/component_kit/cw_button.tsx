@@ -33,7 +33,7 @@ type ButtonStyleProps = {
   buttonType?: ButtonType;
 } & BaseStyleProps;
 
-type ButtonProps = {
+export type ButtonProps = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string | React.ReactNode;
