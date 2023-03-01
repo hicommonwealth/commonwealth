@@ -92,7 +92,7 @@ const updateNewProfile = async (
 
   if (name) {
     // eslint-disable-next-line no-useless-escape
-    const regex = /^([a-zA-Z0-9\s\_\-]+)$/;
+    const regex = /^([a-zA-Z0-9\_\-]+)$/;
     if (!regex.test(name)) {
       return next(new Error(Errors.ProfileNameInvalid));
     }
@@ -100,15 +100,15 @@ const updateNewProfile = async (
 
   const updateStatus = await models.Profile.update(
     {
-      ...(email && { email }),
-      ...(slug && { slug }),
+      // ...(email && { email }),
+      // ...(slug && { slug }),
       ...(name && { profile_name: name }),
-      ...(bio && { bio }),
-      ...(website && { website }),
-      ...(avatarUrl && { avatar_url: avatarUrl }),
-      ...(socials && { socials: JSON.parse(socials) }),
-      ...(coverImage && { cover_image: JSON.parse(coverImage) }),
-      ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
+      // ...(bio && { bio }),
+      // ...(website && { website }),
+      // ...(avatarUrl && { avatar_url: avatarUrl }),
+      // ...(socials && { socials: JSON.parse(socials) }),
+      // ...(coverImage && { cover_image: JSON.parse(coverImage) }),
+      // ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
     },
     {
       where: {

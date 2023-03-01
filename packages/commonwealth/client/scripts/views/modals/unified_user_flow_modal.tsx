@@ -53,7 +53,7 @@ class EntryPage extends ClassComponent<{
             }}
             inputValidationFn={(val) => {
               // eslint-disable-next-line no-useless-escape
-              const regex = /^([a-zA-Z0-9\s\_\-]+)$/;
+              const regex = /^([a-zA-Z0-9\_\-]+)$/;
 
               if (regex.test(val)) {
                 this.validatedName = true;
@@ -62,7 +62,7 @@ class EntryPage extends ClassComponent<{
                 this.validatedName = false;
                 return [
                   'failure',
-                  'Only alphanumeric characters, underscores, and dashes are allowed.',
+                  'Only alphanumeric characters, underscores, spaces, and dashes are allowed.',
                 ];
               }
             }}
