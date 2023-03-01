@@ -1,5 +1,3 @@
-import type { ToastStore } from 'controllers/app/toasts';
-import { getToastStore } from 'controllers/app/toasts';
 import ChainEntityController from 'controllers/server/chain_entities';
 import DiscordController from 'controllers/server/discord';
 import { WebSocketController } from 'controllers/server/socket';
@@ -91,8 +89,6 @@ export interface IApp {
   // Web3
   wallets: WebWalletController;
   snapshot: SnapshotController;
-
-  toasts: ToastStore;
 
   mobileMenu: MobileMenuName;
   mobileMenuRedraw: EventEmitter;
@@ -200,8 +196,6 @@ const app: IApp = {
   sidebarMenu: 'default',
   sidebarRedraw: new EventEmitter(),
   sidebarToggled: false,
-
-  toasts: getToastStore(),
 
   config: {
     chains: new ChainStore(),

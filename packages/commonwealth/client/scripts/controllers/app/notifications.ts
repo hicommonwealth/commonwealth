@@ -1,7 +1,6 @@
-import app from 'state';
 import { toast } from 'react-toastify';
 
-export function notifySuccess(message: string, allowDuplicates?: boolean) {
+export function notifySuccess(message: string) {
   toast(message, {
     type: 'success',
     autoClose: 3000,
@@ -9,7 +8,7 @@ export function notifySuccess(message: string, allowDuplicates?: boolean) {
   });
 }
 
-export function notifyError(message: string, allowDuplicates?: boolean) {
+export function notifyError(message: string) {
   toast(message, {
     type: 'error',
     autoClose: 3000,
@@ -17,7 +16,7 @@ export function notifyError(message: string, allowDuplicates?: boolean) {
   });
 }
 
-export function notifyInfo(message: string, allowDuplicates?: boolean) {
+export function notifyInfo(message: string) {
   toast(message, {
     type: 'info',
     autoClose: 3000,
