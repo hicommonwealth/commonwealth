@@ -108,7 +108,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       const response: any = await $.post(
         `${app.serverUrl()}/updateProfile/v2`,
         {
-          profileId: this.profile.id,
           ...this.profileUpdate,
           jwt: app.user.jwt,
         }

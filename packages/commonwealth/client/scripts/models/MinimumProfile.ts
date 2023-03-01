@@ -61,7 +61,7 @@ class MinimumProfile {
   }
 
   public static fromJSON(json) {
-    return new MinimumProfile(json);
+    return new MinimumProfile(json.address, json.chain);
   }
 
   public getAvatar(size: number) {

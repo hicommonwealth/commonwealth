@@ -11,7 +11,6 @@ export const Errors = {
 };
 
 type UpdateNewProfileReq = {
-  profileId: string;
   email: string;
   slug: string;
   name: string;
@@ -32,9 +31,13 @@ const updateNewProfile = async (
   res: TypedResponse<UpdateNewProfileResp>,
   next: NextFunction
 ) => {
-  if (!req.body.profileId) {
-    return next(new Error(Errors.NoProfileIdProvided));
-  }
+  const profile = await models.Profile.findOne({
+    where: {
+      user_id: req.user.id,
+    },
+  });
+
+  if (!profile) return next(new Error(Errors.NoProfileFound));
 
   if (
     !req.body.email &&
@@ -51,7 +54,6 @@ const updateNewProfile = async (
   }
 
   const {
-    profileId,
     email,
     slug,
     name,
@@ -62,17 +64,6 @@ const updateNewProfile = async (
     coverImage,
     backgroundImage,
   } = req.body;
-
-  const profile = await models.Profile.findOne({
-    where: {
-      id: profileId,
-    },
-  });
-  if (!profile) return next(new Error(Errors.NoProfileFound));
-
-  if (profile.user_id !== req.user.id) {
-    return next(new Error(Errors.NotAuthorized));
-  }
 
   const updateStatus = await models.Profile.update(
     {
@@ -88,7 +79,7 @@ const updateNewProfile = async (
     },
     {
       where: {
-        id: profileId,
+        user_id: req.user.id,
       },
     }
   );

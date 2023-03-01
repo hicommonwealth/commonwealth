@@ -61,7 +61,7 @@ const getAddressProfile = async (
     status: 'Success',
     result: {
       profileId: address.profile_id,
-      name: address.name,
+      name: profile?.profile_name,
       address: address.address,
       lastActive: address.last_active,
       avatarUrl: profile?.avatar_url,
