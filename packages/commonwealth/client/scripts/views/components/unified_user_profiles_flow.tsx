@@ -1,19 +1,11 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import { parseCustomStages, threadStageToLabel } from 'helpers';
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import $ from 'jquery';
 import m from 'mithril';
 
 import 'modals/unified_user_flow_modal.scss';
 
 import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWCard } from '../components/component_kit/cw_card';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { UnifiedUserFlowModal } from '../modals/unified_user_flow_modal';
 
 const DISPLAY_INTERVAL = 60 * 60 * 1000; // 1 hour wait

@@ -2,7 +2,6 @@ import type { NextFunction } from 'express';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import type { DB } from '../models';
 import { success, failure } from '../types';
-import { legacyToBuffer } from '@metamask/eth-sig-util/dist/utils';
 
 export const Errors = {
   NotAuthorized: 'Not authorized',
@@ -92,6 +91,7 @@ const updateNewProfile = async (
   }
 
   if (name) {
+    // eslint-disable-next-line no-useless-escape
     const regex = /^([a-zA-Z0-9\s\_\-]+)$/;
     if (!regex.test(name)) {
       return next(new Error(Errors.ProfileNameInvalid));
