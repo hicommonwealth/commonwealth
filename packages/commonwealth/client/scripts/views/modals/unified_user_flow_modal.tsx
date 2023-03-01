@@ -104,7 +104,7 @@ class EntryPage extends ClassComponent<{
           <CWButton
             buttonType="primary-black"
             label="Save"
-            disabled={!this.validatedName && this.displayNameValue.length === 0}
+            disabled={!this.validatedName || this.displayNameValue.length === 0}
             onclick={async () => {
               try {
                 const res = await $.post(
