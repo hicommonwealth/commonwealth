@@ -92,7 +92,7 @@ const updateNewProfile = async (
 
   if (name) {
     // eslint-disable-next-line no-useless-escape
-    const regex = /^([a-zA-Z0-9\s\_\-]+)$/;
+    const regex = /^([a-zA-Z0-9 \_\-]+)$/;
     if (!regex.test(name)) {
       return next(new Error(Errors.ProfileNameInvalid));
     }
