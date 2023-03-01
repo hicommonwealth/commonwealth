@@ -63,7 +63,7 @@ class EntryPage extends ClassComponent<{
                 this.validatedName = false;
                 return [
                   'failure',
-                  'Only alphanumeric characters, underscores, spaces, and dashes are allowed.',
+                  'Only numbers, letters, underscores, spaces, & dashes.',
                 ];
               }
             }}
@@ -223,7 +223,7 @@ class Success extends ClassComponent<{ onClose: () => void }> {
         </div>
         <div class="Description">
           <CWText type="b1" className="bold-section">
-            Great news! You've just submitted your new display name. Starting
+            Great news! You've just submitted your new display name. Starting 
             <span class="bold"> March 9th</span>, your current profile name will
             be replaced with the display name you provided.
           </CWText>
