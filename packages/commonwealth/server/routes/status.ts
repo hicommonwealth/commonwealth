@@ -294,8 +294,7 @@ const status = async (
     // iterates through the retrieved comments and adds each thread id to the activePosts set
     for (const comment of commentNum) {
       if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {};
-      // extract the thread id from the comments root id
-      const id = comment.thread_id.split('_')[1];
+      const id = comment.thread_id;
       unseenPosts[comment.chain].activePosts
         ? unseenPosts[comment.chain].activePosts.add(id)
         : (unseenPosts[comment.chain].activePosts = new Set(id));

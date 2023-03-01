@@ -116,7 +116,7 @@ export default async function emitNotifications(
   if (!notification) {
     if (isChainEventData) {
       const event: any = (<IChainEventNotificationData>notification_data)
-        .chainEvent;
+        .chainEvent;~
       event.ChainEventType = (<IChainEventNotificationData>(
         notification_data
       )).chainEventType;

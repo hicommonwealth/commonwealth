@@ -44,9 +44,7 @@ const getProfile = async (
     },
   });
 
-  const commentThreadIds = comments
-    .map((c) => c.thread_id.split('_')[1])
-    .filter((id) => !!parseInt(id, 10)); // remove proposals from id list
+  const commentThreadIds = comments.map((c) => c.thread_id);
 
   const threads = await models.Thread.findAll({
     where: {

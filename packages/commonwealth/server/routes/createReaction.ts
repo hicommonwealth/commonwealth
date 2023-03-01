@@ -1,15 +1,12 @@
 /* eslint-disable prefer-const */
 import { AppError, ServerError } from 'common-common/src/errors';
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-} from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainNetwork, ChainType, NotificationCategories, } from 'common-common/src/types';
 /* eslint-disable dot-notation */
 import type { NextFunction, Request, Response } from 'express';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { getThreadUrl, getThreadUrlWithoutObject } from '../../shared/utils';
+import { getThreadUrl } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
@@ -18,7 +15,6 @@ import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -28,7 +24,7 @@ export const Errors = {
   NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found',
   InsufficientTokenBalance:
-    "Users need to hold some of the community's tokens to react",
+    'Users need to hold some of the community\'s tokens to react',
   BalanceCheckFailed: 'Could not verify user token balance',
   RuleCheckFailed: 'Rule check failed',
 };
@@ -189,23 +185,11 @@ const createReaction = async (
     if (!comment) return next(new AppError(Errors.NoCommentMatch));
 
     // Test on variety of comments to ensure root relation + type
-    const [prefix, id] = comment.thread_id.split('_');
-    if (prefix === 'discussion') {
-      proposal = await models.Thread.findOne({
-        where: { id },
-      });
-      cwUrl = getThreadUrl(proposal, comment);
-    } else if (
-      prefix.includes('proposal') ||
-      prefix.includes('referendum') ||
-      prefix.includes('motion')
-    ) {
-      cwUrl = getThreadUrlWithoutObject(chain.id, id, comment);
-      proposal = id;
-    } else {
-      proposal = undefined;
-    }
-    root_type = prefix;
+    const id = comment.thread_id;
+    proposal = await models.Thread.findOne({
+      where: { id },
+    });
+    cwUrl = getThreadUrl(proposal, comment);
   } else if (thread_id) {
     proposal = await models.Thread.findByPk(Number(thread_id));
     if (!proposal) return next(new AppError(Errors.NoProposalMatch));
@@ -219,10 +203,10 @@ const createReaction = async (
   const notification_data = {
     created_at: new Date(),
     thread_id: comment
-      ? comment.thread_id.split('_')[1]
+      ? comment.thread_id
       : proposal instanceof models.Thread
-      ? proposal.id
-      : proposal?.thread_id,
+        ? proposal.id
+        : proposal?.thread_id,
     root_title,
     root_type,
     chain_id: finalReaction.chain,
