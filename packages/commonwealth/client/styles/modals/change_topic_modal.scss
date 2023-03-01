@@ -1,6 +1,6 @@
 @import '../shared';
 
-.modal-container:has(.ChangeTopicModal) {
+.Modal:has(.ChangeTopicModal) {
   overflow: unset;
 
   .ChangeTopicModal {

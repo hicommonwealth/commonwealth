@@ -13,7 +13,7 @@ import app from 'state';
 import { slugify } from 'utils';
 import { isCommandClick, pluralize } from 'helpers';
 import { AddressInfo } from 'models';
-import type { Thread, Topic } from 'models';
+import type { Thread } from 'models';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import {
@@ -43,7 +43,6 @@ type ThreadPreviewProps = {
 };
 
 export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
-  console.log('thread', thread);
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
 
   const [windowIsSmall, setWindowIsSmall] = useState(
@@ -152,9 +151,6 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           <div className="title-row">
             <CWText type="h5" fontWeight="semiBold">
               {thread.title}
-            </CWText>
-            <CWText type="h3" fontWeight="semiBold">
-              {thread.topic.name}
             </CWText>
             {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
