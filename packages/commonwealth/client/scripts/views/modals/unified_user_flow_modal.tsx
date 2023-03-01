@@ -39,7 +39,7 @@ class EntryPage extends ClassComponent<{
           </CWText>
           <CWText type="b1" className="bold-section">
             This change will go into effect
-            <span class="bold"> March 8th, 2023. </span>
+            <span class="bold"> 9th, 2023. </span>
             To prepare, provide a display name below.
           </CWText>
         </div>
@@ -223,7 +223,7 @@ class Success extends ClassComponent<{ onClose: () => void }> {
         <div class="Description">
           <CWText type="b1" className="bold-section">
             Great news! You've just submitted your new display name. Starting
-            <span class="bold"> March 8</span>, your current profile name will
+            <span class="bold"> March 9th</span>, your current profile name will
             be replaced with the display name you provided.
           </CWText>
         </div>
