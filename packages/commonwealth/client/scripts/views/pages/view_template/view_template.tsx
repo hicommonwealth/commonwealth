@@ -222,6 +222,7 @@ class ViewTemplatePage extends ClassComponent {
                 inputs: inputDetails
               }, params))
             })
+            outputArr.push(calldataSubArr)
           }
           else{
             outputArr.push(formState[ref]);
