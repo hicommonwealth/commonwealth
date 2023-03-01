@@ -53,7 +53,7 @@ class EntryPage extends ClassComponent<{
             }}
             inputValidationFn={(val) => {
               // eslint-disable-next-line no-useless-escape
-              const regex = /^([a-zA-Z0-9\_\-]+)$/;
+              const regex = /^([a-zA-Z0-9\s\_\-]+)$/;
 
               if (regex.test(val)) {
                 this.validatedName = true;
@@ -79,7 +79,17 @@ class EntryPage extends ClassComponent<{
         <div class="MoreInfo">
           <CWText>Want a deeper understanding of this change?</CWText>
           <div class="learn-more">
-            <CWText className="blue-text">Learn more</CWText>
+            <CWText
+              className="blue-text"
+              onclick={() => {
+                window.open(
+                  'https://commonwealth.ghost.io/p/7f623d2d-3926-4db5-b154-b36c545c5baf/',
+                  '_blank'
+                );
+              }}
+            >
+              Learn more
+            </CWText>
             <CWIcon iconName="blueExternalLink" iconSize="small" />
           </div>
         </div>
@@ -164,7 +174,17 @@ class Alert extends ClassComponent<{
           <CWText>Want a deeper understanding of this change?</CWText>
 
           <div class="learn-more">
-            <CWText className="blue-text">Learn more</CWText>
+            <CWText
+              className="blue-text"
+              onclick={() => {
+                window.open(
+                  'https://commonwealth.ghost.io/p/7f623d2d-3926-4db5-b154-b36c545c5baf/',
+                  '_blank'
+                );
+              }}
+            >
+              Learn more
+            </CWText>
             <CWIcon iconName="blueExternalLink" iconSize="small" />
           </div>
         </div>
