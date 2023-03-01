@@ -24,14 +24,6 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
   const [isSending, setIsSending] = React.useState<boolean>(false);
   const [status, setStatus] = React.useState<ValidationStatus | null>(null);
 
-  const errorMessage = (err: any): string => {
-    return err.status == 400
-      ? 'Please enter the feedback message.'
-      : err.status >= 401
-      ? 'Something went wrong. Please try again later.'
-      : err.responseJSON?.message || err.responseText;
-  };
-
   return (
     <div className="FeedbackModal">
       <div className="compact-modal-title">
