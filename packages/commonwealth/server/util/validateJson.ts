@@ -147,7 +147,5 @@ type AnyKeyAnyValue = Record<string, any>;
 
 export default function isValidJson(data: AnyKeyAnyValue): boolean {
   const validate = validator(JSON.parse(JSON.stringify(schema)));
-  const val = validate(data)
-  console.log(validate.errors)
-  return val
+  return validate(data)
 }

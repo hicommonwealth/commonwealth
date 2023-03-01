@@ -146,6 +146,7 @@ class ViewTemplatePage extends ClassComponent {
             case TemplateComponents.FUNCTIONFORM:
               this.formState = produce(this.formState, (draft) => {
                 draft[field.function.field_ref] = field.function.tx_forms.map( method => {
+                  // Create a Data structure for each calldata's method params from form
                   const form = {}
                   // Store appropriate ordering of params
                   form['paramRefs'] = method.paramRefs
@@ -271,7 +272,7 @@ class ViewTemplatePage extends ClassComponent {
                   this.formState,
                   (draft) => {
                     if(nested_field_ref){
-                      draft[nested_field_ref][nested_index][field[component].field_ref] = 
+                      draft[nested_field_ref][nested_index][field[component].field_ref] =
                         e.target.value
                     }else{
                       draft[field[component].field_ref] =
@@ -287,6 +288,7 @@ class ViewTemplatePage extends ClassComponent {
           );
         case TemplateComponents.FUNCTIONFORM:
           return field[component].tx_forms.flatMap((method, i) => {
+            // Recursively call the renderTemplate(this function) funciton for each sub function form
             return this.renderTemplate(method.form, field[component].field_ref, i)
           })
         case TemplateComponents.DROPDOWN:
