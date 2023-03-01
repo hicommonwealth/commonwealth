@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import _ from 'lodash';
 import m from 'mithril';
-import type { MinimumProfile as Profile} from 'models';
+import type { MinimumProfile as Profile } from 'models';
 import { MinimumProfile } from 'models';
 import moment from 'moment';
 import Quill from 'quill';

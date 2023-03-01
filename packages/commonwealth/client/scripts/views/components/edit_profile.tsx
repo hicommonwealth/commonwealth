@@ -238,7 +238,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
           this.avatarUrl,
           this.profile.id,
           this.addresses[0].chain.name,
-          null,
+          null
         );
 
         account = new Account({

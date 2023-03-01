@@ -138,9 +138,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
         <div class="attribution-row">
           <div class="attribution-left-content">
             <CWText type="caption">
-              {parentType === ContentType.Comment
-                ? 'Reply as'
-                : 'Comment as'}
+              {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
             </CWText>
             <CWText
               type="caption"
@@ -183,9 +181,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
           <div class="form-buttons">
             <CWButton
               disabled={
-                !handleIsReplying
-                  ? this.quillEditorState?.isBlank()
-                  : undefined
+                !handleIsReplying ? this.quillEditorState?.isBlank() : undefined
               }
               buttonType="secondary-blue"
               onclick={(e) => {

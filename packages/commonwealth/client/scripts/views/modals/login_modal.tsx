@@ -353,7 +353,9 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       try {
         if (this.username || this.avatarUrl) {
           await app.newProfiles.updateProfileForAccount(
-            this.primaryAccount.profile.id, this.primaryAccount.profile.address, data
+            this.primaryAccount.profile.id,
+            this.primaryAccount.profile.address,
+            data
           );
         }
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
