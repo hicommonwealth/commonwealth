@@ -158,6 +158,7 @@ class ViewTemplatePage extends ClassComponent {
                   return form;
                 });
               });
+              break;
             default:
               break;
           }
