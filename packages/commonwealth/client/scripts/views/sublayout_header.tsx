@@ -50,6 +50,7 @@ export const SublayoutHeader = ({
             iconName={app.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
             onClick={() => {
               app.sidebarToggled = !app.sidebarToggled;
+              app.sidebarRedraw.emit('redraw');
             }}
           />
         )}
@@ -63,7 +64,7 @@ export const SublayoutHeader = ({
             onClick={() => {
               app.sidebarToggled = false;
               app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
-              app.mobileMenuRedraw.emit('redraw');
+              app.sidebarRedraw.emit('redraw');
             }}
           />
         </div>

@@ -9,6 +9,7 @@ import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { SublayoutHeader } from './sublayout_header';
+import useForceRerender from 'hooks/useForceRerender';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -22,9 +23,18 @@ const Sublayout = ({
   hideSearch,
   onScroll,
 }: SublayoutProps) => {
+  const forceRerender = useForceRerender();
   const [isWindowSmall, setIsWindowSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
   );
+
+  useEffect(() => {
+    app.sidebarRedraw.on('redraw', () => forceRerender());
+
+    return () => {
+      app.sidebarRedraw.off('redraw', () => forceRerender());
+    };
+  });
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
