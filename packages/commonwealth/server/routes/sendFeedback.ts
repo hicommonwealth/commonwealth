@@ -5,7 +5,8 @@ import { SLACK_FEEDBACK_WEBHOOK } from '../config';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotSent: 'Nothing sent!',
+  NotSent: 'Please enter the feedback message.',
+  GenericError: 'Something went wrong. Please try again later.'
 };
 
 const sendFeedback = async (
@@ -16,6 +17,10 @@ const sendFeedback = async (
 ) => {
   if (!req.body.text) {
     return next(new AppError(Errors.NotSent));
+  }
+
+  if (!SLACK_FEEDBACK_WEBHOOK) {
+    return next(new AppError(Errors.GenericError));
   }
 
   const userText = !req.user
