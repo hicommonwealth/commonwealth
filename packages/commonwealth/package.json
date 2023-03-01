@@ -59,7 +59,8 @@
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "sync-entities": "ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)",
     "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
-    "compress-images": "npx ts-node -T ./scripts/compressImages.ts"
+    "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
+    "reset-frack-db": "heroku pg:copy comonwealth-beta::DATABASE_URL DATABASE_URL -a commonwealth-staging2 --confirm commonwealth-staging2"
   },
   "engines": {
     "node": "18.x"
