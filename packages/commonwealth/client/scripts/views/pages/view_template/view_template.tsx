@@ -23,12 +23,14 @@ import type Contract from 'client/scripts/models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
 import validateType from 'helpers/validateTypes';
+import Web3 from 'web3';
 
 enum TemplateComponents {
   DIVIDER = 'divider',
   TEXT = 'text',
   INPUT = 'input',
   DROPDOWN = 'dropdown',
+  FUNCTIONFORM = 'function'
 }
 
 const goerli_compound_governor_alpha = {
@@ -141,6 +143,22 @@ class ViewTemplatePage extends ClassComponent {
                   field.dropdown.field_options[0].value;
               });
               break;
+            case TemplateComponents.FUNCTIONFORM:
+              this.formState = produce(this.formState, (draft) => {
+                draft[field.funciton.field_ref] = field.function.tx_forms.map( method => {
+                  const form = {}
+                  // Store appropriate ordering of params
+                  form['paramRefs'] = method.paramRefs
+                  form['functionSelector'] = method.functionSelector
+                  form["solidityTypes"] = method.solidityTypes
+                  for(const nested_field of method.form){
+                    if(Object.keys(nested_field)[0] == TemplateComponents.INPUT){
+                      form[nested_field.field_ref] = null
+                    }
+                  }
+                  return form;
+                });
+              });
             default:
               break;
           }
@@ -188,7 +206,26 @@ class ViewTemplatePage extends ClassComponent {
       } else {
         if (arg.startsWith('$')) {
           const ref = arg.slice(1);
-          outputArr.push(formState[ref]);
+          const paramState = formState[ref]
+          if((Array.isArray(paramState))){
+            const calldataSubArr = []
+            paramState.forEach( method => {
+              const params = []
+              const inputDetails = method.solidityTypes
+              method.paramRefs.forEach((param) =>{
+                params.push(method[param])
+              })
+              const w3 = new Web3()
+              calldataSubArr.push(w3.eth.abi.encodeFunctionCall({
+                name: method.functionSelector,
+                type: "function",
+                inputs: inputDetails
+              }, params))
+            })
+          }
+          else{
+            outputArr.push(formState[ref]);
+          }
         } else {
           outputArr.push(arg);
         }
