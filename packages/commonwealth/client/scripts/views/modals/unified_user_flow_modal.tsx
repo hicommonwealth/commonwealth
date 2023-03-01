@@ -12,6 +12,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
+import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 
 class EntryPage extends ClassComponent<{
   onCancel: () => void;
@@ -39,19 +40,19 @@ class EntryPage extends ClassComponent<{
           </CWText>
           <CWText type="b1" className="bold-section">
             This change will go into effect
-            <span class="bold"> 9th, 2023. </span>
+            <span class="bold">March 9th, 2023. </span>
             To prepare, provide a display name below.
           </CWText>
         </div>
         <div class="Inputs">
-          <CWText type="caption">Display Name</CWText>
           <CWTextInput
             placeholder="ex: Common Cow"
             value={this.displayNameValue}
             oninput={(e) => {
               this.displayNameValue = e.target.value;
             }}
-            inputValidationFn={(val) => {
+            label="Display Name"
+            inputValidationFn={(val: string): [ValidationStatus, string] => {
               // eslint-disable-next-line no-useless-escape
               const regex = /^([a-zA-Z0-9 \_\-]+)$/;
 
