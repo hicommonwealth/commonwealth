@@ -55,6 +55,7 @@ class EntryPage extends ClassComponent<{
               this.displayNameValue = e.target.value;
             }}
             inputValidationFn={(val) => {
+              // eslint-disable-next-line no-useless-escape
               const regex = /^([a-zA-Z0-9\s\_\-]+)$/;
 
               if (regex.test(val)) {
@@ -149,10 +150,10 @@ class Alert extends ClassComponent<{
         <div class="Callout">
           <CWText fontWeight="bold">Multipe Profiles</CWText>
           <CWText>
-            If you have multiple profiles and you don't specify a display name, each
-            of your profiles will be converted to different accounts. This means
-            that you will no longer have access to all of your profiles under a
-            single account.
+            If you have multiple profiles and you don't specify a display name,
+            each of your profiles will be converted to different accounts. This
+            means that you will no longer have access to all of your profiles
+            under a single account.
           </CWText>
         </div>
         <div class="Description">
