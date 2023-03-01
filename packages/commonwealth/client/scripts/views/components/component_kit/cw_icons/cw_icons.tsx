@@ -7,6 +7,8 @@ import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 
 import { getClasses } from '../helpers';
