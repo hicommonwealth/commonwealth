@@ -11,6 +11,7 @@ const schema = {
           { $ref: '#/$defs/text' },
           { $ref: '#/$defs/input' },
           { $ref: '#/$defs/dropdown' },
+          { $ref: '#/$defs/function'}
         ],
       },
     },
@@ -88,6 +89,24 @@ const schema = {
       required: ['input'],
       additionalProperties: false,
     },
+    function: {
+      type: 'object',
+      properties: {
+        function: {
+          type: 'object',
+          properties: {
+            field_name: { type: 'string' },
+            field_label: { type: 'string' },
+            field_ref: { type: 'string' },
+            tx_forms: { type: 'array', items: {type: 'object'}}
+          },
+          required: ['field_name', 'field_label', 'field_ref', 'tx_forms'],
+          additionalProperties: false,
+        },
+      },
+      required: ['function'],
+      additionalProperties: false,
+    },
     dropdown: {
       type: 'object',
       properties: {
@@ -128,5 +147,7 @@ type AnyKeyAnyValue = Record<string, any>;
 
 export default function isValidJson(data: AnyKeyAnyValue): boolean {
   const validate = validator(JSON.parse(JSON.stringify(schema)));
-  return validate(data);
+  const val = validate(data)
+  console.log(validate.errors)
+  return val
 }
