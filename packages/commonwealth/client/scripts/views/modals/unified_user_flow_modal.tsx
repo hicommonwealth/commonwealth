@@ -40,7 +40,7 @@ class EntryPage extends ClassComponent<{
           </CWText>
           <CWText type="b1" className="bold-section">
             This change will go into effect
-            <span class="bold">March 9th, 2023. </span>
+            <span class="bold"> March 9th, 2023. </span>
             To prepare, provide a display name below.
           </CWText>
         </div>
