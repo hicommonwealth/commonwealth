@@ -1,51 +1,17 @@
 version: '3.9'
 services:
-  server-external-db:
-    container_name: server
-    restart: always
-    env_file: ./packages/commonwealth/.env
-    build:
-      context: ./
-      dockerfile: ./packages/commonwealth/Dockerfile
-      args:
-        - PORT=8080
-        - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
-        - REDIS_URL=redis:6379
-        - DATABASE_URL=postgresql://commonwealth:edgeware@host.docker.internal/commonwealth #change this URI for external db
-    ports:
-      - '8080:8080'
-    expose:
-      - '8080'
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    profiles:
-      - separate
-
+  # runs on "docker compose up". Fully dockerized commonwealth.
   server:
+    extends:
+      file: docker-compose.base.yml
+      service: base_server
     container_name: server
-    restart: always
-    env_file: ./packages/commonwealth/.env
-    build:
-      context: ./
-      dockerfile: ./packages/commonwealth/Dockerfile
-      args:
-        - PORT=8080
-        - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
-        - REDIS_URL=redis:6379
-        - DATABASE_URL=postgresql://commonwealth:edgeware@postgres/commonwealth
-    ports:
-      - '8080:8080'
-    expose:
-      - '8080'
     depends_on:
+      postgres:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      postgres:
         condition: service_healthy
 
   postgres:
@@ -94,3 +60,20 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  # base server + host postgres
+  server-external-db:
+    extends:
+      file: docker-compose.base.yml
+      service: base_server
+    container_name: server
+    build:
+      args:  # Uses host db by default, change this URI for db outside of host
+        - DATABASE_URL=postgresql://commonwealth:edgeware@host.docker.internal/commonwealth
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles:
+      - separate
