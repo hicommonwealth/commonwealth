@@ -10,7 +10,6 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
-import fs from 'fs';
 import logger from 'morgan';
 import passport from 'passport';
 import prerenderNode from 'prerender-node';
@@ -18,23 +17,24 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import webpack from 'webpack';
-import webpackDevMiddleware from 'webpack-dev-middleware';
-import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
+  DATABASE_URI,
+  DEV,
+  NO_CLIENT_SERVER, NO_GLOBAL_ACTIVITY_CACHE, NO_PRERENDER, NO_RULE_CACHE, NO_TOKEN_BALANCE_CACHE,
   RABBITMQ_URI,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
+  SHOULD_SEND_EMAILS, WITH_PRERENDER,
 } from './server/config';
-import models from './server/database';
+import models, { sequelize } from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
 import { addSwagger } from './server/routing/addSwagger';
 import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
-import setupAppRoutes from './server/scripts/setupAppRoutes';
+import setupWebpack from './server/scripts/setupAppRoutes';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
@@ -63,48 +63,17 @@ log.info(
 );
 
 async function main() {
-  const DEV = process.env.NODE_ENV !== 'production';
+  await sequelize.authenticate(); // make sure db is up, if not throw error
 
-  // CLI parameters for which task to run
-  const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-  const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
-    process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
-
-  const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
-  const NO_RULE_CACHE = process.env.NO_RULE_CACHE === 'true';
-  const NO_GLOBAL_ACTIVITY_CACHE =
-    process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
-  const NO_CLIENT_SERVER =
-    process.env.NO_CLIENT === 'true' ||
-    SHOULD_SEND_EMAILS ||
-    SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
-
-  const tokenBalanceCache = new TokenBalanceCache();
-  await tokenBalanceCache.initBalanceProviders();
-  const ruleCache = new RuleCache();
-  let rc = null;
   if (SHOULD_SEND_EMAILS) {
-    rc = await sendBatchedNotificationEmails(models);
+    const rc = await sendBatchedNotificationEmails(models);
+    // exit if we have performed a one-off event
+    if (rc !== null) {
+      process.exit(rc);
+    }
   }
 
-  // exit if we have performed a one-off event
-  if (rc !== null) {
-    process.exit(rc);
-  }
-
-  const WITH_PRERENDER = process.env.WITH_PRERENDER;
-  const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
-
-  const compiler = DEV
-    ? webpack(devWebpackConfig as any)
-    : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const devMiddleware =
-    DEV && !NO_CLIENT_SERVER
-      ? webpackDevMiddleware(compiler as any, {
-          publicPath: '/build',
-        })
-      : null;
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
@@ -158,32 +127,6 @@ async function main() {
     // dynamic compression settings used
     app.use(compression());
 
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
-
-    // serve the compiled app
-    if (!NO_CLIENT_SERVER) {
-      if (DEV) {
-        app.use(devMiddleware);
-        app.use(webpackHotMiddleware(compiler));
-      } else {
-        app.use('/build', express.static('build'));
-      }
-    }
-
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
@@ -206,16 +149,6 @@ async function main() {
     app.use(passport.session());
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
   };
-
-  const templateFile = (() => {
-    try {
-      return fs.readFileSync('./build/index.html');
-    } catch (e) {
-      console.error(`Failed to read template file: ${e.message}`);
-    }
-  })();
-
-  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.
@@ -261,12 +194,17 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
+  // init caches
+  const tokenBalanceCache = new TokenBalanceCache();
+  await tokenBalanceCache.initBalanceProviders();
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  if (!NO_RULE_CACHE) await ruleCache.start();
-  const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
 
-  // TODO: should we await this? it will block server startup -- but not a big deal locally
+  const ruleCache = new RuleCache();
+  if (!NO_RULE_CACHE) await ruleCache.start();
+
+  const banCache = new BanCache(models);
+
+  const globalActivityCache = new GlobalActivityCache(models);
   if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
 
   // Declare Validation Middleware Service
@@ -293,12 +231,12 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
-  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+  setupWebpack(app, models);
 
   setupErrorHandlers(app, rollbar);
 
   setupServer(app, rollbar, models, rabbitMQController);
 }
 
-main();
+main().catch(e => console.log(e));
 export default app;

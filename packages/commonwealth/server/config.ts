@@ -133,3 +133,22 @@ export const DISCORD_BOT_SUCCESS_URL =
 export const ETHERSCAN_JS_API_KEY = process.env.ETHERSCAN_JS_API_KEY;
 export const CHAIN_EVENT_SERVICE_SECRET =
   process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
+
+export const DEV = process.env.NODE_ENV !== 'production';
+
+// CLI parameters for which task to run
+export const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
+export const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
+  process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
+
+export const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+export const NO_RULE_CACHE = process.env.NO_RULE_CACHE === 'true';
+export const NO_GLOBAL_ACTIVITY_CACHE =
+  process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
+export const NO_CLIENT_SERVER =
+  process.env.NO_CLIENT === 'true' ||
+  SHOULD_SEND_EMAILS ||
+  SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
+
+export const WITH_PRERENDER = process.env.WITH_PRERENDER;
+export const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;

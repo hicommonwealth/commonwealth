@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build-production": "yarn transpile & yarn build-app",
     "build": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
     "transpile": "tsc && tsc-alias",
-    "start-low-mem-usage": "NODE_ENV='production NO_PRERENDER' node --max-old-space-size=4096 ./build/commonwealth/server.js",
+    "start-low-mem-usage": "NODE_ENV=production node ./build/commonwealth/server.js",
     "heroku-postbuild": "NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
     "build-app": "webpack --config webpack/webpack.prod.config.js --progress",
     "build-consumer": "tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json",
@@ -281,7 +282,7 @@
     "source-map-support": "^0.5.13",
     "sync-request": "^6.1.0",
     "ts-node-dev": "^2.0.0",
-    "webpack-dev-server": "^3.1.14"
+    "webpack-dev-server": "^4.11.1"
   },
   "optionalDependencies": {
     "esbuild-darwin-64": "^0.15.12"
