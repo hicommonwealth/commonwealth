@@ -4,6 +4,7 @@ import { capitalize } from 'lodash';
 
 import 'components/new_thread_form.scss';
 
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { notifyError } from 'controllers/app/notifications';
 import { ThreadKind, ThreadStage } from 'models';
 import app from 'state';
@@ -14,6 +15,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
+import { TopicSelector } from 'views/components/topic_selector';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import {
@@ -28,9 +30,11 @@ export const NewThreadForm = () => {
 
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
-  const hasTopics = !!app.topics.getByCommunity(app.chain.id).length;
+  const chainId = app.chain.id;
+  const hasTopics = !!app.topics.getByCommunity(chainId).length;
   const author = app.user.activeAccount;
   const { authorName } = useAuthorName();
+  const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
   const {
     threadTitle,
@@ -38,6 +42,7 @@ export const NewThreadForm = () => {
     threadKind,
     setThreadKind,
     threadTopic,
+    setThreadTopic,
     threadUrl,
     setThreadUrl,
     threadContentDelta,
@@ -47,6 +52,14 @@ export const NewThreadForm = () => {
   } = useNewThreadForm(authorName, hasTopics);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
+
+  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
+    return (
+      isAdmin ||
+      t.tokenThreshold.isZero() ||
+      !TopicGateCheck.isGatedTopic(t.name)
+    );
+  });
 
   const handleNewThreadCreation = async () => {
     if (!isDiscussion && !detectURL(threadUrl)) {
@@ -114,6 +127,13 @@ export const NewThreadForm = () => {
 
             <>
               <div className="topics-and-title-row">
+                {hasTopics && (
+                  <TopicSelector
+                    defaultTopic={threadTopic}
+                    topics={topicsForSelector}
+                    onChange={setThreadTopic}
+                  />
+                )}
                 <CWTextInput
                   autoFocus
                   placeholder="Title"

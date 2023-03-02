@@ -1,19 +1,23 @@
 @import '../shared';
 
-.ChangeTopicModal {
-  width: 320px;
+.Modal:has(.ChangeTopicModal) {
+  overflow: unset;
 
-  .compact-modal-body {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  .ChangeTopicModal {
+    width: 320px;
 
-    .buttons-row {
+    .compact-modal-body {
+      align-items: center;
       display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      width: 100%;
+      flex-direction: column;
+      gap: 16px;
+
+      .buttons-row {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        width: 100%;
+      }
     }
   }
 }

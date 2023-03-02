@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import _ from 'underscore';
 import moment from 'moment';
-import $ from 'jquery';
 
 import 'modals/poll_editor_modal.scss';
 
@@ -17,11 +16,7 @@ import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-
-type PollEditorProps = {
-  onModalClose: () => void;
-  thread: Thread;
-};
+import { SelectList } from 'views/components/component_kit/cw_select_list';
 
 const getPollDurationCopy = (
   customDuration: string,
@@ -41,16 +36,80 @@ const getPollDurationCopy = (
   }
 };
 
-export const PollEditorModal = ({ onModalClose, thread }: PollEditorProps) => {
-  const [customDuration, setCustomDuration] = useState('');
-  const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
-  const [options, setOptions] = useState<Array<string>>();
-  const [prompt, setPrompt] = useState();
+const TWO_EMPTY_OPTIONS = Array<string>(2).fill('');
+const INFINITE_OPTION = 'Infinite';
+const customDurationOptions = [
+  INFINITE_OPTION,
+  ..._.range(1, 31).map((n) => pluralize(Number(n), 'day')),
+].map((option) => ({ value: option, label: option }));
 
-  // reset options when initializing
-  if (!options || options.length === 0) {
-    setOptions(['', '']);
-  }
+type PollEditorModalProps = {
+  onModalClose: () => void;
+  thread: Thread;
+};
+
+export const PollEditorModal = ({
+  onModalClose,
+  thread,
+}: PollEditorModalProps) => {
+  const [customDuration, setCustomDuration] = useState(INFINITE_OPTION);
+  const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
+  const [options, setOptions] = useState(TWO_EMPTY_OPTIONS);
+  const [prompt, setPrompt] = useState('');
+
+  const handleInputChange = (value: string, index: number) => {
+    setOptions((prevState) => {
+      const arrCopy = [...prevState];
+      arrCopy[index] = value;
+      return arrCopy;
+    });
+  };
+
+  const handleRemoveLastChoice = () => {
+    setOptions((prevState) => prevState.slice(0, -1));
+  };
+
+  const handleAddChoice = () => {
+    setOptions((prevState) => [...prevState, '']);
+  };
+
+  const handleCustomDurationChange = () => {
+    setCustomDuration(INFINITE_OPTION);
+    setCustomDurationEnabled((prevState) => !prevState);
+  };
+
+  const handleSavePoll = async () => {
+    if (!prompt) {
+      notifyError('Must set poll prompt');
+      return;
+    }
+
+    if (!options?.length || !options[0]?.length || !options[1]?.length) {
+      notifyError('Must set poll options');
+      return;
+    }
+
+    if (options.length !== [...new Set(options)].length) {
+      notifyError('Poll options must be unique');
+      return;
+    }
+
+    try {
+      await app.polls.setPolling({
+        threadId: thread.id,
+        prompt,
+        options,
+        customDuration: customDurationEnabled ? customDuration : null,
+        address: app.user.activeAccount.address,
+        authorChain: app.user.activeAccount.chain.id,
+      });
+      notifySuccess('Poll creation succeeded');
+    } catch (err) {
+      console.error(err);
+    }
+
+    onModalClose();
+  };
 
   return (
     <div className="PollEditorModal">
@@ -70,16 +129,12 @@ export const PollEditorModal = ({ onModalClose, thread }: PollEditorProps) => {
         <div className="options-and-label-container">
           <CWLabel label="Options" />
           <div className="options-container">
-            {options?.map((_choice: string, index: number) => (
+            {options.map((choice, index) => (
               <CWTextInput
+                key={index}
                 placeholder={`${index + 1}.`}
-                defaultValue={options[index]}
-                onInput={(e) => {
-                  setOptions((prevState) => ({
-                    ...prevState,
-                    [index]: e.target.value,
-                  }));
-                }}
+                value={choice}
+                onInput={(e) => handleInputChange(e.target.value, index)}
               />
             ))}
           </div>
@@ -88,22 +143,12 @@ export const PollEditorModal = ({ onModalClose, thread }: PollEditorProps) => {
               label="Remove choice"
               buttonType="secondary-red"
               disabled={options.length <= 2}
-              onClick={() => {
-                const newOptions = options.filter(
-                  (o, i) => i !== options.length - 1
-                );
-
-                setOptions(newOptions);
-              }}
+              onClick={handleRemoveLastChoice}
             />
             <CWButton
               label="Add choice"
               disabled={options.length >= 6}
-              onClick={() => {
-                const newOptions = options.concat(['']);
-
-                setOptions(newOptions);
-              }}
+              onClick={handleAddChoice}
             />
           </div>
         </div>
@@ -115,78 +160,26 @@ export const PollEditorModal = ({ onModalClose, thread }: PollEditorProps) => {
             <CWCheckbox
               label="Custom duration"
               checked={customDurationEnabled}
-              onChange={() => {
-                setCustomDurationEnabled(!customDurationEnabled);
-                setCustomDuration('Infinite');
-              }}
+              onChange={handleCustomDurationChange}
               value=""
             />
-            {/* {m(SelectList, { // @TODO @REACT FIX ME
-                filterable: false,
-                items: ['Infinite'].concat(
-                  _.range(1, 31).map((n) => pluralize(Number(n), 'day'))
-                ),
-                itemRender: (n) => <div className="duration-item">{n}</div>,
-                onSelect: (e) => {
-                  customDuration = e as string;
-                },
-                trigger: (
-                  <CWButton
-                    disabled={!customDurationEnabled}
-                    iconLeft="chevronDown"
-                    label={customDuration || 'Infinite'}
-                  />
-                ),
-              })} */}
+            {customDurationEnabled && (
+              <SelectList
+                isSearchable={false}
+                options={customDurationOptions}
+                defaultValue={customDurationOptions[0]}
+                onChange={({ value }) => setCustomDuration(value)}
+              />
+            )}
           </div>
         </div>
         <div className="buttons-row">
           <CWButton
             label="Cancel"
             buttonType="secondary-blue"
-            onClick={() => {
-              onModalClose();
-            }}
+            onClick={onModalClose}
           />
-          <CWButton
-            label="Save changes"
-            onClick={async () => {
-              if (!prompt) {
-                notifyError('Must set poll prompt');
-                return;
-              }
-
-              if (
-                !options?.length ||
-                !options[0]?.length ||
-                !options[1]?.length
-              ) {
-                notifyError('Must set poll options');
-                return;
-              }
-
-              if (options.length !== [...new Set(options)].length) {
-                notifyError('Poll options must be unique');
-                return;
-              }
-
-              try {
-                await app.polls.setPolling({
-                  threadId: thread.id,
-                  prompt: prompt,
-                  options: options,
-                  customDuration: customDuration,
-                  address: app.user.activeAccount.address,
-                  authorChain: app.user.activeAccount.chain.id,
-                });
-                notifySuccess('Poll creation succeeded');
-              } catch (err) {
-                console.error(err);
-              }
-
-              onModalClose();
-            }}
-          />
+          <CWButton label="Save changes" onClick={handleSavePoll} />
         </div>
       </div>
     </div>
