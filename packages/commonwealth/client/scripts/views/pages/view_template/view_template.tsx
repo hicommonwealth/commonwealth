@@ -288,7 +288,7 @@ class ViewTemplatePage extends ClassComponent {
           );
         case TemplateComponents.FUNCTIONFORM:
           const functionComponents = 
-          [<CWDivider />, (<CWText fontStyle={"h3"}>
+          [<CWDivider />, (<CWText type={"h3"}>
             {field[component].field_label}
           </CWText>)];
           functionComponents.push(...field[component].tx_forms.flatMap((method, i) => {
