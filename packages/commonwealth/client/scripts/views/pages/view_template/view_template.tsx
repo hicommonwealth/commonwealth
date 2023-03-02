@@ -33,7 +33,7 @@ enum TemplateComponents {
   FUNCTIONFORM = 'function'
 }
 
-// @ts-ignore
+/*
 const goerli_compound_governor_alpha = {
   form_fields: [
     {
@@ -71,6 +71,7 @@ const goerli_compound_governor_alpha = {
     },
   },
 };
+*/
 
 class ViewTemplatePage extends ClassComponent {
   private formState = {};
@@ -287,8 +288,7 @@ class ViewTemplatePage extends ClassComponent {
               }
             />
           );
-        case TemplateComponents.FUNCTIONFORM:
-          // @ts-ignore
+        case TemplateComponents.FUNCTIONFORM: {
           const functionComponents =
           [
           <CWDivider />,
@@ -302,6 +302,7 @@ class ViewTemplatePage extends ClassComponent {
           }));
           functionComponents.push(<CWDivider />);
           return functionComponents;
+        }
         case TemplateComponents.DROPDOWN:
           return (
             <CWDropdown
