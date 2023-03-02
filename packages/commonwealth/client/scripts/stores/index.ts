@@ -13,7 +13,6 @@ export { default as ThreadUniqueAddressesCountStore } from './ThreadUniqueAddres
 export { default as Store } from './Store';
 export { default as TopicStore } from './TopicStore';
 export { default as RecentListingStore } from './RecentListingStore';
-export { default as ChainEntityStore } from './ChainEntityStore';
 export { default as PersistentStore } from './PersistentStore';
 
 export { UpdateType } from './interfaces';
