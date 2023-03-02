@@ -95,7 +95,6 @@ export interface IApp {
   toasts: ToastStore;
 
   mobileMenu: MobileMenuName;
-  mobileMenuRedraw: EventEmitter;
   sidebarMenu: SidebarMenuName;
   sidebarRedraw: EventEmitter;
 
@@ -196,7 +195,6 @@ const app: IApp = {
 
   // Global nav state
   mobileMenu: null,
-  mobileMenuRedraw: new EventEmitter(),
   sidebarMenu: 'default',
   sidebarRedraw: new EventEmitter(),
   sidebarToggled: false,

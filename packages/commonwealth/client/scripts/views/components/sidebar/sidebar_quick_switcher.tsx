@@ -33,8 +33,7 @@ export const SidebarQuickSwitcher = () => {
           <CWIconButton
             iconName="plusCircle"
             iconButtonTheme="black"
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() => {
               app.sidebarMenu = 'createContent';
               app.sidebarRedraw.emit('redraw');
             }}
@@ -43,10 +42,9 @@ export const SidebarQuickSwitcher = () => {
         <CWIconButton
           iconName="compass"
           iconButtonTheme="black"
-          onClick={(e) => {
-            e.preventDefault();
-            app.sidebarRedraw.emit('redraw');
+          onClick={() => {
             app.sidebarMenu = 'exploreCommunities';
+            app.sidebarRedraw.emit('redraw');
           }}
         />
       </div>
