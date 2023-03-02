@@ -1,9 +1,7 @@
 import Web3 from 'web3';
 import type { AbiInput } from 'web3-utils';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
-
-const Bytes32 = ethers.utils.formatBytes32String;
 
 export function validateAbiInput(
   val: string,

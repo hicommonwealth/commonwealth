@@ -33,6 +33,7 @@ enum TemplateComponents {
   FUNCTIONFORM = 'function'
 }
 
+// @ts-ignore
 const goerli_compound_governor_alpha = {
   form_fields: [
     {
@@ -287,10 +288,14 @@ class ViewTemplatePage extends ClassComponent {
             />
           );
         case TemplateComponents.FUNCTIONFORM:
-          const functionComponents = 
-          [<CWDivider />, (<CWText type={"h3"}>
+          // @ts-ignore
+          const functionComponents =
+          [
+          <CWDivider />,
+          (<CWText type="h3">
             {field[component].field_label}
-          </CWText>)];
+          </CWText>)
+            ];
           functionComponents.push(...field[component].tx_forms.flatMap((method, i) => {
             // Recursively call the renderTemplate(this function) funciton for each sub function form
             return this.renderTemplate(method.form, field[component].field_ref, i)
