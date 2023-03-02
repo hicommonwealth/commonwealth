@@ -10,7 +10,7 @@ import Sublayout from '../../sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
-import isValidJson from 'helpers/validateJson';
+import isValidJson from '../../../../../shared/validateJson';
 import {
   CWTextInput,
   MessageRow,
@@ -30,7 +30,7 @@ enum TemplateComponents {
   TEXT = 'text',
   INPUT = 'input',
   DROPDOWN = 'dropdown',
-  FUNCTIONFORM = 'function'
+  FUNCTIONFORM = 'function',
 }
 
 /*
@@ -147,19 +147,23 @@ class ViewTemplatePage extends ClassComponent {
               break;
             case TemplateComponents.FUNCTIONFORM:
               this.formState = produce(this.formState, (draft) => {
-                draft[field.function.field_ref] = field.function.tx_forms.map( method => {
-                  // Create a Data structure for each calldata's method params from form
-                  const form = {}
-                  // Store appropriate ordering of params
-                  form['paramRefs'] = method.paramRefs
-                  form['abi'] = method.functionABI
-                  for(const nested_field of method.form){
-                    if(Object.keys(nested_field)[0] == TemplateComponents.INPUT){
-                      form[nested_field.field_ref] = null
+                draft[field.function.field_ref] = field.function.tx_forms.map(
+                  (method) => {
+                    // Create a Data structure for each calldata's method params from form
+                    const form = {};
+                    // Store appropriate ordering of params
+                    form['paramRefs'] = method.paramRefs;
+                    form['abi'] = method.functionABI;
+                    for (const nested_field of method.form) {
+                      if (
+                        Object.keys(nested_field)[0] == TemplateComponents.INPUT
+                      ) {
+                        form[nested_field.field_ref] = null;
+                      }
                     }
+                    return form;
                   }
-                  return form;
-                });
+                );
               });
               break;
             default:
@@ -209,20 +213,21 @@ class ViewTemplatePage extends ClassComponent {
       } else {
         if (arg.startsWith('$')) {
           const ref = arg.slice(1);
-          const paramState = formState[ref]
-          if((Array.isArray(paramState))){
-            const calldataSubArr = []
-            paramState.forEach( method => {
-              const params = []
-              method.paramRefs.forEach((param) =>{
-                params.push(method[param])
-              })
-              const w3 = new Web3()
-              calldataSubArr.push(w3.eth.abi.encodeFunctionCall(method.abi, params))
-            })
-            outputArr.push(calldataSubArr)
-          }
-          else{
+          const paramState = formState[ref];
+          if (Array.isArray(paramState)) {
+            const calldataSubArr = [];
+            paramState.forEach((method) => {
+              const params = [];
+              method.paramRefs.forEach((param) => {
+                params.push(method[param]);
+              });
+              const w3 = new Web3();
+              calldataSubArr.push(
+                w3.eth.abi.encodeFunctionCall(method.abi, params)
+              );
+            });
+            outputArr.push(calldataSubArr);
+          } else {
             outputArr.push(paramState);
           }
         } else {
@@ -250,7 +255,7 @@ class ViewTemplatePage extends ClassComponent {
     return JSON.stringify(preview, null, 4);
   }
 
-  renderTemplate(form_fields, nested_field_ref?, nested_index?){
+  renderTemplate(form_fields, nested_field_ref?, nested_index?) {
     return form_fields.flatMap((field, index) => {
       const [component] = Object.keys(form_fields[index]);
 
@@ -270,18 +275,15 @@ class ViewTemplatePage extends ClassComponent {
               value={this.formState[field[component].field_ref]}
               placeholder={field[component].field_name}
               oninput={(e) => {
-                this.formState = produce(
-                  this.formState,
-                  (draft) => {
-                    if(nested_field_ref){
-                      draft[nested_field_ref][nested_index][field[component].field_ref] =
-                        e.target.value
-                    }else{
-                      draft[field[component].field_ref] =
-                        e.target.value;
-                    }
+                this.formState = produce(this.formState, (draft) => {
+                  if (nested_field_ref) {
+                    draft[nested_field_ref][nested_index][
+                      field[component].field_ref
+                    ] = e.target.value;
+                  } else {
+                    draft[field[component].field_ref] = e.target.value;
                   }
-                );
+                });
               }}
               inputValidationFn={(val) =>
                 validateType(val, field[component].formatter)
@@ -289,17 +291,20 @@ class ViewTemplatePage extends ClassComponent {
             />
           );
         case TemplateComponents.FUNCTIONFORM: {
-          const functionComponents =
-          [
-          <CWDivider />,
-          (<CWText type="h3">
-            {field[component].field_label}
-          </CWText>)
-            ];
-          functionComponents.push(...field[component].tx_forms.flatMap((method, i) => {
-            // Recursively call the renderTemplate(this function) funciton for each sub function form
-            return this.renderTemplate(method.form, field[component].field_ref, i)
-          }));
+          const functionComponents = [
+            <CWDivider />,
+            <CWText type="h3">{field[component].field_label}</CWText>,
+          ];
+          functionComponents.push(
+            ...field[component].tx_forms.flatMap((method, i) => {
+              // Recursively call the renderTemplate(this function) funciton for each sub function form
+              return this.renderTemplate(
+                method.form,
+                field[component].field_ref,
+                i
+              );
+            })
+          );
           functionComponents.push(<CWDivider />);
           return functionComponents;
         }
@@ -309,19 +314,16 @@ class ViewTemplatePage extends ClassComponent {
               label={field[component].field_label}
               options={field[component].field_options}
               onSelect={(item) => {
-                this.formState = produce(
-                  this.formState,
-                  (draft) => {
-                    draft[field[component].field_ref] = item.value;
-                  }
-                );
+                this.formState = produce(this.formState, (draft) => {
+                  draft[field[component].field_ref] = item.value;
+                });
               }}
             />
           );
         default:
           return null;
       }
-    })
+    });
   }
 
   view(vnode) {

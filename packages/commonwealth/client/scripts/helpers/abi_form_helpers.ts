@@ -1,6 +1,5 @@
 import Web3 from 'web3';
 import type { AbiInput } from 'web3-utils';
-import { ethers } from 'ethers';
 import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
 export function validateAbiInput(

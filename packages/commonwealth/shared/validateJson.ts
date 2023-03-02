@@ -11,7 +11,7 @@ const schema = {
           { $ref: '#/$defs/text' },
           { $ref: '#/$defs/input' },
           { $ref: '#/$defs/dropdown' },
-          { $ref: '#/$defs/function'}
+          { $ref: '#/$defs/function' },
         ],
       },
     },
@@ -96,23 +96,24 @@ const schema = {
           type: 'object',
           properties: {
             name: { type: 'string' },
-            type: { type: 'string'},
+            type: { type: 'string' },
             inputs: {
-              type: 'array', items: {
-              type: 'object',
-              properties: {
-                name: {type: 'string'},
-                type: {type: 'string'},
-                required: ['name', 'type'],
-                additionalProperties: false
-              }
-            }
-          },
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  type: { type: 'string' },
+                  required: ['name', 'type'],
+                  additionalProperties: false,
+                },
+              },
+            },
             required: ['name', 'type', 'inputs'],
-            additionalProperties: false
-          }
+            additionalProperties: false,
+          },
         },
-        paramRefs: {type: 'array', items: {'type': 'string'}},
+        paramRefs: { type: 'array', items: { type: 'string' } },
         form: {
           type: 'array',
           items: {
@@ -125,8 +126,8 @@ const schema = {
           },
         },
         required: ['functionABI', 'paramRefs', 'form'],
-        additionalProperties: false
-      }
+        additionalProperties: false,
+      },
     },
     function: {
       type: 'object',
@@ -137,7 +138,7 @@ const schema = {
             field_name: { type: 'string' },
             field_label: { type: 'string' },
             field_ref: { type: 'string' },
-            tx_forms: { type: 'array', items: {$ref: "#/$defs/method"}}
+            tx_forms: { type: 'array', items: { $ref: '#/$defs/method' } },
           },
           required: ['field_name', 'field_label', 'field_ref', 'tx_forms'],
           additionalProperties: false,
