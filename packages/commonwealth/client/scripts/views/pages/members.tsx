@@ -193,7 +193,8 @@ class MembersPage extends ClassComponent {
             profile.address,
             profile.avatarUrl,
             profile.id,
-            profile.chain
+            profile.chain,
+            profile.lastActive
           );
           const profileInfo: ProfileInfo = {
             profile,
