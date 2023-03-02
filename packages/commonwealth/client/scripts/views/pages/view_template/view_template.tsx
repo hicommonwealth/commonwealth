@@ -249,7 +249,7 @@ class ViewTemplatePage extends ClassComponent {
   }
 
   renderTemplate(form_fields, nested_field_ref?, nested_index?){
-    const form = form_fields.flatMap((field, index) => {
+    return form_fields.flatMap((field, index) => {
       const [component] = Object.keys(form_fields[index]);
 
       switch (component) {
@@ -287,10 +287,16 @@ class ViewTemplatePage extends ClassComponent {
             />
           );
         case TemplateComponents.FUNCTIONFORM:
-          return field[component].tx_forms.flatMap((method, i) => {
+          const functionComponents = 
+          [<CWDivider />, (<CWText fontStyle={"h3"}>
+            {field[component].field_label}
+          </CWText>)];
+          functionComponents.push(...field[component].tx_forms.flatMap((method, i) => {
             // Recursively call the renderTemplate(this function) funciton for each sub function form
             return this.renderTemplate(method.form, field[component].field_ref, i)
-          })
+          }));
+          functionComponents.push(<CWDivider />);
+          return functionComponents;
         case TemplateComponents.DROPDOWN:
           return (
             <CWDropdown
@@ -310,7 +316,6 @@ class ViewTemplatePage extends ClassComponent {
           return null;
       }
     })
-    return form
   }
 
   view(vnode) {

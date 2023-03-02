@@ -52,9 +52,6 @@ export function processAbiInputsToDataTypes(
   const processedArgs: any[] = functionInputs.map(
     (arg: AbiInput, index: number) => {
       const type = arg.type;
-      if (type.substring(0, 4) === 'uint')
-        return BigNumber.from(inputsMap[index]);
-      if (type.substring(0, 4) === 'byte') return Bytes32(inputsMap[index]);
       if (type.slice(-2) === '[]') return JSON.parse(inputsMap[index]);
       return inputsMap[index];
     }
