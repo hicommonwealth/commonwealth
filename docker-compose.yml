@@ -6,6 +6,8 @@ services:
       file: docker-compose.base.yml
       service: base_server
     container_name: server
+    volumes:
+      - .:/commonwealth
     depends_on:
       postgres:
         condition: service_healthy
@@ -24,8 +26,8 @@ services:
       - POSTGRES_PASSWORD=edgeware
     ports:
       - '5432:5432'
-    #    volumes:
-    #      - postgres:/var/lib/postgresql/data
+    volumes:
+      - ${PWD}/docker-volumes/db-data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready', '-d', 'db_prod']
       interval: 5s
@@ -38,8 +40,8 @@ services:
     restart: always
     ports:
       - '6379:6379'
-    #    volumes:
-    #      - $PWD/redis-data:/var/lib/redis
+    volumes:
+      - ${PWD}/docker-volumes/redis-data:/var/lib/redis
     healthcheck:
       test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
       interval: 5s
@@ -52,9 +54,9 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
-    #    volumes:
-    #      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-    #      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    volumes:
+      - ${PWD}/docker-volumes/rmq/data:/var/lib/rabbitmq
+      - ${PWD}/docker-volumes/rmq/log:/var/log/rabbitmq
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 5s

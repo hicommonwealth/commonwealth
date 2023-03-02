@@ -1,4 +1,5 @@
 node_modules/
+docker-volumes/
 */build
 */dist
 */.DS_Store
