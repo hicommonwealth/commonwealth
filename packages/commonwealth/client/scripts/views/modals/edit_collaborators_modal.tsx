@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import $ from 'jquery';
 
 import 'modals/edit_collaborators_modal.scss';
 
-import type { Thread, Profile } from 'models';
+import type { Thread } from 'models';
+import type { IThreadCollaborator } from '/models/Thread';
+import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 
 import app from 'state';
 import { User } from '../components/user/user';
@@ -10,7 +14,12 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import {
+  notifyError,
+  notifyInfo,
+  notifySuccess,
+} from 'controllers/app/notifications';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -21,53 +30,46 @@ export const EditCollaboratorsModal = ({
   onModalClose,
   thread,
 }: EditCollaboratorsModalProps) => {
-  const [addedEditors, setAddedEditors] = useState({});
-  const [items, setItems] = useState([]);
-  const [membersFetched, setMembersFetched] = useState(false);
-  const [removedEditors, setRemovedEditors] = useState({});
-  const [searchTerm, setSearchTerm] = useState();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<
+    Array<RoleInstanceWithPermissionAttributes>
+  >([]);
+  const [collaborators, setCollaborators] = useState<
+    Array<IThreadCollaborator>
+  >(thread.collaborators);
 
-  const fetchMembers = async (_searchTerm: string) => {
-    if (_searchTerm.length < 3) {
-      return;
-    }
-    const chainOrCommObj = {
-      chain: app.activeChainId(),
-      _searchTerm,
+  console.log('searchResults', searchResults);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await axios.get(`${app.serverUrl()}/bulkMembers`, {
+          params: {
+            chain: app.activeChainId(),
+            searchTerm,
+          },
+        });
+
+        if (response.data.status !== 'Success') {
+          throw new Error('Could not fetch members');
+        } else {
+          const results: Array<RoleInstanceWithPermissionAttributes> =
+            response.data.result.filter(
+              (role: RoleInstanceWithPermissionAttributes) =>
+                role.Address.address !== app.user.activeAccount?.address
+            );
+
+          setSearchResults(results);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
-      .then((response) => {
-        if (response.status !== 'Success')
-          throw new Error('Could not fetch members');
-        setItems(
-          response.result.filter(
-            (role) => role.Address.address !== app.user.activeAccount?.address
-          )
-        );
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
-  if (!membersFetched) {
-    setItems([]);
-    fetchMembers('');
-    setMembersFetched(true);
-  }
-
-  if (!addedEditors) {
-    setAddedEditors({});
-  }
-
-  if (!removedEditors) {
-    setRemovedEditors({});
-  }
-
-  const allCollaborators = thread.collaborators
-    .concat(Object.values(addedEditors))
-    .filter((c) => !Object.keys(removedEditors).includes(c.address));
+    if (searchTerm.length >= 3) {
+      fetchMembers();
+    }
+  }, [searchTerm]);
 
   return (
     <div className="EditCollaboratorsModal">
@@ -77,86 +79,73 @@ export const EditCollaboratorsModal = ({
       </div>
       <div className="compact-modal-body">
         <div className="user-list-container">
-          {/* @TODO @REACT FIX ME */}
-          {/*<div className="selected-collaborators-section">*/}
-          {/*  <CWTextInput*/}
-          {/*    label="Search Members"*/}
-          {/*    value={searchTerm}*/}
-          {/*    placeholder="type 3 or more characters to search"*/}
-          {/*    oninput={async (e) => {*/}
-          {/*      searchTerm = e.target.value;*/}
-          {/*      await fetchMembers(searchTerm);*/}
-          {/*    }}*/}
-          {/*  />*/}
-          {/*  <div className="collaborator-rows-container">*/}
-          {/*    {items.map((c) => {*/}
-          {/*      const user: Profile = app.profiles.getProfile(*/}
-          {/*        c.chain_id,*/}
-          {/*        c.Address.address*/}
-          {/*      );*/}
-
-          {/*      return (*/}
-          {/*        <div*/}
-          {/*          class="collaborator-row"*/}
-          {/*          onclick={async () => {*/}
-          {/*            const addrItem = (c as any).Address;*/}
-
-          {/*            // If already scheduled for removal, un-schedule*/}
-          {/*            if (removedEditors[addrItem.address]) {*/}
-          {/*              delete removedEditors[addrItem.address];*/}
-          {/*            }*/}
-
-          {/*            // If already scheduled for addition, un-schedule*/}
-          {/*            if (addedEditors[addrItem.address]) {*/}
-          {/*              delete addedEditors[addrItem.address];*/}
-          {/*            } else if (*/}
-          {/*              thread.collaborators.filter((collaborator) => {*/}
-          {/*                return (*/}
-          {/*                  collaborator.address === addrItem.address &&*/}
-          {/*                  collaborator.chain === addrItem.chain*/}
-          {/*                );*/}
-          {/*              }).length === 0*/}
-          {/*            ) {*/}
-          {/*              // If unscheduled for addition, and not an existing editor, schedule*/}
-          {/*              addedEditors[addrItem.address] = addrItem;*/}
-          {/*            } else {*/}
-          {/*              notifyInfo('Already an editor');*/}
-          {/*            }*/}
-          {/*          }}*/}
-          {/*        >*/}
-          {/*          {m(User, {*/}
-          {/*            user,*/}
-          {/*          })}*/}
-          {/*        </div>*/}
-          {/*      );*/}
-          {/*    })}*/}
-          {/*  </div>*/}
-          {/*</div>*/}
+          <div className="selected-collaborators-section">
+            <CWTextInput
+              label="Search Members"
+              value={searchTerm}
+              placeholder="type 3 or more characters to search"
+              onInput={(e) => {
+                setSearchTerm(e.target.value);
+              }}
+            />
+            <div className="collaborator-rows-container">
+              {searchResults.map((c, i) => (
+                <div
+                  key={i}
+                  className="collaborator-row"
+                  onClick={() => {
+                    // If already scheduled for removal, un-schedule
+                    // if (removedEditors[c.Address.address]) {
+                    //   delete removedEditors[c.Address.address];
+                    // }
+                    // // If already scheduled for addition, un-schedule
+                    // if (addedEditors[c.Address.address]) {
+                    //   delete addedEditors[c.Address.address];
+                    // } else if (
+                    //   thread.collaborators.filter((collaborator) => {
+                    //     return (
+                    //       collaborator.address === c.Address.address &&
+                    //       collaborator.chain === c.Address.chain
+                    //     );
+                    //   }).length === 0
+                    // ) {
+                    //   // If unscheduled for addition, and not an existing editor, schedule
+                    //   addedEditors[c.Address.address] = c;
+                    // } else {
+                    //   notifyInfo('Already an editor');
+                    // }
+                  }}
+                >
+                  <User
+                    user={app.profiles.getProfile(
+                      c.chain_id,
+                      c.Address.address
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        {allCollaborators.length > 0 ? (
+        {collaborators.length > 0 ? (
           <div className="selected-collaborators-section">
             <CWLabel label="Selected collaborators" />
             <div className="collaborator-rows-container">
-              {allCollaborators.map((c) => {
-                const user: Profile = app.profiles.getProfile(
-                  c.chain,
-                  c.address
-                );
-
+              {collaborators.map((c, i) => {
                 return (
-                  <div className="collaborator-row">
-                    <User user={user} />
+                  <div key={i} className="collaborator-row">
+                    <User user={app.profiles.getProfile(c.chain, c.address)} />
                     <CWIconButton
                       iconName="close"
                       iconSize="small"
-                      onClick={async () => {
+                      onClick={() => {
                         // If already scheduled for addition, un-schedule
-                        if (addedEditors[c.address]) {
-                          delete addedEditors[c.address];
-                        } else {
-                          // If already an existing editor, schedule for removal
-                          removedEditors[c.address] = c;
-                        }
+                        // if (addedEditors[c.address]) {
+                        //   delete addedEditors[c.address];
+                        // } else {
+                        //   // If already an existing editor, schedule for removal
+                        //   removedEditors[c.address] = c;
+                        // }
                       }}
                     />
                   </div>
@@ -181,14 +170,15 @@ export const EditCollaboratorsModal = ({
           />
           <CWButton
             disabled={
-              $.isEmptyObject(addedEditors) && $.isEmptyObject(removedEditors)
+              thread.collaborators === collaborators
+              // check deep equality
             }
             label="Save changes"
-            onClick={async (e) => {
+            onClick={async () => {
               if (!$.isEmptyObject(addedEditors)) {
                 try {
                   // TODO Graham 4/4/22: Break off into proper controller methods
-                  const response = await $.post(
+                  const response = await axios.post(
                     `${app.serverUrl()}/addEditors`,
                     {
                       address: app.user.activeAccount.address,
@@ -199,7 +189,7 @@ export const EditCollaboratorsModal = ({
                       jwt: app.user.jwt,
                     }
                   );
-                  const { status, result } = response;
+                  const { status, result } = response.data;
                   if (status === 'Success') {
                     thread.collaborators = result.collaborators;
                     notifySuccess('Collaborators added');
@@ -217,7 +207,7 @@ export const EditCollaboratorsModal = ({
 
               if (!$.isEmptyObject(removedEditors)) {
                 try {
-                  const response = await $.post(
+                  const response = await axios.post(
                     `${app.serverUrl()}/deleteEditors`,
                     {
                       address: app.user.activeAccount.address,
@@ -228,7 +218,7 @@ export const EditCollaboratorsModal = ({
                       jwt: app.user.jwt,
                     }
                   );
-                  const { status, result } = response;
+                  const { status, result } = response.data;
                   if (status === 'Success') {
                     thread.collaborators = result.collaborators;
                     notifySuccess('Collaborators removed');
