@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 const useForceRerender = () => {
-  const [, setState] = useState(true);
+  const [, setState] = useState({});
 
   const forceRerender = useCallback(() => {
-    setState((prevState) => !prevState);
+    setState({});
   }, []);
 
   return forceRerender;

@@ -75,7 +75,8 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
       setToggled(!toggled);
     }
 
-    app.sidebarToggled = false;
+    app.sidebarToggled = true;
+    app.sidebarRedraw.emit('redraw');
 
     onClick(e, toggled);
   };

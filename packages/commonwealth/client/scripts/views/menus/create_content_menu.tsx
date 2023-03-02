@@ -249,7 +249,7 @@ export const CreateContentMenu = () => {
         label: 'Create',
         onClick: () => {
           app.mobileMenu = 'MainMenu';
-          app.mobileMenuRedraw.emit('redraw');
+          app.sidebarRedraw.emit('redraw');
         },
       }}
       menuItems={getCreateContentMenuItems(navigate)}
