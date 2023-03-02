@@ -202,14 +202,17 @@ export type ThreadData = {
   author_profile_img_url: string;
   publish_date_string: string;
   thread_id: number;
+  thread_url: string;
 };
 
 export type CommunityDigestInfo = {
   [communityId: string]: {
     community_name: string;
     community_icon: string;
-    topThreads: ThreadData[];
-    activityScore: number;
+    top_threads: ThreadData[];
+    activity_score: number;
+    new_posts: number;
+    new_comments: number;
   };
 };
 
@@ -228,7 +231,7 @@ export const getTopThreads = async (
 ): Promise<ThreadData[]> => {
   const res = await models.sequelize.query(`SELECT 
         t.title,
-        SUBSTRING(t.body, 1, 300) AS body,
+        SUBSTRING(t.plaintext, 1, 300) AS body,
         COUNT(DISTINCT c.id) AS comment_count,
         COUNT(DISTINCT r.id) AS view_count,
         a.address AS author_address,
@@ -293,8 +296,8 @@ export const getTopThreads = async (
       }
 
       const data: ThreadData = {
-        title: row.title,
-        body: row.plaintext,
+        title: decodeURIComponent(row.title),
+        body: row.body,
         comment_count: row.comment_count,
         view_count: row.view_count,
         author_address: row.author_address,
@@ -303,6 +306,7 @@ export const getTopThreads = async (
         author_profile_img_url: profileData ? profileData.avatarUrl : '',
         thread_id: row.thread_id,
         publish_date_string: moment(row.created_at).format('MM/DD/YY'),
+        thread_url: `https://www.commonwealth.im/${communityId}/thread/${row.thread_id}`,
       };
       threadData.push(data);
     }
@@ -332,6 +336,30 @@ const getCommunityActivityScore = async (
   return (activityScore[1] as any)?.rows?.[0]?.activity_score as number;
 };
 
+const getActivityCounts = async (models: DB, communityId: string) => {
+  const commentCounts = await models.sequelize.query(`SELECT
+              COUNT(DISTINCT c.id) AS comment_count
+              FROM "Comments" c
+              WHERE
+              c.chain='${communityId}' AND
+              c.created_at > NOW() - INTERVAL '6 MONTH'`);
+
+  const totalComments = (commentCounts[1] as any)?.rows?.[0]
+    ?.comment_count as number;
+
+  const threadCounts = await models.sequelize.query(`SELECT
+              COUNT(DISTINCT t.id) AS thread_count
+              FROM "Threads" t
+              WHERE
+              t.chain='${communityId}' AND
+              t.created_at > NOW() - INTERVAL '6 MONTH'`);
+
+  const totalThreads = (threadCounts[1] as any)?.rows?.[0]
+    ?.thread_count as number;
+
+  return { totalComments, totalThreads };
+};
+
 export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
   // Go through each community on CW
   const communities = await models.Chain.findAll();
@@ -351,11 +379,18 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
         community.id
       );
 
+      const { totalComments, totalThreads } = await getActivityCounts(
+        models,
+        community.id
+      );
+
       communityDigestInfo[community.id] = {
         community_name: community.name,
         community_icon: community.icon_url,
-        topThreads,
-        activityScore,
+        top_threads: topThreads,
+        activity_score: activityScore,
+        new_posts: totalThreads,
+        new_comments: totalComments,
       };
     } catch (e) {
       console.log(e);
@@ -397,16 +432,28 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
 
     for (const chain_id of userCommunities) {
       const communityDigest = communityDigestInfo[chain_id];
-      if (!communityDigest || communityDigest.topThreads.length < 1) continue;
+      if (!communityDigest || communityDigest.top_threads.length < 1) continue;
       emailObject.push(communityDigest);
     }
 
     // Fire off Email?
     allEmailObjects.push({
       data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
+      newThreads:
+        emailObject.length > 0
+          ? emailObject.reduce((acc, community) => {
+              acc += +community.new_posts;
+              return acc;
+            }, 0)
+          : null,
+      newComments:
+        emailObject.length > 0
+          ? emailObject.reduce((acc, community) => {
+              acc += +community.new_comments;
+              return acc;
+            }, 0)
+          : null,
     });
-
-    console.log('message to ', user, user.email);
 
     const msg = {
       to: user.email,
@@ -414,6 +461,20 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
       templateId: DynamicTemplate.EmailDigest,
       dynamic_template_data: {
         data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
+        newThreads:
+          emailObject.length > 0
+            ? emailObject.reduce((acc, community) => {
+                acc += +community.new_posts;
+                return acc;
+              }, 0)
+            : null,
+        newComments:
+          emailObject.length > 0
+            ? emailObject.reduce((acc, community) => {
+                acc += +community.new_comments;
+                return acc;
+              }, 0)
+            : null,
       },
     };
   }
