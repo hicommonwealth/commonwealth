@@ -109,14 +109,14 @@ const setupAppRoutes = (
     let title, description, author, profileData, image;
     const address = await models.Address.findOne({
       where: { chain: req.params.scope, address: req.params.address },
-      include: [models.OffchainProfile],
+      include: [models.Profile],
     });
-    if (address && address.OffchainProfile) {
+    const profile = await address.getProfile();
+    if (address && profile) {
       try {
-        profileData = JSON.parse(address.OffchainProfile.data);
         title = profileData.name;
-        description = profileData.headline;
-        image = profileData.avatarUrl;
+        description = profile.bio;
+        image = profile.avatar_url;
         author = '';
       } catch (e) {
         title = '';
@@ -155,7 +155,6 @@ const setupAppRoutes = (
           {
             model: models.Address,
             as: 'Address',
-            include: [models.OffchainProfile],
           },
         ],
       });
@@ -167,11 +166,10 @@ const setupAppRoutes = (
         ? `https://commonwealth.im${chain.icon_url}`
         : DEFAULT_COMMONWEALTH_LOGO;
       try {
-        const profileData =
-          proposal && proposal.Address && proposal.Address.OffchainProfile
-            ? JSON.parse(proposal.Address.OffchainProfile.data)
-            : '';
-        author = profileData.name;
+        const profile = await models.Profile.findOne({
+          where: { id: proposal.Address.id },
+        });
+        author = profile.profile_name;
       } catch (e) {
         author = '';
       }
