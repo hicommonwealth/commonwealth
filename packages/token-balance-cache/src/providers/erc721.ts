@@ -39,7 +39,7 @@ export default class Erc721BalanceProvider extends BalanceProvider<
 
     const erc721Api = ERC721__factory.connect(
       tokenAddress,
-      new providers.Web3Provider(provider)
+      new providers.Web3Provider(provider) as any
     );
     await erc721Api.deployed();
     return erc721Api;

@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "jsx": "preserve",
     "outDir": "./build",
     "baseUrl": ".",
     "skipLibCheck": true,
@@ -16,14 +15,8 @@
     }
   },
   "include": [
-    "./client",
-    "./client/scripts",
-    "./shared",
-    "./test",
-    "./globals.d.ts",
     "./server",
     "./server.ts",
-    "./scripts"
   ],
   "exclude": ["./node_modules"]
 }

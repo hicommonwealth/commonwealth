@@ -4,6 +4,8 @@ const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { WebpackDeduplicationPlugin } = require('webpack-deduplication-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -16,6 +18,14 @@ module.exports = merge(common, {
     chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, '../client/index.html'),
+      filename: path.resolve(__dirname, '../build/commonwealth/client/index.html'),
+      attributes: {
+        'data-cfasync': 'false',
+      },
+    }),
+    new HtmlWebpackInjectAttributesPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
       CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com'),

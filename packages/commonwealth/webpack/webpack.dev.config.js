@@ -3,6 +3,8 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
 
 module.exports = merge(common, {
   mode: 'development',
@@ -32,6 +34,13 @@ module.exports = merge(common, {
       CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001'),
     }),
     new webpack.HotModuleReplacementPlugin(), // used for hot reloading
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, '../client/index.html'),
+      attributes: {
+        'data-cfasync': 'false',
+      },
+    }),
+    new HtmlWebpackInjectAttributesPlugin(),
   ],
   optimization: {
     minimizer: [

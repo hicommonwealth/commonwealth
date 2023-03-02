@@ -41,7 +41,7 @@ export default class Erc1155BalanceProvider extends BalanceProvider<
 
     const erc1155Api: ERC1155 = ERC1155__factory.connect(
       tokenAddress,
-      new providers.Web3Provider(provider)
+      new providers.Web3Provider(provider) as any
     );
     await erc1155Api.deployed();
     return erc1155Api;

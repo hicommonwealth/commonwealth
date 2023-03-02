@@ -28,7 +28,7 @@ export default class RoninBalanceProvider extends BalanceProvider<
     const axsStakingPoolAddress = '05b0bb3c1c320b280501b86706c3551995bc8571';
     const axsApi = ERC20__factory.connect(
       axsAddress,
-      new providers.Web3Provider(provider as any)
+      new providers.Web3Provider(provider as any) as any
     );
     await axsApi.deployed();
 

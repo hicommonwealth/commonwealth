@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 require('dotenv').config();
 
@@ -31,13 +30,14 @@ module.exports = {
         process.env.DISCORD_UI_URL || 'http://localhost:3000'
       ),
     }),
-    new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, '../client/index.html'),
-      attributes: {
-        'data-cfasync': 'false',
-      },
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, '../favicon.ico'),
+          to: path.resolve(__dirname, '../build/commonwealth/favicon.ico'),
+        },
+      ],
     }),
-    new HtmlWebpackInjectAttributesPlugin(),
     new webpack.IgnorePlugin({
       resourceRegExp: /^\.\/locale$/,
       contextRegExp: /moment$/,
@@ -46,7 +46,7 @@ module.exports = {
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
-    new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
+    new webpack.IgnorePlugin({resourceRegExp: /\.md$/}),
   ],
   optimization: {
     splitChunks: {

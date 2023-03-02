@@ -43,7 +43,7 @@ export default class Erc20BalanceProvider extends BalanceProvider<
 
     const erc20Api = ERC20__factory.connect(
       tokenAddress,
-      new providers.Web3Provider(provider)
+      new providers.Web3Provider(provider) as any
     );
     await erc20Api.deployed();
     return erc20Api;
