@@ -43,17 +43,14 @@ class NewProfilesController {
 
   public async updateProfileForAccount(address, data) {
     try {
-      const { name, avatarUrl } = data;
       const response = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
-        name,
-        avatarUrl,
+        ...data,
         jwt: app.user.jwt,
       });
 
       if (response?.result?.status === 'Success') {
         const profile = this._store.getByAddress(address);
-        this._unfetched.push(profile);
-        this._fetchNewProfiles();
+        this._refreshProfiles([profile]);
       }
     } catch (err) {
       console.error(err);

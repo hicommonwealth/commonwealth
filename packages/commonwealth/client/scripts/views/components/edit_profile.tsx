@@ -114,6 +114,8 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       );
 
       if (response?.result?.status === 'Success') {
+        // refresh profile in store
+        app.newProfiles.updateProfileForAccount(this.addresses[0].address, this.profileUpdate);
         setTimeout(() => {
           this.loading = false;
           navigateToSubpage(`/profile/id/${this.profile.id}`);
@@ -161,37 +163,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       setTimeout(() => {
         this.loading = false;
         notifyError('No updates found.');
-      }, 1500);
-    }
-  };
-
-  private handleDeleteProfile = async () => {
-    if (this.addresses.length > 0) {
-      notifyError(
-        'You must unlink all addresses before deleting your profile.'
-      );
-      return;
-    }
-
-    this.loading = true;
-
-    try {
-      const response: any = await $.post(`${app.serverUrl()}/deleteProfile`, {
-        profileId: this.profile.id,
-        jwt: app.user.jwt,
-      });
-      if (response?.status === 'Success') {
-        // Redirect
-        setTimeout(() => {
-          this.loading = false;
-          navigateToSubpage('/profile/manage');
-          m.redraw();
-        }, 1500);
-      }
-    } catch (err) {
-      setTimeout(() => {
-        this.loading = false;
-        notifyError(err.responseJSON?.error || 'Something went wrong.');
       }, 1500);
     }
   };

@@ -12,7 +12,6 @@ import type {
 import type { TopicAttributes } from 'commonwealth/server/models/topic';
 import type { RoleAttributes } from 'commonwealth/server/models/role';
 import type { RuleAttributes } from 'commonwealth/server/models/rule';
-import type { AddressAttributes } from 'commonwealth/server/models/address';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
