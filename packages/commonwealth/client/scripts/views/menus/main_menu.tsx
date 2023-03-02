@@ -14,7 +14,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             iconRight: 'chevronRight',
             onClick: () => {
               app.mobileMenu = 'CreateContentMenu';
-              app.mobileMenuRedraw.emit('redraw');
+              app.sidebarRedraw.emit('redraw');
             },
           },
         ]
@@ -25,7 +25,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       iconRight: 'chevronRight',
       onClick: () => {
         app.mobileMenu = 'HelpMenu';
-        app.mobileMenuRedraw.emit('redraw');
+        app.sidebarRedraw.emit('redraw');
       },
     },
     ...((app.isLoggedIn()
@@ -38,7 +38,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             hasUnreads: !!app.user?.notifications.numUnread,
             onClick: () => {
               app.mobileMenu = 'NotificationsMenu';
-              app.mobileMenuRedraw.emit('redraw');
+              app.sidebarRedraw.emit('redraw');
             },
           },
         ]
