@@ -60,7 +60,7 @@ class RecentActivityController {
     this._activeUsers = users.map((user) => {
       const { count } = user;
       const { chain, address, name, id, avatarUrl, lastActive } = user.info;
-      const info = new Profile(chain, address);
+      const info = new Profile(address, chain);
       info.initialize(name, address, avatarUrl, id, chain, lastActive);
       return { info, count };
     });
