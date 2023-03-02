@@ -75,7 +75,7 @@ export const EditCollaboratorsModal = ({
     <div className="EditCollaboratorsModal">
       <div className="compact-modal-title">
         <h3>Edit collaborators</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
+        <CWIconButton iconName="close" onClick={onModalClose} />
       </div>
       <div className="compact-modal-body">
         <div className="user-list-container">
@@ -164,9 +164,7 @@ export const EditCollaboratorsModal = ({
           <CWButton
             label="Cancel"
             buttonType="secondary-blue"
-            onClick={() => {
-              onModalClose();
-            }}
+            onClick={onModalClose}
           />
           <CWButton
             disabled={
