@@ -182,7 +182,7 @@ export default class CompoundGovernance extends ProposalModule<
     // load server proposals
     console.log('Fetching compound proposals from backend.');
     await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.store.getByType(
+    const entities = this.app.chainEntities.getByType(
       CompoundTypes.EntityKind.Proposal
     );
     console.log(`Found ${entities.length} proposals!`);

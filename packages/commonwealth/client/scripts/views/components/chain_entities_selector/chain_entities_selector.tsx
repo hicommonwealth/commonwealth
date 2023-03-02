@@ -55,7 +55,7 @@ export const ChainEntitiesSelector = ({
       .then(() => {
         // refreshing loads the latest chain entities into app.chainEntities store
         setLoading(false);
-        const entities = app.chainEntities.store.getAll();
+        const entities = Array.from(app.chainEntities.store.values()).flat();
         setChainEntities(entities);
       })
       .catch(() => setLoading(false));
