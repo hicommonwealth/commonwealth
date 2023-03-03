@@ -13,9 +13,10 @@ import type {
   IChainEventNotificationData,
   IChatNotification,
   ICommunityNotificationData,
+  SnapshotEventType,
+  SnapshotNotification
 } from '../../shared/types';
 import {DynamicTemplate } from '../../shared/types';
-import { SnapshotEventType, SnapshotNotification } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import type { UserAttributes } from '../models/user';
 
