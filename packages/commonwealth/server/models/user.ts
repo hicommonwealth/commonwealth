@@ -10,7 +10,7 @@ import type {
 } from './social_account';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type EmailNotificationInterval = 'daily' | 'never';
+export type EmailNotificationInterval = 'weekly' | 'never';
 
 export type UserAttributes = {
   email: string;
@@ -85,8 +85,7 @@ export default (
         defaultValue: false,
       },
       emailNotificationInterval: {
-        type: dataTypes.ENUM,
-        values: ['daily', 'never'],
+        type: dataTypes.STRING,
         defaultValue: 'never',
         allowNull: false,
       },

@@ -110,6 +110,10 @@ export async function createAddressHelper(
     );
     if (updatedId) {
       existingAddress.user_id = updatedId;
+      const profileId = await models.Profile.findOne({
+        where: { user_id: updatedId },
+      });
+      existingAddress.profile_id = profileId?.id;
     }
     existingAddress.keytype = req.keytype;
     existingAddress.verification_token = verification_token;

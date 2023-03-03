@@ -78,7 +78,7 @@ class SubstrateTreasury extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chainEntities.store.getByType(
+    const entities = this.app.chainEntities.getByType(
       SubstrateTypes.EntityKind.TreasuryProposal
     );
     entities.forEach((e) => this._entityConstructor(e));
