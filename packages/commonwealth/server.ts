@@ -64,8 +64,6 @@ log.info(
 );
 
 async function main() {
-  await sequelize.authenticate(); // make sure db is up, if not throw error
-
   if (SHOULD_SEND_EMAILS) {
     const rc = await sendBatchedNotificationEmails(models);
     // exit if we have performed a one-off event
