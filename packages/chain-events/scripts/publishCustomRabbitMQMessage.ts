@@ -1,5 +1,6 @@
-import { IEventData } from '../src/chains/aave/types';
-import { CWEvent, SupportedNetwork } from '../src';
+import type { IEventData } from '../src/chains/aave/types';
+import type { CWEvent } from '../src';
+import { SupportedNetwork } from '../src';
 import { publishRmqMsg } from 'common-common/src/rabbitmq/util';
 import { RABBITMQ_API_URI } from '../services/config';
 import { RascalExchanges, RascalRoutingKeys } from 'common-common/src/rabbitmq';
