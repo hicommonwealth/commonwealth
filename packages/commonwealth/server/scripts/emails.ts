@@ -16,7 +16,7 @@ import type {
   IChatNotification,
   ICommunityNotificationData,
 } from '../../shared/types';
-import { DynamicTemplate } from '../../shared/types';
+import {DynamicTemplate, SnapshotEventType, SnapshotNotification} from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import type { UserAttributes } from '../models/user';
 
@@ -31,7 +31,8 @@ export const createImmediateNotificationEmailObject = async (
     | IPostNotificationData
     | ICommunityNotificationData
     | IChainEventNotificationData
-    | IChatNotification,
+    | IChatNotification
+    | (SnapshotNotification & { eventType: SnapshotEventType }),
   category_id,
   models
 ) => {
