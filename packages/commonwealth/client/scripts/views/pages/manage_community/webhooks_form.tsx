@@ -1,15 +1,13 @@
-import React from 'react';
-
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { link, pluralize } from 'helpers';
-import { redraw } from 'mithrilInterop';
+import React, { useEffect, useState } from 'react';
+import smartTruncate from 'smart-truncate';
 import $ from 'jquery';
-import { Webhook } from 'models';
 
 import 'pages/manage_community/webhooks_form.scss';
-import smartTruncate from 'smart-truncate';
 
 import app from 'state';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { link, pluralize } from 'helpers';
+import { Webhook } from 'models';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -18,24 +16,41 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { Modal } from '../../components/component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 
-type WebhooksFormProps = {
-  webhooks: Array<Webhook>;
-};
-
-export const WebhooksForm = (props: WebhooksFormProps) => {
-  const { webhooks } = props;
+export const WebhooksForm = () => {
   const navigate = useCommonNavigate();
 
-  const [disabled, setDisabled] = React.useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [webhookUrl, setWebhookUrl] = React.useState<string>('');
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [webhooks, setWebhooks] = useState<Array<Webhook>>([]);
 
   const chainOrCommObj = { chain: app.activeChainId() };
+
+  useEffect(() => {
+    const fetch = () => {
+      $.get(`${app.serverUrl()}/getWebhooks`, {
+        ...chainOrCommObj,
+        auth: true,
+        jwt: app.user.jwt,
+      })
+        .then(([webhooksResp]) => {
+          if (webhooksResp.status !== 'Success') {
+            throw new Error('Could not fetch community webhooks');
+          }
+
+          setWebhooks(webhooksResp.result);
+        })
+        .catch(() => {
+          setWebhooks([]);
+        });
+    };
+
+    fetch();
+  }, [webhooks]);
 
   const createWebhook = () => {
     setDisabled(true);
 
-    // TODO: Change to POST /webhook
     $.post(`${app.serverUrl()}/createWebhook`, {
       ...chainOrCommObj,
       webhookUrl,
@@ -47,22 +62,16 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
 
         if (result.status === 'Success') {
           const newWebhook = Webhook.fromJSON(result.result);
-
-          webhooks.push(newWebhook);
-
+          setWebhooks((prevState) => [...prevState, newWebhook]);
           setIsModalOpen(true);
-
           setWebhookUrl('');
         } else {
           notifyError(result.message);
         }
-
-        redraw();
       },
       (err) => {
         setDisabled(false);
         notifyError(err?.responseJSON?.error || 'Unknown error');
-        redraw();
       }
     );
   };
@@ -95,20 +104,15 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
                 <CWIconButton
                   iconName="gear"
                   iconSize="small"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsModalOpen(true);
-                  }}
+                  onClick={() => setIsModalOpen(true)}
                 />
                 <CWIconButton
                   iconName="trash"
                   iconSize="small"
                   disabled={disabled}
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     setDisabled(true);
 
-                    // TODO: Change to DELETE /webhook
                     $.post(`${app.serverUrl()}/deleteWebhook`, {
                       ...chainOrCommObj,
                       webhookUrl: webhook.url,
@@ -131,16 +135,12 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
                         } else {
                           notifyError(result.message);
                         }
-                        redraw();
                       },
                       (err) => {
                         setDisabled(false);
-
                         notifyError(
                           err?.responseJSON?.error || 'Unknown error'
                         );
-
-                        redraw();
                       }
                     );
                   }}
@@ -150,13 +150,6 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
                     <WebhookSettingsModal
                       onModalClose={() => setIsModalOpen(false)}
                       webhook={webhook}
-                      updateSuccessCallback={(wh) => {
-                        const idx = webhooks.findIndex(
-                          (wh2) => wh2.id === wh.id
-                        );
-
-                        webhooks[idx].categories = wh.categories;
-                      }}
                     />
                   }
                   onClose={() => setIsModalOpen(false)}

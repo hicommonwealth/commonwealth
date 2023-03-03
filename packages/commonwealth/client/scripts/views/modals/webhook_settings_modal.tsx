@@ -1,7 +1,11 @@
 import React from 'react';
+import $ from 'jquery';
 
-import { redraw } from 'mithrilInterop';
+import 'modals/webhook_settings_modal.scss';
 
+import type { Webhook } from 'models';
+
+import app from 'state';
 import { NotificationCategories } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import {
@@ -11,12 +15,6 @@ import {
   KusamaChainNotificationTypes,
   PolkadotChainNotificationTypes,
 } from 'helpers/chain_notification_types';
-import $ from 'jquery';
-
-import 'modals/webhook_settings_modal.scss';
-import { Webhook } from 'models';
-
-import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
@@ -24,12 +22,13 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;
-  updateSuccessCallback: (webhook: Webhook) => void;
   webhook: Webhook;
 };
 
-export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
-  const { onModalClose, updateSuccessCallback, webhook } = props;
+export const WebhookSettingsModal = ({
+  onModalClose,
+  webhook,
+}: WebhookSettingsModalProps) => {
   const [selectedCategories, setSelectedCategories] = React.useState<
     Array<string>
   >(webhook.categories);
@@ -67,17 +66,15 @@ export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
         indeterminate={someValuesPresent && !allValuesPresent}
         onChange={() => {
           if (allValuesPresent) {
-            setSelectedCategories(
-              selectedCategories.filter((v) => !values.includes(v))
+            setSelectedCategories((prevState) =>
+              prevState.filter((v) => !values.includes(v))
             );
-            redraw();
           } else {
             values.forEach((v) => {
               if (!selectedCategories.includes(v)) {
-                selectedCategories.push(v);
+                setSelectedCategories((prevState) => [...prevState, v]);
               }
             });
-            redraw();
           }
         }}
       />
@@ -115,7 +112,9 @@ export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
           label="Save webhook settings"
           onClick={(e) => {
             e.preventDefault();
+
             const chainOrCommObj = { chain: webhook.chain_id };
+
             $.ajax({
               url: `${app.serverUrl()}/updateWebhook`,
               data: {
@@ -125,14 +124,11 @@ export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
                 jwt: app.user.jwt,
               },
               type: 'POST',
-              success: (result) => {
-                const updatedWebhook = Webhook.fromJSON(result.result);
-                updateSuccessCallback(updatedWebhook);
+              success: () => {
                 onModalClose();
               },
               error: (err) => {
                 notifyError(err.statusText);
-                redraw();
               },
             });
           }}

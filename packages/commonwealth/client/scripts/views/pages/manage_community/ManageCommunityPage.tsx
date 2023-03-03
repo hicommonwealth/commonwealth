@@ -1,11 +1,10 @@
+import React, { useEffect, useState } from 'react';
 import $ from 'jquery';
 
-import { AccessLevel, RoleInfo } from 'models';
-
 import 'pages/manage_community/index.scss';
-import React, { useEffect, useState } from 'react';
 
 import app from 'state';
+import { AccessLevel, RoleInfo } from 'models';
 import Sublayout from '../../sublayout';
 import ErrorPage from '../error';
 import { PageLoading } from '../loading';
@@ -57,7 +56,6 @@ const ManageCommunityPage = () => {
   const [initialized, setInitialized] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [roleData, setRoleData] = useState([]);
-  const [webhooks, setWebhooks] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [mods, setMods] = useState([]);
 
@@ -74,51 +72,39 @@ const ManageCommunityPage = () => {
     );
 
     const chainOrCommObj = { chain: app.activeChainId() };
-    Promise.all([
-      // TODO: Change to GET /members
-      $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj),
-      // TODO: Change to GET /webhooks
-      $.get(`${app.serverUrl()}/getWebhooks`, {
-        ...chainOrCommObj,
-        auth: true,
-        jwt: app.user.jwt,
-      }),
-    ])
-      .then(([bulkMembers, webhooksResp]) => {
-        if (bulkMembers.status !== 'Success') {
-          throw new Error('Could not fetch members');
-        }
 
-        if (webhooksResp.status !== 'Success') {
-          throw new Error('Could not fetch community webhooks');
-        }
+    const fetch = () => {
+      $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
+        .then((bulkMembers) => {
+          if (bulkMembers.status !== 'Success') {
+            throw new Error('Could not fetch members');
+          }
 
-        setWebhooks(webhooksResp);
+          const memberAdmins = [];
+          const memberMods = [];
 
-        const memberAdmins = [];
-        const memberMods = [];
+          if (bulkMembers.result.length > 0) {
+            bulkMembers.result.sort(sortAdminsAndModsFirst).forEach((role) => {
+              if (role.permission === AccessLevel.Admin) {
+                memberAdmins.push(role);
+              } else if (role.permission === AccessLevel.Moderator) {
+                memberMods.push(role);
+              }
+            });
+          }
 
-        if (bulkMembers?.length > 0) {
-          bulkMembers.sort(sortAdminsAndModsFirst).forEach((role) => {
-            if (role.permission === AccessLevel.Admin) {
-              memberAdmins.push(role);
-            } else if (role.permission === AccessLevel.Moderator) {
-              memberMods.push(role);
-            }
-          });
-        }
+          setAdmins(memberAdmins);
+          setMods(memberMods);
+          setRoleData(bulkMembers.result);
+          setInitialized(true);
+        })
+        .catch(() => {
+          setRoleData([]);
+          setInitialized(true);
+        });
+    };
 
-        setAdmins(memberAdmins);
-        setMods(memberMods);
-
-        setRoleData(bulkMembers.result);
-        setInitialized(true);
-      })
-      .catch(() => {
-        setRoleData([]);
-        setWebhooks([]);
-        setInitialized(true);
-      });
+    fetch();
   }, []);
 
   if (!initialized) return <PageLoading />;
@@ -143,7 +129,6 @@ const ManageCommunityPage = () => {
             onRoleUpdate(oldRole, newRole, (r) => setRoleData(r), roleData)
           }
           roleData={roleData}
-          webhooks={webhooks}
         />
       </div>
     </Sublayout>
