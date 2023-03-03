@@ -15,7 +15,6 @@ import {
 
 import app from 'state';
 import { PageNotFound } from 'views/pages/404';
-import { AppToasts } from 'views/toast';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
@@ -29,7 +28,6 @@ class LoadingLayout extends ClassComponent {
         <div className="spinner-container">
           <CWSpinner size="xl" />
         </div>
-        <AppToasts />
       </div>
     );
   }
@@ -88,7 +86,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
               </div>
             }
           />
-          <AppToasts />
         </div>
       );
     } else if (!app.loginStatusLoaded()) {
@@ -104,7 +101,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       return (
         <div className="Layout">
           <PageNotFound />
-          <AppToasts />
         </div>
       );
     } else if (
@@ -146,7 +142,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     return (
       <div className="Layout">
         {vnode.children}
-        <AppToasts />
         {/*<UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />*/}
       </div>
     );
