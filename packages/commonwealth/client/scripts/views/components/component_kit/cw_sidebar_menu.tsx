@@ -1,6 +1,5 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
@@ -39,18 +38,18 @@ const renderCommunity = (item: ChainInfo) => {
       <CommunityLabel community={item} />
       {app.isLoggedIn() && roles.length > 0 && (
         <div class="roles-and-star">
-          {roles.map((role) => {
-            return m(User, {
+          {
+            m(User, {
               avatarSize: 18,
               avatarOnly: true,
               user: new AddressInfo(
-                role.address_id,
-                role.address,
-                role.address_chain || role.chain_id,
+                roles[0].address_id,
+                roles[0].address,
+                roles[0].address_chain || roles[0].chain_id,
                 null
               ),
-            });
-          })}
+            })
+          }
           <div
             class={
               app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
@@ -157,21 +156,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
                 app.sidebarMenu = 'default';
                 m.route.set('/notification-settings');
               },
-            },
-            {
-              type: 'default',
-              label: 'Account settings',
-              iconLeft: 'bell',
-              onclick: () => {
-                if (app.activeChainId()) {
-                  navigateToSubpage('/settings');
-                } else {
-                  app.sidebarToggled = false;
-                  app.sidebarMenu = 'default';
-                  m.route.set('/settings');
-                }
-              },
-            } as MenuItem,
+            } as MenuItem
           ].map((item: MenuItem) => {
             return (
               <CWSidebarMenuItem type={item.type || 'default'} {...item} />
