@@ -106,7 +106,6 @@ module.exports = {
       await queryInterface.sequelize.query(`
           ALTER TABLE "Subscriptions" RENAME TO "OldSubscriptions";
       `, { transaction: t, raw: true });
-
       console.log("Subscriptions table renamed")
 
       await queryInterface.sequelize.query(`
@@ -160,20 +159,12 @@ module.exports = {
           CREATE INDEX subscriptions_offchain_thread_id ON "Subscriptions" (offchain_thread_id);
       `, { transaction: t, raw: true });
 
-      // await queryInterface.sequelize.query(
-      //   `
-      //     DELETE
-      //     FROM "Subscriptions"
-      //     WHERE category_id = 'chain-event';
-      // `,
-      //   {
-      //     transaction: t,
-      //     raw: true,
-      //     type: queryInterface.sequelize.QueryTypes.DELETE,
-      //   }
-      // );
-      console.log("yogeorgkeorkg")
-
+      await queryInterface.sequelize.query(`
+          ALTER TABLE "NotificationsRead"
+              ADD CONSTRAINT "NotificationsRead_subscription_id_fkey"
+                  FOREIGN KEY (subscription_id) REFERENCES "Subscriptions"(id);
+      `, { transaction: t, raw: true });
+      console.log("subscriber id key added");
 
       // delete the created indices
       await queryInterface.sequelize.query(`
