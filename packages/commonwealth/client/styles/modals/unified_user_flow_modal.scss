@@ -1,0 +1,182 @@
+@import '../shared';
+
+.UnifiedUserFlowModal {
+  max-width: 720px;
+  min-width: 480px;
+  padding: 24px;
+
+  .EntryModal {
+    .Header {
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .Description {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .section {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .bold-section {
+        display: inline-block;
+
+        .bold {
+          font-weight: 700;
+        }
+      }
+    }
+
+    .Inputs {
+      margin-bottom: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .Callout {
+      display: flex;
+      padding: 16px;
+      border-radius: 6px;
+      background: $neutral-100;
+      margin-bottom: 24px;
+      flex-direction: row;
+
+      .bold-section {
+        display: inline-block;
+
+        .bold {
+          font-weight: 700;
+        }
+      }
+    }
+
+    .MoreInfo {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+
+      .learn-more {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        align-items: center;
+
+        .blue-text {
+          color: $primary-500;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    .ButtonRow {
+      display: flex;
+      gap: 16px;
+      justify-content: flex-end;
+    }
+  }
+
+  .AlertDangerModal {
+    .Header {
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+
+    .Description {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .section {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+
+    .Inputs {
+      margin-bottom: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .Callout {
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      border-radius: 6px;
+      background: $neutral-100;
+      margin-bottom: 24px;
+    }
+
+    .MoreInfo {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+
+      .learn-more {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        align-items: center;
+
+        .blue-text {
+          color: $primary-500;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    .ButtonRow {
+      display: flex;
+      gap: 16px;
+      justify-content: flex-end;
+    }
+  }
+
+  .SuccessProfileModal {
+    .Header {
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+
+    .Description {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .bold-section {
+        display: inline-block;
+
+        .bold {
+          font-weight: 700;
+        }
+      }
+    }
+
+    .ButtonRow {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}

@@ -332,6 +332,8 @@ export async function initAppState(
           app.setCustomDomain(customDomain);
         }
 
+        app.user.setHasDisplayName(data.result.user?.hasDisplayName);
+
         resolve();
       })
       .catch((err: any) => {
