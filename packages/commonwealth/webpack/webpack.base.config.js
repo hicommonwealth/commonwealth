@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInjectAttributesPlugin = require('html-webpack-inject-attributes-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 require('dotenv').config();
 
@@ -30,6 +31,14 @@ module.exports = {
       'process.env.DISCORD_UI_URL': JSON.stringify(
         process.env.DISCORD_UI_URL || 'http://localhost:3000'
       ),
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, '../favicon.ico'),
+          to: path.resolve(__dirname, '../build/commonwealth/favicon.ico'),
+        },
+      ],
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
