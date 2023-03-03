@@ -1,6 +1,4 @@
-import type {
-  CWEvent,
-} from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
 import { Label as ChainEventLabel } from 'chain-events/src';
 
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -14,9 +12,9 @@ import type {
   IChatNotification,
   ICommunityNotificationData,
   SnapshotEventType,
-  SnapshotNotification
+  SnapshotNotification,
 } from '../../shared/types';
-import {DynamicTemplate } from '../../shared/types';
+import { DynamicTemplate } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import type { UserAttributes } from '../models/user';
 

@@ -17,7 +17,7 @@ import getFetch from 'helpers/getFetch';
 import type { ChainInfo } from 'models';
 import { ChainEntity, ChainEvent } from 'models';
 import { proposalSlugToChainEntityType } from '../../identifiers';
-import app from "state";
+import app from 'state';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
