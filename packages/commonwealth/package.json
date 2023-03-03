@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "yarn build-app & yarn build-consumer & wait",
+    "build": "yarn build-app && yarn build-consumer",
     "bundle-client": "webpack --config webpack/webpack.prod.config.js --progress",
     "transpile-server": "tsc && tsc-alias",
-    "build-app": "yarn transpile-server & yarn bundle-client & wait",
+    "build-app": "yarn transpile-server && yarn bundle-client",
     "build-consumer": "tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json",
     "build-ios": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios",
     "build-android": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android",
