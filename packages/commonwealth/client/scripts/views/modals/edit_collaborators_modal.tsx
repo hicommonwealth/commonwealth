@@ -218,7 +218,6 @@ export const EditCollaboratorsModal = ({
                   notifyError(errMsg);
                 }
               }
-
               onModalClose();
             }}
           />
