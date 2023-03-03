@@ -509,9 +509,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Change topic',
               iconLeft: 'write' as const,
-              onClick: (e) => {
-                e.preventDefault();
-
+              onClick: () => {
                 setIsChangeTopicModalOpen(true);
               },
             },
