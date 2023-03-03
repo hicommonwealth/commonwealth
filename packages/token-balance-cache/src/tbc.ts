@@ -29,11 +29,15 @@ async function queryChainNodesFromDB(
       ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
       : process.env.DATABASE_URL;
 
-  const config = { connectionString: DATABASE_URI };
-  if (!DATABASE_URI.includes('@localhost') && process.env.NODE_ENV !== 'production') {
-    config['ssl'] = { require: true, rejectUnauthorized: false };
-  }
-  const db = new Client(config);
+  const db = new Client({
+    connectionString: DATABASE_URI,
+    ssl:
+      process.env.NODE_ENV !== 'production'
+        ? false
+        : {
+            rejectUnauthorized: false,
+          },
+  });
   await db.connect();
   const nodeQuery = await db.query<IChainNode>(query);
   const nodeArray = nodeQuery.rows;
