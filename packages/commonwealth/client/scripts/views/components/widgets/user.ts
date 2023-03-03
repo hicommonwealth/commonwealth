@@ -303,24 +303,14 @@ export const UserBlock: m.Component<
     compact?: boolean;
     linkify?: boolean;
     avatarSize?: number;
+    hideAvatar?: boolean;
   },
   {
     profileId: number;
   }
 > = {
   view: (vnode) => {
-    const {
-      user,
-      popover,
-      showRole,
-      searchTerm,
-      showAddressWithDisplayName,
-      showChainName,
-      selected,
-      compact,
-      linkify,
-      addressDisplayOptions,
-    } = vnode.attrs;
+    const { user, searchTerm, showChainName, compact, linkify } = vnode.attrs;
 
     const { showFullAddress } = vnode.attrs.addressDisplayOptions || {};
     const chain = typeof user.chain === 'string' ? user.chain : user.chain?.id;
@@ -346,25 +336,7 @@ export const UserBlock: m.Component<
       : null;
 
     const children = [
-      m('.user-block-left', [
-        m(User, {
-          user,
-          avatarOnly: true,
-          avatarSize: vnode.attrs.avatarSize || 28,
-          popover,
-        }),
-      ]),
       m('.user-block-center', [
-        m('.user-block-name', [
-          m(User, {
-            user,
-            hideAvatar: true,
-            showAddressWithDisplayName,
-            addressDisplayOptions,
-            popover,
-            showRole,
-          }),
-        ]),
         m(
           '.user-block-address',
           {
@@ -393,7 +365,7 @@ export const UserBlock: m.Component<
       m('.user-block-right', [
         m(
           '.user-block-selected',
-          selected ? m(CWIcon, { iconName: 'check' }) : ''
+          m(CWIcon, { iconName: 'check', iconSize: 'small' })
         ),
       ]),
     ];

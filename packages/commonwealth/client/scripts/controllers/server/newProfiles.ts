@@ -103,7 +103,7 @@ class NewProfilesController {
               currentProfile.address,
               currentProfile.avatarUrl,
               currentProfile.profileId,
-              currentProfile.chain,
+              profile.chain,
               currentProfile.lastActive
             );
 

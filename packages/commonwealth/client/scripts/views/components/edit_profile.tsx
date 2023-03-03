@@ -114,11 +114,13 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       );
 
       if (response?.result?.status === 'Success') {
-        // refresh profile in store
-        app.newProfiles.updateProfileForAccount(
-          this.addresses[0].address,
-          this.profileUpdate
-        );
+        // refresh profiles in store
+        this.addresses.forEach((a) => {
+          app.newProfiles.updateProfileForAccount(
+            a.address,
+            this.profileUpdate
+          );
+        });
         setTimeout(() => {
           this.loading = false;
           navigateToSubpage(`/profile/id/${this.profile.id}`);

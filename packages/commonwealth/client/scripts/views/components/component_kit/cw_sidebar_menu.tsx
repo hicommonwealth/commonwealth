@@ -3,9 +3,8 @@
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
-import { Icon, Icons, ListItem } from 'construct-ui';
 import m from 'mithril';
-import type { ChainInfo, RoleInfo } from 'models';
+import type { ChainInfo } from 'models';
 import { AddressInfo } from 'models';
 
 import app from 'state';
@@ -38,18 +37,16 @@ const renderCommunity = (item: ChainInfo) => {
       <CommunityLabel community={item} />
       {app.isLoggedIn() && roles.length > 0 && (
         <div class="roles-and-star">
-          {
-            m(User, {
-              avatarSize: 18,
-              avatarOnly: true,
-              user: new AddressInfo(
-                roles[0].address_id,
-                roles[0].address,
-                roles[0].address_chain || roles[0].chain_id,
-                null
-              ),
-            })
-          }
+          {m(User, {
+            avatarSize: 18,
+            avatarOnly: true,
+            user: new AddressInfo(
+              roles[0].address_id,
+              roles[0].address,
+              roles[0].address_chain || roles[0].chain_id,
+              null
+            ),
+          })}
           <div
             class={
               app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
@@ -156,7 +153,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
                 app.sidebarMenu = 'default';
                 m.route.set('/notification-settings');
               },
-            } as MenuItem
+            } as MenuItem,
           ].map((item: MenuItem) => {
             return (
               <CWSidebarMenuItem type={item.type || 'default'} {...item} />
