@@ -414,6 +414,7 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
   const allEmailObjects = [];
 
   console.log('Starting email generation...');
+  let emailsSent = 0;
 
   for (const user of usersWithEmailDigestOn) {
     const emailObject = []; // TODO: Decide what this looks like
@@ -455,29 +456,43 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
           : null,
     });
 
+    const dynamicData = {
+      data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
+      newThreads:
+        emailObject.length > 0
+          ? emailObject.reduce((acc, community) => {
+              acc += +community.new_posts;
+              return acc;
+            }, 0)
+          : null,
+      newComments:
+        emailObject.length > 0
+          ? emailObject.reduce((acc, community) => {
+              acc += +community.new_comments;
+              return acc;
+            }, 0)
+          : null,
+    };
+
     const msg = {
       to: user.email,
       from: 'Commonwealth <no-reply@commonwealth.im>',
+      subject: 'Common Weekly Digest',
       templateId: DynamicTemplate.EmailDigest,
-      dynamic_template_data: {
-        data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
-        newThreads:
-          emailObject.length > 0
-            ? emailObject.reduce((acc, community) => {
-                acc += +community.new_posts;
-                return acc;
-              }, 0)
-            : null,
-        newComments:
-          emailObject.length > 0
-            ? emailObject.reduce((acc, community) => {
-                acc += +community.new_comments;
-                return acc;
-              }, 0)
-            : null,
-      },
+      dynamic_template_data: dynamicData,
     };
+
+    console.log(msg);
+
+    try {
+      await sgMail.send(msg);
+      emailsSent += 1;
+    } catch (e) {
+      console.log(e);
+    }
   }
+
+  console.log('Sent emails to ', emailsSent, ' users.');
 
   return allEmailObjects;
 };
