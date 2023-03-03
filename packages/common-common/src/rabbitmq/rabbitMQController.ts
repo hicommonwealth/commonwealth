@@ -64,7 +64,6 @@ export class RabbitMQController {
   }
 
   public async init(): Promise<void> {
-    console.log(__dirname);
     log.info(`Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`);
 
     this.broker = await Rascal.BrokerAsPromised.create(
