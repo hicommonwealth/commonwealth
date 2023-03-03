@@ -232,7 +232,6 @@ export const CWTextInput = (props: TextInputProps) => {
               iconName={iconRight}
               iconSize="small"
               onClick={iconRightonClick}
-              iconButtonTheme="primary"
             />
           </div>
         ) : !!iconRight && !disabled ? (

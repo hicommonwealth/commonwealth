@@ -67,10 +67,7 @@ export const AvatarUpload = ({
           uploadCompleteCallback([response]);
         }
       } catch (e) {
-        notifyError(
-          'Failed to get an S3 signed upload URL',
-          e.responseJSON ? e.responseJSON.error : e.responseText
-        );
+        notifyError('Failed to get an S3 signed upload URL');
       }
     },
   });
