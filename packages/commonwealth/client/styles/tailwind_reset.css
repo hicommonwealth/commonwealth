@@ -366,7 +366,7 @@ section.LandingPageTokenHolders {
 }
 
 .bg-geometric-pattern {
-  background-image: url('/static/img/bg.png');
+  background-image: url('../../static/img/bg.png');
 }
 
 .bg-footer {

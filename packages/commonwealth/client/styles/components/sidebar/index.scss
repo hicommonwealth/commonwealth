@@ -37,7 +37,7 @@
     }
 
     .powered-by {
-      background-image: url(/static/img/powered-by.svg);
+      background-image: url('../../../../static/img/powered-by.svg');
       background-position: center;
       background-repeat: no-repeat;
       border-color: $neutral-50;
@@ -48,7 +48,7 @@
       width: 100%;
 
       &:hover {
-        background-image: url('/static/img/powered-by-2.svg');
+        background-image: url('../../../../static/img/powered-by-2.svg');
       }
     }
 

@@ -1,17 +1,12 @@
 import cheerio from 'cheerio';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import express from 'express';
 import fs from 'fs';
 import * as path from 'path';
-import devWebpackConfig from '../../webpack/webpack.dev.config';
-import prodWebpackConfig from '../../webpack/webpack.prod.config';
 import { DEFAULT_COMMONWEALTH_LOGO, DEV } from '../config';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
-import { factory, formatFilename } from 'common-common/src/logging';
-import webpack from 'webpack';
-import webpackDevMiddleware from 'webpack-dev-middleware';
-import webpackHotMiddleware from 'webpack-hot-middleware';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -30,7 +25,7 @@ const decodeTitle = (title: string) => {
   }
 };
 
-const setupAppRoutes = (
+const setupWebpack = async (
   app,
   models: DB
 ) => {
@@ -43,7 +38,7 @@ const setupAppRoutes = (
   // if we are using an external build, serve it from current folder, otherwise server from build folder.
   const indexHtmlPath = `${__dirname}`.includes('/build/commonwealth') ?
     path.resolve(`${__dirname}/../../../index.html`) :
-    path.resolve(`${__dirname}/../../build/index.html`)
+    path.resolve(`${__dirname}/../../build/index.html`);
 
   const templateFile = (() => {
     try {
@@ -237,23 +232,9 @@ const setupAppRoutes = (
   // serve the compiled app
   if (!NO_CLIENT_SERVER) {
     if (DEV) {
-      const compiler = DEV
-        ? webpack(devWebpackConfig as any)
-        : webpack(prodWebpackConfig as any);
-      const devMiddleware =
-        DEV && !NO_CLIENT_SERVER
-          ? webpackDevMiddleware(compiler as any, {
-            publicPath: '/build',
-          })
-          : null;
-      app.use(devMiddleware);
-      app.use(webpackHotMiddleware(compiler));
-
-      // Development: serve everything through devMiddleware
-      app.get('*', (req, res, next) => {
-        req.url = '/build/';
-        devMiddleware(req, res, next);
-      });
+      // lazy import because we want to keep all of webpacks dependencies in devDependencies
+      const setupWebpackDevServer = (await import('./setupWebpackDevServer')).default
+      setupWebpackDevServer(app);
     } else {
       app.use('/build', express.static('build'));
 
@@ -265,4 +246,4 @@ const setupAppRoutes = (
   }
 };
 
-export default setupAppRoutes;
+export default setupWebpack;

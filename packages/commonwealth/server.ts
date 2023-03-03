@@ -19,13 +19,16 @@ import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
-  DATABASE_URI,
   DEV,
-  NO_CLIENT_SERVER, NO_GLOBAL_ACTIVITY_CACHE, NO_PRERENDER, NO_RULE_CACHE, NO_TOKEN_BALANCE_CACHE,
+  NO_GLOBAL_ACTIVITY_CACHE,
+  NO_PRERENDER,
+  NO_RULE_CACHE,
+  NO_TOKEN_BALANCE_CACHE,
   RABBITMQ_URI,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
-  SHOULD_SEND_EMAILS, WITH_PRERENDER,
+  SHOULD_SEND_EMAILS,
+  WITH_PRERENDER,
 } from './server/config';
 import models, { sequelize } from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -34,7 +37,7 @@ import { addSwagger } from './server/routing/addSwagger';
 import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
-import setupWebpack from './server/scripts/setupAppRoutes';
+import setupWebpack from './server/scripts/setupWebpack';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
@@ -45,8 +48,6 @@ import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
-import devWebpackConfig from './webpack/webpack.dev.config.js';
-import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
 
@@ -231,7 +232,7 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
-  setupWebpack(app, models);
+  await setupWebpack(app, models);
 
   setupErrorHandlers(app, rollbar);
 

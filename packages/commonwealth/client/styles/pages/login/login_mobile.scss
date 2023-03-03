@@ -61,15 +61,15 @@
 
 .LoginMobile {
   @include mediumSmallInclusive {
-    background-image: url('/static/img/login-background-mediumsmall.png');
+    background-image: url('../../../../static/img/login-background-mediumsmall.png');
   }
 
   @include small {
-    background-image: url('/static/img/login-background-small.png');
+    background-image: url('../../../../static/img/login-background-small.png');
   }
 
   @include extraSmall {
-    background-image: url('/static/img/login-background-extrasmall.png');
+    background-image: url('../../../../static/img/login-background-extrasmall.png');
   }
 
   align-items: center;
