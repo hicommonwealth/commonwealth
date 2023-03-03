@@ -1,7 +1,11 @@
 /* eslint-disable prefer-const */
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainNetwork, ChainType, NotificationCategories, } from 'common-common/src/types';
+import {
+  ChainNetwork,
+  ChainType,
+  NotificationCategories,
+} from 'common-common/src/types';
 /* eslint-disable dot-notation */
 import type { NextFunction, Request, Response } from 'express';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
@@ -24,7 +28,7 @@ export const Errors = {
   NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found',
   InsufficientTokenBalance:
-    'Users need to hold some of the community\'s tokens to react',
+    "Users need to hold some of the community's tokens to react",
   BalanceCheckFailed: 'Could not verify user token balance',
   RuleCheckFailed: 'Rule check failed',
 };
@@ -205,8 +209,8 @@ const createReaction = async (
     thread_id: comment
       ? comment.thread_id
       : proposal instanceof models.Thread
-        ? proposal.id
-        : proposal?.thread_id,
+      ? proposal.id
+      : proposal?.thread_id,
     root_title,
     root_type,
     chain_id: finalReaction.chain,

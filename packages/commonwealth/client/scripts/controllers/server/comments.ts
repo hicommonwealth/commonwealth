@@ -249,7 +249,7 @@ class CommentsController {
     });
   }
 
-  public async refresh(thread, chainId: string) {
+  public async refresh(thread: Thread, chainId: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
@@ -260,7 +260,7 @@ class CommentsController {
         if (response.status !== 'Success') {
           reject(new Error(`Unsuccessful status: ${response.status}`));
         }
-        this._store.clearByThread(thread.id);
+        this._store.clearByThread(thread);
         response.result.forEach((comment) => {
           // TODO: Comments should always have a linked Address
           if (!comment.Address) console.error('Comment missing linked address');

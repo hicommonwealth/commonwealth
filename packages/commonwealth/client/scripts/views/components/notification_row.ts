@@ -14,7 +14,7 @@ import app from 'state';
 import type { IPostNotificationData } from 'types';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { getCommunityUrl, getThreadUrl } from '../../../../shared/utils';
+import { getCommunityUrl, getThreadUrl } from 'utils';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';

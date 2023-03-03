@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   getRabbitMQConfig,
   RabbitMQController,
@@ -18,6 +19,7 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import * as v8 from 'v8';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
@@ -47,8 +49,6 @@ import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
-import * as v8 from 'v8';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -261,48 +261,47 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-  try {
-    if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-    if (!NO_RULE_CACHE) await ruleCache.start();
-    const banCache = new BanCache(models);
-    const globalActivityCache = new GlobalActivityCache(models);
+  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
+  if (!NO_RULE_CACHE) await ruleCache.start();
+  const banCache = new BanCache(models);
+  const globalActivityCache = new GlobalActivityCache(models);
 
-    // TODO: should we await this? it will block server startup -- but not a big deal locally
-    if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
+  // TODO: should we await this? it will block server startup -- but not a big deal locally
+  if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
 
-    // Declare Validation Middleware Service
-    // middleware to use for all requests
-    const dbValidationService: DatabaseValidationService =
-      new DatabaseValidationService(models);
+  // Declare Validation Middleware Service
+  // middleware to use for all requests
+  const dbValidationService: DatabaseValidationService =
+    new DatabaseValidationService(models);
 
-    setupAPI(
-      '/api',
-      app,
-      models,
-      viewCountCache,
-      tokenBalanceCache,
-      ruleCache,
-      banCache,
-      globalActivityCache,
-      dbValidationService
-    );
+  setupAPI(
+    '/api',
+    app,
+    models,
+    viewCountCache,
+    tokenBalanceCache,
+    ruleCache,
+    banCache,
+    globalActivityCache,
+    dbValidationService
+  );
 
-    // new API
-    addExternalRoutes('/external', app, models, tokenBalanceCache);
-    addSwagger('/docs', app);
+  // new API
+  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addSwagger('/docs', app);
 
-    setupCosmosProxy(app, models);
-    setupIpfsProxy(app);
-    setupEntityProxy(app);
-    setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+  setupCosmosProxy(app, models);
+  setupIpfsProxy(app);
+  setupEntityProxy(app);
+  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 
-    setupErrorHandlers(app, rollbar);
+  setupErrorHandlers(app, rollbar);
 
-    setupServer(app, rollbar, models, rabbitMQController);
-  } catch (e) {
-    console.log(e);
-  }
+  setupServer(app, rollbar, models, rabbitMQController);
 }
 
-main();
+main().catch((e) => {
+  console.log(e);
+  process.exit(0);
+});
 export default app;
