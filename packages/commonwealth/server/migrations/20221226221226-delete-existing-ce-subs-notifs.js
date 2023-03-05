@@ -188,7 +188,7 @@ module.exports = {
       `,
         { transaction: t, raw: true }
       );
-      console.log('chain key added');
+      console.log('subscriber id key added');
 
       await queryInterface.sequelize.query(
         `
