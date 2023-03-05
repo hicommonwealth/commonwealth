@@ -9,8 +9,10 @@ async function createProposal(signer: JsonRpcSigner, bravo: any, comp: any) {
   console.log("Creating Proposal:");
   // const proposalMinimum = await bravo.proposalThreshold();
   const delegateAmount = BigNumber.from(10).pow(19);
-  console.log("\tSelf delegating", ethers.utils.formatUnits(delegateAmount, 18), "COMP...");
-  await comp.delegate(signer._address, delegateAmount, { from: signer._address });
+  const delegateTxnSigner = await comp.delegate(signer._address, delegateAmount, { from: signer._address });
+  const delegateTxnAddr = await comp.delegate(process.argv[4], delegateAmount, { from: signer._address });
+  console.log(`\tDelegated ${ethers.utils.formatUnits(delegateAmount, 18)} COMP to ${signer._address} in block ${(await delegateTxnSigner.wait()).blockNumber}`);
+  console.log(`\tDelegated ${ethers.utils.formatUnits(delegateAmount, 18)} COMP to ${process.argv[4]} in block ${(await delegateTxnAddr.wait()).blockNumber}`);
 
   const targets = ['0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b'];
   const values = [BigNumber.from(0)];
@@ -20,11 +22,10 @@ async function createProposal(signer: JsonRpcSigner, bravo: any, comp: any) {
   ];
   const description = 'test description';
 
-  console.log(`\tSubmitting proposal creation transaction...`)
-  const result = await bravo.propose(targets, values, signatures, calldatas, description, {
+  const proposalTxn = await bravo.propose(targets, values, signatures, calldatas, description, {
     from: signer._address,
   });
-  console.log(`\tProposal Created!`);
+  console.log(`\tProposal created in block: ${(await proposalTxn.wait()).blockNumber}`);
 
   const activeProposals = await bravo.latestProposalIds(signer._address);
   const state = await bravo.state(activeProposals);
@@ -45,6 +46,16 @@ async function startProposal(provider: providers.JsonRpcProvider, bravo: any, fr
 async function main() {
   if (!process.argv[2]) {
     console.warn("Must provide the Governor Bravo contract address");
+    return;
+  }
+
+  if (!process.argv[3]) {
+    console.warn("Must provide the COMP token contract address");
+    return;
+  }
+
+  if (!process.argv[4]) {
+    console.warn("Must provide an address to delegate to");
     return;
   }
 

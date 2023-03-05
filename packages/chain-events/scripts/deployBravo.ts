@@ -38,7 +38,7 @@ async function deployGovBravo(
     timelock.address,
     comp.address,
     member,
-    30,
+    60,
     1,
     1
   );
@@ -226,7 +226,7 @@ async function main() {
   console.log('Next Steps:');
   console.log('\tStart chain-events using: CHAIN=hardhat-local yarn start-all');
   console.log(
-    `\tOnce chain-events is up create a proposal: yarn create-bravo-proposal ${bravo.address} ${comp.address}\n`
+    `\tOnce chain-events is up create a proposal: yarn create-bravo-proposal ${bravo.address} ${comp.address} ${process.argv[2]}\n`
   );
 }
 
