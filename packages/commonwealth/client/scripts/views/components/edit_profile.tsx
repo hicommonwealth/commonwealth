@@ -114,11 +114,13 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       );
 
       if (response?.result?.status === 'Success') {
-        // refresh profile in store
-        app.newProfiles.updateProfileForAccount(
-          this.addresses[0].address,
-          this.profileUpdate
-        );
+        // refresh profiles in store
+        this.addresses.forEach((a) => {
+          app.newProfiles.updateProfileForAccount(
+            a.address,
+            this.profileUpdate
+          );
+        });
         setTimeout(() => {
           this.loading = false;
           navigateToSubpage(`/profile/id/${this.profile.id}`);
@@ -199,7 +201,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       // not the best solution because address is not always available
       // should refactor AvatarUpload to make it work with new profiles
       let account: Account | null;
-      if (this.addresses.length > 0) {
+      if (this.addresses?.length > 0) {
         const oldProfile = new MinimumProfile(
           this.addresses[0].chain.name,
           this.addresses[0].address
@@ -403,7 +405,14 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               <LinkedAddresses
                 addresses={this.addresses}
                 profile={this.profile}
-                refreshProfiles={() => this.getProfile(vnode.attrs.profileId)}
+                refreshProfiles={(address: string) => {
+                  this.getProfile(vnode.attrs.profileId);
+                  // Remove from all address stores in the frontend state
+                  const index = app.user.addresses.indexOf(
+                    app.user.addresses.find((a) => a.address === address)
+                  );
+                  app.user.addresses.splice(index, 1);
+                }}
               />
               <CWDivider />
               <div className="connect-address-container">

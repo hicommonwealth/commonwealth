@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import { initAppState } from 'state';
-import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
@@ -55,7 +54,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
   private profileId: number;
 
   oninit() {
-    const { activeAccount } = app.user;
+    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
     const chain =
       typeof activeAccount.chain === 'string'
         ? activeAccount.chain
@@ -65,29 +64,48 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
   }
 
   view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
-    const { activeAddressesWithRole, nAccountsWithoutRole } = vnode.attrs;
+    const { nAccountsWithoutRole } = vnode.attrs;
+    const { addresses } = app.user;
 
     return (
-      <div class="LoginSelectorMenu">
-        {activeAddressesWithRole.map((account) => (
-          <div
-            class="login-menu-item"
-            onclick={async () => {
-              await setActiveAccount(account);
-              m.redraw();
-            }}
-          >
-            {m(UserBlock, {
-              user: account,
-              selected: isSameAccount(account, app.user.activeAccount),
-              showRole: false,
-              compact: true,
-              avatarSize: 16,
+      <div class="LoginSelectorMenu left">
+        {app.activeChainId() && (
+          <>
+            {addresses.length > 1 && (
+              <CWText type="caption" className="title">
+                Select address to use
+              </CWText>
+            )}
+            {addresses.map((account) => {
+              const selected = isSameAccount(
+                account,
+                app.user.activeAccount ?? addresses[0]
+              );
+              return (
+                <div
+                  class={`login-menu-item ${selected ? 'selected' : ''}`}
+                  onclick={async () => {
+                    await setActiveAccount(account);
+                    m.redraw();
+                  }}
+                >
+                  {m(UserBlock, {
+                    user: account,
+                    selected: isSameAccount(
+                      account,
+                      app.user.activeAccount ?? addresses[0]
+                    ),
+                    showRole: false,
+                    compact: true,
+                    hideAvatar: true,
+                  })}
+                </div>
+              );
             })}
-          </div>
-        ))}
-        {activeAddressesWithRole.length > 0 && <CWDivider />}
-        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
+          </>
+        )}
+        {addresses.length > 0 && <CWDivider />}
+        {addresses.length > 0 && (
           <div
             class="login-menu-item"
             onclick={() => {
@@ -97,7 +115,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             <CWText type="caption">View profile</CWText>
           </div>
         )}
-        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
+        {addresses.length > 0 && (
           <div
             class="login-menu-item"
             onclick={() => {
@@ -143,22 +161,12 @@ export class LoginSelectorMenuRight extends ClassComponent {
     const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
     return (
-      <div class="LoginSelectorMenu">
+      <div class="LoginSelectorMenu right">
         <div
           class="login-menu-item"
           onclick={() => m.route.set('/notification-settings')}
         >
           <CWText type="caption">Notification settings</CWText>
-        </div>
-        <div
-          class="login-menu-item"
-          onclick={() =>
-            app.activeChainId()
-              ? navigateToSubpage('/settings')
-              : m.route.set('/settings')
-          }
-        >
-          <CWText type="caption">Account settings</CWText>
         </div>
         <div class="login-menu-item">
           <CWToggle
@@ -500,30 +508,28 @@ export class LoginSelector extends ClassComponent {
               />
             </div>
           )}
-        {app.chain &&
-          !app.chainPreloading &&
-          this.profileLoadComplete &&
-          app.user.activeAccount && (
-            <CWPopover
-              trigger={
-                <div class="left-button">
-                  {m(User, {
-                    user: app.user.activeAccount,
-                  })}
-                </div>
-              }
-              content={
-                <LoginSelectorMenuLeft
-                  activeAddressesWithRole={activeAddressesWithRole}
-                  nAccountsWithoutRole={nAccountsWithoutRole}
-                />
-              }
-            />
-          )}
+        {this.profileLoadComplete && (
+          <CWPopover
+            trigger={
+              <div class="left-button">
+                {m(User, {
+                  user: app.user.addresses[0],
+                  avatarSize: 24,
+                })}
+              </div>
+            }
+            content={
+              <LoginSelectorMenuLeft
+                activeAddressesWithRole={activeAddressesWithRole}
+                nAccountsWithoutRole={nAccountsWithoutRole}
+              />
+            }
+          />
+        )}
         <CWPopover
           trigger={
             <div class="right-button">
-              <CWIconButton iconName="person" iconButtonTheme="black" />
+              <CWIconButton iconName="gear" iconButtonTheme="black" />
             </div>
           }
           content={<LoginSelectorMenuRight />}
