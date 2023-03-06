@@ -76,7 +76,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                 isSelected={!stage}
                 onClick={(e) => {
                   e.preventDefault();
-                    navigate('/discussions');
+                  navigate('/discussions');
                 }}
               />
               <CWDivider />
@@ -86,7 +86,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                   isSelected={stage === targetStage}
                   onClick={(e) => {
                     e.preventDefault();
-                      navigate(`/discussions?stage=${targetStage}`);
+                    navigate(`/discussions?stage=${targetStage}`);
                   }}
                   label={`
                     ${threadStageToLabel(targetStage)} ${
