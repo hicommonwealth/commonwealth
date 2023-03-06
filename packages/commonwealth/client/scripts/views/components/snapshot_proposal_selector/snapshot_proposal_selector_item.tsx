@@ -14,13 +14,13 @@ const SnapshotProposalSelectorItem = ({
   isSelected,
 }: SnapshotProposalSelectorItemProps) => {
   return (
-    <div className="chain-entity" onClick={() => onClick(snapshot)}>
+    <div className="proposal-item" onClick={() => onClick(snapshot)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
-        <div className="chain-entity-text" title={snapshot.title}>
+        <div className="proposal-item-text" title={snapshot.title}>
           {snapshot.title}
         </div>
-        <div className="chain-entity-subtext" title={snapshot.id}>
+        <div className="proposal-item-subtext" title={snapshot.id}>
           Hash: ${snapshot.id}
         </div>
       </div>

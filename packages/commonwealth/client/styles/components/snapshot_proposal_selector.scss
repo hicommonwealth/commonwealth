@@ -12,7 +12,7 @@
     flex: 1;
   }
 
-  .chain-entity {
+  .proposal-item {
     padding-block: 6px;
     display: flex;
     font-size: 14px;
@@ -37,13 +37,13 @@
     .text {
       width: calc(100% - 50px);
 
-      .chain-entity-text {
+      .proposal-item-text {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
-      .chain-entity-subtext {
+      .proposal-item-subtext {
         color: $neutral-500;
         overflow: hidden;
         text-overflow: ellipsis;
