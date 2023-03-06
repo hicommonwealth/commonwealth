@@ -42,6 +42,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;
+  private uploadStatusMessage: string;
   private imageBehavior: ImageBehavior;
   private prompt: string;
   private isPrompting: boolean;
@@ -88,6 +89,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
         this.imageURL = res.result.imageUrl;
         if (!this.imageBehavior) this.imageBehavior = ImageBehavior.Fill;
         this.uploadStatus = 'success';
+        this.uploadStatusMessage = 'Image upload succeeded.';
         attachButton.style.display = 'none';
         if (vnode.attrs.generatedImageCallback)
           vnode.attrs.generatedImageCallback(this.imageURL, this.imageBehavior);
@@ -102,10 +104,12 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
       return res.result.imageUrl;
     } catch (e) {
       this.uploadStatus = 'failure';
+      this.uploadStatusMessage =
+        'Image generator failed, try uploading an image.';
       this.isUploading = false;
       this.isPrompting = false;
       this.isGenerating = false;
-      throw new Error(e);
+      m.redraw();
     }
   }
 
@@ -140,6 +144,10 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
       const [imageURL, uploadStatus] = await this.uploadImage(file);
       this.isUploading = false;
       this.uploadStatus = uploadStatus;
+      this.uploadStatusMessage =
+        uploadStatus === 'success'
+          ? 'Image upload succeeded.'
+          : 'Image upload failed.';
 
       if (imageURL) {
         this.imageURL = imageURL;
@@ -226,13 +234,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
         <MessageRow
           label={subheaderText || 'Accepts JPG and PNG files.'}
           hasFeedback={true}
-          statusMessage={
-            this.uploadStatus === 'success'
-              ? 'Image upload succeeded.'
-              : this.uploadStatus === 'failure'
-              ? 'Image upload failed.'
-              : null
-          }
+          statusMessage={this.uploadStatusMessage}
           validationStatus={this.uploadStatus}
         />
         <div
@@ -332,7 +334,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
             {enableGenerativeAI && !this.isUploading && (
               <CWButton
                 buttonType="mini-white"
-                label="Generate Image"
+                label="Generate image"
                 className="generate-btn"
                 onclick={(e) => {
                   this.prompt = '';
@@ -349,7 +351,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
             fontWeight="medium"
             className="cover-image-title"
           >
-            Choose Image Behavior
+            Choose image behavior
           </CWText>
           <CWRadioGroup
             name="image-behaviour"

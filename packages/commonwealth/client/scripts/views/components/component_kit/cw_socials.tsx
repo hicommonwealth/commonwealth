@@ -86,7 +86,7 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
             }}
           />
           <CWIconButton
-            iconButtonTheme="primary"
+            iconButtonTheme="neutral"
             iconName="trash"
             onclick={() => this.deleteInputRow(i, handleInputChange)}
           />
@@ -99,7 +99,9 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
         {socialsList}
         <div className="add-social-link" onclick={this.addInputRow}>
           <CWIcon iconName="plus" iconSize="small" />
-          <CWText>Add social link</CWText>
+          <CWText type="caption" fontWeight="medium">
+            Add social link
+          </CWText>
         </div>
       </div>
     );

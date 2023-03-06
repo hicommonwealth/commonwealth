@@ -4,25 +4,27 @@
   .input-row {
     display: flex;
     align-items: center;
+
+    .text-input-right-icon.Icon {
+      color: $neutral-800;
+    }
   }
 
   .add-social-link {
     display: flex;
     align-items: center;
-    color: $neutral-500;
 
     &:hover {
-      color: $neutral-700;
+      color: $neutral-600;
       cursor: pointer;
     }
 
-    .b1 {
-      color: $neutral-500;
-      margin-left: 8px;
+    .caption.medium {
+      color: $neutral-800;
+      margin: 0 0 0 4px;
 
       &:hover {
-        color: $neutral-700;
-        cursor: pointer;
+        color: $neutral-600;
       }
     }
   }

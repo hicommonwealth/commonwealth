@@ -23,6 +23,11 @@
       gap: 16px;
       align-items: center;
 
+      .Button {
+        height: 32px;
+        padding: 0 24px;
+      }
+
       .tertiary-black {
         padding-left: 0;
       }
@@ -70,12 +75,12 @@
       .TextInput {
         margin-bottom: 16px;
 
-        .username {
+        .display-name-label {
           color: $neutral-500;
+        }
 
-          .blue-star {
-            color: $primary-500;
-          }
+        .blue-star {
+          color: $primary-500;
         }
       }
     }
@@ -143,9 +148,23 @@
       margin-bottom: 32px;
     }
 
-    .connect-address-container {
+    .connect-address-button {
       display: flex;
-      justify-content: center;
+      align-items: center;
+
+      .caption {
+        color: $neutral-800;
+        margin-left: 4px;
+
+        &:hover {
+          color: $neutral-600;
+        }
+      }
+
+      &:hover {
+        color: $neutral-600;
+        cursor: pointer;
+      }
     }
   }
 }
