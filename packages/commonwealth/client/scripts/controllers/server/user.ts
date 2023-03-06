@@ -117,6 +117,15 @@ export class UserController {
     this._disableRichText = disableRichText;
   }
 
+  // Likely remove when unified profiles are in
+  private _hasDisplayName: boolean;
+  public setHasDisplayName(hasDisplayName: boolean): void {
+    this._hasDisplayName = hasDisplayName;
+  }
+  public get hasDisplayName(): boolean {
+    return this._hasDisplayName;
+  }
+
   private _notifications: NotificationsController =
     new NotificationsController();
   public get notifications(): NotificationsController {
