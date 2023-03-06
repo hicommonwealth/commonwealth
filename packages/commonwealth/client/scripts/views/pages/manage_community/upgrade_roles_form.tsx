@@ -23,8 +23,6 @@ export const UpgradeRolesForm = ({
   const [role, setRole] = useState('');
   const [user, setUser] = useState('');
 
-  console.log(roleData);
-
   const nonAdmins: RoleInfo[] = roleData.filter((_role) => {
     return (
       _role.permission === AccessLevel.Member ||

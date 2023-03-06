@@ -1,13 +1,10 @@
-import React from 'react';
-import $ from 'jquery';
+import React, { useState } from 'react';
 
 import 'modals/webhook_settings_modal.scss';
 
 import type { Webhook } from 'models';
 
-import app from 'state';
 import { NotificationCategories } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
 import {
   DydxChainNotificationTypes,
   EdgewareChainNotificationTypes,
@@ -22,16 +19,18 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;
+  updateWebhook: (webhook: Webhook, selectedCategories: Array<string>) => void;
   webhook: Webhook;
 };
 
 export const WebhookSettingsModal = ({
   onModalClose,
+  updateWebhook,
   webhook,
 }: WebhookSettingsModalProps) => {
-  const [selectedCategories, setSelectedCategories] = React.useState<
-    Array<string>
-  >(webhook.categories);
+  const [selectedCategories, setSelectedCategories] = useState<Array<string>>(
+    webhook.categories
+  );
 
   const isChain = !!webhook.chain_id;
 
@@ -110,28 +109,7 @@ export const WebhookSettingsModal = ({
         )}
         <CWButton
           label="Save webhook settings"
-          onClick={(e) => {
-            e.preventDefault();
-
-            const chainOrCommObj = { chain: webhook.chain_id };
-
-            $.ajax({
-              url: `${app.serverUrl()}/updateWebhook`,
-              data: {
-                webhookId: webhook.id,
-                categories: selectedCategories,
-                ...chainOrCommObj,
-                jwt: app.user.jwt,
-              },
-              type: 'POST',
-              success: () => {
-                onModalClose();
-              },
-              error: (err) => {
-                notifyError(err.statusText);
-              },
-            });
-          }}
+          onClick={() => updateWebhook(webhook, selectedCategories)}
         />
       </div>
     </div>
