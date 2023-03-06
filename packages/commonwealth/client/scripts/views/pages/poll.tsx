@@ -1,25 +1,16 @@
 import React, { useEffect } from 'react';
 import app from 'state';
+import { useSetRecoilState, useRecoilValue } from 'recoil';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from './loading';
 import { ThreadPollCard } from './view_thread/poll_cards';
+import { pollSelector } from 'controllers/server/polls';
 
 const PollPage = ({ scope, thread_id }) => {
-  const [poll, setPoll] = React.useState(null);
+  const poll = useRecoilValue(pollSelector(thread_id));
 
-  useEffect(() => {
-    const fetch = async () => {
-      await app.polls.fetchPolls(scope, thread_id);
-      const polls = app.polls.getByThreadId(thread_id);
-      if (polls.length > 0) {
-        setPoll(polls[0]);
-      }
-    }
-    fetch();
-  }, []);
-
-  return !poll ? <PageLoading /> : (
+  return (
     <Sublayout>
       <ThreadPollCard poll={poll} />
     </Sublayout>

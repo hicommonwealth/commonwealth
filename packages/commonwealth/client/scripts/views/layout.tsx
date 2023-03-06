@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import { RecoilRoot } from 'recoil';
 
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode, ClassComponentRouter } from 'mithrilInterop';
@@ -161,8 +162,10 @@ export const LayoutWrapper = ({ Component, params }) => {
 
 export const withLayout = (Component, params) => {
   return (
-    <Suspense fallback={null}>
-      <LayoutWrapper Component={Component} params={params} />
-    </Suspense>
+    <RecoilRoot>
+      <Suspense fallback={null}>
+        <LayoutWrapper Component={Component} params={params} />
+      </Suspense>
+    </RecoilRoot>
   );
 };

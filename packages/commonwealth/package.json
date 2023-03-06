@@ -222,6 +222,7 @@
     "react-select": "^5.7.0",
     "react-toastify": "^9.1.1",
     "react-virtuoso": "^4.1.0",
+    "recoil": "^0.7.7",
     "redis": "4.2.0",
     "rollbar": "^2.6.1",
     "rxjs": "^7.3.0",

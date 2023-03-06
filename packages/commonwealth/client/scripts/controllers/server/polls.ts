@@ -3,8 +3,7 @@ import $ from 'jquery';
 import { Poll, Vote } from 'models';
 import moment from 'moment';
 import app from 'state';
-
-import PollStore from 'stores/PollStore';
+import { atom, selectorFamily } from 'recoil';
 
 export const modelFromServer = (poll) => {
   const {
@@ -36,6 +35,29 @@ export const modelFromServer = (poll) => {
     createdAt: moment(created_at),
   });
 };
+
+export const pollSelector = selectorFamily({
+  key: 'PollSelector',
+  get: (thread_id) => async () => {
+    // TODO: add state check here
+    const response = await $.get(
+      `${app.serverUrl()}/getPolls`,
+      {
+        chain: app.activeChainId(),
+        thread_id: thread_id,
+      }
+    );
+    for (const poll of response.result) {
+      const modeledPoll = modelFromServer(poll);
+      // TODO: sync with state here
+      return modeledPoll;
+    }
+  },
+});
+
+// --------------------------------------------
+
+import PollStore from 'stores/PollStore';
 
 class PollsController {
   private _store = new PollStore();
