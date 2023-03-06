@@ -242,7 +242,7 @@ export const getTopThreads = async (
         LEFT JOIN "Reactions" r ON t.id = r.thread_id
         INNER JOIN "Addresses" a ON t.address_id = a.id
       WHERE 
-        t.chain='${communityId}' AND c.created_at > NOW() - INTERVAL '6 MONTH' AND r.created_at > NOW() - INTERVAL '6 MONTH'
+        t.chain='${communityId}' AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
       GROUP BY 
         t.id, a.address
       ORDER BY 
@@ -306,7 +306,7 @@ export const getTopThreads = async (
         author_profile_img_url: profileData ? profileData.avatarUrl : '',
         thread_id: row.thread_id,
         publish_date_string: moment(row.created_at).format('MM/DD/YY'),
-        thread_url: `https://www.commonwealth.im/${communityId}/thread/${row.thread_id}`,
+        thread_url: `https://www.commonwealth.im/${communityId}/discussion/${row.thread_id}`,
       };
       threadData.push(data);
     }
@@ -329,9 +329,9 @@ const getCommunityActivityScore = async (
           LEFT JOIN "Reactions" r ON t.id = r.thread_id
         WHERE 
           t.chain='${communityId}' AND
-          (t.created_at > NOW() - INTERVAL '6 MONTH' OR
-          c.created_at > NOW() - INTERVAL '6 MONTH' OR
-          r.created_at > NOW() - INTERVAL '6 MONTH')`);
+          (t.created_at > NOW() - INTERVAL '1 WEEK' OR
+          c.created_at > NOW() - INTERVAL '1 WEEK' OR
+          r.created_at > NOW() - INTERVAL '1 WEEK')`);
 
   return (activityScore[1] as any)?.rows?.[0]?.activity_score as number;
 };
@@ -342,7 +342,7 @@ const getActivityCounts = async (models: DB, communityId: string) => {
               FROM "Comments" c
               WHERE
               c.chain='${communityId}' AND
-              c.created_at > NOW() - INTERVAL '6 MONTH'`);
+              c.created_at > NOW() - INTERVAL '1 WEEK'`);
 
   const totalComments = (commentCounts[1] as any)?.rows?.[0]
     ?.comment_count as number;
@@ -352,7 +352,7 @@ const getActivityCounts = async (models: DB, communityId: string) => {
               FROM "Threads" t
               WHERE
               t.chain='${communityId}' AND
-              t.created_at > NOW() - INTERVAL '6 MONTH'`);
+              t.created_at > NOW() - INTERVAL '1 WEEK'`);
 
   const totalThreads = (threadCounts[1] as any)?.rows?.[0]
     ?.thread_count as number;
@@ -367,6 +367,8 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
   const communityDigestInfo: CommunityDigestInfo = {};
 
   console.log('Starting community digest builder...');
+
+  // For each community, get the top threads, activity score, and new posts/comments
   for (const community of communities) {
     // if community includes a ' character skip it- SQL queries break and these are fake communities
     if (community.id.includes("'")) continue;
@@ -403,6 +405,7 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
   const intervalsArray = digestLevels[digestLevel];
   console.log('Digest level: ', intervalsArray);
 
+  // Find users who have email digest on
   const usersWithEmailDigestOn = await models.User.findAll({
     where: {
       emailNotificationInterval: {
@@ -417,7 +420,7 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
   let emailsSent = 0;
 
   for (const user of usersWithEmailDigestOn) {
-    const emailObject = []; // TODO: Decide what this looks like
+    const emailObject = [];
     const userAddresses = await models.Address.findAll({
       where: {
         user_id: user.id,
@@ -437,7 +440,7 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
       emailObject.push(communityDigest);
     }
 
-    // Fire off Email?
+    // Build Email Object
     allEmailObjects.push({
       data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
       newThreads:
@@ -456,6 +459,7 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
           : null,
     });
 
+    // Build Template Data
     const dynamicData = {
       data: emailObject.sort((a, b) => b.activityScore - a.activityScore),
       newThreads:
@@ -482,13 +486,13 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
       dynamic_template_data: dynamicData,
     };
 
-    console.log(msg);
-
-    try {
-      await sgMail.send(msg);
-      emailsSent += 1;
-    } catch (e) {
-      console.log(e);
+    if (process.env.NODE_ENV === 'production' && dynamicData.data.length > 0) {
+      try {
+        await sgMail.send(msg);
+        emailsSent += 1;
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
