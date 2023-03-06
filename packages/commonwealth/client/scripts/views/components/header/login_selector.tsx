@@ -68,7 +68,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
     const { addresses } = app.user;
 
     return (
-      <div class="LoginSelectorMenu">
+      <div class="LoginSelectorMenu left">
         {app.activeChainId() && (
           <>
             {addresses.length > 1 && (
@@ -161,7 +161,7 @@ export class LoginSelectorMenuRight extends ClassComponent {
     const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
     return (
-      <div class="LoginSelectorMenu">
+      <div class="LoginSelectorMenu right">
         <div
           class="login-menu-item"
           onclick={() => m.route.set('/notification-settings')}

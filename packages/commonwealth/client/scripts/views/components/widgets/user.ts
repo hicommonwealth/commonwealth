@@ -312,7 +312,6 @@ export const UserBlock: m.Component<
   view: (vnode) => {
     const { user, searchTerm, showChainName, compact, linkify } = vnode.attrs;
 
-    const { showFullAddress } = vnode.attrs.addressDisplayOptions || {};
     const chain = typeof user.chain === 'string' ? user.chain : user.chain?.id;
 
     const profile = app.newProfiles.getProfile(chain, user.address);
@@ -347,9 +346,7 @@ export const UserBlock: m.Component<
               '',
               highlightSearchTerm
                 ? highlightedAddress
-                : showFullAddress
-                ? profile.address
-                : formatAddressShort(profile.address, profile.chain)
+                : `${profile.address.slice(0, 8)}...${profile.address.slice(-5)}`
             ),
             profile?.address && showChainName && m('.address-divider', ' · '),
             showChainName &&
