@@ -87,7 +87,7 @@ export const ThreadStage = (props: ThreadComponentProps) => {
       )}
       onClick={(e) => {
         e.preventDefault();
-        navigate(`?stage=${thread.stage}`);
+        navigate(`/discussions?stage=${thread.stage}`);
       }}
     >
       {threadStageToLabel(thread.stage)}
