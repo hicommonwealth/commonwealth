@@ -217,7 +217,14 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
-      path="/:scope/discussions/:topic"
+      path="/:scope/discussions/topic/:topicName"
+      element={withLayout(DiscussionsPage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />
+    <Route
+      path="/:scope/discussions/stage/:stageName"
       element={withLayout(DiscussionsPage, {
         scoped: true,
         deferChain: true,

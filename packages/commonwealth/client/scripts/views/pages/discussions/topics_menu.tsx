@@ -94,7 +94,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                         isSelected={active}
                         onClick={(e) => {
                           e.preventDefault();
-                          navigate(`/discussions/${name}`);
+                          navigate(`/discussions/topic/${name}`);
                         }}
                         iconRight={
                           app.roles?.isAdminOfEntity({

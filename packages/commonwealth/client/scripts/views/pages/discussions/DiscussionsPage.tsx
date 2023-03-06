@@ -12,17 +12,13 @@ import { ThreadPreview } from './thread_preview';
 import { Footer } from '../../footer';
 
 type DiscussionsPageProps = {
-  topic?: string;
-  stage?: string;
+  topicName?: string;
+  stageName?: string;
 };
 
-const DiscussionsPage = ({ topic, stage }: DiscussionsPageProps) => {
+const DiscussionsPage = ({ topicName, stageName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
   const [initializing, setInitializing] = useState(true);
-  const params = useParams();
-  const topicName = params.topic;
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [stageName, setStageName] = useState<string>(searchParams.get('stage'));
 
   // setup initial threads
   useEffect(() => {
