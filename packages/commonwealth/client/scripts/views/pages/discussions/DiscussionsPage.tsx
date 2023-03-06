@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
+import { useSearchParams } from 'react-router-dom';
 
 import 'pages/discussions/index.scss';
 
@@ -12,12 +13,13 @@ import { Footer } from '../../footer';
 
 type DiscussionsPageProps = {
   topicName?: string;
-  stageName?: string;
 };
 
-const DiscussionsPage = ({ topicName, stageName }: DiscussionsPageProps) => {
+const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
   const [initializing, setInitializing] = useState(true);
+  const [searchParams, _] = useSearchParams();
+  const stageName: string = searchParams.get('stage');
 
   // setup initial threads
   useEffect(() => {
