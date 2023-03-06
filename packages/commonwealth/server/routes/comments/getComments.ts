@@ -1,20 +1,21 @@
-import Sequelize from 'sequelize';
 import type {
   GetCommentsReq,
   GetCommentsResp,
 } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { success, failure } from '../../types';
+import Sequelize from 'sequelize';
 import type { DB } from '../../models';
-import { formatPagination } from '../../util/queries';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
+import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
 export const getCommentsValidation = [
   query('community_id').isString().trim(),
   query('addresses').optional().toArray(),
+  query('include_addresses').optional().isBoolean().toBoolean(),
   query('count_only').optional().isBoolean().toBoolean(),
   ...paginationValidation,
 ];
@@ -29,17 +30,23 @@ export const getComments = async (
     return failure(res.status(400), errors);
   }
 
-  const { community_id, addresses, count_only } = req.query;
+  const { community_id, addresses, include_addresses, count_only } = req.query;
 
   const where = { chain: community_id };
 
   const include = [];
-  if (addresses)
+  if (addresses && !include_addresses) {
     include.push({
       model: models.Address,
       where: { address: { [Op.in]: addresses } },
       required: true,
     });
+  } else if (include_addresses) {
+    include.push({
+      model: models.Address,
+      required: true,
+    });
+  }
 
   let comments, count;
   if (!count_only) {

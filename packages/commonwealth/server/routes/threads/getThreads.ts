@@ -19,6 +19,7 @@ export const getThreadsValidation = [
   query('addresses').optional().toArray(),
   query('no_body').optional().isBoolean().toBoolean(),
   query('include_comments').optional().isBoolean().toBoolean(),
+  query('include_addresses').optional().isBoolean().toBoolean(),
   query('count_only').optional().isBoolean().toBoolean(),
   ...paginationValidation,
 ];
@@ -40,6 +41,7 @@ export const getThreads = async (
     no_body,
     include_comments,
     addresses,
+    include_addresses,
     count_only,
   } = req.query;
 
@@ -48,11 +50,16 @@ export const getThreads = async (
   const where = { chain: community_id };
 
   const include = [];
-  if (addresses) {
+  if (addresses && !include_addresses) {
     include.push({
       model: models.Address,
       where: { address: { [Op.in]: addresses } },
       as: 'Address',
+    });
+  } else if (include_addresses) {
+    include.push({
+      model: models.Address,
+      required: true,
     });
   }
 

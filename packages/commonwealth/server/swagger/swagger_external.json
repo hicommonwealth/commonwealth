@@ -63,6 +63,13 @@
           },
           {
             "in": "query",
+            "name": "include_addresses",
+            "type": "boolean",
+            "required": false,
+            "description": "Returns the associated addresses with the queried threads"
+          },
+          {
+            "in": "query",
             "name": "count_only",
             "type": "boolean",
             "description": "Return only the number of entities found."
@@ -113,6 +120,13 @@
             "name": "count_only",
             "type": "boolean",
             "description": "Return only the number of entities found."
+          },
+          {
+            "in": "query",
+            "name": "include_addresses",
+            "type": "boolean",
+            "required": false,
+            "description": "Returns the associated addresses with the queried comment"
           },
           {
             "in": "query",

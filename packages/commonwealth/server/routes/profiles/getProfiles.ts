@@ -1,4 +1,7 @@
-import type { GetProfilesReq, GetProfilesResp, } from 'common-common/src/api/extApiTypes';
+import type {
+  GetProfilesReq,
+  GetProfilesResp,
+} from 'common-common/src/api/extApiTypes';
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
 import Sequelize from 'sequelize';
@@ -46,7 +49,7 @@ const getProfiles = async (
       where: { address: { [Op.in]: addresses } },
       required: true,
     });
-  } else if(include_addresses) {
+  } else if (include_addresses) {
     include.push({
       model: models.Address,
       required: true,
