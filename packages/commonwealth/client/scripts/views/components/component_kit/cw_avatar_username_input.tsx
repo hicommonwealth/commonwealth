@@ -55,7 +55,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
             files.forEach((f) => {
               if (!f.uploadURL) return;
               const url = f.uploadURL.replace(/\?.*/, '');
-              onAvatarChangeHandler(url.trim);
+              onAvatarChangeHandler(url.trim());
             });
             m.redraw();
           }}
