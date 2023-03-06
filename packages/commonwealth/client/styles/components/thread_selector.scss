@@ -5,14 +5,37 @@
   border: 1px solid $neutral-100;
   margin-bottom: 16px;
 
-  .cui-list {
-    .cui-list-item {
-      padding: 8px 16px 8px 48px;
+  .QueryList {
+    height: 200px;
 
-      .thread-preview-row {
+    .empty-component {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .thread-selector-item-row {
+      display: flex;
+      overflow: hidden;
+      align-items: center;
+      padding-block: 6px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $neutral-100;
+      }
+
+      .selected {
+        min-width: 50px;
         display: flex;
-        flex-direction: column;
-        overflow: hidden;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+          fill: $black;
+          width: 18px;
+        }
       }
     }
   }
