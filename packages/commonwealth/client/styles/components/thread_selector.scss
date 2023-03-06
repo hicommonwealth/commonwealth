@@ -5,16 +5,8 @@
   border: 1px solid $neutral-100;
   margin-bottom: 16px;
 
-  .results {
+  .QueryList {
     height: 200px;
-
-    .Spinner {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-    }
 
     .empty-component {
       height: 100%;
@@ -23,7 +15,7 @@
       align-items: center;
     }
 
-    .thread-preview-row {
+    .thread-selector-item-row {
       display: flex;
       overflow: hidden;
       align-items: center;
