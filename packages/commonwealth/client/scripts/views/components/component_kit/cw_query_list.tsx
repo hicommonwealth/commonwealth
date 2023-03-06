@@ -9,7 +9,7 @@ import 'components/component_kit/cw_query_list.scss';
 interface QueryListProps<ListItem> {
   loading: boolean;
   options: ListItem[];
-  components: Components;
+  components?: Components;
   renderItem: ItemContent<ListItem, any>;
 }
 
@@ -26,7 +26,7 @@ export const QueryList = <T,>({
       ) : (
         <Virtuoso
           data={options}
-          components={components}
+          {...(components ? { components } : {})}
           itemContent={renderItem}
         />
       )}
