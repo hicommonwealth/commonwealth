@@ -37,8 +37,8 @@ module.exports = {
         }
 
         let rootParts = c.root_id.split('_');
-        // handle cosmosproposals differently
-        if (rootParts[0] === 'cosmosproposal') {
+        // handle cosmosproposals and onchainproposal differently
+        if (rootParts[0] === 'cosmosproposal' || rootParts[0] === 'onchainproposal') {
           rootParts = ['proposal', rootParts[1]];
         } else {
           rootParts = [`proposal/${rootParts[0]}`, rootParts[1]];
