@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { useParams, useSearchParams } from 'react-router-dom';
 
 import 'pages/discussions/index.scss';
 
