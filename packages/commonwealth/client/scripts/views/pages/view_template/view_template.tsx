@@ -10,7 +10,7 @@ import Sublayout from '../../sublayout';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
-import isValidJson from 'helpers/validateJson';
+import isValidJson from '../../../../../shared/validateJson';
 import {
   CWTextInput,
   MessageRow,
@@ -23,14 +23,17 @@ import type Contract from 'client/scripts/models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
 import validateType from 'helpers/validateTypes';
+import Web3 from 'web3';
 
 enum TemplateComponents {
   DIVIDER = 'divider',
   TEXT = 'text',
   INPUT = 'input',
   DROPDOWN = 'dropdown',
+  FUNCTIONFORM = 'function',
 }
 
+/*
 const goerli_compound_governor_alpha = {
   form_fields: [
     {
@@ -68,6 +71,7 @@ const goerli_compound_governor_alpha = {
     },
   },
 };
+*/
 
 class ViewTemplatePage extends ClassComponent {
   private formState = {};
@@ -141,6 +145,27 @@ class ViewTemplatePage extends ClassComponent {
                   field.dropdown.field_options[0].value;
               });
               break;
+            case TemplateComponents.FUNCTIONFORM:
+              this.formState = produce(this.formState, (draft) => {
+                draft[field.function.field_ref] = field.function.tx_forms.map(
+                  (method) => {
+                    // Create a Data structure for each calldata's method params from form
+                    const form = {};
+                    // Store appropriate ordering of params
+                    form['paramRefs'] = method.paramRefs;
+                    form['abi'] = method.functionABI;
+                    for (const nested_field of method.form) {
+                      if (
+                        Object.keys(nested_field)[0] == TemplateComponents.INPUT
+                      ) {
+                        form[nested_field.field_ref] = null;
+                      }
+                    }
+                    return form;
+                  }
+                );
+              });
+              break;
             default:
               break;
           }
@@ -188,7 +213,23 @@ class ViewTemplatePage extends ClassComponent {
       } else {
         if (arg.startsWith('$')) {
           const ref = arg.slice(1);
-          outputArr.push(formState[ref]);
+          const paramState = formState[ref];
+          if (Array.isArray(paramState)) {
+            const calldataSubArr = [];
+            paramState.forEach((method) => {
+              const params = [];
+              method.paramRefs.forEach((param) => {
+                params.push(method[param]);
+              });
+              const w3 = new Web3();
+              calldataSubArr.push(
+                w3.eth.abi.encodeFunctionCall(method.abi, params)
+              );
+            });
+            outputArr.push(calldataSubArr);
+          } else {
+            outputArr.push(paramState);
+          }
         } else {
           outputArr.push(arg);
         }
@@ -212,6 +253,77 @@ class ViewTemplatePage extends ClassComponent {
     preview['args'] = functionArgs;
 
     return JSON.stringify(preview, null, 4);
+  }
+
+  renderTemplate(form_fields, nested_field_ref?, nested_index?) {
+    return form_fields.flatMap((field, index) => {
+      const [component] = Object.keys(form_fields[index]);
+
+      switch (component) {
+        case TemplateComponents.DIVIDER:
+          return <CWDivider />;
+        case TemplateComponents.TEXT:
+          return (
+            <CWText fontStyle={field[component].field_type}>
+              {field[component].field_value}
+            </CWText>
+          );
+        case TemplateComponents.INPUT:
+          return (
+            <CWTextInput
+              label={field[component].field_label}
+              value={this.formState[field[component].field_ref]}
+              placeholder={field[component].field_name}
+              oninput={(e) => {
+                this.formState = produce(this.formState, (draft) => {
+                  if (nested_field_ref) {
+                    draft[nested_field_ref][nested_index][
+                      field[component].field_ref
+                    ] = e.target.value;
+                  } else {
+                    draft[field[component].field_ref] = e.target.value;
+                  }
+                });
+              }}
+              inputValidationFn={(val) =>
+                validateType(val, field[component].formatter)
+              }
+            />
+          );
+        case TemplateComponents.FUNCTIONFORM: {
+          const functionComponents = [
+            <CWDivider />,
+            <CWText type="h3">{field[component].field_label}</CWText>,
+          ];
+          functionComponents.push(
+            ...field[component].tx_forms.flatMap((method, i) => {
+              // Recursively call the renderTemplate(this function) funciton for each sub function form
+              return this.renderTemplate(
+                method.form,
+                field[component].field_ref,
+                i
+              );
+            })
+          );
+          functionComponents.push(<CWDivider />);
+          return functionComponents;
+        }
+        case TemplateComponents.DROPDOWN:
+          return (
+            <CWDropdown
+              label={field[component].field_label}
+              options={field[component].field_options}
+              onSelect={(item) => {
+                this.formState = produce(this.formState, (draft) => {
+                  draft[field[component].field_ref] = item.value;
+                });
+              }}
+            />
+          );
+        default:
+          return null;
+      }
+    });
   }
 
   view(vnode) {
@@ -246,57 +358,7 @@ class ViewTemplatePage extends ClassComponent {
 
             {!this.templateError ? (
               <div className="template">
-                {this.json.form_fields.map((field, index) => {
-                  const [component] = Object.keys(this.json.form_fields[index]);
-
-                  switch (component) {
-                    case TemplateComponents.DIVIDER:
-                      return <CWDivider />;
-                    case TemplateComponents.TEXT:
-                      return (
-                        <CWText fontStyle={field[component].field_type}>
-                          {field[component].field_value}
-                        </CWText>
-                      );
-                    case TemplateComponents.INPUT:
-                      return (
-                        <CWTextInput
-                          label={field[component].field_label}
-                          value={this.formState[field[component].field_ref]}
-                          placeholder={field[component].field_name}
-                          oninput={(e) => {
-                            this.formState = produce(
-                              this.formState,
-                              (draft) => {
-                                draft[field[component].field_ref] =
-                                  e.target.value;
-                              }
-                            );
-                          }}
-                          inputValidationFn={(val) =>
-                            validateType(val, field[component].formatter)
-                          }
-                        />
-                      );
-                    case TemplateComponents.DROPDOWN:
-                      return (
-                        <CWDropdown
-                          label={field[component].field_label}
-                          options={field[component].field_options}
-                          onSelect={(item) => {
-                            this.formState = produce(
-                              this.formState,
-                              (draft) => {
-                                draft[field[component].field_ref] = item.value;
-                              }
-                            );
-                          }}
-                        />
-                      );
-                    default:
-                      return null;
-                  }
-                })}
+                {this.renderTemplate(this.json.form_fields)}
               </div>
             ) : (
               <MessageRow

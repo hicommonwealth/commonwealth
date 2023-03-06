@@ -6,7 +6,7 @@ import type {
 import { success } from '../types';
 import type { DB } from '../models';
 import { AppError } from '../../../common-common/src/errors';
-import isValidJson from '../util/validateJson';
+import isValidJson from '../../shared/validateJson';
 import validateRoles from '../util/validateRoles';
 
 type CreateTemplateAndMetadataReq = {

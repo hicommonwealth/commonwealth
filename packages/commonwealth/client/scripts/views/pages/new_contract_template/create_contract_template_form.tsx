@@ -11,7 +11,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWText } from 'views/components/component_kit/cw_text';
 import app from 'state';
-import isValidJson from 'helpers/validateJson';
+import isValidJson from '../../../../../shared/validateJson';
 
 class CreateContractTemplateForm extends ClassComponent {
   private saving = false;

@@ -1,14 +1,15 @@
 /* @jsx m */
 
 import $ from 'jquery';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line
 import m from 'mithril';
 
 import 'modals/confirmation_modal.scss';
 
 import app from 'state';
 import ClassComponent from 'class_component';
-import { ButtonType, CWButton } from 'views/components/component_kit/cw_button';
+import type { ButtonType } from 'views/components/component_kit/cw_button';
+import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 

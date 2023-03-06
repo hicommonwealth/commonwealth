@@ -19,7 +19,7 @@ import {
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
-import { Result } from 'ethers/lib/utils';
+import type { Result } from 'ethers/lib/utils';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';

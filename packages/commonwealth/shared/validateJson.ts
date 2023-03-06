@@ -11,6 +11,7 @@ const schema = {
           { $ref: '#/$defs/text' },
           { $ref: '#/$defs/input' },
           { $ref: '#/$defs/dropdown' },
+          { $ref: '#/$defs/function' },
         ],
       },
     },
@@ -86,6 +87,64 @@ const schema = {
         },
       },
       required: ['input'],
+      additionalProperties: false,
+    },
+    method: {
+      type: 'object',
+      properties: {
+        functionABI: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            type: { type: 'string' },
+            inputs: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  type: { type: 'string' },
+                  required: ['name', 'type'],
+                  additionalProperties: false,
+                },
+              },
+            },
+            required: ['name', 'type', 'inputs'],
+            additionalProperties: false,
+          },
+        },
+        paramRefs: { type: 'array', items: { type: 'string' } },
+        form: {
+          type: 'array',
+          items: {
+            oneOf: [
+              { $ref: '#/$defs/divider' },
+              { $ref: '#/$defs/text' },
+              { $ref: '#/$defs/input' },
+              { $ref: '#/$defs/dropdown' },
+            ],
+          },
+        },
+        required: ['functionABI', 'paramRefs', 'form'],
+        additionalProperties: false,
+      },
+    },
+    function: {
+      type: 'object',
+      properties: {
+        function: {
+          type: 'object',
+          properties: {
+            field_name: { type: 'string' },
+            field_label: { type: 'string' },
+            field_ref: { type: 'string' },
+            tx_forms: { type: 'array', items: { $ref: '#/$defs/method' } },
+          },
+          required: ['field_name', 'field_label', 'field_ref', 'tx_forms'],
+          additionalProperties: false,
+        },
+      },
+      required: ['function'],
       additionalProperties: false,
     },
     dropdown: {

@@ -4,6 +4,7 @@ import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_modal.scss';
 import $ from 'jquery';
+// eslint-disable-next-line
 import m from 'mithril';
 import { CWIconButton } from './cw_icon_button';
 import type { IconButtonTheme } from './cw_icons/types';
