@@ -151,31 +151,6 @@ export function ParseType(
         default:
           return null;
       }
-    case 'tips':
-      switch (method) {
-        case 'NewTip': {
-          return EventKind.NewTip;
-        }
-        // extrinsic call tip()
-        case 'tip': {
-          return EventKind.TipVoted;
-        }
-        case 'TipClosing': {
-          return EventKind.TipClosing;
-        }
-        case 'TipClosed': {
-          return EventKind.TipClosed;
-        }
-        case 'TipRetracted': {
-          return EventKind.TipRetracted;
-        }
-        case 'TipSlashed': {
-          return EventKind.TipSlashed;
-        }
-        default: {
-          return null;
-        }
-      }
     case 'treasuryReward':
       switch (method) {
         case 'TreasuryMinting': {
@@ -205,26 +180,6 @@ export function ParseType(
       switch (method) {
         case 'Offence':
           return EventKind.Offence;
-        default:
-          return null;
-      }
-    }
-    case 'bounties': {
-      switch (method) {
-        case 'BountyProposed':
-          return EventKind.TreasuryBountyProposed;
-        case 'BountyRejected':
-          return EventKind.TreasuryBountyRejected;
-        case 'BountyBecameActive':
-          return EventKind.TreasuryBountyBecameActive;
-        case 'BountyAwarded':
-          return EventKind.TreasuryBountyAwarded;
-        case 'BountyClaimed':
-          return EventKind.TreasuryBountyClaimed;
-        case 'BountyCanceled':
-          return EventKind.TreasuryBountyCanceled;
-        case 'extendBountyExpiry':
-          return EventKind.TreasuryBountyExtended;
         default:
           return null;
       }

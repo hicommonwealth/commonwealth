@@ -217,49 +217,6 @@ export const Title: TitlerFilter = (
         description: 'A treasury spend is rejected.',
       };
     }
-    case EventKind.TreasuryBountyProposed: {
-      return {
-        title: 'Treasury Bounty Proposed',
-        description: 'A treasury bounty is proposed.',
-      };
-    }
-    case EventKind.TreasuryBountyAwarded: {
-      return {
-        title: 'Treasury Bounty Awarded',
-        description: 'A treasury bounty is awarded.',
-      };
-    }
-    case EventKind.TreasuryBountyRejected: {
-      return {
-        title: 'Treasury Bounty Rejected',
-        description: 'A treasury bounty is rejected.',
-      };
-    }
-    case EventKind.TreasuryBountyBecameActive: {
-      return {
-        title: 'Treasury Bounty Became Active',
-        description: 'A treasury bounty became active.',
-      };
-    }
-    case EventKind.TreasuryBountyClaimed: {
-      return {
-        title: 'Treasury Bounty Claimed',
-        description: 'A treasury bounty is claimed.',
-      };
-    }
-    case EventKind.TreasuryBountyCanceled: {
-      return {
-        title: 'Treasury Bounty Canceled',
-        description: 'A treasury bounty is canceled.',
-      };
-    }
-    case EventKind.TreasuryBountyExtended: {
-      return {
-        title: 'Treasury Bounty Expiry Extended',
-        description: "A treasury bounty's expiry is extended.",
-      };
-    }
-
     /**
      * Elections Events
      */
@@ -361,47 +318,6 @@ export const Title: TitlerFilter = (
         description: 'A signaling proposal is completed.',
       };
     }
-
-    /**
-     * Tip Events
-     */
-    case EventKind.NewTip: {
-      return {
-        title: 'New Tip Suggested',
-        description: 'A new tip is opened.',
-      };
-    }
-    case EventKind.TipVoted: {
-      return {
-        title: 'Tip Voted',
-        description: 'A tip is voted on.',
-      };
-    }
-    case EventKind.TipClosing: {
-      return {
-        title: 'Tip Closing',
-        description: 'A tip begins closing.',
-      };
-    }
-    case EventKind.TipClosed: {
-      return {
-        title: 'Tip Closed',
-        description: 'A tip is closed and paid out.',
-      };
-    }
-    case EventKind.TipRetracted: {
-      return {
-        title: 'Tip Retracted',
-        description: 'A tip is retracted.',
-      };
-    }
-    case EventKind.TipSlashed: {
-      return {
-        title: 'Tip Slashed',
-        description: 'A tip is slashed.',
-      };
-    }
-
     /**
      * TreasuryReward events
      */

@@ -150,21 +150,6 @@ export enum EventKind {
   TreasuryAwarded = 'treasury-awarded',
   TreasuryRejected = 'treasury-rejected',
 
-  TreasuryBountyProposed = 'treasury-bounty-proposed',
-  TreasuryBountyAwarded = 'treasury-bounty-awarded',
-  TreasuryBountyRejected = 'treasury-bounty-rejected',
-  TreasuryBountyBecameActive = 'treasury-bounty-became-active',
-  TreasuryBountyClaimed = 'treasury-bounty-claimed',
-  TreasuryBountyCanceled = 'treasury-bounty-canceled',
-  TreasuryBountyExtended = 'treasury-bounty-extended',
-
-  NewTip = 'new-tip',
-  TipVoted = 'tip-voted',
-  TipClosing = 'tip-closing',
-  TipClosed = 'tip-closed',
-  TipRetracted = 'tip-retracted',
-  TipSlashed = 'tip-slashed',
-
   ElectionNewTerm = 'election-new-term',
   ElectionEmptyTerm = 'election-empty-term',
   ElectionCandidacySubmitted = 'election-candidacy-submitted',
@@ -440,111 +425,6 @@ export interface ITreasuryRejected extends IEvent {
   // cannot fetch other data because proposal data disappears on rejection
 }
 
-// Treasury Bounty Event Interfaces
-
-export interface ITreasuryBountyProposed extends IEvent {
-  // New bounty proposal. [index]
-  kind: EventKind.TreasuryBountyProposed;
-  bountyIndex: number;
-  proposer: AccountId;
-  value: BalanceString;
-  fee: BalanceString;
-  curatorDeposit: BalanceString;
-  bond: BalanceString;
-  description?: string;
-}
-
-export interface ITreasuryBountyAwarded extends IEvent {
-  // A bounty is awarded to a beneficiary. [index, beneficiary]
-  kind: EventKind.TreasuryBountyAwarded;
-  bountyIndex: number;
-  beneficiary: AccountId;
-  curator: AccountId;
-  unlockAt: number;
-}
-
-export interface ITreasuryBountyRejected extends IEvent {
-  // A bounty proposal was rejected; funds were slashed. [index, bond]
-  kind: EventKind.TreasuryBountyRejected;
-  bountyIndex: number;
-  bond: BalanceString;
-}
-
-export interface ITreasuryBountyBecameActive extends IEvent {
-  // A bounty proposal is funded and became active. [index]
-  kind: EventKind.TreasuryBountyBecameActive;
-  bountyIndex: number;
-  curator: AccountId;
-  updateDue: number;
-}
-
-export interface ITreasuryBountyClaimed extends IEvent {
-  // A bounty is claimed by beneficiary. [index, payout, beneficiary]
-  kind: EventKind.TreasuryBountyClaimed;
-  bountyIndex: number;
-  payout: BalanceString;
-  beneficiary: AccountId;
-}
-
-export interface ITreasuryBountyCanceled extends IEvent {
-  // A bounty is cancelled. [index]
-  kind: EventKind.TreasuryBountyCanceled;
-  bountyIndex: number;
-}
-
-export interface ITreasuryBountyExtended extends IEvent {
-  // A bounty expiry is extended. [index, remark]
-  kind: EventKind.TreasuryBountyExtended;
-  bountyIndex: number;
-  remark: string;
-}
-
-/**
- * Tips Events
- */
-export interface INewTip extends IEvent {
-  kind: EventKind.NewTip;
-  proposalHash: string;
-  reason: string;
-  who: AccountId;
-  finder: AccountId;
-  deposit: BalanceString;
-  findersFee: boolean;
-}
-
-// from extrinsic, not event
-export interface ITipVoted extends IEvent {
-  kind: EventKind.TipVoted;
-  proposalHash: string;
-  who: AccountId;
-  value: BalanceString;
-}
-
-export interface ITipClosing extends IEvent {
-  kind: EventKind.TipClosing;
-  closing: BlockNumber;
-  proposalHash: string;
-}
-
-export interface ITipClosed extends IEvent {
-  kind: EventKind.TipClosed;
-  proposalHash: string;
-  who: AccountId;
-  payout: BalanceString;
-}
-
-export interface ITipRetracted extends IEvent {
-  kind: EventKind.TipRetracted;
-  proposalHash: string;
-}
-
-export interface ITipSlashed extends IEvent {
-  kind: EventKind.TipSlashed;
-  proposalHash: string;
-  finder: AccountId;
-  deposit: BalanceString;
-}
-
 /**
  * Elections Events
  */
@@ -736,19 +616,6 @@ export type IEventData =
   | ITreasuryProposed
   | ITreasuryAwarded
   | ITreasuryRejected
-  | ITreasuryBountyProposed
-  | ITreasuryBountyAwarded
-  | ITreasuryBountyRejected
-  | ITreasuryBountyBecameActive
-  | ITreasuryBountyCanceled
-  | ITreasuryBountyClaimed
-  | ITreasuryBountyExtended
-  | INewTip
-  | ITipVoted
-  | ITipClosing
-  | ITipClosed
-  | ITipRetracted
-  | ITipSlashed
   | IElectionNewTerm
   | IElectionEmptyTerm
   | ICandidacySubmitted
@@ -815,18 +682,4 @@ export type ISignalingProposalEvents =
   | ISignalingCommitStarted
   | ISignalingVotingStarted
   | ISignalingVotingCompleted;
-export type ITipProposalEvents =
-  | INewTip
-  | ITipVoted
-  | ITipClosing
-  | ITipClosed
-  | ITipRetracted
-  | ITipSlashed;
-export type ITreasuryBountyEvents =
-  | ITreasuryBountyBecameActive
-  | ITreasuryBountyCanceled
-  | ITreasuryBountyClaimed
-  | ITreasuryBountyAwarded
-  | ITreasuryBountyExtended
-  | ITreasuryBountyProposed
-  | ITreasuryBountyRejected;
+

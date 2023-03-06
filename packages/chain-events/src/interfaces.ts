@@ -423,23 +423,6 @@ export function eventToEntity(
         ];
       }
 
-      // Tip Events
-      case SubstrateTypes.EventKind.NewTip: {
-        return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Create];
-      }
-      case SubstrateTypes.EventKind.TipVoted:
-      case SubstrateTypes.EventKind.TipClosing: {
-        return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Update];
-      }
-      case SubstrateTypes.EventKind.TipClosed:
-      case SubstrateTypes.EventKind.TipRetracted:
-      case SubstrateTypes.EventKind.TipSlashed: {
-        return [
-          SubstrateTypes.EntityKind.TipProposal,
-          EntityEventKind.Complete,
-        ];
-      }
-
       // Treasury Events
       case SubstrateTypes.EventKind.TreasuryProposed: {
         return [
@@ -451,50 +434,6 @@ export function eventToEntity(
       case SubstrateTypes.EventKind.TreasuryAwarded: {
         return [
           SubstrateTypes.EntityKind.TreasuryProposal,
-          EntityEventKind.Complete,
-        ];
-      }
-
-      // Bounty Events
-      case SubstrateTypes.EventKind.TreasuryBountyProposed: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Complete,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Complete,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
           EntityEventKind.Complete,
         ];
       }
