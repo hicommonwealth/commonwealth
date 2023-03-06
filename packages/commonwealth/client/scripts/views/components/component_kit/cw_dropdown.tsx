@@ -3,6 +3,7 @@
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_dropdown.scss';
+// eslint-disable-next-line
 import m from 'mithril';
 import { CWText } from './cw_text';
 

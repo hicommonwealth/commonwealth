@@ -3,6 +3,7 @@
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_button.scss';
+// eslint-disable-next-line
 import m from 'mithril';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';

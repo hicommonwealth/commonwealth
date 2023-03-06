@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import $ from 'jquery';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line
 import m from 'mithril';
 
 import 'modals/confirm_modal.scss';
