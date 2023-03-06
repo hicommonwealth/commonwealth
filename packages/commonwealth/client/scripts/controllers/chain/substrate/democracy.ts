@@ -9,7 +9,6 @@ import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
 import type SubstrateChain from './shared';
 
@@ -59,7 +58,7 @@ class SubstrateDemocracy extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server referenda
-    const entities = this.app.chainEntities.store.getByType(
+    const entities = this.app.chainEntities.getByType(
       SubstrateTypes.EntityKind.DemocracyReferendum
     );
     entities.forEach((e) => this._entityConstructor(e));

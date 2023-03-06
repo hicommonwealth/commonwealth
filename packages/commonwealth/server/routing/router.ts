@@ -88,6 +88,7 @@ import updateProfile from '../routes/updateProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import logout from '../routes/logout';
 import createTopic from '../routes/createTopic';
+import updateProfileNew from '../routes/updateNewProfile';
 import updateTopic from '../routes/updateTopic';
 import orderTopics from '../routes/orderTopics';
 import editTopic from '../routes/editTopic';
@@ -738,6 +739,13 @@ function setupRouter(
     '/githubAccount',
     passport.authenticate('jwt', { session: false }),
     deleteSocialAccount.bind(this, models, 'github')
+  );
+
+  // new profile
+  router.post(
+    '/updateProfile/v2',
+    passport.authenticate('jwt', { session: false }),
+    updateProfileNew.bind(this, models)
   );
 
   router.delete(

@@ -126,7 +126,7 @@ export default class AaveGovernance extends ProposalModule<
     // load server proposals
     console.log('Fetching aave proposals from backend.');
     await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.store.getByType(
+    const entities = this.app.chainEntities.getByType(
       AaveTypes.EntityKind.Proposal
     );
     entities.forEach((e) => this._entityConstructor(e));
