@@ -91,6 +91,7 @@ export type GetCommunitiesResp = {
 export type GetProfilesReq = {
   addresses?: string[];
   profile_ids?: number[];
+  include_addresses?: boolean;
   count_only?: boolean;
 } & IPagination;
 
