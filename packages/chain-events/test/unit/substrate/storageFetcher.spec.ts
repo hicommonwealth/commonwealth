@@ -31,11 +31,6 @@ import type {
   ISignalingVotingStarted,
   ISignalingVotingCompleted,
   ICollectiveVoted,
-  ITreasuryBountyProposed,
-  ITreasuryBountyBecameActive,
-  INewTip,
-  ITipVoted,
-  ITipClosing,
 } from '../../../src/chains/substrate/types';
 import {
   EventKind,
@@ -549,85 +544,6 @@ describe('Edgeware Event Migration Tests', () => {
             proposalHash: 'completed-hash',
             voteId: '3',
           } as ISignalingVotingCompleted,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: 'treasury-bounty-proposed',
-            bountyIndex: 0,
-            proposer: 'alice',
-            value: '50',
-            fee: '10',
-            curatorDeposit: '10',
-            bond: '10',
-            description: 'hello',
-          } as ITreasuryBountyProposed,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: 'treasury-bounty-became-active',
-            bountyIndex: 0,
-            curator: 'bob',
-            updateDue: 200,
-          } as ITreasuryBountyBecameActive,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: 'new-tip',
-            proposalHash: 'tip-hash-1',
-            who: 'alice',
-            reason: 'hello world!',
-            finder: 'bob',
-            deposit: '1000',
-            findersFee: true,
-          } as INewTip,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: 'new-tip',
-            proposalHash: 'tip-hash-2',
-            who: 'charlie',
-            reason: 'goodbye world!',
-            finder: 'dave',
-            deposit: '999',
-            findersFee: false,
-          } as INewTip,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: 'tip-voted',
-            proposalHash: 'tip-hash-2',
-            who: 'eve',
-            value: '3',
-          } as ITipVoted,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: 'tip-voted',
-            proposalHash: 'tip-hash-2',
-            who: 'ferdie',
-            value: '4',
-          } as ITipVoted,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: 'tip-closing',
-            proposalHash: 'tip-hash-2',
-            closing: 123,
-          } as ITipClosing,
         },
       ].sort(
         (p1, p2) =>
