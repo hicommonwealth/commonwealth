@@ -25,27 +25,26 @@ export const WebhooksForm = () => {
   const [webhooks, setWebhooks] = useState<Array<Webhook>>([]);
 
   const chainOrCommObj = { chain: app.activeChainId() };
-
-  const fetch = async () => {
-    try {
-      const response = await axios.get(`${app.serverUrl()}/getWebhooks`, {
-        params: {
-          ...chainOrCommObj,
-          auth: true,
-          jwt: app.user.jwt,
-        },
-      });
-
-      console.log('getWebhooks', response);
-
-      setWebhooks(response.data.result);
-    } catch (err) {
-      notifyError(err);
-      setWebhooks([]);
-    }
-  };
-
   useEffect(() => {
+    const fetch = async () => {
+      try {
+        const response = await axios.get(`${app.serverUrl()}/getWebhooks`, {
+          params: {
+            ...chainOrCommObj,
+            auth: true,
+            jwt: app.user.jwt,
+          },
+        });
+
+        console.log('getWebhooks', response);
+
+        setWebhooks(response.data.result);
+      } catch (err) {
+        notifyError(err);
+        setWebhooks([]);
+      }
+    };
+
     fetch();
   }, []);
 
