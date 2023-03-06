@@ -69,7 +69,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
 
     return (
       <div class="LoginSelectorMenu">
-        {!!app.activeChainId() && (
+        {app.activeChainId() && (
           <>
             {addresses.length > 1 && (
               <CWText type="caption" className="title">

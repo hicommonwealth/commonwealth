@@ -16,13 +16,13 @@ import { CWAddressTooltip } from './component_kit/cw_popover/cw_address_tooltip'
 type AddressAttrs = {
   profile: Profile;
   addressInfo: AddressInfo;
-  refreshProfiles: () => Promise<void>;
+  refreshProfiles: (address: string) => void;
 };
 
 type LinkedAddressesAttrs = {
   profile: Profile;
   addresses: AddressInfo[];
-  refreshProfiles: () => Promise<void>;
+  refreshProfiles: (address: string) => void;
 };
 
 class Address extends ClassComponent<AddressAttrs> {
@@ -51,7 +51,7 @@ class Address extends ClassComponent<AddressAttrs> {
                     chain: chain.id,
                   },
                   completeCallback: () => {
-                    refreshProfiles();
+                    refreshProfiles(address);
                   },
                 });
               },
