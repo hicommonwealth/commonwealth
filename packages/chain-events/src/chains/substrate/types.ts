@@ -682,4 +682,3 @@ export type ISignalingProposalEvents =
   | ISignalingCommitStarted
   | ISignalingVotingStarted
   | ISignalingVotingCompleted;
-

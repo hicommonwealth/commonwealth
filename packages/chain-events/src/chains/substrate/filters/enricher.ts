@@ -659,7 +659,6 @@ export async function Enrich(
         };
       }
 
-
       /**
        * Elections Events
        */

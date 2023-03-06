@@ -260,6 +260,19 @@ async function setupNewListeners(
         SubstrateTypes.EventKind.TreasuryRewardMinting,
         SubstrateTypes.EventKind.TreasuryRewardMintingV2,
         SubstrateTypes.EventKind.HeartbeatReceived,
+        'treasury-bounty-proposed',
+        'treasury-bounty-awarded',
+        'treasury-bounty-rejected',
+        'treasury-bounty-became-active',
+        'treasury-bounty-claimed',
+        'treasury-bounty-canceled',
+        'treasury-bounty-extended',
+        'new-tip',
+        'tip-voted',
+        'tip-closing',
+        'tip-closed',
+        'tip-retracted',
+        'tip-slashed',
       ];
 
     // add the rabbitmq handler and the events it should ignore

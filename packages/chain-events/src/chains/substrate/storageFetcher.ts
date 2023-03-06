@@ -34,7 +34,6 @@ import type {
   IDemocracyPassed,
   IPreimageNoted,
   ITreasuryProposed,
-  ITreasuryBountyProposed,
   ICollectiveProposed,
   ICollectiveVoted,
   ISignalingNewProposal,
@@ -44,12 +43,6 @@ import type {
   IEventData,
   IIdentitySet,
   IdentityJudgement,
-  ITreasuryBountyBecameActive,
-  ITreasuryBountyAwarded,
-  ITreasuryBountyEvents,
-  INewTip,
-  ITipVoted,
-  ITipClosing,
 } from './types';
 import { EventKind, parseJudgement, EntityKind } from './types';
 
@@ -141,12 +134,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         return this.fetchDemocracyReferenda(blockNumber, id);
       case EntityKind.SignalingProposal:
         return this.fetchSignalingProposals(blockNumber, id);
-      case EntityKind.TreasuryBounty:
-        return this.fetchBounties(blockNumber, id);
       case EntityKind.TreasuryProposal:
         return this.fetchTreasuryProposals(blockNumber, id);
-      case EntityKind.TipProposal:
-        return this.fetchTips(blockNumber, id);
       default:
         return null;
     }
@@ -182,7 +171,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const treasuryProposalEvents = await this.fetchTreasuryProposals(
       blockNumber
     );
-    const bountyEvents = await this.fetchBounties(blockNumber);
 
     /** collective proposals */
     let technicalCommitteeProposalEvents = [];
@@ -197,9 +185,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       blockNumber
     );
 
-    /** tips */
-    const tipsEvents = await this.fetchTips(blockNumber);
-
     /** signaling proposals */
     const signalingProposalEvents = await this.fetchSignalingProposals(
       blockNumber
@@ -211,11 +196,9 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       ...democracyReferendaEvents,
       ...democracyPreimageEvents,
       ...treasuryProposalEvents,
-      ...bountyEvents,
       ...technicalCommitteeProposalEvents,
       ...councilProposalEvents,
       ...signalingProposalEvents,
-      ...tipsEvents,
     ];
   }
 
@@ -459,81 +442,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }));
   }
 
-  public async fetchBounties(
-    blockNumber: number,
-    id?: string
-  ): Promise<CWEvent<ITreasuryBountyEvents>[]> {
-    // TODO: List all relevant events explicitly?
-    if (
-      !this._api.query.treasury?.bountyCount &&
-      !this._api.query.bounties?.bountyCount
-    ) {
-      this.log.info('Bounties module not detected.');
-      return [];
-    }
-
-    this.log.info('Migrating treasury bounties...');
-    const bounties = await this._api.derive.bounties.bounties();
-    const events = [];
-    for (const b of bounties) {
-      events.push({
-        kind: EventKind.TreasuryBountyProposed,
-        bountyIndex: +b.index,
-        proposer: b.bounty.proposer.toString(),
-        value: b.bounty.value.toString(),
-        fee: b.bounty.fee.toString(),
-        curatorDeposit: b.bounty.curatorDeposit.toString(),
-        bond: b.bounty.bond.toString(),
-        description: b.description,
-      } as ITreasuryBountyProposed);
-
-      if (b.bounty.status.isActive) {
-        events.push({
-          kind: EventKind.TreasuryBountyBecameActive,
-          bountyIndex: +b.index,
-          curator: b.bounty.status.asActive.curator.toString(),
-          updateDue: +b.bounty.status.asActive.updateDue,
-        } as ITreasuryBountyBecameActive);
-      }
-
-      if (b.bounty.status.isPendingPayout) {
-        events.push({
-          kind: EventKind.TreasuryBountyBecameActive,
-          bountyIndex: +b.index,
-          curator: b.bounty.status.asPendingPayout.curator.toString(),
-          updateDue: blockNumber, // fake this unavailable field
-        } as ITreasuryBountyBecameActive);
-        events.push({
-          kind: EventKind.TreasuryBountyAwarded,
-          bountyIndex: +b.index,
-          value: b.bounty.value.toString(),
-          beneficiary: b.bounty.status.asPendingPayout.beneficiary.toString(),
-          curator: b.bounty.status.asPendingPayout.curator.toString(),
-          unlockAt: +b.bounty.status.asPendingPayout.unlockAt,
-        } as ITreasuryBountyAwarded);
-      }
-    }
-
-    // no easier way to only fetch one than to fetch em all
-    const results = events.map((data) => ({
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data,
-    }));
-    if (id !== undefined) {
-      const data = results.filter(
-        ({ data: { bountyIndex } }) => bountyIndex === +id
-      );
-      if (data.length === 0) {
-        this.log.error(`No bounty found with id ${id}!`);
-        return null;
-      }
-      return data;
-    }
-    this.log.info(`Found ${bounties.length} bounties!`);
-    return results;
-  }
-
   public async fetchCollectiveProposals(
     moduleName: 'council' | 'technicalCommittee',
     blockNumber: number,
@@ -659,93 +567,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       network: SupportedNetwork.Substrate,
       data,
     }));
-  }
-
-  public async fetchTips(
-    blockNumber: number,
-    hash?: string
-  ): Promise<CWEvent<INewTip | ITipVoted | ITipClosing>[]> {
-    if (!this._api.query.tips) {
-      this.log.info('Tips module not detected.');
-      return [];
-    }
-
-    this.log.info('Migrating tips...');
-    const openTipKeys = await this._api.query.tips.tips.keys();
-    const results: CWEvent<INewTip | ITipVoted | ITipClosing>[] = [];
-    for (const key of openTipKeys) {
-      const h = key.args[0].toString();
-      // support fetchOne
-      if (!hash || hash === h) {
-        try {
-          const tip = await this._api.rpc.state.getStorage<Option<OpenTip>>(
-            key
-          );
-          if (tip.isSome) {
-            const {
-              reason: reasonHash,
-              who,
-              finder,
-              deposit,
-              closes,
-              tips: tipVotes,
-              findersFee,
-            } = tip.unwrap();
-            const reason = await this._api.query.tips.reasons(reasonHash);
-            if (reason.isSome) {
-              // newtip events
-              results.push({
-                blockNumber,
-                network: SupportedNetwork.Substrate,
-                data: {
-                  kind: EventKind.NewTip,
-                  proposalHash: h,
-                  who: who.toString(),
-                  reason: hexToString(reason.unwrap().toString()),
-                  finder: finder.toString(),
-                  deposit: deposit.toString(),
-                  findersFee: findersFee.valueOf(),
-                },
-              });
-
-              // n tipvoted events
-              for (const [voter, amount] of tipVotes) {
-                results.push({
-                  blockNumber,
-                  network: SupportedNetwork.Substrate,
-                  data: {
-                    kind: EventKind.TipVoted,
-                    proposalHash: h,
-                    who: voter.toString(),
-                    value: amount.toString(),
-                  },
-                });
-              }
-
-              // tipclosing event
-              if (closes.isSome) {
-                const closesAt = +closes.unwrap();
-                results.push({
-                  blockNumber,
-                  network: SupportedNetwork.Substrate,
-                  data: {
-                    kind: EventKind.TipClosing,
-                    proposalHash: h,
-                    closing: closesAt,
-                  },
-                });
-              }
-            }
-          }
-        } catch (e) {
-          this.log.error(`Unable to fetch tip "${key.args[0]}"!`);
-        }
-      }
-    }
-
-    const newTips = results.filter((v) => v.data.kind === EventKind.NewTip);
-    this.log.info(`Found ${newTips.length} open tips!`);
-    return results;
   }
 
   public async fetchSignalingProposals(
