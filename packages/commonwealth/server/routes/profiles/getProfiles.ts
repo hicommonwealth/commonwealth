@@ -1,4 +1,7 @@
-import type { GetProfilesReq, GetProfilesResp, } from 'common-common/src/api/extApiTypes';
+import type {
+  GetProfilesReq,
+  GetProfilesResp,
+} from 'common-common/src/api/extApiTypes';
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
 import Sequelize from 'sequelize';
@@ -36,25 +39,30 @@ const getProfiles = async (
 
   const pagination = formatPagination(req.query);
 
-  const where = {};
+  // if address is included, find which profile_ids they correspond to.
   let newProfileIds = [];
   if (addresses) {
     newProfileIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
-      attributes: ['profile_id']
+      attributes: ['profile_id'],
     });
   }
 
+  const where = {};
   if (!profile_ids) {
-    where['id'] = { [Op.in]: newProfileIds.map(p => p.profile_id) };
+    where['id'] = { [Op.in]: newProfileIds.map((p) => p.profile_id) };
   } else {
-    where['id'] = { [Op.in]: [...profile_ids, ...newProfileIds.map(p => p.profile_id)] };
+    where['id'] = {
+      [Op.in]: [...profile_ids, ...newProfileIds.map((p) => p.profile_id)],
+    };
   }
 
-  const include = [{
-    model: models.Address,
-    required: true,
-  }];
+  const include = [
+    {
+      model: models.Address,
+      required: true,
+    },
+  ];
   let profiles, count;
   if (!count_only) {
     ({ rows: profiles, count } = await models.Profile.findAndCountAll({
