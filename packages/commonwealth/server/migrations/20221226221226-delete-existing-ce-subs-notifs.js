@@ -134,6 +134,14 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `
+            CREATE INDEX new_chain_event_id ON "Notifications" (chain_event_id);
+        `,
+        { transaction: t, raw: true }
+      );
+      console.log('Added new_chain_event_id index');
+
+      await queryInterface.sequelize.query(
+        `
           ALTER TABLE "NotificationsRead"
             ADD CONSTRAINT "NotificationsRead_notification_id_fkey" -- create a new foreign key constraint
             FOREIGN KEY (notification_id) REFERENCES "Notifications" (id);
