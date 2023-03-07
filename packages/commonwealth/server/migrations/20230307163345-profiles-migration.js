@@ -11,6 +11,7 @@ module.exports = {
 
       // For each profile
       for (const profile of profiles) {
+        console.log('Updating profile with id: ', profile.id);
         if (profile.profile_name !== null) {
           // User has set the profile_name via modal
 
@@ -47,8 +48,6 @@ module.exports = {
                   } WHERE id=${profile.id}`,
                   { transaction: t }
                 );
-                // Exit loop because we have found an offchainProfile with the avatarUrl and need not do more
-                break;
               }
             }
           }
@@ -78,17 +77,17 @@ module.exports = {
                 continue;
               }
 
-              // Update with the first offchainProfile that has a name and avatarUrl (if it exists)
+              // Update with the offchainProfile's data
               await queryInterface.sequelize.query(
                 `UPDATE "Profiles" SET avatar_url=${
                   parsedData?.avatarUrl ? `'${parsedData.avatarUrl}'` : 'NULL'
                 }, profile_name=${
-                  parsedData?.name ? `'${parsedData.name}'` : 'NULL'
+                  parsedData?.name
+                    ? `'${parsedData.name.replace(/'/g, '')}'`
+                    : 'NULL'
                 } WHERE id=${profile.id}`,
                 { transaction: t }
               );
-
-              break;
             }
           } else if (addresses.length > 1) {
             // More than one valid address exists
@@ -129,6 +128,7 @@ module.exports = {
             }
 
             if (sameName) {
+              // Multiple addresses with same name- we need only update one profile
               let avatarUrl;
               let name;
 
@@ -141,7 +141,7 @@ module.exports = {
                   }
                 );
 
-                // Choose the first offchainProfile with an avatarUrl
+                // Choose extract the name and avatarUrl from whichever OffchainProfiles have them
                 if (offchainProfiles.length === 1) {
                   if (offchainProfiles[0].data) {
                     let parsedData;
@@ -159,7 +159,6 @@ module.exports = {
                       if (parsedData.avatarUrl) {
                         avatarUrl = parsedData.avatarUrl;
                         // Found an avatar url, no need to continue
-                        break;
                       }
                     }
                   }
@@ -169,13 +168,13 @@ module.exports = {
               await queryInterface.sequelize.query(
                 `UPDATE "Profiles" SET avatar_url=${
                   avatarUrl ? `'${avatarUrl}'` : 'NULL'
-                }, profile_name=${name ? `'${name}'` : 'NULL'} WHERE id=${
-                  profile.id
-                }`,
+                }, profile_name=${
+                  name ? `'${name.replace(/'/g, '')}'` : 'NULL'
+                } WHERE id=${profile.id}`,
                 { transaction: t }
               );
             } else {
-              // Addresses have different names
+              // Addresses have different names- we must create new profiles
               for (let i = 0; i < addresses.length; i++) {
                 const address = addresses[i];
                 const offchainProfiles = await queryInterface.sequelize.query(
@@ -201,7 +200,9 @@ module.exports = {
                           ? `'${parsedData.avatarUrl}'`
                           : 'NULL'
                       }, profile_name=${
-                        parsedData?.name ? `'${parsedData.name}'` : 'NULL'
+                        parsedData?.name
+                          ? `'${parsedData.name.replace(/'/g, '')}'`
+                          : 'NULL'
                       } WHERE id=${profile.id}`,
                       { transaction: t }
                     );
@@ -222,7 +223,9 @@ module.exports = {
                       `INSERT INTO "Profiles" (user_id, profile_name, avatar_url) VALUES (${
                         newUser[0][0].id
                       }, ${
-                        parsedData?.name ? `'${parsedData.name}'` : 'NULL'
+                        parsedData?.name
+                          ? `'${parsedData.name.replace(/'/g, '')}'`
+                          : 'NULL'
                       }, ${
                         parsedData?.avatarUrl
                           ? `'${parsedData.avatarUrl}'`
