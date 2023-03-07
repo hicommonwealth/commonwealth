@@ -90,11 +90,7 @@ export interface ICommunityNotificationData {
   chain: string;
 }
 
-export interface IChainEventNotificationData {
-  chainEvent: any;
-  chainEventType: any;
-  chain_id: string;
-}
+export interface IChainEventNotificationData extends ChainEventAttributes {}
 
 export interface ISnapshotNotificationData {
   created_at: Date;

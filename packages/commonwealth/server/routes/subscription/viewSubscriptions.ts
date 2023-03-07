@@ -33,10 +33,6 @@ export default async (
       include: [models.Address],
     },
     {
-      model: models.ChainEventType,
-      as: 'ChainEventType',
-    },
-    {
       model: models.Chain,
       as: 'Chain',
       required: false,
