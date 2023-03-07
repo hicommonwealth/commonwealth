@@ -23,7 +23,6 @@ export type ProfileAttributes = {
   avatar_url?: string;
   slug?: string;
   socials?: string[];
-  cover_image?: ImageAttributes;
   background_image?: ImageAttributes;
 
   // associations
@@ -66,7 +65,6 @@ export default (
       avatar_url: { type: dataTypes.STRING, allowNull: true },
       slug: { type: dataTypes.STRING, allowNull: true },
       socials: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: true },
-      cover_image: { type: dataTypes.JSONB, allowNull: true },
       background_image: { type: dataTypes.JSONB, allowNull: true },
     },
     {

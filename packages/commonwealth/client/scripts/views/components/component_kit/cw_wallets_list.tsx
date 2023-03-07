@@ -444,14 +444,10 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                 interactionType="click"
                 tooltipContent={
                   <>
-                    <CWText type="caption">
-                      If you don’t see your wallet then make sure:
-                    </CWText>
-                    <CWText type="caption">
-                      • Your wallet chrome extension installed?
-                    </CWText>
-                    <CWText type="caption">
-                      • Your wallet chrome extension active?
+                    <CWText type="caption" className="no-wallets-popover">
+                      If you cannot see your wallet, please ensure that your
+                      wallet Chrome extension is <b>installed</b> and{' '}
+                      <b>activated</b>.
                     </CWText>
                   </>
                 }

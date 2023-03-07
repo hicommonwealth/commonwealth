@@ -100,16 +100,8 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
     if (this.error === ProfileError.None) {
       if (!this.profile) return;
 
-      let coverUrl;
-      let coverImageBehavior;
       let backgroundUrl;
       let backgroundImageBehavior;
-
-      if (this.profile.coverImage) {
-        const { url, imageBehavior } = this.profile.coverImage;
-        coverUrl = url;
-        coverImageBehavior = imageBehavior;
-      }
 
       if (this.profile.backgroundImage) {
         const { url, imageBehavior } = this.profile.backgroundImage;
@@ -142,23 +134,6 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
               : {}
           }
         >
-          {this.profile.coverImage && (
-            <div
-              style={{
-                backgroundImage: `url(${coverUrl})`,
-                backgroundRepeat: `${
-                  coverImageBehavior === ImageBehavior.Fill
-                    ? 'no-repeat'
-                    : 'repeat'
-                }`,
-                backgroundSize:
-                  coverImageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
-                backgroundPosition:
-                  coverImageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
-                height: '240px',
-              }}
-            />
-          )}
           <div
             className={
               this.profile.backgroundImage
