@@ -496,9 +496,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Edit collaborators',
               iconLeft: 'write' as const,
-              onClick: async (e) => {
-                e.preventDefault();
-
+              onClick: () => {
                 setIsEditCollaboratorsModalOpen(true);
               },
             },

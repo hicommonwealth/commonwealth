@@ -13,7 +13,7 @@ export interface LinkedThreadRelation {
   linkingThread: string;
 }
 
-interface IThreadCollaborator {
+export interface IThreadCollaborator {
   address: string;
   chain: string;
 }

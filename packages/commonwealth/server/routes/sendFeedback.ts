@@ -3,10 +3,14 @@ import type { NextFunction, Request, Response } from 'express';
 import request from 'superagent';
 import { SLACK_FEEDBACK_WEBHOOK } from '../config';
 import type { DB } from '../models';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 export const Errors = {
-  NotSent: 'Nothing sent!',
+  NotSent: 'Please enter the feedback message.',
+  SlackWebhookError: 'SLACK_FEEDBACK_WEBHOOK missing.'
 };
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const sendFeedback = async (
   models: DB,
@@ -16,6 +20,11 @@ const sendFeedback = async (
 ) => {
   if (!req.body.text) {
     return next(new AppError(Errors.NotSent));
+  }
+
+  if (!SLACK_FEEDBACK_WEBHOOK) {
+    log.error("No slack webhook found");
+    return next(new ServerError(Errors.SlackWebhookError));
   }
 
   const userText = !req.user
