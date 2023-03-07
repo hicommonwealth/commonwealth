@@ -113,10 +113,7 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hid
   } else {
     return (
       <div
-      className={getClasses<{ collapsed?: boolean }>(
-        { collapsed: isTruncated },
-        'QuillFormattedText'
-      )}
+        className='QuillFormattedText'
       // oncreate={() => {
       // if (!(<any>window).twttr) {
       //   loadScript('//platform.twitter.com/widgets.js').then(() => {
@@ -128,7 +125,7 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hid
           renderQuillDelta(
             truncatedDoc,
             hideFormatting,
-            isTruncated,
+            false,
             openLinksInNewTab,
             navigate
           )}
