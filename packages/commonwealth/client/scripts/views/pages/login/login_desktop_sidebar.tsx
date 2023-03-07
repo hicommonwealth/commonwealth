@@ -64,9 +64,8 @@ export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs
                     ? 'Connect Your Wallet'
                     : 'Please Install a Wallet to Login'
                 }
-                bodyText={`Many communities require different wallets 
-                            based on the chain they are built on and 
-                            the types of tokens members hold.`}
+                bodyText={`Communities may require specific wallets for certain blockchains and tokens.
+                Check requirements to ensure you have the necessary wallet and tokens to participate.`}
               />
             </div>
           </div>
