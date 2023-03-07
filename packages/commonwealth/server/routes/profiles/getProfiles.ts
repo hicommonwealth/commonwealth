@@ -1,7 +1,4 @@
-import type {
-  GetProfilesReq,
-  GetProfilesResp,
-} from 'common-common/src/api/extApiTypes';
+import type { GetProfilesReq, GetProfilesResp, } from 'common-common/src/api/extApiTypes';
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
 import Sequelize from 'sequelize';
@@ -21,7 +18,6 @@ export const getProfilesValidation = [
     ],
     `${needParamErrMsg} (addresses, profile_ids)`
   ),
-  query('include_addresses').optional().isBoolean().toBoolean(),
   query('count_only').optional().isBoolean().toBoolean(),
   ...paginationValidation,
 ];
@@ -36,26 +32,29 @@ const getProfiles = async (
     return failure(res.status(400), errors);
   }
   // This route is for fetching all profiles + addresses by community
-  const { addresses, include_addresses, profile_ids, count_only } = req.query;
+  const { addresses, profile_ids, count_only } = req.query;
 
   const pagination = formatPagination(req.query);
 
   const where = {};
-  if (profile_ids) where['id'] = { [Op.in]: profile_ids };
-  const include = [];
-  if (addresses && !include_addresses) {
-    include.push({
-      model: models.Address,
+  let newProfileIds = [];
+  if (addresses) {
+    newProfileIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
-      required: true,
-    });
-  } else if (include_addresses) {
-    include.push({
-      model: models.Address,
-      required: true,
+      attributes: ['profile_id']
     });
   }
 
+  if (!profile_ids) {
+    where['id'] = { [Op.in]: newProfileIds.map(p => p.profile_id) };
+  } else {
+    where['id'] = { [Op.in]: [...profile_ids, ...newProfileIds.map(p => p.profile_id)] };
+  }
+
+  const include = [{
+    model: models.Address,
+    required: true,
+  }];
   let profiles, count;
   if (!count_only) {
     ({ rows: profiles, count } = await models.Profile.findAndCountAll({

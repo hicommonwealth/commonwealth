@@ -308,13 +308,6 @@
           },
           {
             "in": "query",
-            "name": "include_addresses",
-            "type": "boolean",
-            "required": false,
-            "description": "Returns the associated addresses with the queried profile"
-          },
-          {
-            "in": "query",
             "name": "count_only",
             "type": "boolean",
             "description": "Return only the number of entities found."
