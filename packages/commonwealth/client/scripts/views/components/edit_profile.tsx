@@ -62,7 +62,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
   private avatarUrl: string;
   private addresses: AddressInfo[];
   private isOwner: boolean;
-  private coverImage: Image;
   private backgroundImage: Image;
   private displayNameValid: boolean;
 
@@ -79,7 +78,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       this.email = this.profile.email;
       this.socials = this.profile.socials;
       this.avatarUrl = this.profile.avatarUrl;
-      this.coverImage = this.profile.coverImage;
       this.backgroundImage = this.profile.backgroundImage;
       this.addresses = result.addresses.map(
         (a) =>
@@ -147,9 +145,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
 
     if (!_.isEqual(this.socials, this.profile?.socials))
       this.profileUpdate.socials = JSON.stringify(this.socials);
-
-    if (!_.isEqual(this.coverImage, this.profile?.coverImage))
-      this.profileUpdate.coverImage = JSON.stringify(this.coverImage);
 
     if (!_.isEqual(this.backgroundImage, this.profile?.backgroundImage))
       this.profileUpdate.backgroundImage = JSON.stringify(this.backgroundImage);
@@ -357,7 +352,10 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               title="Personalize your profile"
               description="Use imagery to express yourself."
             >
-              <CWText fontWeight="medium">Image image</CWText>
+              <CWText fontWeight="medium">Image upload</CWText>
+              <CWText type="caption" className="description">
+                Add a background image.
+              </CWText>
               <CWCoverImageUploader
                 name="background-image-uploader"
                 uploadCompleteCallback={(

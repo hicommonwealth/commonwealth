@@ -46,12 +46,12 @@
       }
     }
 
-    .profile-image-section {
-      .description {
-        margin-top: 8px;
-        color: $neutral-500;
-      }
+    .description {
+      margin-top: 8px;
+      color: $neutral-500;
+    }
 
+    .profile-image-section {
       .image-upload {
         position: relative;
         display: flex;
