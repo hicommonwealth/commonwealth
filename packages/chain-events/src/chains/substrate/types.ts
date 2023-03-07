@@ -104,10 +104,8 @@ export enum EntityKind {
   DemocracyReferendum = 'democracy-referendum',
   DemocracyPreimage = 'democracy-preimage',
   TreasuryProposal = 'treasury-proposal',
-  CollectiveProposal = 'collective-proposal',
   SignalingProposal = 'signaling-proposal',
   TipProposal = 'tip-proposal',
-  TreasuryBounty = 'treasury-bounty',
 }
 
 // Each kind of event we handle
@@ -150,19 +148,18 @@ export enum EventKind {
   TreasuryAwarded = 'treasury-awarded',
   TreasuryRejected = 'treasury-rejected',
 
+  NewTip = 'new-tip',
+  TipVoted = 'tip-voted',
+  TipClosing = 'tip-closing',
+  TipClosed = 'tip-closed',
+  TipRetracted = 'tip-retracted',
+  TipSlashed = 'tip-slashed',
+
   ElectionNewTerm = 'election-new-term',
   ElectionEmptyTerm = 'election-empty-term',
   ElectionCandidacySubmitted = 'election-candidacy-submitted',
   ElectionMemberKicked = 'election-member-kicked',
   ElectionMemberRenounced = 'election-member-renounced',
-
-  CollectiveProposed = 'collective-proposed',
-  CollectiveVoted = 'collective-voted',
-  CollectiveApproved = 'collective-approved',
-  CollectiveDisapproved = 'collective-disapproved',
-  CollectiveExecuted = 'collective-executed',
-  CollectiveMemberExecuted = 'collective-member-executed',
-  // TODO: do we want to track votes as events, in collective?
 
   SignalingNewProposal = 'signaling-new-proposal',
   SignalingCommitStarted = 'signaling-commit-started',
@@ -173,7 +170,6 @@ export enum EventKind {
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
 
   IdentitySet = 'identity-set',
-  JudgementGiven = 'identity-judgement-given',
   IdentityCleared = 'identity-cleared',
   IdentityKilled = 'identity-killed',
 
@@ -426,6 +422,52 @@ export interface ITreasuryRejected extends IEvent {
 }
 
 /**
+ * Tips Events
+ */
+export interface INewTip extends IEvent {
+  kind: EventKind.NewTip;
+  proposalHash: string;
+  reason: string;
+  who: AccountId;
+  finder: AccountId;
+  deposit: BalanceString;
+  findersFee: boolean;
+}
+
+// from extrinsic, not event
+export interface ITipVoted extends IEvent {
+  kind: EventKind.TipVoted;
+  proposalHash: string;
+  who: AccountId;
+  value: BalanceString;
+}
+
+export interface ITipClosing extends IEvent {
+  kind: EventKind.TipClosing;
+  closing: BlockNumber;
+  proposalHash: string;
+}
+
+export interface ITipClosed extends IEvent {
+  kind: EventKind.TipClosed;
+  proposalHash: string;
+  who: AccountId;
+  payout: BalanceString;
+}
+
+export interface ITipRetracted extends IEvent {
+  kind: EventKind.TipRetracted;
+  proposalHash: string;
+}
+
+export interface ITipSlashed extends IEvent {
+  kind: EventKind.TipSlashed;
+  proposalHash: string;
+  finder: AccountId;
+  deposit: BalanceString;
+}
+
+/**
  * Elections Events
  */
 export interface IElectionNewTerm extends IEvent {
@@ -455,58 +497,6 @@ export interface IElectionMemberKicked extends IEvent {
 export interface IElectionMemberRenounced extends IEvent {
   kind: EventKind.ElectionMemberRenounced;
   who: AccountId;
-}
-
-/**
- * Collective Events
- */
-export interface ICollectiveProposed extends IEvent {
-  kind: EventKind.CollectiveProposed;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposer: AccountId;
-  proposalIndex: number;
-  proposalHash: string;
-  threshold: number;
-  // TODO: add end block?
-  call: {
-    method: string;
-    section: string;
-    args: string[];
-  };
-}
-
-export interface ICollectiveVoted extends IEvent {
-  kind: EventKind.CollectiveVoted;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-  voter: AccountId;
-  vote: boolean;
-}
-
-export interface ICollectiveApproved extends IEvent {
-  kind: EventKind.CollectiveApproved;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-}
-
-export interface ICollectiveDisapproved extends IEvent {
-  kind: EventKind.CollectiveDisapproved;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-}
-
-export interface ICollectiveExecuted extends IEvent {
-  kind: EventKind.CollectiveExecuted;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-  executionOk: boolean;
-}
-
-export interface ICollectiveMemberExecuted extends IEvent {
-  kind: EventKind.CollectiveMemberExecuted;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-  executionOk: boolean;
 }
 
 /**
@@ -569,13 +559,6 @@ export interface IIdentitySet extends IEvent {
   judgements: [AccountId, IdentityJudgement][];
 }
 
-export interface IJudgementGiven extends IEvent {
-  kind: EventKind.JudgementGiven;
-  who: AccountId;
-  registrar: AccountId;
-  judgement: IdentityJudgement;
-}
-
 export interface IIdentityCleared extends IEvent {
   kind: EventKind.IdentityCleared;
   who: AccountId;
@@ -616,17 +599,17 @@ export type IEventData =
   | ITreasuryProposed
   | ITreasuryAwarded
   | ITreasuryRejected
+  | INewTip
+  | ITipVoted
+  | ITipClosing
+  | ITipClosed
+  | ITipRetracted
+  | ITipSlashed
   | IElectionNewTerm
   | IElectionEmptyTerm
   | ICandidacySubmitted
   | IElectionMemberKicked
   | IElectionMemberRenounced
-  | ICollectiveProposed
-  | ICollectiveVoted
-  | ICollectiveApproved
-  | ICollectiveDisapproved
-  | ICollectiveExecuted
-  | ICollectiveMemberExecuted
   | ISignalingNewProposal
   | ISignalingCommitStarted
   | ISignalingVotingStarted
@@ -634,7 +617,6 @@ export type IEventData =
   | ITreasuryRewardMinting
   | ITreasuryRewardMintingV2
   | IIdentitySet
-  | IJudgementGiven
   | IIdentityCleared
   | IIdentityKilled
   | INewSession
@@ -671,12 +653,6 @@ export type ITreasuryProposalEvents =
   | ITreasuryProposed
   | ITreasuryRejected
   | ITreasuryAwarded;
-export type ICollectiveProposalEvents =
-  | ICollectiveProposed
-  | ICollectiveVoted
-  | ICollectiveApproved
-  | ICollectiveDisapproved
-  | ICollectiveExecuted;
 export type ISignalingProposalEvents =
   | ISignalingNewProposal
   | ISignalingCommitStarted

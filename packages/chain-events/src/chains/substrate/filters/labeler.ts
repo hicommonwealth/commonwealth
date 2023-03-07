@@ -488,101 +488,6 @@ export const Label: LabelerFilter = (
     }
 
     /**
-     * Collective Events
-     */
-    case EventKind.CollectiveProposed: {
-      const { proposer, proposalHash, threshold, collectiveName } = data;
-      const collective =
-        collectiveName && collectiveName === 'technicalCommittee'
-          ? 'Technical Committee'
-          : 'Council';
-      return {
-        heading: `New ${collective} Proposal`,
-        label: `${fmtAddr(
-          proposer
-        )} introduced a new ${collective} proposal, requiring ${threshold} approvals to pass.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/councilmotion/${proposalHash}`
-          : null,
-      };
-    }
-    case EventKind.CollectiveVoted: {
-      const { vote, proposalHash, collectiveName } = data;
-      const collective =
-        collectiveName && collectiveName === 'technicalCommittee'
-          ? 'Technical Committee'
-          : 'Council';
-      return {
-        heading: `Member Voted on ${collective} Proposal`,
-        label: `A council member voted ${
-          vote ? 'Yes' : 'No'
-        } on a collective proposal.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/councilmotion/${proposalHash}`
-          : null,
-      };
-    }
-    case EventKind.CollectiveApproved: {
-      const { proposalHash, collectiveName } = data;
-      const collective =
-        collectiveName && collectiveName === 'technicalCommittee'
-          ? 'Technical Committee'
-          : 'Council';
-      return {
-        heading: `${collective} Proposal Approved`,
-        label: `A ${collective} proposal was approved.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/councilmotion/${proposalHash}`
-          : null,
-      };
-    }
-    case EventKind.CollectiveDisapproved: {
-      const { collectiveName, proposalHash } = data;
-      const collective =
-        collectiveName && collectiveName === 'technicalCommittee'
-          ? 'Technical Committee'
-          : 'Council';
-      return {
-        heading: `${collective} Proposal Disapproved`,
-        label: `A ${collective} proposal was disapproved.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/councilmotion/${proposalHash}`
-          : null,
-      };
-    }
-    case EventKind.CollectiveExecuted: {
-      const { executionOk, collectiveName, proposalHash } = data;
-      const collective =
-        collectiveName && collectiveName === 'technicalCommittee'
-          ? 'Technical Committee'
-          : 'Council';
-      return {
-        heading: `${collective} Proposal Executed`,
-        label: `Approved ${collective} proposal was executed ${
-          executionOk ? 'successfully' : 'unsuccessfully'
-        }.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/councilmotion/${proposalHash}`
-          : null,
-      };
-    }
-    case EventKind.CollectiveMemberExecuted: {
-      const { executionOk, collectiveName } = data;
-      const collective =
-        collectiveName && collectiveName === 'technicalCommittee'
-          ? 'Technical Committee'
-          : 'Council';
-      return {
-        heading: `${collective} Proposal Executed`,
-        label: `A member-executed ${collective} proposal was executed ${
-          executionOk ? 'successfully' : 'unsuccessfully'
-        }.`,
-        // no proposal link will exist, because this happens immediately, without creating a proposal
-        // TODO: maybe link to the executing member?
-      };
-    }
-
-    /**
      * Signaling Events
      */
     case EventKind.SignalingNewProposal: {
@@ -627,6 +532,78 @@ export const Label: LabelerFilter = (
     }
 
     /**
+     * Tip Events
+     */
+    case EventKind.NewTip: {
+      return {
+        heading: 'New Tip Suggested',
+        label: `A new tip for ${fmtAddr(data.who)} was suggested with reason "${
+          data.reason
+        }".`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipVoted: {
+      return {
+        heading: 'Tip Voted',
+        label: `A tip was voted on by ${data.who} for ${balanceFormatter(
+          data.value
+        )}.`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipClosing: {
+      return {
+        heading: 'Tip Closing',
+        label: `A tip is now closing on block ${data.closing}.`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipClosed: {
+      return {
+        heading: 'Tip Closed',
+        label: `A tip to ${fmtAddr(
+          data.who
+        )} was paid out for ${balanceFormatter(data.payout)}.`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipRetracted: {
+      return {
+        heading: 'Tip Retracted',
+        label: 'A tip was retracted.',
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+    case EventKind.TipSlashed: {
+      return {
+        heading: 'Tip Slashed',
+        label: `A tip submitted by ${fmtAddr(
+          data.finder
+        )} slashed for ${balanceFormatter(data.deposit)}`,
+        // TODO: fix
+        linkUrl: chainId
+          ? `/${chainId}/proposal/tip/${data.proposalHash}`
+          : null,
+      };
+    }
+
+    /**
      * TreasuryReward events
      */
     case EventKind.TreasuryRewardMinting: {
@@ -662,16 +639,6 @@ export const Label: LabelerFilter = (
         label: `${fmtAddr(
           who
         )} set their identity with display name "${displayName}".`,
-        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
-      };
-    }
-    case EventKind.JudgementGiven: {
-      const { who, registrar, judgement } = data;
-      return {
-        heading: 'Identity Judgement Given',
-        label: `Registrar ${fmtAddr(
-          registrar
-        )} passed judgement '${judgement}' on ${fmtAddr(who)}.`,
         linkUrl: chainId ? `/${chainId}/account/${who}` : null,
       };
     }

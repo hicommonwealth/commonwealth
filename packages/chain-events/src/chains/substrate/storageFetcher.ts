@@ -34,8 +34,6 @@ import type {
   IDemocracyPassed,
   IPreimageNoted,
   ITreasuryProposed,
-  ICollectiveProposed,
-  ICollectiveVoted,
   ISignalingNewProposal,
   ISignalingCommitStarted,
   ISignalingVotingStarted,
@@ -43,6 +41,9 @@ import type {
   IEventData,
   IIdentitySet,
   IdentityJudgement,
+  INewTip,
+  ITipVoted,
+  ITipClosing,
 } from './types';
 import { EventKind, parseJudgement, EntityKind } from './types';
 
@@ -124,8 +125,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }
     const blockNumber = +(await this._api.rpc.chain.getHeader()).number;
     switch (kind as EntityKind) {
-      case EntityKind.CollectiveProposal:
-        return this.fetchCollectiveProposals(moduleName, blockNumber, id);
       case EntityKind.DemocracyPreimage:
         return this.fetchDemocracyPreimages([id]);
       case EntityKind.DemocracyProposal:
@@ -172,18 +171,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       blockNumber
     );
 
-    /** collective proposals */
-    let technicalCommitteeProposalEvents = [];
-    if (this._api.query.technicalCommittee) {
-      technicalCommitteeProposalEvents = await this.fetchCollectiveProposals(
-        'technicalCommittee',
-        blockNumber
-      );
-    }
-    const councilProposalEvents = await this.fetchCollectiveProposals(
-      'council',
-      blockNumber
-    );
+    /** tips */
+    const tipsEvents = await this.fetchTips(blockNumber);
 
     /** signaling proposals */
     const signalingProposalEvents = await this.fetchSignalingProposals(
@@ -196,9 +185,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       ...democracyReferendaEvents,
       ...democracyPreimageEvents,
       ...treasuryProposalEvents,
-      ...technicalCommitteeProposalEvents,
-      ...councilProposalEvents,
       ...signalingProposalEvents,
+      ...tipsEvents,
     ];
   }
 
@@ -442,131 +430,91 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }));
   }
 
-  public async fetchCollectiveProposals(
-    moduleName: 'council' | 'technicalCommittee',
+  public async fetchTips(
     blockNumber: number,
-    id?: string
-  ): Promise<CWEvent<ICollectiveProposed | ICollectiveVoted>[]> {
-    if (!this._api.query[moduleName]) {
-      this.log.info(`${moduleName} module not detected.`);
+    hash?: string
+  ): Promise<CWEvent<INewTip | ITipVoted | ITipClosing>[]> {
+    if (!this._api.query.tips) {
+      this.log.info('Tips module not detected.');
       return [];
     }
 
-    const constructEvent = (
-      hash: Hash,
-      proposalOpt: Option<Proposal>,
-      votesOpt: Option<Votes>
-    ) => {
-      if (
-        !hash ||
-        !proposalOpt ||
-        !votesOpt ||
-        !proposalOpt.isSome ||
-        !votesOpt.isSome
-      )
-        return null;
-      const proposal = proposalOpt.unwrap();
-      const votes = votesOpt.unwrap();
-      return [
-        {
-          kind: EventKind.CollectiveProposed,
-          collectiveName: moduleName,
-          proposalIndex: +votes.index,
-          proposalHash: hash.toString(),
-          threshold: +votes.threshold,
-          call: {
-            method: proposal.method,
-            section: proposal.section,
-            args: proposal.args.map((arg) => arg.toString()),
-          },
+    this.log.info('Migrating tips...');
+    const openTipKeys = await this._api.query.tips.tips.keys();
+    const results: CWEvent<INewTip | ITipVoted | ITipClosing>[] = [];
+    for (const key of openTipKeys) {
+      const h = key.args[0].toString();
+      // support fetchOne
+      if (!hash || hash === h) {
+        try {
+          const tip = await this._api.rpc.state.getStorage<Option<OpenTip>>(
+            key
+          );
+          if (tip.isSome) {
+            const {
+              reason: reasonHash,
+              who,
+              finder,
+              deposit,
+              closes,
+              tips: tipVotes,
+              findersFee,
+            } = tip.unwrap();
+            const reason = await this._api.query.tips.reasons(reasonHash);
+            if (reason.isSome) {
+              // newtip events
+              results.push({
+                blockNumber,
+                network: SupportedNetwork.Substrate,
+                data: {
+                  kind: EventKind.NewTip,
+                  proposalHash: h,
+                  who: who.toString(),
+                  reason: hexToString(reason.unwrap().toString()),
+                  finder: finder.toString(),
+                  deposit: deposit.toString(),
+                  findersFee: findersFee.valueOf(),
+                },
+              });
 
-          // unknown
-          proposer: '',
-        } as ICollectiveProposed,
-        ...votes.ayes.map(
-          (who) =>
-            ({
-              kind: EventKind.CollectiveVoted,
-              collectiveName: moduleName,
-              proposalHash: hash.toString(),
-              voter: who.toString(),
-              vote: true,
-            } as ICollectiveVoted)
-        ),
-        ...votes.nays.map(
-          (who) =>
-            ({
-              kind: EventKind.CollectiveVoted,
-              collectiveName: moduleName,
-              proposalHash: hash.toString(),
-              voter: who.toString(),
-              vote: false,
-            } as ICollectiveVoted)
-        ),
-      ];
-    };
+              // n tipvoted events
+              for (const [voter, amount] of tipVotes) {
+                results.push({
+                  blockNumber,
+                  network: SupportedNetwork.Substrate,
+                  data: {
+                    kind: EventKind.TipVoted,
+                    proposalHash: h,
+                    who: voter.toString(),
+                    value: amount.toString(),
+                  },
+                });
+              }
 
-    this.log.info(`Migrating ${moduleName} proposals...`);
-    const proposalHashes = await this._api.query[moduleName].proposals();
-
-    // fetch one
-    if (id !== undefined) {
-      const hash = proposalHashes.find((h) => h.toString() === id);
-      if (!hash) {
-        this.log.error(`No collective proposal found with hash ${id}!`);
-        return null;
+              // tipclosing event
+              if (closes.isSome) {
+                const closesAt = +closes.unwrap();
+                results.push({
+                  blockNumber,
+                  network: SupportedNetwork.Substrate,
+                  data: {
+                    kind: EventKind.TipClosing,
+                    proposalHash: h,
+                    closing: closesAt,
+                  },
+                });
+              }
+            }
+          }
+        } catch (e) {
+          this.log.error(`Unable to fetch tip "${key.args[0]}"!`);
+        }
       }
-      const proposalOpt = await this._api.query[moduleName].proposalOf(hash);
-      const votesOpt = await this._api.query[moduleName].voting(hash);
-      const events = constructEvent(hash, proposalOpt, votesOpt);
-      if (!events) {
-        this.log.error(`No collective proposal found with hash ${id}!`);
-        return null;
-      }
-      return events.map((data) => ({
-        blockNumber,
-        network: SupportedNetwork.Substrate,
-        data,
-      }));
     }
 
-    // fetch all
-    const proposals: Array<Option<Proposal>> = await Promise.all(
-      proposalHashes.map(async (h) => {
-        try {
-          // awaiting inside the map here to force the individual call to throw, rather than the Promise.all
-          return await this._api.query[moduleName].proposalOf(h);
-        } catch (e) {
-          this.log.error(`Failed to fetch council motion hash ${h.toString()}`);
-          return Promise.resolve(null);
-        }
-      })
-    );
-    const proposalVotes = await this._api.query[moduleName].voting.multi<
-      Option<Votes>
-    >(proposalHashes);
-    const proposedEvents = _.flatten(
-      proposalHashes
-        .map((hash, index) => {
-          const proposalOpt = proposals[index];
-          const votesOpt = proposalVotes[index];
-          return constructEvent(hash, proposalOpt, votesOpt);
-        })
-        .filter((es) => !!es)
-    );
-    const nProposalEvents = proposedEvents.filter(
-      (e) => e.kind === EventKind.CollectiveProposed
-    ).length;
-    this.log.info(
-      `Found ${nProposalEvents} ${moduleName} proposals and ${
-        proposedEvents.length - nProposalEvents
-      } votes!`
-    );
-    return proposedEvents.map((data) => ({
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data,
-    }));
+    const newTips = results.filter((v) => v.data.kind === EventKind.NewTip);
+    this.log.info(`Found ${newTips.length} open tips!`);
+    return results;
   }
 
   public async fetchSignalingProposals(

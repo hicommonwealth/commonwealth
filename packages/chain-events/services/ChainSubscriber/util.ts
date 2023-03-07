@@ -267,12 +267,13 @@ async function setupNewListeners(
         'treasury-bounty-claimed',
         'treasury-bounty-canceled',
         'treasury-bounty-extended',
-        'new-tip',
-        'tip-voted',
-        'tip-closing',
-        'tip-closed',
-        'tip-retracted',
-        'tip-slashed',
+        'collective-proposed',
+        'collective-voted',
+        'collective-approved',
+        'collective-disapproved',
+        'collective-executed',
+        'collective-member-executed',
+        'identity-judgement-given',
       ];
 
     // add the rabbitmq handler and the events it should ignore

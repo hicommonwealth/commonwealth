@@ -251,12 +251,6 @@ export function getUniqueEntityKey(
     case SubstrateTypes.EntityKind.TreasuryProposal: {
       return 'proposalIndex';
     }
-    case SubstrateTypes.EntityKind.TreasuryBounty: {
-      return 'bountyIndex';
-    }
-    case SubstrateTypes.EntityKind.CollectiveProposal: {
-      return 'proposalIndex';
-    }
     case SubstrateTypes.EntityKind.SignalingProposal: {
       return 'proposalHash';
     }
@@ -423,6 +417,23 @@ export function eventToEntity(
         ];
       }
 
+      // Tip Events
+      case SubstrateTypes.EventKind.NewTip: {
+        return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Create];
+      }
+      case SubstrateTypes.EventKind.TipVoted:
+      case SubstrateTypes.EventKind.TipClosing: {
+        return [SubstrateTypes.EntityKind.TipProposal, EntityEventKind.Update];
+      }
+      case SubstrateTypes.EventKind.TipClosed:
+      case SubstrateTypes.EventKind.TipRetracted:
+      case SubstrateTypes.EventKind.TipSlashed: {
+        return [
+          SubstrateTypes.EntityKind.TipProposal,
+          EntityEventKind.Complete,
+        ];
+      }
+
       // Treasury Events
       case SubstrateTypes.EventKind.TreasuryProposed: {
         return [
@@ -434,33 +445,6 @@ export function eventToEntity(
       case SubstrateTypes.EventKind.TreasuryAwarded: {
         return [
           SubstrateTypes.EntityKind.TreasuryProposal,
-          EntityEventKind.Complete,
-        ];
-      }
-
-      // Collective Events
-      case SubstrateTypes.EventKind.CollectiveProposed: {
-        return [
-          SubstrateTypes.EntityKind.CollectiveProposal,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.CollectiveVoted: {
-        return [
-          SubstrateTypes.EntityKind.CollectiveProposal,
-          EntityEventKind.Vote,
-        ];
-      }
-      case SubstrateTypes.EventKind.CollectiveApproved: {
-        return [
-          SubstrateTypes.EntityKind.CollectiveProposal,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.CollectiveDisapproved:
-      case SubstrateTypes.EventKind.CollectiveExecuted: {
-        return [
-          SubstrateTypes.EntityKind.CollectiveProposal,
           EntityEventKind.Complete,
         ];
       }

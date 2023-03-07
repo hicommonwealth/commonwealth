@@ -252,46 +252,6 @@ export const Title: TitlerFilter = (
     }
 
     /**
-     * Collective Events
-     */
-    case EventKind.CollectiveProposed: {
-      return {
-        title: 'New Collective Proposal',
-        description: 'A new collective proposal is introduced.',
-      };
-    }
-    case EventKind.CollectiveVoted: {
-      return {
-        title: 'Collective Proposal Vote',
-        description: 'A collective proposal receives a vote.',
-      };
-    }
-    case EventKind.CollectiveApproved: {
-      return {
-        title: 'Collective Proposal Approved',
-        description: 'A collective proposal is approved.',
-      };
-    }
-    case EventKind.CollectiveDisapproved: {
-      return {
-        title: 'Collective Proposal Disapproved',
-        description: 'A collective proposal is disapproved.',
-      };
-    }
-    case EventKind.CollectiveExecuted: {
-      return {
-        title: 'Collective Proposal Executed',
-        description: 'A collective proposal is executed.',
-      };
-    }
-    case EventKind.CollectiveMemberExecuted: {
-      return {
-        title: 'Collective Member Execution',
-        description: 'A collective member directly executes a proposal.',
-      };
-    }
-
-    /**
      * Signaling Events
      */
     case EventKind.SignalingNewProposal: {
@@ -330,18 +290,52 @@ export const Title: TitlerFilter = (
     }
 
     /**
+     * Tip Events
+     */
+    case EventKind.NewTip: {
+      return {
+        title: 'New Tip Suggested',
+        description: 'A new tip is opened.',
+      };
+    }
+    case EventKind.TipVoted: {
+      return {
+        title: 'Tip Voted',
+        description: 'A tip is voted on.',
+      };
+    }
+    case EventKind.TipClosing: {
+      return {
+        title: 'Tip Closing',
+        description: 'A tip begins closing.',
+      };
+    }
+    case EventKind.TipClosed: {
+      return {
+        title: 'Tip Closed',
+        description: 'A tip is closed and paid out.',
+      };
+    }
+    case EventKind.TipRetracted: {
+      return {
+        title: 'Tip Retracted',
+        description: 'A tip is retracted.',
+      };
+    }
+    case EventKind.TipSlashed: {
+      return {
+        title: 'Tip Slashed',
+        description: 'A tip is slashed.',
+      };
+    }
+
+    /**
      * Identity events
      */
     case EventKind.IdentitySet: {
       return {
         title: 'Identity Set',
         description: 'A user sets an identity.',
-      };
-    }
-    case EventKind.JudgementGiven: {
-      return {
-        title: 'Identity Judgement Given',
-        description: 'A registrar passes judgement on an identity.',
       };
     }
     case EventKind.IdentityCleared: {

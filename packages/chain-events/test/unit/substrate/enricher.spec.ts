@@ -1124,6 +1124,98 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
 
+  /** tip events */
+  it('should enrich new-tip event', async () => {
+    const kind = EventKind.NewTip;
+    const event = constructEvent(['tip-hash']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        reason: 'hello world!',
+        who: 'alice',
+        finder: 'bob',
+        deposit: '1000',
+        findersFee: true,
+      },
+    });
+  });
+  it('should enrich tip-voted event', async () => {
+    const kind = EventKind.TipVoted;
+    const extrinsic = constructExtrinsic('bob', ['tip-hash', '100']);
+    const result = await Enrich(api, blockNumber, kind, extrinsic);
+    assert.deepEqual(result, {
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        who: 'bob',
+        value: '100',
+      },
+    });
+  });
+  it('should enrich tip-closing event', async () => {
+    const kind = EventKind.TipClosing;
+    const event = constructEvent(['tip-hash']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        closing: 123,
+      },
+    });
+  });
+  it('should enrich tip-closed event', async () => {
+    const kind = EventKind.TipClosed;
+    const event = constructEvent(['tip-hash', 'charlie', '123']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        who: 'charlie',
+        payout: '123',
+      },
+    });
+  });
+  it('should enrich tip-retracted event', async () => {
+    const kind = EventKind.TipRetracted;
+    const event = constructEvent(['tip-hash']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+      },
+    });
+  });
+  it('should enrich tip-slashed event', async () => {
+    const kind = EventKind.TipSlashed;
+    const event = constructEvent(['tip-hash', 'dave', '111']);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      network: SupportedNetwork.Substrate,
+      data: {
+        kind,
+        proposalHash: 'tip-hash',
+        finder: 'dave',
+        deposit: '111',
+      },
+    });
+  });
+
   /** treasury events */
   it('should enrich treasury-proposed event', async () => {
     const kind = EventKind.TreasuryProposed;
@@ -1249,109 +1341,6 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
 
-  /** collective events */
-  it('should enrich collective-proposed event', async () => {
-    const kind = EventKind.CollectiveProposed;
-    const event = constructEvent(['alice', '1', 'hash', '3'], 'council');
-    const result = await Enrich(api, blockNumber, kind, event);
-    assert.deepEqual(result, {
-      blockNumber,
-      excludeAddresses: ['alice'],
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind,
-        collectiveName: 'council',
-        proposer: 'alice',
-        proposalIndex: 1,
-        proposalHash: 'hash',
-        threshold: 3,
-        call: {
-          method: 'method',
-          section: 'section',
-          args: ['arg1', 'arg2'],
-        },
-      },
-    });
-  });
-  it('should enrich collective-voted event', async () => {
-    const kind = EventKind.CollectiveVoted;
-    const event = constructEvent(
-      ['alice', 'hash', constructBool(true), '1', '0'],
-      'council'
-    );
-    const result = await Enrich(api, blockNumber, kind, event);
-    assert.deepEqual(result, {
-      blockNumber,
-      excludeAddresses: ['alice'],
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind,
-        collectiveName: 'council',
-        proposalHash: 'hash',
-        voter: 'alice',
-        vote: true,
-      },
-    });
-  });
-  it('should enrich collective-approved event', async () => {
-    const kind = EventKind.CollectiveApproved;
-    const event = constructEvent(['hash'], 'council');
-    const result = await Enrich(api, blockNumber, kind, event);
-    assert.deepEqual(result, {
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind,
-        collectiveName: 'council',
-        proposalHash: 'hash',
-      },
-    });
-  });
-  it('should enrich collective-disapproved event', async () => {
-    const kind = EventKind.CollectiveDisapproved;
-    const event = constructEvent(['hash'], 'council');
-    const result = await Enrich(api, blockNumber, kind, event);
-    assert.deepEqual(result, {
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind,
-        collectiveName: 'council',
-        proposalHash: 'hash',
-      },
-    });
-  });
-  it('should enrich collective-executed event', async () => {
-    const kind = EventKind.CollectiveExecuted;
-    const event = constructEvent(['hash', constructBool(true)], 'council');
-    const result = await Enrich(api, blockNumber, kind, event);
-    assert.deepEqual(result, {
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind,
-        collectiveName: 'council',
-        proposalHash: 'hash',
-        executionOk: true,
-      },
-    });
-  });
-  it('should enrich collective-member-executed event', async () => {
-    const kind = EventKind.CollectiveExecuted;
-    const event = constructEvent(['hash', constructBool(false)], 'council');
-    const result = await Enrich(api, blockNumber, kind, event);
-    assert.deepEqual(result, {
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind,
-        collectiveName: 'council',
-        proposalHash: 'hash',
-        executionOk: false,
-      },
-    });
-  });
-
   /** signaling events */
   it('should enrich signaling-new-proposal event', async () => {
     const kind = EventKind.SignalingNewProposal;
@@ -1466,21 +1455,6 @@ describe('Edgeware Event Enricher Filter Tests', () => {
           ['charlie', IdentityJudgement.KnownGood],
           ['dave', IdentityJudgement.Erroneous],
         ],
-      },
-    });
-  });
-  it('should enrich identity-judgment-given event', async () => {
-    const kind = EventKind.JudgementGiven;
-    const event = constructEvent(['alice', 1]);
-    const result = await Enrich(api, blockNumber, kind, event);
-    assert.deepEqual(result, {
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data: {
-        kind,
-        who: 'alice',
-        registrar: 'dave',
-        judgement: IdentityJudgement.Erroneous,
       },
     });
   });

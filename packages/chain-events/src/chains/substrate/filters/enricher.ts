@@ -603,6 +603,96 @@ export async function Enrich(
         };
       }
       /**
+       * Tip Events
+       */
+      case EventKind.NewTip: {
+        const [hash] = event.data as unknown as [Hash] & Codec;
+        const tip = await api.query.tips.tips(hash);
+        if (!tip.isSome) {
+          throw new Error(`Could not find tip: ${hash.toString()}`);
+        }
+        const {
+          reason: reasonHash,
+          who,
+          finder,
+          deposit,
+          findersFee,
+        } = tip.unwrap();
+        const reasonOpt = await api.query.tips.reasons(reasonHash);
+        if (!reasonOpt.isSome) {
+          throw new Error(
+            `Could not find reason for tip: ${reasonHash.toString()}`
+          );
+        }
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            // TODO: verify this reason string unmarshals correctly
+            reason: hexToString(reasonOpt.unwrap().toString()),
+            who: who.toString(),
+            finder: finder.toString(),
+            deposit: deposit.toString(),
+            findersFee: findersFee.valueOf(),
+          },
+        };
+      }
+      case EventKind.TipClosing: {
+        const [hash] = event.data as unknown as [Hash] & Codec;
+        const tip = await api.query.tips.tips(hash);
+        if (!tip.isSome) {
+          throw new Error(`Could not find tip: ${hash.toString()}`);
+        }
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            closing: +tip.unwrap().closes.unwrap(),
+          },
+        };
+      }
+      case EventKind.TipClosed: {
+        const [hash, accountId, balance] = event.data as unknown as [
+          Hash,
+          AccountId,
+          Balance
+        ] &
+          Codec;
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            who: accountId.toString(),
+            payout: balance.toString(),
+          },
+        };
+      }
+      case EventKind.TipRetracted: {
+        const [hash] = event.data as unknown as [Hash] & Codec;
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+          },
+        };
+      }
+      case EventKind.TipSlashed: {
+        const [hash, accountId, balance] = event.data as unknown as [
+          Hash,
+          AccountId,
+          Balance
+        ] &
+          Codec;
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            finder: accountId.toString(),
+            deposit: balance.toString(),
+          },
+        };
+      }
+      /**
        * Treasury Events
        */
       case EventKind.TreasuryProposed: {
@@ -706,99 +796,6 @@ export async function Enrich(
           data: {
             kind,
             who: who.toString(),
-          },
-        };
-      }
-
-      /**
-       * Collective Events
-       */
-      case EventKind.CollectiveProposed: {
-        const [proposer, index, hash, threshold] = event.data as unknown as [
-          AccountId,
-          ProposalIndex,
-          Hash,
-          u32
-        ] &
-          Codec;
-        const proposalOpt = await api.query[event.section].proposalOf<
-          Option<Proposal>
-        >(hash);
-        if (!proposalOpt.isSome) {
-          throw new Error(`could not fetch method for collective proposal`);
-        }
-        return {
-          excludeAddresses: [proposer.toString()],
-          data: {
-            kind,
-            collectiveName:
-              event.section === 'council' ||
-              event.section === 'technicalCommittee'
-                ? event.section
-                : undefined,
-            proposer: proposer.toString(),
-            proposalIndex: +index,
-            proposalHash: hash.toString(),
-            threshold: +threshold,
-            call: {
-              method: proposalOpt.unwrap().method,
-              section: proposalOpt.unwrap().section,
-              args: proposalOpt.unwrap().args.map((c) => c.toString()),
-            },
-          },
-        };
-      }
-      case EventKind.CollectiveVoted: {
-        const [voter, hash, vote] = event.data as unknown as [
-          AccountId,
-          Hash,
-          bool
-        ] &
-          Codec;
-        return {
-          excludeAddresses: [voter.toString()],
-          data: {
-            kind,
-            collectiveName:
-              event.section === 'council' ||
-              event.section === 'technicalCommittee'
-                ? event.section
-                : undefined,
-            proposalHash: hash.toString(),
-            voter: voter.toString(),
-            vote: vote.isTrue,
-          },
-        };
-      }
-      case EventKind.CollectiveApproved:
-      case EventKind.CollectiveDisapproved: {
-        const [hash] = event.data as unknown as [Hash] & Codec;
-        return {
-          data: {
-            kind,
-            collectiveName:
-              event.section === 'council' ||
-              event.section === 'technicalCommittee'
-                ? event.section
-                : undefined,
-            proposalHash: hash.toString(),
-          },
-        };
-      }
-      case EventKind.CollectiveExecuted:
-      case EventKind.CollectiveMemberExecuted: {
-        const [hash, executionOk] = event.data as unknown as [Hash, bool] &
-          Codec;
-        return {
-          data: {
-            kind,
-            collectiveName:
-              event.section === 'council' ||
-              event.section === 'technicalCommittee'
-                ? event.section
-                : undefined,
-            proposalHash: hash.toString(),
-            executionOk: executionOk.isTrue,
           },
         };
       }
@@ -941,39 +938,6 @@ export async function Enrich(
             who: who.toString(),
             displayName,
             judgements,
-          },
-        };
-      }
-      case EventKind.JudgementGiven: {
-        const [who, registrarId] = event.data as unknown as [AccountId, u32] &
-          Codec;
-
-        // convert registrar from id to address
-        const registrars = await api.query.identity.registrars();
-        const registrarOpt = registrars[+registrarId];
-        if (!registrarOpt || !registrarOpt.isSome) {
-          throw new Error(`unable to retrieve registrar info`);
-        }
-        const registrar = registrarOpt.unwrap().account;
-
-        // query the actual judgement provided
-        const registrationOpt = await api.query.identity.identityOf(who);
-        if (!registrationOpt.isSome) {
-          throw new Error(`unable to retrieve identity info`);
-        }
-        const judgementTuple = registrationOpt
-          .unwrap()
-          .judgements.find(([id]) => +id === +registrarId);
-        if (!judgementTuple) {
-          throw new Error(`unable to find judgement`);
-        }
-        const judgement = parseJudgement(judgementTuple[1]);
-        return {
-          data: {
-            kind,
-            who: who.toString(),
-            registrar: registrar.toString(),
-            judgement,
           },
         };
       }

@@ -26,11 +26,12 @@ import type {
   IDemocracyPassed,
   IPreimageNoted,
   ITreasuryProposed,
-  ICollectiveProposed,
   ISignalingNewProposal,
   ISignalingVotingStarted,
   ISignalingVotingCompleted,
-  ICollectiveVoted,
+  INewTip,
+  ITipVoted,
+  ITipClosing,
 } from '../../../src/chains/substrate/types';
 import {
   EventKind,
@@ -436,45 +437,6 @@ describe('Edgeware Event Migration Tests', () => {
           blockNumber,
           network: SupportedNetwork.Substrate,
           data: {
-            kind: EventKind.CollectiveProposed,
-            collectiveName: 'council',
-            proposalIndex: 15,
-            proposalHash: 'council-hash',
-            proposer: '',
-            threshold: 4,
-            call: {
-              method: 'proposal-method',
-              section: 'proposal-section',
-              args: ['proposal-arg-1', 'proposal-arg-2'],
-            },
-          } as ICollectiveProposed,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: EventKind.CollectiveVoted,
-            collectiveName: 'council',
-            proposalHash: 'council-hash',
-            voter: 'Alice',
-            vote: true,
-          } as ICollectiveVoted,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
-            kind: EventKind.CollectiveVoted,
-            collectiveName: 'council',
-            proposalHash: 'council-hash',
-            voter: 'Bob',
-            vote: false,
-          } as ICollectiveVoted,
-        },
-        {
-          blockNumber,
-          network: SupportedNetwork.Substrate,
-          data: {
             kind: EventKind.SignalingNewProposal,
             proposer: 'Inactive Author',
             proposalHash: 'inactive-hash',
@@ -544,6 +506,61 @@ describe('Edgeware Event Migration Tests', () => {
             proposalHash: 'completed-hash',
             voteId: '3',
           } as ISignalingVotingCompleted,
+        },
+        {
+          blockNumber,
+          network: SupportedNetwork.Substrate,
+          data: {
+            kind: 'new-tip',
+            proposalHash: 'tip-hash-1',
+            who: 'alice',
+            reason: 'hello world!',
+            finder: 'bob',
+            deposit: '1000',
+            findersFee: true,
+          } as INewTip,
+        },
+        {
+          blockNumber,
+          network: SupportedNetwork.Substrate,
+          data: {
+            kind: 'new-tip',
+            proposalHash: 'tip-hash-2',
+            who: 'charlie',
+            reason: 'goodbye world!',
+            finder: 'dave',
+            deposit: '999',
+            findersFee: false,
+          } as INewTip,
+        },
+        {
+          blockNumber,
+          network: SupportedNetwork.Substrate,
+          data: {
+            kind: 'tip-voted',
+            proposalHash: 'tip-hash-2',
+            who: 'eve',
+            value: '3',
+          } as ITipVoted,
+        },
+        {
+          blockNumber,
+          network: SupportedNetwork.Substrate,
+          data: {
+            kind: 'tip-voted',
+            proposalHash: 'tip-hash-2',
+            who: 'ferdie',
+            value: '4',
+          } as ITipVoted,
+        },
+        {
+          blockNumber,
+          network: SupportedNetwork.Substrate,
+          data: {
+            kind: 'tip-closing',
+            proposalHash: 'tip-hash-2',
+            closing: 123,
+          } as ITipClosing,
         },
       ].sort(
         (p1, p2) =>
