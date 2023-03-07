@@ -8,7 +8,7 @@ import jdenticon from 'jdenticon';
 import 'modals/delete_address_modal.scss';
 
 import app from 'state';
-import type { NewProfile as Profile } from 'client/scripts/models';
+import type { AddressInfo, NewProfile as Profile } from 'client/scripts/models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
@@ -17,6 +17,7 @@ import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_add
 
 type DeleteAddressModalAttrs = {
   profile: Profile;
+  addresses: AddressInfo[];
   address: string;
   chain: string;
 };
@@ -26,9 +27,18 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
     e: Event,
     vnode: m.Vnode<DeleteAddressModalAttrs>
   ) => {
-    const { address, chain } = vnode.attrs;
+    const { addresses, address, chain } = vnode.attrs;
 
     e.preventDefault();
+
+    if (addresses.length === 1) {
+      notifyError(
+        'You must have at least one address linked to a profile. Please add another address before removing this one.'
+      );
+
+      $(e.target).trigger('modalexit');
+      return;
+    }
 
     try {
       const response: any = await $.post(`${app.serverUrl()}/deleteAddress`, {

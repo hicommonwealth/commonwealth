@@ -71,11 +71,9 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
       <div class="LoginSelectorMenu left">
         {app.activeChainId() && (
           <>
-            {addresses.length > 1 && (
-              <CWText type="caption" className="title">
-                Select address to use
-              </CWText>
-            )}
+            <CWText type="caption" className="title">
+              Select address to use
+            </CWText>
             {addresses.map((account) => {
               const selected = isSameAccount(
                 account,
