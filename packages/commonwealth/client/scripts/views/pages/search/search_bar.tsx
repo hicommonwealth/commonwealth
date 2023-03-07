@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 import type { NavigateOptions, To } from 'react-router';
-import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
+import { useDebounce } from 'usehooks-ts';
 
 import 'pages/search/search_bar.scss';
 
@@ -39,77 +40,55 @@ const goToSearchPage = (
 };
 
 export const SearchBar = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [searchResults, setSearchResults] =
-    useState<Record<string, Array<any>>>();
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>();
-  const [searchTerm, setSearchTerm] = useState<Lowercase<string>>('');
-
   const navigate = useCommonNavigate();
 
-  // const historyList = app.search.getHistory().map((previousQuery) => (
-  //   <div
-  //     className="history-row"
-  //     onClick={() => {
-  //       searchTerm = previousQuery.searchTerm;
-  //       getSearchPreview(previousQuery, this);
-  //     }}
-  //   >
-  //     {previousQuery.searchTerm}
-  //     <CWIconButton
-  //       iconName="close"
-  //       onClick={(e) => {
-  //         e.stopPropagation();
-  //         app.search.removeFromHistory(previousQuery);
-  //       }}
-  //     />
-  //   </div>
-  // ));
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] =
+    useState<Record<string, Array<any>>>();
 
-  const handleGetSearchPreview = () => {
-    setSearchQuery(
-      new SearchQuery(searchTerm, {
-        isSearchPreview: true,
-        chainScope: app.activeChainId(),
-      })
-    );
+  const debouncedValue = useDebounce<string>(searchTerm, 500);
 
-    async () => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  useEffect(() => {
+    const search = async () => {
       try {
-        await app.search.search(searchQuery);
+        const response = await app.search.search(
+          new SearchQuery(searchTerm, {
+            isSearchPreview: true,
+            chainScope: app.activeChainId(),
+          })
+        );
+
+        setSearchResults(
+          Object.fromEntries(
+            Object.entries(response.results).map(([k, v]) => [k, v.slice(0, 2)])
+          )
+        );
       } catch (err) {
         setSearchResults({});
-
         notifyError(
           err.responseJSON?.error || err.responseText || err.toString()
         );
       }
-
-      setSearchResults(
-        Object.fromEntries(
-          Object.entries(app.search.getByQuery(searchQuery).results).map(
-            ([k, v]) => [k, v.slice(0, 2)]
-          )
-        )
-      );
-
-      app.search.addToHistory(searchQuery);
     };
-  };
+
+    if (debouncedValue.length > 0) {
+      search();
+    }
+  }, [debouncedValue]);
 
   const handleGoToSearchPage = () => {
-    if (searchTerm?.length < 3) {
-      return;
-    } else {
-      setSearchQuery(
-        new SearchQuery(searchTerm, {
-          isSearchPreview: false,
-          chainScope: app.activeChainId(),
-        })
-      );
-    }
-
-    goToSearchPage(searchQuery, navigate);
+    goToSearchPage(
+      new SearchQuery(searchTerm, {
+        isSearchPreview: false,
+        chainScope: app.activeChainId(),
+      }),
+      navigate
+    );
   };
 
   return (
@@ -123,40 +102,20 @@ export const SearchBar = () => {
             isClearable: searchTerm?.length > 0,
           })}
           placeholder="Search Common"
-          defaultValue={_DEPRECATED_getSearchParams('q') || searchTerm}
-          // value={searchTerm}
+          value={searchTerm}
           autoComplete="off"
-          onFocus={() => {
-            setShowDropdown(true);
-          }}
-          onBlur={() => {
-            setTimeout(() => {
-              setShowDropdown(false);
-            }, 500); // hack to prevent the dropdown closing too quickly on click
-          }}
-          onInput={(e) => {
-            const lower =
-              e.currentTarget.value?.toLowerCase() as Lowercase<string>;
-            setSearchTerm(lower);
-
-            if (searchTerm?.length > 3) {
-              handleGetSearchPreview();
-            }
-          }}
+          onFocus={() => setShowDropdown(true)}
+          onBlur={() => setShowDropdown(false)}
+          onInput={handleChange}
           onKeyUp={(e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && searchTerm.length > 3) {
               handleGoToSearchPage();
             }
           }}
         />
         {searchTerm?.length > 0 && (
           <div className="clear-icon">
-            <CWIconButton
-              iconName="close"
-              onClick={() => {
-                setSearchTerm('');
-              }}
-            />
+            <CWIconButton iconName="close" onClick={() => setSearchTerm('')} />
           </div>
         )}
         {searchResults && showDropdown && (
@@ -176,10 +135,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
+                        {v.map((res, i) => (
                           <SearchBarThreadPreviewRow
+                            key={i}
                             searchResult={res}
-                            searchTerm={searchQuery.searchTerm}
+                            searchTerm={searchTerm}
                           />
                         ))}
                       </div>
@@ -196,10 +156,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
+                        {v.map((res, i) => (
                           <SearchBarCommentPreviewRow
+                            key={i}
                             searchResult={res}
-                            searchTerm={searchQuery.searchTerm}
+                            searchTerm={searchTerm}
                           />
                         ))}
                       </div>
@@ -216,8 +177,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
-                          <SearchBarCommunityPreviewRow searchResult={res} />
+                        {v.map((res, i) => (
+                          <SearchBarCommunityPreviewRow
+                            key={i}
+                            searchResult={res}
+                          />
                         ))}
                       </div>
                     );
@@ -233,8 +197,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
-                          <SearchBarMemberPreviewRow searchResult={res} />
+                        {v.map((res, i) => (
+                          <SearchBarMemberPreviewRow
+                            key={i}
+                            searchResult={res}
+                          />
                         ))}
                       </div>
                     );
@@ -248,18 +215,6 @@ export const SearchBar = () => {
                 No Results
               </CWText>
             )}
-            {/* {historyList.length > 0 && (
-                <div className="history-section">
-                  <CWText
-                    type="caption"
-                    fontWeight="medium"
-                    className="search-history-header"
-                  >
-                    Search History
-                  </CWText>
-                  {historyList}
-                </div>
-              )} */}
           </div>
         )}
       </div>
