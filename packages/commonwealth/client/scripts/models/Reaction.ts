@@ -1,7 +1,7 @@
-import type { IUniqueId } from './interfaces';
+export type ReactionType = 'like';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class Reaction<T extends IUniqueId> {
+class Reaction {
   public readonly id: number;
   public readonly author: string;
   public readonly chain: string;

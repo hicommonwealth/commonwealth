@@ -10,11 +10,7 @@ import type { ChainInfo, Thread } from 'models';
 
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import {
-  fetchReactionsByPost,
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from './helpers';
+import { fetchReactionsByPost, getDisplayedReactorsForPopup, onReactionClick, } from './helpers';
 
 type ThreadPreviewReactionButtonAttrs = {
   thread: Thread;
@@ -22,7 +18,6 @@ type ThreadPreviewReactionButtonAttrs = {
 
 export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewReactionButtonAttrs> {
   private loading: boolean;
-  private reactors: any;
 
   oninit() {
     this.loading = false;
@@ -30,8 +25,6 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
 
   view(vnode: m.Vnode<ThreadPreviewReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
-    const reactionCounts = app.reactionCounts.store.getByPost(thread);
-    const { likes = 0, hasReacted } = reactionCounts || {};
 
     // token balance check if needed
     const isAdmin =
@@ -49,27 +42,23 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
 
     const activeAddress = app.user.activeAccount?.address;
 
+    const hasReacted = activeAddress ?
+      thread.associatedReactions.filter(r => r.address === activeAddress).length > 0
+      : false;
+
     const dislike = async (userAddress: string) => {
       const reaction = (await fetchReactionsByPost(thread)).find((r) => {
         return r.Address.address === activeAddress;
       });
 
-      const { session, action, hash } =
-        await app.sessions.signDeleteThreadReaction({
-          thread_id: reaction.canvasId,
-        });
+      await app.sessions.signDeleteThreadReaction({
+        thread_id: reaction.canvasId,
+      });
 
       this.loading = true;
-      app.reactionCounts
-        .delete(reaction, {
-          ...reactionCounts,
-          likes: likes - 1,
-          hasReacted: false,
-        })
+      app.threadReactions
+        .deleteOnThread(userAddress, thread)
         .then(() => {
-          this.reactors = this.reactors.filter(
-            ({ Address }) => Address.address !== userAddress
-          );
           this.loading = false;
           m.redraw();
         });
@@ -80,31 +69,22 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
       chainId: string,
       userAddress: string
     ) => {
-      const { session, action, hash } = await app.sessions.signThreadReaction({
+      await app.sessions.signThreadReaction({
         thread_id: thread.id,
         like: true,
       });
 
       this.loading = true;
-      app.reactionCounts
-        .create(userAddress, thread, 'like', chainId)
+      app.threadReactions
+        .createOnThread(userAddress, thread, 'like')
         .then(() => {
           this.loading = false;
-          this.reactors = [
-            ...this.reactors,
-            {
-              Address: { address: userAddress, chain },
-            },
-          ];
           m.redraw();
         });
     };
 
     const reactionButtonComponent = (
       <div
-        onmouseenter={async () => {
-          this.reactors = await fetchReactionsByPost(thread);
-        }}
         onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
         class={`ThreadPreviewReactionButton${this.loading ? ' disabled' : ''}${
           hasReacted ? ' has-reacted' : ''
@@ -114,24 +94,24 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
           iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
           iconSize="small"
         />
-        <div class="reactions-count">{likes}</div>
+        <div class="reactions-count">{thread.associatedReactions.length}</div>
       </div>
     );
 
-    return likes > 0
+    return thread.associatedReactions.length > 0
       ? m(Popover, {
-          interactionType: 'hover',
-          content: (
-            <div class="reaction-button-tooltip-contents">
-              {getDisplayedReactorsForPopup({
-                likes,
-                reactors: this.reactors,
-              })}
-            </div>
-          ),
-          trigger: reactionButtonComponent,
-          hoverOpenDelay: 100,
-        })
+        interactionType: 'hover',
+        content: (
+          <div class="reaction-button-tooltip-contents">
+            {getDisplayedReactorsForPopup({
+              likes: thread.associatedReactions.length,
+              reactors: app.threadReactions.getByThreadId(thread.id),
+            })}
+          </div>
+        ),
+        trigger: reactionButtonComponent,
+        hoverOpenDelay: 100,
+      })
       : reactionButtonComponent;
   }
 }

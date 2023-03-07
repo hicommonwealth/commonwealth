@@ -138,6 +138,9 @@ class ThreadsController {
       last_commented_on,
       linked_threads,
       numberOfComments,
+      reactionIds,
+      reactionType,
+      addressesReacted,
       canvasAction,
       canvasSession,
       canvasHash,
@@ -247,6 +250,9 @@ class ThreadsController {
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
       linkedThreads,
       numberOfComments,
+      reactionIds,
+      reactionType,
+      addressesReacted,
       canvasAction,
       canvasSession,
       canvasHash,
@@ -717,6 +723,8 @@ class ThreadsController {
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
     });
+
+    app.threadReactions.refreshReactionsFromThreads(threads);
 
     modeledThreads.forEach((thread) => {
       try {

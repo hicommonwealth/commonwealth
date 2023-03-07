@@ -74,7 +74,7 @@ export const fetchReactionsByPost = async (post: Post) => {
 export const onReactionClick = (
   e: MouseEvent,
   hasReacted: boolean,
-  dislike: (userAddress: string) => void,
+  dislike: (userAddress: string) => Promise<void>,
   like: (chain: ChainInfo, chainId: string, userAddress: string) => void
 ) => {
   e.preventDefault();
