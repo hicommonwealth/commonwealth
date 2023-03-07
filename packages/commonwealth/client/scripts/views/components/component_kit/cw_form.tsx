@@ -28,6 +28,7 @@ export class CWForm extends ClassComponent<FormAttrs> {
             </CWText>
             <CWText type="b1">{description}</CWText>
           </div>
+          {actions && <div className="actions">{actions}</div>}
         </div>
         <CWDivider />
         <div className="content">{vnode.children}</div>

@@ -29,6 +29,7 @@ import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
 import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
 import CWCoverImageUploader from '../components/component_kit/cw_cover_image_uploader';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { PageNotFound } from '../pages/404';
 import { LinkedAddresses } from './linked_addresses';
 import { NewLoginModal } from '../modals/login_modal';
@@ -61,8 +62,8 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
   private avatarUrl: string;
   private addresses: AddressInfo[];
   private isOwner: boolean;
-  private coverImage: Image;
   private backgroundImage: Image;
+  private displayNameValid: boolean;
 
   private getProfile = async (profileId: string) => {
     this.loading = true;
@@ -77,7 +78,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       this.email = this.profile.email;
       this.socials = this.profile.socials;
       this.avatarUrl = this.profile.avatarUrl;
-      this.coverImage = this.profile.coverImage;
       this.backgroundImage = this.profile.backgroundImage;
       this.addresses = result.addresses.map(
         (a) =>
@@ -146,61 +146,40 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
     if (!_.isEqual(this.socials, this.profile?.socials))
       this.profileUpdate.socials = JSON.stringify(this.socials);
 
-    if (!_.isEqual(this.coverImage, this.profile?.coverImage))
-      this.profileUpdate.coverImage = JSON.stringify(this.coverImage);
-
     if (!_.isEqual(this.backgroundImage, this.profile?.backgroundImage))
       this.profileUpdate.backgroundImage = JSON.stringify(this.backgroundImage);
   };
 
   private handleSaveProfile = () => {
     this.loading = true;
+
+    if (!this.name) {
+      this.displayNameValid = false;
+      notifyError('Please fill all required fields.');
+      this.loading = false;
+      return;
+    }
+
     this.checkForUpdates();
     if (Object.keys(this.profileUpdate).length > 0) {
       this.updateProfile();
     } else {
       setTimeout(() => {
         this.loading = false;
-        notifyError('No updates found.');
+        navigateToSubpage(`/profile/id/${this.profile.id}`);
       }, 1500);
     }
   };
 
-  private handleDeleteProfile = async () => {
-    if (this.addresses.length > 0) {
-      notifyError(
-        'You must unlink all addresses before deleting your profile.'
-      );
-      return;
-    }
-
-    this.loading = true;
-
-    try {
-      const response: any = await $.post(`${app.serverUrl()}/deleteProfile`, {
-        profileId: this.profile.id,
-        jwt: app.user.jwt,
-      });
-      if (response?.status === 'Success') {
-        // Redirect
-        setTimeout(() => {
-          this.loading = false;
-          navigateToSubpage('/profile/manage');
-          m.redraw();
-        }, 1500);
-      }
-    } catch (err) {
-      setTimeout(() => {
-        this.loading = false;
-        notifyError(err.responseJSON?.error || 'Something went wrong.');
-      }, 1500);
-    }
+  private onDisplayNameInput = (e) => {
+    this.name = e.target.value;
   };
 
   oninit(vnode) {
     this.error = EditProfileError.None;
     this.getProfile(vnode.attrs.profileId);
     this.profileUpdate = {};
+    this.displayNameValid = true;
   }
 
   view(vnode) {
@@ -246,8 +225,8 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       return (
         <div class="EditProfile">
           <CWForm
-            title="Edit Profile"
-            description="Create and edit profiles and manage your connected addresses."
+            title="Edit profile"
+            description="Add or change your general info and customize your profile."
             actions={
               <div className="buttons-container">
                 <div className="buttons">
@@ -275,12 +254,12 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
             }
           >
             <CWFormSection
-              title="General Info"
-              description="Some helpful text that makes the user feel welcome. This process will be quick and easy."
+              title="General info"
+              description="Let your community and others get to know you by sharing a bit about yourself."
             >
               <div className="profile-image-section">
                 <CWText type="caption" fontWeight="medium">
-                  Profile Image
+                  Profile image
                 </CWText>
                 <CWText type="caption" className="description">
                   Select an image from your files to upload
@@ -310,12 +289,25 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                       return ['success', 'Input validated'];
                     }
                   }}
-                  label="Display Name"
+                  label={
+                    <>
+                      <CWText type="caption" className="display-name-label">
+                        Display name
+                      </CWText>
+                      <div className="blue-star">*</div>
+                    </>
+                  }
                   value={this.name}
                   placeholder="display name"
                   oninput={(e) => {
-                    this.name = e.target.value;
+                    this.displayNameValid = true;
+                    this.onDisplayNameInput(e);
                   }}
+                  inputClassName={this.displayNameValid ? '' : 'failure'}
+                  manualStatusMessage={this.displayNameValid ? '' : 'No input'}
+                  manualValidationStatus={
+                    this.displayNameValid ? 'success' : 'failure'
+                  }
                 />
                 <CWTextInput
                   name="email-form-field"
@@ -347,11 +339,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               </div>
               <CWDivider />
               <div className="socials-section">
-                <CWText type="b1">Social Links</CWText>
-                <CWText type="caption">
-                  Add any of your community's links (Websites, social platforms,
-                  etc) These can be added and edited later.
-                </CWText>
+                <CWText type="caption">Social links</CWText>
                 <CWSocials
                   socials={this.profile?.socials}
                   handleInputChange={(e) => {
@@ -361,36 +349,13 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               </div>
             </CWFormSection>
             <CWFormSection
-              title="Personalize Your Profile"
-              description="Express yourself through imagery."
+              title="Personalize your profile"
+              description="Use imagery to express yourself."
             >
-              <CWText fontWeight="medium">Cover Image</CWText>
-              <CWCoverImageUploader
-                name="cover-image-uploader"
-                uploadCompleteCallback={(
-                  url: string,
-                  imageBehavior: ImageBehavior
-                ) => {
-                  this.coverImage = {
-                    url,
-                    imageBehavior,
-                  };
-                }}
-                generatedImageCallback={(
-                  url: string,
-                  imageBehavior: ImageBehavior
-                ) => {
-                  this.coverImage = {
-                    url,
-                    imageBehavior,
-                  };
-                }}
-                enableGenerativeAI
-                defaultImageUrl={this.coverImage?.url}
-                defaultImageBehavior={this.coverImage?.imageBehavior}
-              />
-              <CWDivider />
-              <CWText fontWeight="medium">Background Image</CWText>
+              <CWText fontWeight="medium">Image upload</CWText>
+              <CWText type="caption" className="description">
+                Add a background image.
+              </CWText>
               <CWCoverImageUploader
                 name="background-image-uploader"
                 uploadCompleteCallback={(
@@ -417,7 +382,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               />
             </CWFormSection>
             <CWFormSection
-              title="Linked Addresses"
+              title="Linked addresses"
               description="Manage your addresses."
             >
               <LinkedAddresses
@@ -425,26 +390,26 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                 profile={this.profile}
                 refreshProfiles={() => this.getProfile(vnode.attrs.profileId)}
               />
-              <CWDivider />
-              <div className="connect-address-container">
-                <CWButton
-                  label="Connect Address"
-                  buttonType="mini-white"
-                  onclick={() => {
-                    app.modals.create({
-                      modal: NewLoginModal,
-                      exitCallback: () => {
-                        setTimeout(() => {
-                          notifySuccess(
-                            'Address has been successfully connected.'
-                          );
-                        }, 1000);
-                        this.getProfile(vnode.attrs.profileId);
-                      },
-                    });
-                  }}
-                  iconLeft="plus"
-                />
+              <div
+                className="connect-address-button"
+                onclick={() => {
+                  app.modals.create({
+                    modal: NewLoginModal,
+                    exitCallback: () => {
+                      setTimeout(() => {
+                        notifySuccess(
+                          'Address has been successfully connected.'
+                        );
+                      }, 1000);
+                      this.getProfile(vnode.attrs.profileId);
+                    },
+                  });
+                }}
+              >
+                <CWIcon iconName="plus" iconSize="small" />
+                <CWText type="caption" fontWeight="medium">
+                  Connect a new address
+                </CWText>
               </div>
             </CWFormSection>
           </CWForm>

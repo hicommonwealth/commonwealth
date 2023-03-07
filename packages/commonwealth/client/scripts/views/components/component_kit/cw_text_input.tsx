@@ -25,7 +25,7 @@ export type BaseTextInputAttrs = {
   iconRight?: IconName;
   iconRightonclick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
-  label?: string;
+  label?: string | m.Vnode;
   maxlength?: number;
   name?: string;
   oninput?: (e) => void;
@@ -33,6 +33,8 @@ export type BaseTextInputAttrs = {
   onclick?: (e) => void;
   placeholder?: string;
   tabindex?: number;
+  manualStatusMessage?: string;
+  manualValidationStatus?: ValidationStatus;
 };
 
 type InputStyleAttrs = {
@@ -51,7 +53,7 @@ type InputInternalStyleAttrs = {
 
 type MessageRowAttrs = {
   hasFeedback?: boolean;
-  label: string;
+  label: string | m.Vnode;
   statusMessage?: string;
   validationStatus?: ValidationStatus;
 };
@@ -117,6 +119,8 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
       size = 'large',
       tabindex,
       displayOnly,
+      manualStatusMessage = '',
+      manualValidationStatus = '',
     } = vnode.attrs;
 
     return (
@@ -137,8 +141,8 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
           <MessageRow
             hasFeedback={!!inputValidationFn}
             label={label}
-            statusMessage={this.statusMessage}
-            validationStatus={this.validationStatus}
+            statusMessage={manualStatusMessage || this.statusMessage}
+            validationStatus={manualValidationStatus || this.validationStatus}
           />
         )}
         <div class="input-and-icon-container">
