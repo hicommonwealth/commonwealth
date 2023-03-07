@@ -239,7 +239,7 @@ module.exports = {
       `,
         { transaction: t, raw: true }
       );
-      console.log('subscriber id key added');
+      console.log('Notifications read subscription id key added');
 
       // delete the created indices
       await queryInterface.sequelize.query(
