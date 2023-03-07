@@ -46,10 +46,11 @@ const updateWebhook = async (
     return next(new AppError(Errors.NoWebhookFound));
   }
 
-  existingWebhook.categories =
-    typeof req.body['categories[]'] === 'string'
-      ? [req.body['categories[]']]
-      : req.body['categories[]'] || [];
+  if (!req.body.categories) {
+    return next(new AppError(Errors.MissingCategories));
+  }
+
+  existingWebhook.categories = req.body.categories || [];
 
   await existingWebhook.save();
 

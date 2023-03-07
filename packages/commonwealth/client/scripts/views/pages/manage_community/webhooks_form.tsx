@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import smartTruncate from 'smart-truncate';
 
@@ -20,11 +20,17 @@ import { useCommonNavigate } from 'navigation/helpers';
 export const WebhooksForm = () => {
   const navigate = useCommonNavigate();
 
-  const [webhookUrl, setWebhookUrl] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [webhooks, setWebhooks] = useState<Array<Webhook>>([]);
 
-  const chainOrCommObj = { chain: app.activeChainId() };
+  const chainOrCommObj = useMemo(
+    () => ({
+      chain: app.activeChainId(),
+    }),
+    []
+  );
+
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -36,8 +42,6 @@ export const WebhooksForm = () => {
           },
         });
 
-        console.log('getWebhooks', response);
-
         setWebhooks(response.data.result);
       } catch (err) {
         notifyError(err);
@@ -46,7 +50,7 @@ export const WebhooksForm = () => {
     };
 
     fetch();
-  }, []);
+  }, [chainOrCommObj]);
 
   const createWebhook = async () => {
     try {
@@ -57,8 +61,10 @@ export const WebhooksForm = () => {
         jwt: app.user.jwt,
       });
 
-      console.log('createWebhook', response);
+      const newWebhookFromServer = response.data.result;
+      const newWebhooks = [...webhooks, newWebhookFromServer];
 
+      setWebhooks(newWebhooks);
       setIsModalOpen(true);
       setWebhookUrl('');
     } catch (err) {
@@ -68,14 +74,15 @@ export const WebhooksForm = () => {
 
   const deleteWebhook = async (webhook: Webhook) => {
     try {
-      const response = await axios.post(`${app.serverUrl()}/deleteWebhook`, {
+      await axios.post(`${app.serverUrl()}/deleteWebhook`, {
         ...chainOrCommObj,
         webhookUrl: webhook.url,
         auth: true,
         jwt: app.user.jwt,
       });
 
-      console.log('deleteWebhook', response);
+      const filteredWebhooks = webhooks.filter(({ id }) => id !== webhook.id);
+      setWebhooks(filteredWebhooks);
     } catch (err) {
       notifyError(err);
     }
@@ -85,7 +92,6 @@ export const WebhooksForm = () => {
     webhook: Webhook,
     selectedCategories: Array<string>
   ) => {
-    console.log('selectedCategories', selectedCategories);
     try {
       const response = await axios.post(`${app.serverUrl()}/updateWebhook`, {
         ...chainOrCommObj,
@@ -94,7 +100,15 @@ export const WebhooksForm = () => {
         jwt: app.user.jwt,
       });
 
-      console.log('updateWebhook', response);
+      const updatedWebhookFromServer = response.data.result;
+
+      const updatedWebhooks = webhooks.map((hook) =>
+        hook.id === updatedWebhookFromServer.id
+          ? updatedWebhookFromServer
+          : hook
+      );
+
+      setWebhooks(updatedWebhooks);
     } catch (err) {
       notifyError(err);
     }
