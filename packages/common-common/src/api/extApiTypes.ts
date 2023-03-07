@@ -27,7 +27,6 @@ export type IPagination = {
 export type GetCommentsReq = {
   community_id: string;
   addresses?: string[];
-  include_addresses?: boolean;
   count_only?: boolean;
 } & IPagination;
 
@@ -46,7 +45,6 @@ export type GetThreadsReq = {
   addresses?: string[];
   no_body?: boolean;
   include_comments?: boolean;
-  include_addresses?: boolean;
   count_only?: boolean;
 } & IPagination;
 
