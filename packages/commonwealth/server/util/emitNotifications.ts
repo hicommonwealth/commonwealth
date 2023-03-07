@@ -19,7 +19,6 @@ import {
 import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { SupportedNetwork } from 'chain-events/src';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -51,22 +50,8 @@ export default async function emitNotifications(
   };
 
   // typeguard function to differentiate between chain event notifications as needed
-  let chainEvent: IChainEventNotificationData;
-  const isChainEventData = !!(
-    typeof (<any>notification_data).id === 'number' &&
-    typeof (<any>notification_data).block_number === 'number' &&
-    (<any>notification_data).event_data &&
-    Object.values(SupportedNetwork).includes(
-      (<any>notification_data).network
-    ) &&
-    (<any>notification_data).chain &&
-    typeof (<any>notification_data).chain === 'string' &&
-    typeof (<any>notification_data).entity_id === 'number'
-  );
-
-  if (isChainEventData) {
-    chainEvent = <IChainEventNotificationData>notification_data;
-  }
+  const isChainEventData =
+    (<IChainEventNotificationData>notification_data).chainEvent !== undefined;
 
   // retrieve distinct user ids given a set of addresses
   const fetchUsersFromAddresses = async (
@@ -116,7 +101,8 @@ export default async function emitNotifications(
     isChainEventData
       ? {
           where: {
-            chain_event_id: chainEvent.id,
+            chain_event_id: (<IChainEventNotificationData>notification_data)
+              .chainEvent.id,
           },
         }
       : {
@@ -129,12 +115,18 @@ export default async function emitNotifications(
   // if the notification does not yet exist create it here
   if (!notification) {
     if (isChainEventData) {
+      const event: any = (<IChainEventNotificationData>notification_data)
+        .chainEvent;
+      event.ChainEventType = (<IChainEventNotificationData>(
+        notification_data
+      )).chainEventType;
+
       notification = await models.Notification.create({
-        notification_data: JSON.stringify(chainEvent),
-        chain_event_id: chainEvent.id,
+        notification_data: JSON.stringify(event),
+        chain_event_id: (<IChainEventNotificationData>notification_data)
+          .chainEvent.id,
         category_id: 'chain-event',
-        chain_id: chainEvent.chain,
-        entity_id: chainEvent.entity_id,
+        chain_id: (<IChainEventNotificationData>notification_data).chain_id,
       });
     } else {
       notification = await models.Notification.create({
@@ -161,6 +153,14 @@ export default async function emitNotifications(
     console.log('Error generating immediate notification email!');
     console.trace(e);
   }
+
+  // create NotificationsRead instances
+  // await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
+  //   subscription_id: subscription.id,
+  //   notification_id: notification.id,
+  //   is_read: false,
+  //   user_id: subscription.subscriber_id
+  // })));
 
   let query = `INSERT INTO "NotificationsRead" VALUES `;
   const replacements = [];
@@ -201,8 +201,14 @@ export default async function emitNotifications(
 
   // send emails
   for (const subscription of subscriptions) {
-    if (msg && isChainEventData && chainEvent.chain) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+    if (
+      msg &&
+      isChainEventData &&
+      (<IChainEventNotificationData>notification_data).chainEventType?.chain
+    ) {
+      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${
+        (<IChainEventNotificationData>notification_data).chainEventType.chain
+      }/notifications?id=${notification.id}`;
     }
     if (msg && subscription?.immediate_email && subscription?.User) {
       // kick off async call and immediately return
@@ -228,7 +234,7 @@ export default async function emitNotifications(
   ) {
     await send(models, {
       notificationCategory: category_id,
-      ...(webhook_data as Required<WebhookContent>),
+      ...(webhook_data as any),
     });
   }
 

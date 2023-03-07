@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable dot-notation */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
@@ -12,6 +14,8 @@ import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQC
 import { EventEmitter } from 'events';
 import type { BrokerConfig } from 'rascal';
 
+import { resetDatabase } from '../../../server-test';
+
 chai.use(chaiHttp);
 const { assert } = chai;
 
@@ -25,6 +29,10 @@ const setupDbEvent = async (event: CWEvent) => {
 };
 
 describe('Edgeware Archival Event Handler Tests', () => {
+  before('reset database', async () => {
+    await resetDatabase();
+  });
+
   it('should create chain entity from event', async () => {
     const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
@@ -39,6 +47,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
+    const dbEventType = await dbEvent.getChainEventType();
 
     const eventHandler = new EntityArchivalHandler(
       models,
@@ -87,8 +96,32 @@ describe('Edgeware Archival Event Handler Tests', () => {
     };
 
     const createDbEvent = await setupDbEvent(createEvent);
+    const createDbEventType = await createDbEvent.getChainEventType();
     const updateDbEvent = await setupDbEvent(updateEvent);
+    const updateDbEventType = await updateDbEvent.getChainEventType();
 
+    // set up wss expected results
+    const mockWssServer = new EventEmitter();
+    // let nEmissions = 0;
+    // mockWssServer.on(WebsocketMessageNames.ChainEntity, (payload) => {
+    //   assert.equal(payload.event, WebsocketMessageNames.ChainEntity);
+    //   if (nEmissions === 0) {
+    //     assert.deepEqual(payload.data.chainEvent, createDbEvent.toJSON());
+    //     assert.deepEqual(payload.data.chainEventType, createDbEventType.toJSON());
+    //     assert.equal(payload.data.chainEntity.chain, 'edgeware');
+    //     assert.equal(payload.data.chainEntity.type, SubstrateTypes.EntityKind.TreasuryProposal);
+    //     assert.equal(payload.data.chainEntity.type_id, '5');
+    //   } else if (nEmissions === 1) {
+    //     assert.deepEqual(payload.data.chainEvent, updateDbEvent.toJSON());
+    //     assert.deepEqual(payload.data.chainEventType, updateDbEventType.toJSON());
+    //     assert.equal(payload.data.chainEntity.chain, 'edgeware');
+    //     assert.equal(payload.data.chainEntity.type, SubstrateTypes.EntityKind.TreasuryProposal);
+    //     assert.equal(payload.data.chainEntity.type_id, '5');
+    //   } else {
+    //     assert.fail('more than 2 emissions');
+    //   }
+    //   nEmissions++;
+    // });
     const eventHandler = new EntityArchivalHandler(
       models,
       rmqController,
