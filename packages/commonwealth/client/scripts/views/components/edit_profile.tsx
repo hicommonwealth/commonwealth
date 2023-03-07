@@ -422,6 +422,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                         );
                       }, 1000);
                       this.getProfile(vnode.attrs.profileId);
+                      m.redraw();
                     },
                   });
                 }}
