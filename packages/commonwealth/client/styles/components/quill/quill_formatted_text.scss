@@ -22,33 +22,33 @@
     margin: 1.5em 0 0.47em;
   }
 
-  > h1:first-child,
-  > h2:first-child,
-  > h3:first-child,
-  > h4:first-child,
-  > h5:first-child,
-  > h6:first-child,
-  > :first-child > h1,
-  > :first-child > h2,
-  > :first-child > h3,
-  > :first-child > h4,
-  > :first-child > h5,
-  > :first-child > h6 {
+  >h1:first-child,
+  >h2:first-child,
+  >h3:first-child,
+  >h4:first-child,
+  >h5:first-child,
+  >h6:first-child,
+  > :first-child>h1,
+  > :first-child>h2,
+  > :first-child>h3,
+  > :first-child>h4,
+  > :first-child>h5,
+  > :first-child>h6 {
     margin-top: 0.35em;
   }
 
-  > h1:last-child,
-  > h2:last-child,
-  > h3:last-child,
-  > h4:last-child,
-  > h5:last-child,
-  > h6:last-child,
-  > :last-child > h1,
-  > :last-child > h2,
-  > :last-child > h3,
-  > :last-child > h4,
-  > :last-child > h5,
-  > :last-child > h6 {
+  >h1:last-child,
+  >h2:last-child,
+  >h3:last-child,
+  >h4:last-child,
+  >h5:last-child,
+  >h6:last-child,
+  > :last-child>h1,
+  > :last-child>h2,
+  > :last-child>h3,
+  > :last-child>h4,
+  > :last-child>h5,
+  > :last-child>h6 {
     margin-bottom: 0;
   }
 
@@ -125,6 +125,7 @@
 
     ul,
     ol {
+
       ul,
       ol {
         ol {
@@ -135,8 +136,10 @@
 
     ul,
     ol {
+
       ul,
       ol {
+
         ul,
         ol {
           ol {
@@ -148,10 +151,13 @@
 
     ul,
     ol {
+
       ul,
       ol {
+
         ul,
         ol {
+
           ul,
           ol {
             ol {
@@ -164,12 +170,16 @@
 
     ul,
     ol {
+
       ul,
       ol {
+
         ul,
         ol {
+
           ul,
           ol {
+
             ul,
             ol {
               ol {
@@ -204,7 +214,7 @@
     }
   }
 
-  ul.checklist + ul.checklist {
+  ul.checklist+ul.checklist {
     margin-top: -10px;
   }
 
@@ -317,7 +327,7 @@
       margin-bottom: 0;
     }
 
-    .hidden-formatting-listitem + .hidden-formatting-listitem {
+    .hidden-formatting-listitem+.hidden-formatting-listitem {
       margin-top: 6px;
     }
   }
@@ -331,7 +341,6 @@
   word-break: break-word;
 
   @include formatted-text();
-  @include collapsible();
   @include hidden-formatting();
 }
 

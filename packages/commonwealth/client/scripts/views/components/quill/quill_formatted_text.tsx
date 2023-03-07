@@ -81,10 +81,10 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hid
             chunks.length <= 1
               ? {}
               : index === 0
-              ? { position: 0 }
-              : index === chunks.length - 1
-              ? {}
-              : { position: middle }
+                ? { position: 0 }
+                : index === chunks.length - 1
+                  ? {}
+                  : { position: middle }
           );
 
           if (subString[subString.length - 1] === ' ') {
@@ -102,44 +102,41 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hid
 
     return (
       <div
-      className={getClasses<{ collapsed?: boolean }>(
-        { collapsed: isTruncated },
-        'QuillFormattedText'
-      )}
-        >
+        className={getClasses<{ collapsed?: boolean }>(
+          { collapsed: isTruncated },
+          'QuillFormattedText'
+        )}
+      >
         {cachedResultWithHighlights}
       </div>
     );
   } else {
     return (
       <div
-      className={getClasses<{ collapsed?: boolean }>(
-        { collapsed: isTruncated },
-        'QuillFormattedText'
-      )}
+        className='QuillFormattedText'
       // oncreate={() => {
       // if (!(<any>window).twttr) {
       //   loadScript('//platform.twitter.com/widgets.js').then(() => {
       //     console.log('Twitter Widgets loaded');
       //   })
       // }}
-        >
+      >
         {truncatedDoc &&
           renderQuillDelta(
             truncatedDoc,
             hideFormatting,
-            isTruncated,
+            false,
             openLinksInNewTab,
             navigate
           )}
-      {isTruncated && (
-        <div className="show-more-button-wrapper">
-          <div className="show-more-button" onClick={toggleDisplay}>
-          <CWIcon iconName="plus" iconSize="small" />
-          <div className="show-more-text">Show More</div>
+        {isTruncated && (
+          <div className="show-more-button-wrapper">
+            <div className="show-more-button" onClick={toggleDisplay}>
+              <CWIcon iconName="plus" iconSize="small" />
+              <div className="show-more-text">Show More</div>
+            </div>
           </div>
-          </div>
-      )}
+        )}
       </div>
     );
   }
