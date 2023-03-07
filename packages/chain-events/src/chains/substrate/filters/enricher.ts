@@ -602,6 +602,7 @@ export async function Enrich(
           },
         };
       }
+
       /**
        * Tip Events
        */
@@ -692,6 +693,7 @@ export async function Enrich(
           },
         };
       }
+
       /**
        * Treasury Events
        */
@@ -1007,7 +1009,18 @@ export async function Enrich(
           },
         };
       }
-
+      case EventKind.TipVoted: {
+        const voter = extrinsic.signer.toString();
+        const [hash, value] = extrinsic.args as [Hash, Compact<BalanceOf>];
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            who: voter,
+            value: value.toString(),
+          },
+        };
+      }
       case EventKind.ElectionCandidacySubmitted: {
         const candidate = extrinsic.signer.toString();
         const section = api.query.electionsPhragmen
