@@ -1,32 +1,30 @@
+import type { IChainEventData } from 'chain-events/src';
 import _ from 'underscore';
-import type { IChainEventData, SupportedNetwork } from 'chain-events/src';
+import ChainEventType from './ChainEventType';
 
 class ChainEvent {
   public readonly id?: number;
   public readonly blockNumber: number;
   public readonly data: IChainEventData;
-  public readonly chain: string;
-  public readonly network: SupportedNetwork;
+  public readonly type: ChainEventType;
 
   public eq(e: ChainEvent) {
     return e.data.kind === this.data.kind && _.isEqual(this.data, e.data);
   }
 
-  constructor(blockNumber, data, id?, chain?, network?) {
+  constructor(blockNumber, data, type, id?) {
     this.id = id;
     this.blockNumber = blockNumber;
     this.data = data;
-    this.chain = chain;
-    this.network = network;
+    this.type = type;
   }
 
-  public static fromJSON(json) {
+  public static fromJSON(json, chainEventType?: ChainEventType) {
     return new ChainEvent(
       json.blockNumber || json.block_number,
       json.data || json.event_data,
-      json.id,
-      json.chain,
-      json.network
+      chainEventType || ChainEventType.fromJSON(json.ChainEventType),
+      json.id
     );
   }
 }
