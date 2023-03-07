@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       // Get all Profiles
       const profiles = await queryInterface.sequelize.query(
-        `SELECT * FROM "Profiles" where user_id='84352'`,
+        `SELECT * FROM "Profiles"`,
         { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
       );
 
