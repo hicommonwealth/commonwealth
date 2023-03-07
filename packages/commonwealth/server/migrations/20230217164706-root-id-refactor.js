@@ -137,6 +137,7 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
+    // IRREVERSABLE data loss, but schema will update fine.
     await queryInterface.renameColumn('Comments', 'thread_id', 'root_id');
   },
 };

@@ -20,7 +20,7 @@ module.exports = {
     const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id, v]));
 
     const threads = await queryInterface.sequelize.query(
-      `SELECT * FROM "Threads"`
+      `SELECT id FROM "Threads"`
     );
 
     const updateQueries = [];
@@ -44,11 +44,40 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+    await queryInterface.createTable('ViewCounts',
+      {
+        id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+        chain: { type: Sequelize.STRING },
+        community: { type: Sequelize.STRING },
+        object_id: { type: Sequelize.INTEGER, allowNull: false },
+        view_count: { type: Sequelize.INTEGER, allowNull: false },
+      },
+      {
+        underscored: true,
+        timestamps: false,
+        indexes: [
+          { fields: ['id'] },
+          { fields: ['chain', 'object_id'] },
+          { fields: ['community', 'object_id'] },
+          { fields: ['chain', 'community', 'object_id'] },
+          { fields: ['view_count'] },
+        ],
+      });
+
+    const threads = await queryInterface.sequelize.query(
+      `SELECT id, chain, view_count FROM "Threads"`
+    );
+
+    const updateQueries = [];
+    threads[0].forEach(t => {
+      updateQueries.push(queryInterface.sequelize.query(
+        `INSERT INTO "ViewCounts"(chain,object_id,view_count) 
+         VALUES(${t.chain}, discussion_${t.id}, ${t.view_count}) `
+      ));
+    })
+
+    await Promise.all(updateQueries);
+
+    return queryInterface.removeColumn('Threads', 'view_count');
   },
 };
