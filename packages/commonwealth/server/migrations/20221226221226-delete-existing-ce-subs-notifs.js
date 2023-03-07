@@ -217,7 +217,7 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `
-        SELECT setval('"Subscriptions_id_seq"', (SELECT MAX(id) FROM "Notifications"));
+        SELECT setval('"Subscriptions_id_seq"', (SELECT MAX(id) FROM "Subscriptions"));
       `,
         { transaction: t, raw: true }
       );
@@ -225,7 +225,7 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `
-          ALTER TABLE "Notifications"
+          ALTER TABLE "Subscriptions"
               ALTER COLUMN id SET DEFAULT nextval('"Subscriptions_id_seq"');
       `,
         { transaction: t, raw: true }
@@ -257,6 +257,34 @@ module.exports = {
         { transaction: t, raw: true }
       );
       console.log('Indexes dropped');
+
+      await queryInterface.sequelize.query(
+        `
+          ALTER TABLE "Subscriptions"
+            ALTER COLUMN created_at SET NOT NULL,
+            ALTER COLUMN updated_at SET NOT NULL,
+            ALTER COLUMN category_id SET NOT NULL,
+            ALTER COLUMN subscriber_id SET NOT NULL,
+            ALTER COLUMN object_id SET NOT NULL,
+            ALTER COLUMN is_active SET NOT NULL,
+            ALTER COLUMN immediate_email SET NOT NULL,
+            ALTER COLUMN is_active SET DEFAULT True,
+            ALTER COLUMN immediate_email SET DEFAULT False;
+        `,
+        { transaction: t, raw: true }
+      );
+      console.log('Added NOT NULL and DEFAULT constraints to Subscriptions');
+
+      await queryInterface.sequelize.query(
+        `
+          ALTER TABLE "Notifications"
+            ALTER COLUMN created_at SET NOT NULL,
+            ALTER COLUMN updated_at SET NOT NULL,
+            ALTER COLUMN category_id SET NOT NULL;   
+      `,
+        { transaction: t, raw: true }
+      );
+      console.log('Added NOT NULL constraints to Notifications');
     });
   },
 
