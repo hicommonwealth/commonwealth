@@ -55,9 +55,6 @@
   },
   "homepage": "https://github.com/hicommonwealth/chain-events#readme",
   "dependencies": {
-    "@ethersproject/abi": "^5.0.0",
-    "@ethersproject/bytes": "^5.0.0",
-    "@ethersproject/providers": "^5.0.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@polkadot/api": "6.0.5",
     "@polkadot/api-derive": "6.0.5",
