@@ -2,6 +2,11 @@
 
 // The purpose of this script is to turn root_id to thread_id. To achieve this without losing any data, we must set the
 // comments that pointed to a proposal, to instead point to a thread that is created to backlink to that proposal
+
+function tupleToKey(list) {
+  return list[0] + '+' + list[1];
+}
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
@@ -29,28 +34,35 @@ module.exports = {
         `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`
       );
 
-      // maps root_id -> newThread it creates
+      // maps [chain, root_id] -> newThread it creates
       const newThreads = new Map();
+      const urlToRootId = new Map();
       proposalComments[0].forEach((c) => {
-        if (newThreads.get(c.root_id)) {
-          return; //if we already had created thread to backlink proposal comments, don't create another one
+        if (newThreads.get(tupleToKey([c.chain, c.root_id]))) {
+          return; // if we already had created thread to backlink proposal comments, don't create another one
         }
 
         let rootParts = c.root_id.split('_');
+        let key = tupleToKey([c.chain, c.root_id]);
         // handle cosmosproposals and onchainproposal differently
-        if (rootParts[0] === 'cosmosproposal' || rootParts[0] === 'onchainproposal') {
+        if (
+          rootParts[0] === 'cosmosproposal' ||
+          rootParts[0] === 'onchainproposal'
+        ) {
           rootParts = ['proposal', rootParts[1]];
+          key = tupleToKey([c.chain, rootParts.join('_')]);
         } else {
           rootParts = [`proposal/${rootParts[0]}`, rootParts[1]];
         }
 
+        const url = `https://commonwealth.im/${c.chain}/${rootParts[0]}/${rootParts[1]}`;
         // otherwise map the root_id to a new thread to backlink proposal comments
-        newThreads.set(c.root_id, {
+        newThreads.set(key, {
           address_id: 1,
           title: `Thread for ${c.chain}'s ${rootParts[0]} ${rootParts[1]}`,
           kind: 'link',
           body: '',
-          url: `https://commonwealth.im/${c.chain}/${rootParts[0]}/${rootParts[1]}`,
+          url: url,
           chain: c.chain,
           read_only: true,
           stage: 'discussion',
@@ -65,6 +77,8 @@ module.exports = {
             new Date().setFullYear(new Date().getFullYear() - 1)
           ),
         });
+
+        urlToRootId.set(url, c.root_id);
       });
 
       const inserted = await queryInterface.bulkInsert(
@@ -76,16 +90,10 @@ module.exports = {
       // create map of rootId -> thread_id
       const rootToThreadMap = new Map(
         inserted.map((thread) => {
-          const urlParts = thread.url.split('/');
-          let rootId =
-            urlParts[urlParts.length - 2] + '_' + urlParts[urlParts.length - 1];
-          if (urlParts[urlParts.length - 2] === 'proposal') {
-            rootId =
-              `cosmos${urlParts[urlParts.length - 2]}` +
-              '_' +
-              urlParts[urlParts.length - 1];
-          }
-          return [rootId, thread.id];
+          return [
+            tupleToKey([thread.chain, urlToRootId.get(thread.url)]),
+            thread.id,
+          ];
         })
       );
 
@@ -107,7 +115,7 @@ module.exports = {
         updateQueries.push(
           queryInterface.sequelize.query(
             `UPDATE "Comments" SET "root_id" = ${rootToThreadMap.get(
-              c.root_id
+              tupleToKey([c.chain, c.root_id])
             )} WHERE "id"=${c.id}`,
             { transaction: t }
           )
