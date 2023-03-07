@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       // Get all Profiles
       const profiles = await queryInterface.sequelize.query(
-        `SELECT * FROM Profiles`,
+        `SELECT * FROM "Profiles"`,
         { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
       );
 
@@ -21,14 +21,14 @@ module.exports = {
 
           console.log('Has profile name', profile.profile_name);
           const addresses = await queryInterface.sequelize.query(
-            `SELECT * FROM Addresses WHERE profile_id=${profile.id}`,
+            `SELECT * FROM "Addresses" WHERE profile_id=${profile.id}`,
             { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
           );
 
           for (const address of addresses) {
             // Get offchainProfile for the address
             const offchainProfiles = await queryInterface.sequelize.query(
-              `SELECT * FROM OffchainProfiles WHERE address_id=${address.id}`,
+              `SELECT * FROM "OffchainProfiles" WHERE address_id=${address.id}`,
               {
                 type: queryInterface.sequelize.QueryTypes.SELECT,
                 transaction: t,
@@ -49,7 +49,7 @@ module.exports = {
                 // Update profile with avatarUrl from corresponding offchainProfile
                 console.log('setting avatarUrl', parsedData.avatarUrl);
                 await queryInterface.sequelize.query(
-                  `UPDATE Profiles SET avatar_url='${parsedData.avatarUrl}' WHERE id=${profile.id}`,
+                  `UPDATE "Profiles" SET avatar_url='${parsedData.avatarUrl}' WHERE id=${profile.id}`,
                   { transaction: t }
                 );
                 // Exit loop because we have found an offchainProfile with the avatarUrl and need not do more
@@ -61,7 +61,7 @@ module.exports = {
           // No profile_name set
           console.log("doesn't have profile_name");
           const addresses = await queryInterface.sequelize.query(
-            `SELECT * FROM Addresses WHERE profile_id=${profile.id}`,
+            `SELECT * FROM "Addresses" WHERE profile_id=${profile.id}`,
             { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
           );
 
@@ -69,25 +69,22 @@ module.exports = {
           if (addresses.length === 1) {
             console.log('Only one address', addresses[0]);
             const offchainProfiles = await queryInterface.sequelize.query(
-              `SELECT * FROM OffchainProfiles WHERE address_id=${addresses[0].id}`,
+              `SELECT * FROM "OffchainProfiles" WHERE address_id=${addresses[0].id}`,
               {
                 type: queryInterface.sequelize.QueryTypes.SELECT,
                 transaction: t,
               }
             );
 
-            let lastValidName = '';
-            for (let i = 0; i < offchainProfiles.length; i++) {
-              const offchainProfile = offchainProfiles[i];
+            if (offchainProfiles.length === 1) {
               let parsedData;
               try {
-                parsedData = JSON.parse(offchainProfile.data);
+                parsedData = JSON.parse(offchainProfiles[0].data);
               } catch (e) {
                 console.log('Error parsing JSON', e);
                 continue;
               }
 
-              // Update profile with name and avatarUrl from corresponding offchainProfile
               if (parsedData && parsedData.name) {
                 lastValidName = parsedData.name;
                 if (!parsedData.avatarUrl && i < offchainProfiles.length - 1) {
@@ -102,7 +99,7 @@ module.exports = {
                 );
                 // Update with the first offchainProfile that has a name and avatarUrl (if it exists)
                 await queryInterface.sequelize.query(
-                  `UPDATE Profiles SET avatar_url='${
+                  `UPDATE "Profiles" SET avatar_url='${
                     parsedData.avatarUrl ?? ''
                   }' profile_name='${parsedData.name}' WHERE id=${profile.id}`,
                   { transaction: t }
@@ -110,31 +107,24 @@ module.exports = {
 
                 break;
               }
-
-              if (i === offchainProfiles.length - 1 && lastValidName) {
-                // If the final offchainProfile had no name, use the last valid name we saw
-                console.log('setting name', lastValidName);
-                await queryInterface.sequelize.query(
-                  `UPDATE Profiles SET profile_name='${lastValidName}' WHERE id=${profile.id}`,
-                  { transaction: t }
-                );
-              }
             }
           } else if (addresses.length > 1) {
+            // More than one valid address exists
             console.log('more than one address');
             const names = [];
             let sameName = true;
 
             for (const address of addresses) {
               const offchainProfiles = await queryInterface.sequelize.query(
-                `SELECT * FROM OffchainProfiles WHERE address_id=${address.id}`,
+                `SELECT * FROM "OffchainProfiles" WHERE address_id=${address.id}`,
                 {
                   type: queryInterface.sequelize.QueryTypes.SELECT,
                   transaction: t,
                 }
               );
 
-              for (const offchainProfile of offchainProfiles) {
+              if (offchainProfiles.length === 0) {
+                const offchainProfile = offchainProfiles[0];
                 if (offchainProfile.data) {
                   let parsedData;
                   try {
@@ -158,72 +148,103 @@ module.exports = {
             }
 
             if (sameName) {
-              console.log('all have same name, ');
+              console.log('all have same name');
               let avatarUrl;
               let name;
 
               for (const address of addresses) {
                 const offchainProfiles = await queryInterface.sequelize.query(
-                  `SELECT * FROM OffchainProfiles WHERE address_id=${address.id}`,
+                  `SELECT * FROM "OffchainProfiles" WHERE address_id=${address.id}`,
                   {
                     type: queryInterface.sequelize.QueryTypes.SELECT,
                     transaction: t,
                   }
                 );
 
-                for (const offchainProfile of offchainProfiles) {
-                  if (offchainProfile.data) {
+                // Choose the first offchainProfile with an avatarUrl
+                if (offchainProfiles.length === 1) {
+                  if (offchainProfiles[0].data) {
                     let parsedData;
                     try {
-                      parsedData = JSON.parse(offchainProfile.data);
+                      parsedData = JSON.parse(offchainProfiles[0].data);
                     } catch (e) {
                       console.log('Error parsing JSON', e);
                       continue;
                     }
 
-                    avatarUrl = parsedData.avatarUrl;
-                    name = parsedData.name;
-                    break;
+                    if (parsedData && parsedData.avatarUrl) {
+                      avatarUrl = parsedData.avatarUrl;
+                      name = parsedData.name;
+                      break;
+                    }
                   }
                 }
               }
 
               await queryInterface.sequelize.query(
-                `UPDATE Profiles SET avatar_url='${avatarUrl}', profile_name='${name}' WHERE id=${profile.id}`,
+                `UPDATE "Profiles" SET avatar_url='${avatarUrl}', profile_name='${name}' WHERE id=${profile.id}`,
                 { transaction: t }
               );
             } else {
-              for (const address of addresses) {
+              // Addresses have different names
+              console.log('Differet names ');
+              for (let i = 0; i < addresses.length; i++) {
+                const address = addresses[i];
                 const offchainProfiles = await queryInterface.sequelize.query(
-                  `SELECT * FROM OffchainProfiles WHERE address_id=${address.id}`,
+                  `SELECT * FROM "OffchainProfiles" WHERE address_id=${address.id}`,
                   { type: queryInterface.sequelize.QueryTypes.SELECT }
                 );
 
-                if (offchainProfiles.length > 1) {
-                  for (let i = 0; i < offchainProfiles.length; i++) {
-                    const offchainProfile = offchainProfiles[i];
+                if (offchainProfiles.length === 1) {
+                  const offchainProfile = offchainProfiles[0];
+                  let parsedData;
+                  try {
+                    parsedData = JSON.parse(offchainProfile.data);
+                  } catch (e) {
+                    console.log('Error parsing JSON', e);
+                    continue;
+                  }
 
-                    if (offchainProfile.data) {
-                      let parsedData;
-                      try {
-                        parsedData = JSON.parse(offchainProfile.data);
-                      } catch (e) {
-                        console.log('Error parsing JSON', e);
-                        continue;
+                  if (i === 0) {
+                    // The first address we simply copy its OffchainProfile data to the Profile
+                    await queryInterface.sequelize.query(
+                      `UPDATE "Profiles" SET avatar_url='${
+                        parsedData.avatarUrl ?? ''
+                      }' name='${parsedData.name ?? ''}' WHERE id=${
+                        profile.id
+                      }`,
+                      { transaction: t }
+                    );
+                  } else {
+                    // The other addresses result in new user and profile objects
+                    console.log('creating new user and profile');
+                    // Create new user
+                    const newUser = await queryInterface.sequelize.query(
+                      `INSERT INTO "Users" (created_at, updated_at) VALUES (NOW(), NOW())`,
+                      {
+                        type: queryInterface.sequelize.QueryTypes.INSERT,
+                        transaction: t,
                       }
+                    );
 
-                      if (i === 0) {
-                        await queryInterface.sequelize.query(
-                          `UPDATE Profiles SET avatar_url='${parsedData.avatarUrl}' name='${parsedData.name}' WHERE id=${profile.id}`,
-                          { transaction: t }
-                        );
-                      } else {
-                        await queryInterface.sequelize.query(
-                          `INSERT INTO Profiles (user_id, profile_name, avatar_url) VALUES (${profile.user_id}, '${parsedData.name}', '${parsedData.avatarUrl}')`,
-                          { transaction: t }
-                        );
+                    // Create new profile
+                    const newProfile = await queryInterface.sequelize.query(
+                      `INSERT INTO "Profiles" (user_id, profile_name, avatar_url) VALUES (${
+                        newUser[0]
+                      }, '${parsedData.name ?? ''}', '${
+                        parsedData.avatarUrl ?? ''
+                      }')`,
+                      {
+                        type: queryInterface.sequelize.QueryTypes.INSERT,
+                        transaction: t,
                       }
-                    }
+                    );
+
+                    // update address with new user id and new profile id
+                    await queryInterface.sequelize.query(
+                      `UPDATE "Addresses" SET user_id=${newUser.id}, profile_id=${newProfile.id} WHERE id=${address.id}`,
+                      { transaction: t }
+                    );
                   }
                 }
               }
