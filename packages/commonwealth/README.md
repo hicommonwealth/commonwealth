@@ -93,7 +93,6 @@ except you must make sure you are using the Rosetta2 Terminal.
 _FOR ALL CLI INSTALLS_ you must prefix `arch -arm64` in front of the command.
 For example for python: `arch -arm64 brew install python@3.9`. This will allow you 
 to install using the M1 homebrew with Rosetta. This is crucial.
-(Exception: some tools already support Apple Silicon. You can check [here](https://doesitarm.com/))
 
 If errors occur try these steps:
 
