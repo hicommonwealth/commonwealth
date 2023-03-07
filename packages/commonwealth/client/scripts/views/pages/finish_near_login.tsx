@@ -1,13 +1,10 @@
 import React from 'react';
-
+import type { NavigateFunction } from 'react-router-dom';
 import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
-import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import { setRoute, getRouteParam, redraw} from
-
- 'mithrilInterop';
+import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -24,13 +21,14 @@ import type { FunctionCallOptions } from 'near-api-js/lib/account';
 
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
-import PageNotFound from 'views/pages/404';
+import { PageNotFound } from 'views/pages/404';
 import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
 import { Modal } from '../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // TODO:
 //  - figure out how account switching will work
@@ -39,7 +37,7 @@ import { Modal } from '../components/component_kit/cw_modal';
 //  - test what happens if the wallet site fails
 //  - move some of this stuff into controllers
 
-const redirectToNextPage = () => {
+const redirectToNextPage = (navigate) => {
   if (
     localStorage &&
     localStorage.getItem &&
@@ -54,9 +52,9 @@ const redirectToNextPage = () => {
         +new Date() - postAuth.timestamp < 24 * 60 * 60 * 1000
       ) {
         localStorage.removeItem('nearPostAuthRedirect');
-        setRoute(postAuth.path, {}, { replace: true });
+        navigate(postAuth.path, { replace: true });
       } else {
-        navigateToSubpage('/', { replace: true });
+        navigate('/', { replace: true });
       }
       return;
     } catch (e) {
@@ -64,10 +62,11 @@ const redirectToNextPage = () => {
     }
   }
 
-  navigateToSubpage('/', { replace: true });
+  navigate('/', { replace: true });
 };
 
 const FinishNearLogin = () => {
+  const navigate = useCommonNavigate();
   const [validating, setValidating] = React.useState<boolean>(false);
   const [validationCompleted, setValidationCompleted] =
     React.useState<boolean>(false);
@@ -138,7 +137,7 @@ const FinishNearLogin = () => {
     }
 
     // tx error handling
-    const failedTx = getRouteParam('tx_failure');
+    const failedTx = _DEPRECATED_getSearchParams('tx_failure');
 
     if (failedTx) {
       console.log(`Login failed: deleting storage key ${failedTx}`);
@@ -153,7 +152,7 @@ const FinishNearLogin = () => {
 
     // tx success handling
     // TODO: ensure that create() calls redirect correctly
-    const savedTx = getRouteParam('saved_tx');
+    const savedTx = _DEPRECATED_getSearchParams('saved_tx');
 
     if (savedTx && localStorage[savedTx]) {
       try {
@@ -182,7 +181,7 @@ const FinishNearLogin = () => {
     // create new chain handling
     // TODO: we need to figure out how to clean this localStorage entry up
     //   in the case of transaction failure!!
-    const chainName = getRouteParam('chain_name');
+    const chainName = _DEPRECATED_getSearchParams('chain_name');
 
     if (chainName && localStorage[chainName]) {
       try {
@@ -199,8 +198,7 @@ const FinishNearLogin = () => {
         );
 
         await initAppState(false);
-
-        setRoute(`${window.location.origin}/${res.result.chain.id}`);
+        navigate(`${window.location.origin}/${res.result.chain.id}`);
       } catch (err) {
         setValidationError(`Failed to initialize chain node: ${err.message}`);
       }
@@ -222,29 +220,29 @@ const FinishNearLogin = () => {
         <CWButton
           onClick={(e) => {
             e.preventDefault();
-            redirectToNextPage();
+            redirectToNextPage(navigate);
           }}
           label="Return Home"
         />
       </Sublayout>
     );
   } else if (validationCompleted) {
-    async () => {
-      if (validatedAccount.profile.name) {
-        redirectToNextPage();
-      } else {
-        if (isNewAccount) {
-          if (!app.isLoggedIn()) {
-            setIsModalOpen(true);
-          } else {
-            await completeClientLogin(validatedAccount);
-            redirectToNextPage();
-          }
+    if (validatedAccount.profile.name) {
+      redirectToNextPage(navigate);
+    } else {
+      if (isNewAccount) {
+        if (!app.isLoggedIn()) {
+          setIsModalOpen(true);
         } else {
-          redirectToNextPage();
+          completeClientLogin(validatedAccount).then(() => {
+            redirectToNextPage(navigate);
+          });
         }
+      } else {
+        redirectToNextPage(navigate);
       }
-    };
+    }
+
     return (
       <>
         <Modal
@@ -252,7 +250,7 @@ const FinishNearLogin = () => {
             <LoginModal
               onModalClose={() => {
                 setIsModalOpen(false);
-                redirectToNextPage();
+                redirectToNextPage(navigate);
               }}
               initialBody="welcome"
               initialSidebar="newOrReturning"

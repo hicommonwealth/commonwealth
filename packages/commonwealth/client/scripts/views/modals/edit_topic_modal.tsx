@@ -3,7 +3,6 @@ import React from 'react';
 import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import { navigateToSubpage } from 'router';
 
 import 'modals/edit_topic_modal.scss';
 import { Topic } from 'models';
@@ -11,7 +10,6 @@ import { Topic } from 'models';
 import app from 'state';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -19,6 +17,7 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import type { QuillEditor } from '../components/quill/quill_editor';
 import type { QuillTextContents } from '../components/quill/types';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type EditTopicModalProps = {
   defaultOffchainTemplate: string;
@@ -40,6 +39,8 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
     onModalClose,
     name: nameProp,
   } = props;
+
+  const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
@@ -105,7 +106,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
 
     await app.topics.remove(topicInfo);
 
-    navigateToSubpage('/');
+    navigate('/');
   };
 
   return (
@@ -187,7 +188,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
                 .then((closeModal) => {
                   if (closeModal) {
                     $(e.target).trigger('modalexit');
-                    navigateToSubpage(
+                    navigate(
                       `/discussions/${encodeURI(name.toString().trim())}`
                     );
                   }
@@ -204,14 +205,14 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
             disabled={isSaving}
             onClick={async (e) => {
               e.preventDefault();
-              const confirmed = await confirmationModalWithText(
-                'Delete this topic?'
-              )();
+              const confirmed = window.confirm('Delete this topic?');
+
               if (!confirmed) return;
+
               deleteTopic()
                 .then(() => {
                   $(e.target).trigger('modalexit');
-                  navigateToSubpage('/');
+                  navigate('/');
                 })
                 .catch(() => {
                   setIsSaving(false);

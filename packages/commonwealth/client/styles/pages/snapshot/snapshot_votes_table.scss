@@ -47,12 +47,16 @@
       gap: 8px;
       padding: 8px 16px;
 
-      .User {
-        display: inline-block;
+      .user-popover-wrapper {
         flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+
+        .User {
+          display: inline-block;
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
 
       .column-text.Text {

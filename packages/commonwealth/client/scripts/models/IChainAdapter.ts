@@ -2,16 +2,7 @@ import type { Coin } from 'adapters/currency';
 import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
@@ -66,9 +57,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
     // if (
-    //   this.meta.id !== (this.app.customDomainId() || getRouteParam('scope'))
+    //   this.meta.id !== (this.app.customDomainId() || _DEPRECATED_getSearchParams('scope'))
     // ) {
-    //   console.log(this.meta.id, getRouteParam('scope'));
+    //   console.log(this.meta.id, _DEPRECATED_getSearchParams('scope'));
     //   return false;
     // }
 
@@ -89,7 +80,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       admins,
       activeUsers,
       numVotingThreads,
-      chatChannels,
       communityBanner,
       contracts,
       communityRoles,
@@ -105,9 +95,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.meta.communityRoles = communityRoles;
 
     await this.app.recentActivity.getRecentTopicActivity(this.id);
-
-    // parse/save the chat channels
-    await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));
 
     if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
       this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
@@ -131,7 +118,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
     this.app.reactionCounts.deinit();
     this.app.threadUniqueAddressesCount.deinit();
-    if (this.app.socket) this.app.socket.chatNs.deinit();
     console.log(`${this.meta.name} stopped`);
   }
 
@@ -168,8 +154,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       await Promise.all(
         modules.map((mod) => mod.init(this.chain, this.accounts))
       );
+      this.app.chainModuleReady.emit('ready');
     }
-    redraw();
   }
 
   public abstract base: ChainBase;

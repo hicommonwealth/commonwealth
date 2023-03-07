@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { setRoute, redraw } from 'mithrilInterop';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
-import { navigateToSubpage } from 'router';
+import { redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 import { AddressInfo } from 'models';
@@ -15,11 +13,20 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
+import { useCommonNavigate } from 'navigation/helpers';
 
-const CWSidebarMenuItemComponent = (props: MenuItem) => {
+export const CWSidebarMenuItem = (props: MenuItem) => {
+  const navigate = useCommonNavigate();
+
   if (props.type === 'default') {
-    const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
-      props;
+    const {
+      disabled,
+      iconLeft,
+      iconRight,
+      isSecondary,
+      label,
+      onClick,
+    } = props;
 
     return (
       <div
@@ -59,15 +66,16 @@ const CWSidebarMenuItemComponent = (props: MenuItem) => {
           app.sidebarToggled = false;
           app.sidebarMenu = 'default';
           app.sidebarRedraw.emit('redraw');
-          setRoute(item.id ? `/${item.id}` : '/');
+          navigate(item.id ? `/${item.id}` : '/', {}, null);
         }}
       >
         <CommunityLabel community={item} />
         {app.isLoggedIn() && roles.length > 0 && (
           <div className="roles-and-star">
-            {roles.map((role) => {
+            {roles.map((role, i) => {
               return (
                 <User
+                  key={i}
                   avatarSize={18}
                   avatarOnly
                   user={
@@ -100,16 +108,15 @@ const CWSidebarMenuItemComponent = (props: MenuItem) => {
   }
 };
 
-const CWSidebarMenuItem = NavigationWrapper(CWSidebarMenuItemComponent);
-
 type SidebarMenuProps = {
   className?: string;
   menuHeader?: { label: string; onClick: (e) => void };
   menuItems: Array<MenuItem>;
 };
 
-const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
+export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
+  const navigate = useCommonNavigate();
 
   return (
     <div
@@ -127,8 +134,8 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
             </CWText>
           </div>
         )}
-        {menuItems.map((item) => (
-          <CWSidebarMenuItem type={item.type || 'default'} {...item} />
+        {menuItems.map((item, i) => (
+          <CWSidebarMenuItem key={i} type={item.type || 'default'} {...item} />
         ))}
       </div>
       <div className="sidebar-bottom">
@@ -145,7 +152,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               app.sidebarRedraw.emit('redraw');
-              setRoute('/communities');
+              navigate('/communities', {}, null);
             },
           },
           {
@@ -156,7 +163,7 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               app.sidebarRedraw.emit('redraw');
-              setRoute('/notification-settings');
+              navigate('/notification-settings');
             },
           },
           {
@@ -165,21 +172,25 @@ const CWSidebarMenuComponent = (props: SidebarMenuProps) => {
             iconLeft: 'bell',
             onClick: () => {
               if (app.activeChainId()) {
-                navigateToSubpage('/settings');
+                navigate('/settings');
               } else {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
                 app.sidebarRedraw.emit('redraw');
-                setRoute('/settings');
+                navigate('/settings');
               }
             },
           } as MenuItem,
-        ].map((item: MenuItem) => {
-          return <CWSidebarMenuItem type={item.type || 'default'} {...item} />;
+        ].map((item: MenuItem, i) => {
+          return (
+            <CWSidebarMenuItem
+              key={i}
+              type={item.type || 'default'}
+              {...item}
+            />
+          );
         })}
       </div>
     </div>
   );
 };
-
-export const CWSidebarMenu = NavigationWrapper(CWSidebarMenuComponent);

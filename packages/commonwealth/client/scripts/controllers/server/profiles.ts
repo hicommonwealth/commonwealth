@@ -1,4 +1,5 @@
-import { addressSwapper } from 'commonwealth/shared/utils';
+import { redraw } from 'mithrilInterop';
+import { addressSwapper } from 'utils';
 import $ from 'jquery';
 import _ from 'lodash';
 import { Profile } from 'models';

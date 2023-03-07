@@ -2,9 +2,7 @@ import React from 'react';
 
 import { link } from 'helpers';
 
-import { getRouteParam, redraw} from
-
- 'mithrilInterop';
+import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/web3login.scss';
@@ -14,17 +12,19 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
-import PageNotFound from './404';
+import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import { Modal } from '../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const Web3LoginPage = () => {
+  const navigate = useCommonNavigate();
   const [errorMsg, setErrorMsg] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-  const token = getRouteParam('connect');
+  const token = _DEPRECATED_getSearchParams('connect');
 
   if (app.isCustomDomain() || !token) {
     // hide page if invalid arguments or via custom domain
@@ -89,12 +89,18 @@ const Web3LoginPage = () => {
                 }
               }}
             />
-            {getRouteParam('prev')
-              ? link('a.web3login-go-home', getRouteParam('prev'), 'Go back')
+            {_DEPRECATED_getSearchParams('prev')
+              ? link(
+                  'a.web3login-go-home',
+                  _DEPRECATED_getSearchParams('prev'),
+                  'Go back',
+                  navigate
+                )
               : link(
                   'a.web3login-go-home',
                   app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,
-                  'Go home'
+                  'Go home',
+                  navigate
                 )}
             {isNonEmptyString(errorMsg) && <CWText>{errorMsg}</CWText>}
           </div>

@@ -12,6 +12,10 @@ body {
   width: 100%;
 }
 
+#root {
+  height: 100%;
+}
+
 html {
   font-family: $fonts;
   font-size: 16px;
@@ -99,4 +103,9 @@ pre {
 // shared styles
 .clear {
   clear: both;
+}
+
+// makes sure that popovers are above the modals
+[id^='popover-'] {
+  z-index: 10000;
 }

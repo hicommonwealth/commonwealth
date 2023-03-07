@@ -1,64 +1,22 @@
 @import '../shared';
 
-@mixin avatarUploadSizing($size) {
-  @if $size == small {
-    height: 60px;
-    width: 60px;
-
-    .dropzone-attach {
-      border-radius: $border-radius-round;
-      height: 60px;
-      width: 60px;
-
-      &.hasNoAvatar {
-        background-color: $neutral-500;
-      }
-    }
-
-    .dropzone-preview-container {
-      border-radius: $border-radius-round;
-      height: 60px;
-      overflow: hidden;
-      width: 60px;
-    }
-  }
-
-  @if $size == large {
-    height: 108px;
-    width: 108px;
-
-    .dropzone-attach {
-      border-radius: $border-radius-round;
-      height: 108px;
-      width: 108px;
-
-      &.hasNoAvatar {
-        background-color: $neutral-500;
-      }
-    }
-
-    .dropzone-preview-container {
-      border-radius: $border-radius-round;
-      height: 108px;
-      overflow: hidden;
-      width: 108px;
-    }
-  }
-}
-
 .AvatarUpload {
   align-items: center;
+  background-color: $neutral-500;
+  border-radius: $border-radius-round;
   cursor: pointer;
   display: flex;
   justify-content: center;
   position: relative;
 
   &.small {
-    @include avatarUploadSizing(small);
+    height: 60px;
+    width: 60px;
   }
 
   &.large {
-    @include avatarUploadSizing(large);
+    height: 108px;
+    width: 108px;
   }
 
   .icon-button-container {
@@ -81,29 +39,17 @@
     }
   }
 
-  .dropzone-preview-container {
-    .dz-preview {
-      .dz-image {
-        height: 100%;
-        width: 100%;
+  .inner-container {
+    border-radius: $border-radius-round;
+    display: flex;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
 
-        img {
-          height: 100%;
-          width: 100%;
-        }
-      }
-
-      .dz-details,
-      .dz-progress,
-      .dz-success-mark,
-      .dz-error-mark,
-      .dz-error-message {
-        display: none;
-      }
-    }
-
-    &.hidden {
-      display: none;
+    img {
+      height: 100%;
+      object-fit: cover;
+      width: 100%;
     }
   }
 }

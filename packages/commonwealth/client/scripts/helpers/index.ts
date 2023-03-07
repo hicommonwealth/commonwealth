@@ -1,4 +1,5 @@
-import { render, setRoute } from 'mithrilInterop';
+import type { ClassComponent } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
@@ -8,6 +9,7 @@ import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
 import type { Coin } from 'adapters/currency';
+import { NavigateFunction } from 'react-router-dom';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -38,21 +40,15 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr
+  return (arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+    .filter((s) => s) as unknown) as ThreadStage[];
 }
-
-export const modalRedirectClick = (e, route) => {
-  e.preventDefault();
-  $(e.target).trigger('modalexit');
-  setRoute(route);
-};
 
 /*
  * mithril link helper
  */
-export function externalLink(selector, target, children) {
+export function externalLink(selector, target, children, setRouteCb) {
   return render(
     selector,
     {
@@ -65,7 +61,7 @@ export function externalLink(selector, target, children) {
           // don't open a new window if the link is on Commonwealth
           e.preventDefault();
           e.stopPropagation();
-          setRoute(target);
+          setRouteCb?.(target);
         }
       },
     },
@@ -73,10 +69,15 @@ export function externalLink(selector, target, children) {
   );
 }
 
+// This function should not be used anymore for links.
+// Instead, <Link/> component from react-router is advised.
+// It is adjusted, not rewritten, as there are non-jsx components
+// that still use this method.ł
 export function link(
   selector: string,
   target: string,
   children,
+  setRoute: ClassComponent['setRoute'],
   extraAttrs?: object,
   saveScrollPositionAs?: string,
   beforeRouteSet?: () => void,
@@ -95,9 +96,9 @@ export function link(
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
       if (beforeRouteSet) beforeRouteSet();
-      const routeArgs: [string, any?, any?] =
+      const routeArgs: [string, any?] =
         window.location.href.split('?')[0] === target.split('?')[0]
-          ? [target, {}, { replace: true }]
+          ? [target, { replace: true }]
           : [target];
       if (afterRouteSet) {
         (async () => {
@@ -290,7 +291,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p) => render('p', p));
+  return paragraphs.map((p, index) => render('p', { key: index }, p));
 }
 
 /*
@@ -305,7 +306,9 @@ export function blocknumToTime(blocknum: number): moment.Moment {
 }
 
 export function blocknumToDuration(blocknum: number) {
-  return moment.duration(blocknumToTime(blocknum).diff(moment()));
+  return moment
+    .duration(blocknumToTime(blocknum).diff(moment()))
+    .asMilliseconds();
 }
 
 export function blockperiodToDuration(blocknum: number) {
@@ -375,7 +378,7 @@ export const isCommandClick = (
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
-  _this,
+  navigate: any,
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
@@ -390,7 +393,7 @@ export const handleRedirectClicks = (
     return;
   }
 
-  _this.navigateToSubpage(redirectLink);
+  navigate(redirectLink);
   if (callback) {
     callback();
   }

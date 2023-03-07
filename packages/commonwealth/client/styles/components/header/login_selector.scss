@@ -9,26 +9,34 @@
     border-bottom: 1px solid $neutral-300;
   }
 
-  .left-button {
-    align-items: center;
-    border-top: 1px solid $neutral-300;
-    border-left: 1px solid $neutral-300;
-    border-bottom: 1px solid $neutral-300;
-    cursor: pointer;
+  .button-container {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 4px 8px;
+
+    .left-button {
+      align-items: center;
+      border-top: 1px solid $neutral-300;
+      border-left: 1px solid $neutral-300;
+      border-bottom: 1px solid $neutral-300;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4px 8px;
+    }
   }
 
-  .right-button {
-    align-items: center;
-    border: 1px solid $neutral-300;
-    cursor: pointer;
+  .button-container {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 4px 8px;
+
+    .right-button {
+      align-items: center;
+      border: 1px solid $neutral-300;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4px 8px;
+    }
   }
 }
 

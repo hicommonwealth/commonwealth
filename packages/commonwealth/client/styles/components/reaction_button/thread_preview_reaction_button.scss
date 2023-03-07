@@ -25,12 +25,17 @@
     pointer-events: none;
   }
 
-  svg {
-    margin: 4px auto 2px;
-  }
+  .reactions-container {
+    display: flex;
+    flex-direction: column;
 
-  .reactions-count {
-    font-size: 14px;
-    margin: 2px auto 4px;
+    svg {
+      margin: 4px auto 2px;
+    }
+
+    .reactions-count {
+      font-size: 14px;
+      margin: 2px auto 4px;
+    }
   }
 }

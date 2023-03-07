@@ -1,15 +1,6 @@
 import React from 'react';
+import type { NavigateOptions, To } from 'react-router';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
 import { getProposalUrlPath } from 'identifiers';
 import type { NotificationSubscription } from 'models';
 import { AddressInfo } from 'models';
@@ -26,8 +17,12 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-const getTextRows = (subscription: NotificationSubscription) => {
+const getTextRows = (
+  subscription: NotificationSubscription,
+  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+) => {
   if (subscription.Thread) {
     const threadUrl = getProposalUrlPath(
       subscription.Thread.slug,
@@ -57,7 +52,6 @@ const getTextRows = (subscription: NotificationSubscription) => {
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Thread.body, {
-            collapse: true,
             hideFormatting: true,
           })}
         </CWText>
@@ -111,7 +105,6 @@ const getTextRows = (subscription: NotificationSubscription) => {
         </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Comment.text, {
-            collapse: true,
             hideFormatting: true,
           })}
         </CWText>
@@ -146,54 +139,47 @@ const getTextRows = (subscription: NotificationSubscription) => {
   }
 };
 
-type SubscriptionRowAttrs = {
+type SubscriptionRowProps = {
   subscription: NotificationSubscription;
 };
 
-export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRowAttrs> {
-  view(vnode: ResultNode<SubscriptionRowAttrs>) {
-    const { subscription } = vnode.attrs;
+export const SubscriptionRowTextContainer = ({
+  subscription,
+}: SubscriptionRowProps) => {
+  const navigate = useCommonNavigate();
 
-    return (
-      <div className="SubscriptionRowTextContainer">
-        <CWIcon
-          iconName={
-            subscription.category === 'new-reaction'
-              ? 'democraticProposal'
-              : 'feedback'
-          }
-          iconSize="small"
-        />
-        <div className="title-and-body-container">
-          {getTextRows(subscription)}
-        </div>
-      </div>
-    );
-  }
-}
-
-export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
-  view(vnode: ResultNode<SubscriptionRowAttrs>) {
-    const { subscription } = vnode.attrs;
-    return (
-      <PopoverMenu
-        renderTrigger={(onclick) => (
-          <CWIconButton iconName="dotsVertical" onClick={onclick} />
-        )}
-        menuItems={[
-          {
-            label: 'Unsubscribe',
-            iconLeft: 'close',
-            isSecondary: true,
-            onClick: () =>
-              app.user.notifications
-                .deleteSubscription(subscription)
-                .then(() => {
-                  redraw();
-                }),
-          },
-        ]}
+  return (
+    <div className="SubscriptionRowTextContainer">
+      <CWIcon
+        iconName={
+          subscription.category === 'new-reaction'
+            ? 'democraticProposal'
+            : 'feedback'
+        }
+        iconSize="small"
       />
-    );
-  }
-}
+      <div className="title-and-body-container">
+        {getTextRows(subscription, navigate)}
+      </div>
+    </div>
+  );
+};
+
+export const SubscriptionRowMenu = ({ subscription }: SubscriptionRowProps) => {
+  return (
+    <PopoverMenu
+      renderTrigger={(onclick) => (
+        <CWIconButton iconName="dotsVertical" onClick={onclick} />
+      )}
+      menuItems={[
+        {
+          label: 'Unsubscribe',
+          iconLeft: 'close',
+          isSecondary: true,
+          onClick: () =>
+            app.user.notifications.deleteSubscription(subscription),
+        },
+      ]}
+    />
+  );
+};

@@ -2,21 +2,12 @@
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import type { Component } from 'mithrilInterop';
+import { render, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { alertModalWithText } from '../../modals/alert_modal';
 import { BanUserModal } from '../../modals/ban_user_modal';
 
 export interface IProfileHeaderAttrs {
@@ -117,22 +108,12 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
       ]),
       render('.bio-actions', [
-        account.profile &&
-          account.profile.bio &&
-          render(CWButton, {
-            onClick: () => {
-              alertModalWithText(account.profile.bio, 'Close')();
-            },
-            label: 'View Bio',
-          }),
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
           render(CWButton, {
             onClick: () => {
-              app.modals.create({
-                modal: BanUserModal,
-                data: { profile: account.profile },
-              });
+              // @REACT @TODO: Re-add BanUserModal using new pattern
+              return null;
             },
             label: 'Ban User',
             buttonType: 'primary-red',

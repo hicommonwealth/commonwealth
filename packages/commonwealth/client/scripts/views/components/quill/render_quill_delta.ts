@@ -1,13 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
@@ -16,7 +7,8 @@ export const renderQuillDelta = (
   delta,
   hideFormatting = false,
   collapse = false,
-  openLinksInNewTab = false
+  openLinksInNewTab = false,
+  navigate
 ) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
@@ -129,7 +121,7 @@ export const renderQuillDelta = (
                           // don't open a new window if the link is on Commonwealth
                           e.preventDefault();
                           e.stopPropagation();
-                          setRoute(child.attributes.link);
+                          navigate(child.attributes.link);
                         }
                       },
                     },
@@ -148,25 +140,26 @@ export const renderQuillDelta = (
         );
       })
     : consolidateOrderedLists(groups).map((group, i) => {
-        const renderChild = (child) => {
+        const renderChild = (child, ii) => {
           // handle images
           if (child.insert?.image) {
             return render('img', {
-              key: i,
+              key: ii,
               src: child.insert?.image,
             });
           }
           // handle video
           if (child.insert?.video) {
             return render('div', {
-              key: i,
+              key: ii,
             }, [
               render('iframe', {
                 frameborder: 0,
                 allowfullscreen: true,
                 src: child.insert?.video,
+                key: 1
               }),
-              render('br'),
+              render('br', { key : 2 }),
             ]);
           }
           // handle tweets
@@ -189,15 +182,13 @@ export const renderQuillDelta = (
             return render(
               'blockquote',
               {
-                key: i,
+                key: ii,
                 class: 'twitter-tweet',
               },
-              [
                 render('a', {
                   tabIndex: -1,
                   href: url,
                 }),
-              ]
             );
           }
           // handle text nodes
@@ -206,6 +197,7 @@ export const renderQuillDelta = (
             result = render(
               'span.mention',
               {
+                key: ii,
                 onClick: () => {
                   // alert(child.insert.mention.id)
                 },
@@ -216,6 +208,7 @@ export const renderQuillDelta = (
             result = render(
               'a',
               {
+                key: ii,
                 href: child.attributes.link,
                 target: '_blank',
                 noreferrer: 'noreferrer',
@@ -230,53 +223,53 @@ export const renderQuillDelta = (
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
-                    setRoute(child.attributes.link);
+                    navigate(child.attributes.link);
                   }
                 },
               },
               `${child.insert}`
             );
           } else {
-            result = render('span', `${child.insert}`);
+            result = render('span', { key: ii }, `${child.insert}`);
           }
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if (k !== 'color' && k !== 'background' && v !== true) return;
             switch (k) {
               case 'bold':
-                result = render('strong', result);
+                result = render('strong', { key: ii }, result);
                 return;
               case 'italic':
-                result = render('em', result);
+                result = render('em', { key: ii }, result);
                 return;
               case 'strike':
-                result = render('s', result);
+                result = render('s', { key: ii }, result);
                 return;
               case 'underline':
-                result = render('u', result);
+                result = render('u', { key: ii }, result);
                 return;
               case 'code':
-                result = render('code', result);
+                result = render('code', { key: ii }, result);
                 return;
               case 'added':
-                result = render('span.added', result);
+                result = render('span.added', { key: ii }, result);
                 return;
               case 'deleted':
-                result = render('span.deleted', result);
+                result = render('span.deleted', { key: ii }, result);
                 return;
               default:
-                result = render('span', result);
+                result = render('span', { key: ii }, result);
             }
           });
           return result;
         };
-        const renderParent = (parent) => {
+        const renderParent = (parent, ii) => {
           // render empty parent nodes as .between-paragraphs
           if (
             !parent.attributes &&
             parent.children.length === 1 &&
             parent.children[0].insert === '\n'
           ) {
-            return render('.between-paragraphs');
+            return render('.between-paragraphs', { key: ii });
           }
           // render normal parent nodes with content
           return render(
@@ -305,64 +298,72 @@ export const renderQuillDelta = (
               : parent.attributes && parent.attributes.list === 'unchecked'
               ? `li.unchecked`
               : 'div',
+            { key: ii },
             parent.children.map(renderChild)
           );
         };
         // special handler for lists, which need to be un-flattened and turned into a tree
-        const renderListGroup = (_group) => {
+      const renderListGroup = (_group, ii) => {
           const temp = []; // accumulator for potential parent tree nodes; will grow to the maximum depth of the tree
-          _group.parents.forEach((parent) => {
+          _group.parents.forEach((parent, iii) => {
             const tag = getParentTag(parent);
             const content = parent.children.map(renderChild);
             if (tag === 'li.checked') {
               content.unshift(
-                render(`input[type='checkbox'][disabled][checked]`)
+                render(`input[type='checkbox'][disabled][checked]`, { key: iii })
               );
             } else if (tag === 'li.unchecked') {
-              content.unshift(render(`input[type='checkbox'][disabled]`));
+              content.unshift(render(`input[type='checkbox'][disabled]`, { key: iii }));
             }
             const indent = parent.attributes.indent || 0;
 
             if (indent >= temp.length) {
               // indent
               temp.push([]);
-              temp[temp.length - 1].push({ tag, content, indent });
+              temp[temp.length - 1].push({ tag, content, indent, key: ii });
             } else if (indent === temp.length - 1) {
               // keep same
-              temp[indent].push({ tag, content, indent });
+              temp[indent].push({ tag, content, indent, key: ii });
             } else if (indent < temp.length - 1) {
               // outdent and unwind
               while (indent < temp.length - 1) {
+                let iii = 0
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   render(
                     getGroupTag(_group),
-                    temp.pop().map((data) => {
-                      return render(data.tag, data.content);
+                    { key: `outdent-${iii}` },
+                    temp.pop().map((data, index) => {
+                      return render(data.tag, { key: index }, data.content);
                     })
                   )
                 );
+                iii++
               }
-              temp[temp.length - 1].push({ tag, content, indent });
+              temp[temp.length - 1].push({ tag, content, indent, key: ii });
             }
           });
 
           // fully unwind and collect stray children
           while (temp.length > 1) {
+            let iii = 0;
             const outdentBuffer = temp[temp.length - 2];
             outdentBuffer[outdentBuffer.length - 1].content.push(
               render(
                 getGroupTag(_group),
-                temp.pop().map(({ tag, content }) => {
-                  return render(tag, content);
+                { key: `extra-${iii}` },
+                temp.pop().map(({ tag, content, key }, index) => {
+                  return render(tag, { key: index }, content);
                 })
               )
             );
+            iii++
           }
           return render(
             getGroupTag(_group),
-            temp[0].map(({ tag, content }) => {
-              return render(tag, content);
+            { key: ii },
+            temp[0].map(({ tag, content, key }, index) => {
+              return render(tag, { key: index }, content);
             })
           );
         };

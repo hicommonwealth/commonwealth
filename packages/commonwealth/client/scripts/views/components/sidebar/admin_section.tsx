@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { getRoute } from 'mithrilInterop';
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import { handleRedirectClicks } from 'helpers';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
@@ -15,6 +14,7 @@ import type {
   ToggleTree,
 } from './types';
 import { Modal } from '../component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
@@ -40,6 +40,8 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 };
 
 const AdminSectionComponent = () => {
+  const navigate = useCommonNavigate();
+
   const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
     React.useState<boolean>(false);
   const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
@@ -53,14 +55,20 @@ const AdminSectionComponent = () => {
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
-      isActive: getRoute().includes('/manage'),
+      isActive: _DEPRECATED_getRoute().includes('/manage'),
       isVisible: true,
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(this, e, `/manage`, app.activeChainId(), () => {
-          setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
-        });
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/manage`,
+          app.activeChainId(),
+          () => {
+            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+          }
+        );
       },
     },
     {
@@ -68,14 +76,20 @@ const AdminSectionComponent = () => {
       containsChildren: false,
       displayData: null,
       hasDefaultToggle: false,
-      isActive: getRoute().includes('/analytics'),
+      isActive: _DEPRECATED_getRoute().includes('/analytics'),
       isVisible: true,
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(this, e, `/analytics`, app.activeChainId(), () => {
-          setAdminToggleTree(`children.analytics.toggledState`, toggle);
-        });
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/analytics`,
+          app.activeChainId(),
+          () => {
+            setAdminToggleTree(`children.analytics.toggledState`, toggle);
+          }
+        );
       },
     },
     {
@@ -185,4 +199,4 @@ const AdminSectionComponent = () => {
   );
 };
 
-export const AdminSection = NavigationWrapper(AdminSectionComponent);
+export const AdminSection = AdminSectionComponent;

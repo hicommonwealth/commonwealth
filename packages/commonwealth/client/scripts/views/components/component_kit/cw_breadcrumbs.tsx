@@ -1,13 +1,10 @@
 import React from 'react';
 
-import { setRoute} from
-
- 'mithrilInterop';
-
 import 'components/component_kit/cw_breadcrumbs.scss';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type BreadcrumbsType = {
   label: string;
@@ -20,6 +17,7 @@ type BreadcrumbsProps = {
 
 export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
   const { breadcrumbs } = props;
+  const navigate = useCommonNavigate();
 
   return (
     <div className={ComponentType.Breadcrumbs}>
@@ -32,7 +30,7 @@ export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
               type="caption"
               fontWeight="medium"
               className={isCurrent ? 'current-text' : 'parent-text'}
-              onClick={isCurrent ? undefined : () => setRoute(b.path)}
+              onClick={isCurrent ? undefined : () => navigate(b.path)}
             >
               {b.label}
             </CWText>

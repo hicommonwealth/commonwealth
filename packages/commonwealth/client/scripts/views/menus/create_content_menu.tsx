@@ -1,35 +1,20 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
-import { navigateToSubpage } from 'router';
+import { redraw } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import {
-  PopoverMenu,
-  PopoverMenuItem,
-} from '../components/component_kit/cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import type { MenuItem } from '../components/component_kit/types';
+import { useCommonNavigate } from 'navigation/helpers';
 
-const getCreateContentMenuItems = (): PopoverMenuItem[] => {
-  const activeAccount = app.user.activeAccount;
-
+const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
@@ -72,7 +57,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
             `${app.activeChainId()}-active-topic-default-template`
           );
         }
-        navigateToSubpage('/new/discussion');
+        navigate('/new/discussion');
       },
     }));
 
@@ -81,7 +66,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
       ? [
           {
             label: 'New On-Chain Proposal',
-            onClick: () => navigateToSubpage('/new/proposal'),
+            onClick: () => navigate('/new/proposal'),
             iconLeft: 'star',
           },
         ]
@@ -92,7 +77,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
       ? [
           {
             label: 'New Sputnik proposal',
-            onClick: () => navigateToSubpage('/new/proposal'),
+            onClick: () => navigate('/new/proposal'),
             iconLeft: 'democraticProposal',
           },
         ]
@@ -104,7 +89,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
           {
             label: 'New treasury proposal',
             onClick: () =>
-              navigateToSubpage('/new/proposal/:type', {
+              navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
               }),
             iconLeft: 'treasuryProposal',
@@ -112,7 +97,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
           {
             label: 'New democracy proposal',
             onClick: () =>
-              navigateToSubpage('/new/proposal/:type', {
+              navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
             iconLeft: 'democraticProposal',
@@ -120,7 +105,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
           {
             label: 'New tip',
             onClick: () =>
-              navigateToSubpage('/new/proposal/:type', {
+              navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
               }),
             iconLeft: 'jar',
@@ -137,11 +122,11 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
             onClick: () => {
               const snapshotSpaces = app.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
-                navigateToSubpage('/multiple-snapshots', {
+                navigate('/multiple-snapshots', {
                   action: 'create-proposal',
                 });
               } else {
-                navigateToSubpage(`/new/snapshot/${snapshotSpaces}`);
+                navigate(`/new/snapshot/${snapshotSpaces}`);
               }
             },
           },
@@ -160,30 +145,30 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
       label: 'New Community',
       iconLeft: 'people',
       onClick: (e) => {
-        e.preventDefault();
-        mixpanelBrowserTrack({
-          event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-          chainBase: null,
-          isCustomDomain: app.isCustomDomain(),
-          communityType: null,
-        });
+        e?.preventDefault();
+        // mixpanelBrowserTrack({
+        //   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
+        //   chainBase: null,
+        //   isCustomDomain: app.isCustomDomain(),
+        //   communityType: null,
+        // });
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
         app.sidebarRedraw.emit('redraw');
-        setRoute('/createCommunity');
+        navigate('/createCommunity', {}, null);
       },
     },
     {
       label: 'Gate your Discord',
       iconLeft: 'discord',
       onClick: (e) => {
-        e.preventDefault();
-        mixpanelBrowserTrack({
-          event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-          chainBase: null,
-          isCustomDomain: app.isCustomDomain(),
-          communityType: null,
-        });
+        e?.preventDefault();
+        // mixpanelBrowserTrack({
+        //   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
+        //   chainBase: null,
+        //   isCustomDomain: app.isCustomDomain(),
+        //   communityType: null,
+        // });
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
         app.sidebarRedraw.emit('redraw');
@@ -209,7 +194,7 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
           {
             label: 'New Thread',
             onClick: () => {
-              navigateToSubpage('/new/discussion');
+              navigate('/new/discussion');
             },
             iconLeft: 'write',
           } as PopoverMenuItem,
@@ -228,72 +213,72 @@ const getCreateContentMenuItems = (): PopoverMenuItem[] => {
   ];
 };
 
-export class CreateContentSidebar extends ClassComponent {
-  view() {
-    return (
-      <CWSidebarMenu
-        className="CreateContentSidebar"
-        menuHeader={{
-          label: 'Create',
-          onClick: async () => {
-            const sidebar = document.getElementsByClassName(
-              'CreateContentSidebar'
-            );
-            sidebar[0].classList.add('onremove');
-            setTimeout(() => {
-              app.sidebarToggled = false;
-              app.sidebarMenu = 'default';
-              app.sidebarRedraw.emit('redraw');
-              redraw();
-            }, 200);
-          },
-        }}
-        menuItems={getCreateContentMenuItems()}
-      />
-    );
-  }
-}
+export const CreateContentSidebar = () => {
+  const navigate = useCommonNavigate();
 
-export class CreateContentMenu extends ClassComponent {
-  view() {
-    return (
-      <CWMobileMenu
-        className="CreateContentMenu"
-        menuHeader={{
-          label: 'Create',
-          onClick: () => {
-            app.mobileMenu = 'MainMenu';
-            app.mobileMenuRedraw.emit('redraw');
-          },
-        }}
-        menuItems={getCreateContentMenuItems()}
-      />
-    );
-  }
-}
+  return (
+    <CWSidebarMenu
+      className="CreateContentSidebar"
+      menuHeader={{
+        label: 'Create',
+        onClick: async () => {
+          const sidebar = document.getElementsByClassName(
+            'CreateContentSidebar'
+          );
+          sidebar[0].classList.add('onremove');
+          setTimeout(() => {
+            app.sidebarToggled = false;
+            app.sidebarMenu = 'default';
+            app.sidebarRedraw.emit('redraw');
+            redraw();
+          }, 200);
+        },
+      }}
+      menuItems={getCreateContentMenuItems(navigate)}
+    />
+  );
+};
 
-export class CreateContentPopover extends ClassComponent {
-  view() {
-    if (
-      !app.isLoggedIn() ||
-      !app.chain ||
-      !app.activeChainId() ||
-      !app.user.activeAccount
-    ) {
-      return;
-    }
+export const CreateContentMenu = () => {
+  const navigate = useCommonNavigate();
 
-    return (
-      <PopoverMenu
-        menuItems={getCreateContentMenuItems()}
-        renderTrigger={(onclick) => (
-          <CWIconButton
-            iconButtonTheme="black"
-            iconName="plusCircle"
-            onClick={onclick}
-          />
-        )}
-      />
-    );
+  return (
+    <CWMobileMenu
+      className="CreateContentMenu"
+      menuHeader={{
+        label: 'Create',
+        onClick: () => {
+          app.mobileMenu = 'MainMenu';
+          app.sidebarRedraw.emit('redraw');
+        },
+      }}
+      menuItems={getCreateContentMenuItems(navigate)}
+    />
+  );
+};
+
+export const CreateContentPopover = () => {
+  const navigate = useCommonNavigate();
+
+  if (
+    !app.isLoggedIn() ||
+    !app.chain ||
+    !app.activeChainId() ||
+    !app.user.activeAccount
+  ) {
+    return;
   }
-}
+
+  return (
+    <PopoverMenu
+      menuItems={getCreateContentMenuItems(navigate)}
+      renderTrigger={(onclick) => (
+        <CWIconButton
+          iconButtonTheme="black"
+          iconName="plusCircle"
+          onClick={onclick}
+        />
+      )}
+    />
+  );
+};

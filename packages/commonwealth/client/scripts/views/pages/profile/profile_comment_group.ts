@@ -1,15 +1,6 @@
 import _ from 'lodash';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { render, ClassComponent } from 'mithrilInterop';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import type { Account, Comment } from 'models';
@@ -17,6 +8,7 @@ import type { Thread } from 'models';
 
 import app from 'state';
 import { renderQuillTextBody } from '../../components/quill/helpers';
+import withRouter from 'navigation/helpers';
 
 interface IProfileCommentGroupAttrs {
   proposal: Thread | any;
@@ -24,8 +16,9 @@ interface IProfileCommentGroupAttrs {
   account: Account;
 }
 
-const ProfileCommentGroup: Component<IProfileCommentGroupAttrs> = {
-  view: (vnode) => {
+class ProfileCommentGroupComponent extends ClassComponent<IProfileCommentGroupAttrs> {
+  // const ProfileCommentGroup: Component<IProfileCommentGroupAttrs> = {
+  view(vnode) {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
 
@@ -44,11 +37,17 @@ const ProfileCommentGroup: Component<IProfileCommentGroupAttrs> = {
               'a.link-bold',
               `/${proposal.chain}${getProposalUrlPath(slug, identifier, true)}`,
               `${title}`,
+              this.setRoute.bind(this),
               {},
               `profile-${account.address}-${account.chain.id}-${proposal.chain}-scrollY`
             ),
             ' in ',
-            link('a.link-bold', `/${proposal.chain}`, ` ${proposal.chain}`),
+            link(
+              'a.link-bold',
+              `/${proposal.chain}`,
+              ` ${proposal.chain}`,
+              this.setRoute.bind(this)
+            ),
           ],
         ]),
         comments[0] &&
@@ -58,17 +57,14 @@ const ProfileCommentGroup: Component<IProfileCommentGroupAttrs> = {
       render('.activity', [
         comments.map((comment) =>
           render('.proposal-comment', [
-            render(
-              '.comment-text',
-              renderQuillTextBody(comment.text, {
-                collapse: true,
-              })
-            ),
+            render('.comment-text', renderQuillTextBody(comment.text)),
           ])
         ),
       ]),
     ]);
-  },
-};
+  }
+}
+
+const ProfileCommentGroup = withRouter(ProfileCommentGroupComponent);
 
 export default ProfileCommentGroup;

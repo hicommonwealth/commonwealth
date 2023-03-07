@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
 import type { AnyProposal, Thread } from 'models';
 
 import app from 'state';
@@ -17,6 +15,10 @@ const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
 type CollapsibleThreadBodyProps = {
   thread: Thread;
 };
+
+// 1) TODO: Port CollapsibleProposalBody to React.FC.
+// 2) This component is not actually used to dynamically collapse threads.
+// That happens entirely in QuillFormattedText.
 
 export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
   const { thread } = props;
@@ -68,7 +70,6 @@ export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
       <QuillFormattedText
         doc={doc}
         cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-        collapse={collapsed}
         hideFormatting={false}
       />
     );
@@ -88,70 +89,52 @@ export const CollapsibleThreadBody = (props: CollapsibleThreadBodyProps) => {
   }
 };
 
-type CollapsibleProposalBodyAttrs = {
+type CollapsibleProposalBodyProps = {
   proposal: AnyProposal;
 };
 
-export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalBodyAttrs> {
-  private body: any;
-  private collapsed: boolean;
+export const CollapsibleProposalBody = ({
+  proposal,
+}: CollapsibleProposalBodyProps) => {
+  const [body, setBody] = useState(proposal.description);
+  const [collapsed, setCollapsed] = useState(false);
 
-  oninit(vnode: ResultNode<CollapsibleProposalBodyAttrs>) {
-    const { proposal } = vnode.attrs;
-
-    this.collapsed = false;
-    this.body = proposal.description;
-
+  useEffect(() => {
     try {
       const doc = JSON.parse(proposal.description);
       if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
-        this.collapsed = true;
+        setCollapsed(true);
       }
     } catch (e) {
       if (
         countLinesMarkdown(proposal.description) >
         MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
       ) {
-        this.collapsed = true;
+        setCollapsed(true);
       }
     }
+  }, []);
+
+  try {
+    const doc = JSON.parse(body);
+
+    if (!doc.ops) throw new Error();
+
+    return (
+      <QuillFormattedText
+        doc={doc}
+        cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+        hideFormatting={false}
+      />
+    );
+  } catch (e) {
+    return (
+      body && (
+        <MarkdownFormattedText
+          doc={body}
+          cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+        />
+      )
+    );
   }
-
-  onupdate(vnode: ResultNode<CollapsibleProposalBodyAttrs>) {
-    const { proposal } = vnode.attrs;
-
-    this.body = proposal.description;
-  }
-
-  view() {
-    const { body } = this;
-
-    const text = () => {
-      try {
-        const doc = JSON.parse(body);
-
-        if (!doc.ops) throw new Error();
-
-        return (
-          <QuillFormattedText
-            doc={doc}
-            cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-            collapse={false}
-            hideFormatting={false}
-          />
-        );
-      } catch (e) {
-        return (
-          body && (
-            <MarkdownFormattedText
-              doc={body}
-              cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
-            />
-          )
-        );
-      }
-    };
-
-    return text();
-  }
-}
+};

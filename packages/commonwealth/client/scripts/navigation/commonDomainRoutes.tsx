@@ -1,7 +1,8 @@
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { Navigate, withLayout } from 'navigation/helpers';
+import { Navigate } from 'navigation/helpers';
 import app from 'state';
+import { withLayout } from 'views/layout';
 
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
@@ -11,7 +12,6 @@ const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(() => import('views/pages/members'));
-const ChatPage = lazy(() => import('views/pages/chat'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
@@ -23,11 +23,12 @@ const NotificationSettingsPage = lazy(
 
 const ReferendaPage = lazy(() => import('views/pages/referenda'));
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
-const DelegatePage = lazy(() => import('views/pages/delegate'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
-const DiscussionsPage = lazy(() => import('views/pages/discussions'));
+const DiscussionsPage = lazy(
+  () => import('views/pages/discussions/DiscussionsPage')
+);
 const ViewThreadPage = lazy(() => import('views/pages/view_thread/index'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
@@ -44,7 +45,7 @@ const TreasuryPage = lazy(() => import('views/pages/treasury'));
 const TipsPage = lazy(() => import('views/pages/tips'));
 
 const ManageCommunityPage = lazy(
-  () => import('views/pages/manage_community/index')
+  () => import('views/pages/manage_community/ManageCommunityPage')
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
 const SnapshotProposalPage = lazy(
@@ -121,13 +122,6 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
-      path="/:scope/chat/:channel"
-      element={withLayout(ChatPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
       path="/:scope/sputnik-daos"
       element={withLayout(SputnikDaosPage, {
         scoped: true,
@@ -159,6 +153,10 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
+      path="/:scope/notification-settings"
+      element={<Navigate to="/notification-settings" />}
+    />
+    <Route
       path="/notifications"
       element={<Navigate to={'/edgeware/notifications'} />}
     />
@@ -174,12 +172,6 @@ const getCommonDomainsRoutes = () => (
     <Route
       path="/:scope/proposals"
       element={withLayout(ProposalsPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/delegate"
-      element={withLayout(DelegatePage, {
         scoped: true,
       })}
     />
@@ -225,7 +217,7 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     <Route
-      path="/:scope/discussions/:topic"
+      path="/:scope/discussions/:topicName"
       element={withLayout(DiscussionsPage, {
         scoped: true,
         deferChain: true,

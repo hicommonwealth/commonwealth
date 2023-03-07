@@ -121,6 +121,7 @@
   }
 
   .role-tag-container {
+    display: inline-block;
     .role-tag-text.Text {
       background-color: $neutral-200;
       border-radius: $border-radius-rounded-corners;
@@ -128,6 +129,13 @@
       padding: 2px 8px;
     }
   }
+}
+
+.user-popover-wrapper {
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .UserPopover {

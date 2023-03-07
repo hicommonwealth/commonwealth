@@ -1,10 +1,10 @@
 import type { ThreadKind, Topic } from 'models';
 
 export type NewThreadFormType = {
-  kind: ThreadKind;
-  title: string;
-  topic: Topic;
-  url?: string;
+  threadKind: ThreadKind;
+  threadTitle: string;
+  threadTopic: Topic;
+  threadUrl?: string;
 };
 
 export enum NewThreadErrors {

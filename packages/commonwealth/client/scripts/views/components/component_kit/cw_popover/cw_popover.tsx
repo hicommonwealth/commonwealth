@@ -2,9 +2,6 @@ import React from 'react';
 import { PopperUnstyled } from '@mui/base';
 import type { Placement } from '@popperjs/core/lib';
 
-import { ClassComponent} from
-
- 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 
 export type AnchorType = HTMLElement | SVGSVGElement;
@@ -69,9 +66,3 @@ export const Popover = (props: PopoverProps) => {
     </PopperUnstyled>
   );
 };
-
-export class CWPopover extends ClassComponent {
-  view() {
-    return <div />;
-  }
-}

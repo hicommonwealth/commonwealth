@@ -1,33 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import type { NavigateOptions, To } from 'react-router';
+import $ from 'jquery';
+import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 
+import app from 'state';
 import { initAppState } from 'state';
 import { updateActiveAddresses } from 'controllers/app/login';
-import $ from 'jquery';
-import app from 'state';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
-
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';
-
-interface IState {
-  validating: boolean;
-  error: string;
-}
+import { useCommonNavigate } from 'navigation/helpers';
 
 // creates address, initializes account, and redirects to main page
 const validate = async (
   token: string,
   stateId: string,
-  chain: string
+  chain: string,
+  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
 ): Promise<void | string> => {
   // verifyAddress against token, returns user if not logged in
   let result;
@@ -53,34 +41,28 @@ const validate = async (
   }
 };
 
-class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
-  public state: IState = {
-    validating: false,
-    error: '',
-  };
+const FinishAxieLogin = () => {
+  const [error, setError] = useState('');
+  const navigate = useCommonNavigate();
 
-  public oninit() {
-    // grab token
-    // TODO: how to use state id?
-    const token = getRouteParam('token');
-    const stateId = getRouteParam('stateId');
+  const token = _DEPRECATED_getSearchParams('token');
+  const stateId = _DEPRECATED_getSearchParams('stateId');
 
-    validate(token, stateId, 'axie-infinity').then((res) => {
+  useEffect(() => {
+    validate(token, stateId, 'axie-infinity', navigate).then((res) => {
       if (typeof res === 'string') {
-        this.state.error = res;
-        redraw();
+        setError(res);
       }
     });
-  }
+  }, []);
 
-  public view() {
-    console.log('finish axie login');
-    if (this.state.error) {
-      return <ErrorPage title="Login Error" message={this.state.error} />;
-    } else {
-      return <PageLoading />;
-    }
+  console.log('finish axie login');
+
+  if (error) {
+    return <ErrorPage title="Login Error" message={error} />;
+  } else {
+    return <PageLoading />;
   }
-}
+};
 
 export default FinishAxieLogin;

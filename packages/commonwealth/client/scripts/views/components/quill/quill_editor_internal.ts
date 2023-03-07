@@ -1,13 +1,4 @@
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import { loadScript } from 'helpers';
 import { detectURL } from 'helpers/threads';
@@ -390,14 +381,15 @@ export default class QuillEditorInternal {
       .find('button.ql-preview')
       .on('click', (e) => {
         const markdownMode = this._activeMode === 'markdown';
-        app.modals.create({
-          modal: PreviewModal,
-          data: {
-            doc: markdownMode
-              ? this._quill.getText()
-              : JSON.stringify(this._quill.getContents()),
-          },
-        });
+
+        return null;
+        // @REACT @TODO: Re-add modal using new pattern
+        //   modal: PreviewModal,
+        //   data: {
+        //     doc: markdownMode
+        //       ? this._quill.getText()
+        //       : JSON.stringify(this._quill.getContents()),
+        //   },
       });
   }
 

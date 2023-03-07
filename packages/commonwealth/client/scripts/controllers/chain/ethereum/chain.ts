@@ -1,16 +1,7 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import type { ChainInfo, IChainModule, ITXModalData, NodeInfo } from 'models';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
@@ -60,15 +51,6 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   private _api: Web3;
   private _metadataInitialized = false;
-  private _totalbalance: EthereumCoin;
-
-  public get metadataInitialized() {
-    return this._metadataInitialized;
-  }
-
-  public get totalbalance() {
-    return this._totalbalance;
-  }
 
   public async _initApi(node: NodeInfo): Promise<Web3> {
     try {

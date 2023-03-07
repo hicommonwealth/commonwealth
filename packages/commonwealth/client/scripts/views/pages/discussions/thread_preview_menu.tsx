@@ -1,27 +1,28 @@
-import React from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import React, { useState } from 'react';
 
 import { redraw } from 'mithrilInterop';
-import { navigateToSubpage } from 'router';
-import type { Thread, ThreadStage, Topic } from 'models';
+import type { Thread, ThreadStage } from 'models';
 import app from 'state';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
-import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadPreviewMenuProps = {
   thread: Thread;
+  setIsChangeTopicModalOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
-  const { thread } = props;
+export const ThreadPreviewMenu = ({
+  thread,
+  setIsChangeTopicModalOpen,
+}: ThreadPreviewMenuProps) => {
+  const navigate = useCommonNavigate();
 
-  const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] =
-    React.useState<boolean>(false);
   const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
-    React.useState<boolean>(false);
+    useState(false);
 
   const hasAdminPermissions =
     app.user.activeAccount &&
@@ -56,7 +57,7 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
                       e.preventDefault();
 
                       app.threads.pin({ proposal: thread }).then(() => {
-                        navigateToSubpage('/discussions');
+                        navigate('/discussions');
                         redraw();
                       });
                     },
@@ -86,10 +87,7 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
             ...(hasAdminPermissions
               ? [
                   {
-                    onClick: (e) => {
-                      e.preventDefault();
-                      setIsChangeTopicModalOpen(true);
-                    },
+                    onClick: () => setIsChangeTopicModalOpen(true),
                     label: 'Change topic',
                     iconLeft: 'filter' as const,
                   },
@@ -113,14 +111,14 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
                     onClick: async (e) => {
                       e.preventDefault();
 
-                      const confirmed = await confirmationModalWithText(
+                      const confirmed = window.confirm(
                         'Delete this entire thread?'
-                      )();
+                      );
 
                       if (!confirmed) return;
 
                       app.threads.delete(thread).then(() => {
-                        navigateToSubpage('/discussions');
+                        navigate('/discussions');
                       });
                     },
                     label: 'Delete',
@@ -138,20 +136,6 @@ export const ThreadPreviewMenu = (props: ThreadPreviewMenuProps) => {
           )}
         />
       </div>
-      <Modal
-        content={
-          <ChangeTopicModal
-            onChangeHandler={(topic: Topic) => {
-              thread.topic = topic;
-              redraw();
-            }}
-            thread={thread}
-            onModalClose={() => setIsChangeTopicModalOpen(false)}
-          />
-        }
-        onClose={() => setIsChangeTopicModalOpen(false)}
-        open={isChangeTopicModalOpen}
-      />
       <Modal
         content={
           <UpdateProposalStatusModal

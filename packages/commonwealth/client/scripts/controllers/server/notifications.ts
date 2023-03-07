@@ -1,5 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
+
+import { redraw } from 'mithrilInterop';
 import { ChainEventType, Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
 import { EventEmitter } from 'events';

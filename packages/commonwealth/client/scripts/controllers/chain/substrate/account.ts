@@ -28,13 +28,6 @@ export class SubstrateAccount extends Account {
   private polkadot;
 
   // GETTERS AND SETTERS
-  // staking
-  public get stakedBalance(): Promise<SubstrateCoin> {
-    if (!this._Chain?.apiInitialized) return;
-    return this.stakingExposure.then((exposure) =>
-      this._Chain.coins(exposure ? exposure.total.toBn() : NaN)
-    );
-  }
 
   // The total balance
   public get balance(): Promise<SubstrateCoin> {
@@ -69,37 +62,6 @@ export class SubstrateAccount extends Account {
     );
   }
 
-  // The coin locks this account has on them
-  public get locks(): Promise<(BalanceLock | BalanceLockTo212)[]> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.derive.balances
-      .all(this.address)
-      .then(({ lockedBreakdown }) =>
-        lockedBreakdown.length > 0 ? lockedBreakdown : []
-      );
-  }
-
-  // The amount staked by this account & accounts who have nominated it
-  public get stakingExposure(): Promise<Exposure> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.staking
-      .currentEra<EraIndex>()
-      .then((era: EraIndex) => {
-        // Different runtimes call for different access to stakers: old vs. new
-        const stakersCall = this._Chain.api.query.staking.stakers
-          ? this._Chain.api.query.staking.stakers
-          : this._Chain.api.query.staking.erasStakers;
-        // Different staking functions call for different function arguments: old vs. new
-        const stakersCallArgs = (account) =>
-          this._Chain.api.query.staking.stakers
-            ? [account]
-            : [era.toString(), account];
-        return stakersCall(
-          ...stakersCallArgs(this.address)
-        ) as Promise<Exposure>;
-      });
-  }
-
   public get bonded(): Promise<SubstrateAccount> {
     if (!this._Chain?.apiInitialized) return;
     return this._Chain.api.query.staking
@@ -111,17 +73,6 @@ export class SubstrateAccount extends Account {
           return null;
         }
       });
-  }
-
-  public get stakingLedger(): Promise<StakingLedger> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.staking.ledger(this.address).then((ledger) => {
-      if (ledger && ledger.isSome) {
-        return ledger.unwrap();
-      } else {
-        return null;
-      }
-    });
   }
 
   // Accounts may delegate their voting power for democracy referenda. This always incurs the maximum locktime
@@ -175,102 +126,6 @@ export class SubstrateAccount extends Account {
     this.isEd25519 = isEd25519;
     this._Accounts = Accounts;
     this._Accounts.store.add(this);
-  }
-
-  // TRANSACTIONS
-  public get balanceTransferFee(): Promise<SubstrateCoin> {
-    const txFee = this._Chain.api.consts.balances.transferFee as Balance;
-    if (txFee) return Promise.resolve(this._Chain.coins(txFee));
-    const dummyTxFunc = (api: ApiPromise) =>
-      api.tx.balances.transfer(this.address, '0');
-    return this._Chain.computeFees(this.address, dummyTxFunc);
-  }
-
-  public nominateTx(nominees: SubstrateAccount[]) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) =>
-        api.tx.staking.nominate(nominees.map((n) => n.address)),
-      'nominate',
-      `${this.address} updates nominations`
-    );
-  }
-
-  public chillTx() {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.chill(),
-      'chill',
-      `${this.address} is chilling`
-    );
-  }
-
-  public bondTx(
-    controller: SubstrateAccount,
-    amount: SubstrateCoin,
-    rewardDestination: number | string
-  ) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) =>
-        api.tx.staking.bond(
-          controller.address,
-          amount,
-          this._Chain.createType('RewardDestination', rewardDestination)
-        ),
-      'bond',
-      `${this.address} bonds ${amount.toString()} to controller ${
-        controller.address
-      }`
-    );
-  }
-
-  public bondExtraTx(amount: SubstrateCoin) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.bondExtra(amount),
-      'bondExtra',
-      `${this.address} bonds additional ${amount.toString()}`
-    );
-  }
-
-  public unbond(amount: SubstrateCoin) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.unbond(amount),
-      'unbond',
-      `${this.address} unbonds ${amount.toString()}`
-    );
-  }
-
-  public setController(controller: SubstrateAccount) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.setController(controller.address),
-      'setController',
-      `${this.address} sets controller ${controller.address}`
-    );
-  }
-
-  public setPayee(rewardDestination: number | string) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) =>
-        api.tx.staking.setPayee(
-          this._Chain.createType('RewardDestination', rewardDestination)
-        ),
-      'setPayee',
-      `${this.address} sets reward destination ${rewardDestination}`
-    );
-  }
-
-  public unlockTx() {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.democracy.unlock(this.address),
-      'unlock',
-      `${this.address} attempts to unlock from democracy`
-    );
   }
 }
 

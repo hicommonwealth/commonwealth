@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { getProposalUrlPath } from 'identifiers';
 import type { Thread } from 'models';
@@ -19,36 +19,34 @@ type LinkedThreadsCardProps = {
   threadId: number;
 };
 
-export const LinkedThreadsCard = (props: LinkedThreadsCardProps) => {
-  const { allowLinking, threadId } = props;
-
-  const [initialized, setInitialized] = React.useState<boolean>(false);
-  const [linkedThreads, setLinkedThreads] = React.useState<Array<Thread>>([]);
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+export const LinkedThreadsCard = ({
+  allowLinking,
+  threadId,
+}: LinkedThreadsCardProps) => {
+  const [linkedThreads, setLinkedThreads] = useState<Array<Thread>>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const thread = app.threads.getById(threadId);
 
-  if (thread.linkedThreads.length > 0 && !initialized) {
-    setInitialized(true);
-
-    app.threads
-      .fetchThreadsFromId(
-        thread.linkedThreads.map(
-          (relation: LinkedThreadRelation) => relation.linkedThread
+  useEffect(() => {
+    if (thread.linkedThreads.length > 0) {
+      app.threads
+        .fetchThreadsFromId(
+          thread.linkedThreads.map(
+            (relation: LinkedThreadRelation) => relation.linkedThread
+          )
         )
-      )
-      .then((result) => {
-        setLinkedThreads(result);
-        setInitialized(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setInitialized(false);
-      });
-  }
+        .then((result) => {
+          setLinkedThreads(result);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }, [thread?.linkedThreads]);
 
   return (
-    <React.Fragment>
+    <>
       <CWContentPageCard
         header="Linked Discussions"
         content={
@@ -58,10 +56,15 @@ export const LinkedThreadsCard = (props: LinkedThreadsCardProps) => {
                 {linkedThreads.map((t) => {
                   const discussionLink = getProposalUrlPath(
                     t.slug,
-                    `${t.identifier}-${slugify(t.title)}`
+                    `${t.identifier}-${slugify(t.title)}`,
+                    true
                   );
 
-                  return <a href={discussionLink}>{t.title}</a>;
+                  return (
+                    <a key={t.id} href={discussionLink}>
+                      {t.title}
+                    </a>
+                  );
                 })}
               </div>
             ) : (
@@ -93,6 +96,6 @@ export const LinkedThreadsCard = (props: LinkedThreadsCardProps) => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

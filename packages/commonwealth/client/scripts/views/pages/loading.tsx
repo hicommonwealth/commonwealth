@@ -1,39 +1,26 @@
 import React from 'react';
 
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-  } from 'mithrilInterop';
-
 import 'pages/loading.scss';
 
 import Sublayout from 'views/sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { CWText } from '../components/component_kit/cw_text';
 
-type PageLoadingAttrs = {
+type PageLoadingProps = {
   message?: string;
 };
 
-export class PageLoading extends ClassComponent<PageLoadingAttrs> {
-  view(vnode: ResultNode<PageLoadingAttrs>) {
-    const { message } = vnode.attrs;
+export const PageLoading = (props: PageLoadingProps) => {
+  const { message } = props;
 
-    return (
-      <Sublayout hideSearch>
-        <div className="LoadingPage">
-          <div className="inner-content">
-            <CWSpinner size="xl" />
-            <CWText>{message}</CWText>
-          </div>
+  return (
+    <Sublayout hideSearch>
+      <div className="LoadingPage">
+        <div className="inner-content">
+          <CWSpinner size="xl" />
+          <CWText>{message}</CWText>
         </div>
-      </Sublayout>
-    );
-  }
-}
+      </div>
+    </Sublayout>
+  );
+};

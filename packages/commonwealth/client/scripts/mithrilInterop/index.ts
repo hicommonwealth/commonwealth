@@ -8,15 +8,15 @@
  * as we do not want to expose its imports and features until we are prepared to migrate to react.
  */
 
-import {
-  createElement,
-  FunctionComponent,
-  ReactNode,
-  // eslint-disable-next-line import/no-unresolved
-  Component as ReactComponent,
-} from 'react';
-import { redirect, NavigateFunction } from 'react-router-dom';
+import type { FunctionComponent, ReactNode } from 'react';
+import { createElement, Component as ReactComponent } from 'react';
+import type {
+  NavigateFunction,
+  Location,
+  NavigateOptions,
+} from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
+import { getScopePrefix } from 'navigation/helpers';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
 export type Children = ReactNode | ReactNode[];
@@ -83,13 +83,18 @@ export type Component<Props = unknown> = FunctionComponent<Props>;
 // corresponds to Mithril's Vnode type with attrs only (no state)
 export type ResultNode<A = unknown> = { attrs: A; children: Children };
 
+export type ClassComponentRouter = {
+  location: Location;
+  navigate: NavigateFunction;
+  params: Readonly<Record<string, string | undefined>>;
+};
 // Additions to base React Component attrs
 type AdditionalAttrs = {
   // simulate mithril's vnode.children
   children?: Children;
 
-  // optionally used navigation for NavigationWrapper, see `./helpers.tsx`
-  navigate?: NavigateFunction;
+  // optionally used navigation for withRouter, see `navigation/helpers.tsx`
+  router?: ClassComponentRouter;
 };
 
 // Replicates Mithril's ClassComponent functionality with support for JSX syntax.
@@ -99,6 +104,7 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
 > {
   protected readonly __props: A;
   private _isMounted = false;
+  private _isCreated = false;
 
   // props that should not trigger a redraw -- internal to React
   private static readonly IGNORED_PROPS = [
@@ -156,7 +162,10 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
 
   // used for mithril's `oncreate` lifecycle hook and for the main `view` function
   render() {
-    this.oncreate({ attrs: this.props, children: this.props.children });
+    if (!this._isCreated) {
+      this._isCreated = true;
+      this.oncreate({ attrs: this.props, children: this.props.children });
+    }
     return this.view({ attrs: this.props, children: this.props.children });
   }
 
@@ -173,25 +182,18 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
     this.forceUpdate();
   }
 
-  // replicates `m.route.set()` functionality via react-router
-  public setRoute(route: string) {
-    if (this.props.navigate) {
-      console.log('setting route', route);
-      this.props.navigate(route);
-    }
-  }
-
-  // replicates navigation to scoped page functionality via react-router
-  // see `navigateToSubpage` in `app.tsx`
-  public navigateToSubpage(route: string) {
-    console.log('Redirecting to', route);
-    // hacky way to get the current scope
-    // @REACT @TODO: this will fail on custom domains
-    const scope = window.location.pathname.split('/')[1];
-    if (scope) {
-      this.setRoute(`/${scope}${route}`);
+  // It works very similar as useCommonNavigate but only for class components with withRouter() HOC
+  public setRoute(
+    route: string,
+    options?: NavigateOptions,
+    prefix?: null | string
+  ) {
+    const scopePrefix = getScopePrefix(prefix);
+    if (this.props.router.navigate) {
+      const url = `${scopePrefix}${route}`;
+      this.props.router.navigate(url, options);
     } else {
-      this.setRoute(route);
+      console.error('Prop "navigate" is not defined!');
     }
   }
 }
@@ -202,6 +204,8 @@ export function redraw(sync = false, component?: any) {
   if (component) {
     console.log(component);
     component.forceUpdate();
+  } else {
+    // console.trace('no-op redraw called!');
   }
 }
 
@@ -216,41 +220,27 @@ export function rootRender(el: Element, vnodes: Children) {
 }
 
 // ROUTING FUNCTIONS
-// m.route.param() shim
-export function getRouteParam(name?: string) {
+// Do not use for new features. Instead, take a look on react-router hook => "useSearchParams"
+export function _DEPRECATED_getSearchParams(name?: string) {
   const search = new URLSearchParams(window.location.search);
   return search.get(name);
 }
 
 // m.route.get() shim
-export function getRoute() {
+// Do not use for new features. Instead, take a look on react-router hook => "useLocation"
+export function _DEPRECATED_getRoute() {
   return window.location.pathname;
 }
 
-type RouteOptions = {
-  replace?: boolean;
-};
+// This should not be used for setting the route, because it does not use react-router.
+// Instead, it uses native history API, and because react router does not recognize the
+// path change, the page has to be reloaded programmatically.
+// This is only for legacy code, where react router is not accessible (eg in controllers or JS classes).
+// Always use "withRouter" for react class components or "useNavigate" for functional components.
+export function _DEPRECATED_dangerouslySetRoute(route: string) {
+  window.history.pushState('', '', route);
+  window.location.reload();
 
-// attempt to replicate global m.route.set(), currently a no-op.
-export function setRoute(
-  route: string,
-  data?: Record<string, unknown>,
-  options?: RouteOptions
-) {
-  // app._lastNavigatedBack = false;
-  // app._lastNavigatedFrom = getRoute();
-  /*
-  if (route !== getRoute()) {
-    if (options?.replace) {
-      window.history.replaceState(data, null, route);
-    } else {
-      window.history.pushState(data, null, route);
-    }
-  }
-  */
-
-  redirect(route);
-  // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];

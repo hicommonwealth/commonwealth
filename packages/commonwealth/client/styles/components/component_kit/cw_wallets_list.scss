@@ -53,17 +53,13 @@
       }
     }
 
-    .trigger-wrapper {
-      align-self: flex-end;
+    .no-wallet-link {
+      color: $neutral-500;
+      cursor: pointer;
+      margin: 8px 12px 8px 0;
 
-      .no-wallet-link {
-        color: $neutral-500;
-        cursor: pointer;
-        margin: 8px 12px 8px 0;
-
-        &.darkMode {
-          color: $neutral-400;
-        }
+      &.darkMode {
+        color: $neutral-400;
       }
     }
   }

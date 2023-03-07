@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { redraw} from
-
- 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/feedback_modal.scss';
@@ -63,7 +61,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
               (err) => {
                 setIsSending(false);
                 setStatus('failure');
-                setMessage(err.responseJSON?.message || err.responseText);
+                setMessage(err.responseJSON?.error || err.responseText);
                 redraw();
               }
             );

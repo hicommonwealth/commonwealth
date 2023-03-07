@@ -1,13 +1,9 @@
 import React from 'react';
 
-import { ClassComponent} from
-
- 'mithrilInterop';
-import { NavigationWrapper } from 'mithrilInterop/helpers';
-
 import 'footer.scss';
 
 import { isNotUndefined } from '../helpers/typeGuards';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -29,43 +25,41 @@ const footercontents = [
   },
 ];
 
-class FooterComponent extends ClassComponent {
-  view() {
-    const redirectClick = (route) => {
-      this.setRoute(route);
-    };
+export const Footer = () => {
+  const navigate = useCommonNavigate();
 
-    return (
-      <div className="Footer">
-        <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
-        <div className="footer-links-container">
-          {footercontents.map((item) => {
-            return isNotUndefined(item.redirectTo) ? (
-              <a
-                className="footer-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  redirectClick(item.redirectTo);
-                }}
-                key={item.text}
-              >
-                {item.text}
-              </a>
-            ) : (
-              <a
-                className="footer-link"
-                key={item.text}
-                href={item.externalLink}
-                target="_blank"
-              >
-                {item.text}
-              </a>
-            );
-          })}
-        </div>
+  const redirectClick = (route) => {
+    navigate(route, {}, null);
+  };
+
+  return (
+    <div className="Footer">
+      <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
+      <div className="footer-links-container">
+        {footercontents.map((item) => {
+          return isNotUndefined(item.redirectTo) ? (
+            <a
+              className="footer-link"
+              onClick={(e) => {
+                e.preventDefault();
+                redirectClick(item.redirectTo);
+              }}
+              key={item.text}
+            >
+              {item.text}
+            </a>
+          ) : (
+            <a
+              className="footer-link"
+              key={item.text}
+              href={item.externalLink}
+              target="_blank"
+            >
+              {item.text}
+            </a>
+          );
+        })}
       </div>
-    );
-  }
-}
-
-export const Footer = NavigationWrapper(FooterComponent);
+    </div>
+  );
+};

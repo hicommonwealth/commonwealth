@@ -6,24 +6,24 @@ import type {
   PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
 import express from 'express';
-import type { DB } from 'commonwealth/server/models';
+import type { DB } from '../models';
 import {
   getComments,
   getCommentsValidation,
-} from 'commonwealth/server/routes/comments/getComments';
+} from '../routes/comments/getComments';
 import getCommunities, {
   getCommunitiesValidation,
-} from 'commonwealth/server/routes/communities/getCommunities';
+} from '../routes/communities/getCommunities';
 import getProfiles, {
   getProfilesValidation,
-} from 'commonwealth/server/routes/profiles/getProfiles';
+} from '../routes/profiles/getProfiles';
 import getReactions, {
   getReactionsValidation,
-} from 'commonwealth/server/routes/reactions/getReactions';
+} from '../routes/reactions/getReactions';
 import {
   getThreads,
   getThreadsValidation,
-} from 'commonwealth/server/routes/threads/getThreads';
+} from '../routes/threads/getThreads';
 import type { Express } from 'express';
 import type Router from 'express/lib/router/index';
 import passport from 'passport';

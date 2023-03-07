@@ -15,6 +15,7 @@ import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
 import { Modal } from '../component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -48,8 +49,10 @@ export const User = (props: UserAttrs) => {
     popover,
     showRole,
   } = props;
+  const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [, updateState] = React.useState({});
 
   const popoverProps = usePopover();
 
@@ -104,6 +107,11 @@ export const User = (props: UserAttrs) => {
     }
 
     profile = app.profiles.getProfile(chainId.id, address);
+    if (!profile.initialized) {
+      app.profiles.isFetched.on('redraw', () => {
+        updateState({});
+      });
+    }
 
     role = adminsAndMods.find(
       (r) => r.address === address && r.address_chain === chainId.id
@@ -131,6 +139,12 @@ export const User = (props: UserAttrs) => {
     const chainId = account.chain.id;
 
     profile = account.profile;
+
+    if (!profile.initialized) {
+      app.profiles.isFetched.on('redraw', () => {
+        updateState({});
+      });
+    }
 
     role = adminsAndMods.find(
       (r) => r.address === account.address && r.address_chain === chainId
@@ -194,7 +208,8 @@ export const User = (props: UserAttrs) => {
                   </>
                 )}
                 {getRoleTags(false)}
-              </>
+              </>,
+              navigate
             )
           ) : (
             <a className="user-display-name username">
@@ -265,7 +280,8 @@ export const User = (props: UserAttrs) => {
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
                 </React.Fragment>
-              )
+              ),
+              navigate
             )}
         </div>
         {profile?.address && (
@@ -311,6 +327,7 @@ export const User = (props: UserAttrs) => {
 
   return popover ? (
     <div
+      className="user-popover-wrapper"
       onMouseEnter={popoverProps.handleInteraction}
       onMouseLeave={popoverProps.handleInteraction}
     >

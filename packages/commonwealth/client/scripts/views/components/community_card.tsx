@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { setRoute } from 'mithrilInterop';
-
 import 'components/community_card.scss';
 
 import { isCommandClick } from 'helpers';
@@ -11,11 +9,13 @@ import { CWCard } from './component_kit/cw_card';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWText } from './component_kit/cw_text';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type CommunityCardProps = { chain: ChainInfo };
 
 export const CommunityCard = (props: CommunityCardProps) => {
   const { chain } = props;
+  const navigate = useCommonNavigate();
 
   const redirectFunction = (e) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ export const CommunityCard = (props: CommunityCardProps) => {
       return;
     }
     localStorage['home-scrollY'] = window.scrollY;
-    setRoute(`/${chain.id}`);
+    navigate(`/${chain.id}`);
   };
 
   // Potentially Temporary (could be built into create community flow)
