@@ -65,7 +65,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
 
   view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
     const { nAccountsWithoutRole } = vnode.attrs;
-    const { addresses } = app.user;
+    const { activeAccounts } = app.user;
 
     return (
       <div class="LoginSelectorMenu left">
@@ -74,10 +74,10 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             <CWText type="caption" className="title">
               Select address to use
             </CWText>
-            {addresses.map((account) => {
+            {activeAccounts.map((account) => {
               const selected = isSameAccount(
                 account,
-                app.user.activeAccount ?? addresses[0]
+                app.user.activeAccount
               );
               return (
                 <div
@@ -91,7 +91,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
                     user: account,
                     selected: isSameAccount(
                       account,
-                      app.user.activeAccount ?? addresses[0]
+                      app.user.activeAccount
                     ),
                     showRole: false,
                     compact: true,
@@ -102,19 +102,16 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             })}
           </>
         )}
-        {addresses.length > 0 && <CWDivider />}
-        {addresses.length > 0 && (
-          <div
+        {activeAccounts.length > 0 && <CWDivider />}
+        <div
             class="login-menu-item"
             onclick={() => {
               m.route.set(`/profile/id/${this.profileId}`);
             }}
           >
             <CWText type="caption">View profile</CWText>
-          </div>
-        )}
-        {addresses.length > 0 && (
-          <div
+        </div>
+        <div
             class="login-menu-item"
             onclick={() => {
               m.route.set(`/profile/id/${this.profileId}/edit`);
@@ -122,7 +119,6 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
           >
             <CWText type="caption">Edit profile</CWText>
           </div>
-        )}
         <div
           class="login-menu-item"
           onclick={() => {
