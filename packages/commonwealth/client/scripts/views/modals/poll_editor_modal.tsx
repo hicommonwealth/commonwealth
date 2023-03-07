@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { pluralize } from 'helpers';
+import _ from 'underscore';
+import moment from 'moment';
 
 import 'modals/poll_editor_modal.scss';
-import type { Thread } from 'models';
-import moment from 'moment';
-import app from 'state';
-import _ from 'underscore';
 
+import type { Thread } from 'models';
+
+import app from 'state';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { pluralize } from 'helpers';
 import { getNextPollEndingTime } from 'utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
@@ -43,10 +43,10 @@ const customDurationOptions = [
   ..._.range(1, 31).map((n) => pluralize(Number(n), 'day')),
 ].map((option) => ({ value: option, label: option }));
 
-interface PollEditorModalProps {
+type PollEditorModalProps = {
   onModalClose: () => void;
   thread: Thread;
-}
+};
 
 export const PollEditorModal = ({
   onModalClose,
@@ -121,7 +121,10 @@ export const PollEditorModal = ({
         <CWTextInput
           label="Question"
           placeholder="Do you support this proposal?"
-          onInput={(e) => setPrompt(e.target.value)}
+          defaultValue={prompt}
+          onInput={(e) => {
+            setPrompt(e.target.value);
+          }}
         />
         <div className="options-and-label-container">
           <CWLabel label="Options" />
