@@ -147,13 +147,16 @@ const User: m.Component<
       }
     );
 
+    const defaultAvatar = jdenticon.toSvg(profile.id, 90);
+    const svgSource =`data:image/svg+xml;utf8,${encodeURIComponent(defaultAvatar)}`;
+
     const profileAvatar = profile?.avatarUrl
       ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize })
-      : m(CWJdenticon, { address: profile.address, size: avatarSize });
+      : m('img', { src: svgSource});
 
     const profileAvatarPopover = profile?.avatarUrl
       ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize+12 })
-      : m(CWJdenticon, { address: profile.address, size: avatarSize+8 });
+      : m('img', { src: svgSource});
 
     const userFinal = avatarOnly
       ? m(
