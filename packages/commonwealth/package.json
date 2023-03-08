@@ -5,6 +5,7 @@
   "scripts": {
     "build": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
     "heroku-postbuild": "NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
+    "heroku-cleanup": "chmod u+x ../../scripts/postinstall-cleanup.sh && ../../scripts/postinstall-cleanup.sh",
     "build-app": "webpack --config webpack/webpack.prod.config.js --progress",
     "build-consumer": "tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json",
     "build-ios": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios",
