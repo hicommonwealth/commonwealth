@@ -31,6 +31,7 @@ type CreateCommmentProps = {
 export const CreateComment = (props: CreateCommmentProps) => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(null);
+  const [editorValue, setEditorValue] = React.useState<string>('');
   const [sendingComment, setSendingComment] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
@@ -45,22 +46,10 @@ export const CreateComment = (props: CreateCommmentProps) => {
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
-  const handleSubmitComment = async (
-    e?: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    if (!quillEditorState) {
-      if (e) e.preventDefault();
-      setErrorMsg('Editor not initialized, please try again');
-      return;
-    }
-
-    const commentText = quillEditorState.textContentsAsString;
+  const handleSubmitComment = async () => {
 
     setErrorMsg(null);
-
     setSendingComment(true);
-
-    quillEditorState.disable();
 
     const chainId = app.activeChainId();
 
@@ -69,43 +58,29 @@ export const CreateComment = (props: CreateCommmentProps) => {
         author.address,
         rootProposal.uniqueIdentifier,
         chainId,
-        commentText,
+        editorValue,
         parentCommentId
       );
 
       updatedCommentsCallback();
-
-      quillEditorState.resetEditor();
-
       setErrorMsg(null);
-
-      setSendingComment(false);
 
       // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
 
-      redraw();
-
       jumpHighlightComment(res.id);
     } catch (err) {
       console.log(err);
-
       notifyError(err.message || 'Comment submission failed.');
-
-      quillEditorState.enable();
-
       setErrorMsg(err.message);
-
+    } finally {
       setSendingComment(false);
 
-      redraw();
+      if (handleIsReplying) {
+        handleIsReplying(false);
+      }
     }
-
-    if (handleIsReplying) {
-      handleIsReplying(false);
-    }
-    redraw();
   };
 
   const activeTopicName =
@@ -121,8 +96,8 @@ export const CreateComment = (props: CreateCommmentProps) => {
     userBalance?.gtn(0) &&
     userBalance.lt(tokenPostingThreshold);
 
-  const disabled =
-    quillEditorState?.isBlank() || sendingComment || userFailsThreshold;
+  // TODO: disabled if no content
+  const disabled = sendingComment || userFailsThreshold;
 
   const decimals = getDecimals(app.chain);
 
@@ -135,7 +110,6 @@ export const CreateComment = (props: CreateCommmentProps) => {
               <EditProfileModal
                 onModalClose={() => setIsModalOpen(false)}
                 account={app.user.activeAccount}
-                refreshCallback={() => redraw()}
               />
             }
             onClose={() => setIsModalOpen(false)}
@@ -176,8 +150,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
             )}
           </div>
           <ReactQuillEditor
-            contentDelta={{ops: []} as DeltaStatic}
-            setContentDelta={() => {}}
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+            onChange={(v) => setEditorValue(v)}
           />
           {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
             <CWText className="token-req-text">
@@ -194,10 +169,6 @@ export const CreateComment = (props: CreateCommmentProps) => {
           )}
           <div
             className="form-bottom"
-            onMouseOver={() => {
-              // keeps Quill's isBlank up to date
-              return redraw();
-            }}
           >
             <div className="form-buttons">
               <CWButton

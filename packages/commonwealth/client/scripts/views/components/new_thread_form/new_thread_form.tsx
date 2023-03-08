@@ -153,6 +153,7 @@ export const NewThreadForm = () => {
               )}
 
               <div>
+                {/*  TODO: Replace with ReactQuillEditor */}
                 <ReactQuill
                   className="QuillEditor"
                   onChange={(value, delta, source, editor) =>
