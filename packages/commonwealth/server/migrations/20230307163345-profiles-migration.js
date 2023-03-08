@@ -9,6 +9,7 @@ module.exports = {
         { type: queryInterface.sequelize.QueryTypes.SELECT, transaction: t }
       );
 
+      let newProfilesAndUsersCreated = 0;
       // For each profile
       for (const profile of profiles) {
         console.log('Updating profile with id: ', profile.id);
@@ -243,6 +244,8 @@ module.exports = {
                       `UPDATE "Addresses" SET user_id=${newUser[0][0].id}, profile_id=${newProfile[0][0].id} WHERE id=${address.id}`,
                       { transaction: t }
                     );
+
+                    newProfilesAndUsersCreated += 1;
                   }
                 }
               }
@@ -250,6 +253,10 @@ module.exports = {
           }
         }
       }
+
+      console.log(
+        `Created ${newProfilesAndUsersCreated} new profiles and users`
+      );
     });
   },
 
