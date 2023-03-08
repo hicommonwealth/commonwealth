@@ -92,8 +92,7 @@ export const ThreadPreviewMenu = ({
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onClick: (e) => {
-                      e.preventDefault();
+                    onClick: () => {
                       setIsUpdateProposalStatusModalOpen(true);
                     },
                     label: 'Update status',
