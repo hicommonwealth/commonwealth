@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 import { useDebounce } from 'usehooks-ts';
+import { isEmpty } from 'lodash';
 
 import 'pages/search/search_bar.scss';
 
@@ -44,8 +45,9 @@ export const SearchBar = () => {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] =
-    useState<Record<string, Array<any>>>();
+  const [searchResults, setSearchResults] = useState<
+    Record<string, Array<any>>
+  >({});
 
   const debouncedValue = useDebounce<string>(searchTerm, 500);
 
@@ -82,13 +84,15 @@ export const SearchBar = () => {
   }, [debouncedValue]);
 
   const handleGoToSearchPage = () => {
-    goToSearchPage(
-      new SearchQuery(searchTerm, {
-        isSearchPreview: false,
-        chainScope: app.activeChainId(),
-      }),
-      navigate
-    );
+    if (searchTerm.length > 3) {
+      goToSearchPage(
+        new SearchQuery(searchTerm, {
+          isSearchPreview: false,
+          chainScope: app.activeChainId(),
+        }),
+        navigate
+      );
+    }
   };
 
   return (
@@ -105,27 +109,41 @@ export const SearchBar = () => {
           value={searchTerm}
           autoComplete="off"
           onFocus={() => setShowDropdown(true)}
-          onBlur={() => setShowDropdown(false)}
+          onBlur={() => {
+            setTimeout(() => {
+              setShowDropdown(false);
+            }, 500); // hack to prevent the dropdown closing too quickly on click
+          }}
           onInput={handleChange}
           onKeyUp={(e) => {
-            if (e.key === 'Enter' && searchTerm.length > 3) {
+            if (e.key === 'Enter') {
               handleGoToSearchPage();
             }
           }}
         />
         {searchTerm?.length > 0 && (
           <div className="clear-icon">
-            <CWIconButton iconName="close" onClick={() => setSearchTerm('')} />
+            <CWIconButton
+              iconName="close"
+              onClick={() => {
+                setSearchTerm('');
+                setSearchResults({});
+              }}
+            />
           </div>
         )}
-        {searchResults && showDropdown && (
+        {!isEmpty(searchResults) && showDropdown && (
           <div className="search-results-dropdown">
             {Object.values(searchResults).flat(1).length > 0 ? (
               <div className="previews-section">
                 {Object.entries(searchResults).map(([k, v]) => {
                   if (k === SearchScope.Threads && v.length > 0) {
                     return (
-                      <div className="preview-section" key={k}>
+                      <div
+                        className="preview-section"
+                        key={k}
+                        onClick={() => console.log('in')}
+                      >
                         <div className="section-header">
                           <CWText
                             type="caption"
