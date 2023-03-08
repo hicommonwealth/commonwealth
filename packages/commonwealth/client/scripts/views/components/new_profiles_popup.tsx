@@ -12,7 +12,7 @@ import { CWGrowl } from './component_kit/cw_growl';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWText } from './component_kit/cw_text';
 
-const GROWL_DISPLAY_INTERVAL = 1000 * 1; // 1 Hour wait
+const GROWL_DISPLAY_INTERVAL = 1000 * 60 * 60; // 1 Hour wait
 
 type ProfileGrowlViewAttrs = {
   disabled: boolean;
