@@ -12,6 +12,7 @@ export default class NewProfile extends ClassComponent {
   }
 
   view() {
+    if (this.profileId !== m.route.param('profileId')) { console.log('hello'); this.profileId = m.route.param('profileId'); m.redraw();}
     return <ProfileComponent profileId={this.profileId} />;
   }
 }

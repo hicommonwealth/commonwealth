@@ -76,7 +76,7 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
     m.redraw();
   };
 
-  oninit(vnode) {
+  private fetchProfile(vnode) {
     this.loading = true;
     this.error = ProfileError.None;
     this.comments = [];
@@ -84,7 +84,16 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
     this.getProfileData(vnode.attrs.profileId);
   }
 
-  view() {
+  oninit(vnode) {
+    this.fetchProfile(vnode);
+  }
+
+  view(vnode) {
+    if (this.profile
+      && this.profile.id.toString() !== vnode.attrs.profileId
+      && !this.loading) {
+        this.fetchProfile(vnode);
+    }
     if (this.loading)
       this.content = (
         <div class="NewProfilePage">
@@ -135,11 +144,7 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
           }
         >
           <div
-            className={
-              this.profile.backgroundImage
-                ? 'ProfilePageContainer'
-                : 'ProfilePageContainer smaller-margins'
-            }
+            className={'ProfilePageContainer'}
           >
             <ProfileHeader profile={this.profile} isOwner={this.isOwner} />
             <ProfileActivity
