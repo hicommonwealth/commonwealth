@@ -2,7 +2,7 @@
 
 import ClassComponent from 'class_component';
 
-import 'components/user_survey_popup.scss';
+import 'components/profile_growl.scss';
 import m from 'mithril';
 import app from 'state';
 
@@ -12,9 +12,9 @@ import { CWGrowl } from './component_kit/cw_growl';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWText } from './component_kit/cw_text';
 
-const USER_SURVEY_DISPLAY_INTERVAL = 1000 * 60 * 60; // 1 Hour wait
+const GROWL_DISPLAY_INTERVAL = 1000 * 1; // 1 Hour wait
 
-type UserSurveyViewAttrs = {
+type ProfileGrowlViewAttrs = {
   disabled: boolean;
   checked: boolean;
   onRedirectClick: () => void;
@@ -22,33 +22,42 @@ type UserSurveyViewAttrs = {
   onCheckboxClick: () => void;
 };
 
-class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
-  view(vnode: m.Vnode<UserSurveyViewAttrs>) {
+class UserSurveyView extends ClassComponent<ProfileGrowlViewAttrs> {
+  view(vnode: m.Vnode<ProfileGrowlViewAttrs>) {
     const { disabled, checked, onRedirectClick, onClose, onCheckboxClick } =
       vnode.attrs;
     return (
       <CWGrowl position="bottom-right" disabled={disabled}>
-        <div class="UserSurveyPopup">
+        <div class="ProfileGrowlPopup">
           <div class="survey-svg-header"></div>
           <CWIcon iconName="close" className="close-icon" onclick={onClose} />
           <CWText type="h3" fontWeight="bold" className="header-text">
-            Want a Milk Carton NFT?
+            Introducing Unified Profiles
           </CWText>
           <CWText type="b1" className="body-text">
-            Take a quick survey to help us improve Common and get a special NFT
-            dropped to your ETH address!
+            One display name for all communities. Enjoy personalized pages and
+            activity history.
           </CWText>
           <div class="button-wrapper">
             <CWButton
-              buttonType="secondary-black"
-              label="No Thanks"
-              onclick={onClose}
-            />
-            <CWButton
               buttonType="primary-black"
-              label="Sure Thing!"
+              label="View profile"
               onclick={onRedirectClick}
             />
+          </div>
+          <div class="learn-more">
+            <CWText
+              className="blue-text"
+              onclick={() => {
+                window.open(
+                  'https://commonwealth.ghost.io/p/7f623d2d-3926-4db5-b154-b36c545c5baf/',
+                  '_blank'
+                );
+              }}
+            >
+              Learn more
+            </CWText>
+            <CWIcon iconName="blueExternalLink" iconSize="small" />
           </div>
           <CWCheckbox
             value=""
@@ -64,7 +73,7 @@ class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
 }
 
 function surveyDisplayTimeElapsed() {
-  const lastSurvey = localStorage.getItem('user-survey-last-displayed');
+  const lastSurvey = localStorage.getItem('profile-growl-last-displayed');
   if (!lastSurvey) {
     // They have never seen the survey growl before
     return true;
@@ -73,43 +82,28 @@ function surveyDisplayTimeElapsed() {
   const now = new Date();
 
   const timeSinceLastSurvey = now.getTime() - lastSurveyDate.getTime();
-  return timeSinceLastSurvey > USER_SURVEY_DISPLAY_INTERVAL;
+  return timeSinceLastSurvey > GROWL_DISPLAY_INTERVAL;
 }
-
-const openTypeform = (
-  typeformBaseUrl: string,
-  params: { [param: string]: string }
-) => {
-  let paramsString = '';
-  Object.keys(params).forEach((key, i) => {
-    if (i > 0) {
-      paramsString += '&';
-    } else {
-      paramsString += '#';
-    }
-    paramsString += `${key}=${params[key]}`;
-  });
-
-  window.open(`${typeformBaseUrl}${paramsString}`, '_blank');
-};
 
 type NewProfilesPopupAttrs = {
   readyForDisplay: boolean;
 };
 
 export class NewProfilesPopup extends ClassComponent<NewProfilesPopupAttrs> {
-  private surveyLocked: boolean;
+  private growlLocked: boolean;
   private hideForeverChecked: boolean; // radio button indicating whether the user wants to hide the survey forever
 
-  oncreate() {
+  oninit() {
     this.hideForeverChecked = false;
-    const surveyCurrentlyLocked = localStorage.getItem('user-survey-locked');
-    const surveyDelayTimeElapsed = surveyDisplayTimeElapsed();
+    const profileGrowlCurrentlyLocked = localStorage.getItem(
+      'profile-growl-locked'
+    );
+    const delayTimeElapsed = surveyDisplayTimeElapsed();
 
-    if (surveyCurrentlyLocked) {
-      this.surveyLocked = true;
+    if (profileGrowlCurrentlyLocked) {
+      this.growlLocked = true;
     } else {
-      this.surveyLocked = !surveyDelayTimeElapsed;
+      this.growlLocked = !delayTimeElapsed;
     }
   }
 
@@ -118,41 +112,30 @@ export class NewProfilesPopup extends ClassComponent<NewProfilesPopupAttrs> {
 
     const handleClose = () => {
       if (this.hideForeverChecked) {
-        localStorage.setItem('user-survey-locked', 'true');
+        localStorage.setItem('profile-growl-locked', 'true');
       }
-      this.surveyLocked = true;
-      localStorage.setItem('user-survey-last-displayed', Date.now().toString());
-      console.log('setting new survey-last-displayed');
+      this.growlLocked = true;
+      localStorage.setItem(
+        'profile-growl-last-displayed',
+        Date.now().toString()
+      );
+      console.log('setting new profile-growl-last-displayed');
       m.redraw();
     };
 
     const handleRedirect = () => {
-      const address =
-        app.user.activeAccount?.address ?? app.user.addresses[0].address;
-      const name = app.user.activeAccount?.profile.name ?? 'there';
-
-      openTypeform('https://hicommonwealth.typeform.com/to/dS5q7cM2', {
-        address,
-        name,
-      });
+      // Redirect to the view profile page
 
       // We don't need to display it to this user again
-      this.surveyLocked = true;
-      localStorage.setItem('user-survey-locked', 'true');
+      this.growlLocked = true;
+      localStorage.setItem('profile-growl-locked', 'true');
     };
 
-    const hasAnAddress =
-      (app.user.activeAccount?.address ?? app.user.addresses[0]?.address) !==
-      undefined;
+    if (this.growlLocked) return;
 
     return (
       <UserSurveyView
-        disabled={
-          !readyForDisplay ||
-          this.surveyLocked ||
-          !app.isLoggedIn() ||
-          !hasAnAddress
-        }
+        disabled={!readyForDisplay || this.growlLocked || !app.isLoggedIn()}
         checked={this.hideForeverChecked}
         onRedirectClick={handleRedirect}
         onClose={handleClose}

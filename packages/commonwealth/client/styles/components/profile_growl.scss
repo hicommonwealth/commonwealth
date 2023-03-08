@@ -1,0 +1,69 @@
+@import '../shared';
+
+.ProfileGrowlPopup {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+
+  .survey-svg-header {
+    background-image: url('/static/img/profile_growl.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 187px;
+  }
+
+  .header-text {
+    text-align: center;
+    padding: 0 16px 0 16px;
+  }
+
+  .body-text {
+    text-align: center;
+    padding: 0 16px 0 16px;
+    margin-top: 8px;
+  }
+
+  .button-wrapper {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .checkbox.Checkbox {
+    justify-content: center;
+    margin-bottom: 8px;
+
+    .Text {
+      color: $neutral-500;
+      font-family: $font-family-neue-haas-unica;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      line-height: 16px;
+    }
+  }
+
+  .close-icon {
+    position: fixed;
+    right: 34px; // not on grid system due to fixed positioning
+    color: $primary-300;
+  }
+
+  .learn-more {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    margin: 16px;
+
+    .blue-text {
+      color: $primary-500;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
