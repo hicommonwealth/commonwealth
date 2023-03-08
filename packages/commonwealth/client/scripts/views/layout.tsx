@@ -19,6 +19,7 @@ import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import { UserSurveyPopup } from './components/user_survey_popup';
+import { NewProfilesPopup } from './components/new_profiles_popup';
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -45,6 +46,8 @@ export class Layout extends ClassComponent<LayoutAttrs> {
   private deferred: boolean;
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
+  private growlDelayTriggered = false;
+  private profileGrowlReadyForDisplay = false;
 
   view(vnode: m.Vnode<LayoutAttrs>) {
     const { scope, deferChain } = vnode.attrs;
@@ -57,6 +60,15 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       this.surveyDelayTriggered = true;
       setTimeout(() => {
         this.surveyReadyForDisplay = true;
+      }, 4000);
+    }
+
+    // Put the profile growl on a timer so it doesn't immediately appear
+    if (!this.growlDelayTriggered && !this.profileGrowlReadyForDisplay) {
+      this.growlDelayTriggered = true;
+      setTimeout(() => {
+        this.profileGrowlReadyForDisplay = true;
+        m.redraw();
       }, 4000);
     }
 
@@ -133,6 +145,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
         <AppModals />
         <AppToasts />
         <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
+        <NewProfilesPopup readyForDisplay={this.profileGrowlReadyForDisplay} />
       </div>
     );
   }
