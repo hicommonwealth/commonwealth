@@ -28,7 +28,7 @@ module.exports = {
       if (viewCountMap.has(thread.id.toString())) {
         updateQueries.push(
           queryInterface.sequelize.query(
-            `UPDATE "Threads" 
+            `UPDATE "Threads"
                SET "view_count" = ${
                  viewCountMap.get(thread.id.toString()).view_count
                }
@@ -48,8 +48,7 @@ module.exports = {
       {
         id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
         chain: { type: Sequelize.STRING },
-        community: { type: Sequelize.STRING },
-        object_id: { type: Sequelize.INTEGER, allowNull: false },
+        object_id: { type: Sequelize.STRING, allowNull: false },
         view_count: { type: Sequelize.INTEGER, allowNull: false },
       },
       {
@@ -71,8 +70,8 @@ module.exports = {
     const updateQueries = [];
     threads[0].forEach(t => {
       updateQueries.push(queryInterface.sequelize.query(
-        `INSERT INTO "ViewCounts"(chain,object_id,view_count) 
-         VALUES(${t.chain}, discussion_${t.id}, ${t.view_count}) `
+        `INSERT INTO "ViewCounts" (chain, object_id, view_count)
+         VALUES ('${t.chain}', 'discussion_${t.id}', ${t.view_count})`
       ));
     })
 
