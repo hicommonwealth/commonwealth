@@ -519,7 +519,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               label: 'Delete',
               iconLeft: 'trash' as const,
               onClick: async (e) => {
-                e.preventDefault();
+                // e.preventDefault();
 
                 const confirmed = window.confirm('Delete this entire thread?');
 
@@ -538,7 +538,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
               iconLeft: 'lock' as const,
               onClick: (e) => {
-                e.preventDefault();
+                // e.preventDefault();
                 app.threads
                   .setPrivacy({
                     threadId: thread.id,
