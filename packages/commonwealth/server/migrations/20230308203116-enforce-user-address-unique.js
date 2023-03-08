@@ -36,7 +36,7 @@ module.exports = {
         addressToUserMap[address.address].push(address.user_id);
       }
 
-      // 3. Walk map of addresses to produce lists of users to combine
+      // 3. Walk map of addresses to produce sets of users to combine
       const userMergeSets = []
       for (const mergeGroup of Object.values(addressToUserMap)) {
         const mergeSet = new Set(mergeGroup);
@@ -67,7 +67,7 @@ module.exports = {
       }
       console.log(`Found ${userMergeSets.length} sets of users to merge.`);
 
-      // query all identified users + profiles in order to select which to use
+      // 4. query all identified users + profiles in order to select which to use
       const usersToBeMerged = await queryInterface.sequelize.query(
         `
           SELECT
@@ -84,8 +84,8 @@ module.exports = {
         }
       );
 
-      // Produce object to transform addresses / profiles
-      /*
+      // 5. Produce object to transform addresses / profiles
+      /* userTransformData =
         {
           keptUser: user_id,
           keptProfile: profile_id,
@@ -118,20 +118,19 @@ module.exports = {
         userTransformData.keptUser = keptUser.user_id;
         userTransformData.keptProfile = keptUser.profile_id;
 
-        // Select which Profile will be kept -- most recently updated with name
-        const keptProfile = userSetData.reduce((acc, cur) => {
+        // Select which Profile name will be kept, if any
+        const keptProfileName = userSetData.reduce((acc, cur) => {
           if (!acc) return cur;
           if (!cur.name && acc.name) return acc;
           if (cur.name && !acc.name) return cur;
-          if (cur.profile_updated > acc.profile_updated) return cur;
           return acc;
         });
-        userTransformData.keptProfileName = keptProfile.name;
-        userTransformData.keptProfileNameId = keptProfile.profile_id;
+        userTransformData.keptProfileName = keptProfileName.name;
+        userTransformData.keptProfileNameId = keptProfileName.profile_id;
         userToKeepMap.push(userTransformData);
       }
 
-      // Update profile object on kept user to have selected name
+      // 6. Update profile objects on kept users to have selected name
       let profilesUpdated = 0;
       for (const { keptProfile, keptProfileName, keptProfileNameId } of userToKeepMap) {
         if (keptProfileNameId !== keptProfile && keptProfileName) {
@@ -148,7 +147,7 @@ module.exports = {
       }
       console.log(`Updated ${profilesUpdated} profiles.`);
 
-      // Update address objects on merged users to have kept user
+      // 7. Update address objects on merged users to have kept user
       for (const { keptUser, keptProfile, mergedUsers } of userToKeepMap) {
         await queryInterface.sequelize.query(
           `
@@ -162,6 +161,7 @@ module.exports = {
       console.log('Migration complete.');
 
       // For another migration: remove dead (orphaned) users + profiles
+      // (this is difficult because of cascading deletions, e.g. notifications, subscriptions)
     });
   },
 
