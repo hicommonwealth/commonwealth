@@ -124,11 +124,15 @@ export class NewProfilesPopup extends ClassComponent<NewProfilesPopupAttrs> {
     };
 
     const handleRedirect = () => {
-      // Redirect to the view profile page
-
       // We don't need to display it to this user again
       this.growlLocked = true;
       localStorage.setItem('profile-growl-locked', 'true');
+
+      // Redirect to the view profile page
+      const pf = app.user.activeAccount.profile;
+      if (pf) {
+        m.route.set(`/profile/${pf.address}`);
+      }
     };
 
     if (this.growlLocked) return;

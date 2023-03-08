@@ -69,7 +69,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       setTimeout(() => {
         this.profileGrowlReadyForDisplay = true;
         m.redraw();
-      }, 50);
+      }, 4000);
     }
 
     if (app.loadingError) {
