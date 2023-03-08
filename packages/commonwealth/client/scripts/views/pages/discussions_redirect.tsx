@@ -7,25 +7,18 @@ import { useCommonNavigate } from 'navigation/helpers';
 
 export default function DiscussionsRedirect() {
   const navigate = useCommonNavigate();
-  console.log('app', app);
 
   useEffect(() => {
-    console.log('app.chain', app.chain);
-
     if (!app.chain) return;
 
     const { defaultPage, defaultOverview, hasHomepage } = app.chain.meta;
     let view;
-
-    console.log('app.chain.meta', app.chain.meta);
 
     if (hasHomepage) {
       view = defaultPage;
     } else {
       view = defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions;
     }
-
-    console.log('view', view);
 
     // @TODO: make sure that this navigation does not apply to back button
     switch (view) {
