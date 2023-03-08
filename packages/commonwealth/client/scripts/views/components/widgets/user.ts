@@ -151,6 +151,10 @@ const User: m.Component<
       ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize })
       : m(CWJdenticon, { address: profile.address, size: avatarSize });
 
+    const profileAvatarPopover = profile?.avatarUrl
+      ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize+12 })
+      : m(CWJdenticon, { address: profile.address, size: avatarSize+8 });
+
     const userFinal = avatarOnly
       ? m(
           '.User.avatar-only',
@@ -227,7 +231,7 @@ const User: m.Component<
         },
       },
       [
-        m('.user-avatar', [!profile ? null : profileAvatar]),
+        m('.user-avatar', [!profile ? null : profileAvatarPopover]),
         m('.user-name', [
           link(
             'a.user-display-name',
@@ -255,7 +259,7 @@ const User: m.Component<
               maxCharLength
             )
           ),
-        friendlyChainName && m('.user-chain', friendlyChainName),
+        // friendlyChainName && m('.user-chain', friendlyChainName),
         getRoleTags(), // always show roleTags in .UserPopover
 
         // If Admin Allow Banning
