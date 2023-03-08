@@ -51,9 +51,11 @@ const processAddress = async (
   sessionIssued: string | null,
   sessionBlockInfo: string | null
 ): Promise<void> => {
-  const addressInstance = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: chain.id, address }
-  });
+  const addressInstance = await models.Address.scope('withPrivateData').findOne(
+    {
+      where: { chain: chain.id, address },
+    }
+  );
   if (!addressInstance) {
     throw new AppError(Errors.AddressNF);
   }
@@ -96,8 +98,12 @@ const processAddress = async (
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
       // address is not yet verified => create a new user
-      const newUser = await models.User.createWithProfile(models, { email: null });
-      addressInstance.profile_id = (newUser.Profiles[0] as ProfileAttributes).id;
+      const newUser = await models.User.createWithProfile(models, {
+        email: null,
+      });
+      addressInstance.profile_id = (
+        newUser.Profiles[0] as ProfileAttributes
+      ).id;
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
@@ -123,7 +129,9 @@ const processAddress = async (
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     addressInstance.user_id = user.id;
-    const profile = await models.Profile.findOne({ where: { user_id: user.id } });
+    const profile = await models.Profile.findOne({
+      where: { user_id: user.id },
+    });
     addressInstance.profile_id = profile.id;
   }
   await addressInstance.save();
@@ -135,21 +143,24 @@ const processAddress = async (
       address,
       user_id: { [Op.ne]: addressInstance.user_id },
       verified: { [Op.ne]: null },
-    }
+    },
   });
 
   if (addressToTransfer) {
     // reassign the users and profiles of the transferred addresses
-    await models.Address.update({
-      user_id: addressInstance.user_id,
-      profile_id: addressInstance.profile_id,
-    }, {
-      where: {
-        address,
-        user_id: { [Op.ne]: addressInstance.user_id },
-        verified: { [Op.ne]: null },
+    await models.Address.update(
+      {
+        user_id: addressInstance.user_id,
+        profile_id: addressInstance.profile_id,
+      },
+      {
+        where: {
+          address,
+          user_id: { [Op.ne]: addressInstance.user_id },
+          verified: { [Op.ne]: null },
+        },
       }
-    });
+    );
 
     try {
       // send email to the old user (should only ever be one)

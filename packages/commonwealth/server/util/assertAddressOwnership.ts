@@ -5,12 +5,15 @@ import { ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export default async function assertAddressOwnership(models: DB, address: string) {
+export default async function assertAddressOwnership(
+  models: DB,
+  address: string
+) {
   const addressUsers = await models.Address.findAll({
     where: {
       address,
       verified: { [Op.ne]: null },
-    }
+    },
   });
   const numUserIds = new Set(addressUsers.map((au) => au.user_id)).size;
   if (numUserIds !== 1) {

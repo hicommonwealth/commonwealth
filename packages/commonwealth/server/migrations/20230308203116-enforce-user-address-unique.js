@@ -1,14 +1,14 @@
 'use strict';
 
 const hasIntersection = (set1, set2) => {
-  return [...set1].filter(x => set2.has(x)).length > 0;
-}
+  return [...set1].filter((x) => set2.has(x)).length > 0;
+};
 
 const inplaceSetUnion = (set1, set2) => {
   for (const item of set2) {
     set1.add(item);
   }
-}
+};
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -37,7 +37,7 @@ module.exports = {
       }
 
       // 3. Walk map of addresses to produce sets of users to combine
-      const userMergeSets = []
+      const userMergeSets = [];
       for (const mergeGroup of Object.values(addressToUserMap)) {
         const mergeSet = new Set(mergeGroup);
         let found = false;
@@ -76,7 +76,9 @@ module.exports = {
           FROM "Users" AS u
           JOIN "Profiles" AS p
           ON u.id = p.user_id
-            AND u.id IN (${userMergeSets.map((set) => [...set].join(',')).join(',')});
+            AND u.id IN (${userMergeSets
+              .map((set) => [...set].join(','))
+              .join(',')});
         `,
         {
           type: queryInterface.sequelize.QueryTypes.SELECT,
@@ -96,8 +98,8 @@ module.exports = {
       */
       const userToKeepMap = [];
       for (const userSet of userMergeSets) {
-        const userSetData = [...userSet].map(
-          (user_id) => usersToBeMerged.find((u) => u.user_id === user_id)
+        const userSetData = [...userSet].map((user_id) =>
+          usersToBeMerged.find((u) => u.user_id === user_id)
         );
         const userTransformData = {
           keptUser: null,
@@ -105,7 +107,7 @@ module.exports = {
           keptProfileName: null,
           keptProfileNameId: null,
           mergedUsers: [...userSet],
-        }
+        };
 
         // Select which User will be kept -- most recently updated with email
         const keptUser = userSetData.reduce((acc, cur) => {
@@ -133,7 +135,11 @@ module.exports = {
 
       // 6. Update profile objects on kept users to have selected name
       let profilesUpdated = 0;
-      for (const { keptProfile, keptProfileName, keptProfileNameId } of userToKeepMap) {
+      for (const {
+        keptProfile,
+        keptProfileName,
+        keptProfileNameId,
+      } of userToKeepMap) {
         if (keptProfileNameId !== keptProfile && keptProfileName) {
           profilesUpdated++;
           await queryInterface.sequelize.query(
@@ -168,5 +174,5 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // NOT REVERSIBLE
-  }
+  },
 };
