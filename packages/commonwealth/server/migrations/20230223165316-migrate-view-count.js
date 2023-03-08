@@ -44,7 +44,8 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('ViewCounts',
+    await queryInterface.createTable(
+      'ViewCounts',
       {
         id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
         chain: { type: Sequelize.STRING },
@@ -61,19 +62,22 @@ module.exports = {
           { fields: ['chain', 'community', 'object_id'] },
           { fields: ['view_count'] },
         ],
-      });
+      }
+    );
 
     const threads = await queryInterface.sequelize.query(
       `SELECT id, chain, view_count FROM "Threads"`
     );
 
     const updateQueries = [];
-    threads[0].forEach(t => {
-      updateQueries.push(queryInterface.sequelize.query(
-        `INSERT INTO "ViewCounts" (chain, object_id, view_count)
+    threads[0].forEach((t) => {
+      updateQueries.push(
+        queryInterface.sequelize.query(
+          `INSERT INTO "ViewCounts" (chain, object_id, view_count)
          VALUES ('${t.chain}', 'discussion_${t.id}', ${t.view_count})`
-      ));
-    })
+        )
+      );
+    });
 
     await Promise.all(updateQueries);
 

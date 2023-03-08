@@ -11,6 +11,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
       const updateQueries = [];
+      const deleteCommentIds = [];
 
       const threadComments = await queryInterface.sequelize.query(
         `SELECT * FROM "Comments" WHERE "root_id" ILIKE '%discussion%'`
@@ -99,17 +100,11 @@ module.exports = {
 
       // for each proposal comment, set its root_id to thread_id
       proposalComments[0].forEach((c) => {
-        // implicitly remove all councilCandidate comments to avoid fkcs
         if (
           c.root_id.includes('councilcandidate') ||
           c.root_id.includes('councilmotion')
         ) {
-          updateQueries.push(
-            queryInterface.sequelize.query(
-              `UPDATE "Comments" SET "root_id"='1' WHERE "id"=${c.id}`,
-              { transaction: t }
-            )
-          );
+          deleteCommentIds.push(c.id);
           return;
         }
         updateQueries.push(
@@ -122,7 +117,24 @@ module.exports = {
         );
       });
 
-      await Promise.all(updateQueries);
+      const deleteQueries = [];
+      deleteCommentIds.forEach((id) => {
+        deleteQueries.push(
+          queryInterface.bulkDelete(
+            'Reactions',
+            { comment_id: id },
+            { transaction: t }
+          )
+        );
+      });
+
+      deleteCommentIds.forEach((id) => {
+        deleteQueries.push(
+          queryInterface.bulkDelete('Comments', { id: id }, { transaction: t })
+        );
+      });
+
+      await Promise.all([...deleteQueries, ...updateQueries]);
 
       await queryInterface.renameColumn('Comments', 'root_id', 'thread_id', {
         transaction: t,
