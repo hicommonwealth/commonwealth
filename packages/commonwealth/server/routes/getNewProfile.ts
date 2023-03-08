@@ -9,18 +9,20 @@ import type { ProfileInstance } from '..//models/profile';
 import { success } from '../types';
 
 export const Errors = {
-  NoAddressProvided: 'No address provided in query',
-  NoAddressFound: 'No address found',
+  NoIdentifierProvided: 'No profile id provided in query',
   NoProfileFound: 'No profile found',
 };
 
-type GetNewProfileReq = { address: string };
+type GetNewProfileReq = {
+  profileId: string;
+};
 type GetNewProfileResp = {
   profile: ProfileInstance;
   addresses: AddressAttributes[];
   threads: ThreadAttributes[];
   comments: CommentAttributes[];
   commentThreads: ThreadAttributes[];
+  isOwner: boolean;
 };
 
 const getNewProfile = async (
@@ -29,26 +31,18 @@ const getNewProfile = async (
   res: TypedResponse<GetNewProfileResp>,
   next: NextFunction
 ) => {
-  const { address } = req.query;
-  if (!address) return next(new Error(Errors.NoAddressProvided));
+  const { profileId } = req.query;
+  if (!profileId) return next(new Error(Errors.NoIdentifierProvided));
 
-  const addressModel = await models.Address.findOne({
+  const profile = await models.Profile.findOne({
     where: {
-      address,
+      id: profileId,
     },
-    include: [{ model: models.Profile, required: true }],
   });
-  if (!addressModel) return next(new Error(Errors.NoAddressFound));
 
-  const profile = await addressModel.getProfile();
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const addresses = await models.Address.findAll({
-    where: {
-      profile_id: profile.id,
-    },
-    include: [models.Chain],
-  });
+  const addresses = await profile.getAddresses();
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
   const threads = await models.Thread.findAll({
@@ -88,6 +82,7 @@ const getNewProfile = async (
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map((c) => c.toJSON()),
+    isOwner: req.user?.id === profile.user_id,
   });
 };
 

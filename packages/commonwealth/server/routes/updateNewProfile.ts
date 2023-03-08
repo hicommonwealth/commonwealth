@@ -7,12 +7,10 @@ export const Errors = {
   NotAuthorized: 'Not authorized',
   InvalidUpdate: 'Invalid update',
   NoProfileFound: 'No profile found',
-  NoAddressFound: 'No address found',
-  NoAddressProvided: 'No address provided in query',
+  NoProfileIdProvided: 'No profile id provided in query',
 };
 
 type UpdateNewProfileReq = {
-  address: string;
   email: string;
   slug: string;
   name: string;
@@ -20,7 +18,6 @@ type UpdateNewProfileReq = {
   website: string;
   avatarUrl: string;
   socials: string;
-  coverImage: string;
   backgroundImage: string;
 };
 type UpdateNewProfileResp = {
@@ -33,9 +30,13 @@ const updateNewProfile = async (
   res: TypedResponse<UpdateNewProfileResp>,
   next: NextFunction
 ) => {
-  if (!req.body.address) {
-    return next(new Error(Errors.NoAddressProvided));
-  }
+  const profile = await models.Profile.findOne({
+    where: {
+      user_id: req.user.id,
+    },
+  });
+
+  if (!profile) return next(new Error(Errors.NoProfileFound));
 
   if (
     !req.body.email &&
@@ -45,14 +46,12 @@ const updateNewProfile = async (
     !req.body.website &&
     !req.body.avatarUrl &&
     !req.body.socials &&
-    !req.body.coverImage &&
     !req.body.backgroundImage
   ) {
     return next(new Error(Errors.InvalidUpdate));
   }
 
   const {
-    address,
     email,
     slug,
     name,
@@ -60,24 +59,8 @@ const updateNewProfile = async (
     website,
     avatarUrl,
     socials,
-    coverImage,
     backgroundImage,
   } = req.body;
-
-  const addressModel = await models.Address.findOne({
-    where: {
-      address,
-    },
-    include: [models.OffchainProfile, models.Profile],
-  });
-  if (!addressModel) return next(new Error(Errors.NoAddressFound));
-
-  if (addressModel.user_id !== req.user.id) {
-    return next(new Error(Errors.NotAuthorized));
-  }
-
-  const profile = await addressModel.getProfile();
-  if (!profile) return next(new Error(Errors.NoProfileFound));
 
   const updateStatus = await models.Profile.update(
     {
@@ -88,12 +71,11 @@ const updateNewProfile = async (
       ...(website && { website }),
       ...(avatarUrl && { avatar_url: avatarUrl }),
       ...(socials && { socials: JSON.parse(socials) }),
-      ...(coverImage && { cover_image: JSON.parse(coverImage) }),
       ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
     },
     {
       where: {
-        id: profile.id,
+        user_id: req.user.id,
       },
     }
   );

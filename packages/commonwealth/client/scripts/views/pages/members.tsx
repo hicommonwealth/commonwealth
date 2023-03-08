@@ -1,11 +1,10 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
-import type { Profile } from 'models';
+import type { MinimumProfile } from 'models';
 
 import 'pages/members.scss';
 
@@ -28,7 +27,7 @@ type MemberInfo = {
 
 type ProfileInfo = {
   postCount: number;
-  profile: Profile;
+  profile: MinimumProfile;
 };
 
 class MembersPage extends ClassComponent {
@@ -128,8 +127,20 @@ class MembersPage extends ClassComponent {
       const profileInfos: ProfileInfo[] = this.membersLoaded
         .slice(0, this.numProfilesLoaded)
         .map((member) => {
+          const profile = app.newProfiles.getProfile(
+            member.chain,
+            member.address
+          );
+          profile.initialize(
+            profile.name,
+            profile.address,
+            profile.avatarUrl,
+            profile.id,
+            profile.chain,
+            profile.lastActive
+          );
           return {
-            profile: app.profiles.getProfile(member.chain, member.address),
+            profile,
             postCount: member.count,
           };
         });
@@ -173,8 +184,20 @@ class MembersPage extends ClassComponent {
 
         for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
           const member = this.membersLoaded[i];
+          const profile = app.newProfiles.getProfile(
+            member.chain,
+            member.address
+          );
+          profile.initialize(
+            profile.name,
+            profile.address,
+            profile.avatarUrl,
+            profile.id,
+            profile.chain,
+            profile.lastActive
+          );
           const profileInfo: ProfileInfo = {
-            profile: app.profiles.getProfile(member.chain, member.address),
+            profile,
             postCount: member.count,
           };
           this.profilesLoaded.push(profileInfo);
@@ -208,11 +231,11 @@ class MembersPage extends ClassComponent {
           </div>
           <div class="members-container">
             {profilesLoaded.map((profileInfo) => {
-              const { address, chain } = profileInfo.profile;
+              const { id } = profileInfo.profile;
               return (
                 <div class="member-row">
                   <a
-                    href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
+                    href={`/profile/id/${id}`}
                     onclick={(e) => {
                       e.preventDefault();
                       localStorage[`${app.activeChainId()}-members-scrollY`] =
@@ -220,7 +243,7 @@ class MembersPage extends ClassComponent {
                       localStorage[
                         `${app.activeChainId()}-members-numProfilesLoaded`
                       ] = numProfilesLoaded;
-                      navigateToSubpage(`/account/${address}?base=${chain}`);
+                      m.route.set(`/profile/id/${id}`);
                     }}
                   >
                     {m(User, { user: profileInfo.profile, showRole: true })}

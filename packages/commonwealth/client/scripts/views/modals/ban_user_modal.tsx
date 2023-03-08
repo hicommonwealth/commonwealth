@@ -5,7 +5,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';
 import m from 'mithril';
 
-import type { Profile } from 'models';
+import type { MinimumProfile as Profile } from 'models';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 

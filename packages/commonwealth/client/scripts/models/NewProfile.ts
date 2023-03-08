@@ -1,4 +1,4 @@
-import type { Image } from '../views/pages/edit_new_profile';
+import type { Image } from '../views/components/edit_profile';
 
 class NewProfile {
   private _name: string;
@@ -9,7 +9,8 @@ class NewProfile {
   private _avatarUrl: string;
   private _slug: string;
   private _socials: string[];
-  private _coverImage: Image;
+  private _id: number;
+  private _isOwner: boolean;
   private _backgroundImage: Image;
 
   get name() {
@@ -44,8 +45,12 @@ class NewProfile {
     return this._socials;
   }
 
-  get coverImage() {
-    return this._coverImage;
+  get id() {
+    return this._id;
+  }
+
+  get isOwner() {
+    return this._isOwner;
   }
 
   get backgroundImage() {
@@ -61,7 +66,8 @@ class NewProfile {
     avatar_url,
     slug,
     socials,
-    cover_image,
+    id,
+    is_owner,
     background_image,
   }) {
     this._name = profile_name;
@@ -72,7 +78,8 @@ class NewProfile {
     this._avatarUrl = avatar_url;
     this._slug = slug;
     this._socials = socials;
-    this._coverImage = cover_image;
+    this._id = id;
+    this._isOwner = is_owner;
     this._backgroundImage = background_image;
   }
 
@@ -85,7 +92,8 @@ class NewProfile {
     avatarUrl,
     slug,
     socials,
-    coverImage,
+    id,
+    isOwner,
     backgroundImage
   ) {
     this._name = name;
@@ -96,7 +104,8 @@ class NewProfile {
     this._avatarUrl = avatarUrl;
     this._slug = slug;
     this._socials = socials;
-    this._coverImage = coverImage;
+    this._id = id;
+    this._isOwner = isOwner;
     this._backgroundImage = backgroundImage;
   }
 

@@ -9,7 +9,7 @@ import { CWText } from './cw_text';
 import { ComponentType } from './types';
 
 type LabelAttrs = {
-  label: string;
+  label: string | m.Vnode;
 };
 
 export class CWLabel extends ClassComponent<LabelAttrs> {

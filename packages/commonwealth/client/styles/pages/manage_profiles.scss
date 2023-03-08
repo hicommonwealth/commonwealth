@@ -1,0 +1,52 @@
+@import '../shared';
+
+.ManageProfiles {
+  margin: 48px 190px;
+
+  &.full-height {
+    height: 100%;
+    margin: 0;
+  }
+
+  .loading-spinner {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+  }
+
+  @include mediumInclusive {
+    margin: 48px 160px;
+  }
+
+  @include mediumSmallInclusive {
+    margin: 24px 40px;
+  }
+
+  @include smallInclusive {
+    margin: 40px 32px;
+  }
+
+  .title-container {
+    display: flex;
+    justify-content: space-between;
+
+    @include smallInclusive {
+      flex-direction: column;
+      margin-bottom: 24px;
+      width: 100%;
+
+      .Button {
+        width: 100%;
+      }
+    }
+
+    .title {
+      margin-bottom: 8px;
+    }
+
+    .description {
+      margin-bottom: 32px;
+    }
+  }
+}
