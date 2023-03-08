@@ -53,9 +53,7 @@ export const ThreadPreviewMenu = ({
             ...(hasAdminPermissions
               ? [
                   {
-                    onClick: (e) => {
-                      e.preventDefault();
-
+                    onClick: () => {
                       app.threads.pin({ proposal: thread }).then(() => {
                         navigate('/discussions');
                         redraw();
@@ -69,9 +67,7 @@ export const ThreadPreviewMenu = ({
             ...(hasAdminPermissions
               ? [
                   {
-                    onClick: (e) => {
-                      e.preventDefault();
-
+                    onClick: () => {
                       app.threads
                         .setPrivacy({
                           threadId: thread.id,
@@ -108,9 +104,7 @@ export const ThreadPreviewMenu = ({
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onClick: async (e) => {
-                      e.preventDefault();
-
+                    onClick: async () => {
                       const confirmed = window.confirm(
                         'Delete this entire thread?'
                       );
