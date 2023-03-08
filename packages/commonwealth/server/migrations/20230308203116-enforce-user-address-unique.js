@@ -123,6 +123,7 @@ module.exports = {
           if (!acc) return cur;
           if (!cur.name && acc.name) return acc;
           if (cur.name && !acc.name) return cur;
+          if (cur.profile_updated > acc.profile_updated) return cur;
           return acc;
         });
         userTransformData.keptProfileName = keptProfileName.name;
