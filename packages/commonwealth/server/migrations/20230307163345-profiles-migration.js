@@ -48,6 +48,7 @@ module.exports = {
                   } WHERE id=${profile.id}`,
                   { transaction: t }
                 );
+                break;
               }
             }
           }
