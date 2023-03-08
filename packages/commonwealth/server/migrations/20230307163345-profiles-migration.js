@@ -22,13 +22,11 @@ module.exports = {
       for (const profile of profiles) {
         console.log('Updating profile with id: ', profile.profile_id);
 
-        const profileId = profile.profile_id;
         const profileName = profile.profile_name;
 
         if (profileName !== null) {
           // User has set the profile_name via modal
           for (const address_offchain_pair of profile.address_offchain_pairs) {
-            const addressId = address_offchain_pair.address_id;
             let parsedData;
             try {
               parsedData = JSON.parse(address_offchain_pair.data);
@@ -82,7 +80,6 @@ module.exports = {
             let sameName = true;
 
             for (const address_offchain_pair of profile.address_offchain_pairs) {
-              const addressId = address_offchain_pair.address_id;
               let parsedData;
               try {
                 parsedData = JSON.parse(address_offchain_pair.data);
@@ -107,7 +104,6 @@ module.exports = {
               let avatarUrl;
               let name;
               for (const address_offchain_pair of profile.address_offchain_pairs) {
-                const addressId = address_offchain_pair.address_id;
                 let parsedData;
                 try {
                   parsedData = JSON.parse(address_offchain_pair.data);
