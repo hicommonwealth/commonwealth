@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -12,8 +11,6 @@ import { Thread } from 'models';
 
 import app from 'state';
 import { ContentType } from 'types';
-import type { QuillEditor } from 'views/components/quill/quill_editor';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { User } from 'views/components/user/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { CWButton } from '../component_kit/cw_button';
@@ -21,6 +18,8 @@ import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
 import { Modal } from '../component_kit/cw_modal';
+import { ReactQuillEditor } from '../react_quill_editor/react_quill_editor';
+import { DeltaStatic } from 'quill';
 
 type CreateCommmentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -31,8 +30,7 @@ type CreateCommmentProps = {
 
 export const CreateComment = (props: CreateCommmentProps) => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [quillEditorState, setQuillEditorState] =
-    React.useState<QuillEditor | null>(null);
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(null);
   const [sendingComment, setSendingComment] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
@@ -177,13 +175,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
               <CWValidationText message={errorMsg} status="failure" />
             )}
           </div>
-          <QuillEditorComponent
-            contentsDoc=""
-            oncreateBind={(state: QuillEditor) => {
-              setQuillEditorState(state);
-            }}
-            editorNamespace={`${document.location.pathname}-commenting`}
-            imageUploader
+          <ReactQuillEditor
+            contentDelta={{ops: []} as DeltaStatic}
+            setContentDelta={() => {}}
           />
           {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
             <CWText className="token-req-text">
@@ -208,7 +202,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
             <div className="form-buttons">
               <CWButton
                 disabled={
-                  !handleIsReplying ? quillEditorState?.isBlank() : undefined
+                    !handleIsReplying ? contentDelta?.ops?.length > 0 : undefined
                 }
                 buttonType="secondary-blue"
                 onClick={(e) => {
