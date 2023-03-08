@@ -252,7 +252,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
         >
           {this.uploadStatus === 'success' && enableGenerativeAI && (
             <CWButton
-              label="retry"
+              label="Regenerate"
               buttonType="mini-black"
               className="retry-button"
               onclick={(e) => {
@@ -326,7 +326,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
           {this.isUploading && <CWSpinner active="true" size="large" />}
           <div class={`attach-btn ${name}`}>
             {!this.isUploading && (
-              <CWIcon iconName="imageUpload" iconSize="medium" />
+              <CWIcon iconName="imageUpload" iconSize="large" iconButtonTheme='hasBackground' />
             )}
             <CWText type="caption" fontWeight="medium">
               {headerText}

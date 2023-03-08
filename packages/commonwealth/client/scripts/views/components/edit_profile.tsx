@@ -244,7 +244,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               <div className="buttons-container">
                 <div className="buttons">
                   <CWButton
-                    label="Cancel Edits"
+                    label="Cancel"
                     onclick={() => {
                       this.loading = true;
                       setTimeout(() => {
@@ -252,7 +252,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                       }, 1000);
                     }}
                     className="save-button"
-                    buttonType="mini-white"
+                    buttonType="secondary-black"
                   />
                   <CWButton
                     label="Save"
@@ -260,7 +260,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                       this.handleSaveProfile();
                     }}
                     className="save-button"
-                    buttonType="mini-black"
+                    buttonType="primary-black"
                   />
                 </div>
               </div>

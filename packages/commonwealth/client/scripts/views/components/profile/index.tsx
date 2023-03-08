@@ -165,6 +165,6 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
       );
     }
 
-    return <Sublayout>{this.content}</Sublayout>;
+    return <Sublayout hideFooter={true}>{this.content}</Sublayout>;
   }
 }

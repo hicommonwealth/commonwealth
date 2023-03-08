@@ -108,6 +108,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             class="login-menu-item"
             onclick={() => {
               m.route.set(`/profile/id/${this.profileId}`);
+              m.redraw();
             }}
           >
             <CWText type="caption">View profile</CWText>
