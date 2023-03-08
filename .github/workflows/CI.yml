@@ -80,6 +80,23 @@ jobs:
     name: Remaining commonwealth tests
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: commonwealth
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -98,6 +115,9 @@ jobs:
 
       - name: Install dependencies
         run: yarn --ignore-engines
+
+      - name: Init Db
+        run: cd packages/commonwealth && npx sequelize db:migrate
 
       - name: Run linter
         run: yarn lint-branch
