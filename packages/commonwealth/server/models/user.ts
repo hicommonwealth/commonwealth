@@ -1,6 +1,5 @@
 import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
-import { generateUsername } from 'friendly-username-generator';
 import type { DB } from '../models';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ChainAttributes, ChainInstance } from './chain';

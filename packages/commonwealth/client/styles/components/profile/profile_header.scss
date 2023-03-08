@@ -29,6 +29,8 @@
       height: 160px;
       width: 160px;
       border-radius: 50%;
+      border: 1px;
+      border-color: $neutral-200;
       object-fit: cover;
     }
   }

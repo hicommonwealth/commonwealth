@@ -360,7 +360,6 @@ const getCustomDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/settings': importRoute(import('views/pages/settings'), { scoped: true }),
   '/analytics': importRoute(import('views/pages/stats'), {
     scoped: true,
     deferChain: true,
@@ -427,7 +426,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/treasury': redirectRoute(() => '/treasury'),
   '/:scope/tips': redirectRoute(() => '/tips'),
   '/:scope/login': redirectRoute(() => '/login'),
-  '/:scope/settings': redirectRoute(() => '/settings'),
   '/:scope/admin': redirectRoute(() => '/admin'),
   '/:scope/manage': redirectRoute(() => '/manage'),
   '/:scope/spec_settings': redirectRoute(() => '/spec_settings'),
@@ -503,12 +501,6 @@ const getCommonDomainRoutes = (importRoute) => ({
     }
   ),
   '/finishaxielogin': importRoute(import('views/pages/finish_axie_login')),
-
-  // Settings
-  '/settings': redirectRoute(() => '/edgeware/settings'),
-  '/:scope/settings': importRoute(import('views/pages/settings'), {
-    scoped: true,
-  }),
 
   // Discussions
   '/home': redirectRoute('/'), // legacy redirect, here for compatibility only

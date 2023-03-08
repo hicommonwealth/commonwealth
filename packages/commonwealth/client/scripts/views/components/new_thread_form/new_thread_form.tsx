@@ -16,7 +16,6 @@ import { ThreadKind, ThreadStage } from 'models';
 
 import app from 'state';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { EditProfileModal } from '../../modals/edit_profile_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
@@ -338,26 +337,6 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
         </div>
         <div class="new-thread-body">
           <div class="new-thread-form-inputs">
-            {author?.profile && !author.profile.name && (
-              <div class="set-display-name-callout">
-                <CWText>{"You haven't set a display name yet."}</CWText>
-                <a
-                  href={`/${chainId}/account/${author.address}?base=${author.chain.id}`}
-                  onclick={(e) => {
-                    e.preventDefault();
-                    app.modals.create({
-                      modal: EditProfileModal,
-                      data: {
-                        account: author,
-                        refreshCallback: () => m.redraw(),
-                      },
-                    });
-                  }}
-                >
-                  Set a display name
-                </a>
-              </div>
-            )}
             {this.form.kind === ThreadKind.Discussion && (
               <>
                 {!!fromDraft && <CWText className="draft-text">Draft</CWText>}

@@ -6,7 +6,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
 import _, { capitalize } from 'lodash';
 import m from 'mithril';
-import type { Profile } from 'models';
+import type { MinimumProfile as Profile } from 'models';
 import { AddressInfo, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
 import moment from 'moment';
@@ -148,8 +148,8 @@ const getCommunityResult = (community) => {
 };
 
 const getMemberResult = (addr) => {
-  const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
-  if (addr.name) profile.initialize(addr.name, null, null, null, null);
+  const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
+  if (addr.name) profile.initialize(addr.name, null, null, null, null, null);
 
   if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
 

@@ -15,19 +15,20 @@ import { CWAddressTooltip } from './component_kit/cw_popover/cw_address_tooltip'
 
 type AddressAttrs = {
   profile: Profile;
+  addresses: AddressInfo[];
   addressInfo: AddressInfo;
-  refreshProfiles: () => Promise<void>;
+  refreshProfiles: (address: string) => void;
 };
 
 type LinkedAddressesAttrs = {
   profile: Profile;
   addresses: AddressInfo[];
-  refreshProfiles: () => Promise<void>;
+  refreshProfiles: (address: string) => void;
 };
 
 class Address extends ClassComponent<AddressAttrs> {
   view(vnode: m.Vnode<AddressAttrs>) {
-    const { profile, addressInfo, refreshProfiles } = vnode.attrs;
+    const { profile, addresses, addressInfo, refreshProfiles } = vnode.attrs;
     const { address, chain } = addressInfo;
 
     return (
@@ -47,11 +48,12 @@ class Address extends ClassComponent<AddressAttrs> {
                   modal: DeleteAddressModal,
                   data: {
                     profile,
+                    addresses,
                     address,
                     chain: chain.id,
                   },
                   completeCallback: () => {
-                    refreshProfiles();
+                    refreshProfiles(address);
                   },
                 });
               },
@@ -74,6 +76,7 @@ export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
           return (
             <Address
               profile={profile}
+              addresses={addresses}
               addressInfo={address}
               refreshProfiles={refreshProfiles}
             />

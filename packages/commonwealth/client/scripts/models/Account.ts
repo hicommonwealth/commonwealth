@@ -3,8 +3,8 @@ import { ChainType } from 'common-common/src/types';
 import $ from 'jquery';
 import app from 'state';
 
+import type { MinimumProfile as Profile } from 'models';
 import type ChainInfo from './ChainInfo';
-import type Profile from './Profile';
 
 class Account {
   public readonly address: string;
@@ -66,7 +66,7 @@ class Account {
     if (profile) {
       this._profile = profile;
     } else if (!ignoreProfile && chain?.id) {
-      this._profile = app.profiles.getProfile(chain.id, address);
+      this._profile = app.newProfiles.getProfile(chain.id, address);
     }
   }
 

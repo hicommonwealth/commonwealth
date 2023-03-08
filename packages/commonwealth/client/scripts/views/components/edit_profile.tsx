@@ -15,7 +15,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
   Account,
-  Profile as OldProfile,
+  MinimumProfile,
   AddressInfo,
 } from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -108,13 +108,19 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       const response: any = await $.post(
         `${app.serverUrl()}/updateProfile/v2`,
         {
-          profileId: this.profile.id,
           ...this.profileUpdate,
           jwt: app.user.jwt,
         }
       );
 
       if (response?.result?.status === 'Success') {
+        // refresh profiles in store
+        this.addresses.forEach((a) => {
+          app.newProfiles.updateProfileForAccount(
+            a.address,
+            this.profileUpdate
+          );
+        });
         setTimeout(() => {
           this.loading = false;
           navigateToSubpage(`/profile/id/${this.profile.id}`);
@@ -205,13 +211,20 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       // not the best solution because address is not always available
       // should refactor AvatarUpload to make it work with new profiles
       let account: Account | null;
-      if (this.addresses.length > 0) {
-        const oldProfile = new OldProfile(
+      if (this.addresses?.length > 0) {
+        const oldProfile = new MinimumProfile(
           this.addresses[0].chain.name,
           this.addresses[0].address
         );
 
-        oldProfile.initialize(this.name, null, this.bio, this.avatarUrl, null);
+        oldProfile.initialize(
+          this.name,
+          this.addresses[0].address,
+          this.avatarUrl,
+          this.profile.id,
+          this.addresses[0].chain.name,
+          null
+        );
 
         account = new Account({
           chain: this.addresses[0].chain,
@@ -231,7 +244,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               <div className="buttons-container">
                 <div className="buttons">
                   <CWButton
-                    label="Cancel Edits"
+                    label="Cancel"
                     onclick={() => {
                       this.loading = true;
                       setTimeout(() => {
@@ -239,7 +252,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                       }, 1000);
                     }}
                     className="save-button"
-                    buttonType="mini-white"
+                    buttonType="secondary-black"
                   />
                   <CWButton
                     label="Save"
@@ -247,7 +260,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                       this.handleSaveProfile();
                     }}
                     className="save-button"
-                    buttonType="mini-black"
+                    buttonType="primary-black"
                   />
                 </div>
               </div>
@@ -388,7 +401,14 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
               <LinkedAddresses
                 addresses={this.addresses}
                 profile={this.profile}
-                refreshProfiles={() => this.getProfile(vnode.attrs.profileId)}
+                refreshProfiles={(address: string) => {
+                  this.getProfile(vnode.attrs.profileId);
+                  // Remove from all address stores in the frontend state
+                  const index = app.user.addresses.indexOf(
+                    app.user.addresses.find((a) => a.address === address)
+                  );
+                  app.user.addresses.splice(index, 1);
+                }}
               />
               <div
                 className="connect-address-button"
@@ -402,6 +422,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                         );
                       }, 1000);
                       this.getProfile(vnode.attrs.profileId);
+                      m.redraw();
                     },
                   });
                 }}

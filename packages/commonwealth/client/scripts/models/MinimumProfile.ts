@@ -1,4 +1,10 @@
-// Only to be used in User component to render minimum new profile
+import jdenticon from 'jdenticon';
+import m from 'mithril';
+
+import {
+  CWAvatar,
+  CWJdenticon,
+} from '../views/components/component_kit/cw_avatar';
 
 class MinimumProfile {
   private _name: string;
@@ -34,7 +40,7 @@ class MinimumProfile {
     return this._chain;
   }
 
-  constructor({ address, chain }) {
+  constructor(address, chain) {
     this._address = address;
     this._chain = chain;
   }
@@ -49,8 +55,23 @@ class MinimumProfile {
     this._initialized = true;
   }
 
+  get displayName(): string {
+    if (!this._initialized) return 'Loading...';
+    return this.name || 'Anonymous';
+  }
+
   public static fromJSON(json) {
-    return new MinimumProfile(json);
+    return new MinimumProfile(json.address, json.chain);
+  }
+
+  public getAvatar(size: number) {
+    return this.avatarUrl
+      ? m(CWAvatar, { avatarUrl: this.avatarUrl, size })
+      : m(CWJdenticon, { address: this.address, size });
+  }
+
+  public static getSVGAvatar(address, size) {
+    return jdenticon.toSvg(address, size);
   }
 }
 

@@ -21,7 +21,7 @@ const renderThreadPreview = (
   idx: number
 ) => {
   const selected = linkedThreads.some((lt) => +lt.id === +thread.id);
-  const author = app.profiles.getProfile(thread.authorChain, thread.author);
+  const author = app.newProfiles.getProfile(thread.authorChain, thread.author);
 
   return m(ListItem, {
     label: (
@@ -126,7 +126,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                       .then((results) => {
                         this.searchResults = results;
                         results.forEach((thread) => {
-                          app.profiles.getProfile(
+                          app.newProfiles.getProfile(
                             thread.authorChain,
                             thread.author
                           );
