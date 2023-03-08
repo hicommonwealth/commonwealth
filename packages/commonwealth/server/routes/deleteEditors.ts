@@ -46,7 +46,7 @@ const deleteEditors = async (
   if (!thread) return next(new AppError(Errors.InvalidThread));
 
   await Promise.all(
-    editors.map(async (editor: IThreadCollaborator) => {
+    editors.map(async (editor) => {
       const address = await models.Address.findOne({
         where: {
           chain: editor.chain,
