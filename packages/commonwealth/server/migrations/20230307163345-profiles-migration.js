@@ -3,10 +3,15 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      // Get all Profiles
       const profiles = await queryInterface.sequelize.query(
-        `SELECT "Profiles".id AS profile_id, "Profiles".profile_name, 
-          JSON_AGG(JSON_BUILD_OBJECT('address_id', "Addresses".id, 'data', COALESCE("OffchainProfiles".data, '{}'))) AS address_offchain_pairs
+        `SELECT "Profiles".id AS profile_id, "Profiles".profile_name, "Profiles".user_id,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'address_id', "Addresses".id, 
+            'data', COALESCE("OffchainProfiles".data, '{}'),
+            'address', "Addresses".address
+          )
+        ) AS address_offchain_pairs
           FROM "Profiles"
           LEFT JOIN "Addresses" ON "Profiles".id = "Addresses".profile_id
           LEFT JOIN "OffchainProfiles" ON "Addresses".id = "OffchainProfiles".address_id
@@ -18,6 +23,7 @@ module.exports = {
       );
 
       let newProfilesAndUsersCreated = 0;
+      let newProfilesSkippedForAddressDuplication = 0;
       // For each profile
       for (const profile of profiles) {
         console.log('Updating profile with id: ', profile.profile_id);
@@ -131,10 +137,12 @@ module.exports = {
                 { transaction: t }
               );
             } else {
+              let addressMapping = {};
               // Addresses have different names- we must create new profiles
               for (let i = 0; i < profile.address_offchain_pairs.length; i++) {
                 const address_offchain_pair = profile.address_offchain_pairs[i];
                 const addressId = address_offchain_pair.address_id;
+                const address = address_offchain_pair.address;
                 let parsedData;
                 try {
                   parsedData = JSON.parse(address_offchain_pair.data);
@@ -157,8 +165,55 @@ module.exports = {
                     } WHERE id=${profile.profile_id}`,
                     { transaction: t }
                   );
+
+                  addressMapping[address] = {
+                    profileId: profile.profile_id,
+                    userId: profile.user_id,
+                    name: parsedData?.name
+                      ? `${parsedData.name.replace(/'/g, '')}`
+                      : null,
+                    avatarUrl: parsedData?.avatarUrl
+                      ? `${parsedData.avatarUrl}`
+                      : null,
+                  };
                 } else {
                   // The other addresses result in new user and profile objects
+
+                  // Check if we have seen the address already (special case)
+
+                  if (addressMapping[address]) {
+                    const existingAddressProfileId =
+                      addressMapping[address].profileId;
+                    const existingAddressUserId =
+                      addressMapping[address].userId;
+                    const existingAddressName = addressMapping[address].name;
+                    const existingAddressAvatarUrl =
+                      addressMapping[address].avatarUrl;
+
+                    if (!existingAddressAvatarUrl || !existingAddressName) {
+                      // Update the existing profile with the avatar url and name if they exists
+                      await queryInterface.sequelize.query(
+                        `UPDATE "Profiles" SET avatar_url=${
+                          parsedData?.avatarUrl
+                            ? `'${parsedData.avatarUrl}'`
+                            : 'NULL'
+                        }, profile_name=${
+                          parsedData?.name
+                            ? `'${parsedData.name.replace(/'/g, '')}'`
+                            : 'NULL'
+                        } WHERE id=${existingAddressProfileId}`,
+                        { transaction: t }
+                      );
+                    }
+
+                    // update address with new user id and new profile id
+                    await queryInterface.sequelize.query(
+                      `UPDATE "Addresses" SET user_id=${existingAddressUserId}, profile_id=${existingAddressProfileId} WHERE id=${addressId}`,
+                      { transaction: t }
+                    );
+                    newProfilesSkippedForAddressDuplication += 1;
+                    continue;
+                  }
 
                   // Create new user
                   const newUser = await queryInterface.sequelize.query(
@@ -194,6 +249,14 @@ module.exports = {
                     { transaction: t }
                   );
 
+                  // Add to map to keep track of address duplicates
+                  addressMapping[address] = {
+                    profileId: newProfile[0][0].id,
+                    userId: newUser[0][0].id,
+                    name: parsedData?.name,
+                    avatarUrl: parsedData?.avatarUrl,
+                  };
+
                   newProfilesAndUsersCreated += 1;
                 }
               }
@@ -204,6 +267,11 @@ module.exports = {
 
       console.log(
         `Created ${newProfilesAndUsersCreated} new profiles and users`
+      );
+      console.log(
+        'Skipped creating',
+        newProfilesSkippedForAddressDuplication,
+        'new profiles due to duplicate addresses'
       );
     });
   },
