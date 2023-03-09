@@ -141,7 +141,7 @@ export class NewProfilesPopup extends ClassComponent<NewProfilesPopupAttrs> {
 
     return (
       <UserSurveyView
-        disabled={false}
+        disabled={!readyForDisplay || this.growlLocked || !app.isLoggedIn()}
         checked={this.hideForeverChecked}
         onRedirectClick={handleRedirect}
         onClose={handleClose}
