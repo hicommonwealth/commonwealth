@@ -52,7 +52,9 @@ module.exports = {
         }
 
         // once mergeSet is maximal, remove all intersecting elements + reinsert the final set
-        userMergeSets = userMergeSets.filter((set) => !hasIntersection(set, mergeSet));
+        userMergeSets = userMergeSets.filter(
+          (set) => !hasIntersection(set, mergeSet)
+        );
         userMergeSets.push(mergeSet);
       }
 
