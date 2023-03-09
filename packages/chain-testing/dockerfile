@@ -1,0 +1,23 @@
+# Use a Node.js base image with version 14.x
+FROM node:18.14.1-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+RUN apk add --no-cache libc6-compat 
+RUN ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
+
+RUN npm install
+
+COPY . .
+
+ENV RPC_HOST=ganache
+
+RUN npm run build
+
+EXPOSE 8080
+EXPOSE 8545
+
+CMD npm run ganache ; npm start
