@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
@@ -23,7 +23,7 @@ import {
 import type { AnyProposal } from 'models';
 import { VotingType } from 'models';
 
-import app from 'state';
+import app, { LoginState } from 'state';
 
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWButton } from '../component_kit/cw_button';
@@ -57,6 +57,14 @@ export const VotingActions = (props: VotingActionsProps) => {
   const [amount, setAmount] = React.useState<number>();
   const [conviction, setConviction] = React.useState<number>();
   // conviction isn't used anywhere?
+
+  // const [isLoggedIn, setIsLoggedIn] = React.useState();
+
+  // useEffect(() => {
+  //   const _isLoggedIn = app.loginState === LoginState.LoggedIn;
+  //   console.log('_isLoggedIn', _isLoggedIn);
+  //   setIsLoggedIn(_isLoggedIn);
+  // }, [app.loginState]);
 
   if (
     proposal instanceof SubstrateDemocracyProposal ||
@@ -210,7 +218,11 @@ export const VotingActions = (props: VotingActionsProps) => {
     hasVotedRemove,
   } = getVotingResults(proposal, user);
 
-  const canVote = getCanVote(proposal, hasVotedForAnyChoice);
+  const isLoggedIn = app.isLoggedIn();
+  console.log('app.user', app.user);
+  console.log('isLoggedIn', isLoggedIn);
+
+  const canVote = isLoggedIn && getCanVote(proposal, hasVotedForAnyChoice);
 
   const yesButton = (
     <CWButton
