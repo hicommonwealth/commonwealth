@@ -22,7 +22,8 @@ type SocialAccountAttrs = {
 class SocialAccount extends ClassComponent<SocialAccountAttrs> {
   view(vnode: m.Vnode<SocialAccountAttrs>) {
     const { iconName, link, email } = vnode.attrs;
-    const formattedLink = (link.includes('http') || !!email) ? link : `https://${link}`;
+    const formattedLink =
+      link.includes('http') || !!email ? link : `https://${link}`;
 
     return (
       <a href={formattedLink} target="_blank">

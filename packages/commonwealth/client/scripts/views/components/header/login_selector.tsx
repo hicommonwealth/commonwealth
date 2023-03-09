@@ -71,15 +71,13 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
       <div class="LoginSelectorMenu left">
         {app.activeChainId() && (
           <>
-            {activeAccounts.length > 0 &&
+            {activeAccounts.length > 0 && (
               <CWText type="caption" className="title">
                 Select address to use
-              </CWText>}
+              </CWText>
+            )}
             {activeAccounts.map((account) => {
-              const selected = isSameAccount(
-                account,
-                app.user.activeAccount
-              );
+              const selected = isSameAccount(account, app.user.activeAccount);
               return (
                 <div
                   class={`login-menu-item ${selected ? 'selected' : ''}`}
@@ -90,10 +88,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
                 >
                   {m(UserBlock, {
                     user: account,
-                    selected: isSameAccount(
-                      account,
-                      app.user.activeAccount
-                    ),
+                    selected: isSameAccount(account, app.user.activeAccount),
                     showRole: false,
                     compact: true,
                     hideAvatar: true,
@@ -105,22 +100,22 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         )}
         {activeAccounts.length > 0 && <CWDivider />}
         <div
-            class="login-menu-item"
-            onclick={() => {
-              m.route.set(`/profile/id/${this.profileId}`);
-              m.redraw();
-            }}
-          >
-            <CWText type="caption">View profile</CWText>
+          class="login-menu-item"
+          onclick={() => {
+            m.route.set(`/profile/id/${this.profileId}`);
+            m.redraw();
+          }}
+        >
+          <CWText type="caption">View profile</CWText>
         </div>
         <div
-            class="login-menu-item"
-            onclick={() => {
-              m.route.set(`/profile/id/${this.profileId}/edit`);
-            }}
-          >
-            <CWText type="caption">Edit profile</CWText>
-          </div>
+          class="login-menu-item"
+          onclick={() => {
+            m.route.set(`/profile/id/${this.profileId}/edit`);
+          }}
+        >
+          <CWText type="caption">Edit profile</CWText>
+        </div>
         <div
           class="login-menu-item"
           onclick={() => {

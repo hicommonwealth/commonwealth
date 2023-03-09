@@ -89,10 +89,12 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
   }
 
   view(vnode) {
-    if (this.profile
-      && this.profile.id.toString() !== vnode.attrs.profileId
-      && !this.loading) {
-        this.fetchProfile(vnode);
+    if (
+      this.profile &&
+      this.profile.id.toString() !== vnode.attrs.profileId &&
+      !this.loading
+    ) {
+      this.fetchProfile(vnode);
     }
     if (this.loading)
       this.content = (
@@ -143,9 +145,7 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
               : {}
           }
         >
-          <div
-            className={'ProfilePageContainer'}
-          >
+          <div className={'ProfilePageContainer'}>
             <ProfileHeader profile={this.profile} isOwner={this.isOwner} />
             <ProfileActivity
               threads={this.threads}

@@ -326,7 +326,11 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
           {this.isUploading && <CWSpinner active="true" size="large" />}
           <div class={`attach-btn ${name}`}>
             {!this.isUploading && (
-              <CWIcon iconName="imageUpload" iconSize="large" iconButtonTheme='hasBackground' />
+              <CWIcon
+                iconName="imageUpload"
+                iconSize="large"
+                iconButtonTheme="hasBackground"
+              />
             )}
             <CWText type="caption" fontWeight="medium">
               {headerText}

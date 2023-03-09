@@ -148,15 +148,17 @@ const User: m.Component<
     );
 
     const defaultAvatar = jdenticon.toSvg(profile.id, 90);
-    const svgSource =`data:image/svg+xml;utf8,${encodeURIComponent(defaultAvatar)}`;
+    const svgSource = `data:image/svg+xml;utf8,${encodeURIComponent(
+      defaultAvatar
+    )}`;
 
     const profileAvatar = profile?.avatarUrl
       ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize })
-      : m('img', { src: svgSource});
+      : m('img', { src: svgSource });
 
     const profileAvatarPopover = profile?.avatarUrl
-      ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize+12 })
-      : m('img', { src: svgSource});
+      ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize + 12 })
+      : m('img', { src: svgSource });
 
     const userFinal = avatarOnly
       ? m(
@@ -353,7 +355,9 @@ export const UserBlock: m.Component<
               '',
               highlightSearchTerm
                 ? highlightedAddress
-                : `${profile.address.slice(0, 8)}...${profile.address.slice(-5)}`
+                : `${profile.address.slice(0, 8)}...${profile.address.slice(
+                    -5
+                  )}`
             ),
             profile?.address && showChainName && m('.address-divider', ' · '),
             showChainName &&

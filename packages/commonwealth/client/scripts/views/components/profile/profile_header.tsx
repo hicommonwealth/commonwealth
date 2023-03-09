@@ -32,7 +32,6 @@ export class ProfileHeader extends ClassComponent<ProfileHeaderAttrs> {
     if (!profile) return;
     const { bio, name } = profile;
 
-
     const isCurrentUser = app.isLoggedIn() && isOwner;
 
     return (

@@ -146,7 +146,11 @@ export class Layout extends ClassComponent<LayoutAttrs> {
         <AppModals />
         <AppToasts />
         <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
-        {app.isLoggedIn() && <NewProfilesPopup readyForDisplay={this.profileGrowlReadyForDisplay} />}
+        {app.isLoggedIn() && (
+          <NewProfilesPopup
+            readyForDisplay={this.profileGrowlReadyForDisplay}
+          />
+        )}
       </div>
     );
   }

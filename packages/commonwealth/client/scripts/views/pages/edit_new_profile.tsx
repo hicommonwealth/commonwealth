@@ -21,9 +21,7 @@ export default class EditNewProfile extends ClassComponent {
 
   view() {
     return (
-      <Sublayout
-        hideFooter={true}
-      >
+      <Sublayout hideFooter={true}>
         <EditProfileComponent profileId={this.profileId} />
       </Sublayout>
     );
