@@ -147,24 +147,5 @@
     .LinkedAddresses {
       margin-bottom: 32px;
     }
-
-    .connect-address-button {
-      display: flex;
-      align-items: center;
-
-      .caption {
-        color: $neutral-800;
-        margin-left: 4px;
-
-        &:hover {
-          color: $neutral-600;
-        }
-      }
-
-      &:hover {
-        color: $neutral-600;
-        cursor: pointer;
-      }
-    }
   }
 }

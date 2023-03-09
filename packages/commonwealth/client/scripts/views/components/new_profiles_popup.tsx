@@ -128,10 +128,12 @@ export class NewProfilesPopup extends ClassComponent<NewProfilesPopupAttrs> {
       this.growlLocked = true;
       localStorage.setItem('profile-growl-locked', 'true');
 
+      const { address, chain } = app.user.addresses[0];
+      const pf = app.newProfiles.getProfile(chain.id, address);
+
       // Redirect to the view profile page
-      const pf = app.user.activeAccount.profile;
       if (pf) {
-        m.route.set(`/profile/${pf.id}`);
+        m.route.set(`/profile/id/${pf.id}`);
       }
     };
 
