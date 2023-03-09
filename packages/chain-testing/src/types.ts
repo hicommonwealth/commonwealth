@@ -27,5 +27,17 @@ export interface dexGetTokens {
     accountIndex?: number;
 }
 
+export interface govCompVote {
+    proposalId: string | number;
+    accountIndex: number;
+    numberOfVotes: string;
+    forAgainst: boolean;
+}
+
+export interface govCompGetVotes{
+    accountIndex: number;
+    numberOfVotes: string;
+}
+
 
 
