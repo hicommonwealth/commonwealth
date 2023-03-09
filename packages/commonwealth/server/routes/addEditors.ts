@@ -1,4 +1,3 @@
-import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import { AppError } from 'common-common/src/errors';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
@@ -15,11 +14,6 @@ export const Errors = {
   IncorrectOwner: 'Not owned by this user',
 };
 
-export interface AddEditorsBody {
-  thread_id: string
-  editors: IThreadCollaborator[]
-}
-
 const addEditors = async (
   models: DB,
   req: Request,
@@ -29,11 +23,11 @@ const addEditors = async (
   if (!req.body?.thread_id) {
     return next(new AppError(Errors.InvalidThread));
   }
-
-  const { thread_id, editors } = req.body as AddEditorsBody;
-
-  // Ensure editors is an array
-  if (!Array.isArray(editors)) {
+  const { thread_id } = req.body;
+  let editors;
+  try {
+    editors = JSON.parse(req.body.editors);
+  } catch (e) {
     return next(new AppError(Errors.InvalidEditorFormat));
   }
 
@@ -53,12 +47,9 @@ const addEditors = async (
   if (!thread) return next(new AppError(Errors.InvalidThread));
 
   const collaborators = await Promise.all(
-    editors.map((editor) => {
+    Object.values(editors).map((editor: any) => {
       return models.Address.findOne({
-        where: {
-          chain: editor.chain,
-          address: editor.address,
-        },
+        where: { id: editor.id },
         include: [models.RoleAssignment, models.User],
       });
     })
@@ -131,7 +122,7 @@ const addEditors = async (
   await thread.save();
 
   if (collaborators?.length > 0) {
-    collaborators.forEach((collaborator) => {
+    collaborators.map((collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
       emitNotifications(
@@ -171,12 +162,14 @@ const addEditors = async (
     ],
   });
 
+  const finalAddresses = await Promise.all(
+    finalCollaborations.map((e) => e.getAddress())
+  );
+
   return res.json({
     status: 'Success',
     result: {
-      collaborators: finalCollaborations
-        .map((c) => c.toJSON())
-        .map((c) => c.Address)
+      collaborators: finalAddresses.map((a) => a.toJSON()),
     },
   });
 };

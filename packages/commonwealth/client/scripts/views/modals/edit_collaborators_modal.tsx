@@ -20,13 +20,11 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
   thread: Thread;
-  onCollaboratorsUpdated: (newEditors: IThreadCollaborator[]) => void
 };
 
 export const EditCollaboratorsModal = ({
   onModalClose,
   thread,
-  onCollaboratorsUpdated
 }: EditCollaboratorsModalProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<
@@ -172,14 +170,13 @@ export const EditCollaboratorsModal = ({
                       author_chain: app.user.activeAccount.chain.id,
                       chain: app.activeChainId(),
                       thread_id: thread.id,
-                      editors: added,
+                      editors: JSON.stringify(added),
                       jwt: app.user.jwt,
                     }
                   );
 
                   if (response.data.status === 'Success') {
                     notifySuccess('Collaborators added');
-                    onCollaboratorsUpdated(response.data.result.collaborators);
                   } else {
                     notifyError('Failed to add collaborators');
                   }
@@ -205,14 +202,13 @@ export const EditCollaboratorsModal = ({
                       author_chain: app.user.activeAccount.chain.id,
                       chain: app.activeChainId(),
                       thread_id: thread.id,
-                      editors: deleted,
+                      editors: JSON.stringify(deleted),
                       jwt: app.user.jwt,
                     }
                   );
 
                   if (response.data.status === 'Success') {
                     notifySuccess('Collaborators removed');
-                    onCollaboratorsUpdated(response.data.result.collaborators);
                   } else {
                     throw new Error('Failed to remove collaborators');
                   }
@@ -222,9 +218,7 @@ export const EditCollaboratorsModal = ({
                   notifyError(errMsg);
                 }
               }
-
               onModalClose();
-
             }}
           />
         </div>

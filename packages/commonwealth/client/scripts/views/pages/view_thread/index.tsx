@@ -39,7 +39,6 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
-import { IThreadCollaborator } from 'client/scripts/models/Thread';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -741,10 +740,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
-            onCollaboratorsUpdated={(newEditors: IThreadCollaborator[]) => {
-              thread.collaborators = newEditors;
-              setThread(thread);
-            }}
           />
         }
         onClose={() => setIsEditCollaboratorsModalOpen(false)}
