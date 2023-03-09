@@ -3,7 +3,8 @@ import type { Express } from 'express';
 
 function setupIpfsProxy(app: Express) {
   // using bodyParser here because cosmjs generates text/plain type headers
-  app.get('/api/ipfsProxy', async function cosmosProxy(req, res) {
+  // TODO: add cache
+  app.get('/api/ipfsProxy', async function (req, res) {
     try {
       const hash = req.query.hash;
       const response = await axios.get(
@@ -12,6 +13,7 @@ function setupIpfsProxy(app: Express) {
           headers: {
             origin: 'https://commonwealth.im',
           },
+          timeout: 5000,
         }
       );
       return res.send(response.data);
