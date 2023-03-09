@@ -316,9 +316,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                   }}
                   inputClassName={this.displayNameValid ? '' : 'failure'}
                   manualStatusMessage={this.displayNameValid ? '' : 'No input'}
-                  manualValidationStatus={
-                    this.displayNameValid ? 'success' : 'failure'
-                  }
                 />
                 {/* <CWTextInput
                   name="email-form-field"
@@ -408,7 +405,9 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                   app.user.addresses.splice(index, 1);
                 }}
               />
-              <CWText type="caption" fontWeight="medium">Link new addresses via the profile dropdown menu</CWText>
+              <CWText type="caption" fontWeight="medium">
+                Link new addresses via the profile dropdown menu
+              </CWText>
             </CWFormSection>
           </CWForm>
         </div>
