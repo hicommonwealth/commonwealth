@@ -50,6 +50,7 @@ export type ChainAttributes = {
   discord_config_id?: number;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
+  last_interaction_date?: Date;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -141,6 +142,10 @@ export default (
         type: dataTypes.BIGINT,
         allowNull: false,
         defaultValue: 0,
+      },
+      last_interaction_date: {
+        type: dataTypes.DATE,
+        allowNull: true,
       },
     },
     {

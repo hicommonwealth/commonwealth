@@ -55,6 +55,13 @@ export default class DatabaseValidationService {
       // If the chain is valid, add it to the request object
       req.chain = chain;
     }
+
+    if (req.user) {
+      // A logged in user- we should update the last interaction date
+      chain.last_interaction_date = new Date();
+      await chain.save();
+    }
+
     if (!chain) return next(new AppError(Errors.InvalidCommunity));
     next();
   };
