@@ -8,6 +8,7 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { DB } from '../models';
 import { createRole, findOneRole } from '../util/roles';
 import { factory, formatFilename } from 'common-common/src/logging';
+import assertAddressOwnership from '../util/assertAddressOwnership';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -125,10 +126,15 @@ const linkExistingAddressToChain = async (
       //   we can just update with userId. this covers both edge case (1) & (2)
       // Address.updateWithTokenProvided
       existingAddress.user_id = userId;
+      const profileId = await models.Profile.findOne({
+        where: { user_id: userId },
+      });
+      existingAddress.profile_id = profileId?.id;
       existingAddress.keytype = req.body.keytype;
       existingAddress.verification_token = verificationToken;
       existingAddress.verification_token_expires = verificationTokenExpires;
       existingAddress.last_active = new Date();
+      existingAddress.name = originalAddress.name;
       const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
     } else {
@@ -148,6 +154,9 @@ const linkExistingAddressToChain = async (
 
       addressId = newObj.id;
     }
+
+    // assertion check
+    await assertAddressOwnership(models, encodedAddress);
 
     const existingProfile = await models.OffchainProfile.findOne({
       where: { address_id: addressId },

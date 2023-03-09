@@ -11,6 +11,7 @@ import 'pages/snapshot_proposals.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
+import { NotificationCategories } from '../../../../../../common-common/src/types';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -114,15 +115,55 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
       this.selectedFilter = value;
     };
 
+    const spaceSubscription = app.user.notifications.subscriptions.find(
+      (sub) => {
+        return (
+          sub.category === 'snapshot-proposal' && sub.objectId === snapshotId
+        );
+      }
+    );
+
     return (
       <Sublayout
       // title="Proposals"
       >
         <div class="SnapshotProposalsPage">
-          <SnapshotProposalStagesBar
-            selected={selectedFilter}
-            onChangeFilter={onChangeFilter}
-          />
+          <div class="top-bar">
+            <SnapshotProposalStagesBar
+              selected={selectedFilter}
+              onChangeFilter={onChangeFilter}
+            />
+            <div>
+              <CWButton
+                label={
+                  spaceSubscription !== undefined
+                    ? 'Remove Subscription'
+                    : 'Subscribe to Notifications'
+                }
+                iconLeft={spaceSubscription !== undefined ? 'mute' : 'bell'}
+                onclick={() => {
+                  if (spaceSubscription !== undefined) {
+                    app.user.notifications
+                      .deleteSubscription(spaceSubscription)
+                      .then(() => {
+                        m.redraw();
+                      });
+                  } else {
+                    app.user.notifications
+                      .subscribe(
+                        NotificationCategories.SnapshotProposal,
+                        snapshotId
+                      )
+                      .then(() => {
+                        m.redraw();
+                      });
+                  }
+                }}
+                buttonType="mini-black"
+              />
+            </div>
+          </div>
+
           {proposals.length > 0 ? (
             <CardsCollection
               content={proposals.map((proposal) => (

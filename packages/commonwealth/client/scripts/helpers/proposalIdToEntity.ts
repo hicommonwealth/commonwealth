@@ -13,7 +13,9 @@ export default function (app: IApp, chain: string, identifier: string) {
   console.log(`Looking up proposal: ${chain}: ${identifier}`);
   const [prefix, type_id] = identifier.split('_');
   const findEntity = (type) => {
-    const entities = app.chainEntities.store.getByType(type, true);
+    const entities = Array.from(app.chainEntities.store.values())
+      .flat()
+      .filter((e) => e.type === type);
     for (const entity of entities) {
       if (entity.chain == chain && entity.typeId == type_id) {
         return entity;

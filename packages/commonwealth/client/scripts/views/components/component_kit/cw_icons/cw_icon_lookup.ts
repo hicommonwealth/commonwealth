@@ -33,6 +33,7 @@ export const iconLookup = {
   expand: Icons.CWExpand,
   exploreCommunity: Icons.CWExploreCommunities,
   externalLink: Icons.CWExternalLink,
+  blueExternalLink: Icons.CWBlueExternalLink,
   feedback: Icons.CWFeedback,
   filter: Icons.CWFilter,
   flag: Icons.CWFlag,

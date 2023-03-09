@@ -40,11 +40,13 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
         {this.chainEntitiesLoaded ? (
           m(QueryList, {
             checkmark: true,
-            items: app.chainEntities.store.getAll().sort((a, b) => {
-              if (!a.threadId && b.threadId) return -1;
-              if (a.threadId && !b.threadId) return 1;
-              return 0;
-            }),
+            items: Array.from(app.chainEntities.store.values())
+              .flat()
+              .sort((a, b) => {
+                if (!a.threadId && b.threadId) return -1;
+                if (a.threadId && !b.threadId) return 1;
+                return 0;
+              }),
             inputAttrs: {
               placeholder: 'Search for an existing proposal...',
             },

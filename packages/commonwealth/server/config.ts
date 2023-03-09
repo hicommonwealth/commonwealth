@@ -49,6 +49,8 @@ export const GITHUB_OAUTH_CALLBACK =
   process.env.GITHUB_OAUTH_CALLBACK ||
   (process.env.NODE_ENV === 'production'
     ? 'https://commonwealth.im'
+    : process.env.NODE_ENV === 'mobile'
+    ? 'capacitor://localhost'
     : 'http://localhost:8080') + '/api/auth/github/callback';
 
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
@@ -57,6 +59,8 @@ export const DISCORD_OAUTH_CALLBACK =
   process.env.DISCORD_OAUTH_CALLBACK ||
   (process.env.NODE_ENV === 'production'
     ? 'https://commonwealth.im'
+    : process.env.NODE_ENV === 'mobile'
+    ? 'capacitor://localhost'
     : 'http://localhost:8080') + '/api/auth/discord/callback';
 export const DISCORD_OAUTH_SCOPES =
   process.env.DISCORD_OAUTH_SCOPES?.split(' ');

@@ -19,6 +19,7 @@ import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import { UserSurveyPopup } from './components/user_survey_popup';
+import { UnifiedUserFlow } from './components/unified_user_profiles_flow';
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -127,12 +128,14 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       }
       return <LoadingLayout />;
     }
+
     return (
       <div class="Layout">
         {vnode.children}
         <AppModals />
         <AppToasts />
         <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
+        {app.isLoggedIn() && <UnifiedUserFlow />}
       </div>
     );
   }

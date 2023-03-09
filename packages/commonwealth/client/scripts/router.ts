@@ -477,14 +477,9 @@ const getCommonDomainRoutes = (importRoute) => ({
   ),
 
   // Notifications
-  '/:scope/notifications': importRoute(
-    import('views/pages/notifications_page'),
-    {
-      scoped: true,
-      deferChain: true,
-    }
-  ),
-  '/notifications': redirectRoute(() => '/edgeware/notifications'),
+  '/notifications': importRoute(import('views/pages/notifications_page'), {
+    deferChain: true,
+  }),
   '/notification-settings': importRoute(
     import('views/pages/notification_settings'),
     {

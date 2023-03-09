@@ -59,7 +59,7 @@ class SubstrateDemocracy extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server referenda
-    const entities = this.app.chainEntities.store.getByType(
+    const entities = this.app.chainEntities.getByType(
       SubstrateTypes.EntityKind.DemocracyReferendum
     );
     entities.forEach((e) => this._entityConstructor(e));

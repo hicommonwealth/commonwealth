@@ -5,6 +5,7 @@ import $ from 'jquery';
 
 import type { ChainInfo, SocialAccount, StarredCommunity } from 'models';
 import app from 'state';
+import { notifyError } from '../app/notifications';
 import DraftsController from './drafts';
 
 // eslint-disable-next-line
@@ -111,6 +112,15 @@ export class UserController {
     this._disableRichText = disableRichText;
   }
 
+  // Likely remove when unified profiles are in
+  private _hasDisplayName: boolean;
+  public setHasDisplayName(hasDisplayName: boolean): void {
+    this._hasDisplayName = hasDisplayName;
+  }
+  public get hasDisplayName(): boolean {
+    return this._hasDisplayName;
+  }
+
   private _notifications: NotificationsController =
     new NotificationsController();
   public get notifications(): NotificationsController {
@@ -168,8 +178,32 @@ export class UserController {
     this._setEmail(email);
   }
 
+  public updateEmail(email: string): void {
+    this._setEmail(email);
+
+    try {
+      $.post(`${app.serverUrl()}/updateEmail`, {
+        email: email,
+        jwt: app.user.jwt,
+      });
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to update email');
+    }
+  }
+
   public setEmailInterval(emailInterval: string): void {
     this._setEmailInterval(emailInterval);
+    try {
+      $.post(`${app.serverUrl()}/writeUserSetting`, {
+        jwt: app.user.jwt,
+        key: 'updateEmailInterval',
+        value: emailInterval,
+      });
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to set email interval');
+    }
   }
 
   public setEmailVerified(verified: boolean): void {

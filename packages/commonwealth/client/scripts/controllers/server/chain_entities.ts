@@ -11,15 +11,12 @@ import {
   SupportedNetwork,
 } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
+import type { ProposalType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { getBaseUrl, getFetch } from 'helpers/getUrl';
-import $ from 'jquery';
 import type { ChainInfo } from 'models';
 import { ChainEntity, ChainEvent, ChainEventType } from 'models';
-import app from 'state';
-
-import { ChainEntityStore } from 'stores';
-import { notifyError } from '../app/notifications';
+import { proposalSlugToChainEntityType } from '../../identifiers';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
@@ -34,56 +31,55 @@ export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   );
 }
 
-// const get = (route, args, callback) => {
-//   return $.get(app.serverUrl() + route, args)
-//     .then((resp) => {
-//       if (resp.status === 'Success') {
-//         callback(resp.result);
-//       } else {
-//         console.error(resp);
-//       }
-//     })
-//     .catch((e) => console.error(e));
-// };
-
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
 class ChainEntityController {
-  private _store: ChainEntityStore = new ChainEntityStore();
-  public get store() {
+  private _store: Map<string, ChainEntity[]> = new Map();
+
+  public get store(): Map<string, ChainEntity[]> {
     return this._store;
   }
 
   private _subscriber: IEventSubscriber<any, any>;
   private _handlers: { [t: string]: EntityHandler[] } = {};
 
-  public constructor() {
-    // do nothing
+  public getByUniqueId(chain: string, uniqueId: string): ChainEntity {
+    const [slug, type_id] = uniqueId.split('_');
+    const type = proposalSlugToChainEntityType(<ProposalType>slug);
+
+    return this._store
+      .get(chain)
+      .filter((e) => e.type === type && e.typeId === type_id)[0];
   }
 
   public getPreimage(hash: string) {
-    const preimage = this.store
-      .getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
-      .find((preimageEntity) => {
-        return (
-          preimageEntity.typeId === hash &&
-          preimageEntity.chainEvents.length > 0
-        );
-      });
-    if (preimage) {
-      const notedEvent = preimage.chainEvents.find(
-        (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
-      );
-      if (notedEvent && notedEvent.data) {
-        const result = (notedEvent.data as SubstrateTypes.IPreimageNoted)
-          .preimage;
-        return result;
-      } else {
-        return null;
-      }
+    const chainEntities: ChainEntity[] = Array.from(
+      this._store.values()
+    ).flat();
+    const preimage = chainEntities.filter(
+      (preimageEntity) =>
+        preimageEntity.typeId === hash && preimageEntity.chainEvents.length > 0
+    );
+
+    if (preimage.length === 0) {
+      return null;
+    }
+
+    const notedEvent = preimage[0].chainEvents.find(
+      (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
+    );
+
+    if (notedEvent && notedEvent.data) {
+      return (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
     } else {
       return null;
     }
+  }
+
+  public getByType(type: IChainEntityKind): ChainEntity[] {
+    return Array.from(this._store.values())
+      .flat()
+      .filter((e) => e.type === type);
   }
 
   /**
@@ -91,7 +87,11 @@ class ChainEntityController {
    * to form full ChainEntities
    * @param chain
    */
-  public async refresh(chain: string) {
+  public async refresh(chain: string): Promise<ChainEntity[]> {
+    if (this._store.has(chain)) {
+      return this._store.get(chain);
+    }
+
     const options: any = { chain };
 
     // load the chain-entity objects
@@ -100,37 +100,49 @@ class ChainEntityController {
       getFetch(getBaseUrl() + '/getEntityMeta', options),
     ]);
 
+    const data = [];
+    // save chain-entity metadata to the appropriate chain-entity
+    const metaMap: Map<string, { title: string; threadId: number }> = new Map(
+      entityMetas.map((e) => [
+        e.ce_id,
+        { title: e.title, threadId: e.thread_id },
+      ])
+    );
+
     if (Array.isArray(entities)) {
       // save the chain-entity objects in the store
       for (const entityJSON of entities) {
+        const metaData = metaMap.get(entityJSON.id);
+        if (metaData) {
+          entityJSON.title = metaData.title;
+          entityJSON.threadId = metaData.threadId;
+        }
+
         const entity = ChainEntity.fromJSON(entityJSON);
-        this._store.add(entity);
+        data.push(entity);
       }
     }
 
-    // save chain-entity metadata to the appropriate chain-entity
-    for (const entityMetaJSON of entityMetas) {
-      const entity = this._store.getById(entityMetaJSON.ce_id);
-      if (entity) {
-        entity.title = entityMetaJSON.title;
-        entity.threadId = entityMetaJSON.thread_id;
-      }
-    }
+    this._store.set(chain, data);
+    return data;
   }
 
-  public async refreshRawEntities(chain: string) {
+  public async getRawEntities(chain: string): Promise<ChainEntity[]> {
     const entities = await getFetch(getBaseUrl() + '/entities', { chain });
+    const data = [];
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);
-        this._store.add(entity);
+        data.push(entity);
       }
     }
+    this._store.set(chain, data);
+    return data;
   }
 
   public deinit() {
     this.clearEntityHandlers();
-    this.store.clear();
+    this._store.clear();
     if (this._subscriber) {
       this._subscriber.unsubscribe();
       this._subscriber = undefined;
@@ -181,11 +193,12 @@ class ChainEntityController {
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
 
-      const entity = this.store.getByUniqueData(
-        chain,
-        entityKind,
-        fieldValue.toString()
-      );
+      const entity = this._store
+        .get(chain)
+        .filter(
+          (e) => e.type === entityKind && e.typeId === fieldValue.toString()
+        )[0];
+
       if (!entity) {
         console.log(
           'Client creation of entities not supported. Please refresh to fetch new entities from the server.'
@@ -205,32 +218,6 @@ class ChainEntityController {
         }
       }
     }
-  }
-
-  public async updateEntityTitle(uniqueIdentifier: string, title: string) {
-    const chainEntity = this.store.getByUniqueId(
-      app.activeChainId(),
-      uniqueIdentifier
-    );
-    if (!chainEntity)
-      console.error('Cannot update title for non-existent entity');
-    return $.ajax({
-      url: `${app.serverUrl()}/updateChainEntityTitle`,
-      type: 'POST',
-      data: {
-        jwt: app.user.jwt,
-        chain_entity_id: chainEntity.id,
-        title,
-        chain: app.activeChainId(),
-      },
-      success: () => {
-        chainEntity.title = title;
-      },
-      error: (err) => {
-        notifyError('Could not set entity title');
-        console.error(err);
-      },
-    });
   }
 
   public async subscribeEntities<Api, RawEvent>(
