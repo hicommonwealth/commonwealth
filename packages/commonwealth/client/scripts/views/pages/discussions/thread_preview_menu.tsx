@@ -1,28 +1,25 @@
 import type { Dispatch, SetStateAction } from 'react';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { redraw } from 'mithrilInterop';
-import type { Thread, ThreadStage } from 'models';
+import type { Thread } from 'models';
 import app from 'state';
-import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { Modal } from '../../components/component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadPreviewMenuProps = {
   thread: Thread;
   setIsChangeTopicModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsUpdateProposalStatusModalOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const ThreadPreviewMenu = ({
   thread,
   setIsChangeTopicModalOpen,
+  setIsUpdateProposalStatusModalOpen,
 }: ThreadPreviewMenuProps) => {
   const navigate = useCommonNavigate();
-
-  const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
-    useState(false);
 
   const hasAdminPermissions =
     app.user.activeAccount &&
@@ -129,20 +126,6 @@ export const ThreadPreviewMenu = ({
           )}
         />
       </div>
-      <Modal
-        content={
-          <UpdateProposalStatusModal
-            onChangeHandler={(stage: ThreadStage) => {
-              thread.stage = stage;
-              redraw();
-            }}
-            thread={thread}
-            onModalClose={() => setIsUpdateProposalStatusModalOpen(false)}
-          />
-        }
-        onClose={() => setIsUpdateProposalStatusModalOpen(false)}
-        open={isUpdateProposalStatusModalOpen}
-      />
     </React.Fragment>
   );
 };

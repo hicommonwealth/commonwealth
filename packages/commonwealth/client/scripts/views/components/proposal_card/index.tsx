@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ProposalType } from 'common-common/src/types';
 
@@ -32,8 +32,18 @@ type ProposalCardProps = {
 export const ProposalCard = (props: ProposalCardProps) => {
   const { proposal, injectedContent } = props;
   const navigate = useCommonNavigate();
+  const [title, setTitle] = useState(proposal.title);
 
   const secondaryTagText = getSecondaryTagText(proposal);
+
+  useEffect(() => {
+    if (proposal instanceof AaveProposal) {
+      proposal.ipfsDataReady.once('ready', () => {
+        // triggers render of shortDescription too
+        setTitle(proposal?.ipfsData.title);
+      });
+    }
+  }, [proposal]);
 
   return (
     <CWCard
@@ -63,8 +73,8 @@ export const ProposalCard = (props: ProposalCardProps) => {
             <ProposalTag label={secondaryTagText} />
           )}
         </div>
-        <CWText title={proposal.title} fontWeight="semiBold" noWrap>
-          {proposal.title}
+        <CWText title={title} fontWeight="semiBold" noWrap>
+          {title}
         </CWText>
         {proposal instanceof SubstrateTreasuryProposal && (
           <CWText className="proposal-amount-text">
