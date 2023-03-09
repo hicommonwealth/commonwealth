@@ -11,7 +11,7 @@ import app from 'state';
 import { navigateToSubpage } from 'router';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import type { QuillEditor } from 'views/components/quill/quill_editor';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
   Account,
@@ -29,10 +29,8 @@ import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
 import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
 import CWCoverImageUploader from '../components/component_kit/cw_cover_image_uploader';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { PageNotFound } from '../pages/404';
 import { LinkedAddresses } from './linked_addresses';
-import { NewLoginModal } from '../modals/login_modal';
 
 enum EditProfileError {
   None,
@@ -410,28 +408,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                   app.user.addresses.splice(index, 1);
                 }}
               />
-              <div
-                className="connect-address-button"
-                onclick={() => {
-                  app.modals.create({
-                    modal: NewLoginModal,
-                    exitCallback: () => {
-                      setTimeout(() => {
-                        notifySuccess(
-                          'Address has been successfully connected.'
-                        );
-                      }, 1000);
-                      this.getProfile(vnode.attrs.profileId);
-                      m.redraw();
-                    },
-                  });
-                }}
-              >
-                <CWIcon iconName="plus" iconSize="small" />
-                <CWText type="caption" fontWeight="medium">
-                  Connect a new address
-                </CWText>
-              </div>
+              <CWText type="caption" fontWeight="medium">Link new addresses via the profile dropdown menu</CWText>
             </CWFormSection>
           </CWForm>
         </div>
