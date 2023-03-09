@@ -1,5 +1,5 @@
 /* @jsx m */
-
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
@@ -16,14 +16,13 @@ type SocialAccountsAttrs = {
 type SocialAccountAttrs = {
   iconName: IconName;
   link: string;
-  email?: boolean;
 };
 
 class SocialAccount extends ClassComponent<SocialAccountAttrs> {
   view(vnode: m.Vnode<SocialAccountAttrs>) {
-    const { iconName, link, email } = vnode.attrs;
+    const { iconName, link } = vnode.attrs;
     const formattedLink =
-      link.includes('http') || !!email ? link : `https://${link}`;
+      link.includes('http') ? link : `https://${link}`;
 
     return (
       <a href={formattedLink} target="_blank">
@@ -39,7 +38,7 @@ export class SocialAccounts extends ClassComponent<SocialAccountsAttrs> {
 
     if (!profile) return;
 
-    const { email, socials } = profile;
+    const { socials } = profile;
 
     return (
       <div className="SocialAccounts">

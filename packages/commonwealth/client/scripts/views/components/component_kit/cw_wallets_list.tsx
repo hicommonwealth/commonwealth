@@ -16,6 +16,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import $ from 'jquery';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 
 import app from 'state';

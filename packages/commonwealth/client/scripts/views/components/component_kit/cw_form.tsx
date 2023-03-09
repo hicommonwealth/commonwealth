@@ -3,6 +3,7 @@
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_form.scss';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';

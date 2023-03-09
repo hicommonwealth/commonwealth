@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 
 import 'pages/login/login_desktop.scss';

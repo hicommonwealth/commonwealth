@@ -2,6 +2,7 @@
 
 import ClassComponent from 'class_component';
 import { ChainNetwork } from 'common-common/src/types';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 
 import type { IWebWallet } from 'models';

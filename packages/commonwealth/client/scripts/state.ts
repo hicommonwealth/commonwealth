@@ -211,7 +211,7 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: (win: Window) => {
+  isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
   },
