@@ -37,22 +37,23 @@ module.exports = {
       }
 
       // 3. Walk map of addresses to produce sets of users to combine
-      const userMergeSets = [];
-      for (const mergeGroup of Object.values(addressToUserMap)) {
+      let userMergeSets = [];
+      const addressMapUserArrays = Object.values(addressToUserMap);
+      for (const mergeGroup of addressMapUserArrays) {
         const mergeSet = new Set(mergeGroup);
-        let found = false;
+        // add elements to search set + continue search, to maximize size of union
+        // ex. we're adding {A, B} to [{A, C}, {B, D}], so we need to end up with [{A, B, C, D}]
+        //   start: union({A, B}, {A, C}) => {A, B, C}, then, union({A, B, C}, {B, D}) => {A, B, C, D}.
+        //   after this, we remove {A, C} and {B, D} from the search set, and add {A, B, C, D}.
         for (const existingSet of userMergeSets) {
-          // if existing set has any intersection with current set, merge them
           if (hasIntersection(existingSet, mergeSet)) {
-            found = true;
-            inplaceSetUnion(existingSet, mergeSet);
+            inplaceSetUnion(mergeSet, existingSet);
           }
         }
 
-        // if no existing set has any intersection with current set, add it as a new set
-        if (!found) {
-          userMergeSets.push(mergeSet);
-        }
+        // once mergeSet is maximal, remove all intersecting elements + reinsert the final set
+        userMergeSets = userMergeSets.filter((set) => !hasIntersection(set, mergeSet));
+        userMergeSets.push(mergeSet);
       }
 
       // at this point, all sets should be disjoint -- assert this
