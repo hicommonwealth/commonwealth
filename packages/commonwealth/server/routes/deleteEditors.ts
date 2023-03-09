@@ -1,3 +1,4 @@
+import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
@@ -11,6 +12,11 @@ export const Errors = {
   InvalidAddress: 'Must provide editor address and chain',
 };
 
+interface DeleteEditorsBody {
+  thread_id: string
+  editors: IThreadCollaborator[]
+}
+
 const deleteEditors = async (
   models: DB,
   req: Request,
@@ -20,12 +26,11 @@ const deleteEditors = async (
   if (!req.body.thread_id) {
     return next(new AppError(Errors.InvalidThread));
   }
-  const { thread_id } = req.body;
-  let editors;
-  try {
-    const editorsObj = JSON.parse(req.body.editors);
-    editors = Object.values(editorsObj);
-  } catch (e) {
+
+  const { thread_id, editors } = req.body as DeleteEditorsBody;
+
+  // Ensure editors is an array
+  if (!Array.isArray(editors)) {
     return next(new AppError(Errors.InvalidEditorFormat));
   }
 
@@ -41,7 +46,7 @@ const deleteEditors = async (
   if (!thread) return next(new AppError(Errors.InvalidThread));
 
   await Promise.all(
-    editors.map(async (editor: any) => {
+    editors.map(async (editor) => {
       const address = await models.Address.findOne({
         where: {
           chain: editor.chain,
@@ -65,18 +70,17 @@ const deleteEditors = async (
     include: [
       {
         model: models.Address,
+        as: 'Address',
       },
     ],
   });
 
-  const finalAddresses = await Promise.all(
-    finalCollaborations.map((e) => e.getAddress())
-  );
-
   return res.json({
     status: 'Success',
     result: {
-      collaborators: finalAddresses.map((a) => a.toJSON()),
+      collaborators: finalCollaborations
+        .map((c) => c.toJSON())
+        .map((c) => c.Address)
     },
   });
 };

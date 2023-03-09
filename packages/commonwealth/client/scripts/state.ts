@@ -26,9 +26,9 @@ import TopicsController from './controllers/server/topics';
 import { UserController } from './controllers/server/user';
 import type { MobileMenuName } from './views/app_mobile_menus';
 import type { SidebarMenuName } from './views/components/sidebar';
+import $ from 'jquery';
 import { updateActiveUser } from 'controllers/app/login';
 import { redraw } from 'mithrilInterop';
-import axios from 'axios';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -230,93 +230,95 @@ export async function initAppState(
   updateSelectedChain = true,
   customDomain = null
 ): Promise<void> {
-  axios
-    .get(`${app.serverUrl()}/status`)
-    .then(async ({ data }) => {
-      app.config.chains.clear();
-      app.config.nodes.clear();
-      app.user.notifications.clear();
-      app.user.notifications.clearSubscriptions();
+  return new Promise((resolve, reject) => {
+    $.get(`${app.serverUrl()}/status`)
+      .then(async (data) => {
+        app.config.chains.clear();
+        app.config.nodes.clear();
+        app.user.notifications.clear();
+        app.user.notifications.clearSubscriptions();
 
-      data.result.nodes
-        .sort((a, b) => a.id - b.id)
-        .map((node) => {
-          return app.config.nodes.add(NodeInfo.fromJSON(node));
-        });
+        data.result.nodes
+          .sort((a, b) => a.id - b.id)
+          .map((node) => {
+            return app.config.nodes.add(NodeInfo.fromJSON(node));
+          });
 
-      data.result.chainsWithSnapshots
-        .filter((chainWithSnapshots) => chainWithSnapshots.chain.active)
-        .map((chainWithSnapshots) => {
-          delete chainWithSnapshots.chain.ChainNode;
-          return app.config.chains.add(
-            ChainInfo.fromJSON({
-              ChainNode: app.config.nodes.getById(
-                chainWithSnapshots.chain.chain_node_id
-              ),
-              snapshot: chainWithSnapshots.snapshot,
-              ...chainWithSnapshots.chain,
-            })
+        data.result.chainsWithSnapshots
+          .filter((chainsWithSnapshots) => chainsWithSnapshots.chain.active)
+          .map((chainsWithSnapshots) => {
+            delete chainsWithSnapshots.chain.ChainNode;
+            return app.config.chains.add(
+              ChainInfo.fromJSON({
+                ChainNode: app.config.nodes.getById(
+                  chainsWithSnapshots.chain.chain_node_id
+                ),
+                snapshot: chainsWithSnapshots.snapshot,
+                ...chainsWithSnapshots.chain,
+              })
+            );
+          });
+
+        app.roles.setRoles(data.result.roles);
+        app.config.notificationCategories =
+          data.result.notificationCategories.map((json) =>
+            NotificationCategory.fromJSON(json)
           );
+        app.config.chainCategories = data.result.chainCategories;
+        app.config.chainCategoryTypes = data.result.chainCategoryTypes;
+
+        // add recentActivity
+        const { recentThreads } = data.result;
+        recentThreads.forEach(({ chain, count }) => {
+          app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
-      app.roles.setRoles(data.result.roles);
-      app.config.notificationCategories =
-        data.result.notificationCategories.map((json) =>
-          NotificationCategory.fromJSON(json)
-        );
-      app.config.chainCategories = data.result.chainCategories;
-      app.config.chainCategoryTypes = data.result.chainCategoryTypes;
+        // update the login status
+        updateActiveUser(data.result.user);
+        app.loginState = data.result.user
+          ? LoginState.LoggedIn
+          : LoginState.LoggedOut;
 
-      // add recentActivity
-      const { recentThreads } = data.result;
-      recentThreads.forEach(({ chain, count }) => {
-        app.recentActivity.setCommunityThreadCounts(chain, count);
+        if (app.loginState === LoginState.LoggedIn) {
+          console.log('Initializing socket connection with JTW:', app.user.jwt);
+          // init the websocket connection and the chain-events namespace
+          app.socket.init(app.user.jwt);
+          app.user.notifications.refresh().then(() => redraw());
+        } else if (
+          app.loginState === LoginState.LoggedOut &&
+          app.socket.isConnected
+        ) {
+          // TODO: create global deinit function
+          app.socket.disconnect();
+        }
+
+        app.user.setStarredCommunities(
+          data.result.user ? data.result.user.starredCommunities : []
+        );
+        // update the selectedChain, unless we explicitly want to avoid
+        // changing the current state (e.g. when logging in through link_new_address_modal)
+        if (
+          updateSelectedChain &&
+          data.result.user &&
+          data.result.user.selectedChain
+        ) {
+          app.user.setSelectedChain(
+            ChainInfo.fromJSON(data.result.user.selectedChain)
+          );
+        }
+
+        if (customDomain) {
+          app.setCustomDomain(customDomain);
+        }
+
+        resolve();
+      })
+      .catch((err: any) => {
+        app.loadingError =
+          err.responseJSON?.error || 'Error loading application state';
+        reject(err);
       });
-
-      // update the login status
-      updateActiveUser(data.result.user);
-      app.loginState = data.result.user
-        ? LoginState.LoggedIn
-        : LoginState.LoggedOut;
-
-      if (app.loginState === LoginState.LoggedIn) {
-        console.log('Initializing socket connection with JTW:', app.user.jwt);
-        // init the websocket connection and the chain-events namespace
-        app.socket.init(app.user.jwt);
-        app.user.notifications.refresh().then(() => redraw());
-      } else if (
-        app.loginState === LoginState.LoggedOut &&
-        app.socket.isConnected
-      ) {
-        // TODO: create global deinit function
-        app.socket.disconnect();
-      }
-
-      app.user.setStarredCommunities(
-        data.result.user ? data.result.user.starredCommunities : []
-      );
-      // update the selectedChain, unless we explicitly want to avoid
-      // changing the current state (e.g. when logging in through link_new_address_modal)
-      if (
-        updateSelectedChain &&
-        data.result.user &&
-        data.result.user.selectedChain
-      ) {
-        app.user.setSelectedChain(
-          ChainInfo.fromJSON(data.result.user.selectedChain)
-        );
-      }
-
-      if (customDomain) {
-        app.setCustomDomain(customDomain);
-      }
-      return Promise.resolve();
-    })
-    .catch((err: any) => {
-      app.loadingError =
-        err.responseJSON?.error || 'Error loading application state';
-      return Promise.reject();
-    });
+  });
 }
 
 export default app;
