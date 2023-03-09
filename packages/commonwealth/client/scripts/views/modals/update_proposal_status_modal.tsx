@@ -34,7 +34,7 @@ export const UpdateProposalStatusModal = ({
   >([{ id: thread.snapshotProposal } as SnapshotProposal]);
   const [tempChainEntities, setTempChainEntities] = useState<
     Array<ChainEntity>
-  >([]);
+  >(thread.chainEntities || []);
 
   if (!app.chain?.meta) {
     return;
@@ -73,7 +73,7 @@ export const UpdateProposalStatusModal = ({
     try {
       await app.threads.setLinkedChainEntities({
         threadId: thread.id,
-        entities: thread.chainEntities,
+        entities: tempChainEntities,
       });
       await app.threads.setLinkedSnapshotProposal({
         threadId: thread.id,
@@ -92,18 +92,31 @@ export const UpdateProposalStatusModal = ({
     onModalClose();
   };
 
-  const handleSelectProposal = (sn: SnapshotProposal) => {
+  const setVotingStage = () => {
     if (
       tempStage === ThreadStage.Discussion ||
       tempStage === ThreadStage.ProposalInReview
     ) {
       setTempStage(ThreadStage.Voting);
     }
+  };
 
-    const isSelected =
-      sn.id === tempSnapshotProposals.find(({ id }) => sn.id === id)?.id;
+  const handleSelectProposal = (sn: SnapshotProposal) => {
+    const isSelected = tempSnapshotProposals.find(({ id }) => sn.id === id);
 
     setTempSnapshotProposals(isSelected ? [] : [sn]);
+    setVotingStage();
+  };
+
+  const handleSelectChainEntity = (ce: ChainEntity) => {
+    const isSelected = tempChainEntities.find(({ id }) => ce.id === id);
+
+    const updatedChainEntities = isSelected
+      ? tempChainEntities.filter(({ id }) => ce.id !== id)
+      : [...tempChainEntities, ce];
+
+    setTempChainEntities(updatedChainEntities);
+    setVotingStage();
   };
 
   return (
@@ -135,15 +148,8 @@ export const UpdateProposalStatusModal = ({
         {app.chainEntities && (
           <ChainEntitiesSelector
             thread={thread}
-            onSelect={() => {
-              if (
-                tempStage === ThreadStage.Discussion ||
-                tempStage === ThreadStage.ProposalInReview
-              ) {
-                setTempStage(ThreadStage.Voting);
-              }
-            }}
-            chainEntitiesToSet={thread.chainEntities}
+            onSelect={handleSelectChainEntity}
+            chainEntitiesToSet={tempChainEntities}
           />
         )}
         <div className="buttons-row">
