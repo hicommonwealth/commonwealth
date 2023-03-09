@@ -26,8 +26,6 @@ module.exports = {
       let newProfilesSkippedForAddressDuplication = 0;
       // For each profile
       for (const profile of profiles) {
-        console.log('Updating profile with id: ', profile.profile_id);
-
         const profileName = profile.profile_name;
 
         if (profileName !== null) {
