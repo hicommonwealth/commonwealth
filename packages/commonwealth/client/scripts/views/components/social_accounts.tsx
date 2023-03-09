@@ -16,12 +16,13 @@ type SocialAccountsAttrs = {
 type SocialAccountAttrs = {
   iconName: IconName;
   link: string;
+  email?: boolean;
 };
 
 class SocialAccount extends ClassComponent<SocialAccountAttrs> {
   view(vnode: m.Vnode<SocialAccountAttrs>) {
-    const { iconName, link } = vnode.attrs;
-    const formattedLink = link.includes('http') ? link : `https://${link}`;
+    const { iconName, link, email } = vnode.attrs;
+    const formattedLink = (link.includes('http') || !!email) ? link : `https://${link}`;
 
     return (
       <a href={formattedLink} target="_blank">
@@ -41,7 +42,7 @@ export class SocialAccounts extends ClassComponent<SocialAccountsAttrs> {
 
     return (
       <div className="SocialAccounts">
-        {email && <SocialAccount link={`mailto:${email}`} iconName="mail" />}
+        {email && <SocialAccount email={true} link={`mailto:${email}`} iconName="mail" />}
         {socials?.map((social) => {
           if (social.includes('twitter')) {
             return <SocialAccount link={social} iconName="twitter" />;
