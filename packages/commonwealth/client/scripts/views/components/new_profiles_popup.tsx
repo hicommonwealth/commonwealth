@@ -131,7 +131,7 @@ export class NewProfilesPopup extends ClassComponent<NewProfilesPopupAttrs> {
       // Redirect to the view profile page
       const pf = app.user.activeAccount.profile;
       if (pf) {
-        m.route.set(`/profile/${pf.address}`);
+        m.route.set(`/profile/${pf.id}`);
       }
     };
 
