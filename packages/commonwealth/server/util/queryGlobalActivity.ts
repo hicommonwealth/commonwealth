@@ -1,4 +1,4 @@
-import type { Profile } from 'client/scripts/models';
+import type { Profile } from 'models';
 import type { DB } from '../models';
 
 export type GlobalActivity = Array<{

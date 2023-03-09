@@ -39,7 +39,7 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
-import { IThreadCollaborator } from 'client/scripts/models/Thread';
+import { IThreadCollaborator } from 'models/Thread';
 
 export type ThreadPrefetch = {
   [identifier: string]: {

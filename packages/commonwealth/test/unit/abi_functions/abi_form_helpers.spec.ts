@@ -3,7 +3,7 @@ import {
   handleMappingAbiInputs,
   processAbiInputsToDataTypes,
   validateAbiInput,
-} from 'client/scripts/helpers/abi_form_helpers';
+} from '../../../client/scripts/helpers/abi_form_helpers';
 import { BigNumber, ethers } from 'ethers';
 
 describe('validateAbiInput() unit tests', () => {
