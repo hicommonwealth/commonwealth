@@ -661,19 +661,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           <LinkedProposalsCard
                             onChangeHandler={(
                               stage: ThreadStageType,
-                              chainEntities: ChainEntity[],
-                              snapshotProposal: SnapshotProposal[]
+                              chainEntities: ChainEntity[] = [],
+                              snapshotProposal: SnapshotProposal[] = []
                             ) => {
-                              thread.stage = stage;
-                              thread.chainEntities = chainEntities;
-                              if (app.chain?.meta.snapshot.length) {
-                                thread.snapshotProposal =
-                                  snapshotProposal[0]?.id;
-                              }
-                              app.threads.fetchThreadsFromId([
-                                thread.identifier,
-                              ]);
-                              setThread(thread);
+                              const newThread = {
+                                ...thread,
+                                stage,
+                                chainEntities,
+                                snapshotProposal: snapshotProposal[0]?.id,
+                              } as Thread;
+                              setThread(newThread);
                             }}
                             thread={thread}
                             showAddProposalButton={isAuthor || isAdminOrMod}

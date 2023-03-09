@@ -19,6 +19,7 @@ type SnapshotProposalSelectorProps = {
 export const SnapshotProposalSelector = ({
   onSelect,
   thread,
+  snapshotProposalsToSet,
 }: SnapshotProposalSelectorProps) => {
   const [allProposals, setAllProposals] = useState<Array<SnapshotProposal>>([]);
   const [loading, setLoading] = useState(false);
@@ -51,7 +52,9 @@ export const SnapshotProposalSelector = ({
 
   const renderItem = useCallback(
     (i: number, snapshot: SnapshotProposal) => {
-      const isSelected = thread.snapshotProposal === snapshot.id;
+      const isSelected = !!snapshotProposalsToSet.find(
+        ({ id }) => id === snapshot.id
+      );
 
       return (
         <SnapshotProposalSelectorItem
@@ -61,7 +64,7 @@ export const SnapshotProposalSelector = ({
         />
       );
     },
-    [onSelect, thread.snapshotProposal]
+    [onSelect, snapshotProposalsToSet]
   );
 
   if (!app.chain || !app.activeChainId()) {
