@@ -15,9 +15,7 @@ type ReactQuillEditorProps = {
 }
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
-export function ReactQuillEditor(props: ReactQuillEditorProps) {
-
-  const {
+const ReactQuillEditor = ({
     className = '',
     placeholder,
     tabIndex,
@@ -25,8 +23,14 @@ export function ReactQuillEditor(props: ReactQuillEditorProps) {
     contentDelta,
     setContentDelta,
     onChange
-  } = props
-
+  } : ReactQuillEditorProps) => {
+  
+  const handleChange = (value, delta, source, editor) => {
+        console.log('value:', value)
+        setContentDelta(editor.getContents())
+        onChange?.(value)
+      }
+  
   return (
     <ReactQuill
       className={`QuillEditor ${className}`}
@@ -34,12 +38,10 @@ export function ReactQuillEditor(props: ReactQuillEditorProps) {
       tabIndex={tabIndex}
       theme={theme}
       value={contentDelta}
-      onChange={(value, delta, source, editor) => {
-        console.log('value:', value)
-        setContentDelta(editor.getContents())
-        onChange?.(value)
-      }}
+      onChange={handleChange}
     />
   )
 
 }
+
+export default ReactQuillEditor
