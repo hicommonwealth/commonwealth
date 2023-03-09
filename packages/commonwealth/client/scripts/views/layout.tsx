@@ -18,8 +18,7 @@ import { AppModals } from './app_modals';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
-import { UserSurveyPopup } from './components/user_survey_popup';
-import { UnifiedUserFlow } from './components/unified_user_profiles_flow';
+import { NewProfilesPopup } from './components/new_profiles_popup';
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -44,8 +43,8 @@ type LayoutAttrs = {
 export class Layout extends ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
-  private surveyDelayTriggered = false;
-  private surveyReadyForDisplay = false;
+  private growlDelayTriggered = false;
+  private profileGrowlReadyForDisplay = false;
 
   view(vnode: m.Vnode<LayoutAttrs>) {
     const { scope, deferChain } = vnode.attrs;
@@ -53,11 +52,12 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
 
-    // Put the survey on a timer so it doesn't immediately appear
-    if (!this.surveyDelayTriggered && !this.surveyReadyForDisplay) {
-      this.surveyDelayTriggered = true;
+    // Put the profile growl on a timer so it doesn't immediately appear
+    if (!this.growlDelayTriggered && !this.profileGrowlReadyForDisplay) {
+      this.growlDelayTriggered = true;
       setTimeout(() => {
-        this.surveyReadyForDisplay = true;
+        this.profileGrowlReadyForDisplay = true;
+        m.redraw();
       }, 4000);
     }
 
@@ -134,8 +134,11 @@ export class Layout extends ClassComponent<LayoutAttrs> {
         {vnode.children}
         <AppModals />
         <AppToasts />
-        <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
-        {app.isLoggedIn() && <UnifiedUserFlow />}
+        {app.isLoggedIn() && (
+          <NewProfilesPopup
+            readyForDisplay={this.profileGrowlReadyForDisplay}
+          />
+        )}
       </div>
     );
   }

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 
 import 'pages/login/login_desktop.scss';
@@ -149,7 +150,8 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                   Welcome to Common!
                 </CWText>
                 <CWText type="b2" className="subheader-text" isCentered>
-                  Use a generated username and photo to edit later, or edit now
+                  Provide a profile image and display name. You can always edit
+                  them later.
                 </CWText>
               </div>
               <CWAvatarUsernameInput
