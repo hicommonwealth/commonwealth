@@ -1,7 +1,9 @@
 import { BigNumber, ethers, providers } from 'ethers';
 import { JsonRpcSigner } from '@ethersproject/providers';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Cannot find module
 import BravoABI from '../eth/artifacts/contracts/Compound/GovernorBravoImmutable.sol/GovernorBravoImmutable.json';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Cannot find module
 import CompABI from '../eth/artifacts/contracts/Compound/MPond.sol/MPond.json';
 import { ProposalState } from '../src/chains/compound/types';
