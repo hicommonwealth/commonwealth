@@ -169,7 +169,9 @@ export const LoginSelectorMenuRight = ({
 }: LoginSelectorMenuRightProps) => {
   const navigate = useCommonNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
+  const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
+    localStorage.getItem('dark-mode-state') === 'on'
+  );
 
   return (
     <>
@@ -192,19 +194,23 @@ export const LoginSelectorMenuRight = ({
                 localStorage.setItem('user-dark-mode-state', 'off');
                 document
                   .getElementsByTagName('html')[0]
-                  .classList.remove('invert');
+                  .classList.toggle('invert');
+                setIsDarkModeOn(false);
               } else {
                 document
                   .getElementsByTagName('html')[0]
-                  .classList.add('invert');
+                  .classList.toggle('invert');
                 localStorage.setItem('dark-mode-state', 'on');
                 localStorage.setItem('user-dark-mode-state', 'on');
+                setIsDarkModeOn(true);
               }
               e.stopPropagation();
               redraw();
             }}
           />
-          <CWText type="caption">Dark mode</CWText>
+          <CWText type="caption">
+            {isDarkModeOn ? 'Light mode' : 'Dark mode'}
+          </CWText>
         </div>
         <CWDivider />
         <div className="login-menu-item" onClick={() => setIsModalOpen(true)}>
