@@ -37,6 +37,7 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
+import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -44,6 +45,8 @@ type ThreadPreviewProps = {
 
 export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
+  const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
+    useState(false);
 
   const [windowIsSmall, setWindowIsSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
@@ -226,6 +229,9 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 <ThreadPreviewMenu
                   thread={thread}
                   setIsChangeTopicModalOpen={setIsChangeTopicModalOpen}
+                  setIsUpdateProposalStatusModalOpen={
+                    setIsUpdateProposalStatusModalOpen
+                  }
                 />
               )}
             </div>
@@ -244,6 +250,19 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
         }
         onClose={() => setIsChangeTopicModalOpen(false)}
         open={isChangeTopicModalOpen}
+      />
+      <Modal
+        content={
+          <UpdateProposalStatusModal
+            onChangeHandler={() => {
+              // TODO update store and rerender
+            }}
+            thread={thread}
+            onModalClose={() => setIsUpdateProposalStatusModalOpen(false)}
+          />
+        }
+        onClose={() => setIsUpdateProposalStatusModalOpen(false)}
+        open={isUpdateProposalStatusModalOpen}
       />
     </>
   );
