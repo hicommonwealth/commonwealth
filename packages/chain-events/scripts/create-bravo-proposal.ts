@@ -1,6 +1,8 @@
 import { BigNumber, ethers, providers } from 'ethers';
 import { JsonRpcSigner } from '@ethersproject/providers';
+// @ts-ignore: Cannot find module
 import BravoABI from '../eth/artifacts/contracts/Compound/GovernorBravoImmutable.sol/GovernorBravoImmutable.json';
+// @ts-ignore: Cannot find module
 import CompABI from '../eth/artifacts/contracts/Compound/MPond.sol/MPond.json';
 import { ProposalState } from '../src/chains/compound/types';
 import { timeTravel } from './utils/timeTravel';

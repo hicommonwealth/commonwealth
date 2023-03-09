@@ -1,7 +1,4 @@
-import { ethers, providers } from 'ethers';
-import BravoABI from '../eth/artifacts/contracts/Compound/GovernorBravoImmutable.sol/GovernorBravoImmutable.json';
-import CompABI from '../eth/artifacts/contracts/Compound/MPond.sol/MPond.json';
-import { ProposalState } from '../src/chains/compound/types';
+import { providers } from 'ethers';
 import { timeTravel } from './utils/timeTravel';
 
 async function main() {

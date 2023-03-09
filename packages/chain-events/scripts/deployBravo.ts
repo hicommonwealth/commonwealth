@@ -15,7 +15,6 @@ import {
   ChainNetwork,
   ChainType,
 } from 'common-common/src/types';
-import { BIGINT } from 'sequelize';
 
 async function deployGovBravo(
   signer: JsonRpcSigner,
