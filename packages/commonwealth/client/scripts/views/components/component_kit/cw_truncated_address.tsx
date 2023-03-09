@@ -7,22 +7,28 @@ import ClassComponent from 'class_component';
 import 'components/component_kit/cw_truncated_address.scss';
 
 import { formatAddressShort } from '../../../helpers';
+import { CWCommunityAvatar } from './cw_community_avatar';
+import { ChainInfo } from 'client/scripts/models';
 
 type TruncatedAddressAttrs = {
   address: string;
-  communityIcon?: string;
+  communityInfo?: ChainInfo;
 };
 
 export class CWTruncatedAddress extends ClassComponent<TruncatedAddressAttrs> {
   view(vnode: m.Vnode<TruncatedAddressAttrs>) {
-    const { address, communityIcon } = vnode.attrs;
+    const { address, communityInfo } = vnode.attrs;
 
     return (
-      <div className="TruncatedAddress">
-        {communityIcon && (
-          <img className="community-icon" src={communityIcon} />
+      <div
+        className={
+          communityInfo ? 'TruncatedAddress with-community' : 'TruncatedAddress'
+        }
+      >
+        {communityInfo && (
+          <CWCommunityAvatar community={communityInfo} size="small" />
         )}
-        <div className="shortened-address">{formatAddressShort(address)}</div>
+        {formatAddressShort(address)}
       </div>
     );
   }
