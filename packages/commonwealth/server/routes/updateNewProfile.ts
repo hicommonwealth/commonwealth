@@ -8,6 +8,7 @@ export const Errors = {
   InvalidUpdate: 'Invalid update',
   NoProfileFound: 'No profile found',
   NoProfileIdProvided: 'No profile id provided in query',
+  ProfileNameInvalid: 'Profile name invalid',
 };
 
 type UpdateNewProfileReq = {

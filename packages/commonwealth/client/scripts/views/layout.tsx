@@ -139,13 +139,14 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       }
       return <LoadingLayout />;
     }
+
     return (
       <div class="Layout">
         {vnode.children}
         <AppModals />
         <AppToasts />
         <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
-        <NewProfilesPopup readyForDisplay={this.profileGrowlReadyForDisplay} />
+        {app.isLoggedIn() && <NewProfilesPopup readyForDisplay={this.profileGrowlReadyForDisplay} />}
       </div>
     );
   }

@@ -29,6 +29,65 @@
     padding: 16px;
   }
 
+  .email-management-section {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 12px;
+
+    .text-description {
+      margin-left: 42px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .subtitle-text {
+        color: $neutral-500;
+        max-width: 400px;
+      }
+    }
+  }
+
+  .email-input-section {
+    margin-left: 42px;
+    margin-right: 12px;
+    margin-bottom: 40px;
+
+    .email-input-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .email-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      gap: 24px;
+      min-height: fit-content;
+    }
+
+    .email-input {
+      width: 70%;
+    }
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .trigger-wrapper {
+    height: fit-content !important;
+  }
+
   .page-header-text.Text {
     margin-bottom: 16px;
   }
