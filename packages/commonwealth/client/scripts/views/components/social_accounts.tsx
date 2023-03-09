@@ -42,7 +42,7 @@ export class SocialAccounts extends ClassComponent<SocialAccountsAttrs> {
 
     return (
       <div className="SocialAccounts">
-        {email && <SocialAccount email={true} link={`mailto:${email}`} iconName="mail" />}
+        {/* {email && <SocialAccount email={true} link={`mailto:${email}`} iconName="mail" />} */}
         {socials?.map((social) => {
           if (social.includes('twitter')) {
             return <SocialAccount link={social} iconName="twitter" />;

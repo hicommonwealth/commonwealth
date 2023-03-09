@@ -322,7 +322,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                     this.displayNameValid ? 'success' : 'failure'
                   }
                 />
-                <CWTextInput
+                {/* <CWTextInput
                   name="email-form-field"
                   inputValidationFn={(val: string) => {
                     if (!val.match(/\S+@\S+\.\S+/)) {
@@ -337,7 +337,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                   oninput={(e) => {
                     this.email = e.target.value;
                   }}
-                />
+                /> */}
               </div>
               <div className="bio-section">
                 <CWText type="caption">Bio</CWText>
