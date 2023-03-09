@@ -703,7 +703,7 @@ export default class QuillEditorInternal {
         node.appendChild(textWrap);
 
         return {
-          link: `/${addr.chain}/account/${addr.address}`,
+          link: `/profile/id/${profile.id}`,
           name: addr.name,
           component: node.outerHTML,
         };
