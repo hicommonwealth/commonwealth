@@ -408,6 +408,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
                   app.user.addresses.splice(index, 1);
                 }}
               />
+              <CWText type="caption" fontWeight="medium">Link new addresses via the profile dropdown menu</CWText>
             </CWFormSection>
           </CWForm>
         </div>
