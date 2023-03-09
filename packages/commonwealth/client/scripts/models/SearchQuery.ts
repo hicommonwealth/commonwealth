@@ -97,6 +97,7 @@ export default class SearchQuery implements SearchParams {
   }
 
   public static fromUrlParams(url: Record<string, any>) {
+    console.log('fromUrlParams', url);
     const sq = new SearchQuery(url['q']);
     sq.chainScope = url['chainScope'] || undefined;
     sq.isSearchPreview = url['preview'] === 'true';

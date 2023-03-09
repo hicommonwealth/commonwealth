@@ -177,14 +177,14 @@ export const CreateComment = (props: CreateCommmentProps) => {
               <CWValidationText message={errorMsg} status="failure" />
             )}
           </div>
-          <QuillEditorComponent
+          {/* <QuillEditorComponent
             contentsDoc=""
             oncreateBind={(state: QuillEditor) => {
               setQuillEditorState(state);
             }}
             editorNamespace={`${document.location.pathname}-commenting`}
             imageUploader
-          />
+          /> */}
           {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
             <CWText className="token-req-text">
               Commenting in {activeTopicName} requires{' '}

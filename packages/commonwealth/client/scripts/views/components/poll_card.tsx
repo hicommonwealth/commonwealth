@@ -256,6 +256,7 @@ export const ResultsSection = ({
             }
             return (
               <CWProgressBar
+                key={index}
                 progress={
                   option.voteCount
                     ? (option.voteCount / totalVoteCount) * 100

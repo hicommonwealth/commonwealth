@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
-import type { NavigateOptions, To } from 'react-router';
 import { useDebounce } from 'usehooks-ts';
 import { isEmpty } from 'lodash';
 
@@ -21,24 +20,6 @@ import {
   SearchBarThreadPreviewRow,
 } from './search_bar_components';
 import { useCommonNavigate } from 'navigation/helpers';
-
-const goToSearchPage = (
-  query: SearchQuery,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
-) => {
-  if (!query.searchTerm || !query.searchTerm.toString().trim()) {
-    notifyError('Enter a valid search term');
-    return;
-  }
-
-  if (query.searchTerm.length < 4) {
-    notifyError('Query must be at least 4 characters');
-  }
-
-  app.search.addToHistory(query);
-
-  setRoute(`/search?${query.toUrlParams()}`);
-};
 
 export const SearchBar = () => {
   const navigate = useCommonNavigate();
@@ -85,13 +66,19 @@ export const SearchBar = () => {
 
   const handleGoToSearchPage = () => {
     if (searchTerm.length > 3) {
-      goToSearchPage(
-        new SearchQuery(searchTerm, {
-          isSearchPreview: false,
-          chainScope: app.activeChainId(),
-        }),
-        navigate
-      );
+      const newQuery = new SearchQuery(searchTerm, {
+        isSearchPreview: false,
+        chainScope: app.activeChainId(),
+      });
+
+      if (!newQuery.searchTerm || !newQuery.searchTerm.toString().trim()) {
+        notifyError('Enter a valid search term');
+      }
+
+      // app.search.addToHistory(newQuery);
+      const searchUrl = `/search?${newQuery.toUrlParams()}`;
+      // console.log(searchUrl);
+      navigate(searchUrl);
     }
   };
 
