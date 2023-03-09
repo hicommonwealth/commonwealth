@@ -29,6 +29,13 @@ export class NewProfileActivityRow extends ClassComponent<ProfileActivityRowAttr
     const comment = activity as CommentWithAssociatedThread;
     const domain = document.location.origin;
     const iconUrl = app.config.chains.getById(chain)?.iconUrl;
+    let decodedTitle;
+    try {
+      decodedTitle = decodeURIComponent(title);
+    } catch (err) {
+      console.error(`Could not decode title: "${title}"`);
+      decodedTitle = title;
+    }
 
     return (
       <div className="ProfileActivityRow">
@@ -54,9 +61,7 @@ export class NewProfileActivityRow extends ClassComponent<ProfileActivityRowAttr
             </span>
             {isThread
               ? link('a', `/${chain}/discussion/${id}`, [`${title}`])
-              : link('a', `/${chain}/discussion/${comment.thread?.id}`, [
-                  `${decodeURIComponent(comment.thread?.title)}`,
-                ])}
+              : link('a', `/${chain}/discussion/${comment.thread?.id}`, [`${decodedTitle}`,])}
           </CWText>
         </div>
         <div className="content">
