@@ -1,12 +1,12 @@
-import {ethers, providers} from "ethers";
-import BravoABI from "../eth/artifacts/contracts/Compound/GovernorBravoImmutable.sol/GovernorBravoImmutable.json";
-import CompABI from "../eth/artifacts/contracts/Compound/MPond.sol/MPond.json";
-import {ProposalState} from "../src/chains/compound/types";
-import {timeTravel} from "./utils/timeTravel";
+import { ethers, providers } from 'ethers';
+import BravoABI from '../eth/artifacts/contracts/Compound/GovernorBravoImmutable.sol/GovernorBravoImmutable.json';
+import CompABI from '../eth/artifacts/contracts/Compound/MPond.sol/MPond.json';
+import { ProposalState } from '../src/chains/compound/types';
+import { timeTravel } from './utils/timeTravel';
 
 async function main() {
   if (!process.argv[2]) {
-    console.warn("Must provide the Governor Bravo contract address");
+    console.warn('Must provide the Governor Bravo contract address');
     return;
   }
 
@@ -24,7 +24,7 @@ async function main() {
   );
   const provider = new providers.Web3Provider(web3Provider as any);
 
-  console.log(`Time Traveling:`)
+  console.log(`Time Traveling:`);
   await timeTravel(provider, Number(process.argv[2]));
 }
 

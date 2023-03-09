@@ -15,7 +15,7 @@ import {
   ChainNetwork,
   ChainType,
 } from 'common-common/src/types';
-import {BIGINT} from "sequelize";
+import { BIGINT } from 'sequelize';
 
 async function deployGovBravo(
   signer: JsonRpcSigner,
@@ -53,7 +53,10 @@ async function deployGovBravo(
 
   // transfer COMP to the give address
   await comp.transfer(process.argv[2], BigNumber.from(10).pow(21));
-  await comp.transfer('0xCC8D47D441D1e2b477B322C9243f814D8A609808', BigNumber.from(10).pow(21));
+  await comp.transfer(
+    '0xCC8D47D441D1e2b477B322C9243f814D8A609808',
+    BigNumber.from(10).pow(21)
+  );
 
   const balance = await comp.balanceOf(process.argv[2]);
   console.log(
@@ -127,7 +130,7 @@ async function findOrCreateChainAndChainNode() {
       chain_node_id: chainNode.id,
       ce_verbose: true,
       type: ChainType.DAO,
-      token_name: 'comp'
+      token_name: 'comp',
     });
 
     console.log('\tCreating new community roles...');
@@ -136,20 +139,20 @@ async function findOrCreateChainAndChainNode() {
         chain_id: 'hardhat-local',
         name: 'member',
         allow: BigInt('0'),
-        deny: BigInt('0')
+        deny: BigInt('0'),
       },
       {
         chain_id: 'hardhat-local',
         name: 'admin',
         allow: BigInt('0'),
-        deny: BigInt('0')
+        deny: BigInt('0'),
       },
       {
         chain_id: 'hardhat-local',
         name: 'moderator',
         allow: BigInt('0'),
-        deny: BigInt('0')
-      }
+        deny: BigInt('0'),
+      },
     ]);
   } else console.log('\tChain found!');
 
@@ -164,7 +167,7 @@ async function findOrCreateDbContracts(
   console.log(
     'Finding or creating the database contract and community contract:'
   );
-  let [contract, created] = await cwModels.Contract.findOrCreate({
+  const [contract, created] = await cwModels.Contract.findOrCreate({
     where: {
       chain_node_id: chainNodeId,
       address: contractAddress,
@@ -177,7 +180,7 @@ async function findOrCreateDbContracts(
   if (created) console.log(`\tDatabase contract created!`);
   else console.log(`\tDatabase contract found!`);
 
-  let [communityContract, created2] =
+  const [communityContract, created2] =
     await cwModels.CommunityContract.findOrCreate({
       where: {
         chain_id: 'hardhat-local',

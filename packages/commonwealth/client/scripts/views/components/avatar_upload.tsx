@@ -16,7 +16,6 @@ import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
 
-
 type AvatarUploadStyleAttrs = {
   size?: 'small' | 'large';
 };

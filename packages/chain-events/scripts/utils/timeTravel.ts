@@ -1,6 +1,9 @@
-import {BigNumber, providers} from "ethers";
+import { BigNumber, providers } from 'ethers';
 
-export async function timeTravel(provider: providers.JsonRpcProvider, numBlocks: number) {
+export async function timeTravel(
+  provider: providers.JsonRpcProvider,
+  numBlocks: number
+) {
   const numBlocksBN = BigNumber.from(numBlocks);
   console.log(`\tTime travelling through ${numBlocks} blocks!`);
   const timeDelta = numBlocksBN.mul(15);
