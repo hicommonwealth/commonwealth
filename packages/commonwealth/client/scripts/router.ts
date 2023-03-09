@@ -1,11 +1,10 @@
-import { alertModalWithText } from 'views/modals/alert_modal';
 import app from 'state';
 import { ChainType } from 'common-common/src/types';
+import { APPLICATION_UPDATE_MESSAGE } from 'helpers/constants';
 import {
-  APPLICATION_UPDATE_ACTION,
-  APPLICATION_UPDATE_MESSAGE,
-} from 'helpers/constants';
-import { getRoute, getRouteParam } from 'mithrilInterop';
+  _DEPRECATED_getRoute,
+  _DEPRECATED_getSearchParams,
+} from 'mithrilInterop';
 
 export const pathIsDiscussion = (
   scope: string | null,
@@ -39,22 +38,11 @@ interface ShouldDeferChainAttrs {
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
-  app._lastNavigatedFrom = getRoute();
+  app._lastNavigatedFrom = _DEPRECATED_getRoute();
 
   if (_onpopstate) {
     _onpopstate.apply(this, args);
   }
-};
-
-const navigateToSubpage = (...args) => {
-  // prepend community if we are not on a custom domain
-  if (!app.isCustomDomain() && app.activeChainId()) {
-    args[0] = `/${app.activeChainId()}${args[0]}`;
-  }
-  app.sidebarMenu = 'default';
-  // app.sidebarRedraw.emit('redraw');
-  // TODO navigate should be passed as argument
-  // setRoute.apply(this, args);
 };
 
 const shouldDeferChain = ({
@@ -84,12 +72,12 @@ const shouldDeferChain = ({
 
 // DEPRECATED in favour of "Navigate" in "navigation/helpers.tsx"
 // Left here for now to not break the code in "getCustomDomainRoutes".
-// Should be removed after all occurrences of "redirectRoute" will be removed.
-const redirectRoute = (
+// Should be removed after all occurrences of "_DEPRECATED_redirectRoute" will be removed.
+const _DEPRECATED_redirectRoute = (
   path: string | ((attrs: Record<string, unknown>) => string)
 ) => ({
   render: (vnode) => {
-    // TODO remove when redirectRoute will be removed
+    // TODO remove when _DEPRECATED_redirectRoute will be removed
     // setRoute(
     //   typeof path === 'string' ? path : path(vnode.attrs),
     //   {},
@@ -102,7 +90,7 @@ const redirectRoute = (
 // TODO this function used to be in the app.ts but now
 // should be incorporated in new react flow
 const handleLoginRedirects = () => {
-  const routeParam = getRouteParam();
+  const routeParam = _DEPRECATED_getSearchParams();
   if (
     routeParam['loggedin'] &&
     routeParam['loggedin'].toString() === 'true' &&
@@ -116,14 +104,14 @@ const handleLoginRedirects = () => {
      else we identify to associate mixpanel events
     */
     if (
-      getRouteParam()['new'] &&
-      getRouteParam()['new'].toString() === 'true'
+      _DEPRECATED_getSearchParams()['new'] &&
+      _DEPRECATED_getSearchParams()['new'].toString() === 'true'
     ) {
       console.log('creating account');
     }
 
     // TODO setRoute outside of react router, might not work properly
-    // setRoute(getRouteParam['path'], {}, { replace: true });
+    // setRoute(_DEPRECATED_getSearchParams['path'], {}, { replace: true });
   } else if (
     localStorage &&
     localStorage.getItem &&
@@ -179,10 +167,7 @@ const renderRoute = (
         console.error(err);
 
         if (err.name === 'ChunkLoadError') {
-          alertModalWithText(
-            APPLICATION_UPDATE_MESSAGE,
-            APPLICATION_UPDATE_ACTION
-          )();
+          window.confirm(APPLICATION_UPDATE_MESSAGE);
         }
 
         // return to the last page, if it was on commonwealth
@@ -213,7 +198,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/': importRoute(import('views/pages/discussions_redirect'), {
     scoped: true,
   }),
-  '/web3login': redirectRoute(() => '/'),
+  '/web3login': _DEPRECATED_redirectRoute(() => '/'),
   '/search': importRoute(import('views/pages/search'), {
     deferChain: true,
   }),
@@ -252,15 +237,7 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
 
   // Discussions
-  '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-  '/discussions': importRoute(import('views/pages/discussions'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/discussions/:topic': importRoute(import('views/pages/discussions'), {
-    scoped: true,
-    deferChain: true,
-  }),
+  '/home': _DEPRECATED_redirectRoute((attrs) => `/${attrs.scope}/`),
   '/overview': importRoute(import('views/pages/overview'), {
     scoped: true,
     deferChain: true,
@@ -270,10 +247,6 @@ const getCustomDomainRoutes = (importRoute) => ({
     deferChain: true,
   }),
   '/sputnik-daos': importRoute(import('views/pages/sputnikdaos'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/chat/:channel': importRoute(import('views/pages/chat'), {
     scoped: true,
     deferChain: true,
   }),
@@ -287,7 +260,7 @@ const getCustomDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/account': redirectRoute(() =>
+  '/account': _DEPRECATED_redirectRoute(() =>
     app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
   ),
 
@@ -302,7 +275,7 @@ const getCustomDomainRoutes = (importRoute) => ({
     import('views/pages/view_proposal/index'),
     { scoped: true }
   ),
-  '/:scope/proposal/discussion/:identifier': redirectRoute(
+  '/:scope/proposal/discussion/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/discussion/${attrs.identifier}`
   ),
   '/proposal/:identifier': importRoute(
@@ -329,9 +302,12 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
 
   // Admin
-  '/manage': importRoute(import('views/pages/manage_community/index'), {
-    scoped: true,
-  }),
+  '/manage': importRoute(
+    import('views/pages/manage_community/ManageCommunityPage'),
+    {
+      scoped: true,
+    }
+  ),
   '/settings': importRoute(import('views/pages/settings'), { scoped: true }),
   '/analytics': importRoute(import('views/pages/stats'), {
     scoped: true,
@@ -359,71 +335,70 @@ const getCustomDomainRoutes = (importRoute) => ({
   ),
 
   // Redirects
-  '/:scope/dashboard': redirectRoute(() => '/'),
-  '/:scope/notifications': redirectRoute(() => '/notifications'),
-  '/:scope/notification-settings': redirectRoute(
-    () => '/notification-settings'
+  '/:scope/dashboard': _DEPRECATED_redirectRoute(() => '/'),
+  '/:scope/notifications': _DEPRECATED_redirectRoute(() => '/notifications'),
+  // '/:scope/notification-settings': _DEPRECATED_redirectRoute(
+  //   () => '/notification-settings'
+  // ),
+  '/:scope/overview': _DEPRECATED_redirectRoute(() => '/overview'),
+  '/:scope/projects': _DEPRECATED_redirectRoute(() => '/projects'),
+  '/:scope/backers': _DEPRECATED_redirectRoute(() => '/backers'),
+  '/:scope/collectives': _DEPRECATED_redirectRoute(() => '/collectives'),
+  '/:scope/finishNearLogin': _DEPRECATED_redirectRoute(
+    () => '/finishNearLogin'
   ),
-  '/:scope/overview': redirectRoute(() => '/overview'),
-  '/:scope/projects': redirectRoute(() => '/projects'),
-  '/:scope/backers': redirectRoute(() => '/backers'),
-  '/:scope/collectives': redirectRoute(() => '/collectives'),
-  '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
-  '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
-  '/:scope/home': redirectRoute(() => '/'),
-  '/:scope/discussions': redirectRoute(() => '/discussions'),
-  '/:scope': redirectRoute(() => '/'),
-  '/:scope/discussions/:topic': redirectRoute(
-    (attrs) => `/discussions/${attrs.topic}/`
+  '/:scope/finishaxielogin': _DEPRECATED_redirectRoute(
+    () => '/finishaxielogin'
   ),
-  '/:scope/search': redirectRoute(() => '/search'),
-  '/:scope/members': redirectRoute(() => '/members'),
-  '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
-  '/:scope/chat/:channel': redirectRoute((attrs) => `/chat/${attrs.channel}`),
-  '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
-  '/:scope/account/:address': redirectRoute(
+  '/:scope/home': _DEPRECATED_redirectRoute(() => '/'),
+  '/:scope': _DEPRECATED_redirectRoute(() => '/'),
+  '/:scope/search': _DEPRECATED_redirectRoute(() => '/search'),
+  '/:scope/members': _DEPRECATED_redirectRoute(() => '/members'),
+  '/:scope/sputnik-daos': _DEPRECATED_redirectRoute(() => '/sputnik-daos'),
+  // '/:scope/new/discussion': _DEPRECATED_redirectRoute(() => '/new/discussion'),
+  '/:scope/account/:address': _DEPRECATED_redirectRoute(
     (attrs) => `/account/${attrs.address}/`
   ),
-  '/:scope/account': redirectRoute(() =>
+  '/:scope/account': _DEPRECATED_redirectRoute(() =>
     app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
   ),
-  '/:scope/referenda': redirectRoute(() => '/referenda'),
-  '/:scope/proposals': redirectRoute(() => '/proposals'),
-  '/:scope/proposal/:type/:identifier': redirectRoute(
+  '/:scope/referenda': _DEPRECATED_redirectRoute(() => '/referenda'),
+  '/:scope/proposals': _DEPRECATED_redirectRoute(() => '/proposals'),
+  '/:scope/proposal/:type/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
   ),
-  '/:scope/proposal/:identifier': redirectRoute(
+  '/:scope/proposal/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/proposal/${attrs.identifier}/`
   ),
-  '/:scope/discussion/:identifier': redirectRoute(
+  '/:scope/discussion/:identifier': _DEPRECATED_redirectRoute(
     (attrs) => `/discussion/${attrs.identifier}/`
   ),
-  '/:scope/new/proposal/:type': redirectRoute(
+  '/:scope/new/proposal/:type': _DEPRECATED_redirectRoute(
     (attrs) => `/new/proposal/${attrs.type}/`
   ),
-  '/:scope/new/proposal': redirectRoute(() => '/new/proposal'),
-  '/:scope/treasury': redirectRoute(() => '/treasury'),
-  '/:scope/bounties': redirectRoute(() => '/bounties'),
-  '/:scope/tips': redirectRoute(() => '/tips'),
-  '/:scope/validators': redirectRoute(() => '/validators'),
-  '/:scope/login': redirectRoute(() => '/login'),
-  '/:scope/settings': redirectRoute(() => '/settings'),
-  '/:scope/admin': redirectRoute(() => '/admin'),
-  '/:scope/manage': redirectRoute(() => '/manage'),
-  '/:scope/analytics': redirectRoute(() => '/analytics'),
-  '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
+  '/:scope/new/proposal': _DEPRECATED_redirectRoute(() => '/new/proposal'),
+  '/:scope/treasury': _DEPRECATED_redirectRoute(() => '/treasury'),
+  '/:scope/bounties': _DEPRECATED_redirectRoute(() => '/bounties'),
+  '/:scope/tips': _DEPRECATED_redirectRoute(() => '/tips'),
+  '/:scope/validators': _DEPRECATED_redirectRoute(() => '/validators'),
+  '/:scope/login': _DEPRECATED_redirectRoute(() => '/login'),
+  '/:scope/settings': _DEPRECATED_redirectRoute(() => '/settings'),
+  '/:scope/admin': _DEPRECATED_redirectRoute(() => '/admin'),
+  '/:scope/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/snapshot/${attrs.snapshotId}`
   ),
-  '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
-    (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-  ),
-  '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
+  '/:scope/snapshot-proposal/:snapshotId/:identifier':
+    _DEPRECATED_redirectRoute(
+      (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+    ),
+  '/:scope/new/snapshot-proposal/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/new/snapshot/${attrs.snapshotId}`
   ),
-  '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
-    (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-  ),
-  '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
+  '/:scope/snapshot-proposals/:snapshotId/:identifier':
+    _DEPRECATED_redirectRoute(
+      (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
+    ),
+  '/:scope/new/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
     (attrs) => `/new/snapshot/${attrs.snapshotId}`
   ),
 });
@@ -452,7 +427,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   deferChain: true,
   // }),
   // Scoped routes
-  // '/:scope/proposal/discussion/:identifier': redirectRoute(
+  // '/:scope/proposal/discussion/:identifier': _DEPRECATED_redirectRoute(
   //   (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
   // ),
   // Notifications
@@ -460,7 +435,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   scoped: true,
   //   deferChain: true,
   // }),
-  // '/notifications': redirectRoute(() => '/edgeware/notifications'),
+  // '/notifications': _DEPRECATED_redirectRoute(() => '/edgeware/notifications'),
   // '/notification-settings': importRoute(
   //   import('views/pages/notification_settings'),
   //   {
@@ -477,14 +452,14 @@ const getCommonDomainRoutes = (importRoute) => ({
   // ),
   // '/finishaxielogin': importRoute(import('views/pages/finish_axie_login')),
   // Settings
-  // '/settings': redirectRoute(() => '/edgeware/settings'),
+  // '/settings': _DEPRECATED_redirectRoute(() => '/edgeware/settings'),
   // '/:scope/settings': importRoute(import('views/pages/settings'), {
   //   scoped: true,
   // }),
   // Discussions
-  // '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
-  // '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
-  // '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
+  // '/home': _DEPRECATED_redirectRoute('/'), // legacy redirect, here for compatibility only
+  // '/discussions': _DEPRECATED_redirectRoute('/'), // legacy redirect, here for compatibility only
+  // '/:scope/home': _DEPRECATED_redirectRoute((attrs) => `/${attrs.scope}/`),
   // '/:scope': importRoute(import('views/pages/discussions_redirect'), {
   //   scoped: true,
   // }),
@@ -520,10 +495,6 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   scoped: true,
   //   deferChain: true,
   // }),
-  // '/:scope/chat/:channel': importRoute(import('views/pages/chat'), {
-  //   scoped: true,
-  //   deferChain: true,
-  // }),
   // '/:scope/new/discussion': importRoute(import('views/pages/new_thread'), {
   //   scoped: true,
   //   deferChain: true,
@@ -533,7 +504,7 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   scoped: true,
   //   deferChain: true,
   // }),
-  // '/:scope/account': redirectRoute((a) =>
+  // '/:scope/account': _DEPRECATED_redirectRoute((a) =>
   //   app.user.activeAccount
   //     ? `/${a.scope}/account/${app.user.activeAccount.address}`
   //     : `/${a.scope}/`
@@ -608,21 +579,21 @@ const getCommonDomainRoutes = (importRoute) => ({
   //   'views/pages/new_snapshot_proposal',
   //   { scoped: true, deferChain: true }
   // ),
-  // '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
+  // '/:scope/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
   //   (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}`
   // ),
-  // '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
+  // '/:scope/snapshot-proposal/:snapshotId/:identifier': _DEPRECATED_redirectRoute(
   //   (attrs) =>
   //     `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
   // ),
-  // '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
+  // '/:scope/new/snapshot-proposal/:snapshotId': _DEPRECATED_redirectRoute(
   //   (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
   // ),
-  // '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
+  // '/:scope/snapshot-proposals/:snapshotId/:identifier': _DEPRECATED_redirectRoute(
   //   (attrs) =>
   //     `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
   // ),
-  // '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
+  // '/:scope/new/snapshot-proposals/:snapshotId': _DEPRECATED_redirectRoute(
   //   (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
   // ),
 });
@@ -646,4 +617,4 @@ const getRoutes = (customDomain: string) => {
   };
 };
 
-export { getRoutes, navigateToSubpage, handleLoginRedirects };
+export { getRoutes, handleLoginRedirects };

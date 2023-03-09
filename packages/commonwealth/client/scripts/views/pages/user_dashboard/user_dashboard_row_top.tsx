@@ -10,18 +10,16 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getCommentPreview } from './helpers';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from 'router';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardRowTopProps = {
   activityData: any;
   category: string;
 };
 
-export const UserDashboardRowTopComponent = (
-  props: UserDashboardRowTopProps
-) => {
+export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
   const { activityData, category } = props;
+  const navigate = useCommonNavigate();
 
   const {
     created_at,
@@ -64,7 +62,7 @@ export const UserDashboardRowTopComponent = (
       onclick={(e: any) => {
         e.preventDefault();
         e.stopPropagation();
-        navigateToSubpage(`/${author_chain}/account/${author_address}`);
+        navigate(`/${author_chain}/account/${author_address}`);
       }}
     />
   );
@@ -80,7 +78,7 @@ export const UserDashboardRowTopComponent = (
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigateToSubpage(`/${chain_id}`);
+              navigate(`/${chain_id}`);
             }}
           >
             {communityName}
@@ -104,5 +102,3 @@ export const UserDashboardRowTopComponent = (
     </div>
   );
 };
-
-export const UserDashboardRowTop = withRouter(UserDashboardRowTopComponent);

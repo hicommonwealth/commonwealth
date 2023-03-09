@@ -1,26 +1,26 @@
 import React from 'react';
-
 import $ from 'jquery';
+
 import type { ChainInfo, Comment } from 'models';
-import { AddressInfo, Thread } from 'models';
 
 import app from 'state';
+import { AddressInfo, Thread } from 'models';
 import { User } from 'views/components/user/user';
 import { CWText } from '../component_kit/cw_text';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
-type ReactorAttrs = {
+type ReactorProps = {
   likes: number;
   reactors: any;
 };
 
 type Post = Thread | Comment<any>;
 
-export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
-  const { reactors = [], likes = 0 } = reactorAttrs;
-
+export const getDisplayedReactorsForPopup = ({
+  likes = 0,
+  reactors = [],
+}: ReactorProps) => {
   const slicedReactors = reactors
     .slice(0, MAX_VISIBLE_REACTING_ACCOUNTS)
     .map((rxn) => {
@@ -29,7 +29,10 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       } = rxn;
 
       return (
-        <div key={address + "#" + (chain?.id || chain)} style={{ display: 'flex', width: '120px' }}>
+        <div
+          key={address + '#' + (chain?.id || chain)}
+          style={{ display: 'flex', width: '120px' }}
+        >
           <CWText noWrap>
             <User
               user={new AddressInfo(null, address, chain?.id || chain, null)}

@@ -1,70 +1,119 @@
-import React from 'react';
-
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { link, pluralize } from 'helpers';
-import { redraw } from 'mithrilInterop';
-import $ from 'jquery';
-import { Webhook } from 'models';
-
-import 'pages/manage_community/webhooks_form.scss';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import smartTruncate from 'smart-truncate';
 
+import 'pages/manage_community/webhooks_form.scss';
+
+import type { Webhook } from 'models';
+
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
+import { link, pluralize } from 'helpers';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { Modal } from '../../components/component_kit/cw_modal';
-import {useNavigate} from "react-router-dom";
+import { useCommonNavigate } from 'navigation/helpers';
 
-type WebhooksFormProps = {
-  webhooks: Array<Webhook>;
-};
+export const WebhooksForm = () => {
+  const navigate = useCommonNavigate();
 
-export const WebhooksForm = (props: WebhooksFormProps) => {
-  const { webhooks } = props;
-  const navigate = useNavigate();
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [webhooks, setWebhooks] = useState<Array<Webhook>>([]);
 
-  const [disabled, setDisabled] = React.useState<boolean>(false);
-  const [webhookUrl, setWebhookUrl] = React.useState<string>('');
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const chainOrCommObj = useMemo(
+    () => ({
+      chain: app.activeChainId(),
+    }),
+    []
+  );
 
-  const chainOrCommObj = { chain: app.activeChainId() };
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const response = await axios.get(`${app.serverUrl()}/getWebhooks`, {
+          params: {
+            ...chainOrCommObj,
+            auth: true,
+            jwt: app.user.jwt,
+          },
+        });
 
-  const createWebhook = () => {
-    setDisabled(true);
-
-    // TODO: Change to POST /webhook
-    $.post(`${app.serverUrl()}/createWebhook`, {
-      ...chainOrCommObj,
-      webhookUrl,
-      auth: true,
-      jwt: app.user.jwt,
-    }).then(
-      (result) => {
-        setDisabled(false);
-
-        if (result.status === 'Success') {
-          const newWebhook = Webhook.fromJSON(result.result);
-
-          webhooks.push(newWebhook);
-
-          setIsModalOpen(true);
-
-          setWebhookUrl('');
-        } else {
-          notifyError(result.message);
-        }
-
-        redraw();
-      },
-      (err) => {
-        setDisabled(false);
-        notifyError(err?.responseJSON?.error || 'Unknown error');
-        redraw();
+        setWebhooks(response.data.result);
+      } catch (err) {
+        notifyError(err);
+        setWebhooks([]);
       }
-    );
+    };
+
+    fetch();
+  }, [chainOrCommObj]);
+
+  const createWebhook = async () => {
+    try {
+      const response = await axios.post(`${app.serverUrl()}/createWebhook`, {
+        ...chainOrCommObj,
+        webhookUrl,
+        auth: true,
+        jwt: app.user.jwt,
+      });
+
+      const newWebhookFromServer = response.data.result;
+      const newWebhooks = [...webhooks, newWebhookFromServer];
+
+      setWebhooks(newWebhooks);
+      setIsModalOpen(true);
+      setWebhookUrl('');
+    } catch (err) {
+      notifyError(err);
+    }
+  };
+
+  const deleteWebhook = async (webhook: Webhook) => {
+    try {
+      await axios.post(`${app.serverUrl()}/deleteWebhook`, {
+        ...chainOrCommObj,
+        webhookUrl: webhook.url,
+        auth: true,
+        jwt: app.user.jwt,
+      });
+
+      const filteredWebhooks = webhooks.filter(({ id }) => id !== webhook.id);
+      setWebhooks(filteredWebhooks);
+    } catch (err) {
+      notifyError(err);
+    }
+  };
+
+  const updateWebhook = async (
+    webhook: Webhook,
+    selectedCategories: Array<string>
+  ) => {
+    try {
+      const response = await axios.post(`${app.serverUrl()}/updateWebhook`, {
+        ...chainOrCommObj,
+        webhookId: webhook.id,
+        categories: selectedCategories,
+        jwt: app.user.jwt,
+      });
+
+      const updatedWebhookFromServer = response.data.result;
+
+      const updatedWebhooks = webhooks.map((hook) =>
+        hook.id === updatedWebhookFromServer.id
+          ? updatedWebhookFromServer
+          : hook
+      );
+
+      setWebhooks(updatedWebhooks);
+    } catch (err) {
+      notifyError(err);
+    }
+
+    setIsModalOpen(false);
   };
 
   return (
@@ -95,68 +144,19 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
                 <CWIconButton
                   iconName="gear"
                   iconSize="small"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsModalOpen(true);
-                  }}
+                  onClick={() => setIsModalOpen(true)}
                 />
                 <CWIconButton
                   iconName="trash"
                   iconSize="small"
-                  disabled={disabled}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setDisabled(true);
-
-                    // TODO: Change to DELETE /webhook
-                    $.post(`${app.serverUrl()}/deleteWebhook`, {
-                      ...chainOrCommObj,
-                      webhookUrl: webhook.url,
-                      auth: true,
-                      jwt: app.user.jwt,
-                    }).then(
-                      (result) => {
-                        setDisabled(false);
-
-                        if (result.status === 'Success') {
-                          const idx = webhooks.findIndex(
-                            (w) => w.url === webhook.url
-                          );
-
-                          if (idx !== -1) {
-                            webhooks.splice(idx, 1);
-                          }
-
-                          notifySuccess('Success! Webhook deleted');
-                        } else {
-                          notifyError(result.message);
-                        }
-                        redraw();
-                      },
-                      (err) => {
-                        setDisabled(false);
-
-                        notifyError(
-                          err?.responseJSON?.error || 'Unknown error'
-                        );
-
-                        redraw();
-                      }
-                    );
-                  }}
+                  onClick={() => deleteWebhook(webhook)}
                 />
                 <Modal
                   content={
                     <WebhookSettingsModal
                       onModalClose={() => setIsModalOpen(false)}
+                      updateWebhook={updateWebhook}
                       webhook={webhook}
-                      updateSuccessCallback={(wh) => {
-                        const idx = webhooks.findIndex(
-                          (wh2) => wh2.id === wh.id
-                        );
-
-                        webhooks[idx].categories = wh.categories;
-                      }}
                     />
                   }
                   onClose={() => setIsModalOpen(false)}
@@ -172,7 +172,12 @@ export const WebhooksForm = (props: WebhooksFormProps) => {
           No webhooks yet. Slack, Discord, and Telegram webhooks are supported.
           For more information and examples for setting these up, please view
           our
-          {link('a', 'https://docs.commonwealth.im', [' documentation.'], navigate)}
+          {link(
+            'a',
+            'https://docs.commonwealth.im',
+            [' documentation.'],
+            navigate
+          )}
         </CWText>
       )}
       <CWTextInput

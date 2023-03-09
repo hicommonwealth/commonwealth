@@ -1,6 +1,6 @@
 import type { LoginBodyType } from './types';
 
-export const getText = (bodyType: LoginBodyType) => {
+export const getLoginText = (bodyType: LoginBodyType) => {
   if (bodyType === 'walletList') {
     return {
       headerText: 'Connect Your Wallet',

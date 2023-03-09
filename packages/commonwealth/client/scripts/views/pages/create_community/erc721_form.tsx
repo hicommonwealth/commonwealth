@@ -1,251 +1,248 @@
-import React from 'react';
-
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { initAppState } from 'state';
-import { IERC721Metadata__factory } from 'common-common/src/eth/types';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
+import React, { useEffect } from 'react';
+import { isAddress } from 'web3-utils';
 import { providers } from 'ethers';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
-
 import $ from 'jquery';
+
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
+import { initAppState } from 'state';
+import { IERC721Metadata__factory } from 'common-common/src/eth/types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import { isAddress } from 'web3-utils';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { defaultChainRows, ethChainRows } from './chain_input_rows';
+import type { EthChainFormState } from './types';
+import { useCommonNavigate } from 'navigation/helpers';
 import {
-  defaultChainRows,
-  ethChainRows,
-  initChainForm,
-} from './chain_input_rows';
-import type {
-  ChainFormFields,
-  ChainFormState,
-  EthChainAttrs,
-  EthFormFields,
-} from './types';
-import withRouter from 'navigation/helpers';
+  useChainFormIdFields,
+  useChainFormDefaultFields,
+  useChainFormState,
+  useEthChainFormFields,
+} from './hooks';
 
-type CreateERC721Form = ChainFormFields & EthFormFields;
+export const ERC721Form = (props: EthChainFormState) => {
+  const { ethChainNames, ethChains } = props;
 
-type CreateERC721State = ChainFormState & { form: CreateERC721Form };
+  const { id, setId, name, setName, symbol, setSymbol } =
+    useChainFormIdFields();
 
-class ERC721FormComponent extends ClassComponent<EthChainAttrs> {
-  public state: CreateERC721State = {
-    message: '',
-    loaded: false,
-    loading: false,
-    saving: false,
-    status: undefined,
-    form: {
-      address: '',
-      altWalletUrl: '',
-      ethChainId: 1,
-      chainString: 'Ethereum Mainnet',
-      id: '',
-      name: '',
-      symbol: 'XYZ',
-      nodeUrl: '',
-      ...initChainForm(),
-    },
-  };
+  const chainFormDefaultFields = useChainFormDefaultFields();
 
-  oninit(vnode: ResultNode<EthChainAttrs>) {
-    this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
-  }
+  const chainFormState = useChainFormState();
 
-  view(vnode: ResultNode<EthChainAttrs>) {
-    const validAddress = isAddress(this.state.form.address);
-    const disableField = !validAddress || !this.state.loaded;
+  const ethChainFormFields = useEthChainFormFields();
 
-    const updateTokenForum = async () => {
-      if (!this.state.form.address || !this.state.form.ethChainId) return;
-      this.state.status = undefined;
-      this.state.message = '';
-      this.state.loading = true;
-      const args = {
-        address: this.state.form.address,
-        chain_id: this.state.form.ethChainId,
-        chain_network: ChainNetwork.ERC721,
-        url: this.state.form.nodeUrl,
-        allowUncached: true,
-      };
-      try {
-        console.log('Querying backend for token data');
-        const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
-        if (res.status === 'Success') {
-          if (res?.token?.name) {
-            this.state.form.name = res.token.name || '';
-            this.state.form.id = res.token.id && slugify(res.token.id);
-            this.state.form.symbol = res.token.symbol || '';
-            this.state.form.iconUrl = res.token.icon_url || '';
-            if (this.state.form.iconUrl.startsWith('/')) {
-              this.state.form.iconUrl = `https://commonwealth.im${this.state.form.iconUrl}`;
-            }
-            this.state.form.description = res.token.description || '';
-            this.state.form.website = res.token.website || '';
-            this.state.form.discord = res.token.discord || '';
-            this.state.form.element = res.token.element || '';
-            this.state.form.telegram = res.token.telegram || '';
-            this.state.form.github = res.token.github || '';
-            this.state.status = 'success';
-            this.state.message = 'Success!';
-          } else {
-            // attempt to query ERC721Detailed token info from chain
-            console.log('Querying chain for ERC info');
-            const Web3 = (await import('web3')).default;
-            const provider = new Web3.providers.WebsocketProvider(args.url);
-            try {
-              const ethersProvider = new providers.Web3Provider(provider);
-              const contract = IERC721Metadata__factory.connect(
-                args.address,
-                ethersProvider
-              );
-              const name = await contract.name();
-              const symbol = await contract.symbol();
-              this.state.form.name = name || '';
-              this.state.form.id = name && slugify(name);
-              this.state.form.symbol = symbol || '';
-              this.state.status = 'success';
-              this.state.message = 'Success!';
-            } catch (e) {
-              this.state.form.name = '';
-              this.state.form.id = '';
-              this.state.form.symbol = '';
-              this.state.status = 'failure';
-              this.state.message =
-                'Verified token but could not load metadata.';
-            }
-            this.state.form.iconUrl = '';
-            this.state.form.description = '';
-            this.state.form.website = '';
-            this.state.form.discord = '';
-            this.state.form.element = '';
-            this.state.form.telegram = '';
-            this.state.form.github = '';
-            provider.disconnect(1000, 'finished');
-          }
-          this.state.loaded = true;
-        } else {
-          this.state.status = 'failure';
-          this.state.message =
-            res.message || 'Failed to load Token Information';
-        }
-      } catch (err) {
-        this.state.status = 'failure';
-        this.state.message =
-          err.responseJSON?.error || 'Failed to load Token Information';
-      }
-      this.state.loading = false;
-      redraw();
+  const navigate = useCommonNavigate();
+
+  useEffect(() => {
+    ethChainFormFields.setChainString('Ethereum Mainnet');
+    ethChainFormFields.setNodeUrl(ethChains[1].url);
+  }, []);
+
+  const validAddress = isAddress(ethChainFormFields.address);
+  const disableField = !validAddress || !chainFormState.loaded;
+
+  const updateTokenForum = async () => {
+    if (!ethChainFormFields.address || !ethChainFormFields.ethChainId) return;
+
+    chainFormState.setStatus(undefined);
+    chainFormState.setMessage('');
+    chainFormState.setLoading(true);
+
+    const args = {
+      address: ethChainFormFields.address,
+      chain_id: ethChainFormFields.ethChainId,
+      chain_network: ChainNetwork.ERC721,
+      url: ethChainFormFields.nodeUrl,
+      allowUncached: true,
     };
 
-    return (
-      <div className="CreateCommunityForm">
-        {...ethChainRows(vnode.attrs, this.state.form)}
-        <CWButton
-          label="Populate fields"
-          disabled={
-            this.state.saving ||
-            !validAddress ||
-            !this.state.form.ethChainId ||
-            this.state.loading
+    try {
+      console.log('Querying backend for token data');
+
+      const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
+
+      if (res.status === 'Success') {
+        if (res?.token?.name) {
+          setName(res.token.name || '');
+          setId(res.token.id && slugify(res.token.id));
+          setSymbol(res.token.symbol || '');
+          chainFormDefaultFields.setIconUrl(res.token.icon_url || '');
+
+          if (chainFormDefaultFields.iconUrl.startsWith('/')) {
+            `https://commonwealth.im${chainFormDefaultFields.iconUrl}`;
           }
-          onClick={async () => {
-            await updateTokenForum();
-          }}
+
+          chainFormDefaultFields.setDescription(res.token.description || '');
+          chainFormDefaultFields.setWebsite(res.token.website || '');
+          chainFormDefaultFields.setDiscord(res.token.discord || '');
+          chainFormDefaultFields.setElement(res.token.element || '');
+          chainFormDefaultFields.setTelegram(res.token.telegram || '');
+          chainFormDefaultFields.setGithub(res.token.github || '');
+          chainFormState.setStatus('success');
+          chainFormState.setMessage('Success!');
+        } else {
+          // attempt to query ERC721Detailed token info from chain
+          console.log('Querying chain for ERC info');
+
+          const Web3 = (await import('web3')).default;
+
+          const provider = new Web3.providers.WebsocketProvider(args.url);
+
+          try {
+            const ethersProvider = new providers.Web3Provider(provider);
+
+            const contract = IERC721Metadata__factory.connect(
+              args.address,
+              ethersProvider
+            );
+
+            const contractName = await contract.name();
+            const contractSymbol = await contract.symbol();
+
+            setName(contractName || '');
+            setId(contractName);
+            setSymbol(contractSymbol || '');
+            chainFormState.setStatus('success');
+            chainFormState.setMessage('Success!');
+          } catch (e) {
+            setName('');
+            setId('');
+            setSymbol('');
+            chainFormState.setStatus('failure');
+            chainFormState.setMessage(
+              'Verified token but could not load metadata.'
+            );
+          }
+
+          chainFormDefaultFields.setIconUrl('');
+          chainFormDefaultFields.setDescription('');
+          chainFormDefaultFields.setWebsite('');
+          chainFormDefaultFields.setDiscord('');
+          chainFormDefaultFields.setElement('');
+          chainFormDefaultFields.setTelegram('');
+          chainFormDefaultFields.setGithub('');
+
+          provider.disconnect(1000, 'finished');
+        }
+
+        chainFormState.setLoaded(true);
+      } else {
+        chainFormState.setStatus('failure');
+        chainFormState.setMessage(
+          res.message || 'Failed to load Token Information'
+        );
+      }
+    } catch (err) {
+      chainFormState.setStatus('failure');
+      chainFormState.setMessage(
+        err.responseJSON?.error || 'Failed to load Token Information'
+      );
+    }
+    chainFormState.setLoading(false);
+  };
+
+  return (
+    <div className="CreateCommunityForm">
+      {ethChainRows(
+        { ethChainNames, ethChains },
+        { ...ethChainFormFields, ...chainFormState }
+      )}
+      <CWButton
+        label="Populate fields"
+        disabled={
+          chainFormState.saving ||
+          !validAddress ||
+          !ethChainFormFields.ethChainId ||
+          chainFormState.loading
+        }
+        onClick={async () => {
+          await updateTokenForum();
+        }}
+      />
+      {chainFormState.message && (
+        <CWValidationText
+          message={chainFormState.message}
+          status={chainFormState.status}
         />
-        {this.state.message && (
-          <CWValidationText
-            message={this.state.message}
-            status={this.state.status}
-          />
-        )}
-        <InputRow
-          title="Name"
-          value={this.state.form.name}
-          disabled={disableField}
-          onChangeHandler={(v) => {
-            this.state.form.name = v;
-            this.state.form.id = slugifyPreserveDashes(v);
-          }}
-        />
-        <IdRow id={this.state.form.id} />
-        <InputRow
-          title="Symbol"
-          disabled={disableField}
-          value={this.state.form.symbol}
-          placeholder="XYZ"
-          onChangeHandler={(v) => {
-            this.state.form.symbol = v;
-          }}
-        />
-        {...defaultChainRows(this.state.form, disableField)}
-        <CWButton
-          label="Save changes"
-          disabled={this.state.saving || !validAddress || !this.state.loaded}
-          onClick={async () => {
-            const {
-              altWalletUrl,
-              chainString,
-              ethChainId,
-              nodeUrl,
-              symbol,
-              iconUrl,
-            } = this.state.form;
-            this.state.saving = true;
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: null,
+      )}
+      <InputRow
+        title="Name"
+        value={name}
+        disabled={disableField}
+        onChangeHandler={(v) => {
+          setName(v);
+          setId(slugifyPreserveDashes(v));
+        }}
+      />
+      <IdRow id={id} />
+      <InputRow
+        title="Symbol"
+        disabled={disableField}
+        value={symbol}
+        placeholder="XYZ"
+        onChangeHandler={(v) => {
+          setSymbol(v);
+        }}
+      />
+      {defaultChainRows(chainFormDefaultFields, disableField)}
+      <CWButton
+        label="Save changes"
+        disabled={
+          chainFormState.saving || !validAddress || !chainFormState.loaded
+        }
+        onClick={async () => {
+          chainFormState.setSaving(true);
+          // mixpanelBrowserTrack({
+          //   event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+          //   chainBase: null,
+          //   isCustomDomain: app.isCustomDomain(),
+          //   communityType: null,
+          // });
+
+          try {
+            const res = await $.post(`${app.serverUrl()}/createChain`, {
+              alt_wallet_url: ethChainFormFields.altWalletUrl,
+              base: ChainBase.Ethereum,
+              chain_string: ethChainFormFields.chainString,
+              eth_chain_id: ethChainFormFields.ethChainId,
+              jwt: app.user.jwt,
+              icon_url: chainFormDefaultFields.iconUrl,
+              network: ChainNetwork.ERC721,
+              node_url: ethChainFormFields.nodeUrl,
+              type: ChainType.Token,
+              default_symbol: symbol,
+              // ...form, <-- not typed so I don't know what's needed
             });
 
-            try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
-                alt_wallet_url: altWalletUrl,
-                base: ChainBase.Ethereum,
-                chain_string: chainString,
-                eth_chain_id: ethChainId,
-                jwt: app.user.jwt,
-                icon_url: iconUrl,
-                network: ChainNetwork.ERC721,
-                node_url: nodeUrl,
-                type: ChainType.Token,
-                default_symbol: symbol,
-                ...this.state.form,
-              });
-              if (res.result.admin_address) {
-                await linkExistingAddressToChainOrCommunity(
-                  res.result.admin_address,
-                  res.result.role.chain_id,
-                  res.result.role.chain_id
-                );
-              }
-              await initAppState(false);
-              this.setRoute(`/${res.result.chain?.id}`);
-            } catch (err) {
-              notifyError(
-                err.responseJSON?.error ||
-                  'Creating new ERC721 community failed'
+            if (res.result.admin_address) {
+              await linkExistingAddressToChainOrCommunity(
+                res.result.admin_address,
+                res.result.role.chain_id,
+                res.result.role.chain_id
               );
-            } finally {
-              this.state.saving = false;
             }
-          }}
-        />
-      </div>
-    );
-  }
-}
 
-export const ERC721Form = withRouter(ERC721FormComponent);
+            await initAppState(false);
+
+            navigate(`/${res.result.chain?.id}`);
+          } catch (err) {
+            notifyError(
+              err.responseJSON?.error || 'Creating new ERC721 community failed'
+            );
+          } finally {
+            chainFormState.setSaving(false);
+          }
+        }}
+      />
+    </div>
+  );
+};

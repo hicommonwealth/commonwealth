@@ -1,25 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import _ from 'lodash';
 import type { Account } from 'models';
-import {
-  ClassComponent,
-  ResultNode,
-  render,
-  setRoute,
-  getRoute,
-  getRouteParam,
-  redraw,
-  Component,
-} from 'mithrilInterop';
-import { initChain } from 'helpers/chain';
+import type { Component } from 'mithrilInterop';
+import { render, redraw } from 'mithrilInterop';
 import { setActiveAccount } from '../../../controllers/app/login';
 import app from '../../../state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { User } from '../../components/user/user';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
 export interface IProfileHeaderAttrs {
   account: Account;
@@ -142,10 +131,8 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ? [
               render(CWButton, {
                 onClick: () => {
-                  app.modals.create({
-                    modal: EditProfileModal,
-                    data: { account, refreshCallback },
-                  });
+                  // @REACT @TODO: Re-add EditProfileModal using new pattern
+                  return null;
                 },
                 label: 'Edit',
               }),

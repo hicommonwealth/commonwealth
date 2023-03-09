@@ -1,6 +1,10 @@
 import React from 'react';
 
-import { ClassComponent, getRouteParam, redraw } from 'mithrilInterop';
+import {
+  ClassComponent,
+  _DEPRECATED_getSearchParams,
+  redraw,
+} from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -15,7 +19,6 @@ import { AddressInfo, SearchQuery } from 'models';
 import type { Profile } from 'models';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
@@ -67,7 +70,6 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
         <CWText noWrap>
           {renderQuillTextBody(thread.body, {
             hideFormatting: true,
-            collapse: true,
             searchTerm,
           })}
         </CWText>
@@ -119,7 +121,6 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
         <CWText noWrap>
           {renderQuillTextBody(comment.text, {
             hideFormatting: true,
-            collapse: true,
             searchTerm,
           })}
         </CWText>
@@ -225,7 +226,9 @@ class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
-    const searchQuery = SearchQuery.fromUrlParams({ url: getRouteParam() });
+    const searchQuery = SearchQuery.fromUrlParams({
+      url: _DEPRECATED_getSearchParams(),
+    });
 
     const { chainScope, searchTerm } = searchQuery;
     const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
@@ -307,10 +310,7 @@ class SearchPageComponent extends ClassComponent<SearchPageAttrs> {
     };
 
     return this.errorText?.length > 0 ? (
-      <ErrorPage
-        message={this.errorText}
-        title={<BreadcrumbsTitleTag title="Search" />}
-      />
+      <ErrorPage message={this.errorText} />
     ) : (
       <Sublayout>
         <div className="SearchPage">

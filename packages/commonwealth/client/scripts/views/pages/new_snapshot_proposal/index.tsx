@@ -3,7 +3,6 @@ import React from 'react';
 import { ClassComponent, redraw, parsePathname } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 import moment from 'moment';
-import { navigateToSubpage } from 'router';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
@@ -24,12 +23,13 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { newLink } from './helpers';
 import type { ThreadForm } from './types';
+import withRouter from 'navigation/helpers';
 
 type NewSnapshotProposalPageAttrs = {
   snapshotId: string;
 };
 
-export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalPageAttrs> {
+class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposalPageAttrs> {
   private form: ThreadForm;
   private initialized: boolean;
   private isFromExistingProposal: boolean;
@@ -48,7 +48,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
     const pathVars = parsePathname(window.location.href);
 
     if (!app.snapshot.initialized) {
-      app.snapshot.init(vnode.attrs.snapshotId).then(() => redraw());
+      app.snapshot.init(vnode.attrs.snapshotId).then(() => this.redraw());
       return <PageLoading />;
     }
 
@@ -112,7 +112,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
         this.members = space.members;
 
         this.snapshotScoresFetched = true;
-        redraw();
+        this.redraw();
       });
     }
 
@@ -194,7 +194,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
                 }
                 onInput={(e) => {
                   this.form.choices[idx] = (e.target as any).value;
-                  redraw();
+                  this.redraw();
                 }}
                 iconRight={
                   idx > 1 && idx === this.form.choices.length - 1
@@ -203,7 +203,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
                 }
                 iconRightonClick={() => {
                   this.form.choices.pop();
-                  redraw();
+                  this.redraw();
                 }}
               />
             );
@@ -213,7 +213,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
             label="Add voting choice"
             onClick={() => {
               this.form.choices.push(`Option ${this.form.choices.length + 1}`);
-              redraw();
+              this.redraw();
             }}
           />
           <div className="date-range">
@@ -265,7 +265,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
 
                 notifySuccess('Snapshot Created!');
 
-                navigateToSubpage(`/snapshot/${this.space.id}`);
+                this.setRoute(`/snapshot/${this.space.id}`);
               } catch (err) {
                 this.saving = false;
 
@@ -278,5 +278,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
     );
   }
 }
+
+const NewSnapshotProposalPage = withRouter(NewSnapshotProposalPageComponent);
 
 export default NewSnapshotProposalPage;

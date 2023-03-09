@@ -1,7 +1,6 @@
 import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
-import type { ChainAttributes } from '../server/models/chain';
 import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
-import type { AccessLevel } from 'commonwealth/shared/permissions';
+import type { AccessLevel } from './permissions';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
@@ -97,18 +96,18 @@ export interface ISnapshotNotificationData {
   snapshotEventType: string;
 }
 
+export enum ContentType {
+  Thread = 'thread',
+  Comment = 'comment',
+  // Proposal = 'proposal',
+}
+
 export interface IChatNotification {
   message_id: string | number;
   channel_id: string | number;
   chain_id: string;
   author_address: string;
   created_at: any;
-}
-
-export enum ContentType {
-  Thread = 'thread',
-  Comment = 'comment',
-  // Proposal = 'proposal',
 }
 
 export enum SearchContentType {

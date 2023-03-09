@@ -9,8 +9,7 @@ import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import type { QuillEditor } from '../../components/quill/quill_editor';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { navigateToSubpage } from 'router';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type EditBodyProps = {
   savedEdits: string;
@@ -21,6 +20,7 @@ type EditBodyProps = {
 };
 
 export const EditBody = (props: EditBodyProps) => {
+  const navigate = useCommonNavigate();
   const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
   const [saving, setSaving] = React.useState<boolean>(false);
   const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } = props;
@@ -51,11 +51,9 @@ export const EditBody = (props: EditBodyProps) => {
             const threadText = quillEditorState.textContentsAsString;
 
             if (threadText !== body) {
-              confirmed = await confirmationModalWithText(
-                'Cancel editing? Changes will not be saved.',
-                'Delete changes',
-                'Keep editing'
-              )();
+              confirmed = window.confirm(
+                'Cancel editing? Changes will not be saved.'
+              );
             }
 
             if (confirmed) {
@@ -77,7 +75,7 @@ export const EditBody = (props: EditBodyProps) => {
             const itemText = quillEditorState.textContentsAsString;
 
             app.threads.edit(thread, itemText, title).then(() => {
-              navigateToSubpage(`/discussion/${thread.id}`);
+              navigate(`/discussion/${thread.id}`);
               setSaving(false);
               clearEditingLocalStorage(thread.id, ContentType.Thread);
               setIsEditing(false);

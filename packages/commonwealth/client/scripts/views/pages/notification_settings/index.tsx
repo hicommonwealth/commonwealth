@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
 import moment from 'moment';
 import { AddressInfo } from 'models';
 import 'pages/notification_settings/index.scss';
@@ -20,231 +19,209 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs } from './helpers';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-class NotificationSettingsPageComponent extends ClassComponent {
-  view() {
-    if (!app.loginStatusLoaded()) {
-      return <PageLoading />;
-    } else if (!app.isLoggedIn()) {
-      this.setRoute('/', { replace: true });
-      return <PageLoading />;
-    }
+const NotificationSettingsPage = () => {
+  const navigate = useCommonNavigate();
 
-    const bundledSubs = bundleSubs(app.user.notifications.subscriptions);
+  if (!app.loginStatusLoaded()) {
+    return <PageLoading />;
+  } else if (!app.isLoggedIn()) {
+    navigate('/', { replace: true });
+    return <PageLoading />;
+  }
 
-    return (
-      <Sublayout
-      // title={<BreadcrumbsTitleTag title="Notification Settings" />}
-      >
-        <div className="NotificationSettingsPage">
-          <CWText type="h3" fontWeight="semiBold" className="page-header-text">
-            Notification Management
+  const bundledSubs = bundleSubs(app.user.notifications.subscriptions);
+
+  return (
+    <Sublayout>
+      <div className="NotificationSettingsPage">
+        <CWText type="h3" fontWeight="semiBold" className="page-header-text">
+          Notification Management
+        </CWText>
+        <CWText className="page-subheader-text">
+          Notification settings for all new threads, comments, mentions, likes,
+          and chain events in the following communities.
+        </CWText>
+        <div className="column-header-row">
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="column-header-text"
+          >
+            Community
           </CWText>
-          <CWText className="page-subheader-text">
-            Notification settings for all new threads, comments, mentions,
-            likes, and chain events in the following communities.
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="column-header-text"
+          >
+            Email
           </CWText>
-          <div className="column-header-row">
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="column-header-text"
-            >
-              Community
-            </CWText>
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="column-header-text"
-            >
-              Email
-            </CWText>
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="last-column-header-text"
-            >
-              In-App
-            </CWText>
-          </div>
-          {Object.entries(bundledSubs).map(([chainName, subs]) => {
-            const chainInfo = app.config.chains.getById(chainName);
-            const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
-            const hasSomeInAppSubs = subs.some((s) => s.isActive);
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="last-column-header-text"
+          >
+            In-App
+          </CWText>
+        </div>
+        {Object.entries(bundledSubs).map(([chainName, subs]) => {
+          const chainInfo = app.config.chains.getById(chainName);
+          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
+          const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
-            return (
-              <div className="notification-row">
-                <CWCollapsible
-                  headerContent={
-                    <div className="notification-row-header">
-                      <div className="left-content-container">
-                        <div className="avatar-and-name">
-                          <CWCommunityAvatar
-                            size="medium"
-                            community={chainInfo}
-                          />
-                          <CWText type="h5" fontWeight="medium">
-                            {chainInfo?.name}
-                          </CWText>
-                        </div>
-                        <CWText type="b2" className="subscriptions-count-text">
-                          {subs.length} subscriptions
+          return (
+            <div className="notification-row">
+              <CWCollapsible
+                headerContent={
+                  <div className="notification-row-header">
+                    <div className="left-content-container">
+                      <div className="avatar-and-name">
+                        <CWCommunityAvatar
+                          size="medium"
+                          community={chainInfo}
+                        />
+                        <CWText type="h5" fontWeight="medium">
+                          {chainInfo?.name}
                         </CWText>
                       </div>
-                      <CWCheckbox
-                        label="Receive Emails"
-                        checked={hasSomeEmailSubs}
-                        onChange={() => {
-                          hasSomeEmailSubs
-                            ? app.user.notifications
-                                .disableImmediateEmails(subs)
-                                .then(() => {
-                                  redraw();
-                                })
-                            : app.user.notifications
-                                .enableImmediateEmails(subs)
-                                .then(() => {
-                                  redraw();
-                                });
-                        }}
-                      />
-                      <CWToggle
-                        checked={subs.some((s) => s.isActive)}
-                        onChange={() => {
-                          hasSomeInAppSubs
-                            ? app.user.notifications
-                                .disableSubscriptions(subs)
-                                .then(() => {
-                                  redraw();
-                                })
-                            : app.user.notifications
-                                .enableSubscriptions(subs)
-                                .then(() => {
-                                  redraw();
-                                });
-                        }}
-                      />
+                      <CWText type="b2" className="subscriptions-count-text">
+                        {subs.length} subscriptions
+                      </CWText>
                     </div>
-                  }
-                  collapsibleContent={
-                    <div className="subscriptions-list-container">
-                      <div className="subscriptions-list-header">
-                        <CWText
-                          type="caption"
-                          className="subscription-list-header-text"
-                        >
-                          Title
-                        </CWText>
-                        <CWText
-                          type="caption"
-                          className="subscription-list-header-text"
-                        >
-                          Subscribed
-                        </CWText>
-                        <CWText
-                          type="caption"
-                          className="subscription-list-header-text"
-                        >
-                          Author
-                        </CWText>
-                      </div>
-                      {subs.map((sub) => {
-                        const getUser = () => {
-                          if (sub.Thread) {
-                            return (
-                              <User
-                                user={
-                                  new AddressInfo(
-                                    null,
-                                    sub.Thread.author,
-                                    sub.Thread.chain,
-                                    null
-                                  )
-                                }
-                              />
-                            );
-                          } else if (sub.Comment) {
-                            return (
-                              <User
-                                user={
-                                  new AddressInfo(
-                                    null,
-                                    sub.Comment.author,
-                                    sub.Comment.chain,
-                                    null
-                                  )
-                                }
-                              />
-                            );
-                          } else {
-                            // return empty div to ensure that grid layout is correct
-                            // even in the absence of a user
-                            return <div />;
-                          }
-                        };
+                    <CWCheckbox
+                      label="Receive Emails"
+                      checked={hasSomeEmailSubs}
+                      onChange={() => {
+                        hasSomeEmailSubs
+                          ? app.user.notifications.disableImmediateEmails(subs)
+                          : app.user.notifications.enableImmediateEmails(subs);
+                      }}
+                    />
+                    <CWToggle
+                      checked={subs.some((s) => s.isActive)}
+                      onChange={() => {
+                        hasSomeInAppSubs
+                          ? app.user.notifications.disableSubscriptions(subs)
+                          : app.user.notifications.enableSubscriptions(subs);
+                      }}
+                    />
+                  </div>
+                }
+                collapsibleContent={
+                  <div className="subscriptions-list-container">
+                    <div className="subscriptions-list-header">
+                      <CWText
+                        type="caption"
+                        className="subscription-list-header-text"
+                      >
+                        Title
+                      </CWText>
+                      <CWText
+                        type="caption"
+                        className="subscription-list-header-text"
+                      >
+                        Subscribed
+                      </CWText>
+                      <CWText
+                        type="caption"
+                        className="subscription-list-header-text"
+                      >
+                        Author
+                      </CWText>
+                    </div>
+                    {subs.map((sub) => {
+                      const getUser = () => {
+                        if (sub.Thread) {
+                          return (
+                            <User
+                              user={
+                                new AddressInfo(
+                                  null,
+                                  sub.Thread.author,
+                                  sub.Thread.chain,
+                                  null
+                                )
+                              }
+                            />
+                          );
+                        } else if (sub.Comment) {
+                          return (
+                            <User
+                              user={
+                                new AddressInfo(
+                                  null,
+                                  sub.Comment.author,
+                                  sub.Comment.chain,
+                                  null
+                                )
+                              }
+                            />
+                          );
+                        } else {
+                          // return empty div to ensure that grid layout is correct
+                          // even in the absence of a user
+                          return <div />;
+                        }
+                      };
 
-                        const getTimeStamp = () => {
-                          if (sub.Thread) {
-                            return moment(sub.Thread.createdAt).format('l');
-                          } else if (sub.Comment) {
-                            return moment(sub.Comment.createdAt).format('l');
-                          } else {
-                            return null;
-                          }
-                        };
+                      const getTimeStamp = () => {
+                        if (sub.Thread) {
+                          return moment(sub.Thread.createdAt).format('l');
+                        } else if (sub.Comment) {
+                          return moment(sub.Comment.createdAt).format('l');
+                        } else {
+                          return null;
+                        }
+                      };
 
-                        return (
-                          <>
-                            <div className="subscription-row-desktop">
+                      return (
+                        <>
+                          <div className="subscription-row-desktop">
+                            <SubscriptionRowTextContainer subscription={sub} />
+                            <CWText type="b2">{getTimeStamp()}</CWText>
+                            {getUser()}
+                            <SubscriptionRowMenu subscription={sub} />
+                          </div>
+                          <div className="subscription-row-mobile">
+                            <div className="subscription-row-mobile-top">
                               <SubscriptionRowTextContainer
                                 subscription={sub}
                               />
-                              <CWText type="b2">{getTimeStamp()}</CWText>
-                              {getUser()}
                               <SubscriptionRowMenu subscription={sub} />
                             </div>
-                            <div className="subscription-row-mobile">
-                              <div className="subscription-row-mobile-top">
-                                <SubscriptionRowTextContainer
-                                  subscription={sub}
-                                />
-                                <SubscriptionRowMenu subscription={sub} />
-                              </div>
-                              <div className="subscription-row-mobile-bottom">
-                                {getUser()}
-                                {getTimeStamp() && (
-                                  <CWText
-                                    type="caption"
-                                    className="subscription-list-header-text"
-                                  >
-                                    subscribed
-                                  </CWText>
-                                )}
+                            <div className="subscription-row-mobile-bottom">
+                              {getUser()}
+                              {getTimeStamp() && (
                                 <CWText
                                   type="caption"
-                                  fontWeight="medium"
                                   className="subscription-list-header-text"
                                 >
-                                  {getTimeStamp()}
+                                  subscribed
                                 </CWText>
-                              </div>
+                              )}
+                              <CWText
+                                type="caption"
+                                fontWeight="medium"
+                                className="subscription-list-header-text"
+                              >
+                                {getTimeStamp()}
+                              </CWText>
                             </div>
-                          </>
-                        );
-                      })}
-                    </div>
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
-      </Sublayout>
-    );
-  }
-}
-
-const NotificationSettingsPage = withRouter(NotificationSettingsPageComponent);
+                          </div>
+                        </>
+                      );
+                    })}
+                  </div>
+                }
+              />
+            </div>
+          );
+        })}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default NotificationSettingsPage;

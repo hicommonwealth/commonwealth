@@ -1,7 +1,4 @@
-import React from 'react';
-
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
+import React, { useState, useEffect } from 'react';
 
 import 'pages/discussions/thread_preview.scss';
 import {
@@ -37,57 +34,59 @@ import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 
-type ThreadPreviewAttrs = {
+type ThreadPreviewProps = {
   thread: Thread;
 };
 
-class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
-  private isWindowSmallInclusive: boolean;
+export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
+  const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
 
-  onResize() {
-    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
-    redraw();
-  }
+  const [windowIsSmall, setWindowIsSmall] = useState(
+    isWindowSmallInclusive(window.innerWidth)
+  );
 
-  oninit() {
-    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+  const navigate = useCommonNavigate();
 
-    window.addEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+  useEffect(() => {
+    if (localStorage.getItem('dark-mode-state') === 'on') {
+      document.getElementsByTagName('html')[0].classList.add('invert');
+    }
 
-  onremove() {
-    window.removeEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+    const onResize = () => {
+      setWindowIsSmall(isWindowSmallInclusive(window.innerWidth));
+    };
 
-  view(vnode: ResultNode<ThreadPreviewAttrs>) {
-    const { thread } = vnode.attrs;
+    window.addEventListener('resize', onResize);
 
-    const isSubscribed =
-      getCommentSubscription(thread)?.isActive &&
-      getReactionSubscription(thread)?.isActive;
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
-    const hasAdminPermissions =
-      app.user.activeAccount &&
-      (app.roles.isRoleOfCommunity({
-        role: 'admin',
+  const isSubscribed =
+    getCommentSubscription(thread)?.isActive &&
+    getReactionSubscription(thread)?.isActive;
+
+  const hasAdminPermissions =
+    app.user.activeAccount &&
+    (app.roles.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+    }) ||
+      app.roles.isRoleOfCommunity({
+        role: 'moderator',
         chain: app.activeChainId(),
-      }) ||
-        app.roles.isRoleOfCommunity({
-          role: 'moderator',
-          chain: app.activeChainId(),
-        }));
+      }));
 
-    const isAuthor =
-      app.user.activeAccount &&
-      thread.author === app.user.activeAccount.address;
+  const isAuthor =
+    app.user.activeAccount && thread.author === app.user.activeAccount.address;
 
-    return (
+  return (
+    <>
       <div
         className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
@@ -111,13 +110,11 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
             scrollEle.scrollTop;
 
-          this.setRoute(discussionLink);
+          navigate(discussionLink);
         }}
         key={thread.id}
       >
-        {!this.isWindowSmallInclusive && (
-          <ThreadPreviewReactionButton thread={thread} />
-        )}
+        {!windowIsSmall && <ThreadPreviewReactionButton thread={thread} />}
         <div className="main-content">
           <div className="top-row">
             <div className="user-and-date">
@@ -129,7 +126,7 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
                 linkify
                 showAddressWithDisplayName
               />
-              {!this.isWindowSmallInclusive && (
+              {!windowIsSmall && (
                 <CWText className="last-updated-text">•</CWText>
               )}
               <CWText
@@ -146,7 +143,7 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
               {thread.pinned && (
                 <CWIcon
                   iconName="pin"
-                  iconSize={this.isWindowSmallInclusive ? 'small' : 'medium'}
+                  iconSize={windowIsSmall ? 'small' : 'medium'}
                 />
               )}
             </div>
@@ -191,9 +188,7 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
           )}
           <div className="row-bottom">
             <div className="comments-count">
-              {this.isWindowSmallInclusive && (
-                <ThreadReactionButton thread={thread} />
-              )}
+              {windowIsSmall && <ThreadReactionButton thread={thread} />}
               <CWIcon iconName="feedback" iconSize="small" />
               <CWText type="caption">
                 {pluralize(thread.numberOfComments, 'comment')}
@@ -228,14 +223,28 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
                 />
               </div>
               {app.isLoggedIn() && (isAuthor || hasAdminPermissions) && (
-                <ThreadPreviewMenu thread={thread} />
+                <ThreadPreviewMenu
+                  thread={thread}
+                  setIsChangeTopicModalOpen={setIsChangeTopicModalOpen}
+                />
               )}
             </div>
           </div>
         </div>
       </div>
-    );
-  }
-}
-
-export const ThreadPreview = withRouter(ThreadPreviewComponent);
+      <Modal
+        content={
+          <ChangeTopicModal
+            onChangeHandler={() => {
+              // TODO update store and rerender
+            }}
+            thread={thread}
+            onModalClose={() => setIsChangeTopicModalOpen(false)}
+          />
+        }
+        onClose={() => setIsChangeTopicModalOpen(false)}
+        open={isChangeTopicModalOpen}
+      />
+    </>
+  );
+};

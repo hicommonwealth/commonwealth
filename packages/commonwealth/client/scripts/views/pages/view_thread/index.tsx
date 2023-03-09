@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { navigateToSubpage } from 'router';
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -31,15 +30,16 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 import { EditBody } from './edit_body';
-import { activeQuillEditorHasText } from './helpers';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
+import { useCommonNavigate } from 'navigation/helpers';
+import { Modal } from '../../components/component_kit/cw_modal';
+import { IThreadCollaborator } from 'models/Thread';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -52,72 +52,53 @@ export type ThreadPrefetch = {
   };
 };
 
-type ViewThreadPageAttrs = {
+type ViewThreadPageProps = {
   identifier: string;
 };
 
-const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
-  // React.Component<ViewThreadPageAttrs & { thread: Thread }> = () =>
-  const [comments, setComments] = useState<Array<Comment<Thread>>>();
-  const [isEditingBody, setIsEditingBody] = useState<boolean>();
-  const [isGloballyEditing, setIsGloballyEditing] = useState<boolean>();
-  const [polls, setPolls] = useState<Array<Poll>>();
+const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
+  const navigate = useCommonNavigate();
+
+  const [comments, setComments] = useState<Array<Comment<Thread>>>([]);
+  const [isEditingBody, setIsEditingBody] = useState(false);
+  const [isGloballyEditing, setIsGloballyEditing] = useState(false);
+  const [polls, setPolls] = useState<Array<Poll>>([]);
   const [prefetch, setPrefetch] = useState<ThreadPrefetch>({});
-  const [recentlyEdited, setRecentlyEdited] = useState<boolean>();
-  const [savedEdits, setSavedEdits] = useState<string>();
-  const [shouldRestoreEdits, setShouldRestoreEdits] = useState<boolean>();
-  const [thread, setThread] = useState<Thread>();
-  const [threadFetched, setThreadFetched] = useState<boolean>();
-  const [threadFetchFailed, setThreadFetchFailed] = useState<boolean>();
-  const [title, setTitle] = useState<string>();
-  const [viewCount, setViewCount] = useState<number>();
-  const [initializedComments, setInitializedComments] =
-    useState<boolean>(false);
-  const [initializedPolls, setInitializedPolls] = useState<boolean>(false);
-
-  // editorListener(e) {
-  //   if (this.isGloballyEditing || activeQuillEditorHasText()) {
-  //     e.preventDefault();
-  //     e.returnValue = '';
-  //   }
-  // }
-
-  // oninit() {
-  //   window.addEventListener('beforeunload', (e) => {
-  //     this.editorListener(e);
-  //   });
-  // }
-
-  // onremove() {
-  //   window.removeEventListener('beforeunload', (e) => {
-  //     this.editorListener(e);
-  //   });
-  // }
-
-  if (!app.chain?.meta) {
-    console.log(1);
-    return (
-      <PageLoading
-      // title="Loading..."
-      />
-    );
-  }
-
-  if (typeof identifier !== 'string') {
-    return (
-      <PageNotFound
-      // title={headerTitle}
-      />
-    );
-  }
+  const [recentlyEdited, setRecentlyEdited] = useState(false);
+  const [savedEdits, setSavedEdits] = useState('');
+  const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
+  const [thread, setThread] = useState<Thread>(null);
+  const [threadFetched, setThreadFetched] = useState(false);
+  const [threadFetchFailed, setThreadFetchFailed] = useState(false);
+  const [title, setTitle] = useState('');
+  const [viewCount, setViewCount] = useState(null);
+  const [initializedComments, setInitializedComments] = useState(false);
+  const [initializedPolls, setInitializedPolls] = useState(false);
+  const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
+  const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
+    useState(false);
 
   const threadId = identifier.split('-')[0];
   const threadIdAndType = `${threadId}-${ProposalType.Thread}`;
+  const threadDoesNotMatch =
+    +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
+
+  const updatedCommentsCallback = useCallback(() => {
+    if (!thread) {
+      return;
+    }
+
+    const _comments =
+      app.comments
+        .getByProposal(thread)
+        .filter((c) => c.parentComment === null) || [];
+    setComments(_comments);
+  }, [thread]);
 
   // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
   if (!prefetch[threadIdAndType]) {
-    setPrefetch({
-      ...prefetch,
+    setPrefetch((prevState) => ({
+      ...prevState,
       [threadIdAndType]: {
         commentsStarted: false,
         pollsStarted: false,
@@ -125,308 +106,305 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
         profilesStarted: false,
         profilesFinished: false,
       },
-    });
+    }));
   }
 
-  if (threadFetchFailed) {
-    return (
-      <PageNotFound
-      // title={headerTitle}
-      />
-    );
+  useEffect(() => {
+    if (recentlyEdited) {
+      setRecentlyEdited(false);
+    }
+  }, [recentlyEdited]);
+
+  useEffect(() => {
+    // load thread, and return PageLoading
+    if (!thread || recentlyEdited) {
+      try {
+        const _thread = idToProposal(ProposalType.Thread, threadId);
+        if (_thread === undefined) {
+          throw new Error();
+        }
+        setThread(_thread);
+      } catch (e) {
+        // proposal might be loading, if it's not an thread
+        if (!threadFetched) {
+          app.threads
+            .fetchThreadsFromId([+threadId])
+            .then((res) => {
+              setThread(res[0]);
+            })
+            .catch(() => {
+              notifyError('Thread not found');
+              setThreadFetchFailed(true);
+            });
+          setThreadFetched(true);
+        }
+      }
+    }
+  }, [recentlyEdited, thread, threadFetched, threadId]);
+
+  useEffect(() => {
+    if (!thread) {
+      return;
+    }
+
+    // load proposal
+    if (!prefetch[threadIdAndType]['threadReactionsStarted']) {
+      app.threads.fetchReactionsCount([thread]).then(() => {
+        setThread(thread);
+      });
+      setPrefetch((prevState) => ({
+        ...prevState,
+        [threadIdAndType]: {
+          ...prevState[threadIdAndType],
+          threadReactionsStarted: true,
+        },
+      }));
+    }
+  }, [prefetch, thread, threadIdAndType]);
+
+  useEffect(() => {
+    if (!thread) {
+      return;
+    }
+
+    if (thread && identifier !== `${threadId}-${slugify(thread?.title)}`) {
+      const url = getProposalUrlPath(
+        thread.slug,
+        `${threadId}-${slugify(thread?.title)}`,
+        true
+      );
+      navigate(url, { replace: true });
+    }
+  }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
+
+  useEffect(() => {
+    if (!thread) {
+      return;
+    }
+
+    if (!prefetch[threadIdAndType]['commentsStarted']) {
+      app.comments
+        .refresh(thread, app.activeChainId())
+        .then(async () => {
+          // fetch comments
+          const _comments = app.comments
+            .getByProposal(thread)
+            .filter((c) => c.parentComment === null);
+          setComments(_comments);
+
+          // fetch reactions
+          const { result: reactionCounts } = await $.ajax({
+            type: 'POST',
+            url: `${app.serverUrl()}/reactionsCounts`,
+            headers: {
+              'content-type': 'application/json',
+            },
+            data: JSON.stringify({
+              proposal_ids: [threadId],
+              comment_ids: app.comments
+                .getByProposal(thread)
+                .map((comment) => comment.id),
+              active_address: app.user.activeAccount?.address,
+            }),
+          });
+
+          // app.reactionCounts.deinit()
+          for (const rc of reactionCounts) {
+            const id = app.reactionCounts.store.getIdentifier({
+              threadId: rc.thread_id,
+              proposalId: rc.proposal_id,
+              commentId: rc.comment_id,
+            });
+
+            app.reactionCounts.store.add(
+              modelReactionCountFromServer({ ...rc, id })
+            );
+          }
+        })
+        .catch(() => {
+          notifyError('Failed to load comments');
+          setComments([]);
+        });
+
+      setPrefetch((prevState) => ({
+        ...prevState,
+        [threadIdAndType]: {
+          ...prevState[threadIdAndType],
+          commentsStarted: true,
+        },
+      }));
+    }
+  }, [prefetch, thread, threadId, threadIdAndType]);
+
+  useEffect(() => {
+    if (!initializedComments) {
+      setInitializedComments(true);
+      updatedCommentsCallback();
+    }
+  }, [initializedComments, updatedCommentsCallback]);
+
+  useEffect(() => {
+    if (!initializedPolls) {
+      setInitializedPolls(true);
+      setPolls(app.polls.getByThreadId(thread?.id));
+    }
+  }, [initializedPolls, thread?.id]);
+
+  useEffect(() => {
+    if (!thread) {
+      return;
+    }
+
+    // load polls
+    if (!prefetch[threadIdAndType]['pollsStarted']) {
+      app.polls
+        .fetchPolls(app.activeChainId(), thread?.id)
+        .then(() => {
+          setPolls(app.polls.getByThreadId(thread.id));
+        })
+        .catch(() => {
+          notifyError('Failed to load polls');
+          setPolls([]);
+        });
+
+      setPrefetch((prevState) => ({
+        ...prevState,
+        [threadIdAndType]: {
+          ...prevState[threadIdAndType],
+          pollsStarted: true,
+        },
+      }));
+    }
+  }, [prefetch, thread, thread?.id, threadIdAndType]);
+
+  useEffect(() => {
+    if (!thread) {
+      return;
+    }
+
+    // load view count
+    if (!prefetch[threadIdAndType]['viewCountStarted']) {
+      $.post(`${app.serverUrl()}/viewCount`, {
+        chain: app.activeChainId(),
+        object_id: thread.id,
+      })
+        .then((response) => {
+          if (response.status !== 'Success') {
+            setViewCount(0);
+            throw new Error(`got unsuccessful status: ${response.status}`);
+          } else {
+            setViewCount(response.result.view_count);
+          }
+        })
+        .catch(() => {
+          setViewCount(0);
+          throw new Error('could not load view count');
+        });
+
+      setPrefetch((prevState) => ({
+        ...prevState,
+        [threadIdAndType]: {
+          ...prevState[threadIdAndType],
+          viewCountStarted: true,
+        },
+      }));
+    }
+  }, [prefetch, thread, thread?.id, threadIdAndType]);
+
+  useEffect(() => {
+    if (!thread) {
+      return;
+    }
+
+    // load profiles
+    if (!prefetch[threadIdAndType]['profilesStarted']) {
+      app.profiles.getProfile(thread.authorChain, thread.author);
+
+      comments.forEach((comment) => {
+        app.profiles.getProfile(comment.authorChain, comment.author);
+      });
+
+      app.profiles.isFetched.on('redraw', () => {
+        if (!prefetch[threadIdAndType]['profilesFinished']) {
+          setPrefetch((prevState) => ({
+            ...prevState,
+            [threadIdAndType]: {
+              ...prevState[threadIdAndType],
+              profilesFinished: true,
+            },
+          }));
+        }
+      });
+
+      setPrefetch((prevState) => ({
+        ...prevState,
+        [threadIdAndType]: {
+          ...prevState[threadIdAndType],
+          profilesStarted: true,
+        },
+      }));
+    }
+  }, [
+    comments,
+    prefetch,
+    thread,
+    thread?.author,
+    thread?.authorChain,
+    threadIdAndType,
+  ]);
+
+  useEffect(() => {
+    if (threadDoesNotMatch) {
+      setThread(undefined);
+      setRecentlyEdited(false);
+      setThreadFetched(false);
+    }
+  }, [threadDoesNotMatch]);
+
+  useEffect(() => {
+    if (comments?.length > 0) {
+      const mismatchedComments = comments.filter((c) => {
+        return c.rootProposal !== `${ProposalType.Thread}_${threadId}`;
+      });
+
+      if (mismatchedComments.length) {
+        setPrefetch((prevState) => ({
+          ...prevState,
+          [threadIdAndType]: {
+            ...prevState[threadIdAndType],
+            commentsStarted: false,
+          },
+        }));
+      }
+    }
+  }, [comments, threadId, threadIdAndType]);
+
+  if (typeof identifier !== 'string') {
+    return <PageNotFound />;
+  }
+
+  if (!app.chain?.meta) {
+    return <PageLoading />;
   }
 
   // load app controller
   if (!app.threads.initialized) {
-    console.log(2);
-    return (
-      <PageLoading
-      // title={headerTitle}
-      />
-    );
+    return <PageLoading />;
   }
 
-  const threadDoesNotMatch =
-    thread &&
-    (+thread.identifier !== +threadId || thread.slug !== ProposalType.Thread);
-
-  if (threadDoesNotMatch) {
-    setThread(undefined);
-    setRecentlyEdited(false);
-    setThreadFetched(false);
-  }
-
-  // load thread, and return PageLoading
-  if (!thread || recentlyEdited) {
-    try {
-      const _thread = idToProposal(ProposalType.Thread, threadId);
-      if (_thread === undefined) throw new Error();
-      setThread(_thread);
-    } catch (e) {
-      // proposal might be loading, if it's not an thread
-      if (!threadFetched) {
-        app.threads
-          .fetchThreadsFromId([+threadId])
-          .then((res) => {
-            setThread(res[0]);
-          })
-          .catch(() => {
-            notifyError('Thread not found');
-            setThreadFetchFailed(true);
-          });
-
-        setThreadFetched(true);
-      }
-    }
-    console.log(3);
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
-  }
-
-  if (recentlyEdited) {
-    setRecentlyEdited(false);
-    console.log(4);
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
-  }
-
-  if (identifier !== `${threadId}-${slugify(thread.title)}`) {
-    navigateToSubpage(
-      getProposalUrlPath(
-        thread.slug,
-        `${threadId}-${slugify(thread.title)}`,
-        true
-      ),
-      {},
-      { replace: true }
-    );
-  }
-
-  // load proposal
-  if (!prefetch[threadIdAndType]['threadReactionsStarted']) {
-    app.threads.fetchReactionsCount([thread]).then(() => setThread(thread));
-    setPrefetch({
-      ...prefetch,
-      [threadIdAndType]: {
-        ...prefetch[threadIdAndType],
-        threadReactionsStarted: true,
-      },
-    });
-    console.log(5);
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
-  }
-
-  // load comments
-  if (!prefetch[threadIdAndType]['commentsStarted']) {
-    app.comments
-      .refresh(thread, app.activeChainId())
-      .then(async () => {
-        // fetch comments
-        const _comments = app.comments
-          .getByProposal(thread)
-          .filter((c) => c.parentComment === null);
-        setComments(_comments);
-
-        // fetch reactions
-        const { result: reactionCounts } = await $.ajax({
-          type: 'POST',
-          url: `${app.serverUrl()}/reactionsCounts`,
-          headers: {
-            'content-type': 'application/json',
-          },
-          data: JSON.stringify({
-            proposal_ids: [threadId],
-            comment_ids: app.comments
-              .getByProposal(thread)
-              .map((comment) => comment.id),
-            active_address: app.user.activeAccount?.address,
-          }),
-        });
-
-        // app.reactionCounts.deinit()
-        for (const rc of reactionCounts) {
-          const id = app.reactionCounts.store.getIdentifier({
-            threadId: rc.thread_id,
-            proposalId: rc.proposal_id,
-            commentId: rc.comment_id,
-          });
-
-          app.reactionCounts.store.add(
-            modelReactionCountFromServer({ ...rc, id })
-          );
-        }
-      })
-      .catch(() => {
-        notifyError('Failed to load comments');
-        setComments([]);
-      });
-
-    setPrefetch({
-      ...prefetch,
-      [threadIdAndType]: {
-        ...prefetch[threadIdAndType],
-        commentsStarted: true,
-      },
-    });
-    console.log(6);
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
-  }
-
-  if (comments && comments.length > 0) {
-    const mismatchedComments = comments.filter((c) => {
-      return c.rootProposal !== `${ProposalType.Thread}_${threadId}`;
-    });
-
-    if (mismatchedComments.length) {
-      setPrefetch({
-        ...prefetch,
-        [threadIdAndType]: {
-          ...prefetch[threadIdAndType],
-          commentsStarted: false,
-        },
-      });
-      console.log(7);
-      return (
-        <PageLoading
-        //  title={headerTitle}
-        />
-      );
-    }
-  }
-
-  const updatedCommentsCallback = () => {
-    const _comments =
-      app.comments
-        .getByProposal(thread)
-        .filter((c) => c.parentComment === null) || [];
-    setComments(_comments);
-  };
-  if (!initializedComments) {
-    setInitializedComments(true);
-    updatedCommentsCallback();
-  }
-
-  // load polls
-  if (!prefetch[threadIdAndType]['pollsStarted']) {
-    app.polls.fetchPolls(app.activeChainId(), thread.id).catch(() => {
-      notifyError('Failed to load comments');
-      setComments([]);
-      setPolls(app.polls.getByThreadId(thread.id));
-    });
-
-    setPrefetch({
-      ...prefetch,
-      [threadIdAndType]: {
-        ...prefetch[threadIdAndType],
-        pollsStarted: true,
-      },
-    });
-  }
-  if (!initializedPolls) {
-    setInitializedPolls(true);
-    setPolls(app.polls.getByThreadId(thread.id));
-  }
-
-  // load view count
-  if (!prefetch[threadIdAndType]['viewCountStarted']) {
-    $.post(`${app.serverUrl()}/viewCount`, {
-      chain: app.activeChainId(),
-      object_id: thread.id,
-    })
-      .then((response) => {
-        if (response.status !== 'Success') {
-          setViewCount(0);
-          throw new Error(`got unsuccessful status: ${response.status}`);
-        } else {
-          setViewCount(response.result.view_count);
-        }
-      })
-      .catch(() => {
-        setViewCount(0);
-        throw new Error('could not load view count');
-      });
-
-    setPrefetch({
-      ...prefetch,
-      [threadIdAndType]: {
-        ...prefetch[threadIdAndType],
-        viewCountStarted: true,
-      },
-    });
-  }
-
-  if (comments === undefined || viewCount === undefined) {
-    console.log(8);
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
-  }
-
-  // load profiles
-  if (!prefetch[threadIdAndType]['profilesStarted']) {
-    app.profiles.getProfile(thread.authorChain, thread.author);
-
-    comments.forEach((comment) => {
-      app.profiles.getProfile(comment.authorChain, comment.author);
-    });
-
-    setPrefetch({
-      ...prefetch,
-      [threadIdAndType]: {
-        ...prefetch[threadIdAndType],
-        profilesStarted: true,
-      },
-    });
-    console.log(9);
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
+  if (threadFetchFailed) {
+    return <PageNotFound />;
   }
 
   if (
     !app.profiles.allLoaded() &&
     !prefetch[threadIdAndType]['profilesFinished']
   ) {
-    console.log(10);
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
+    return <PageLoading />;
   }
 
-  if (!prefetch[threadIdAndType]['profilesFinished']) {
-    setPrefetch({
-      ...prefetch,
-      [threadIdAndType]: {
-        ...prefetch[threadIdAndType],
-        profilesFinished: true,
-      },
-    });
-    console.log(11);
-    return (
-      <PageLoading
-      //  title={headerTitle}
-      />
-    );
+  if (!thread) {
+    return <PageLoading />;
   }
 
   const commentCount = app.comments.nComments(thread);
@@ -502,13 +480,10 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
 
                 if (savedEdits) {
                   clearEditingLocalStorage(thread.id, ContentType.Thread);
-                  setShouldRestoreEdits(
-                    await confirmationModalWithText(
-                      'Previous changes found. Restore edits?',
-                      'Yes',
-                      'No'
-                    )()
+                  const confirmation = window.confirm(
+                    'Previous changes found. Restore edits?'
                   );
+                  setShouldRestoreEdits(confirmation);
                 }
 
                 setIsGloballyEditing(true);
@@ -522,14 +497,8 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
             {
               label: 'Edit collaborators',
               iconLeft: 'write' as const,
-              onClick: async (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: EditCollaboratorsModal,
-                  data: {
-                    thread,
-                  },
-                });
+              onClick: () => {
+                setIsEditCollaboratorsModalOpen(true);
               },
             },
           ]
@@ -539,18 +508,8 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
             {
               label: 'Change topic',
               iconLeft: 'write' as const,
-              onClick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: ChangeTopicModal,
-                  data: {
-                    onChangeHandler: (topic: Topic) => {
-                      thread.topic = topic;
-                      setThread(thread);
-                    },
-                    thread,
-                  },
-                });
+              onClick: () => {
+                setIsChangeTopicModalOpen(true);
               },
             },
           ]
@@ -560,17 +519,13 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
             {
               label: 'Delete',
               iconLeft: 'trash' as const,
-              onClick: async (e) => {
-                e.preventDefault();
-
-                const confirmed = await confirmationModalWithText(
-                  'Delete this entire thread?'
-                )();
+              onClick: async () => {
+                const confirmed = window.confirm('Delete this entire thread?');
 
                 if (!confirmed) return;
 
                 app.threads.delete(thread).then(() => {
-                  navigateToSubpage('/discussions');
+                  navigate('/discussions');
                 });
               },
             },
@@ -581,8 +536,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
             {
               label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
               iconLeft: 'lock' as const,
-              onClick: (e) => {
-                e.preventDefault();
+              onClick: () => {
                 app.threads
                   .setPrivacy({
                     threadId: thread.id,
@@ -606,12 +560,9 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
                 const snapshotSpaces = app.chain.meta.snapshot;
 
                 if (snapshotSpaces.length > 1) {
-                  navigateToSubpage('/multiple-snapshots', {
-                    action: 'create-from-thread',
-                    thread,
-                  });
+                  navigate('/multiple-snapshots');
                 } else {
-                  navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+                  navigate(`/snapshot/${snapshotSpaces}`);
                 }
               },
             },
@@ -623,9 +574,7 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
   };
 
   return (
-    <Sublayout
-    //  title={headerTitle}
-    >
+    <Sublayout>
       <CWContentPage
         contentBodyLabel="Thread"
         showSidebar={
@@ -769,6 +718,34 @@ const ViewThreadPage: React.FC<ViewThreadPageAttrs> = ({ identifier }) => {
               : []),
           ] as SidebarComponents
         }
+      />
+      <Modal
+        content={
+          <ChangeTopicModal
+            onChangeHandler={(topic: Topic) => {
+              thread.topic = topic;
+              setThread(thread);
+            }}
+            thread={thread}
+            onModalClose={() => setIsChangeTopicModalOpen(false)}
+          />
+        }
+        onClose={() => setIsChangeTopicModalOpen(false)}
+        open={isChangeTopicModalOpen}
+      />
+      <Modal
+        content={
+          <EditCollaboratorsModal
+            onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
+            thread={thread}
+            onCollaboratorsUpdated={(newEditors: IThreadCollaborator[]) => {
+              thread.collaborators = newEditors;
+              setThread(thread);
+            }}
+          />
+        }
+        onClose={() => setIsEditCollaboratorsModalOpen(false)}
+        open={isEditCollaboratorsModalOpen}
       />
     </Sublayout>
   );

@@ -1,114 +1,98 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
-import { ProposalType } from 'common-common/src/types';
+import 'pages/view_proposal/proposal_header_links.scss';
 
+import { ProposalType } from 'common-common/src/types';
 import { externalLink, extractDomain, link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from 'models';
-
-import 'pages/view_proposal/proposal_header_links.scss';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
-type ProposalHeaderLinkAttrs = {
+type ProposalHeaderLinkProps = {
   proposal: AnyProposal;
 };
 
 // "View in Subscan"
-class BlockExplorerLinkComponent extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
-    const { proposal } = vnode.attrs;
+export const BlockExplorerLink = (props: ProposalHeaderLinkProps) => {
+  const { proposal } = props;
 
-    return (
-      <div className="HeaderLink">
-        {externalLink(
-          'a',
-          proposal['blockExplorerLink'],
-          [
-            proposal['blockExplorerLinkLabel'] ||
-              extractDomain(proposal['blockExplorerLink']),
-          ],
-          this.setRoute
-        )}
-        <CWIcon iconName="externalLink" iconSize="small" />
-      </div>
-    );
-  }
-}
+  const navigate = useCommonNavigate();
 
-export const BlockExplorerLink = withRouter(BlockExplorerLinkComponent);
+  return (
+    <div className="HeaderLink">
+      {externalLink(
+        'a',
+        proposal['blockExplorerLink'],
+        [
+          proposal['blockExplorerLinkLabel'] ||
+            extractDomain(proposal['blockExplorerLink']),
+        ],
+        navigate
+      )}
+      <CWIcon iconName="externalLink" iconSize="small" />
+    </div>
+  );
+};
 
 // "Vote on polkadot-js"
-class VotingInterfaceLinkComponent extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
-    const { proposal } = vnode.attrs;
+export const VotingInterfaceLink = (props: ProposalHeaderLinkProps) => {
+  const { proposal } = props;
 
-    return (
-      <div className="HeaderLink">
-        {externalLink(
-          'a',
-          proposal['votingInterfaceLink'],
-          [
-            proposal['votingInterfaceLinkLabel'] ||
-              extractDomain(proposal['votingInterfaceLink']),
-          ],
-          this.setRoute
-        )}
-        <CWIcon iconName="externalLink" iconSize="small" />
-      </div>
-    );
-  }
-}
+  const navigate = useCommonNavigate();
 
-export const VotingInterfaceLink = withRouter(VotingInterfaceLinkComponent);
+  return (
+    <div className="HeaderLink">
+      {externalLink(
+        'a',
+        proposal['votingInterfaceLink'],
+        [
+          proposal['votingInterfaceLinkLabel'] ||
+            extractDomain(proposal['votingInterfaceLink']),
+        ],
+        navigate
+      )}
+      <CWIcon iconName="externalLink" iconSize="small" />
+    </div>
+  );
+};
 
 // "Go to discussion"
-class ThreadLinkComponent extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
-    const { proposal } = vnode.attrs;
+export const ThreadLink = (props: ProposalHeaderLinkProps) => {
+  const { proposal } = props;
 
-    const path = getProposalUrlPath(
-      ProposalType.Thread,
-      `${proposal.threadId}`,
-      false,
-      proposal['chain']
-    );
+  const navigate = useCommonNavigate();
 
-    return (
-      <div className="HeaderLink">
-        {link('a', path, ['Go to discussion'], this.setRoute.bind(this))}
-        <CWIcon iconName="externalLink" iconSize="small" />
-      </div>
-    );
-  }
-}
+  const path = getProposalUrlPath(
+    ProposalType.Thread,
+    `${proposal.threadId}`,
+    false,
+    proposal['chain']
+  );
 
-export const ThreadLink = withRouter(ThreadLinkComponent);
+  return (
+    <div className="HeaderLink">
+      {link('a', path, ['Go to discussion'], navigate)}
+      <CWIcon iconName="externalLink" iconSize="small" />
+    </div>
+  );
+};
 
-type SnapshotThreadLinkAttrs = {
+type SnapshotThreadLinkProps = {
   thread: { id: string; title: string };
 };
 
-class SnapshotThreadLinkComponent extends ClassComponent<SnapshotThreadLinkAttrs> {
-  view(vnode: ResultNode<SnapshotThreadLinkAttrs>) {
-    const { id, title } = vnode.attrs.thread;
+export const SnapshotThreadLink = (props: SnapshotThreadLinkProps) => {
+  const { id, title } = props.thread;
 
-    const proposalLink = getProposalUrlPath(ProposalType.Thread, id);
+  const navigate = useCommonNavigate();
 
-    return (
-      <div className="HeaderLink">
-        {link(
-          'a',
-          proposalLink,
-          [decodeURIComponent(title)],
-          this.setRoute.bind(this)
-        )}
-        <CWIcon iconName="externalLink" iconSize="small" />
-      </div>
-    );
-  }
-}
+  const proposalLink = getProposalUrlPath(ProposalType.Thread, id, true);
 
-export const SnapshotThreadLink = withRouter(SnapshotThreadLinkComponent);
+  return (
+    <div className="HeaderLink">
+      {link('a', proposalLink, [decodeURIComponent(title)], navigate)}
+      <CWIcon iconName="externalLink" iconSize="small" />
+    </div>
+  );
+};

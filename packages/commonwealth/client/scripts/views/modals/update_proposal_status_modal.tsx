@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
@@ -23,17 +23,19 @@ type UpdateProposalStatusModalProps = {
   thread: Thread;
 };
 
-export const UpdateProposalStatusModal = (
-  props: UpdateProposalStatusModalProps
-) => {
-  const { onChangeHandler, onModalClose, thread } = props;
-
-  const [snapshotProposalsToSet, setSnapshotProposalsToSet] = React.useState<
+export const UpdateProposalStatusModal = ({
+  onChangeHandler,
+  onModalClose,
+  thread,
+}: UpdateProposalStatusModalProps) => {
+  const [snapshotProposalsToSet, setSnapshotProposalsToSet] = useState<
     Array<SnapshotProposal>
   >([]);
-  const [stage, setStage] = React.useState<ThreadStage>(thread.stage);
+  const [stage, setStage] = useState<ThreadStage>(thread.stage);
 
-  if (!app.chain?.meta) return;
+  if (!app.chain?.meta) {
+    return;
+  }
 
   const { customStages } = app.chain.meta;
 

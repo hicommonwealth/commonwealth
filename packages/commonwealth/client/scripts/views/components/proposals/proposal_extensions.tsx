@@ -31,8 +31,8 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
   } = props;
 
   React.useEffect(() => {
-    setDemocracyVoteAmount(0);
-    setCosmosDepositAmount(0);
+    if (setDemocracyVoteAmount) setDemocracyVoteAmount(0);
+    if (setCosmosDepositAmount) setCosmosDepositAmount(0);
   }, []);
 
   if (proposal instanceof SubstrateDemocracyReferendum) {

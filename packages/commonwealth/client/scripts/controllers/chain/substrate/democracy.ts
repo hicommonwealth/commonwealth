@@ -28,20 +28,8 @@ class SubstrateDemocracy extends ProposalModule<
     return this._enactmentPeriod;
   }
 
-  get cooloffPeriod() {
-    return this._cooloffPeriod;
-  }
-
   get votingPeriod() {
     return this._votingPeriod;
-  }
-
-  get emergencyVotingPeriod() {
-    return this._emergencyVotingPeriod;
-  }
-
-  get preimageByteDeposit() {
-    return this._preimageByteDeposit;
   }
 
   private _Chain: SubstrateChain;
@@ -109,81 +97,6 @@ class SubstrateDemocracy extends ProposalModule<
     this._initialized = true;
     this._initializing = false;
   }
-
-  public reapPreimage(author: SubstrateAccount, hash: string) {
-    // TODO: verify that hash corresponds to an actual preimage & is in a reap-able state
-    return this._Chain.createTXModalData(
-      author,
-      (api: ApiPromise) => (api.tx.democracy.reapPreimage as any)(hash),
-      'reapPreimage',
-      `Preimage hash: ${hash}`
-    );
-  }
-
-  /*
-  * Proxying and Delegation currently unsupported...
-  * If we decide to support them, we'll update the controllers.
-
-  public async setProxyTx(who: SubstrateAccount, proxy: SubstrateAccount) {
-    const proxyFor = await proxy.proxyFor.pipe(first()).toPromise();
-    if (proxyFor) {
-      throw new Error('already a proxy');
-    }
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) => api.tx.democracy.setProxy(proxy.address),
-      'setProxy',
-      `${who.address} sets proxy to ${proxy.address}`
-    );
-  }
-
-  public async resignProxyTx(who: SubstrateAccount) {
-    const proxyFor = await who.proxyFor.pipe(first()).toPromise();
-    if (proxyFor) {
-      throw new Error('not a proxy');
-    }
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) => api.tx.democracy.resignProxy(),
-      'resignProxy',
-      `${who.address} resigns as proxy`
-    );
-  }
-
-  public async removeProxyTx(who: SubstrateAccount, proxy: SubstrateAccount) {
-    const proxyFor = await proxy.proxyFor.pipe(first()).toPromise();
-    if (!proxyFor) {
-      throw new Error('not a proxy');
-    }
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) => api.tx.democracy.removeProxy(proxy.address),
-      'removeProxy',
-      `${who.address} removes proxy ${proxy.address}`
-    );
-  }
-
-  public delegateTx(who: SubstrateAccount, toAccount: SubstrateAccount, conviction: Conviction) {
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) => api.tx.democracy.delegate(toAccount.address, conviction),
-      'delegate',
-      `${who.address} delegates to ${toAccount.address}`
-    );
-  }
-
-  public undelegateTx(who: SubstrateAccount) {
-    if (!who.delegation) {
-      throw new Error('Account not delegated');
-    }
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) => api.tx.democracy.undelegate(),
-      'undelegate',
-      `undelegating ${who.address}`
-    );
-  }
-  */
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args): ITXModalData {

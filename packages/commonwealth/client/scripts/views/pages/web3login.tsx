@@ -2,7 +2,7 @@ import React from 'react';
 
 import { link } from 'helpers';
 
-import { getRouteParam, redraw } from 'mithrilInterop';
+import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/web3login.scss';
@@ -16,15 +16,15 @@ import { PageNotFound } from './404';
 import { PageLoading } from './loading';
 import { isNonEmptyString } from 'helpers/typeGuards';
 import { Modal } from '../components/component_kit/cw_modal';
-import { useNavigate } from 'react-router-dom';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const Web3LoginPage = () => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
   const [errorMsg, setErrorMsg] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-  const token = getRouteParam('connect');
+  const token = _DEPRECATED_getSearchParams('connect');
 
   if (app.isCustomDomain() || !token) {
     // hide page if invalid arguments or via custom domain
@@ -89,10 +89,10 @@ const Web3LoginPage = () => {
                 }
               }}
             />
-            {getRouteParam('prev')
+            {_DEPRECATED_getSearchParams('prev')
               ? link(
                   'a.web3login-go-home',
-                  getRouteParam('prev'),
+                  _DEPRECATED_getSearchParams('prev'),
                   'Go back',
                   navigate
                 )

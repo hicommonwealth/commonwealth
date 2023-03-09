@@ -47,26 +47,6 @@ export default class CompoundChain extends EthereumChain {
     super.deinitApi();
   }
 
-  public async priorDelegates(address: string, blockNumber: number | string) {
-    if (!this.compoundApi.Token) {
-      console.warn('No token found, cannot fetch prior delegates');
-      return new BN(0);
-    }
-    let delegates: BigNumber;
-    if (this.compoundApi.tokenType === GovernorTokenType.OzVotes) {
-      delegates = await (this.compoundApi.Token as ERC20Votes).getPastVotes(
-        address,
-        blockNumber
-      );
-    } else {
-      delegates = await this.compoundApi.Token.getPriorVotes(
-        address,
-        blockNumber
-      );
-    }
-    return new BN(delegates.toString(), 10) || new BN(0);
-  }
-
   public async balanceOf(address: string) {
     if (!this.compoundApi.Token) {
       console.warn('No token found, cannot fetch balance');
@@ -122,11 +102,6 @@ export default class CompoundChain extends EthereumChain {
       );
       return delegate;
     }
-  }
-
-  public async isHolder(address: string): Promise<boolean> {
-    const m = await this.balanceOf(address);
-    return !m.isZero();
   }
 
   public async isDelegate(address: string, block?: number): Promise<boolean> {

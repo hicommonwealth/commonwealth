@@ -4,66 +4,51 @@
   border-radius: $border-radius-corners;
   border: 1px solid $neutral-100;
   height: 208px;
-  overflow-y: hidden;
   width: 552px;
+  display: flex;
+  flex-direction: column;
 
-  .cui-control-group {
-    margin-bottom: 0;
+  .QueryList {
+    flex: 1;
   }
 
-  .cui-input input {
-    border-bottom-color: $neutral-100;
-    border-left: none;
-    border-radius: 0;
-    border-right: none;
-    border-top: none;
-    height: 40px;
-  }
-
-  .cui-list {
-    border-radius: $border-radius-corners;
-    height: 168px;
-
-    .cui-list-item {
-      height: 56px;
-      padding: 8px 16px !important;
-    }
-  }
-
-  .cui-query-list-checkmark .cui-list-item-content-left {
-    left: 0;
-    position: unset;
-  }
-
-  .chain-entity {
+  .proposal-item {
+    padding-block: 6px;
     display: flex;
-    flex-direction: column;
     font-size: 14px;
-    min-width: 0; // this ensures the title ellipsis will work
+    cursor: pointer;
 
-    .chain-entity-text {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    &:hover {
+      background-color: $neutral-100;
     }
 
-    .chain-entity-subtext {
-      color: $neutral-500;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .selected {
+      min-width: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      svg {
+        fill: $black;
+        width: 18px;
+      }
     }
-  }
 
-  .loading-container {
-    align-items: center;
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    width: 100%;
+    .text {
+      width: calc(100% - 50px);
 
-    .loading-text {
-      color: $neutral-600;
+      .proposal-item-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .proposal-item-subtext {
+        color: $neutral-500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
 }

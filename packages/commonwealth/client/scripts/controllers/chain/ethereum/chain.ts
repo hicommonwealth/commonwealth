@@ -51,15 +51,6 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   private _api: Web3;
   private _metadataInitialized = false;
-  private _totalbalance: EthereumCoin;
-
-  public get metadataInitialized() {
-    return this._metadataInitialized;
-  }
-
-  public get totalbalance() {
-    return this._totalbalance;
-  }
 
   public async _initApi(node: NodeInfo): Promise<Web3> {
     try {

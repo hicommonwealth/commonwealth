@@ -6,26 +6,19 @@
   flex-direction: column;
   gap: 16px;
 
-  // sticky header
-  // position: sticky;
-  // top: 0;
-  padding: 56px 0 16px;
+  padding: 56px 56px 24px;
 
   @include medium {
-    padding: 40px 0 16px;
+    padding: 40px 40px 16px;
   }
 
   @include mediumSmall {
-    padding: 32px 0 16px;
+    padding: 32px 32px 16px;
   }
 
   @include smallInclusive {
-    padding: 24px 0 16px;
+    padding: 24px 24px 16px;
   }
-
-  // .header-text.Text {
-  //   margin-bottom: 12px;
-  // }
 
   .header-row {
     display: flex;
@@ -44,7 +37,6 @@
 
   .subheader-text.Text {
     color: $neutral-600;
-    // margin-bottom: 32px;
   }
 
   .buttons-row {

@@ -31,13 +31,6 @@ export const enum MixpanelCommunityCreationEvent {
   CREATE_COMMUNITY_ATTEMPTED = 'Create Community Attempted',
 }
 
-export const enum MixpanelChatEvents {
-  NEW_CHAT_SENT = 'New Chat Sent',
-  CHAT_PAGE_VISIT = 'Chat Page Visit',
-  NEW_CHANNEL_CREATED = 'New Chat Channel Created',
-  CHANNEL_NAME_CHANGED = 'Chat Channel Name Changed',
-}
-
 export const enum MixpanelSnapshotEvents {
   SNAPSHOT_PAGE_VISIT = 'Snapshot Page Visited',
   SNAPSHOT_PROPOSAL_VIEWED = 'Snapshot Proposal Viewed',
@@ -50,7 +43,6 @@ export type MixpanelEvents =
   | MixpanelCommunityCreationEvent
   | MixpanelPageViewEvent
   | MixpanelCommunityInteractionEvent
-  | MixpanelChatEvents
   | MixpanelSnapshotEvents
   | MixpanelErrorCaptureEvent;
 
@@ -82,11 +74,6 @@ export interface MixpanelErrorCapturePayload extends BaseMixpanelPayload {
   message: string;
   community: string;
   event: MixpanelErrorCaptureEvent;
-}
-
-export interface MixpanelChatEventsPayload extends BaseMixpanelPayload {
-  community: string;
-  event: MixpanelChatEvents;
 }
 
 export interface MixpanelSnapshotEventsPayload extends BaseMixpanelPayload {

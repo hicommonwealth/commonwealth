@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { CWButton } from '../component_kit/cw_button';
 import { GovExplainer } from '../gov_explainer';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type SubstrateProposalStatsProps = { nextLaunchBlock: number };
 
@@ -25,10 +25,7 @@ export const SubstrateProposalStats = (props: SubstrateProposalStatsProps) => {
         {
           statHeading: 'Next proposal or motion becomes a referendum:',
           stat: nextLaunchBlock ? (
-            <CountdownUntilBlock
-              block={nextLaunchBlock}
-              includeSeconds={false}
-            />
+            <CountdownUntilBlock block={nextLaunchBlock} />
           ) : (
             '--'
           ),
@@ -42,6 +39,7 @@ type CompoundProposalStatsProps = { chain: Compound };
 
 export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
   const { chain } = props;
+  const navigate = useCommonNavigate();
 
   const symbol = chain.meta.default_symbol;
 
@@ -74,7 +72,7 @@ export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
       statAction={
         <CWButton
           buttonType="primary-blue"
-          onClick={() => navigateToSubpage('/new/proposal')}
+          onClick={() => navigate('/new/proposal')}
           label="New proposal"
         />
       }

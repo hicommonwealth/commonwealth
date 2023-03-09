@@ -2,7 +2,13 @@
 
 .Footer {
   margin-top: auto;
-  background-image: url('/static/img/footer.png');
+  background: linear-gradient(
+    92deg,
+    #fbfafd 0%,
+    #c4d0e6 50%,
+    #e7dee0 75%,
+    #c6d5dd 100%
+  );
   background-size: cover;
   display: flex;
   flex-wrap: wrap;

@@ -75,20 +75,8 @@ class CosmosGovernance extends ProposalModule<
   private _maxDepositPeriodS: number;
   private _minDeposit: CosmosToken;
 
-  public get votingPeriodNs() {
-    return this._votingPeriodS;
-  }
-
-  public get yesThreshold() {
-    return this._yesThreshold;
-  }
-
   public get vetoThreshold() {
     return this._vetoThreshold;
-  }
-
-  public get maxDepositPeriodNs() {
-    return this._maxDepositPeriodS;
   }
 
   public get minDeposit() {

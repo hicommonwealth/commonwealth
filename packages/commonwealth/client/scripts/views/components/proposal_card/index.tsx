@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { navigateToSubpage } from 'router';
 import { ProposalType } from 'common-common/src/types';
 
 import 'components/proposal_card/index.scss';
@@ -23,6 +22,7 @@ import {
   getStatusText,
 } from './helpers';
 import { ProposalTag } from './proposal_tag';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -31,6 +31,7 @@ type ProposalCardProps = {
 
 export const ProposalCard = (props: ProposalCardProps) => {
   const { proposal, injectedContent } = props;
+  const navigate = useCommonNavigate();
 
   const secondaryTagText = getSecondaryTagText(proposal);
 
@@ -52,7 +53,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
           true
         );
 
-        navigateToSubpage(path); // avoid resetting scroll point
+        navigate(path); // avoid resetting scroll point
       }}
     >
       <div className="proposal-card-metadata">
@@ -107,7 +108,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
               localStorage[`${app.activeChainId()}-proposals-scrollY`] =
                 window.scrollY;
 
-              navigateToSubpage(
+              navigate(
                 getProposalUrlPath(
                   ProposalType.Thread,
                   `${proposal.threadId}`,

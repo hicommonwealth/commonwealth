@@ -11,7 +11,7 @@ import {
 import type { NextFunction } from 'express';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
-import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+// import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
 
@@ -21,7 +21,7 @@ import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { mixpanelTrack } from '../util/mixpanelUtil';
+// import { mixpanelTrack } from '../util/mixpanelUtil';
 
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
@@ -460,12 +460,12 @@ const createChain = async (
   }
 
   if (process.env.NODE_ENV !== 'test') {
-    mixpanelTrack({
-      chainBase: req.body.base,
-      isCustomDomain: null,
-      communityType: null,
-      event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-    });
+    // mixpanelTrack({
+    //   chainBase: req.body.base,
+    //   isCustomDomain: null,
+    //   communityType: null,
+    //   event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+    // });
   }
 
   return success(res, {

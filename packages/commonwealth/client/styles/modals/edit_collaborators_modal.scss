@@ -12,20 +12,13 @@
     flex-direction: column;
     gap: 16px;
 
-    .cui-list {
-      border-radius: $border-radius-corners;
-      border: 1px solid $neutral-200;
-      height: 200px;
-
-      .cui-list-item {
-        height: 40px;
-        padding: 8px 8px 8px 40px;
-      }
-    }
-
-    .selected-collaborators-section {
+    .section {
       display: flex;
       flex-direction: column;
+
+      .TextInput {
+        margin-bottom: 8px;
+      }
 
       .collaborator-rows-container {
         border-radius: $border-radius-corners;
@@ -33,9 +26,8 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
-        height: 144px;
+        height: 140px;
         overflow-y: auto;
-        margin-top: 8px;
 
         @include visibleScrollbar(light);
 
@@ -53,18 +45,18 @@
           }
         }
       }
-    }
 
-    .no-collaborators {
-      align-items: center;
-      background-color: $neutral-100;
-      border-radius: $border-radius-corners;
-      display: flex;
-      height: 164px;
-      justify-content: center;
+      .no-collaborators {
+        align-items: center;
+        background-color: $neutral-100;
+        border-radius: $border-radius-corners;
+        display: flex;
+        justify-content: center;
+        height: 140px;
 
-      .no-collaborators-text.Text {
-        color: $neutral-500;
+        .no-collaborators-text.Text {
+          color: $neutral-500;
+        }
       }
     }
 

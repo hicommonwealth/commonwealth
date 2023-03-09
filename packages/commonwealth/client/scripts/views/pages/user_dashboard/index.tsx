@@ -1,23 +1,16 @@
 import React from 'react';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
-import _ from 'lodash';
-import { notifyInfo } from 'controllers/app/notifications';
-import $ from 'jquery';
-import { DashboardActivityNotification } from 'models';
-
 import 'pages/user_dashboard/index.scss';
 
 import app, { LoginState } from 'state';
+import { notifyInfo } from 'controllers/app/notifications';
+import { DashboardActivityNotification } from 'models';
 import Sublayout from 'views/sublayout';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWText } from '../../components/component_kit/cw_text';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
-import { fetchActivity, notificationsRemaining } from './helpers';
-import { UserDashboardRow } from './user_dashboard_row';
-import withRouter from 'navigation/helpers';
+import { fetchActivity } from './helpers';
+import { useCommonNavigate } from 'navigation/helpers';
+import { Feed } from '../../components/feed';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -25,297 +18,152 @@ export enum DashboardViews {
   Chain = 'Chain',
 }
 
-type UserDashboardAttrs = {
+type UserDashboardProps = {
   type?: string;
 };
 
-class UserDashboardComponent extends ClassComponent<UserDashboardAttrs> {
-  private activePage: DashboardViews;
-  private chainEventCount: number;
-  private chainEvents: DashboardActivityNotification[];
-  private fyCount: number;
-  private fyNotifications: DashboardActivityNotification[];
-  private globalCount: number;
-  private globalNotifications: DashboardActivityNotification[];
-  private loadingData: boolean;
-  private onScroll;
+const UserDashboard = (props: UserDashboardProps) => {
+  const { type } = props;
 
-  // Helper to load activity conditional on the selected tab
-  handleToggle = () => {
-    this.loadingData = false;
-    redraw();
-    const tab = this.activePage;
-    if (tab === DashboardViews.ForYou) {
-      if (this.fyNotifications && this.fyNotifications.length === 0)
-        this.loadingData = true;
-      fetchActivity(tab).then((activity) => {
-        this.fyNotifications = activity.result.map((notification) =>
-          DashboardActivityNotification.fromJSON(notification)
-        );
-        this.loadingData = false;
-        redraw();
-      });
-    } else if (tab === DashboardViews.Global) {
-      if (this.globalNotifications && this.globalNotifications.length === 0)
-        this.loadingData = true;
-      fetchActivity(tab).then((activity) => {
-        this.globalNotifications = activity.result.map((notification) =>
-          DashboardActivityNotification.fromJSON(notification)
-        );
-        this.loadingData = false;
-        redraw();
-      });
-    } else if (tab === DashboardViews.Chain) {
-      if (this.chainEvents && this.chainEvents.length === 0)
-        this.loadingData = true;
-      fetchActivity(tab).then((activity) => {
-        this.chainEvents = activity.result.map((notification) =>
-          DashboardActivityNotification.fromJSON(notification)
-        );
-        this.loadingData = false;
-        redraw();
-      });
-    }
-    this.activePage = tab;
-  };
+  const [activePage, setActivePage] = React.useState<DashboardViews>(
+    DashboardViews.Global
+  );
 
-  oninit() {
-    this.fyCount = 10;
-    this.globalCount = 10;
-    this.chainEventCount = 10;
-    this.loadingData = false;
-    this.fyNotifications = [];
-    this.globalNotifications = [];
-    this.chainEvents = [];
+  const navigate = useCommonNavigate();
+
+  const loggedIn = app.loginState === LoginState.LoggedIn;
+
+  if (!type) {
+    navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+  } else if (type === 'for-you' && !loggedIn) {
+    navigate('/dashboard/global');
   }
 
-  view(vnode: ResultNode<UserDashboardAttrs>) {
-    const {
-      activePage,
-      fyNotifications,
-      globalNotifications,
-      chainEvents,
-      loadingData,
-    } = this;
+  const subpage: DashboardViews =
+    type === 'chain-events'
+      ? DashboardViews.Chain
+      : type === 'global'
+      ? DashboardViews.Global
+      : loggedIn
+      ? DashboardViews.ForYou
+      : DashboardViews.Global;
 
-    // Load activity
-    const loggedIn = app.loginState === LoginState.LoggedIn;
-
-    if (!vnode.attrs.type) {
-      this.setRoute(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
-    } else if (vnode.attrs.type === 'for-you' && !loggedIn) {
-      this.setRoute('/dashboard/global');
+  React.useEffect(() => {
+    if (!activePage || activePage !== subpage) {
+      setActivePage(subpage);
     }
+  }, [activePage]);
 
-    const subpage: DashboardViews =
-      vnode.attrs.type === 'chain-events'
-        ? DashboardViews.Chain
-        : vnode.attrs.type === 'global'
-        ? DashboardViews.Global
-        : loggedIn
-        ? DashboardViews.ForYou
-        : DashboardViews.Global;
-
-    if (!this.activePage || this.activePage !== subpage) {
-      this.activePage = subpage;
-      this.handleToggle();
-    }
-
-    // Scroll
-    this.onScroll = _.debounce(async () => {
-      if (this.activePage === DashboardViews.ForYou) {
-        if (!notificationsRemaining(fyNotifications.length, this.fyCount))
-          return;
-        const scrollHeight = $(document).height();
-        const scrollPos = $(window).height() + $(window).scrollTop();
-        if (scrollPos > scrollHeight - 400) {
-          this.fyCount += 10;
-          redraw();
-        }
-      } else if (this.activePage === DashboardViews.Global) {
-        if (
-          !notificationsRemaining(globalNotifications.length, this.globalCount)
-        )
-          return;
-        const scrollHeight = $(document).height();
-        const scrollPos = $(window).height() + $(window).scrollTop();
-        if (scrollPos > scrollHeight - 400) {
-          this.globalCount += 10;
-          redraw();
-        }
-      } else {
-        if (!notificationsRemaining(chainEvents.length, this.chainEventCount))
-          return;
-        const scrollHeight = $(document).height();
-        const scrollPos = $(window).height() + $(window).scrollTop();
-        if (scrollPos > scrollHeight - 400) {
-          this.chainEventCount += 10;
-          redraw();
-        }
-      }
-    }, 400);
-
-    return (
-      <Sublayout onScroll={this.onScroll}>
-        <div className="UserDashboard">
-          <div className="dashboard-column">
-            <div className="dashboard-header">
-              <CWText type="h3" fontWeight="medium">
-                Home
-              </CWText>
-              <CWTabBar>
-                <CWTab
-                  label={DashboardViews.ForYou}
-                  isSelected={activePage === DashboardViews.ForYou}
-                  onClick={() => {
-                    if (!loggedIn) {
-                      notifyInfo(
-                        'Log in or create an account for custom activity feed'
-                      );
-                      return;
-                    }
-                    this.setRoute('/dashboard/for-you');
-                    redraw();
-                  }}
-                />
-                <CWTab
-                  label={DashboardViews.Global}
-                  isSelected={activePage === DashboardViews.Global}
-                  onClick={() => {
-                    this.setRoute('/dashboard/global');
-                    redraw();
-                  }}
-                />
-                <CWTab
-                  label={DashboardViews.Chain}
-                  isSelected={activePage === DashboardViews.Chain}
-                  onClick={() => {
-                    this.setRoute('/dashboard/chain-events');
-                    redraw();
-                  }}
-                />
-              </CWTabBar>
-            </div>
-            {loadingData && <CWSpinner />}
-            {!loadingData && (
-              <>
-                {/* TODO: add filter functionality */}
-                {/* <CWPopover
-                  trigger={
-                    <CWButton
-                      buttonType="mini-white"
-                      label="Filter"
-                      iconRight="chevronDown"
-                    />
+  return (
+    <Sublayout>
+      <div className="UserDashboard">
+        <div className="dashboard-column">
+          <div className="dashboard-header">
+            <CWTabBar>
+              <CWTab
+                label={DashboardViews.ForYou}
+                isSelected={activePage === DashboardViews.ForYou}
+                onClick={() => {
+                  if (!loggedIn) {
+                    notifyInfo(
+                      'Log in or create an account for custom activity feed'
+                    );
+                    return;
                   }
-                  content={
-                    <CWCard className="dashboard-filter-items">
-                      <CWCheckbox
-                        checked={false}
-                        value=""
-                        label="Threads"
-                        onchange={() => {
-                          // TODO: add filter functionality
-                        }}
-                      />
-                      <CWCheckbox
-                        checked={false}
-                        value=""
-                        label="Polls"
-                        onchange={() => {
-                          // TODO: add filter functionality
-                        }}
-                      />
-                      <CWCheckbox
-                        checked={false}
-                        value=""
-                        label="Proposals"
-                        onchange={() => {
-                          // TODO: add filter functionality
-                        }}
-                      />
-                      <CWCheckbox
-                        checked={false}
-                        value=""
-                        label="Crowdfunds"
-                        onchange={() => {
-                          // TODO: add filter functionality
-                        }}
-                      />
-                    </CWCard>
-                  }
-                />
-                <CWDivider /> */}
-                {activePage === DashboardViews.ForYou && (
-                  <>
-                    {fyNotifications && fyNotifications.length > 0 ? (
-                      <>
-                        {fyNotifications
-                          .slice(0, this.fyCount)
-                          .map((data, i) => (
-                            <UserDashboardRow key={i} notification={data} />
-                          ))}
-                        {notificationsRemaining(
-                          fyNotifications.length,
-                          this.fyCount
-                        ) && <CWSpinner />}
-                      </>
-                    ) : (
-                      <CWText>Join some communities to see Activity!</CWText>
-                    )}
-                  </>
-                )}
-                {activePage === DashboardViews.Global && [
-                  globalNotifications && globalNotifications.length > 0 ? (
-                    <>
-                      {globalNotifications
-                        .slice(0, this.globalCount)
-                        .map((data, i) => (
-                          <UserDashboardRow key={i} notification={data} />
-                        ))}
-                      {notificationsRemaining(
-                        globalNotifications.length,
-                        this.globalCount
-                      ) && <CWSpinner />}
-                    </>
-                  ) : (
-                    <CWText>No Activity</CWText>
-                  ),
-                ]}
-                {activePage === DashboardViews.Chain && (
-                  <>
-                    {chainEvents && chainEvents.length > 0 ? (
-                      <>
-                        {chainEvents
-                          .slice(0, this.chainEventCount)
-                          .map((data, i) => {
-                            return (
-                              <UserDashboardRow key={i} notification={data} />
-                            );
-                          })}
-                        {notificationsRemaining(
-                          chainEvents.length,
-                          this.chainEventCount
-                        ) && <CWSpinner />}
-                      </>
-                    ) : (
-                      <CWText>
-                        Join some communities that have governance to see Chain
-                        Events!
-                      </CWText>
-                    )}
-                  </>
-                )}
-              </>
-            )}
+                  navigate('/dashboard/for-you');
+                }}
+              />
+              <CWTab
+                label={DashboardViews.Global}
+                isSelected={activePage === DashboardViews.Global}
+                onClick={() => {
+                  navigate('/dashboard/global');
+                }}
+              />
+              <CWTab
+                label={DashboardViews.Chain}
+                isSelected={activePage === DashboardViews.Chain}
+                onClick={() => {
+                  navigate('/dashboard/chain-events');
+                }}
+              />
+            </CWTabBar>
           </div>
-          <DashboardCommunitiesPreview />
+          <>
+            {/* TODO: add filter functionality */}
+            {/* <CWPopover
+              trigger={
+                <CWButton
+                  buttonType="mini-white"
+                  label="Filter"
+                  iconRight="chevronDown"
+                />
+              }
+              content={
+                <CWCard className="dashboard-filter-items">
+                  <CWCheckbox
+                    checked={false}
+                    value=""
+                    label="Threads"
+                    onchange={() => {
+                      // TODO: add filter functionality
+                    }}
+                  />
+                  <CWCheckbox
+                    checked={false}
+                    value=""
+                    label="Polls"
+                    onchange={() => {
+                      // TODO: add filter functionality
+                    }}
+                  />
+                  <CWCheckbox
+                    checked={false}
+                    value=""
+                    label="Proposals"
+                    onchange={() => {
+                      // TODO: add filter functionality
+                    }}
+                  />
+                  <CWCheckbox
+                    checked={false}
+                    value=""
+                    label="Crowdfunds"
+                    onchange={() => {
+                      // TODO: add filter functionality
+                    }}
+                  />
+                </CWCard>
+              }
+            />
+            <CWDivider /> */}
+            {activePage === DashboardViews.ForYou && (
+              <Feed
+                fetchData={() => fetchActivity(activePage)}
+                noFeedMessage="Join some communities to see Activity!"
+                onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+              />
+            )}
+            {activePage === DashboardViews.Global && (
+              <Feed
+                fetchData={() => fetchActivity(activePage)}
+                noFeedMessage="No Activity"
+                onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+              />
+            )}
+            {activePage === DashboardViews.Chain && (
+              <Feed
+                fetchData={() => fetchActivity(activePage)}
+                noFeedMessage="Join some communities that have governance to see Chain Events!"
+                onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+              />
+            )}
+          </>
         </div>
-      </Sublayout>
-    );
-  }
-}
-
-const UserDashboard = withRouter(UserDashboardComponent);
+        <DashboardCommunitiesPreview />
+      </div>
+    </Sublayout>
+  );
+};
 
 export default UserDashboard;

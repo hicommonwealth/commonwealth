@@ -6,9 +6,11 @@
   flex-direction: column;
   gap: 16px;
   padding: 24px;
+  width: 100%;
 
   .notifications-buttons-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     width: 100%;
   }

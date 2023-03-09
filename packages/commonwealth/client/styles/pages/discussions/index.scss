@@ -8,21 +8,6 @@ $size: 48px;
   flex-direction: column;
   width: 100%;
 
-  // 0 padding on top for sticky header
-  padding: 0 56px 56px;
-
-  @include medium {
-    padding: 0 40px 40px;
-  }
-
-  @include mediumSmall {
-    padding: 0 32px 32px;
-  }
-
-  @include smallInclusive {
-    padding: 0 24px 24px;
-  }
-
   .no-threads-text.Text {
     color: $neutral-500;
   }
@@ -32,6 +17,7 @@ $size: 48px;
     flex-direction: column;
     padding: 0 0 24px;
     width: 100%;
+    height: 100%;
 
     .listing-scroll {
       align-items: center;

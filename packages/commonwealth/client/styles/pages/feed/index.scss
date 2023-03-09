@@ -1,9 +1,7 @@
 @import '../../shared';
 
 .FeedPage {
-  @include contentPadding;
-
-  .h3 {
-    margin-bottom: 16px;
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }

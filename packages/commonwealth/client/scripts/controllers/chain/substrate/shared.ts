@@ -69,14 +69,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   private _metadataInitialized = false;
-  public get metadataInitialized() {
-    return this._metadataInitialized;
-  }
 
   private _eventsInitialized = false;
-  public get eventsInitialized() {
-    return this._eventsInitialized;
-  }
 
   private _sudoKey: string;
   public get sudoKey() {
@@ -307,13 +301,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return args.toArray();
   }
 
-  public generateMethod(mod: string, func: string, args) {
-    if (!mod || !func) {
-      return null;
-    }
-    return this.api.tx[mod][func](...args);
-  }
-
   public getTxMethod(mod: string, func: string, args: any[]): Call {
     const result = this.api.tx[mod][func];
     if (!result) {
@@ -378,15 +365,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     }
     if (!this._silencedEvents[moduleName][eventName]) {
       this._silencedEvents[moduleName][eventName] = true;
-    }
-  }
-
-  public unsilenceEvent(moduleName: string, eventName: string) {
-    if (
-      this._silencedEvents[moduleName] &&
-      this._silencedEvents[moduleName][eventName]
-    ) {
-      delete this._silencedEvents[moduleName][eventName];
     }
   }
 
@@ -466,33 +444,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // TODO: refactor fee computation into a more standard form that can be used throughout
   //   and shown at TX creation time
-  public async canPayFee(
-    sender: SubstrateAccount,
-    txFunc: (api: ApiPromise) => SubmittableExtrinsic<'promise'>,
-    additionalDeposit?: SubstrateCoin
-  ): Promise<boolean> {
-    const senderBalance = await sender.freeBalance;
-    const netBalance = additionalDeposit
-      ? senderBalance.sub(additionalDeposit)
-      : senderBalance;
-    let fees: SubstrateCoin;
-    if (sender.chain.network === ChainNetwork.Edgeware) {
-      // XXX: we cannot compute tx fees on edgeware yet, so we are forced to assume no fees
-      //   besides explicit additional fees
-      fees = additionalDeposit || this.coins(0);
-    } else {
-      fees = await this.computeFees(sender.address, txFunc);
-    }
-    console.log(
-      `sender free balance: ${senderBalance.format(
-        true
-      )}, tx fees: ${fees.format(true)}, ` +
-        `additional deposit: ${
-          additionalDeposit ? additionalDeposit.format(true) : 'N/A'
-        }`
-    );
-    return netBalance.gte(fees);
-  }
 
   public async computeFees(
     senderAddress: string,
@@ -651,20 +602,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       (prev, curr, idx) => prev + (idx > 0 ? ', ' : '') + curr,
       ''
     )})`;
-  }
-
-  public get currentEra(): Promise<EraIndex> {
-    return this.api.query.staking.currentEra<EraIndex>();
-  }
-
-  public get activeEra(): Promise<ActiveEraInfo> {
-    if (this.api.query.staking.activeEra) {
-      return this.api.query.staking
-        .activeEra()
-        .then((eraOpt) => eraOpt.unwrapOr(null));
-    } else {
-      return Promise.resolve(null);
-    }
   }
 
   public get session(): Promise<SessionIndex> {

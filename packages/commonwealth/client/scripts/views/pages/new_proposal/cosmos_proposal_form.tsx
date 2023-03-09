@@ -1,9 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
-import { ClassComponent } from 'mithrilInterop';
-import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
-
-import { navigateToSubpage } from 'router';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -16,119 +13,118 @@ import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { useCommonNavigate } from 'navigation/helpers';
 
-export class CosmosProposalForm extends ClassComponent {
-  private cosmosProposalType: 'textProposal' | 'communitySpend';
-  private deposit: number;
-  private description: string;
-  private payoutAmount: string;
-  private recipient: string;
-  private title: string;
+export const CosmosProposalForm = () => {
+  const [cosmosProposalType, setCosmosProposalType] = useState<
+    'textProposal' | 'communitySpend'
+  >('textProposal');
+  const [deposit, setDeposit] = useState<number | undefined>();
+  const [description, setDescription] = useState();
+  const [payoutAmount, setPayoutAmount] = useState();
+  const [recipient, setRecipient] = useState();
+  const [title, setTitle] = useState();
 
-  oninit() {
-    this.cosmosProposalType = 'textProposal';
-  }
+  const navigate = useCommonNavigate();
 
-  view() {
-    const author = app.user.activeAccount as CosmosAccount;
-    const cosmos = app.chain as Cosmos;
+  const author = app.user.activeAccount as CosmosAccount;
+  const cosmos = app.chain as Cosmos;
 
-    return !cosmos.governance.initialized ? (
-      <CWSpinner />
-    ) : (
-      <>
-        <CWLabel label="Proposal Type" />
-        <CWRadioGroup
-          name="cosmos-proposal-type"
-          onChange={(value) => {
-            this.cosmosProposalType = value;
-          }}
-          toggledOption="textProposal"
-          options={[
-            { label: 'Text Proposal', value: 'textProposal' },
-            { label: 'Community Spend', value: 'communitySpend' },
-          ]}
-        />
+  return !cosmos.governance.initialized ? (
+    <CWSpinner />
+  ) : (
+    <>
+      <CWLabel label="Proposal Type" />
+      <CWRadioGroup
+        name="cosmos-proposal-type"
+        onChange={(value) => {
+          setCosmosProposalType(value);
+        }}
+        toggledOption="textProposal"
+        options={[
+          { label: 'Text Proposal', value: 'textProposal' },
+          { label: 'Community Spend', value: 'communitySpend' },
+        ]}
+      />
+      <CWTextInput
+        placeholder="Enter a title"
+        label="Title"
+        onInput={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <CWTextArea
+        label="Description"
+        placeholder="Enter a description"
+        onInput={(e) => {
+          setDescription(e.target.value);
+        }}
+      />
+      <CWTextInput
+        label={`Deposit (${cosmos.governance.minDeposit.denom})`}
+        placeholder={`Min: ${+cosmos.governance.minDeposit}`}
+        defaultValue={+cosmos.governance.minDeposit}
+        onInput={(e) => {
+          setDeposit(+e.target.value);
+        }}
+      />
+      {cosmosProposalType !== 'textProposal' && (
         <CWTextInput
-          placeholder="Enter a title"
-          label="Title"
+          label="Recipient"
+          placeholder={app.user.activeAccount.address}
+          defaultValue=""
           onInput={(e) => {
-            this.title = e.target.value;
+            setRecipient(e.target.value);
           }}
         />
-        <CWTextArea
-          label="Description"
-          placeholder="Enter a description"
-          onInput={(e) => {
-            this.description = e.target.value;
-          }}
-        />
+      )}
+      {cosmosProposalType !== 'textProposal' && (
         <CWTextInput
-          label={`Deposit (${cosmos.governance.minDeposit.denom})`}
-          placeholder={`Min: ${+cosmos.governance.minDeposit}`}
-          defaultValue={+cosmos.governance.minDeposit}
+          label={`Amount (${cosmos.governance.minDeposit.denom})`}
+          placeholder="12345"
+          defaultValue=""
           onInput={(e) => {
-            this.deposit = +e.target.value;
+            setPayoutAmount(e.target.value);
           }}
         />
-        {this.cosmosProposalType !== 'textProposal' && (
-          <CWTextInput
-            label="Recipient"
-            placeholder={app.user.activeAccount.address}
-            defaultValue=""
-            onInput={(e) => {
-              this.recipient = e.target.value;
-            }}
-          />
-        )}
-        {this.cosmosProposalType !== 'textProposal' && (
-          <CWTextInput
-            label={`Amount (${cosmos.governance.minDeposit.denom})`}
-            placeholder="12345"
-            defaultValue=""
-            onInput={(e) => {
-              this.payoutAmount = e.target.value;
-            }}
-          />
-        )}
-        <CWButton
-          label="Send transaction"
-          onClick={(e) => {
-            e.preventDefault();
+      )}
+      <CWButton
+        label="Send transaction"
+        onClick={(e) => {
+          e.preventDefault();
 
-            let prop: ProtobufAny;
+          let prop: ProtobufAny;
 
-            const { title, description } = this;
+          const _deposit = deposit
+            ? new CosmosToken(
+                cosmos.governance.minDeposit.denom,
+                deposit,
+                false
+              )
+            : cosmos.governance.minDeposit;
 
-            const deposit = this.deposit
-              ? new CosmosToken(
-                  cosmos.governance.minDeposit.denom,
-                  this.deposit,
-                  false
-                )
-              : cosmos.governance.minDeposit;
-            if (this.cosmosProposalType === 'textProposal') {
-              prop = cosmos.governance.encodeTextProposal(title, description);
-            } else if (this.cosmosProposalType === 'communitySpend') {
-              prop = cosmos.governance.encodeCommunitySpend(
-                title,
-                description,
-                this.recipient,
-                this.payoutAmount
-              );
-            } else {
-              throw new Error('Unknown Cosmos proposal type.');
-            }
-            // TODO: add disabled / loading
-            cosmos.governance
-              .submitProposalTx(author, deposit, prop)
-              .then((result) => {
-                navigateToSubpage(`/proposal/${result}`);
-              })
-              .catch((err) => notifyError(err.message));
-          }}
-        />
-      </>
-    );
-  }
-}
+          if (cosmosProposalType === 'textProposal') {
+            prop = cosmos.governance.encodeTextProposal(title, description);
+          } else if (cosmosProposalType === 'communitySpend') {
+            prop = cosmos.governance.encodeCommunitySpend(
+              title,
+              description,
+              recipient,
+              payoutAmount
+            );
+          } else {
+            throw new Error('Unknown Cosmos proposal type.');
+          }
+
+          // TODO: add disabled / loading
+          cosmos.governance
+            .submitProposalTx(author, _deposit, prop)
+            .then((result) => {
+              navigate(`/proposal/${result}`);
+            })
+            .catch((err) => notifyError(err.message));
+        }}
+      />
+    </>
+  );
+};

@@ -4,8 +4,7 @@ import 'footer.scss';
 import m from 'mithril';
 
 import { isNotUndefined } from '../helpers/typeGuards';
-import withRouter from 'navigation/helpers';
-import { navigateToSubpage } from '../router';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },
@@ -27,9 +26,11 @@ const footercontents = [
   },
 ];
 
-const FooterComponent = () => {
+export const Footer = () => {
+  const navigate = useCommonNavigate();
+
   const redirectClick = (route) => {
-    navigateToSubpage(route);
+    navigate(route, {}, null);
   };
 
   return (
@@ -63,5 +64,3 @@ const FooterComponent = () => {
     </div>
   );
 };
-
-export const Footer = withRouter(FooterComponent);

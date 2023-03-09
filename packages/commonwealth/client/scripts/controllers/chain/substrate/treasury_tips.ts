@@ -88,23 +88,6 @@ class SubstrateTreasuryTips extends ProposalModule<
       `reportAwesome(${formatAddressShort(who.address)}`
     );
   }
-
-  public createTxAsTipper(
-    author: SubstrateAccount,
-    reason: string,
-    who: SubstrateAccount,
-    value: SubstrateCoin
-  ) {
-    if (!this.isMember(author)) {
-      throw new Error('Must be tipper to call tipNew.');
-    }
-    return this._Chain.createTXModalData(
-      author,
-      (api: ApiPromise) => api.tx.tips.tipNew(reason, who.address, value.asBN),
-      'tipNew',
-      `tipNew(${formatAddressShort(who.address)}`
-    );
-  }
 }
 
 export default SubstrateTreasuryTips;

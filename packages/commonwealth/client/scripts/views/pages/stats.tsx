@@ -1,6 +1,5 @@
-import React from 'react';
-
-import $ from 'jquery';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import 'pages/stats.scss';
 
@@ -10,114 +9,125 @@ import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CWText } from '../components/component_kit/cw_text';
 
+type Batchable = {
+  date: string;
+  new_items: string;
+};
+
+type Batchables = {
+  activeAccounts: Array<Batchable>;
+  comments: Array<Batchable>;
+  roles: Array<Batchable>;
+  threads: Array<Batchable>;
+};
+
+type TotalDataType = {
+  totalComments: number;
+  totalRoles: number;
+  totalThreads: number;
+};
+
+type Batched = {
+  day: number;
+  month: number;
+  twoWeek: number;
+  week: number;
+};
+
+type BatchedDataType = {
+  batchedActiveAccounts: Batched;
+  batchedComments: Batched;
+  batchedRoles: Batched;
+  batchedThreads: Batched;
+};
+
+const getBatched = ({
+  activeAccounts,
+  comments,
+  roles,
+  threads,
+}: Batchables) => {
+  const batchedComments = {};
+  const batchedRoles = {};
+  const batchedThreads = {};
+  const batchedActiveAccounts = {};
+  const c = comments.map((a) => Number(a.new_items));
+  const r = roles.map((a) => Number(a.new_items));
+  const t = threads.map((a) => Number(a.new_items));
+  const aa = activeAccounts.map((a) => Number(a.new_items));
+
+  // Comments
+  batchedComments['day'] = c.slice(0, 1).reduce((a, b) => a + b, 0);
+  batchedComments['week'] = c.slice(0, 7).reduce((a, b) => a + b, 0);
+  batchedComments['twoWeek'] = c.slice(0, 14).reduce((a, b) => a + b, 0);
+  batchedComments['month'] = c.slice(0, 28).reduce((a, b) => a + b, 0);
+
+  // Roles
+  batchedRoles['day'] = r.slice(0, 1).reduce((a, b) => a + b, 0);
+  batchedRoles['week'] = r.slice(0, 7).reduce((a, b) => a + b, 0);
+  batchedRoles['twoWeek'] = r.slice(0, 14).reduce((a, b) => a + b, 0);
+  batchedRoles['month'] = r.slice(0, 28).reduce((a, b) => a + b, 0);
+
+  // Threads
+  batchedThreads['day'] = t.slice(0, 1).reduce((a, b) => a + b, 0);
+  batchedThreads['week'] = t.slice(0, 7).reduce((a, b) => a + b, 0);
+  batchedThreads['twoWeek'] = t.slice(0, 14).reduce((a, b) => a + b, 0);
+  batchedThreads['month'] = t.slice(0, 28).reduce((a, b) => a + b, 0);
+
+  // Active Accounts
+  batchedActiveAccounts['day'] = aa.slice(0, 1).reduce((a, b) => a + b, 0);
+  batchedActiveAccounts['week'] = aa.slice(0, 7).reduce((a, b) => a + b, 0);
+  batchedActiveAccounts['twoWeek'] = aa.slice(0, 14).reduce((a, b) => a + b, 0);
+  batchedActiveAccounts['month'] = aa.slice(0, 28).reduce((a, b) => a + b, 0);
+
+  return {
+    batchedRoles,
+    batchedComments,
+    batchedThreads,
+    batchedActiveAccounts,
+  } as BatchedDataType;
+};
+
 const StatsPage = () => {
-  const [data, setData] = React.useState<any>();
-  const [batchedData, setBatchedData] = React.useState<any>();
-  const [totalData, setTotalData] = React.useState<any>();
-  const [error, setError] = React.useState<string>();
-  const [requested, setRequested] = React.useState<boolean>(false);
+  const [batchedData, setBatchedData] = useState<BatchedDataType>();
+  const [totalData, setTotalData] = useState<TotalDataType>();
+  const [error, setError] = useState('');
 
-  if (!requested && app.user && app.activeChainId()) {
-    setRequested(true);
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const response = await axios.get(`${app.serverUrl()}/communityStats`, {
+          params: {
+            chain: app.activeChainId(),
+            jwt: app.user?.jwt,
+          },
+        });
 
-    $.get(`${app.serverUrl()}/communityStats`, {
-      chain: app.activeChainId(),
-      jwt: app.user?.jwt,
-    })
-      .then(({ status, result }) => {
-        if (status !== 'Success') {
-          setError('Error loading stats');
-        } else {
-          setTotalData({
-            totalComments: +result.totalComments[0].new_items,
-            totalRoles: +result.totalRoles[0].new_items,
-            totalThreads: +result.totalThreads[0].new_items,
-          });
+        const {
+          comments,
+          roles,
+          threads,
+          activeAccounts,
+          totalComments,
+          totalRoles,
+          totalThreads,
+        } = response.data.result;
 
-          const { comments, roles, threads, activeAccounts } = result;
-          const batchedComments = {};
-          const batchedRoles = {};
-          const batchedThreads = {};
-          const batchedActiveAccounts = {};
-          const c = comments.map((a) => Number(a.new_items));
-          const r = roles.map((a) => Number(a.new_items));
-          const t = threads.map((a) => Number(a.new_items));
-          const aa = activeAccounts.map((a) => Number(a.new_items));
+        setTotalData({
+          totalComments: +totalComments[0].new_items,
+          totalRoles: +totalRoles[0].new_items,
+          totalThreads: +totalThreads[0].new_items,
+        });
 
-          // Comments
-          batchedComments['day'] = c.slice(0, 1).reduce((a, b) => a + b, 0);
-          batchedComments['week'] = c.slice(0, 7).reduce((a, b) => a + b, 0);
-          batchedComments['2week'] = c.slice(0, 14).reduce((a, b) => a + b, 0);
-          batchedComments['month'] = c.slice(0, 28).reduce((a, b) => a + b, 0);
-
-          // Roles
-          batchedRoles['day'] = r.slice(0, 1).reduce((a, b) => a + b, 0);
-          batchedRoles['week'] = r.slice(0, 7).reduce((a, b) => a + b, 0);
-          batchedRoles['2week'] = r.slice(0, 14).reduce((a, b) => a + b, 0);
-          batchedRoles['month'] = r.slice(0, 28).reduce((a, b) => a + b, 0);
-
-          // Threads
-          batchedThreads['day'] = t.slice(0, 1).reduce((a, b) => a + b, 0);
-          batchedThreads['week'] = t.slice(0, 7).reduce((a, b) => a + b, 0);
-          batchedThreads['2week'] = t.slice(0, 14).reduce((a, b) => a + b, 0);
-          batchedThreads['month'] = t.slice(0, 28).reduce((a, b) => a + b, 0);
-
-          // Active Accounts
-          batchedActiveAccounts['day'] = aa
-            .slice(0, 1)
-            .reduce((a, b) => a + b, 0);
-          batchedActiveAccounts['week'] = aa
-            .slice(0, 7)
-            .reduce((a, b) => a + b, 0);
-          batchedActiveAccounts['2week'] = aa
-            .slice(0, 14)
-            .reduce((a, b) => a + b, 0);
-          batchedActiveAccounts['month'] = aa
-            .slice(0, 28)
-            .reduce((a, b) => a + b, 0);
-
-          setBatchedData({
-            batchedRoles,
-            batchedComments,
-            batchedThreads,
-            batchedActiveAccounts,
-          });
-
-          result.comments.forEach(({ date, new_items }) => {
-            if (data[date]) {
-              setData[date].comments = new_items;
-            } else {
-              setData[date] = { comments: new_items };
-            }
-          });
-
-          result.roles.forEach(({ date, new_items }) => {
-            if (data[date]) {
-              setData[date].roles = new_items;
-            } else {
-              setData[date] = { roles: new_items };
-            }
-          });
-
-          result.threads.forEach(({ date, new_items }) => {
-            if (data[date]) {
-              setData[date].threads = new_items;
-            } else {
-              setData[date] = { threads: new_items };
-            }
-          });
-
-          (result.activeAccounts || []).forEach(({ date, new_items }) => {
-            if (data[date]) {
-              setData[date].activeAccounts = new_items;
-            } else {
-              setData[date] = { activeAccounts: new_items };
-            }
-          });
-        }
-      })
-      .catch((err: any) => {
-        console.log(error);
+        setBatchedData(
+          getBatched({
+            comments,
+            roles,
+            threads,
+            activeAccounts,
+          })
+        );
+      } catch (err) {
         if (err.responseJSON?.error) {
           setError(err.responseJSON.error);
         } else if (err.responseText) {
@@ -125,13 +135,19 @@ const StatsPage = () => {
         } else {
           setError('Error loading analytics');
         }
-      });
-  }
+      }
+    };
 
-  if (!requested || (!error && !data))
+    if (app.user && app.activeChainId()) {
+      fetch();
+    }
+  }, []);
+
+  if (!batchedData) {
     return <PageLoading message="Loading analytics" />;
-
-  if (error) return <ErrorPage message={error} />;
+  } else if (error) {
+    return <ErrorPage message={error} />;
+  }
 
   const {
     batchedRoles,
@@ -139,6 +155,7 @@ const StatsPage = () => {
     batchedThreads,
     batchedActiveAccounts,
   } = batchedData;
+
   return (
     <Sublayout>
       <div className="StatsPage">
@@ -165,10 +182,10 @@ const StatsPage = () => {
         </div>
         <div className="stat-row">
           <CWText>2 weeks</CWText>
-          <CWText>{batchedRoles['2week']}</CWText>
-          <CWText>{batchedComments['2week']}</CWText>
-          <CWText>{batchedThreads['2week']}</CWText>
-          <CWText>{batchedActiveAccounts['2week']}</CWText>
+          <CWText>{batchedRoles['twoWeek']}</CWText>
+          <CWText>{batchedComments['twoWeek']}</CWText>
+          <CWText>{batchedThreads['twoWeek']}</CWText>
+          <CWText>{batchedActiveAccounts['twoWeek']}</CWText>
         </div>
         <div className="stat-row">
           <CWText>1 month</CWText>

@@ -1,13 +1,13 @@
 import React from 'react';
-
-import _ from 'lodash';
 import moment from 'moment';
+import _ from 'lodash';
 
 import 'pages/notifications/notification_row.scss';
 
-import app from 'state';
-import { IPostNotificationData } from 'types';
+import type { IPostNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
+
+import app from 'state';
 import { AddressInfo } from 'models';
 import { pluralize } from 'helpers';
 import { User } from 'views/components/user/user';
@@ -60,9 +60,7 @@ const getCommentPreview = (commentText) => {
 
     if (!doc.ops) throw new Error();
 
-    decodedCommentText = (
-      <QuillFormattedText doc={doc} hideFormatting collapse />
-    );
+    decodedCommentText = <QuillFormattedText doc={doc} hideFormatting />;
   } catch (e) {
     // TODO Graham 22-6-5: What does this do? How can we simplify to use helper?
     let doc = decodeURIComponent(commentText);

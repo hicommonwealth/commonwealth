@@ -20,7 +20,7 @@ import { ApiStatus } from 'state';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import { redraw, dangerouslySetRoute } from 'mithrilInterop';
+import { redraw, _DEPRECATED_dangerouslySetRoute } from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;
@@ -209,58 +209,6 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     return daoInfos.filter((d) => !!d);
   }
 
-  public async createDaoTx(
-    creator: NearAccount,
-    name: string,
-    purpose: string,
-    value: BN
-  ): Promise<void> {
-    const contractId = this.isMainnet ? 'sputnik2.near' : 'sputnikv2.testnet';
-    const methodName = 'create';
-    const pk = this.isMainnet
-      ? '2gtDEwdLuUBawzFLAnCS9gUso3Ph76bRzMpVrtb66f3J'
-      : 'G8JpvUhKqfr89puEKgbBqUxQzCMfJfPSRvKw4EJoiZpZ';
-
-    const argsList = {
-      config: {
-        name,
-        purpose,
-        metadata: '',
-      },
-      // TODO: add far more configuration for initial policy
-      // initial council
-      policy: [creator.address],
-    };
-    const attachedDeposit = this.coins(value, true).asBN.toString();
-    const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
-    const propArgs = {
-      name,
-      public_key: pk,
-      args,
-    };
-
-    // redirect back to /finishNearLogin for chain node creation
-    const id = this.isMainnet
-      ? `${name}.sputnik-dao.near`
-      : `${name}.sputnikv2.testnet`;
-    let redirectUrl: string;
-    if (!this.app.isCustomDomain()) {
-      redirectUrl = `${
-        window.location.origin
-      }/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
-    } else {
-      redirectUrl = `${window.location.origin}/finishNearLogin?chain_name=${id}`;
-    }
-    await this.redirectTx(
-      contractId,
-      methodName,
-      propArgs,
-      attachedDeposit,
-      redirectUrl,
-      '150000000000000'
-    );
-  }
-
   public async redirectTx(
     contractId: string,
     methodName: string,
@@ -331,7 +279,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         failureUrl,
       });
     } else {
-      dangerouslySetRoute(successUrl);
+      _DEPRECATED_dangerouslySetRoute(successUrl);
     }
   }
 

@@ -11,10 +11,6 @@ import CompoundProposal, {
   BravoVote,
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import MolochProposal, {
-  MolochProposalState,
-  MolochVote,
-} from 'controllers/chain/ethereum/moloch/proposal';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
   NearSputnikProposalStatus,
@@ -79,18 +75,7 @@ export const cancelProposal = (
   e.preventDefault();
   toggleVotingModal(true);
 
-  if (proposal instanceof MolochProposal) {
-    proposal
-      .abortTx()
-      .then(() => {
-        onModalClose();
-        redraw();
-      })
-      .catch((err) => {
-        onModalClose();
-        console.error(err.toString());
-      });
-  } else if (proposal instanceof CompoundProposal) {
+  if (proposal instanceof CompoundProposal) {
     proposal
       .cancelTx()
       .then(() => {
@@ -129,11 +114,6 @@ export const getCanVote = (
   } else if (
     proposal.isPassing !== ProposalStatus.Passing &&
     proposal.isPassing !== ProposalStatus.Failing
-  ) {
-    canVote = false;
-  } else if (
-    proposal instanceof MolochProposal &&
-    proposal.state !== MolochProposalState.Voting
   ) {
     canVote = false;
   } else if (
@@ -209,26 +189,6 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .filter(
           (vote) =>
             vote.choice === 'NoWithVeto' &&
-            vote.account.address === user.address
-        ).length > 0;
-  } else if (proposal instanceof MolochProposal) {
-    hasVotedYes =
-      user &&
-      proposal
-        .getVotes()
-        .filter(
-          (vote) =>
-            vote.choice === MolochVote.YES &&
-            vote.account.address === user.address
-        ).length > 0;
-
-    hasVotedNo =
-      user &&
-      proposal
-        .getVotes()
-        .filter(
-          (vote) =>
-            vote.choice === MolochVote.NO &&
             vote.account.address === user.address
         ).length > 0;
   } else if (proposal instanceof CompoundProposal) {

@@ -21,7 +21,7 @@ export const pathIsDiscussion = (
 export const getProposalUrlPath = (
   type: ProposalType,
   id: string,
-  omitActiveId = false,
+  omitActiveId = true,
   chainId?: string
 ): string => {
   let basePath: string;

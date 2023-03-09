@@ -17,7 +17,7 @@ export type LoginBodyType =
   | 'walletList'
   | 'welcome';
 
-export type LoginAttrs = {
+export type LoginProps = {
   address: string;
   currentlyInCommunityPage: boolean;
   bodyType: LoginBodyType;
@@ -27,9 +27,9 @@ export type LoginAttrs = {
   wallets: Array<IWebWallet<any>>;
   magicLoading: boolean;
   setAddress: (address: string) => void;
-  setBodyType: (bodyType: string) => void;
+  setBodyType: (bodyType: LoginBodyType) => void;
   handleEmailLoginCallback: () => void;
-  handleSetAvatar: (url: string) => void;
+  handleSetAvatar: (avatarUrl: string) => void;
   handleSetUsername: (username: string) => void;
   handleSetEmail: (e: any) => void;
   setProfiles: (profiles: Array<ProfileRowProps>) => void;

@@ -73,25 +73,8 @@ export class SubstrateTreasuryTip extends Proposal<
   }
 
   private _retracted = false;
-  public get retracted() {
-    return this._retracted;
-  }
 
   private _slashed = false;
-  public get slashed() {
-    return this._slashed;
-  }
-
-  public get isClosing() {
-    return !!this.data.closing;
-  }
-
-  public get isClosable() {
-    return (
-      this.data.closing &&
-      this.data.closing <= this._Tips.app.chain.block.height
-    );
-  }
 
   // TODO: are these voting types correct?
   public readonly votingType = VotingType.SimpleYesApprovalVoting;
@@ -256,40 +239,6 @@ export class SubstrateTreasuryTip extends Proposal<
       //     this.addOrUpdateVote(vote);
       //   }
       // },
-    );
-  }
-
-  public closeTx(who: SubstrateAccount): ITXModalData {
-    if (
-      !this.data.closing ||
-      this.data.closing > this._Tips.app.chain.block.height
-    ) {
-      throw new Error('Tip not ready for closing.');
-    }
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) => api.tx.tips.closeTip(this.data.hash),
-      'closeTip',
-      this.title
-      // (success) => success && this.complete(),
-    );
-  }
-
-  public retractTx(who: SubstrateAccount): ITXModalData {
-    if (this.data.finder !== who.address) {
-      throw new Error('Only finder can retract tip.');
-    }
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) => api.tx.tips.retractTip(this.data.hash),
-      'retractTip',
-      this.title
-      // (success) => {
-      //   if (success) {
-      //     this._retracted = true;
-      //     this.complete();
-      //   }
-      // }
     );
   }
 }

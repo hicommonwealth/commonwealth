@@ -45,14 +45,6 @@ export default class CosmosAccounts
     return acct;
   }
 
-  public fromAddressIfExists(address: string): CosmosAccount | null {
-    try {
-      return this._store.getByAddress(address);
-    } catch (e) {
-      return null;
-    }
-  }
-
   public deinit() {
     this._initialized = false;
     this.store.clear();

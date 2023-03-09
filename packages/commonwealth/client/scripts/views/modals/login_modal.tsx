@@ -80,7 +80,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
   private showMobile: boolean;
 
   oncreate(vnode: ResultNode<LoginModalAttrs>) {
-    console.log(vnode);
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
@@ -279,6 +278,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
             );
             this.cachedWalletSignature = signature;
             this.cachedChainId = this.selectedWallet.getChainId();
+            onSuccess?.();
           } catch (e) {
             console.log(e);
           }
@@ -288,7 +288,6 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           this.sidebarType = 'newAddressLinked';
           this.bodyType = 'selectProfile';
         }
-        redraw();
       }
     };
 

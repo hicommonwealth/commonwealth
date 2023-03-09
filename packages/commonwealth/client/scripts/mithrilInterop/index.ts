@@ -16,6 +16,7 @@ import type {
   NavigateOptions,
 } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
+import { getScopePrefix } from 'navigation/helpers';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
 export type Children = ReactNode | ReactNode[];
@@ -103,6 +104,7 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
 > {
   protected readonly __props: A;
   private _isMounted = false;
+  private _isCreated = false;
 
   // props that should not trigger a redraw -- internal to React
   private static readonly IGNORED_PROPS = [
@@ -160,7 +162,10 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
 
   // used for mithril's `oncreate` lifecycle hook and for the main `view` function
   render() {
-    this.oncreate({ attrs: this.props, children: this.props.children });
+    if (!this._isCreated) {
+      this._isCreated = true;
+      this.oncreate({ attrs: this.props, children: this.props.children });
+    }
     return this.view({ attrs: this.props, children: this.props.children });
   }
 
@@ -177,27 +182,18 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
     this.forceUpdate();
   }
 
-  // replicates `m.route.set()` functionality via react-router
-  public setRoute(route: string, options?: NavigateOptions) {
+  // It works very similar as useCommonNavigate but only for class components with withRouter() HOC
+  public setRoute(
+    route: string,
+    options?: NavigateOptions,
+    prefix?: null | string
+  ) {
+    const scopePrefix = getScopePrefix(prefix);
     if (this.props.router.navigate) {
-      console.log('setting route: ', route, ' with options: ', options);
-      this.props.router.navigate(route, options);
+      const url = `${scopePrefix}${route}`;
+      this.props.router.navigate(url, options);
     } else {
       console.error('Prop "navigate" is not defined!');
-    }
-  }
-
-  // replicates navigation to scoped page functionality via react-router
-  // see `navigateToSubpage` in `app.tsx`
-  public navigateToSubpage(route: string) {
-    console.log('Redirecting to', route);
-    // hacky way to get the current scope
-    // @REACT @TODO: this will fail on custom domains
-    const scope = window.location.pathname.split('/')[1];
-    if (scope) {
-      this.setRoute(`/${scope}${route}`);
-    } else {
-      this.setRoute(route);
     }
   }
 }
@@ -224,31 +220,24 @@ export function rootRender(el: Element, vnodes: Children) {
 }
 
 // ROUTING FUNCTIONS
-// m.route.param() shim
-export function getRouteParam(name?: string) {
+// Do not use for new features. Instead, take a look on react-router hook => "useSearchParams"
+export function _DEPRECATED_getSearchParams(name?: string) {
   const search = new URLSearchParams(window.location.search);
   return search.get(name);
 }
 
 // m.route.get() shim
-export function getRoute() {
+// Do not use for new features. Instead, take a look on react-router hook => "useLocation"
+export function _DEPRECATED_getRoute() {
   return window.location.pathname;
 }
 
-type RouteOptions = {
-  replace?: boolean;
-};
-
 // This should not be used for setting the route, because it does not use react-router.
-// Instead it uses native history API, and because react router does not recognize the
+// Instead, it uses native history API, and because react router does not recognize the
 // path change, the page has to be reloaded programmatically.
 // This is only for legacy code, where react router is not accessible (eg in controllers or JS classes).
 // Always use "withRouter" for react class components or "useNavigate" for functional components.
-export function dangerouslySetRoute(
-  route: string,
-  data?: Record<string, unknown>,
-  options?: RouteOptions
-) {
+export function _DEPRECATED_dangerouslySetRoute(route: string) {
   window.history.pushState('', '', route);
   window.location.reload();
 

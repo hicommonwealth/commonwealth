@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { redraw } from 'mithrilInterop';
+import 'modals/webhook_settings_modal.scss';
+
+import type { Webhook } from 'models';
 
 import { NotificationCategories } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
 import {
   DydxChainNotificationTypes,
   EdgewareChainNotificationTypes,
@@ -11,13 +12,6 @@ import {
   KusamaChainNotificationTypes,
   PolkadotChainNotificationTypes,
 } from 'helpers/chain_notification_types';
-import $ from 'jquery';
-import m from 'mithril';
-
-import 'modals/webhook_settings_modal.scss';
-import { Webhook } from 'models';
-
-import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
@@ -25,15 +19,18 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;
-  updateSuccessCallback: (webhook: Webhook) => void;
+  updateWebhook: (webhook: Webhook, selectedCategories: Array<string>) => void;
   webhook: Webhook;
 };
 
-export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
-  const { onModalClose, updateSuccessCallback, webhook } = props;
-  const [selectedCategories, setSelectedCategories] = React.useState<
-    Array<string>
-  >(webhook.categories);
+export const WebhookSettingsModal = ({
+  onModalClose,
+  updateWebhook,
+  webhook,
+}: WebhookSettingsModalProps) => {
+  const [selectedCategories, setSelectedCategories] = useState<Array<string>>(
+    webhook.categories
+  );
 
   const isChain = !!webhook.chain_id;
 
@@ -68,17 +65,15 @@ export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
         indeterminate={someValuesPresent && !allValuesPresent}
         onChange={() => {
           if (allValuesPresent) {
-            setSelectedCategories(
-              selectedCategories.filter((v) => !values.includes(v))
+            setSelectedCategories((prevState) =>
+              prevState.filter((v) => !values.includes(v))
             );
-            redraw();
           } else {
             values.forEach((v) => {
               if (!selectedCategories.includes(v)) {
-                selectedCategories.push(v);
+                setSelectedCategories((prevState) => [...prevState, v]);
               }
             });
-            redraw();
           }
         }}
       />
@@ -114,29 +109,7 @@ export const WebhookSettingsModal = (props: WebhookSettingsModalProps) => {
         )}
         <CWButton
           label="Save webhook settings"
-          onClick={(e) => {
-            e.preventDefault();
-            const chainOrCommObj = { chain: webhook.chain_id };
-            $.ajax({
-              url: `${app.serverUrl()}/updateWebhook`,
-              data: {
-                webhookId: webhook.id,
-                categories: selectedCategories,
-                ...chainOrCommObj,
-                jwt: app.user.jwt,
-              },
-              type: 'POST',
-              success: (result) => {
-                const updatedWebhook = Webhook.fromJSON(result.result);
-                updateSuccessCallback(updatedWebhook);
-                onModalClose();
-              },
-              error: (err) => {
-                notifyError(err.statusText);
-                redraw();
-              },
-            });
-          }}
+          onClick={() => updateWebhook(webhook, selectedCategories)}
         />
       </div>
     </div>

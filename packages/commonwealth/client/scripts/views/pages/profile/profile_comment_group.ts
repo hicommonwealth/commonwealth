@@ -57,12 +57,7 @@ class ProfileCommentGroupComponent extends ClassComponent<IProfileCommentGroupAt
       render('.activity', [
         comments.map((comment) =>
           render('.proposal-comment', [
-            render(
-              '.comment-text',
-              renderQuillTextBody(comment.text, {
-                collapse: true,
-              })
-            ),
+            render('.comment-text', renderQuillTextBody(comment.text)),
           ])
         ),
       ]),

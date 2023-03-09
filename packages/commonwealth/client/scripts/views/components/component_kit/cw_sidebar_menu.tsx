@@ -1,8 +1,6 @@
 import React from 'react';
 
 import { redraw } from 'mithrilInterop';
-import { navigateToSubpage } from 'router';
-import { useNavigate } from 'react-router-dom';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 import { AddressInfo } from 'models';
@@ -15,13 +13,20 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
+import { useCommonNavigate } from 'navigation/helpers';
 
 export const CWSidebarMenuItem = (props: MenuItem) => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   if (props.type === 'default') {
-    const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
-      props;
+    const {
+      disabled,
+      iconLeft,
+      iconRight,
+      isSecondary,
+      label,
+      onClick,
+    } = props;
 
     return (
       <div
@@ -61,15 +66,16 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
           app.sidebarToggled = false;
           app.sidebarMenu = 'default';
           app.sidebarRedraw.emit('redraw');
-          navigate(item.id ? `/${item.id}` : '/');
+          navigate(item.id ? `/${item.id}` : '/', {}, null);
         }}
       >
         <CommunityLabel community={item} />
         {app.isLoggedIn() && roles.length > 0 && (
           <div className="roles-and-star">
-            {roles.map((role) => {
+            {roles.map((role, i) => {
               return (
                 <User
+                  key={i}
                   avatarSize={18}
                   avatarOnly
                   user={
@@ -110,7 +116,7 @@ type SidebarMenuProps = {
 
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   return (
     <div
@@ -128,8 +134,8 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             </CWText>
           </div>
         )}
-        {menuItems.map((item) => (
-          <CWSidebarMenuItem type={item.type || 'default'} {...item} />
+        {menuItems.map((item, i) => (
+          <CWSidebarMenuItem key={i} type={item.type || 'default'} {...item} />
         ))}
       </div>
       <div className="sidebar-bottom">
@@ -146,7 +152,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               app.sidebarRedraw.emit('redraw');
-              navigate('/communities');
+              navigate('/communities', {}, null);
             },
           },
           {
@@ -166,7 +172,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             iconLeft: 'bell',
             onClick: () => {
               if (app.activeChainId()) {
-                navigateToSubpage('/settings');
+                navigate('/settings');
               } else {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
@@ -175,8 +181,14 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               }
             },
           } as MenuItem,
-        ].map((item: MenuItem) => {
-          return <CWSidebarMenuItem type={item.type || 'default'} {...item} />;
+        ].map((item: MenuItem, i) => {
+          return (
+            <CWSidebarMenuItem
+              key={i}
+              type={item.type || 'default'}
+              {...item}
+            />
+          );
         })}
       </div>
     </div>

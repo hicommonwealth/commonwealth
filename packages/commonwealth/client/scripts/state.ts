@@ -1,7 +1,3 @@
-import type { ModalStore } from 'controllers/app/modals';
-import { getModalStore } from 'controllers/app/modals';
-import type { ToastStore } from 'controllers/app/toasts';
-import { getToastStore } from 'controllers/app/toasts';
 import ChainEntityController from 'controllers/server/chain_entities';
 import DiscordController from 'controllers/server/discord';
 import { WebSocketController } from 'controllers/server/socket';
@@ -94,11 +90,7 @@ export interface IApp {
   wallets: WebWalletController;
   snapshot: SnapshotController;
 
-  toasts: ToastStore;
-  modals: ModalStore;
-
   mobileMenu: MobileMenuName;
-  mobileMenuRedraw: EventEmitter;
   sidebarMenu: SidebarMenuName;
   sidebarRedraw: EventEmitter;
 
@@ -199,13 +191,9 @@ const app: IApp = {
 
   // Global nav state
   mobileMenu: null,
-  mobileMenuRedraw: new EventEmitter(),
   sidebarMenu: 'default',
   sidebarRedraw: new EventEmitter(),
   sidebarToggled: false,
-
-  toasts: getToastStore(),
-  modals: getModalStore(),
 
   config: {
     chains: new ChainStore(),

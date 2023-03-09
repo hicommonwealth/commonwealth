@@ -75,59 +75,6 @@
     .cui-popover.community-options-popover .cui-menu {
       padding: 4px 0;
     }
-
-    .chatAdminOverlay {
-      align-items: center;
-      display: flex;
-      height: 100vh;
-      justify-content: center;
-
-      .Card {
-        cursor: default;
-        max-width: none;
-        position: relative;
-        width: 500px;
-        z-index: 100;
-
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-
-        .header {
-          align-items: center;
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          width: 100%;
-
-          svg {
-            cursor: pointer;
-          }
-        }
-
-        .TextInput {
-          width: 100%;
-        }
-
-        .cui-icon-x {
-          color: $neutral-600;
-          left: calc(100% - 35px);
-          position: absolute;
-          top: 15px;
-        }
-
-        .button-bar {
-          display: flex;
-          flex-direction: row;
-          justify-content: flex-end;
-          width: 100%;
-
-          button {
-            margin-left: 8px;
-          }
-        }
-      }
-    }
   }
 
   .CreateContentSidebar,

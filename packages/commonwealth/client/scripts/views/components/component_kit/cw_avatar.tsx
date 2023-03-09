@@ -34,5 +34,5 @@ export const CWJdenticon = (props: JdenticonProps) => {
 
   if (!address) return null;
 
-  return <Jdenticon value={address.toString()} height={size} width={size} />;
+  return <Jdenticon value={address.toString()} size={size.toString()} />;
 };

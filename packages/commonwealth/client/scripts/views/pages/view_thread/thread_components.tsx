@@ -1,9 +1,6 @@
 import React from 'react';
-import { ClassComponent } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import {
   externalLink,
   extractDomain,
@@ -21,7 +18,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
-import withRouter from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadComponentProps = {
   thread: Thread;
@@ -68,6 +65,7 @@ export const ThreadAuthor = (props: ThreadComponentProps) => {
 
 export const ThreadStage = (props: ThreadComponentProps) => {
   const { thread } = props;
+  const navigate = useCommonNavigate();
 
   return (
     <CWText
@@ -89,7 +87,7 @@ export const ThreadStage = (props: ThreadComponentProps) => {
       )}
       onClick={(e) => {
         e.preventDefault();
-        navigateToSubpage(`?stage=${thread.stage}`);
+        navigate(`/discussions?stage=${thread.stage}`);
       }}
     >
       {threadStageToLabel(thread.stage)}
@@ -97,22 +95,15 @@ export const ThreadStage = (props: ThreadComponentProps) => {
   );
 };
 
-class ExternalLinkComponent extends ClassComponent<ThreadComponentProps> {
-  view(vnode: ResultNode<ThreadComponentProps>) {
-    const { thread } = vnode.attrs;
+export const ExternalLink = (props: ThreadComponentProps) => {
+  const { thread } = props;
 
-    return (
-      <div className="HeaderLink">
-        {externalLink(
-          'a',
-          thread.url,
-          [extractDomain(thread.url)],
-          this.setRoute
-        )}
-        <CWIcon iconName="externalLink" iconSize="small" />
-      </div>
-    );
-  }
-}
+  const navigate = useCommonNavigate();
 
-export const ExternalLink = withRouter(ExternalLinkComponent);
+  return (
+    <div className="HeaderLink">
+      {externalLink('a', thread.url, [extractDomain(thread.url)], navigate)}
+      <CWIcon iconName="externalLink" iconSize="small" />
+    </div>
+  );
+};

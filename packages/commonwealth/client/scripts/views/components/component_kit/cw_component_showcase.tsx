@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
@@ -38,6 +38,7 @@ import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
+import { AvatarUpload } from '../avatar_upload';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -129,28 +130,28 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
 };
 
 export const ComponentShowcase = () => {
-  const [selectedIconButton, setSelectedIconButton] = React.useState<
+  const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
   >(undefined);
-  const [checkboxGroupSelected, setCheckboxGroupSelected] = React.useState<
+  const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
     Array<string>
   >([]);
-  const [isToggled, setIsToggled] = React.useState<boolean>(false);
-  const [voteCount, setVoteCount] = React.useState<number>(0);
-  const [selectedTab, setSelectedTab] = React.useState<number>(1);
+  const [isToggled, setIsToggled] = useState<boolean>(false);
+  const [voteCount, setVoteCount] = useState<number>(0);
+  const [selectedTab, setSelectedTab] = useState<number>(1);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
-    React.useState<boolean>(false);
-  const [isCheckboxChecked, setIsCheckboxChecked] =
-    React.useState<boolean>(false);
-  const [radioGroupSelection, setRadioGroupSelection] = React.useState<string>(
+    useState<boolean>(false);
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
+  const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
     radioGroupOptions[2].value
   );
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
-    React.useState<boolean>(false);
+    useState<boolean>(false);
 
   return (
     <div className="ComponentShowcase">
+      <AvatarUpload scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
       <Modal
         content={<div>hi</div>}

@@ -1,15 +1,15 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { getRouteParam } from 'mithrilInterop';
+import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 
 const showLoginNotification = () => {
-  const loggedIn = getRouteParam('loggedin');
-  const loginError = getRouteParam('loginerror');
+  const loggedIn = _DEPRECATED_getSearchParams('loggedin');
+  const loginError = _DEPRECATED_getSearchParams('loginerror');
 
   if (loggedIn) {
     notifySuccess('Logged in!');
   } else if (loginError) {
     notifyError('Could not log in');
-    console.error(getRouteParam('loginerror'));
+    console.error(_DEPRECATED_getSearchParams('loginerror'));
   }
 };
 

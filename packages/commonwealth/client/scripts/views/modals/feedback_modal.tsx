@@ -62,7 +62,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
               (err) => {
                 setIsSending(false);
                 setStatus('failure');
-                setMessage(err.responseJSON?.message || err.responseText);
+                setMessage(err.responseJSON?.error || err.responseText);
                 redraw();
               }
             );

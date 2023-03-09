@@ -1,11 +1,9 @@
+import type { Component } from 'mithrilInterop';
 import {
-  ClassComponent,
-  ResultNode,
   render,
-  getRoute,
-  getRouteParam,
+  _DEPRECATED_getRoute,
+  _DEPRECATED_getSearchParams,
   redraw,
-  Component,
 } from 'mithrilInterop';
 
 import {
@@ -13,7 +11,6 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { navigateToSubpage } from 'router';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 import { ChainBase } from 'common-common/src/types';
@@ -143,7 +140,9 @@ const loadProfile = async (
   state: IProfilePageState
 ) => {
   const chain =
-    getRouteParam('base') || app.customDomainId() || getRouteParam('scope');
+    _DEPRECATED_getSearchParams('base') ||
+    app.customDomainId() ||
+    _DEPRECATED_getSearchParams('scope');
   const { address } = attrs;
   const chainInfo = app.config.chains.getById(chain);
   let valid = false;
@@ -284,10 +283,12 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
     const chain =
-      getRouteParam('base') || app.customDomainId() || getRouteParam('scope');
+      _DEPRECATED_getSearchParams('base') ||
+      app.customDomainId() ||
+      _DEPRECATED_getSearchParams('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
-    const baseSuffix = getRouteParam('base');
+    const baseSuffix = _DEPRECATED_getSearchParams('base');
 
     if (chainInfo?.base === ChainBase.Substrate) {
       const decodedAddress = decodeAddress(address);
@@ -297,9 +298,9 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
-          navigateToSubpage(
-            `/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`
-          );
+          // navigateToSubpage(
+          //   `/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`
+          // );
         } catch (e) {
           // do nothing if can't encode address
         }
@@ -310,11 +311,11 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
       if (!valid) {
         try {
           const checksumAddress = toChecksumAddress(address);
-          navigateToSubpage(
-            `/account/${checksumAddress}${
-              baseSuffix ? `?base=${baseSuffix}` : ''
-            }`
-          );
+          // navigateToSubpage(
+          //   `/account/${checksumAddress}${
+          //     baseSuffix ? `?base=${baseSuffix}` : ''
+          //   }`
+          // );
         } catch (e) {
           // do nothing if can't get checksumAddress
         }
@@ -385,18 +386,18 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
       if (scrollPos > scrollHeight - 400) {
         if (tab === 0) {
           vnode.state.allContentCount += 20;
-          const thisUrl = getRoute();
-          if (getRoute() === thisUrl)
+          const thisUrl = _DEPRECATED_getRoute();
+          if (_DEPRECATED_getRoute() === thisUrl)
             window.location.hash = vnode.state.allContentCount.toString();
         } else if (tab === 1) {
           vnode.state.proposalsContentCount += 20;
-          const thisUrl = getRoute();
-          if (getRoute() === thisUrl)
+          const thisUrl = _DEPRECATED_getRoute();
+          if (_DEPRECATED_getRoute() === thisUrl)
             window.location.hash = vnode.state.proposalsContentCount.toString();
         } else {
           vnode.state.commentsContentCount += 20;
-          const thisUrl = getRoute();
-          if (getRoute() === thisUrl)
+          const thisUrl = _DEPRECATED_getRoute();
+          if (_DEPRECATED_getRoute() === thisUrl)
             window.location.hash = vnode.state.commentsContentCount.toString();
         }
         redraw();
@@ -481,7 +482,9 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
+                  }-${_DEPRECATED_getSearchParams(
+                    'base'
+                  )}-${app.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 1 &&
                 render(ProfileContent, {
@@ -492,7 +495,9 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
+                  }-${_DEPRECATED_getSearchParams(
+                    'base'
+                  )}-${app.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 2 &&
                 render(ProfileContent, {
@@ -503,7 +508,9 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
+                  }-${_DEPRECATED_getSearchParams(
+                    'base'
+                  )}-${app.activeChainId()}-scrollY`,
                 }),
             ]),
             render('.xs-display-none .col-md-4', [

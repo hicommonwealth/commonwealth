@@ -13,7 +13,6 @@ import type { Account, RoleInfo } from 'models';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
@@ -85,9 +84,7 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
     );
 
     // confirm
-    const confirmed = await confirmationModalWithText(
-      'Remove this address from the community?'
-    )();
+    const confirmed = window.confirm('Remove this address from the community?');
 
     if (!confirmed) {
       setIsLoading(false);

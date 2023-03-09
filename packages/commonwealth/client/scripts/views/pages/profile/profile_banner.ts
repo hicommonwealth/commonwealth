@@ -4,7 +4,6 @@ import type { Account, AddressInfo } from 'models';
 import app from 'state';
 import { render, redraw, Component } from 'mithrilInterop';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 
@@ -23,9 +22,9 @@ const ProfileBanner: Component<
       vnode.state.loading = true;
 
       const community = app.chain?.meta ? app.chain.meta.name : 'current';
-      const confirmed = await confirmationModalWithText(
+      const confirmed = window.confirm(
         `Join the ${community} community with this address?`
-      )();
+      );
       if (!confirmed) {
         vnode.state.loading = false;
         redraw();

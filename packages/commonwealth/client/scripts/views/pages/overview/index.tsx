@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
 import type { Thread, Topic } from 'models';
-import { navigateToSubpage } from 'router';
+
 import 'pages/overview/index.scss';
 
 import app from 'state';
@@ -14,127 +13,133 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
+import { useCommonNavigate } from 'navigation/helpers';
+import useForceRerender from 'hooks/useForceRerender';
 
-class OverviewPage extends ClassComponent {
-  private isWindowExtraSmall: boolean;
+const OverviewPage = () => {
+  const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
 
-  onResize() {
-    this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
-    redraw();
-  }
+  const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
+    isWindowExtraSmall(window.innerWidth)
+  );
 
-  oninit() {
-    this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
+  useEffect(() => {
+    const onResize = () => {
+      setWindowIsExtraSmall(isWindowExtraSmall(window.innerWidth));
+    };
 
-    window.addEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+    window.addEventListener('resize', onResize);
 
-  onremove() {
-    window.removeEventListener('resize', () => {
-      this.onResize();
-    });
-  }
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
-  view() {
-    const allMonthlyThreads = app.threads.overviewStore.getAll();
-    const allPinnedThreads = app.threads.listingStore.getThreads({
-      pinned: true,
-    });
+  useEffect(() => {
+    app.threads.isFetched.on('redraw', () => forceRerender());
 
-    const topics = app.topics.getByCommunity(app.activeChainId());
+    return () => {
+      app.threads.isFetched.off('redraw', () => forceRerender());
+    };
+  }, []);
 
-    const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
+  const allMonthlyThreads = app.threads.overviewStore.getAll();
+  const allPinnedThreads = app.threads.listingStore.getThreads({
+    pinned: true,
+  });
 
-    const topicsFiltered = anyTopicsFeatured
-      ? topics.filter((t) => t.featuredInSidebar)
-      : topics;
+  const topics = app.topics.getByCommunity(app.activeChainId());
 
-    const topicsSorted = anyTopicsFeatured
-      ? topicsFiltered.sort((a, b) => a.order - b.order)
-      : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
+  const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
 
-    const topicSummaryRows: Array<{
-      monthlyThreads: Array<Thread>;
-      pinnedThreads: Array<Thread>;
-      topic: Topic;
-    }> = topicsSorted.map((topic) => {
-      const monthlyThreads = allMonthlyThreads.filter(
-        (thread) => topic.id === thread.topic.id
-      );
-      const pinnedThreads = allPinnedThreads.filter(
-        (thread) => topic.id === thread.topic.id
-      );
+  const topicsFiltered = anyTopicsFeatured
+    ? topics.filter((t) => t.featuredInSidebar)
+    : topics;
 
-      return { monthlyThreads, pinnedThreads, topic };
-    });
+  const topicsSorted = anyTopicsFeatured
+    ? topicsFiltered.sort((a, b) => a.order - b.order)
+    : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
 
-    return !topicSummaryRows.length && !app.threads.initialized ? (
-      <PageLoading />
-    ) : (
-      <Sublayout>
-        <div className="OverviewPage">
-          <div className="header-row">
-            <div className="header-row-left">
-              <CWText type="h3" fontWeight="semiBold">
-                Overview
-              </CWText>
-              <CWButton
-                className="latest-button"
-                buttonType="mini-black"
-                label="Latest Threads"
-                iconLeft="home"
-                onClick={() => {
-                  navigateToSubpage('/discussions');
-                }}
-              />
-            </div>
-            {this.isWindowExtraSmall ? (
-              <CWIconButton
-                iconName="plusCircle"
-                iconButtonTheme="black"
-                onClick={() => {
-                  navigateToSubpage('/new/discussion');
-                }}
-              />
-            ) : (
-              <CWButton
-                buttonType="mini-black"
-                label="Create Thread"
-                iconLeft="plus"
-                onClick={() => {
-                  navigateToSubpage('/new/discussion');
-                }}
-              />
-            )}
+  const topicSummaryRows: Array<{
+    monthlyThreads: Array<Thread>;
+    pinnedThreads: Array<Thread>;
+    topic: Topic;
+  }> = topicsSorted.map((topic) => {
+    const monthlyThreads = allMonthlyThreads.filter(
+      (thread) => topic.id === thread.topic.id
+    );
+    const pinnedThreads = allPinnedThreads.filter(
+      (thread) => topic.id === thread.topic.id
+    );
+
+    return { monthlyThreads, pinnedThreads, topic };
+  });
+
+  return !topicSummaryRows.length && !app.threads.initialized ? (
+    <PageLoading />
+  ) : (
+    <Sublayout>
+      <div className="OverviewPage">
+        <div className="header-row">
+          <div className="header-row-left">
+            <CWText type="h3" fontWeight="semiBold">
+              Overview
+            </CWText>
+            <CWButton
+              className="latest-button"
+              buttonType="mini-black"
+              label="Latest Threads"
+              iconLeft="home"
+              onClick={() => {
+                navigate('/discussions');
+              }}
+            />
           </div>
-          <div className="column-headers-row">
+          {windowIsExtraSmall ? (
+            <CWIconButton
+              iconName="plusCircle"
+              iconButtonTheme="black"
+              onClick={() => {
+                navigate('/new/discussion');
+              }}
+            />
+          ) : (
+            <CWButton
+              buttonType="mini-black"
+              label="Create Thread"
+              iconLeft="plus"
+              onClick={() => {
+                navigate('/new/discussion');
+              }}
+            />
+          )}
+        </div>
+        <div className="column-headers-row">
+          <CWText
+            type="h5"
+            fontWeight="semiBold"
+            className="threads-header-row-text"
+          >
+            Topic
+          </CWText>
+          <div className="threads-header-container">
             <CWText
               type="h5"
               fontWeight="semiBold"
               className="threads-header-row-text"
             >
-              Topic
+              Recent threads
             </CWText>
-            <div className="threads-header-container">
-              <CWText
-                type="h5"
-                fontWeight="semiBold"
-                className="threads-header-row-text"
-              >
-                Recent threads
-              </CWText>
-            </div>
           </div>
-          <CWDivider />
-          {topicSummaryRows.map((row, i) => (
-            <TopicSummaryRow {...row} key={i} />
-          ))}
         </div>
-      </Sublayout>
-    );
-  }
-}
+        <CWDivider />
+        {topicSummaryRows.map((row, i) => (
+          <TopicSummaryRow {...row} key={i} />
+        ))}
+      </div>
+    </Sublayout>
+  );
+};
 
 export default OverviewPage;

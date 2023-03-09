@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import useInitApp from 'hooks/useInitApp';
@@ -10,12 +10,12 @@ const App = () => {
   const { customDomain } = useInitApp();
 
   return (
-    <React.StrictMode>
+    <StrictMode>
       <BrowserRouter>
         <AppNavigator customDomain={customDomain} />
         <ToastContainer />
       </BrowserRouter>
-    </React.StrictMode>
+    </StrictMode>
   );
 };
 

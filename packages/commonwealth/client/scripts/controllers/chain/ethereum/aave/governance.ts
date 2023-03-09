@@ -38,10 +38,6 @@ export default class AaveGovernance extends ProposalModule<
     return this._api;
   }
 
-  public get usingServerChainEntities() {
-    return this._usingServerChainEntities;
-  }
-
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {
     super(app, (e) => new AaveProposal(this._Chain, this._Accounts, this, e));

@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { rootRender } from 'mithrilInterop';
-
 import 'components/quill/quill_formatted_text.scss';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
@@ -11,10 +9,9 @@ import { countLinesQuill } from './helpers';
 
 // import { loadScript } from 'helpers';
 import { renderQuillDelta } from './render_quill_delta';
-import { useNavigate } from 'react-router-dom';
+import { useCommonNavigate } from 'navigation/helpers';
 
 export type QuillTextParams = {
-  collapse?: boolean;
   hideFormatting?: boolean;
   cutoffLines?: number;
   openLinksInNewTab?: boolean;
@@ -25,30 +22,18 @@ type QuillFormattedTextAttrs = {
   doc;
 } & QuillTextParams;
 
-export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({
-  doc,
-  collapse,
-  hideFormatting,
-  cutoffLines,
-  openLinksInNewTab,
-  searchTerm,
-}) => {
-  const navigate = useNavigate();
-  const [cachedDocWithHighlights, setCachedDocWithHighlights] = useState<any>();
-  const [cachedResultWithHighlights, setCachedResultWithHighlights] =
-    useState<any>();
+export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hideFormatting, cutoffLines, openLinksInNewTab, searchTerm }) => {
+  const navigate = useCommonNavigate();
+  const [cachedDocWithHighlights, setCachedDocWithHighlights] = useState();
+  const [cachedResultWithHighlights, setCachedResultWithHighlights] = useState();;
   const [isTruncated, setIsTruncated] = useState<boolean>();
-  const [truncatedDoc, setTruncatedDoc] = useState<any>();
+  const [truncatedDoc, setTruncatedDoc] = useState();
 
   useEffect(() => {
-    setIsTruncated(cutoffLines && cutoffLines < countLinesQuill(doc.ops));
-    setTruncatedDoc(
-      isTruncated
-        ? {
-            ops: [...doc.ops.slice(0, cutoffLines)],
-          }
-        : doc
-    );
+    const isTruncated = cutoffLines && cutoffLines < countLinesQuill(doc.ops);
+    const truncatedDoc = isTruncated ? {
+      ops: [...doc.ops.slice(0, cutoffLines)],
+    } : doc;
     setTruncatedDoc(truncatedDoc);
     setIsTruncated(isTruncated);
   }, [doc, cutoffLines]);
@@ -64,10 +49,7 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({
 
   // if we're showing highlighted search terms, render the doc once, and cache the result
   if (searchTerm) {
-    if (
-      truncatedDoc &&
-      JSON.stringify(truncatedDoc) !== cachedDocWithHighlights
-    ) {
+    if (truncatedDoc && JSON.stringify(truncatedDoc) !== cachedDocWithHighlights) {
       const vnodes = truncatedDoc
         ? renderQuillDelta(truncatedDoc, hideFormatting, true, false, navigate)
         : []; // collapse = true, to inline blocks
@@ -87,8 +69,8 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({
 
       setCachedDocWithHighlights(JSON.stringify(truncatedDoc));
 
-      setCachedResultWithHighlights(
-        chunks.map(({ end, highlight, start }, index) => {
+      setCachedResultWithHighlights(chunks.map(
+        ({ end, highlight, start }, index) => {
           const middle = 15;
 
           const subString = textToHighlight.substr(start, end - start);
@@ -114,50 +96,47 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({
           }
 
           return highlight ? <mark>{text}</mark> : <span>{text}</span>;
-        })
-      );
+        }
+      ));
     }
 
     return (
       <div
-        className={getClasses<{ collapsed?: boolean }>(
-          { collapsed: collapse },
-          'QuillFormattedText'
-        )}
-      >
+      className={getClasses<{ collapsed?: boolean }>(
+        { collapsed: isTruncated },
+        'QuillFormattedText'
+      )}
+        >
         {cachedResultWithHighlights}
       </div>
     );
   } else {
     return (
       <div
-        className={getClasses<{ collapsed?: boolean }>(
-          { collapsed: collapse },
-          'QuillFormattedText'
-        )}
-        // oncreate={() => {
-        // if (!(<any>window).twttr) {
-        //   loadScript('//platform.twitter.com/widgets.js').then(() => {
-        //     console.log('Twitter Widgets loaded');
-        //   })
-        // }}
-      >
+        className='QuillFormattedText'
+      // oncreate={() => {
+      // if (!(<any>window).twttr) {
+      //   loadScript('//platform.twitter.com/widgets.js').then(() => {
+      //     console.log('Twitter Widgets loaded');
+      //   })
+      // }}
+        >
         {truncatedDoc &&
           renderQuillDelta(
             truncatedDoc,
             hideFormatting,
-            collapse,
+            false,
             openLinksInNewTab,
             navigate
           )}
-        {isTruncated && (
-          <div className="show-more-button-wrapper">
-            <div className="show-more-button" onClick={toggleDisplay}>
-              <CWIcon iconName="plus" iconSize="small" />
-              <div className="show-more-text">Show More</div>
-            </div>
+      {isTruncated && (
+        <div className="show-more-button-wrapper">
+          <div className="show-more-button" onClick={toggleDisplay}>
+          <CWIcon iconName="plus" iconSize="small" />
+          <div className="show-more-text">Show More</div>
           </div>
-        )}
+          </div>
+      )}
       </div>
     );
   }

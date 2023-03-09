@@ -1,10 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { blockperiodToDuration } from 'helpers';
-
-import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/referenda.scss';
 
@@ -14,7 +12,6 @@ import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { ProposalCard } from 'views/components/proposal_card';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 import ErrorPage from './error';
@@ -32,132 +29,118 @@ function getModules() {
   }
 }
 
-class ReferendaPage extends ClassComponent {
-  oncreate() {
-    const returningFromThread =
-      app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
+const ReferendaPage = () => {
+  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded)
+  const [isSubstrateLoading, setSubstrateLoading] = useState(false);
 
+  useEffect(() => {
+    app.chainAdapterReady.on('ready', () => setLoading(false));
+    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
+
+    return () => {
+      app.chainAdapterReady.off('ready', () => setLoading(false));
+      app.chainModuleReady.off('ready', () => setSubstrateLoading(false));
+    };
+  }, [setLoading, setSubstrateLoading]);
+
+  if (isLoading) {
     if (
-      returningFromThread &&
-      localStorage[`${app.activeChainId()}-proposals-scrollY`]
+      app.chain?.base === ChainBase.Substrate &&
+      (app.chain as Substrate).chain?.timedOut
     ) {
-      setTimeout(() => {
-        window.scrollTo(
-          0,
-          Number(localStorage[`${app.activeChainId()}-proposals-scrollY`])
-        );
-      }, 100);
+      return <ErrorPage message="Could not connect to chain" />;
     }
+
+    return <PageLoading message="Connecting to chain" />;
   }
 
-  view() {
-    if (!app.chain || !app.chain.loaded) {
-      if (
-        app.chain?.base === ChainBase.Substrate &&
-        (app.chain as Substrate).chain?.timedOut
-      ) {
-        return (
-          <ErrorPage
-            message="Could not connect to chain"
-            title={<BreadcrumbsTitleTag title="Referenda" />}
-          />
-        );
-      }
+  const onSubstrate = app.chain?.base === ChainBase.Substrate;
 
-      return <PageLoading message="Connecting to chain" />;
-    }
+  const modLoading = loadSubstrateModules('Referenda', getModules);
 
-    const onSubstrate = app.chain?.base === ChainBase.Substrate;
+  if (isSubstrateLoading) return modLoading;
 
-    const modLoading = loadSubstrateModules('Referenda', getModules);
+  // active proposals
+  const activeDemocracyReferenda =
+    onSubstrate &&
+    (app.chain as Substrate).democracy.store
+      .getAll()
+      .filter((p) => !p.completed);
 
-    if (modLoading) return modLoading;
+  const activeProposalContent = !activeDemocracyReferenda?.length ? (
+    <div className="no-proposals">None</div>
+  ) : (
+    (activeDemocracyReferenda || []).map((proposal, i) => (
+      <ProposalCard key={i} proposal={proposal} />
+    ))
+  );
 
-    // active proposals
-    const activeDemocracyReferenda =
-      onSubstrate &&
-      (app.chain as Substrate).democracy.store
-        .getAll()
-        .filter((p) => !p.completed);
+  // inactive proposals
+  const inactiveDemocracyReferenda =
+    onSubstrate &&
+    (app.chain as Substrate).democracy.store
+      .getAll()
+      .filter((p) => p.completed);
 
-    const activeProposalContent = !activeDemocracyReferenda?.length ? (
-      <div className="no-proposals">None</div>
-    ) : (
-      (activeDemocracyReferenda || []).map((proposal) => (
-        <ProposalCard proposal={proposal} />
-      ))
-    );
+  const inactiveProposalContent = !inactiveDemocracyReferenda?.length ? (
+    <div className="no-proposals">None</div>
+  ) : (
+    (inactiveDemocracyReferenda || []).map((proposal, i) => (
+      <ProposalCard key={i} proposal={proposal} />
+    ))
+  );
 
-    // inactive proposals
-    const inactiveDemocracyReferenda =
-      onSubstrate &&
-      (app.chain as Substrate).democracy.store
-        .getAll()
-        .filter((p) => p.completed);
-
-    const inactiveProposalContent = !inactiveDemocracyReferenda?.length ? (
-      <div className="no-proposals">None</div>
-    ) : (
-      (inactiveDemocracyReferenda || []).map((proposal) => (
-        <ProposalCard proposal={proposal} />
-      ))
-    );
-
-    return (
-      <Sublayout
-      // title={<BreadcrumbsTitleTag title="Referenda" />}
-      >
-        <div className="ReferendaPage">
-          {onSubstrate && (
-            <GovExplainer
-              statHeaders={[
-                {
-                  statName: 'Referenda',
-                  statDescription: `are final votes to approve/reject treasury proposals, \
+  return (
+    <Sublayout>
+      <div className="ReferendaPage">
+        {onSubstrate && (
+          <GovExplainer
+            statHeaders={[
+              {
+                statName: 'Referenda',
+                statDescription: `are final votes to approve/reject treasury proposals, \
                     upgrade the chain, or change technical parameters.`,
-                },
-              ]}
-              stats={[
-                {
-                  statHeading: 'Next referendum:',
-                  stat: (app.chain as Substrate).democracyProposals
-                    .nextLaunchBlock ? (
-                    <CountdownUntilBlock
-                      block={
-                        (app.chain as Substrate).democracyProposals
-                          .nextLaunchBlock
-                      }
-                      includeSeconds={false}
-                    />
-                  ) : (
-                    '--'
-                  ),
-                },
-                {
-                  statHeading: 'Passed referenda are enacted after:',
-                  stat: `${
-                    (app.chain as Substrate).democracy.enactmentPeriod
-                      ? blockperiodToDuration(
-                          (app.chain as Substrate).democracy.enactmentPeriod
-                        ).asDays()
-                      : '--'
-                  } days`,
-                },
-              ]}
-            />
-          )}
-          <CardsCollection
-            content={activeProposalContent}
-            header="Active Referenda"
+              },
+            ]}
+            stats={[
+              {
+                statHeading: 'Next referendum:',
+                stat: (app.chain as Substrate).democracyProposals
+                  .nextLaunchBlock ? (
+                  <CountdownUntilBlock
+                    block={
+                      (app.chain as Substrate).democracyProposals
+                        .nextLaunchBlock
+                    }
+                  />
+                ) : (
+                  '--'
+                ),
+              },
+              {
+                statHeading: 'Passed referenda are enacted after:',
+                stat: `${
+                  (app.chain as Substrate).democracy.enactmentPeriod
+                    ? blockperiodToDuration(
+                        (app.chain as Substrate).democracy.enactmentPeriod
+                      ).asDays()
+                    : '--'
+                } days`,
+              },
+            ]}
           />
-          <CardsCollection
-            content={inactiveProposalContent}
-            header="Inactive Referenda"
-          />
-        </div>
-      </Sublayout>
-    );
-  }
-}
+        )}
+        <CardsCollection
+          content={activeProposalContent}
+          header="Active Referenda"
+        />
+        <CardsCollection
+          content={inactiveProposalContent}
+          header="Inactive Referenda"
+        />
+      </div>
+    </Sublayout>
+  );
+};
 
 export default ReferendaPage;

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { navigateToSubpage } from 'router';
-import { ClassComponent, ResultNode, redraw } from 'mithrilInterop';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -34,6 +34,7 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
+import withRouter from 'navigation/helpers';
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -48,7 +49,7 @@ type ViewProposalPageAttrs = {
   type?: string;
 };
 
-class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
+class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
   private comments: Comment<AnyProposal>[];
   private prefetch: ProposalPrefetch;
   private proposal: AnyProposal;
@@ -59,12 +60,12 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
-      return (
-        <PageLoading
-        // title="Loading..."
-        />
-      );
+      return <PageLoading message="Loading..." />;
     }
+
+    app.chainAdapterReady.on('ready', () => {
+      this.redraw();
+    });
 
     const type = vnode.attrs.type || chainToProposalSlug(app.chain.meta);
 
@@ -129,7 +130,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           // load sibling modules too
           if (app.chain.base === ChainBase.Substrate) {
             const chain = app.chain as Substrate;
-
             app.chain.loadModules([
               chain.treasury,
               chain.democracyProposals,
@@ -152,13 +152,12 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     }
 
     if (identifier !== `${proposalId}-${slugify(this.proposal.title)}`) {
-      navigateToSubpage(
+      this.setRoute(
         getProposalUrlPath(
           this.proposal.slug,
           `${proposalId}-${slugify(this.proposal.title)}`,
           true
         ),
-        {},
         { replace: true }
       );
     }
@@ -172,12 +171,12 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             .getByProposal(this.proposal)
             .filter((c) => c.parentComment === null);
 
-          redraw();
+          this.redraw();
         })
         .catch(() => {
           notifyError('Failed to load comments');
           this.comments = [];
-          redraw();
+          this.redraw();
         });
 
       this.prefetch[proposalIdAndType]['commentsStarted'] = true;
@@ -197,7 +196,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       this.comments = app.comments
         .getByProposal(this.proposal)
         .filter((c) => c.parentComment === null);
-      redraw();
+      this.redraw();
     };
 
     if (this.comments === undefined) {
@@ -244,14 +243,13 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
 
     const toggleVotingModal = (newModalState: boolean) => {
       this.votingModalOpen = newModalState;
-      redraw();
+      this.redraw();
     };
 
     const onModalClose = () => {
       this.votingModalOpen = false;
-      redraw();
+      this.redraw();
     };
-
     return (
       <Sublayout
       //  title={headerTitle}
@@ -310,5 +308,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     );
   }
 }
+
+const ViewProposalPage = withRouter(ViewProposalPageComponent);
 
 export default ViewProposalPage;

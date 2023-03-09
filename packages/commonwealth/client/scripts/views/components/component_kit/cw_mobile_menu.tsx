@@ -25,7 +25,7 @@ const CWMobileMenuItem = (props: MenuItem) => {
         onClick={(e) => {
           // Graham TODO 22.10.06: Temporary solution as we transition Notifications
           app.mobileMenu = null;
-          app.mobileMenuRedraw.emit('redraw');
+          app.sidebarRedraw.emit('redraw');
           onClick(e);
         }}
       >
@@ -51,7 +51,7 @@ const CWMobileMenuItem = (props: MenuItem) => {
         onClick={(e) => {
           // Graham TODO 22.10.06: Temporary solution as we transition Notifications
           app.mobileMenu = null;
-          app.mobileMenuRedraw.emit('redraw');
+          app.sidebarRedraw.emit('redraw');
           onClick(e);
         }}
       >

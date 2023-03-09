@@ -13,9 +13,8 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { User } from './user';
 import type { AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
-import withRouter from 'navigation/helpers';
 
-const UserBlockComponent = (props: {
+export const UserBlock = (props: {
   addressDisplayOptions?: AddressDisplayOptions;
   avatarSize?: number;
   compact?: boolean;
@@ -137,5 +136,3 @@ const UserBlockComponent = (props: {
     </div>
   );
 };
-
-export const UserBlock = withRouter(UserBlockComponent);

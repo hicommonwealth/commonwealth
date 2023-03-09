@@ -23,6 +23,7 @@ import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
+import { EventEmitter } from 'events';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -65,6 +66,7 @@ class ThreadsController {
   private readonly _store: ProposalStore<Thread>;
   private readonly _listingStore: RecentListingStore;
   private readonly _overviewStore: ProposalStore<Thread>;
+  public isFetched = new EventEmitter();
 
   private constructor() {
     this._store = new ProposalStore<Thread>();
@@ -712,6 +714,8 @@ class ThreadsController {
     if (threads.length < DEFAULT_PAGE_SIZE) {
       this.listingStore.depleteListing(options);
     }
+
+    return modeledThreads;
   }
 
   public initialize(initialThreads = [], numVotingThreads, reset) {

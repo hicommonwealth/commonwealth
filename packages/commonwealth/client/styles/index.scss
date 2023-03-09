@@ -104,3 +104,8 @@ pre {
 .clear {
   clear: both;
 }
+
+// makes sure that popovers are above the modals
+[id^='popover-'] {
+  z-index: 10000;
+}

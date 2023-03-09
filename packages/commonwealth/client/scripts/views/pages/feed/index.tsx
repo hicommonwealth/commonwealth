@@ -1,116 +1,88 @@
 import React from 'react';
 
-import { ClassComponent } from 'mithrilInterop';
-
 import 'pages/feed/index.scss';
 
 import app from 'state';
+import { DashboardActivityNotification } from 'models';
 import Sublayout from '../../sublayout';
-import { PageLoading } from '../loading';
 import { fetchActivity } from '../user_dashboard/helpers';
 import { DashboardViews } from '../user_dashboard';
-import { UserDashboardRow } from '../user_dashboard/user_dashboard_row';
 import { CWText } from '../../components/component_kit/cw_text';
 import ErrorPage from '../error';
+import { Feed } from '../../components/feed';
 
-class FeedPage extends ClassComponent {
-  private isLoading: boolean;
-  private globalFeed: any;
-  private chainEvents: any;
-  private error: boolean;
-
-  private getGlobalFeed = async () => {
+const FeedPage = () => {
+  const getGlobalFeed = async () => {
     try {
       const activity = await fetchActivity(DashboardViews.Global);
-      this.globalFeed = activity.result
-        .map((item) => {
-          return {
-            ...item,
-            notificationData: item.notification_data,
-            createdAt: JSON.parse(item.notification_data).created_at,
-          };
-        })
-        .filter((item) => {
-          return (
-            JSON.parse(item.notification_data).chain_id === app.activeChainId()
-          );
-        });
+      const formattedData = activity.result
+        .map((item) => DashboardActivityNotification.fromJSON(item))
+        .filter(
+          (item) =>
+            JSON.parse(item.notificationData).chain_id === app.activeChainId()
+        );
+      return formattedData;
     } catch (err) {
-      this.error = true;
+      return err;
     }
   };
 
-  private getChainEvents = async () => {
+  const getChainEvents = async () => {
     try {
       const activity = await fetchActivity(DashboardViews.Chain);
-      this.chainEvents = activity.result
-        .map((item) => {
-          return {
-            blockNumber: item.block_number,
-            chain: item.chain,
-            eventData: item.event_data,
-            eventNetwork: item.event_network,
-            categoryId: 'chain-event',
-            createdAt: item.created_at,
-          };
-        })
-        .filter((item) => {
-          return item.chain === app.activeChainId();
-        });
+      const formattedData = activity.result
+        .map((item) => DashboardActivityNotification.fromJSON(item))
+        .filter((item) => item.chain === app.activeChainId());
+      return formattedData;
     } catch (err) {
-      this.error = true;
+      return err;
     }
   };
 
-  oninit() {
-    this.isLoading = true;
-    this.getGlobalFeed();
-    this.getChainEvents();
-    this.isLoading = false;
-  }
+  const getCombinedFeed = async () => {
+    return Promise.all([getGlobalFeed(), getChainEvents()])
+      .then((result) => {
+        return {
+          result: sortFeed(result[0], result[1]),
+        };
+      })
+      .catch((err) => {
+        return err;
+      });
+  };
 
-  view() {
-    if (this.isLoading) {
-      return <PageLoading />;
-    }
-
-    if (this.error) {
-      return <ErrorPage message="There was an error loading the feed." />;
-    }
-
-    if (!app.chain.meta.hasHomepage) {
-      return (
-        <ErrorPage message="The Homepage feature has not been enabled for this community." />
-      );
-    }
-
+  const sortFeed = (globalFeed, chainEvents) => {
     let sortedFeed = [];
-    if (this.globalFeed?.length > 0 && this.chainEvents?.length > 0) {
-      sortedFeed = this.globalFeed.concat(this.chainEvents).sort((a, b) => {
+    if (globalFeed?.length > 0 && chainEvents?.length > 0) {
+      sortedFeed = globalFeed.concat(chainEvents).sort((a, b) => {
         return (
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
       });
-    } else if (this.globalFeed?.length > 0) {
-      sortedFeed = this.globalFeed;
-    } else if (this.chainEvents?.length > 0) {
-      sortedFeed = this.chainEvents;
+    } else if (globalFeed?.length > 0) {
+      sortedFeed = globalFeed;
+    } else if (chainEvents?.length > 0) {
+      sortedFeed = chainEvents;
     }
+    return sortedFeed;
+  };
 
+  if (!app.chain.meta.hasHomepage) {
     return (
-      <Sublayout>
-        <div className="FeedPage">
-          <CWText type="h3" fontWeight="semiBold">
-            Home
-          </CWText>
-          {sortedFeed.length !== 0 &&
-            sortedFeed.map((item, i) => {
-              return <UserDashboardRow key={i} notification={item} />;
-            })}
-        </div>
-      </Sublayout>
+      <ErrorPage message="The Homepage feature has not been enabled for this community." />
     );
   }
-}
+
+  return (
+    <Sublayout>
+      <div className="FeedPage">
+        <CWText type="h3" fontWeight="semiBold">
+          Home
+        </CWText>
+        <Feed fetchData={getCombinedFeed} noFeedMessage="No activity yet" />
+      </div>
+    </Sublayout>
+  );
+};
 
 export default FeedPage;

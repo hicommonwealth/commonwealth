@@ -3,8 +3,22 @@
 .ThreadPreview {
   cursor: pointer;
   display: flex;
-  padding: 16px;
   width: 100%;
+
+  // 0 padding on top for sticky header
+  padding: 16px 56px;
+
+  @include medium {
+    padding: 16px 40px;
+  }
+
+  @include mediumSmall {
+    padding: 16px 32px;
+  }
+
+  @include smallInclusive {
+    padding: 16px 24px;
+  }
 
   &.isPinned {
     background: $neutral-50;

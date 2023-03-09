@@ -1,12 +1,10 @@
 import React from 'react';
 import type { NavigateFunction } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState } from 'state';
-import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
-import { getRouteParam, redraw } from 'mithrilInterop';
+import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -30,6 +28,7 @@ import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
 import { Modal } from '../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // TODO:
 //  - figure out how account switching will work
@@ -38,7 +37,7 @@ import { Modal } from '../components/component_kit/cw_modal';
 //  - test what happens if the wallet site fails
 //  - move some of this stuff into controllers
 
-const redirectToNextPage = (navigate: NavigateFunction) => {
+const redirectToNextPage = (navigate) => {
   if (
     localStorage &&
     localStorage.getItem &&
@@ -55,7 +54,7 @@ const redirectToNextPage = (navigate: NavigateFunction) => {
         localStorage.removeItem('nearPostAuthRedirect');
         navigate(postAuth.path, { replace: true });
       } else {
-        navigateToSubpage('/', { replace: true });
+        navigate('/', { replace: true });
       }
       return;
     } catch (e) {
@@ -63,11 +62,11 @@ const redirectToNextPage = (navigate: NavigateFunction) => {
     }
   }
 
-  navigateToSubpage('/', { replace: true });
+  navigate('/', { replace: true });
 };
 
 const FinishNearLogin = () => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
   const [validating, setValidating] = React.useState<boolean>(false);
   const [validationCompleted, setValidationCompleted] =
     React.useState<boolean>(false);
@@ -138,7 +137,7 @@ const FinishNearLogin = () => {
     }
 
     // tx error handling
-    const failedTx = getRouteParam('tx_failure');
+    const failedTx = _DEPRECATED_getSearchParams('tx_failure');
 
     if (failedTx) {
       console.log(`Login failed: deleting storage key ${failedTx}`);
@@ -153,7 +152,7 @@ const FinishNearLogin = () => {
 
     // tx success handling
     // TODO: ensure that create() calls redirect correctly
-    const savedTx = getRouteParam('saved_tx');
+    const savedTx = _DEPRECATED_getSearchParams('saved_tx');
 
     if (savedTx && localStorage[savedTx]) {
       try {
@@ -182,7 +181,7 @@ const FinishNearLogin = () => {
     // create new chain handling
     // TODO: we need to figure out how to clean this localStorage entry up
     //   in the case of transaction failure!!
-    const chainName = getRouteParam('chain_name');
+    const chainName = _DEPRECATED_getSearchParams('chain_name');
 
     if (chainName && localStorage[chainName]) {
       try {

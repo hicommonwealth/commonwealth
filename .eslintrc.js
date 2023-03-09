@@ -4,6 +4,7 @@ module.exports = {
     // re-enable later -> currently bugged when paired with webpack
     // "plugin:import/recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended",
     "prettier"
   ],
   plugins: [

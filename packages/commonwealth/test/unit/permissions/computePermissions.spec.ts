@@ -3,7 +3,7 @@ import {
   PermissionManager,
   Action,
   ToCheck,
-} from 'commonwealth/shared/permissions';
+} from 'shared/permissions';
 
 describe('computePermissions() unit tests', () => {
   let base_permission;

@@ -1,25 +1,20 @@
 import React from 'react';
+import { uuidv4 } from 'lib/util';
+import $ from 'jquery';
 
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
-import _ from 'underscore';
-import $ from 'jquery';
 import app from 'state';
-import { uuidv4 } from 'lib/util';
 import { ChainBase, DefaultPage } from 'common-common/src/types';
 import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import type { ChainInfo, RoleInfo } from 'models';
-import {
-  Action,
-  PermissionManager,
-  ToCheck,
-} from 'commonwealth/shared/permissions';
+import { PermissionManager } from 'permissions';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -57,7 +52,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   iconUrl: string;
   stagesEnabled: boolean;
   customStages: string;
-  chatEnabled: boolean;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
   customDomain: string;
@@ -94,11 +88,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !this.permissionsManager.hasPermission(
-      chain.defaultDenyPermissions,
-      Action.VIEW_CHAT_CHANNELS,
-      ToCheck.Allow
-    );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -145,7 +134,20 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     return (
       <div className="ChainMetadataRows">
         <div className="AvatarUploadRow">
-          {/* @TODO Replace AvatarUploader here */}
+          <AvatarUpload
+            scope="community"
+            uploadStartedCallback={() => {
+              this.uploadInProgress = true;
+            }}
+            uploadCompleteCallback={(files) => {
+              files.forEach((f) => {
+                if (!f.uploadURL) return;
+                const url = f.uploadURL.replace(/\?.*/, '');
+                this.iconUrl = url;
+              });
+              this.uploadInProgress = false;
+            }}
+          />
         </div>
         <InputRow
           title="Name"
@@ -274,18 +276,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             }
           />
         )}
-        <ToggleRow
-          title="Chat Enabled"
-          defaultValue={this.chatEnabled}
-          onToggle={(checked) => {
-            this.chatEnabled = !!checked;
-          }}
-          caption={(checked) =>
-            checked
-              ? "Don't enable chat feature for this community"
-              : 'Enable chat feature for this community '
-          }
-        />
         <InputRow
           title="Custom Stages"
           value={this.customStages}
@@ -344,20 +334,23 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <div className="tag-row">
           <CWLabel label="Community Tags" />
           <div className="tag-group">
-            {this.selectedTags && Object.keys(this.selectedTags).map((key) => {
-              return (
-                <CWButton
-                  key={key}
-                  label={key}
-                  buttonType={
-                    this.selectedTags[key] ? 'primary-black' : 'secondary-black'
-                  }
-                  onClick={() => {
-                    this.selectedTags[key] = !this.selectedTags[key];
-                  }}
-                />
-              );
-            })}
+            {this.selectedTags &&
+              Object.keys(this.selectedTags).map((key) => {
+                return (
+                  <CWButton
+                    key={key}
+                    label={key}
+                    buttonType={
+                      this.selectedTags[key]
+                        ? 'primary-black'
+                        : 'secondary-black'
+                    }
+                    onClick={() => {
+                      this.selectedTags[key] = !this.selectedTags[key];
+                    }}
+                  />
+                );
+              })}
           </div>
         </div>
 
@@ -443,19 +436,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               console.log(err);
             }
             try {
-              if (this.chatEnabled) {
-                this.default_deny_permissions =
-                  this.permissionsManager.removeDenyPermission(
-                    default_deny_permissions,
-                    Action.VIEW_CHAT_CHANNELS
-                  );
-              } else {
-                this.default_deny_permissions =
-                  this.permissionsManager.addDenyPermission(
-                    default_deny_permissions,
-                    Action.VIEW_CHAT_CHANNELS
-                  );
-              }
               await chain.updateChainData({
                 name,
                 description,

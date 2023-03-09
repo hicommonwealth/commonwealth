@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { useNavigate } from 'react-router-dom';
-
 import 'pages/landing/landing_page_header.scss';
 
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // eslint-disable-next-line max-len
 const INITIAL_HEADER_STYLE = `bg-white static lg:flex lg:flex-row lg:justify-between
@@ -24,10 +23,14 @@ const triggerMenu = () => {
 type HeaderLandingPageProps = {
   navs: Array<{ text: string; redirectTo: string }>;
   scrollHeader: boolean;
+  onLogin: () => void;
 };
 
-export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
-  const navigate = useNavigate();
+export const HeaderLandingPage = ({
+  navs,
+  onLogin,
+}: HeaderLandingPageProps) => {
+  const navigate = useCommonNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -65,7 +68,12 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
   return (
     <>
       <Modal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+        content={
+          <LoginModal
+            onSuccess={onLogin}
+            onModalClose={() => setIsModalOpen(false)}
+          />
+        }
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
@@ -82,7 +90,7 @@ export const HeaderLandingPage = (props: HeaderLandingPageProps) => {
           />
           <nav className="lg:block hidden">
             <ul className="lg:flex lg:flex-row lg:items-center">
-              {props.navs.map((nav: any, i) => {
+              {navs.map((nav: any, i) => {
                 return (
                   <li
                     className="LandingPageHeaderLinks ml-10 py-8 lg:flex"

@@ -203,9 +203,6 @@ export class SubstrateDemocracyReferendum extends Proposal<
   }
 
   private _executionBlock: number;
-  public get executionBlock() {
-    return this._executionBlock;
-  }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
@@ -490,18 +487,6 @@ export class SubstrateDemocracyReferendum extends Proposal<
     );
   }
 
-  public get accountsVotedYes() {
-    return this.getVotes()
-      .filter((vote) => vote.choice === true)
-      .map((vote) => vote.account);
-  }
-
-  public get accountsVotedNo() {
-    return this.getVotes()
-      .filter((vote) => vote.choice === false)
-      .map((vote) => vote.account);
-  }
-
   get endTime(): ProposalEndTime {
     return { kind: 'fixed_block', blocknum: this._endBlock };
   }
@@ -567,60 +552,6 @@ export class SubstrateDemocracyReferendum extends Proposal<
       'submitDemocracyVote',
       this.title,
       cb
-    );
-  }
-
-  public unvote(who: SubstrateAccount, target?: SubstrateAccount) {
-    // you can remove someone else's vote if their unvote scope is set properly,
-    // but we don't support that in the UI right now (it requires their vote
-    // to be "expired", or for the proxy configuration to allow removing their vote)
-    if (!target) {
-      target = who;
-    }
-    return this._Chain.createTXModalData(
-      who,
-      (api: ApiPromise) =>
-        api.tx.democracy.removeOtherVote(target.address, this.data.index),
-      'unvote',
-      `${who.address} unvotes for ${target.address} on referendum ${this.data.index}`
-    );
-  }
-
-  // public async proxyVoteTx(vote: BinaryVote<SubstrateCoin>) {
-  //   const proxyFor = await (vote.account as SubstrateAccount).proxyFor.pipe(first()).toPromise();
-  //   if (!proxyFor) {
-  //     throw new Error('not a proxy');
-  //   }
-  //   const srmlVote = this._Chain.createType('Vote', {
-  //     aye: vote.choice,
-  //     conviction: convictionToSubstrate(this._Chain, weightToConviction(vote.weight)),
-  //   });
-  //   return this._Chain.createTXModalData(
-  //     vote.account as SubstrateAccount,
-  //     (api: ApiPromise) => api.tx.democracy.proxyVote(this.data.index, srmlVote),
-  //     'submitProxyDemocracyVote',
-  //     this.title
-  //   );
-  // }
-
-  public async notePreimage(author: SubstrateAccount, action: Call) {
-    const txFunc = (api: ApiPromise) =>
-      api.tx.democracy.notePreimage(action.toHex());
-    return this._Chain.createTXModalData(
-      author,
-      txFunc,
-      'notePreimage',
-      this._Chain.methodToTitle(action)
-    );
-  }
-
-  public noteImminentPreimage(author: SubstrateAccount, action: Call) {
-    return this._Chain.createTXModalData(
-      author,
-      (api: ApiPromise) =>
-        api.tx.democracy.noteImminentPreimage(action.toHex()),
-      'noteImminentPreimage',
-      this._Chain.methodToTitle(action)
     );
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getRoute } from 'mithrilInterop';
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
@@ -28,7 +28,7 @@ export const SharePopover = (props: SharePopoverProps) => {
           label: 'Copy URL',
           onClick: async () => {
             const currentRouteSansCommentParam =
-              getRoute().split('?comment=')[0];
+              _DEPRECATED_getRoute().split('?comment=')[0];
             if (!commentId) {
               await navigator.clipboard.writeText(
                 `${domain}${currentRouteSansCommentParam}`
@@ -46,12 +46,12 @@ export const SharePopover = (props: SharePopoverProps) => {
           onClick: async () => {
             if (!commentId) {
               await window.open(
-                `https://twitter.com/intent/tweet?text=${domain}${getRoute()}`,
+                `https://twitter.com/intent/tweet?text=${domain}${_DEPRECATED_getRoute()}`,
                 '_blank'
               );
             } else {
               await window.open(
-                `https://twitter.com/intent/tweet?text=${domain}${getRoute()}?comment=${commentId}`,
+                `https://twitter.com/intent/tweet?text=${domain}${_DEPRECATED_getRoute()}?comment=${commentId}`,
                 '_blank'
               );
             }

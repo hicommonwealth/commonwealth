@@ -115,6 +115,7 @@ export const AccountSelector = (props: AccountSelectorProps) => {
       {accounts.map((account, idx) => {
         return (
           <LinkAccountItem
+            key={`${account.address}-${idx}`}
             account={account}
             walletChain={walletChain}
             walletNetwork={walletNetwork}
@@ -232,8 +233,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
             'wallets'
           )}
         >
-          {wallets.map((wallet: IWebWallet<any>) => (
-            <>
+          {wallets.map((wallet: IWebWallet<any>, index) => (
+            <React.Fragment key={`${wallet.name}-${index}`}>
               <CWWalletOptionRow
                 walletName={wallet.name}
                 walletLabel={wallet.label}
@@ -340,7 +341,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 onClose={() => setIsModalOpen(false)}
                 open={isModalOpen}
               />
-            </>
+            </React.Fragment>
           ))}
           {wallets.length === 0 && (
             <CWWalletMissingOptionRow darkMode={darkMode} />

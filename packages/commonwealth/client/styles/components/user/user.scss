@@ -131,6 +131,13 @@
   }
 }
 
+.user-popover-wrapper {
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .UserPopover {
   background-color: $white;
   border-radius: $border-radius-corners;
