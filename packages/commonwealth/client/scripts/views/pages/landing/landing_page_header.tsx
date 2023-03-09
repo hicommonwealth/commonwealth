@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'pages/landing/landing_page_header.scss';
 
@@ -18,6 +18,21 @@ export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
   const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isWindowMediumSmall, setIsWindowMediumSmall] = useState(
+    isWindowMediumSmallInclusive(window.innerWidth)
+  );
+
+  useEffect(() => {
+    const onResize = () => {
+      setIsWindowMediumSmall(isWindowMediumSmallInclusive(window.innerWidth));
+    };
+
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
   return (
     <>
@@ -27,14 +42,19 @@ export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
           alt="Commonwealth"
           className="logo-with-text"
         />
-        <CWIconButton
-          iconName="hamburger"
-          onClick={() => console.log('menu open')}
-        />
-        <CWText onClick={() => navigate('/whyCommonwealth')}>
-          Why Commonwealth?
-        </CWText>
-        <CWButton label="Login" />
+        {isWindowMediumSmall ? (
+          <CWIconButton
+            iconName="hamburger"
+            onClick={() => console.log('menu open')}
+          />
+        ) : (
+          <>
+            <CWText onClick={() => navigate('/whyCommonwealth')}>
+              Why Commonwealth?
+            </CWText>
+            <CWButton label="Login" buttonType="primary-black" />
+          </>
+        )}
       </div>
       <Modal
         content={
@@ -43,7 +63,7 @@ export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
             onModalClose={() => setIsModalOpen(false)}
           />
         }
-        isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
+        isFullScreen={isWindowMediumSmall}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />

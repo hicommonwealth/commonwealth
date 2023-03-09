@@ -1,13 +1,54 @@
 @import '../../shared';
 
-.TokensCommunityConnectWalletButton {
-  a.btn-outline.rounded-lg.pb-2.pt-3.px-3 {
-    color: $neutral-800;
-    text-decoration: none;
-    cursor: pointer;
+.TokensCommunityHero {
+  display: flex;
+  height: 624px;
 
-    &:hover {
-      opacity: 0.6;
+  .search-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 24px;
+    justify-content: center;
+    padding: 56px;
+
+    .header-text.Text {
+      display: inline-block;
+
+      span {
+        color: $purple-300;
+      }
     }
+
+    input {
+      border-radius: $border-radius-rounded-corners;
+      box-shadow: $elevation-3;
+      height: 52px;
+      padding: 8px 24px;
+      width: 100%;
+    }
+
+    .links-section {
+      align-items: center;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+
+      .links-container {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+      }
+    }
+  }
+
+  .gradient {
+    flex: 1;
+
+    background: linear-gradient(
+      135deg,
+      rgb(179, 125, 186) 0%,
+      rgb(96, 134, 209) 100%
+    );
   }
 }

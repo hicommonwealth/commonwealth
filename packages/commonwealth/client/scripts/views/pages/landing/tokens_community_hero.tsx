@@ -7,6 +7,8 @@ import type { Chain } from './index';
 import { notifyError } from 'controllers/app/notifications';
 import { InputTokenList } from './input_tokens_lists';
 import { useCommonNavigate } from 'navigation/helpers';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 export const placeholderChain = {
   img: 'static/img/add.svg',
@@ -79,126 +81,78 @@ export const TokensCommunityHero = ({ chains }: TokensCommunityHeroProps) => {
     .filter((comm) => comm);
 
   return (
-    <section className="bg-gray-700">
-      <div className="relative mx-auto">
-        <div className="md:flex md:flex-row">
-          <div className="flex items-center justify-center md:w-2/4">
-            <div className="mt-32 mb-10 md:my-40 sm:px-8 md:px-8 lg:px-8 xl:px-16 px-8">
-              <h1 className="text-4xl font-bold mb-5 leading-10">
-                A
-                <span className="bg-clip-text text-transparent gradient-0">
-                  {' '}
-                  community{' '}
-                </span>
-                for every token.
-              </h1>
-              <p className="text-xl text-gray-600 mb-5">
-                Commonwealth is an all-in-one platform for on-chain communities
-                to discuss, vote, and fund projects together. Never miss an
-                on-chain event, proposal, or important discussion again.
-              </p>
-              <div
-                className={`token-search-wrap bg-white shadow-2xl rounded-xl
-                     p-2 flex flex-row justify-between mb-10 relative`}
-              >
-                <input
-                  autoComplete="off"
-                  className="p-2 flex-grow mr-2 text-xl text-gray-400 pt-3.5 focus:outline-none"
-                  id="token-input"
-                  type="text"
-                  placeholder="Find your favorite token"
-                  onInput={(event: any) => {
-                    setInputTokenValue(event.target.value);
-                    setRefilterResults(false);
-                    clearTimeout(inputTimeout);
-                    setInputTimeout(
-                      setTimeout(() => {
-                        setRefilterResults(true);
-                      }, 200)
-                    );
-                  }}
-                  onKeyUp={(event: any) => {
-                    if (event.key === 'Enter') {
-                      // initiateFullSearch(event.target.value);
-                    }
-                  }}
-                />
-                {inputTokenValue && inputTokenValue.length > 2 && (
-                  <InputTokenList
-                    optionList={[placeholderChain, ...chains]}
-                    inputValue={inputTokenValue}
-                    maxOptions={20}
-                    refilterResults={refilterResults}
-                  />
-                )}
-                <button
-                  type="button"
-                  className="btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36"
-                  style={{ padding: '8px 16px' }}
-                  onClick={() => {
-                    // initiateFullSearch(inputTokenValue);
-                  }}
-                >
-                  Let's Go{' '}
-                  <img
-                    className="inline ml-1.5"
-                    src="static/img/arrow-right.svg"
-                    alt="Let's Go"
-                  />
-                </button>
-              </div>
-              <div className="flex justify-center">
-                <h1 className="font-bold mb-5 leading-10 md:text-xl lg:text-2xl xl:text-4xl">
-                  We’re also here
-                </h1>
-                <div className="block flex">
-                  <a
-                    className="ml-4"
-                    href="https://discord.gg/t9XscHdZrG"
-                    target="_blank"
-                  >
-                    <img
-                      className="inline mr-1.5 h-8 w-8"
-                      src="static/img/discordIcon.svg"
-                      alt="Discord"
-                    />
-                  </a>
-                  <a
-                    className="mx-3 lg:mx-3"
-                    href="https://t.me/HiCommonwealth"
-                    target="_blank"
-                  >
-                    <img
-                      className="inline mr-1.5 h-8 w-8"
-                      src="static/img/telegramIcon.svg"
-                      alt="Telegram"
-                    />
-                  </a>
-                  <a
-                    className="lg:mx-3"
-                    href="https://twitter.com/hicommonwealth"
-                    target="_blank"
-                  >
-                    <img
-                      className="inline mr-1.5 h-8 w-8"
-                      src="static/img/twitterIcon.svg"
-                      alt="Twitter"
-                    />
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="h-556 md:h-auto md:w-2/4">
-            <div
-              className={`gradient-135 overflow-hidden relative h-full lg:min-h-desktop
-                lg:h-screen lg:w-50-screen lg:absolute lg:object-left xl:h-full xl:min-h-full`}
-            >
-              {mappedCommunities}
-            </div>
+    <div className="TokensCommunityHero">
+      <div className="search-section">
+        <CWText className="header-text" type="h2" fontWeight="semiBold">
+          A <span className="community-span"> community </span>
+          for every token.
+        </CWText>
+        <CWText type="h5">
+          Commonwealth is an all-in-one platform for on-chain communities to
+          discuss, vote, and fund projects together. Never miss an on-chain
+          event, proposal, or important discussion again.
+        </CWText>
+        <input
+          autoComplete="off"
+          type="text"
+          placeholder="Find your community"
+          onInput={(event: any) => {
+            setInputTokenValue(event.target.value);
+            setRefilterResults(false);
+            clearTimeout(inputTimeout);
+            setInputTimeout(
+              setTimeout(() => {
+                setRefilterResults(true);
+              }, 200)
+            );
+          }}
+          onKeyUp={(event: any) => {
+            if (event.key === 'Enter') {
+              // initiateFullSearch(event.target.value);
+            }
+          }}
+          onClick={() => {
+            // initiateFullSearch(inputTokenValue);
+          }}
+        />
+        {inputTokenValue && inputTokenValue.length > 2 && (
+          <InputTokenList
+            optionList={[placeholderChain, ...chains]}
+            inputValue={inputTokenValue}
+            maxOptions={20}
+            refilterResults={refilterResults}
+          />
+        )}
+        <div className="links-section">
+          <CWText type="h3" fontWeight="semiBold">
+            We’re also here
+          </CWText>
+          <div className="links-container">
+            <CWIconButton
+              iconName="discord"
+              onClick={() => {
+                console.log('https://discord.gg/t9XscHdZrG');
+              }}
+              iconSize="large"
+            />
+            <CWIconButton
+              iconName="telegram"
+              onClick={() => {
+                console.log('https://t.me/HiCommonwealth');
+              }}
+              iconSize="large"
+            />
+            <CWIconButton
+              iconName="twitter"
+              onClick={() => {
+                console.log('https://twitter.com/hicommonwealth');
+              }}
+              iconSize="large"
+            />
           </div>
         </div>
       </div>
-    </section>
+      <div className="gradient">{mappedCommunities}</div>
+    </div>
   );
 };
