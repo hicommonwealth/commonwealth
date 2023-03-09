@@ -742,8 +742,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
             onCollaboratorsUpdated={(newEditors: IThreadCollaborator[]) => {
-              thread.collaborators = newEditors;
-              setThread(thread);
+              const newThread = { ...thread, collaborators: newEditors } as Thread;
+              setThread(newThread);
             }}
           />
         }
