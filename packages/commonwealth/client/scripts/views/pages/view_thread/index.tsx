@@ -672,14 +672,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 chainEntities,
                                 snapshotProposal: snapshotProposal[0]?.id,
                               } as Thread;
-                              // thread.chainEntities = chainEntities;
-                              // if (app.chain?.meta.snapshot.length) {
-                              //   thread.snapshotProposal =
-                              //     snapshotProposal[0]?.id;
-                              // }
-                              // app.threads.fetchThreadsFromId([
-                              //   thread.identifier,
-                              // ]);
                               setThread(newThread);
                             }}
                             thread={thread}
