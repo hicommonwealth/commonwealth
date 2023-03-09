@@ -8,6 +8,7 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { DB } from '../models';
 import { createRole, findOneRole } from '../util/roles';
 import { factory, formatFilename } from 'common-common/src/logging';
+import assertAddressOwnership from '../util/assertAddressOwnership';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -146,6 +147,9 @@ const linkExistingAddressToChain = async (
 
       addressId = newObj.id;
     }
+
+    // assertion check
+    await assertAddressOwnership(models, encodedAddress);
 
     const ownedAddresses = await models.Address.findAll({
       where: { user_id: originalAddress.user_id },
