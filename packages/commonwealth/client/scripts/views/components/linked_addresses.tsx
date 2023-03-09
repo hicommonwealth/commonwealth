@@ -30,12 +30,15 @@ class Address extends ClassComponent<AddressAttrs> {
   view(vnode: m.Vnode<AddressAttrs>) {
     const { profile, addresses, addressInfo, refreshProfiles } = vnode.attrs;
     const { address, chain } = addressInfo;
+    const { iconUrl } = app.config.chains.getById(chain.id);
 
     return (
       <div className="AddressContainer">
         <CWAddressTooltip
           address={address}
-          trigger={<CWTruncatedAddress address={address} />}
+          trigger={
+            <CWTruncatedAddress address={address} communityIcon={iconUrl} />
+          }
         />
         <CWPopoverMenu
           menuItems={[

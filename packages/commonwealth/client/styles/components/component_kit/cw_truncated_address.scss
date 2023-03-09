@@ -1,14 +1,21 @@
 @import '../../shared';
 
 .TruncatedAddress {
-  width: 120px;
+  width: 136px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 4px 0;
+  justify-content: left;
+  padding: 4px 0 4px 12px;
   background-color: $neutral-100;
   border-radius: 5px;
   color: $neutral-600;
   font-weight: 500;
   font-size: 14px;
+
+  .community-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border-radius: 50%;
+  }
 }
