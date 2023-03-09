@@ -50,7 +50,7 @@ class UserSurveyView extends ClassComponent<ProfileGrowlViewAttrs> {
               className="blue-text"
               onclick={() => {
                 window.open(
-                  'https://commonwealth.ghost.io/p/7f623d2d-3926-4db5-b154-b36c545c5baf/',
+                  'https://blog.commonwealth.im/introducing-unified-profiles/',
                   '_blank'
                 );
               }}
