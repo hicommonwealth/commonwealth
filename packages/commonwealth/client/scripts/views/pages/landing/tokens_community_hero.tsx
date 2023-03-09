@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import 'pages/landing/tokens_community_hero.scss';
 
+import type { Chain } from './index';
+
 import { notifyError } from 'controllers/app/notifications';
 import { InputTokenList } from './input_tokens_lists';
-import { Chain } from './index';
 import { useCommonNavigate } from 'navigation/helpers';
 
 export const placeholderChain = {
@@ -15,37 +16,33 @@ export const placeholderChain = {
   placeholder: true,
 };
 
-type TokensCommunityComponentProps = {
+type TokensCommunityHeroProps = {
   chains: Array<Chain>;
 };
 
-export const TokensCommunityComponent = (
-  props: TokensCommunityComponentProps
-) => {
-  // const { chains } = props;
+export const TokensCommunityHero = ({ chains }: TokensCommunityHeroProps) => {
+  const navigate = useCommonNavigate();
 
-  // const navigate = useCommonNavigate();
+  const [inputTimeout, setInputTimeout] = useState<any>();
+  const [inputTokenValue, setInputTokenValue] = useState('');
+  const [refilterResults, setRefilterResults] = useState(true);
 
-  // const [inputTimeout, setInputTimeout] = React.useState<any>();
-  // const [inputTokenValue, setInputTokenValue] = React.useState<string>('');
-  // const [refilterResults, setRefilterResults] = React.useState<boolean>(true);
-
-  // const initiateFullSearch = (searchTerm: string) => {
-  // if (
-  //   !searchTerm ||
-  //   !searchTerm.toString().trim() ||
-  //   !searchTerm.match(/[A-Za-z]+/)
-  // ) {
-  //   return;
-  // }
-  // if (searchTerm.length < 3) {
-  //   notifyError('Query must be at least 3 characters');
-  // }
-  // const params = `q=${encodeURIComponent(
-  //   searchTerm.toString().trim()
-  // )}&scope[]=Communities`;
-  // navigate(`/search?${params}`);
-  // };
+  const initiateFullSearch = (searchTerm: string) => {
+    if (
+      !searchTerm ||
+      !searchTerm.toString().trim() ||
+      !searchTerm.match(/[A-Za-z]+/)
+    ) {
+      return;
+    }
+    if (searchTerm.length < 3) {
+      notifyError('Query must be at least 3 characters');
+    }
+    const params = `q=${encodeURIComponent(
+      searchTerm.toString().trim()
+    )}&scope[]=Communities`;
+    navigate(`/search?${params}`);
+  };
 
   const mappedCommunities = [
     {
@@ -100,7 +97,7 @@ export const TokensCommunityComponent = (
                 to discuss, vote, and fund projects together. Never miss an
                 on-chain event, proposal, or important discussion again.
               </p>
-              {/* <div
+              <div
                 className={`token-search-wrap bg-white shadow-2xl rounded-xl
                      p-2 flex flex-row justify-between mb-10 relative`}
               >
@@ -112,11 +109,8 @@ export const TokensCommunityComponent = (
                   placeholder="Find your favorite token"
                   onInput={(event: any) => {
                     setInputTokenValue(event.target.value);
-
                     setRefilterResults(false);
-
                     clearTimeout(inputTimeout);
-
                     setInputTimeout(
                       setTimeout(() => {
                         setRefilterResults(true);
@@ -125,7 +119,7 @@ export const TokensCommunityComponent = (
                   }}
                   onKeyUp={(event: any) => {
                     if (event.key === 'Enter') {
-                      initiateFullSearch(event.target.value);
+                      // initiateFullSearch(event.target.value);
                     }
                   }}
                 />
@@ -142,7 +136,7 @@ export const TokensCommunityComponent = (
                   className="btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36"
                   style={{ padding: '8px 16px' }}
                   onClick={() => {
-                    initiateFullSearch(inputTokenValue);
+                    // initiateFullSearch(inputTokenValue);
                   }}
                 >
                   Let's Go{' '}
@@ -152,7 +146,7 @@ export const TokensCommunityComponent = (
                     alt="Let's Go"
                   />
                 </button>
-              </div> */}
+              </div>
               <div className="flex justify-center">
                 <h1 className="font-bold mb-5 leading-10 md:text-xl lg:text-2xl xl:text-4xl">
                   We’re also here

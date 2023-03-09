@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import type { ICardListItem } from 'models/interfaces';
 
 import { removeOrAddClasslistToAllElements } from 'helpers';
-import { ICardListItem } from 'models/interfaces';
 import { ListedCardWithImage } from './listed_card_with_image';
-import { ListContainer } from './list_container';
 
-type ItemListsMapperProps = {
+type ListMapperWithItemProps = {
   bgColor: string;
   cardItems: Array<ICardListItem>;
   margin: string;
@@ -14,13 +14,18 @@ type ItemListsMapperProps = {
   variant?: string;
 };
 
-export const ItemListsMapper = (props: ItemListsMapperProps) => {
-  const { bgColor, cardItems, margin, tabHoverColorClick, textType, variant } =
-    props;
-
-  const [buttonHoverActiveById, setButtonHoverActiveById] =
-    React.useState<string>(cardItems[0].button.id);
-  const [cardImageActiveById, setCardImageActiveById] = React.useState<string>(
+export const ListMapperWithItem = ({
+  bgColor,
+  cardItems,
+  margin,
+  tabHoverColorClick,
+  textType,
+  variant,
+}: ListMapperWithItemProps) => {
+  const [buttonHoverActiveById, setButtonHoverActiveById] = useState<string>(
+    cardItems[0].button.id
+  );
+  const [cardImageActiveById, setCardImageActiveById] = useState<string>(
     cardItems[0].card.id
   );
 
@@ -65,8 +70,11 @@ export const ItemListsMapper = (props: ItemListsMapperProps) => {
   });
 
   return (
-    <ListContainer bgColor={bgColor} margin={margin}>
+    <ul
+      className={`rounded-3xl p-3 lg:p-6 relative min-h-tabs lg:flex
+           lg:flex-col lg:h-full ${bgColor} ${margin}`}
+    >
       {mappedListItems}
-    </ListContainer>
+    </ul>
   );
 };

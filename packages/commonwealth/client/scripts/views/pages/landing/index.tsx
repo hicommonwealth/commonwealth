@@ -1,25 +1,22 @@
 import React from 'react';
-
 import Glide from '@glidejs/glide';
 
-// Logged Out Homepage View
-import 'pages/landing/landing_page.scss';
-// Logged In Homepage View
 import 'pages/landing/index.scss';
 
+import type { ChainInfo } from 'models';
+
 import app, { LoginState } from 'state';
-import { ChainInfo } from 'models';
-import { HeaderLandingPage } from './landing_page_header';
-import { TokensCommunityComponent } from './tokens_community_hero';
-import { TokensCreatorComponent } from './creators_card_section';
-import { TokensChainsComponent } from './chains_slider';
-import { TokenHoldersComponent } from './find_your_community_section';
-import { ChainsCrowdfundingComponent } from './crowdfunding_card_section';
+import { LandingPageHeader } from './landing_page_header';
+import { TokensCommunityHero } from './tokens_community_hero';
+import { CreatorsCardSection } from './creators_card_section';
+import { ChainsSlider } from './chains_slider';
+import { FindYourCommunitySection } from './find_your_community_section';
+import { CrowdfundingCardSection } from './crowdfunding_card_section';
 import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
-import { MixpanelPageViewEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import useForceRerender from 'hooks/useForceRerender';
+// import { MixpanelPageViewEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 export type Chain = {
   chainInfo: ChainInfo;
@@ -76,19 +73,11 @@ const LandingPage = () => {
 
   if (app.loginState !== LoginState.LoggedIn) {
     return (
-      <div className="LandingPage bg-primary">
-        <div className="absolute w-screen z-20">
-          <HeaderLandingPage
-            onLogin={forceRerender}
-            scrollHeader
-            navs={[
-              { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-            ]}
-          />
-        </div>
-        <TokensCommunityComponent chains={chains} />
+      <div className="LandingPage">
+        <LandingPageHeader onLogin={forceRerender} />
+        <TokensCommunityHero chains={chains} />
         {/* {chains && (
-            <TokensChainsComponent
+            <ChainsSlider
               oncreateSlider={() => {
                 return new (Glide as any)('.glide', {
                   type: 'carousel',
@@ -124,7 +113,7 @@ const LandingPage = () => {
               chains={chains}
             />
           )} */}
-        <TokensCreatorComponent
+        <CreatorsCardSection
           creators={[
             {
               button: {
@@ -186,7 +175,7 @@ const LandingPage = () => {
             },
           ]}
         />
-        <TokenHoldersComponent
+        <FindYourCommunitySection
           holders={[
             {
               img: 'static/img/circleCrowd.svg',
@@ -216,7 +205,7 @@ const LandingPage = () => {
             },
           ]}
         />
-        <ChainsCrowdfundingComponent
+        <CrowdfundingCardSection
           chains={[
             {
               button: {

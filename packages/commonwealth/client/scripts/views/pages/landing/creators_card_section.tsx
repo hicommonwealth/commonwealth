@@ -3,15 +3,13 @@ import React from 'react';
 import 'pages/landing/creators_card_section.scss';
 
 import type { ICardListItem } from 'models/interfaces';
-import { ItemListsMapper } from './list_mapper_with_item';
+import { ListMapperWithItem } from './list_mapper_with_item';
 
-type TokensCreatorComponentProps = {
+type CreatorsCardSectionProps = {
   creators: Array<ICardListItem>;
 };
 
-export const TokensCreatorComponent = (props: TokensCreatorComponentProps) => {
-  const { creators } = props;
-
+export const CreatorsCardSection = ({ creators }: CreatorsCardSectionProps) => {
   return (
     <section className="container mx-auto pt-10">
       <h2 className="text-3xl font-bold mb-5 text-center">
@@ -21,7 +19,7 @@ export const TokensCreatorComponent = (props: TokensCreatorComponentProps) => {
         Commonwealth lets you simplify your community and governance, bringing
         four tools into one.
       </p>
-      <ItemListsMapper
+      <ListMapperWithItem
         bgColor="bg-gray-900"
         margin="mt-4"
         cardItems={creators}

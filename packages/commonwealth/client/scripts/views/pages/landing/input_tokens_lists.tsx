@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { InputTokenOptionComponent } from './input_token_option';
-import { Chain, Token } from './index';
-import { placeholderChain } from './tokens_community_hero';
+import type { Chain, Token } from './index';
+import type { placeholderChain } from './tokens_community_hero';
+
+import { InputTokenOption } from './input_token_option';
 
 type InputTokenListProps = {
   inputValue: string;
@@ -11,11 +12,14 @@ type InputTokenListProps = {
   refilterResults: boolean;
 };
 
-export const InputTokenList = (props: InputTokenListProps) => {
-  const { maxOptions, optionList, refilterResults, inputValue } = props;
-
-  const [oldValue, setOldValue] = React.useState<string>();
-  const [options, setOptions] = React.useState<Array<any>>();
+export const InputTokenList = ({
+  inputValue,
+  maxOptions,
+  optionList,
+  refilterResults,
+}: InputTokenListProps) => {
+  const [oldValue, setOldValue] = useState('');
+  const [options, setOptions] = useState<Array<any>>();
 
   if (inputValue.length < 3) return;
 
@@ -71,7 +75,7 @@ export const InputTokenList = (props: InputTokenListProps) => {
       option = option as Token;
 
       return (
-        <InputTokenOptionComponent
+        <InputTokenOption
           route={option.address}
           iconImg={option.logoURI}
           text={option.name}
@@ -81,7 +85,7 @@ export const InputTokenList = (props: InputTokenListProps) => {
       option = option as Chain;
 
       return (
-        <InputTokenOptionComponent
+        <InputTokenOption
           route={option.id}
           iconImg={option.img}
           text={option.name}

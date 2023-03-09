@@ -4,16 +4,17 @@ import { useCommonNavigate } from 'navigation/helpers';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 
-type InputTokenOptionComponentProps = {
+type InputTokenOptionProps = {
   iconImg: string;
   route: string;
   text: string;
 };
 
-export const InputTokenOptionComponent = (
-  props: InputTokenOptionComponentProps
-) => {
-  const { iconImg, route, text } = props;
+export const InputTokenOption = ({
+  iconImg,
+  route,
+  text,
+}: InputTokenOptionProps) => {
   const navigate = useCommonNavigate();
 
   let tokenImage;

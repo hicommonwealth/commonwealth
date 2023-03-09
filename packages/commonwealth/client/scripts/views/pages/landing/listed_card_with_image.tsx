@@ -16,23 +16,21 @@ type ListedCardWithImageProps = {
   variant?: string;
 };
 
-export const ListedCardWithImage = (props: ListedCardWithImageProps) => {
-  const {
-    buttonId,
-    cardId,
-    handleClick,
-    imageActive,
-    imageAlt,
-    imageSrc,
-    isTabHoverActive,
-    subtitle,
-    subtitleId,
-    tabHoverColorClick,
-    textType,
-    title,
-    variant,
-  } = props;
-
+export const ListedCardWithImage = ({
+  buttonId,
+  cardId,
+  handleClick,
+  imageActive,
+  imageAlt,
+  imageSrc,
+  isTabHoverActive,
+  subtitle,
+  subtitleId,
+  tabHoverColorClick,
+  textType,
+  title,
+  variant,
+}: ListedCardWithImageProps) => {
   return (
     <li className="lg:flex-grow">
       <div className="lg:flex lg:flex-row">

@@ -9,13 +9,13 @@ type Holder = {
   title: string;
 };
 
-type TokenHoldersComponentProps = {
+type FindYourCommunitySectionProps = {
   holders: Array<Holder>;
 };
 
-export const TokenHoldersComponent = (props: TokenHoldersComponentProps) => {
-  const { holders } = props;
-
+export const FindYourCommunitySection = ({
+  holders,
+}: FindYourCommunitySectionProps) => {
   return (
     <section className="LandingPageTokenHolders container mx-auto pt-20">
       <h2 className="text-3xl font-bold mb-5 text-center">

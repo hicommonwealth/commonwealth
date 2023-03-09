@@ -1,26 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import 'pages/landing/chains_slider.scss';
 
 import type { Chain } from './index';
+
 import { useCommonNavigate } from 'navigation/helpers';
 
-const initialSlides = 4;
-
-type TokensChainsComponentAttrs = {
+type ChainsSliderProps = {
   chains: Array<Chain>;
   oncreateSlider: () => any;
 };
 
-export const TokensChainsComponent = (props: TokensChainsComponentAttrs) => {
-  const { chains, oncreateSlider } = props;
-
+export const ChainsSlider = ({ chains, oncreateSlider }: ChainsSliderProps) => {
   const navigate = useCommonNavigate();
 
-  const chainToTag = (chain, index: number) => {
+  const [index, setIndex] = useState<number>(0);
+  const [displayedChains, setDisplayedChains] = useState<any>(
+    chains.slice(0, 4).map((chain, idx) => chainToTag(chain, idx))
+  );
+
+  const chainToTag = (chain, idx: number) => {
     return (
       <li
-        id={`card_${index}`}
+        id={`card_${idx}`}
         className="glide__slide mt-4 pb-8"
         onClick={(e) => {
           e.preventDefault();
@@ -41,13 +43,6 @@ export const TokensChainsComponent = (props: TokensChainsComponentAttrs) => {
       </li>
     );
   };
-
-  const [displayedChains, setDisplayedChains] = React.useState<any>(
-    chains
-      .slice(0, initialSlides)
-      .map((chain, index) => chainToTag(chain, index))
-  );
-  const [index, setIndex] = React.useState<number>(0);
 
   //   const glide = oncreateSlider();
 
