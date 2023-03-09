@@ -56,6 +56,9 @@ const getNewProfile = async (
 
   const comments = await models.Comment.findAll({
     where: {
+      root_id: {
+        [Op.like]: 'discussion%',
+      },
       address_id: {
         [Op.in]: addressIds,
       },
