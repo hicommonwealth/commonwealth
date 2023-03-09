@@ -18,7 +18,6 @@ import { AppModals } from './app_modals';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
-import { UserSurveyPopup } from './components/user_survey_popup';
 import { NewProfilesPopup } from './components/new_profiles_popup';
 
 class LoadingLayout extends ClassComponent {
@@ -44,8 +43,6 @@ type LayoutAttrs = {
 export class Layout extends ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
-  private surveyDelayTriggered = false;
-  private surveyReadyForDisplay = false;
   private growlDelayTriggered = false;
   private profileGrowlReadyForDisplay = false;
 
@@ -54,14 +51,6 @@ export class Layout extends ClassComponent<LayoutAttrs> {
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
-
-    // Put the survey on a timer so it doesn't immediately appear
-    if (!this.surveyDelayTriggered && !this.surveyReadyForDisplay) {
-      this.surveyDelayTriggered = true;
-      setTimeout(() => {
-        this.surveyReadyForDisplay = true;
-      }, 4000);
-    }
 
     // Put the profile growl on a timer so it doesn't immediately appear
     if (!this.growlDelayTriggered && !this.profileGrowlReadyForDisplay) {
@@ -145,7 +134,6 @@ export class Layout extends ClassComponent<LayoutAttrs> {
         {vnode.children}
         <AppModals />
         <AppToasts />
-        <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
         {app.isLoggedIn() && (
           <NewProfilesPopup
             readyForDisplay={this.profileGrowlReadyForDisplay}
