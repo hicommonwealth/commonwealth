@@ -268,21 +268,12 @@ export const getTopThreads = async (
         },
       });
 
-      // TODO: When new profiles are created, this will need to be swapped in
-      // const profile = await models.Profile.findOne({
-      //   where: {
-      //     id: addressData.profile_id,
-      //     user_id: addressData.user_id,
-      //   },
-      // });
-
-      const profile = await models.OffchainProfile.findOne({
+      const profile = await models.Profile.findOne({
         where: {
-          address_id: addressData.id,
+          id: addressData.profile_id,
+          user_id: addressData.user_id,
         },
       });
-
-      let profileData;
 
       if (!profile) {
         console.log(
@@ -291,8 +282,6 @@ export const getTopThreads = async (
           ' in ',
           communityId
         );
-      } else {
-        profileData = JSON.parse(profile.data);
       }
 
       const data: ThreadData = {
@@ -302,8 +291,8 @@ export const getTopThreads = async (
         view_count: row.view_count,
         author_address: row.author_address,
         author_address_short: shortAddress,
-        author_name: profileData ? profileData.name : 'Anonymous',
-        author_profile_img_url: profileData ? profileData.avatarUrl : '',
+        author_name: profile ? profile.profile_name : 'Anonymous',
+        author_profile_img_url: profile ? profile.avatar_url : '',
         thread_id: row.thread_id,
         publish_date_string: moment(row.created_at).format('MM/DD/YY'),
         thread_url: `https://www.commonwealth.im/${communityId}/discussion/${row.thread_id}`,
