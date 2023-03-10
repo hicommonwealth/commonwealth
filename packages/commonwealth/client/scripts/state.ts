@@ -18,7 +18,7 @@ import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
 import PollsController from './controllers/server/polls';
-import ProfilesController from './controllers/server/profiles';
+import NewProfilesController from './controllers/server/newProfiles';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
 import ThreadReactionsController from './controllers/server/reactions/ThreadReactionsController';
@@ -89,7 +89,7 @@ export interface IApp {
   user: UserController;
   roles: RolesController;
   recentActivity: RecentActivityController;
-  profiles: ProfilesController;
+  newProfiles: NewProfilesController;
   sessions: SessionsController;
 
   // Web3
@@ -194,7 +194,7 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  profiles: new ProfilesController(),
+  newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
 
@@ -214,7 +214,7 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: (win: Window) => {
+  isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
   },

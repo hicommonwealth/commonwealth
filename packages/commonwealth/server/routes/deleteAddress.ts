@@ -41,6 +41,7 @@ const deleteAddress = async (
     addressObj.profile_id = null;
     addressObj.user_id = null;
     addressObj.verified = null;
+    addressObj.profile_id = null;
     addressObj.name = null;
     await addressObj.save();
     return res.json({ status: 'Success', response: 'Deleted address' });

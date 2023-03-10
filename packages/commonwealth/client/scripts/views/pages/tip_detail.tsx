@@ -55,7 +55,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
             <div class="proposal-page-row">
               <div class="label">Beneficiary</div>
               {m(User, {
-                user: app.profiles.getProfile(proposal.author.chain.id, who),
+                user: app.newProfiles.getProfile(proposal.author.chain.id, who),
                 linkify: true,
                 popover: true,
                 showAddressWithDisplayName: true,
