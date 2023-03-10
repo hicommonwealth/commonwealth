@@ -70,7 +70,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
 
     const { topicName, stageName } = this;
 
-    // Fetch first 20 unpinned threads
+    // Fetch first 20 + unpinned threads
     if (
       !app.threads.listingStore.isInitialized({
         topicName,
@@ -78,7 +78,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       })
     ) {
       this.initializing = true;
-      app.threads.loadNextPage({ topicName, stageName }).then(() => {
+      app.threads.loadNextPage({ topicName, stageName, includePinnedThreads: true }).then(() => {
         this.initializing = false;
         m.redraw();
       });

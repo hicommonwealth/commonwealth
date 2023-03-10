@@ -13,7 +13,7 @@ const bulkThreads = async (
   next: NextFunction
 ) => {
   const chain = req.chain;
-  const { cutoff_date, topic_id, stage } = req.query;
+  const { cutoff_date, topic_id, includePinnedThreads, stage } = req.query;
 
   const bind = { chain: chain.id };
 
@@ -26,6 +26,8 @@ const bulkThreads = async (
     topicOptions += `AND t.stage = $stage `;
     bind['stage'] = stage;
   }
+
+  const pinnedThreadsQuery = includePinnedThreads ? 'OR t.pinned = true' : 'AND t.pinned = false'
 
   bind['created_at'] = cutoff_date;
 
@@ -97,7 +99,7 @@ const bulkThreads = async (
           AND t.chain = $chain 
           ${topicOptions}
           AND COALESCE(t.last_commented_on, t.created_at) < $created_at
-          AND t.pinned = false
+          ${pinnedThreadsQuery}
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
            reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
           ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
