@@ -1,17 +1,29 @@
 @import '../../shared';
 
 .FindYourCommunitySection {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  justify-content: center;
+  padding: 56px 268px;
   width: 100%;
+
+  .header {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+  }
 
   .holders-container {
     display: flex;
     flex-wrap: wrap;
+    gap: 40px;
 
     .holder-card {
-      // flex: 1;
-
-      img {
-      }
+      flex: 1;
     }
   }
 }

@@ -47,13 +47,15 @@ export const CreatorsCardSection = () => {
 
   return (
     <div className="CreatorsCardSection">
-      <CWText type="h3" fontWeight="semiBold">
-        Token creators are empowered.
-      </CWText>
-      <CWText type="h4" fontWeight="medium">
-        Commonwealth lets you simplify your community and governance, bringing
-        four tools into one.
-      </CWText>
+      <div className="header">
+        <CWText type="h3" fontWeight="semiBold">
+          Token creators are empowered.
+        </CWText>
+        <CWText type="h4" fontWeight="medium">
+          Commonwealth lets you simplify your community and governance, bringing
+          four tools into one.
+        </CWText>
+      </div>
       <div className="inner-container">
         <div className="cards-column">
           <GalleryCard

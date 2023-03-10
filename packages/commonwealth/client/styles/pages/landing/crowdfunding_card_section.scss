@@ -4,13 +4,21 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 48px;
   justify-content: center;
   padding: 56px;
   width: 100%;
 
-  img {
-    width: 112px;
+  .header {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+
+    img {
+      width: 112px;
+    }
   }
 
   .inner-container {

@@ -10,8 +10,12 @@ export const CrowdfundingCardSection = () => {
 
   return (
     <div className="CrowdfundingCardSection">
-      <img src="static/img/misc.png" alt="" />
-      <CWText>Leverage on-chain crowdfunding</CWText>
+      <div className="header">
+        <img src="static/img/misc.png" alt="" />
+        <CWText type="h3" fontWeight="semiBold">
+          Leverage on-chain crowdfunding
+        </CWText>
+      </div>
       <div className="inner-container">
         <div className="cards-column">
           <GalleryCard

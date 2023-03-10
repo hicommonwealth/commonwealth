@@ -39,10 +39,18 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 48px;
   justify-content: center;
   padding: 56px;
   width: 100%;
+
+  .header {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+  }
 
   .inner-container {
     display: flex;
