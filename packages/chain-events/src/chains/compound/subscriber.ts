@@ -98,6 +98,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
               args: parsedRawEvent.args as any,
               name: parsedRawEvent.name,
               blockNumber: log.blockNumber,
+              data: log.data,
             };
 
             const logStr = `Found the following event log in block ${
@@ -139,7 +140,8 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     this.subIntervalId = setInterval(
       this.fetchLogs.bind(this),
       maxBlockTime * 1000,
-      provider
+      provider,
+      cb
     );
   }
 

@@ -142,7 +142,9 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
     // TODO: keep track of the number of requests that return no blocks - adjust accordingly
     this.subIntervalId = setInterval(
       this.fetchLogs.bind(this),
-      maxBlockTime * 1000
+      maxBlockTime * 1000,
+      this._api.provider,
+      cb
     );
   }
 

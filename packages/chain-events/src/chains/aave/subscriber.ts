@@ -138,7 +138,8 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     this.subIntervalId = setInterval(
       this.fetchLogs.bind(this),
       maxBlockTime * 1000,
-      provider
+      provider,
+      cb
     );
   }
 

@@ -39,6 +39,7 @@ export interface RawEvent {
   args: any;
   name: string;
   blockNumber: number;
+  data: any;
 }
 
 // eslint-disable-next-line no-shadow
