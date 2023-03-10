@@ -140,14 +140,12 @@ export const UpdateProposalStatusModal = ({
         )}
         {showSnapshot && (
           <SnapshotProposalSelector
-            thread={thread}
             onSelect={handleSelectProposal}
             snapshotProposalsToSet={tempSnapshotProposals}
           />
         )}
         {app.chainEntities && (
           <ChainEntitiesSelector
-            thread={thread}
             onSelect={handleSelectChainEntity}
             chainEntitiesToSet={tempChainEntities}
           />
@@ -156,9 +154,7 @@ export const UpdateProposalStatusModal = ({
           <CWButton
             label="Cancel"
             buttonType="secondary-blue"
-            onClick={() => {
-              onModalClose();
-            }}
+            onClick={onModalClose}
           />
           <CWButton label="Save changes" onClick={handleSaveChanges} />
         </div>
