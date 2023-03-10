@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, getRouteParam } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'components/profile/profile_activity.scss';
 
@@ -30,11 +30,9 @@ type ProfileActivityAttrs = {
 };
 
 class ProfileActivity extends ClassComponent<ProfileActivityAttrs> {
-  private address: string;
   private selectedActivity: ProfileActivityType;
 
   oninit() {
-    this.address = getRouteParam('address');
     this.selectedActivity = ProfileActivityType.Comments;
   }
 
@@ -85,7 +83,6 @@ class ProfileActivity extends ClassComponent<ProfileActivityAttrs> {
         <div className="activity-content">
           <ProfileActivityContent
             option={this.selectedActivity}
-            address={this.address}
             threads={vnode.attrs.threads}
             comments={vnode.attrs.comments}
           />

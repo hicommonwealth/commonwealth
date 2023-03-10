@@ -68,9 +68,6 @@ const ManageProfilesPage = lazy(() => import('views/pages/manage_profiles'));
 const CreateNewProfilePage = lazy(
   () => import('views/pages/create_new_profile')
 );
-const NewProfileRedirect = lazy(
-  () => import('views/pages/new_profile_redirect')
-);
 
 const getCommonDomainsRoutes = () => (
   <>
@@ -433,14 +430,14 @@ const getCommonDomainsRoutes = () => (
     {/* PROFILES END*/}
     {/* NEW PROFILES */}
     <Route
-      path="/profile/:username"
+      path="/profile/id/:profileId"
       element={withLayout(NewProfilePage, {
         scoped: true,
         deferChain: true,
       })}
     />
     <Route
-      path="/profile/:username/edit"
+      path="/profile/id/:profileId/edit"
       element={withLayout(EditNewProfilePage, {
         scoped: true,
         deferChain: true,
@@ -456,24 +453,6 @@ const getCommonDomainsRoutes = () => (
     <Route
       path="/profile/new"
       element={withLayout(CreateNewProfilePage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    {/* TODO: remove route when PR4 is merged
-    should be able to use /profile/:username instead */}
-    <Route
-      path="/profile/id/:profileId"
-      element={withLayout(NewProfileRedirect, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    {/* TODO: remove route when PR4 is merged
-    should be able to use /profile/:username/edit instead */}
-    <Route
-      path="/profile/id/:profileId/edit"
-      element={withLayout(NewProfileRedirect, {
         scoped: true,
         deferChain: true,
       })}

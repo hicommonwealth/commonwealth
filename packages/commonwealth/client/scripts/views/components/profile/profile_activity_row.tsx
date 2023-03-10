@@ -18,7 +18,6 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 
 type ProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
-  address: string;
 };
 
 class ProfileActivityRow extends ClassComponent<ProfileActivityRowAttrs> {

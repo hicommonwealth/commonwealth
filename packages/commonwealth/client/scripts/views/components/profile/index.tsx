@@ -21,8 +21,7 @@ enum ProfileError {
 }
 
 type ProfileProps = {
-  username?: string;
-  profileId?: string;
+  profileId: string;
 };
 
 const NoProfileFoundError = 'No profile found';
@@ -38,11 +37,11 @@ const ProfileComponent = (props: ProfileProps) => {
   const [threads, setThreads] = React.useState<Thread[]>([]);
   const [isOwner, setIsOwner] = React.useState<boolean>();
 
-  const getProfileData = async (query: string, type: string) => {
+  const getProfileData = async (query: string) => {
     setLoading(true);
     try {
       const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
-        [type]: query,
+        profileId: query,
         jwt: app.user.jwt,
       });
 
@@ -85,15 +84,7 @@ const ProfileComponent = (props: ProfileProps) => {
   };
 
   React.useEffect(() => {
-    if (props.username) {
-      getProfileData(props.username, 'username');
-      return;
-    }
-
-    if (props.profileId) {
-      getProfileData(props.profileId, 'profileId');
-      return;
-    }
+    getProfileData(props.profileId);
   }, []);
 
   if (loading)

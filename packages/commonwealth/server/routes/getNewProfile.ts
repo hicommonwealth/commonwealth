@@ -1,20 +1,19 @@
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import type { AddressAttributes } from 'server/models/address';
-import type { CommentAttributes } from 'server/models/comment';
-import type { ProfileInstance } from 'server/models/profile';
-import type { ThreadAttributes } from 'server/models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../types';
-import { success } from '../types';
 import type { DB } from '../models';
+import type { AddressAttributes } from '../models/address';
+import type { CommentAttributes } from '../models/comment';
+import type { ThreadAttributes } from '../models/thread';
+import type { ProfileInstance } from '..//models/profile';
+import { success } from '../types';
 
 export const Errors = {
-  NoIdentifierProvided: 'No username or profile id provided in query',
+  NoIdentifierProvided: 'No profile id provided in query',
   NoProfileFound: 'No profile found',
 };
 
 type GetNewProfileReq = {
-  username: string;
   profileId: string;
 };
 type GetNewProfileResp = {
@@ -32,27 +31,14 @@ const getNewProfile = async (
   res: TypedResponse<GetNewProfileResp>,
   next: NextFunction
 ) => {
-  const { username, profileId } = req.query;
-  if (!username && !profileId)
-    return next(new Error(Errors.NoIdentifierProvided));
+  const { profileId } = req.query;
+  if (!profileId) return next(new Error(Errors.NoIdentifierProvided));
 
-  let profile;
-
-  if (username) {
-    profile = await models.Profile.findOne({
-      where: {
-        username,
-      },
-    });
-  }
-
-  if (!username && profileId) {
-    profile = await models.Profile.findOne({
-      where: {
-        id: profileId,
-      },
-    });
-  }
+  const profile = await models.Profile.findOne({
+    where: {
+      id: profileId,
+    },
+  });
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 

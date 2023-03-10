@@ -15,7 +15,6 @@ enum ProfileActivityType {
 }
 
 type ProfileActivityContentAttrs = {
-  address: string;
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
@@ -23,13 +22,13 @@ type ProfileActivityContentAttrs = {
 
 class ProfileActivityContent extends ClassComponent<ProfileActivityContentAttrs> {
   view(vnode: ResultNode<ProfileActivityContentAttrs>) {
-    const { option, address, comments, threads } = vnode.attrs;
+    const { option, comments, threads } = vnode.attrs;
 
     if (option === ProfileActivityType.Threads) {
       return threads
         .sort((a, b) => +b.createdAt - +a.createdAt)
         .map((thread, i) => (
-          <NewProfileActivityRow key={i} activity={thread} address={address} />
+          <NewProfileActivityRow key={i} activity={thread} />
         ));
     }
 
@@ -40,7 +39,7 @@ class ProfileActivityContent extends ClassComponent<ProfileActivityContentAttrs>
 
     return allActivities.map((activity, i) => {
       return (
-        <NewProfileActivityRow key={i} activity={activity} address={address} />
+        <NewProfileActivityRow key={i} activity={activity} />
       );
     });
   }

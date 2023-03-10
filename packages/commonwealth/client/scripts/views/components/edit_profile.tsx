@@ -36,8 +36,7 @@ enum EditProfileError {
 const NoProfileFoundError = 'No profile found';
 
 type EditNewProfileProps = {
-  username?: string;
-  profileId?: string;
+  profileId: string;
 };
 
 export type Image = {
@@ -54,7 +53,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [socials, setSocials] = React.useState<string[]>();
   const [profile, setProfile] = React.useState<Profile>();
-  const [username, setUsername] = React.useState<string>(props.username || '');
+  const [username, setUsername] = React.useState<string>('');
   const [name, setName] = React.useState<string>('');
   const [avatarUrl, setAvatarUrl] = React.useState<string>();
   const [bio, setBio] = React.useState<QuillEditor>();
@@ -67,10 +66,10 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   const backgroundImageRef = React.useRef<Image>();
   backgroundImageRef.current = backgroundImage;
 
-  const getProfile = async (query: string, type: string) => {
+  const getProfile = async (query: string) => {
     try {
       const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
-        [type]: query,
+        profileId: query,
         jwt: app.user.jwt,
       });
 
@@ -205,18 +204,11 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
   React.useEffect(() => {
     if (!app.isLoggedIn()) {
-      navigate(`/profile/${props.username}`);
-    }
-    // when a user navigates from /profile/:username/edit
-    if (props.username) {
-      getProfile(props.username, 'username');
-      return;
+      navigate(`/profile/id/${props.profileId}`);
     }
 
-    // when a user navigates from /profile/id/:profileId/edit
     if (props.profileId) {
-      getProfile(props.profileId, 'profileId');
-      return;
+      getProfile(props.profileId);
     }
   }, []);
 
@@ -236,7 +228,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
   if (error === EditProfileError.None) {
     if (!isOwner) {
-      navigate(`/profile/${props.username}`);
+      navigate(`/profile/id/${props.profileId}`);
     }
 
     // need to create an account to pass to AvatarUpload to see last upload

@@ -5,20 +5,20 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import EditProfileComponent from '../components/edit_profile';
 
-type EditNewProfileProps = { username: string };
+type EditNewProfileProps = { profileId: string };
 
 const EditNewProfile = (props: EditNewProfileProps) => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!app.isLoggedIn()) {
-      navigate(`/profile/${props.username}`);
+      navigate(`/profile/id/${props.profileId}`);
     }
   }, []);
 
   return (
     <Sublayout>
-      <EditProfileComponent username={props.username} />
+      <EditProfileComponent profileId={props.profileId} />
     </Sublayout>
   );
 };
