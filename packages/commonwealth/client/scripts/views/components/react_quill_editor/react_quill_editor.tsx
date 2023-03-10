@@ -28,7 +28,6 @@ const ReactQuillEditor = ({
   const handleChange = (value, delta, source, editor) => {
     setContentDelta(editor.getContents())
     onChange?.(value)
-    console.log('ops: ', editor.getContents())
   }
 
   return (

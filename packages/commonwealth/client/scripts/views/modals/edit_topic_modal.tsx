@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
@@ -8,16 +7,15 @@ import 'modals/edit_topic_modal.scss';
 import { Topic } from 'models';
 
 import app from 'state';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import type { QuillEditor } from '../components/quill/quill_editor';
-import type { QuillTextContents } from '../components/quill/types';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
+import { DeltaStatic } from 'quill';
+import { EMPTY_OPS, ReactQuillEditor } from '../components/react_quill_editor';
 
 type EditTopicModalProps = {
   defaultOffchainTemplate: string;
@@ -43,9 +41,9 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
   const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(EMPTY_OPS);
+  const [editorValue, setEditorValue] = React.useState<string>('');
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
-  const [contentsDoc, setContentsDoc] = React.useState<QuillTextContents>();
 
   const [description, setDescription] = React.useState<string>(descriptionProp);
   const [featuredInNewPost, setFeaturedInNewPost] = React.useState<boolean>(
@@ -56,22 +54,10 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
   );
   const [name, setName] = React.useState<string>(nameProp);
 
-  if (defaultOffchainTemplate) {
-    try {
-      setContentsDoc(JSON.parse(defaultOffchainTemplate));
-    } catch (e) {
-      setContentsDoc(defaultOffchainTemplate);
-    }
-  }
 
   const updateTopic = async () => {
-    if (featuredInNewPost) {
-      if (!quillEditorState || quillEditorState?.isBlank()) {
-        setErrorMsg('Must provide template.');
-        return false;
-      } else {
-        quillEditorState?.disable();
-      }
+    if (featuredInNewPost && editorValue.length === 0) {
+      setErrorMsg('Must provide template.');
     }
 
     const topicInfo = {
@@ -83,7 +69,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
       default_offchain_template: featuredInNewPost
-        ? quillEditorState.textContentsAsString
+        ? editorValue
         : null,
     };
 
@@ -92,7 +78,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
       return true;
     } catch (err) {
       setErrorMsg(err.message || err);
-      redraw();
       return false;
     }
   };
@@ -133,7 +118,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
               )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
-              redraw();
               return ['failure', newErrorMsg];
             }
 
@@ -169,15 +153,11 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
           }}
           value=""
         />
-        {/* TODO: replace with ReactQuillEditor */}
         {featuredInNewPost && (
-          <QuillEditorComponent
-            contentsDoc={contentsDoc}
-            oncreateBind={(state: QuillEditor) => {
-              setQuillEditorState(state);
-            }}
-            editorNamespace="new-discussion"
-            tabIndex={3}
+          <ReactQuillEditor
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+            onChange={(v) => setEditorValue(v)}
           />
         )}
         <div className="buttons-row">
@@ -196,7 +176,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
                 })
                 .catch(() => {
                   setIsSaving(false);
-                  redraw();
+                  // redraw();
                 });
             }}
             label="Save changes"
@@ -217,7 +197,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
                 })
                 .catch(() => {
                   setIsSaving(false);
-                  redraw();
+                  // redraw();
                 });
             }}
             label="Delete topic"

@@ -94,6 +94,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                         isSelected={active}
                         onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           navigate(`/discussions/${name}`);
                         }}
                         iconRight={
@@ -106,6 +107,7 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                                 iconSize="small"
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  e.stopPropagation();
                                   setIsModalOpen(true);
                                 }}
                               />
