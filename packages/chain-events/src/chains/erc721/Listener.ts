@@ -1,5 +1,5 @@
 import type { CWEvent } from '../../interfaces';
-import { SupportedNetwork } from '../../interfaces';
+import {EvmEventSourceMapType, SupportedNetwork} from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 
@@ -12,6 +12,7 @@ import type {
 import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
 import { Subscriber } from './subscriber';
+import {ethers} from "ethers";
 
 export class Listener extends BaseListener<
   IErc721Contracts,
@@ -82,12 +83,25 @@ export class Listener extends BaseListener<
           this.options.tokenNames || '[token names not given!]'
         }, on url ${this._options.url}`
       );
-      await this._subscriber.subscribe(this.processBlock.bind(this));
+      await this._subscriber.subscribe(this.processBlock.bind(this), this.getEventSourceMap());
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
       throw error;
     }
+  }
+
+  private getEventSourceMap(): EvmEventSourceMapType {
+    // create an object where the keys are contract addresses and the values are arrays containing all the
+    // event signatures from that contract that we want to listen for
+    const tokenHashMap: EvmEventSourceMapType = {};
+    for (const token of this._api.tokens) {
+      tokenHashMap[token.contract.address.toLowerCase()] = {
+        eventSignatures: Object.keys(token.contract.interface.events).map(x => ethers.utils.id(x)),
+        parseLog: token.contract.interface.parseLog
+      };
+    }
+    return tokenHashMap;
   }
 
   // override handleEvent to stop the chain from being added to event data
