@@ -35,7 +35,7 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
     super(api, verbose);
     this._name = name;
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Aave, this._name])
+      addPrefix(__filename, [SupportedNetwork.ERC20, this._name])
     );
   }
 
@@ -110,7 +110,6 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
             }: ${JSON.stringify(rawEvent, null, 2)}.`;
             // eslint-disable-next-line no-unused-expressions
             this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
-
             cb(rawEvent);
           }
         }
