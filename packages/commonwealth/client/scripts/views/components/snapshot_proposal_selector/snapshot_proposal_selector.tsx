@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import 'components/snapshot_proposal_selector.scss';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
-import type { Thread } from 'models';
 
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
@@ -13,12 +12,10 @@ import { SnapshotProposalSelectorItem } from 'views/components/snapshot_proposal
 type SnapshotProposalSelectorProps = {
   onSelect: (sn: SnapshotProposal) => void;
   snapshotProposalsToSet: SnapshotProposal[];
-  thread: Thread;
 };
 
 export const SnapshotProposalSelector = ({
   onSelect,
-  thread,
   snapshotProposalsToSet,
 }: SnapshotProposalSelectorProps) => {
   const [allProposals, setAllProposals] = useState<Array<SnapshotProposal>>([]);
