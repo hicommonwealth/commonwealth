@@ -1,0 +1,160 @@
+@import '../shared';
+
+.EditProfile {
+  padding: 50px;
+
+  &.full-height {
+    height: 100%;
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .actions.top {
+    .buttons-container {
+      @include smallInclusive {
+        margin-top: 32px;
+        justify-content: flex-start;
+      }
+    }
+  }
+
+  .buttons-container {
+    display: flex;
+    justify-content: flex-end;
+
+    .buttons {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+
+      .Button {
+        height: 32px;
+        padding: 0 24px;
+      }
+
+      .tertiary-black {
+        padding-left: 0;
+      }
+    }
+  }
+
+  .FormSection {
+    width: 100%;
+
+    .bio-section {
+      margin-bottom: 36px;
+
+      .caption {
+        color: $neutral-500;
+        margin-bottom: 4px;
+      }
+    }
+
+    .description {
+      margin-top: 8px;
+      color: $neutral-500;
+    }
+
+    .profile-image-section {
+      .image-upload {
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: 60px;
+        align-items: center;
+        margin: 16px 0;
+
+        .TextInput {
+          width: 75%;
+        }
+
+        p {
+          margin: 0 20px;
+          color: #999999;
+        }
+      }
+    }
+
+    .info-section {
+      .TextInput {
+        margin-bottom: 16px;
+
+        .display-name-label {
+          color: $neutral-500;
+        }
+
+        .blue-star {
+          color: $primary-500;
+        }
+      }
+    }
+
+    .socials-section {
+      margin-top: 24px;
+
+      .b1 {
+        color: $neutral-600;
+      }
+
+      .caption {
+        color: $neutral-500;
+        margin: 4px 0 16px 0;
+      }
+
+      .input-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+    }
+
+    .addresses-section {
+      .addresses {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 80px;
+
+        .Tag {
+          margin-right: 8px;
+        }
+
+        .address {
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      .Button {
+        background-color: $neutral-100;
+        margin-top: 24px;
+        width: 100%;
+
+        &:hover {
+          background-color: $neutral-200;
+        }
+
+        svg,
+        .Text {
+          color: $neutral-600;
+        }
+      }
+    }
+
+    .Divider {
+      margin-bottom: 16px;
+    }
+
+    .CoverImageUploader {
+      margin: 16px 0;
+    }
+
+    .LinkedAddresses {
+      margin-bottom: 32px;
+    }
+  }
+}
