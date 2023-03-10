@@ -99,8 +99,7 @@ export const getThreadSubScriptionMenuItem = (
     commentSubscription?.isActive && reactionSubscription?.isActive;
 
   return {
-    onClick: (e) => {
-      e.preventDefault();
+    onClick: () => {
       handleToggleSubscription(
         thread,
         getCommentSubscription(thread),

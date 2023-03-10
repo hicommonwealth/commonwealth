@@ -88,19 +88,7 @@ export const ChainEntitiesSelector = ({
         <ChainEntitiesSelectorItem
           chainEntity={chainEntity}
           isSelected={isSelected}
-          onClick={(ce) => {
-            console.log('click');
-            if (isSelected) {
-              // TODO FIX THIS
-              // const index = vnode.attrs.chainEntitiesToSet.findIndex(
-              //   (ce_) => ce_.id === ce.id
-              // );
-              // vnode.attrs.chainEntitiesToSet.splice(index, 1);
-            } else {
-              // vnode.attrs.chainEntitiesToSet.push(ce);
-            }
-            onSelect(ce);
-          }}
+          onClick={(ce) => onSelect(ce)}
         />
       );
     },

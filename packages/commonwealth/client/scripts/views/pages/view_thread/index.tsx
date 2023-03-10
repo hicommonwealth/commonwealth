@@ -39,6 +39,7 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { IThreadCollaborator } from 'models/Thread';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -518,9 +519,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Delete',
               iconLeft: 'trash' as const,
-              onClick: async (e) => {
-                e.preventDefault();
-
+              onClick: async () => {
                 const confirmed = window.confirm('Delete this entire thread?');
 
                 if (!confirmed) return;
@@ -537,8 +536,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
               iconLeft: 'lock' as const,
-              onClick: (e) => {
-                e.preventDefault();
+              onClick: () => {
                 app.threads
                   .setPrivacy({
                     threadId: thread.id,
@@ -663,19 +661,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           <LinkedProposalsCard
                             onChangeHandler={(
                               stage: ThreadStageType,
-                              chainEntities: ChainEntity[],
-                              snapshotProposal: SnapshotProposal[]
+                              chainEntities: ChainEntity[] = [],
+                              snapshotProposal: SnapshotProposal[] = []
                             ) => {
-                              thread.stage = stage;
-                              thread.chainEntities = chainEntities;
-                              if (app.chain?.meta.snapshot.length) {
-                                thread.snapshotProposal =
-                                  snapshotProposal[0]?.id;
-                              }
-                              app.threads.fetchThreadsFromId([
-                                thread.identifier,
-                              ]);
-                              setThread(thread);
+                              const newThread = {
+                                ...thread,
+                                stage,
+                                chainEntities,
+                                snapshotProposal: snapshotProposal[0]?.id,
+                              } as Thread;
+                              setThread(newThread);
                             }}
                             thread={thread}
                             showAddProposalButton={isAuthor || isAdminOrMod}
@@ -740,6 +735,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
+            onCollaboratorsUpdated={(newEditors: IThreadCollaborator[]) => {
+              thread.collaborators = newEditors;
+              setThread(thread);
+            }}
           />
         }
         onClose={() => setIsEditCollaboratorsModalOpen(false)}
