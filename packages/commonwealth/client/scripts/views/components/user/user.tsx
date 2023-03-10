@@ -75,7 +75,7 @@ export const User = (props: UserAttrs) => {
   }, []);
 
   const getProfileId = async (passedUser: Account | AddressInfo | Profile) => {
-    const { result } = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
+    const { result } = await $.post(`${app.serverUrl()}/getAddressProfile`, {
       address: passedUser.address,
       chain:
         typeof passedUser.chain === 'string'

@@ -21,7 +21,7 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   const getProfileId = async (address, chain) => {
     setLoading(true);
     try {
-      const res = await $.post(`${app.serverUrl()}/getAddressProfileId`, {
+      const res = await $.post(`${app.serverUrl()}/getAddressProfile`, {
         address,
         chain,
       });
