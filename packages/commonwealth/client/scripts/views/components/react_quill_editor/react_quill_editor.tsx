@@ -24,13 +24,13 @@ const ReactQuillEditor = ({
     setContentDelta,
     onChange
   } : ReactQuillEditorProps) => {
-  
+
   const handleChange = (value, delta, source, editor) => {
-        console.log('value:', value)
-        setContentDelta(editor.getContents())
-        onChange?.(value)
-      }
-  
+    setContentDelta(editor.getContents())
+    onChange?.(value)
+    console.log('ops: ', editor.getContents())
+  }
+
   return (
     <ReactQuill
       className={`QuillEditor ${className}`}

@@ -34,6 +34,7 @@ export const EditComment = (props: EditCommentProps) => {
 
   return (
     <div className="EditComment">
+      {/* TODO: replace with ReactQuillEditor, but must fix bug preventing this parent component from rendering */}
       <QuillEditorComponent
         contentsDoc={body}
         oncreateBind={(state: QuillEditor) => {

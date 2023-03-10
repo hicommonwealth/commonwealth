@@ -130,7 +130,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
               newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
                 'char'
-              )} 
+              )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
               redraw();
@@ -169,6 +169,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
           }}
           value=""
         />
+        {/* TODO: replace with ReactQuillEditor */}
         {featuredInNewPost && (
           <QuillEditorComponent
             contentsDoc={contentsDoc}

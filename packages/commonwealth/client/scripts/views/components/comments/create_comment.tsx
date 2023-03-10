@@ -18,7 +18,7 @@ import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
 import { Modal } from '../component_kit/cw_modal';
-import { ReactQuillEditor } from '../react_quill_editor/react_quill_editor';
+import { createInsertOps, EMPTY_OPS, ReactQuillEditor } from '../react_quill_editor';
 import { DeltaStatic } from 'quill';
 
 type CreateCommmentProps = {
@@ -30,7 +30,7 @@ type CreateCommmentProps = {
 
 export const CreateComment = (props: CreateCommmentProps) => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(null);
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(EMPTY_OPS);
   const [editorValue, setEditorValue] = React.useState<string>('');
   const [sendingComment, setSendingComment] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -68,6 +68,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
       // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
+
+      setContentDelta(EMPTY_OPS);
+      setEditorValue('')
 
       jumpHighlightComment(res.id);
     } catch (err) {
@@ -173,7 +176,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
             <div className="form-buttons">
               <CWButton
                 disabled={
-                    !handleIsReplying ? contentDelta?.ops?.length > 0 : undefined
+                    !handleIsReplying ? editorValue.length > 0 : undefined
                 }
                 buttonType="secondary-blue"
                 onClick={(e) => {
