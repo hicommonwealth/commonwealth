@@ -116,7 +116,7 @@ export class Listener extends BaseListener<
     return {
       [this._api.address.toLowerCase()]: {
         eventSignatures: Object.keys(this._api.interface.events).map(x => ethers.utils.id(x)),
-        parseLog: this._api.interface.parseLog
+        parseLog: this._api.interface.parseLog.bind(this._api.interface.parseLog)
       }
     }
   }

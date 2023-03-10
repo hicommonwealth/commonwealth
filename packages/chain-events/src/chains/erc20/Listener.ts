@@ -101,7 +101,7 @@ export class Listener extends BaseListener<
     for (const token of this._api.tokens) {
       tokenHashMap[token.contract.address.toLowerCase()] = {
         eventSignatures: Object.keys(token.contract.interface.events).map(x => ethers.utils.id(x)),
-        parseLog: token.contract.interface.parseLog
+        parseLog: token.contract.interface.parseLog.bind(token.contract.interface)
       };
     }
     return tokenHashMap;

@@ -107,15 +107,15 @@ export class Listener extends BaseListener<
     return {
       [gov.address.toLowerCase()]: {
         eventSignatures: Object.keys(gov.interface.events).map(x => ethers.utils.id(x)),
-        parseLog: gov.interface.parseLog
+        parseLog: gov.interface.parseLog.bind(gov.interface.parseLog)
       },
       [aaveToken.address.toLowerCase()]: {
         eventSignatures: Object.keys(aaveToken.interface.events).map(x => ethers.utils.id(x)),
-        parseLog: aaveToken.interface.parseLog
+        parseLog: aaveToken.interface.parseLog.bind(aaveToken.interface.parseLog)
       },
       [stkAaveToken.address.toLowerCase()]: {
         eventSignatures: Object.keys(stkAaveToken.interface.events).map(x => ethers.utils.id(x)),
-        parseLog: stkAaveToken.interface.parseLog
+        parseLog: stkAaveToken.interface.parseLog.bind(stkAaveToken.interface.parseLog)
       }
     }
   }
