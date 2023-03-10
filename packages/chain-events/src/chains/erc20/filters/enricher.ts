@@ -2,9 +2,7 @@ import BN from 'bn.js';
 
 import type { CWEvent } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
-import type { TypedEventFilter } from '../../../contractTypes/commons';
-import type { ERC20 } from '../../../contractTypes';
-import type { RawEvent, IEventData, IErc20Contracts } from '../types';
+import type {RawEvent, IEventData, IErc20Contracts, GetArgType} from '../types';
 import { EventKind } from '../types';
 
 /**
@@ -21,11 +19,6 @@ export interface EnricherConfig {
   // Set to 0 or undefined to emit for all balance transfers.
   balanceTransferThresholdPermill?: number;
 }
-
-type GetEventArgs<T> = T extends TypedEventFilter<unknown, infer Y> ? Y : never;
-type GetArgType<Name extends keyof ERC20['filters']> = GetEventArgs<
-  ReturnType<ERC20['filters'][Name]>
->;
 
 export async function Enrich(
   api: IErc20Contracts,
