@@ -21,11 +21,17 @@
     }
 
     input {
+      @include b1;
+
+      border: 1px solid $neutral-300;
       border-radius: $border-radius-rounded-corners;
-      box-shadow: $elevation-3;
       height: 52px;
       padding: 8px 24px;
       width: 100%;
+
+      &::placeholder {
+        color: $neutral-500;
+      }
     }
 
     .links-section {

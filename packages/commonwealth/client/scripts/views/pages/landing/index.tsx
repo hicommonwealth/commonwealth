@@ -15,6 +15,7 @@ import { CrowdfundingCardSection } from './crowdfunding_card_section';
 import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
 import useForceRerender from 'hooks/useForceRerender';
+import { CWText } from '../../components/component_kit/cw_text';
 // import { MixpanelPageViewEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
@@ -116,69 +117,11 @@ const LandingPage = () => {
           )} */}
         <CreatorsCardSection />
         <FindYourCommunitySection />
-        <CrowdfundingCardSection
-          chains={[
-            {
-              button: {
-                id: 'second-section-button1',
-              },
-              texts: {
-                title: 'Fund new projects',
-                text: `Anyone from within your community can easily
-                 turn a conversation thread into a Kickstarter-like campaign.`,
-              },
-              card: {
-                id: 'tab-card',
-                imgSrc: 'static/img/card1.png',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'second-section-button2',
-              },
-              texts: {
-                title: 'Create Community Endowments',
-                text: `Pool funds with other like-minded folks, and fund
-                 interesting projects within your community or across the web.`,
-              },
-              card: {
-                id: 'tab2-card',
-                imgSrc: 'static/img/card2.png',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'second-section-button3',
-              },
-              texts: {
-                title: 'Launch New Tokens',
-                text: `Use a project to raise funds for a new DeFi token or NFT.
-                 Optionally plug in an allowlist for KYC compliance.`,
-              },
-              card: {
-                id: 'tab3-card',
-                imgSrc: 'static/img/card3.png',
-                imgAlt: '',
-              },
-            },
-          ]}
-        />
-        <section className="h-80 bg-gray-900 flex items-center mt-20 h-56">
-          <div className="container mx-auto">
-            <div className="flex flex-col md:flex-row md:justify-between">
-              <div>
-                <h2 className="text-white font-bold text-3xl">
-                  A community for every token.
-                </h2>
-                <p className="text-xl text-gray-400">
-                  Join Commonwealth today.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <CrowdfundingCardSection />
+        <div className="join-section">
+          <CWText className="join-text">A community for every token.</CWText>
+          <CWText className="join-text">Join Commonwealth today.</CWText>
+        </div>
         <Footer />
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js"

@@ -1,14 +1,16 @@
 @import '../../shared';
 
-section.LandingPageTokenHolders {
-  .TokenHoldersButton {
-    a.btn-outline.text-xl.rounded-lg.pb-2.pt-3.px-3 {
-      color: $neutral-800;
-      text-decoration: none;
-      cursor: pointer;
+.FindYourCommunitySection {
+  width: 100%;
 
-      &:hover {
-        opacity: 0.6;
+  .holders-container {
+    display: flex;
+    flex-wrap: wrap;
+
+    .holder-card {
+      // flex: 1;
+
+      img {
       }
     }
   }

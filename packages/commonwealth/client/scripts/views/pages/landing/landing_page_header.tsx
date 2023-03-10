@@ -52,7 +52,11 @@ export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
             <CWText onClick={() => navigate('/whyCommonwealth')}>
               Why Commonwealth?
             </CWText>
-            <CWButton label="Login" buttonType="primary-black" />
+            <CWButton
+              label="Login"
+              buttonType="primary-black"
+              onClick={() => setIsModalOpen(true)}
+            />
           </>
         )}
       </div>

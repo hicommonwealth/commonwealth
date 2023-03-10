@@ -1,5 +1,40 @@
 @import '../../shared';
 
+.GalleryCard {
+  background-color: $neutral-800;
+  border-radius: $border-radius-corners;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  width: 336px;
+
+  &.isSelected {
+    background-color: $black;
+  }
+
+  &:hover {
+    background-color: $yellow-800;
+  }
+
+  &:active {
+    background-color: $yellow-600;
+  }
+
+  .gallery-card-title.Text {
+    color: $white;
+  }
+
+  .gallery-card-subtitle.Text {
+    color: $neutral-800;
+
+    &.isSelected {
+      color: $white;
+    }
+  }
+}
+
 .CreatorsCardSection {
   align-items: center;
   display: flex;
@@ -17,45 +52,10 @@
     padding: 32px;
     width: 1104px;
 
-    .creators-cards-column {
+    .cards-column {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-
-      .creators-card {
-        background-color: $neutral-800;
-        border-radius: $border-radius-corners;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        padding: 16px;
-        width: 336px;
-
-        &.isActive {
-          background-color: $black;
-        }
-
-        &:hover {
-          background-color: $yellow-800;
-        }
-
-        &:active {
-          background-color: $yellow-600;
-        }
-
-        .creators-card-title.Text {
-          color: $white;
-        }
-
-        .creators-card-subtitle.Text {
-          color: $neutral-800;
-
-          &.isActive {
-            color: $white;
-          }
-        }
-      }
     }
   }
 }

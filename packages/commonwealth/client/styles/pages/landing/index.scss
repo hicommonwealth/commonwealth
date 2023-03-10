@@ -7,4 +7,19 @@
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
+
+  .join-section {
+    background-color: $neutral-800;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .join-text.Text {
+      color: $white;
+    }
+  }
+
+  .Footer {
+    width: 100%;
+  }
 }
