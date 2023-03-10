@@ -57,23 +57,21 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
         return { ...c, thread };
       });
       this.comments = commentsWithAssociatedThread;
-      this.addresses = result.addresses.map(
-        (a) => {
-          try {
-            return new AddressInfo(
-              a.id,
-              a.address,
-              a.chain,
-              a.keytype,
-              a.wallet_id,
-              a.ghost_address
-            )
-          } catch (err) {
-            console.log(a.chain);
-            return null;
-          }
+      this.addresses = result.addresses.map((a) => {
+        try {
+          return new AddressInfo(
+            a.id,
+            a.address,
+            a.chain,
+            a.keytype,
+            a.wallet_id,
+            a.ghost_address
+          );
+        } catch (err) {
+          console.log(a.chain);
+          return null;
         }
-      );
+      });
       this.isOwner = result.isOwner;
     } catch (err) {
       this.error = ProfileError.NoProfileFound;
