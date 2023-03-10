@@ -2,10 +2,6 @@ import type { WalletId } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes, ChainInstance } from './chain';
-import type {
-  OffchainProfileAttributes,
-  OffchainProfileInstance,
-} from './offchain_profile';
 import type { ProfileInstance } from './profile';
 import type {
   RoleAssignmentAttributes,
@@ -37,7 +33,6 @@ export type AddressAttributes = {
   // associations
   Chain?: ChainAttributes;
   User?: UserAttributes;
-  OffchainProfile?: OffchainProfileAttributes;
   RoleAssignments?: RoleAssignmentAttributes[];
   SsoToken?: SsoTokenAttributes;
 };
@@ -45,7 +40,6 @@ export type AddressAttributes = {
 export type AddressInstance = ModelInstance<AddressAttributes> & {
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
-  getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
   getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
@@ -132,7 +126,6 @@ export default (
       foreignKey: 'user_id',
       targetKey: 'id',
     });
-    models.Address.hasOne(models.OffchainProfile);
     models.Address.hasOne(models.SsoToken);
     models.Address.hasMany(models.RoleAssignment, { foreignKey: 'address_id' });
     models.Address.belongsToMany(models.Thread, {
