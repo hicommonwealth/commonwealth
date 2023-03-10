@@ -13,7 +13,6 @@ import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
 import { Subscriber } from './subscriber';
 import type { EnricherConfig } from './filters/enricher';
-import { ERC20 } from '../../contractTypes';
 import { ethers } from 'ethers';
 
 export class Listener extends BaseListener<

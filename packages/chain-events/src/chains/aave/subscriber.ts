@@ -35,25 +35,6 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     );
   }
 
-  /**
-   * Initializes subscription to chain and starts emitting events.
-   */
-  // public async subscribe(cb: (event: RawEvent) => void): Promise<void> {
-  //   this._listener = (event: RawEvent): void => {
-  //     const logStr = `Received ${this._name} event: ${JSON.stringify(
-  //       event,
-  //       null,
-  //       2
-  //     )}.`;
-  //     // eslint-disable-next-line no-unused-expressions
-  //     this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
-  //     cb(event);
-  //   };
-  //   this._api.governance.on('*', this._listener);
-  //   this._api.aaveToken?.on('*', this._listener);
-  //   this._api.stkAaveToken?.on('*', this._listener);
-  // }
-
   private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
     const provider = this._api.governance.provider;
 
