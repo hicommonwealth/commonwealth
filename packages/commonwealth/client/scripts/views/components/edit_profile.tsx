@@ -78,15 +78,21 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       this.avatarUrl = this.profile.avatarUrl;
       this.backgroundImage = this.profile.backgroundImage;
       this.addresses = result.addresses.map(
-        (a) =>
-          new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          )
+        (a) =>{
+          try {
+            return new AddressInfo(
+              a.id,
+              a.address,
+              a.chain,
+              a.keytype,
+              a.wallet_id,
+              a.ghost_address
+            )
+          } catch (err) {
+            console.log(a.chain);
+            return null;
+          }
+        }
       );
       this.isOwner = result.isOwner;
     } catch (err) {
