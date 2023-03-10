@@ -5,7 +5,8 @@ import $ from 'jquery';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import _ from 'lodash';
 import m from 'mithril';
-import { Profile } from 'models';
+import type { MinimumProfile as Profile } from 'models';
+import { MinimumProfile } from 'models';
 import moment from 'moment';
 import Quill from 'quill';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
@@ -657,7 +658,7 @@ export default class QuillEditorInternal {
         chainScope: app.activeChainId(),
       });
       formattedMatches = members.map((addr) => {
-        const profile: Profile = app.profiles.getProfile(
+        const profile: Profile = app.newProfiles.getProfile(
           addr.chain,
           addr.address
         );
@@ -672,7 +673,7 @@ export default class QuillEditorInternal {
         } else {
           avatar = document.createElement('div');
           avatar.className = 'ql-mention-avatar';
-          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 20);
+          avatar.innerHTML = MinimumProfile.getSVGAvatar(addr.address, 20);
         }
 
         const nameSpan = document.createElement('span');
@@ -702,7 +703,7 @@ export default class QuillEditorInternal {
         node.appendChild(textWrap);
 
         return {
-          link: `/${addr.chain}/account/${addr.address}`,
+          link: `/profile/id/${profile.id}`,
           name: addr.name,
           component: node.outerHTML,
         };
