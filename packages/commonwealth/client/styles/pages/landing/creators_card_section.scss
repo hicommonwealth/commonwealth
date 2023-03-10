@@ -65,5 +65,14 @@
       flex-direction: column;
       justify-content: space-between;
     }
+
+    .image-container {
+      display: flex;
+
+      img {
+        height: auto;
+        max-width: 100%;
+      }
+    }
   }
 }

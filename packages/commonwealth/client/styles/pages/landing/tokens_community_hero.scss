@@ -2,15 +2,15 @@
 
 .TokensCommunityHero {
   display: flex;
-  height: 624px;
+  min-height: 624px;
 
   .search-section {
     display: flex;
     flex-direction: column;
-    flex: 1;
     gap: 24px;
     justify-content: center;
-    padding: 56px;
+    padding: 128px 56px 56px;
+    width: 50%;
 
     .header-text.Text {
       display: inline-block;
@@ -58,8 +58,9 @@
   }
 
   .images-section {
-    flex: 1;
+    display: flex;
     position: relative;
+    width: 50%;
 
     background: linear-gradient(
       135deg,
@@ -68,26 +69,28 @@
     );
 
     .discussions-img {
-      object-position: top;
-      position: absolute;
-      left: 2.5rem;
-      margin-top: 2.5rem;
-      --transform-translate-y: 4rem;
-      max-width: none;
+      bottom: 0;
       height: auto;
+      max-width: 100%;
+      position: absolute;
+      right: 0;
     }
 
     .notification-img {
-      object-position: bottom;
-      position: absolute;
       bottom: 0;
-      --transform-translate-y: -2rem;
+      height: auto;
+      max-width: 100%;
+      position: absolute;
+      z-index: 2;
     }
 
     .discussion-img {
+      bottom: 88px;
+      height: auto;
+      left: 128px;
+      max-width: 100%;
       position: absolute;
-      top: 50%;
-      --transform-translate-x: 2rem;
+      z-index: 3;
     }
   }
 }

@@ -9,6 +9,10 @@
   padding: 56px 268px;
   width: 100%;
 
+  @include mediumSmall {
+    padding: 56px;
+  }
+
   .header {
     align-items: center;
     display: flex;

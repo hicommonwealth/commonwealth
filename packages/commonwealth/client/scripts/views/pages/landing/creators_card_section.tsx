@@ -86,10 +86,12 @@ export const CreatorsCardSection = () => {
           Enhance your posts with built in Markdown and fun reactions.`}
           />
         </div>
-        {selectedCard === 1 && <img src="static/img/tab1.svg" alt="" />}
-        {selectedCard === 2 && <img src="static/img/tab2.svg" alt="" />}
-        {selectedCard === 3 && <img src="static/img/tab3.svg" alt="" />}
-        {selectedCard === 4 && <img src="static/img/tab4.svg" alt="" />}
+        <div className="image-container">
+          {selectedCard === 1 && <img src="static/img/tab1.svg" alt="" />}
+          {selectedCard === 2 && <img src="static/img/tab2.svg" alt="" />}
+          {selectedCard === 3 && <img src="static/img/tab3.svg" alt="" />}
+          {selectedCard === 4 && <img src="static/img/tab4.svg" alt="" />}
+        </div>
       </div>
     </div>
   );

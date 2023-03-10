@@ -48,7 +48,7 @@ export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
             onClick={() => console.log('menu open')}
           />
         ) : (
-          <>
+          <div className="desktop-login">
             <CWText onClick={() => navigate('/whyCommonwealth')}>
               Why Commonwealth?
             </CWText>
@@ -57,7 +57,7 @@ export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
               buttonType="primary-black"
               onClick={() => setIsModalOpen(true)}
             />
-          </>
+          </div>
         )}
       </div>
       <Modal
