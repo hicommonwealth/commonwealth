@@ -112,19 +112,19 @@ export class Listener extends BaseListener<
     const aaveToken = this._api.aaveToken;
     const stkAaveToken = this._api.stkAaveToken;
     return {
-      [gov.address]: {
+      [gov.address.toLowerCase()]: {
         eventSignatures: Object.keys(gov.interface.events).map((x) =>
           ethers.utils.id(x)
         ),
         parseLog: gov.interface.parseLog,
       },
-      [aaveToken.address]: {
+      [aaveToken.address.toLowerCase()]: {
         eventSignatures: Object.keys(aaveToken.interface.events).map((x) =>
           ethers.utils.id(x)
         ),
         parseLog: aaveToken.interface.parseLog,
       },
-      [stkAaveToken.address]: {
+      [stkAaveToken.address.toLowerCase()]: {
         eventSignatures: Object.keys(stkAaveToken.interface.events).map((x) =>
           ethers.utils.id(x)
         ),
