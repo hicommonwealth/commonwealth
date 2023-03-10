@@ -49,7 +49,6 @@ export const ListMapperWithItem = ({
   const mappedListItems = cardItems.map((item: ICardListItem, i) => {
     const { button, card, texts } = item;
 
-    // eslint-disable-next-line no-return-assign
     return (
       <ListedCardWithImage
         key={i}

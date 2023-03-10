@@ -9,13 +9,36 @@ type Holder = {
   title: string;
 };
 
-type FindYourCommunitySectionProps = {
-  holders: Array<Holder>;
-};
+const holders: Array<Holder> = [
+  {
+    img: 'static/img/circleCrowd.svg',
+    alt: '',
+    title: 'Your community is here.',
+    text: 'Stop bouncing between 10 tabs at once - everything you need to know about your token is here.',
+  },
+  {
+    img: 'static/img/1stButtonToken.svg',
+    alt: '',
+    title: 'Claim your token',
+    text: `We generate pages for your favorite community and address
+     from real-time chain activity. Claim yours.`,
+  },
+  {
+    img: 'static/img/bell.svg',
+    alt: '',
+    title: 'Stay updated',
+    text: `Be the first to know when community events are happening
+     with in-app, email, and mobile push notifications.`,
+  },
+  {
+    img: 'static/img/calendar.svg',
+    alt: '',
+    title: 'Participate in events.',
+    text: ' Participate in events like upcoming votes, new projects and community initiatives. ',
+  },
+];
 
-export const FindYourCommunitySection = ({
-  holders,
-}: FindYourCommunitySectionProps) => {
+export const FindYourCommunitySection = () => {
   return (
     <section className="LandingPageTokenHolders container mx-auto pt-20">
       <h2 className="text-3xl font-bold mb-5 text-center">

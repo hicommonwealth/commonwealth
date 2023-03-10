@@ -42,13 +42,37 @@
     }
   }
 
-  .gradient {
+  .images-section {
     flex: 1;
+    position: relative;
 
     background: linear-gradient(
       135deg,
       rgb(179, 125, 186) 0%,
       rgb(96, 134, 209) 100%
     );
+
+    .discussions-img {
+      object-position: top;
+      position: absolute;
+      left: 2.5rem;
+      margin-top: 2.5rem;
+      --transform-translate-y: 4rem;
+      max-width: none;
+      height: auto;
+    }
+
+    .notification-img {
+      object-position: bottom;
+      position: absolute;
+      bottom: 0;
+      --transform-translate-y: -2rem;
+    }
+
+    .discussion-img {
+      position: absolute;
+      top: 50%;
+      --transform-translate-x: 2rem;
+    }
   }
 }

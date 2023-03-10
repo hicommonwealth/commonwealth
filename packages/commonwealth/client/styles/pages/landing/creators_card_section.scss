@@ -1,28 +1,61 @@
 @import '../../shared';
 
-.TokensCreatorsUseCaseButton.text-center.hidden.mb-20 {
-  a.btn-outline.text-xl.rounded-lg.pb-2.pt-3.px-3 {
-    color: $neutral-800;
-    text-decoration: none;
-    cursor: pointer;
+.CreatorsCardSection {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  padding: 56px;
+  width: 100%;
 
-    &:hover {
-      opacity: 0.6;
+  .inner-container {
+    display: flex;
+    background-color: $neutral-800;
+    border-radius: $border-radius-corners;
+    height: 568px;
+    padding: 32px;
+    width: 1104px;
+
+    .creators-cards-column {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .creators-card {
+        background-color: $neutral-800;
+        border-radius: $border-radius-corners;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 16px;
+        width: 336px;
+
+        &.isActive {
+          background-color: $black;
+        }
+
+        &:hover {
+          background-color: $yellow-800;
+        }
+
+        &:active {
+          background-color: $yellow-600;
+        }
+
+        .creators-card-title.Text {
+          color: $white;
+        }
+
+        .creators-card-subtitle.Text {
+          color: $neutral-800;
+
+          &.isActive {
+            color: $white;
+          }
+        }
+      }
     }
-  }
-}
-
-button.TokensCreatorsText {
-  &:hover {
-    background: $yellow-800;
-  }
-}
-
-img.TokensCreatorsImage {
-  margin-left: 3rem;
-  margin-top: 1rem;
-
-  @include mediumSmall {
-    margin-left: 0rem;
   }
 }

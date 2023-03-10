@@ -37,48 +37,17 @@ export const TokensCommunityHero = ({ chains }: TokensCommunityHeroProps) => {
     ) {
       return;
     }
+
     if (searchTerm.length < 3) {
       notifyError('Query must be at least 3 characters');
     }
+
     const params = `q=${encodeURIComponent(
       searchTerm.toString().trim()
     )}&scope[]=Communities`;
+
     navigate(`/search?${params}`);
   };
-
-  const mappedCommunities = [
-    {
-      variant: `absolute object-top transform sm:translate-x-16 md:translate-x-64
-          lg:translate-x-48 translate-y-16 sm:translate-y-40 md:translate-y-32
-          lg:translate-y-32 left-10 max-w-none max-h-none h-auto w-629 xl:left-36
-          mt-10 sm:mt-0`,
-      src: 'static/img/discussions.svg',
-      alt: '',
-    },
-    {
-      variant: `absolute object-bottom bottom-0 transform sm:translate-x-16
-          md:translate-x-8 lg:translate-x-64 -translate-y-8 lg:left-32 w-350`,
-      src: 'static/img/notification.svg',
-      alt: '',
-    },
-    {
-      variant: `absolute top-1/2 transform sm:translate-y-16 md:translate-y-48
-          lg:translate-y-64  translate-x-8 sm:-translate-x-8 w-400`,
-      src: 'static/img/discussion.svg',
-      alt: '',
-    },
-  ]
-    .map((community, i) => {
-      return (
-        <img
-          key={i}
-          className={community.variant}
-          src={community.src}
-          alt={community.alt}
-        />
-      );
-    })
-    .filter((comm) => comm);
 
   return (
     <div className="TokensCommunityHero">
@@ -152,7 +121,23 @@ export const TokensCommunityHero = ({ chains }: TokensCommunityHeroProps) => {
           </div>
         </div>
       </div>
-      <div className="gradient">{mappedCommunities}</div>
+      <div className="images-section">
+        <img
+          src="static/img/discussions.svg"
+          alt=""
+          className="discussions-img"
+        />
+        <img
+          src="static/img/notification.svg"
+          alt=""
+          className="notification-img"
+        />
+        <img
+          src="static/img/discussion.svg"
+          alt=""
+          className="discussion-img"
+        />
+      </div>
     </div>
   );
 };

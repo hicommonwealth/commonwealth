@@ -8,8 +8,10 @@
   display: flex;
   gap: 16px;
   justify-content: center;
+  margin: 24px;
   padding: 16px 24px;
   position: absolute;
+  z-index: 2;
 
   .logo-with-text {
     max-height: 32px;

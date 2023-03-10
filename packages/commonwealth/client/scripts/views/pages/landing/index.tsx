@@ -63,6 +63,7 @@ const chains = [...sortedChainsAndCommunities, ...betaChainsAndCommunities];
 
 const LandingPage = () => {
   const forceRerender = useForceRerender();
+
   //   if (!app.isLoggedIn()) {
   //     mixpanelBrowserTrack({
   //       event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
@@ -113,98 +114,8 @@ const LandingPage = () => {
               chains={chains}
             />
           )} */}
-        <CreatorsCardSection
-          creators={[
-            {
-              button: {
-                id: 'first-section-button1',
-              },
-              texts: {
-                title: 'On-chain notifications',
-                text: 'Stay up-to-date on chain events like votes and large transfers.',
-              },
-              card: {
-                id: 'tab-codepen',
-                imgSrc: 'static/img/tab1.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button2',
-              },
-              texts: {
-                title: 'Off-chain polling & on-chain voting',
-                text: `Whether you use Snapshot, COMP governance contracts, or
-                 native Layer 1 voting, access everything from one place.`,
-              },
-              card: {
-                id: 'tab2-codepen',
-                imgSrc: 'static/img/tab2.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button3',
-              },
-              texts: {
-                title: 'Crowdfunding',
-                text: 'Fund new tokens and community initiatives with Kickstarter-like raises from a thread.',
-              },
-              card: {
-                id: 'tab3-codepen',
-                imgSrc: 'static/img/tab3.svg',
-                imgAlt: '',
-              },
-            },
-            {
-              button: {
-                id: 'first-section-button4',
-              },
-              texts: {
-                title: 'A rich forum experience',
-                text: `Discuss memes or key decisions, in a Discourse-style forum.
-                 Enhance your posts with built in Markdown and fun reactions.`,
-              },
-              card: {
-                id: 'tab4-codepen',
-                imgSrc: 'static/img/tab4.svg',
-                imgAlt: '',
-              },
-            },
-          ]}
-        />
-        <FindYourCommunitySection
-          holders={[
-            {
-              img: 'static/img/circleCrowd.svg',
-              alt: '',
-              title: 'Your community is here.',
-              text: 'Stop bouncing between 10 tabs at once - everything you need to know about your token is here.',
-            },
-            {
-              img: 'static/img/1stButtonToken.svg',
-              alt: '',
-              title: 'Claim your token',
-              text: `We generate pages for your favorite community and address
-               from real-time chain activity. Claim yours.`,
-            },
-            {
-              img: 'static/img/bell.svg',
-              alt: '',
-              title: 'Stay updated',
-              text: `Be the first to know when community events are happening
-               with in-app, email, and mobile push notifications.`,
-            },
-            {
-              img: 'static/img/calendar.svg',
-              alt: '',
-              title: 'Participate in events.',
-              text: ' Participate in events like upcoming votes, new projects and community initiatives. ',
-            },
-          ]}
-        />
+        <CreatorsCardSection />
+        <FindYourCommunitySection />
         <CrowdfundingCardSection
           chains={[
             {
