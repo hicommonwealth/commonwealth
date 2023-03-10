@@ -8,8 +8,8 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
-import { ThreadStage as ThreadStageType } from 'models';
+import type { ChainEntity, Comment, Poll, Topic } from 'models';
+import { ThreadStage as ThreadStageType, Thread } from 'models';
 
 import 'pages/view_thread/index.scss';
 
@@ -39,7 +39,7 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
-import { IThreadCollaborator } from 'client/scripts/models/Thread';
+import type { IThreadCollaborator } from 'models/Thread';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -463,6 +463,36 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasEditPerms = isAuthor || isEditor;
 
+  const handleLinkedThreadChange = (linkedThreads: Thread[]) => {
+    const linkedThreadsRelations = linkedThreads.map((t) => ({
+      id: '',
+      linkedThread: String(t.id),
+      linkingThread: String(thread.id),
+    }));
+
+    const updatedThread = new Thread({
+      ...thread,
+      linkedThreads: linkedThreadsRelations,
+    });
+
+    setThread(updatedThread);
+  };
+
+  const handleLinkedProposalChange = (
+    stage: ThreadStageType,
+    chainEntities: ChainEntity[] = [],
+    snapshotProposal: SnapshotProposal[] = []
+  ) => {
+    const newThread = {
+      ...thread,
+      stage,
+      chainEntities,
+      snapshotProposal: snapshotProposal[0]?.id,
+    } as Thread;
+
+    setThread(newThread);
+  };
+
   const getActionMenuItems = () => {
     return [
       ...(hasEditPerms && !thread.readOnly
@@ -519,9 +549,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Delete',
               iconLeft: 'trash' as const,
-              onClick: async (e) => {
-                e.preventDefault();
-
+              onClick: async () => {
                 const confirmed = window.confirm('Delete this entire thread?');
 
                 if (!confirmed) return;
@@ -538,8 +566,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
               iconLeft: 'lock' as const,
-              onClick: (e) => {
-                e.preventDefault();
+              onClick: () => {
                 app.threads
                   .setPrivacy({
                     threadId: thread.id,
@@ -662,30 +689,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <div className="cards-column">
                         {showLinkedProposalOptions && (
                           <LinkedProposalsCard
-                            onChangeHandler={(
-                              stage: ThreadStageType,
-                              chainEntities: ChainEntity[],
-                              snapshotProposal: SnapshotProposal[]
-                            ) => {
-                              thread.stage = stage;
-                              thread.chainEntities = chainEntities;
-                              if (app.chain?.meta.snapshot.length) {
-                                thread.snapshotProposal =
-                                  snapshotProposal[0]?.id;
-                              }
-                              app.threads.fetchThreadsFromId([
-                                thread.identifier,
-                              ]);
-                              setThread(thread);
-                            }}
+                            onChangeHandler={handleLinkedProposalChange}
                             thread={thread}
                             showAddProposalButton={isAuthor || isAdminOrMod}
                           />
                         )}
                         {showLinkedThreadOptions && (
                           <LinkedThreadsCard
-                            threadId={thread.id}
+                            thread={thread}
                             allowLinking={isAuthor || isAdminOrMod}
+                            onChangeHandler={handleLinkedThreadChange}
                           />
                         )}
                       </div>

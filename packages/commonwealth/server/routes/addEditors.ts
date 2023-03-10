@@ -1,4 +1,4 @@
-import { IThreadCollaborator } from 'client/scripts/models/Thread';
+import { IThreadCollaborator } from 'models/Thread';
 import { AppError } from 'common-common/src/errors';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
