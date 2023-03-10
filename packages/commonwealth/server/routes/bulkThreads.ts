@@ -94,22 +94,24 @@ const bulkThreads = async (
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          AND t.chain = $chain 
+          AND t.chain = $chain
           ${topicOptions}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $created_at AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
            reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
-          ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
+          ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics
       ON threads.topic_id = topics.id`;
+    console.log(bind);
     let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
         bind,
         type: QueryTypes.SELECT,
+        logging: console.log,
       });
     } catch (e) {
       console.log(e);
