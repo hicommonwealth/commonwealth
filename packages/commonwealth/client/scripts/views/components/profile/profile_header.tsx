@@ -39,7 +39,7 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
             label="Edit"
             buttonType="mini-white"
             iconLeft="write"
-            onClick={() => navigate(`/profile/${username}/edit`)}
+            onClick={() => navigate(`/profile/id/${profile.id}/edit`)}
           />
         )}
       </div>

@@ -64,6 +64,7 @@ const NewSnapshotProposalPage = lazy(
 const ProfilePage = lazy(() => import('views/pages/profile'));
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
+const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const getCommonDomainsRoutes = () => (
   <>
@@ -406,22 +407,17 @@ const getCommonDomainsRoutes = () => (
     {/* PROFILES*/}
     <Route
       path="/:scope/account/:address"
-      element={withLayout(ProfilePage, {
+      element={withLayout(ProfilePageRedirect, {
         scoped: true,
         deferChain: true,
       })}
     />
     <Route
       path="/:scope/account"
-      element={
-        <Navigate
-          to={({ scope }) =>
-            app.user.activeAccount
-              ? `/${scope}/account/${app.user.activeAccount.address}`
-              : `/${scope}`
-          }
-        />
-      }
+      element={withLayout(ProfilePageRedirect, {
+        scoped: true,
+        deferChain: true,
+      })}
     />
     {/* PROFILES END*/}
     {/* NEW PROFILES */}
