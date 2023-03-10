@@ -97,6 +97,8 @@ export interface IApp {
   sidebarToggled: boolean;
 
   loginState: LoginState;
+  loginStateEmitter: EventEmitter;
+
   // stored on server-side
   config: {
     chains: ChainStore;
@@ -188,6 +190,7 @@ const app: IApp = {
   profiles: new ProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
+  loginStateEmitter: new EventEmitter(),
 
   // Global nav state
   mobileMenu: null,
@@ -284,12 +287,14 @@ export async function initAppState(
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => redraw());
+          app.loginStateEmitter.emit('redraw');
         } else if (
           app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected
         ) {
           // TODO: create global deinit function
           app.socket.disconnect();
+          app.loginStateEmitter.emit('redraw');
         }
 
         app.user.setStarredCommunities(

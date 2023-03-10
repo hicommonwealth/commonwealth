@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
@@ -54,17 +54,16 @@ type VotingActionsProps = {
 export const VotingActions = (props: VotingActionsProps) => {
   const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
 
-  const [amount, setAmount] = React.useState<number>();
-  const [conviction, setConviction] = React.useState<number>();
+  const [amount, setAmount] = useState<number>();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
+  const [conviction, setConviction] = useState<number>();
   // conviction isn't used anywhere?
 
-  // const [isLoggedIn, setIsLoggedIn] = React.useState();
-
-  // useEffect(() => {
-  //   const _isLoggedIn = app.loginState === LoginState.LoggedIn;
-  //   console.log('_isLoggedIn', _isLoggedIn);
-  //   setIsLoggedIn(_isLoggedIn);
-  // }, [app.loginState]);
+  useEffect(() => {
+    app.loginStateEmitter.once('redraw', () => {
+      setIsLoggedIn(app.isLoggedIn());
+    });
+  }, [app.loginState]);
 
   if (
     proposal instanceof SubstrateDemocracyProposal ||
@@ -72,6 +71,14 @@ export const VotingActions = (props: VotingActionsProps) => {
     proposal instanceof SubstrateTreasuryProposal
   ) {
     return null;
+  }
+
+  if (!isLoggedIn) {
+    return <CannotVote label="Log in to vote" />;
+  } else if (!app.user.activeAccount) {
+    return <CannotVote label="Connect an address to vote" />;
+  } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
+    return <CannotVote label="Cannot vote from this address" />;
   }
 
   let user;
@@ -218,11 +225,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     hasVotedRemove,
   } = getVotingResults(proposal, user);
 
-  const isLoggedIn = app.isLoggedIn();
-  console.log('app.user', app.user);
-  console.log('isLoggedIn', isLoggedIn);
-
-  const canVote = isLoggedIn && getCanVote(proposal, hasVotedForAnyChoice);
+  const canVote = getCanVote(proposal, hasVotedForAnyChoice);
 
   const yesButton = (
     <CWButton
