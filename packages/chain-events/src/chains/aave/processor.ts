@@ -25,14 +25,14 @@ export class Processor extends IEventProcessor<Api, RawEvent> {
     const log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.Aave, this.chain])
     );
-    const kind = ParseType(event.event, this.chain);
+    const kind = ParseType(event.name, this.chain);
     if (!kind) return [];
     try {
       const cwEvent = await Enrich(this._api, event.blockNumber, kind, event);
       return [cwEvent];
     } catch (e) {
       log.error(
-        `Failed to enrich event. Block number: ${event.blockNumber}, Name/Kind: ${event.event}, Error Message: ${e.message}`
+        `Failed to enrich event. Block number: ${event.blockNumber}, Name/Kind: ${event.name}, Error Message: ${e.message}`
       );
       return [];
     }

@@ -18,6 +18,7 @@ import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { LogDescription } from '@ethersproject/abi/src.ts/interface';
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -39,12 +40,7 @@ export type IChainEventKind =
   | Erc20Types.EventKind
   | Erc721Types.EventKind
   | CosmosTypes.EventKind;
-export type IAPIs =
-  | SubstrateApi
-  | ERC721Api
-  | ERC20Api
-  | CompoundApi
-  | AaveApi;
+export type IAPIs = SubstrateApi | ERC721Api | ERC20Api | CompoundApi | AaveApi;
 export type IAnyListener = Listener<
   IAPIs,
   IStorageFetcher<IAPIs>,
@@ -122,10 +118,20 @@ export abstract class IEventSubscriber<Api, RawEvent> {
   }
 
   // throws on error
-  public abstract subscribe(cb: (event: RawEvent) => void): Promise<void>;
+  public abstract subscribe(
+    cb: (event: RawEvent) => void,
+    ...args: any
+  ): Promise<void>;
 
   public abstract unsubscribe(): void;
 }
+
+export type EvmEventSourceMapType = {
+  [address: string]: {
+    eventSignatures: string[];
+    parseLog: (log: { topics: Array<string>; data: string }) => LogDescription;
+  };
+};
 
 export interface IDisconnectedRange {
   startBlock?: number;
