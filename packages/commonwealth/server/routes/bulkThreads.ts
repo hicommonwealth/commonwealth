@@ -27,8 +27,6 @@ const bulkThreads = async (
     bind['stage'] = stage;
   }
 
-  const pinnedThreadsQuery = includePinnedThreads ? 'OR t.pinned = true' : 'AND t.pinned = false'
-
   bind['created_at'] = cutoff_date;
 
   let threads;
@@ -98,8 +96,8 @@ const bulkThreads = async (
         WHERE t.deleted_at IS NULL
           AND t.chain = $chain 
           ${topicOptions}
-          AND COALESCE(t.last_commented_on, t.created_at) < $created_at
-          ${pinnedThreadsQuery}
+          AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
+          (COALESCE(t.last_commented_on, t.created_at) < $created_at AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
            reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
           ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
