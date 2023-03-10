@@ -36,6 +36,7 @@ export enum ComponentType {
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   SidebarMenu = 'SidebarMenu',
+  Socials = 'Socials',
   Spinner = 'Spinner',
   Tab = 'Tab',
   TabBar = 'TabBar',

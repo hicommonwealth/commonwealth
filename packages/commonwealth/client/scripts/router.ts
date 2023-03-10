@@ -293,13 +293,25 @@ const getCustomDomainRoutes = (importRoute) => ({
   }),
 
   // Profiles
-  '/account/:address': importRoute(import('views/pages/profile'), {
+  '/account/:address': importRoute(import('views/pages/profile_redirect'), {
     scoped: true,
     deferChain: true,
   }),
-  '/account': redirectRoute(() =>
-    app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
+  '/account': importRoute(import('views/pages/profile_redirect'), {
+    scoped: true,
+    deferChain: true,
+  }),
+  '/:scope/account/:address': importRoute(
+    import('views/pages/profile_redirect'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
   ),
+  '/:scope/account': importRoute(import('views/pages/profile_redirect'), {
+    scoped: true,
+    deferChain: true,
+  }),
 
   // Governance
   '/referenda': importRoute(import('views/pages/referenda'), {
@@ -348,7 +360,6 @@ const getCustomDomainRoutes = (importRoute) => ({
     scoped: true,
     deferChain: true,
   }),
-  '/settings': importRoute(import('views/pages/settings'), { scoped: true }),
   '/analytics': importRoute(import('views/pages/stats'), {
     scoped: true,
     deferChain: true,
@@ -396,12 +407,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
   '/:scope/chat/:channel': redirectRoute((attrs) => `/chat/${attrs.channel}`),
   '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
-  '/:scope/account/:address': redirectRoute(
-    (attrs) => `/account/${attrs.address}/`
-  ),
-  '/:scope/account': redirectRoute(() =>
-    app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
-  ),
   '/:scope/referenda': redirectRoute(() => '/referenda'),
   '/:scope/proposals': redirectRoute(() => '/proposals'),
   '/:scope/delegate': redirectRoute(() => '/delegate'),
@@ -421,7 +426,6 @@ const getCustomDomainRoutes = (importRoute) => ({
   '/:scope/treasury': redirectRoute(() => '/treasury'),
   '/:scope/tips': redirectRoute(() => '/tips'),
   '/:scope/login': redirectRoute(() => '/login'),
-  '/:scope/settings': redirectRoute(() => '/settings'),
   '/:scope/admin': redirectRoute(() => '/admin'),
   '/:scope/manage': redirectRoute(() => '/manage'),
   '/:scope/spec_settings': redirectRoute(() => '/spec_settings'),
@@ -493,12 +497,6 @@ const getCommonDomainRoutes = (importRoute) => ({
   ),
   '/finishaxielogin': importRoute(import('views/pages/finish_axie_login')),
 
-  // Settings
-  '/settings': redirectRoute(() => '/edgeware/settings'),
-  '/:scope/settings': importRoute(import('views/pages/settings'), {
-    scoped: true,
-  }),
-
   // Discussions
   '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
   '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
@@ -548,14 +546,29 @@ const getCommonDomainRoutes = (importRoute) => ({
   }),
 
   // Profiles
-  '/:scope/account/:address': importRoute(import('views/pages/profile'), {
+  '/:scope/account/:address': importRoute(
+    import('views/pages/profile_redirect'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
+  ),
+  '/:scope/account': importRoute(import('views/pages/profile_redirect'), {
     scoped: true,
     deferChain: true,
   }),
-  '/:scope/account': redirectRoute((a) =>
-    app.user.activeAccount
-      ? `/${a.scope}/account/${app.user.activeAccount.address}`
-      : `/${a.scope}/`
+
+  // New Profiles
+  '/profile/id/:profileId': importRoute(import('views/pages/new_profile'), {
+    scoped: true,
+    deferChain: true,
+  }),
+  '/profile/id/:profileId/edit': importRoute(
+    import('views/pages/edit_new_profile'),
+    {
+      scoped: true,
+      deferChain: true,
+    }
   ),
 
   // Governance

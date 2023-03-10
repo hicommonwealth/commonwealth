@@ -8,26 +8,42 @@ import app from 'state';
 
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWSpinner } from './cw_spinner';
+import { CWText } from './cw_text';
+import { CWRadioGroup } from './cw_radio_group';
 import { getClasses } from './helpers';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
 import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
-import { CWText } from './cw_text';
 
 type CoverImageUploaderAttrs = {
   headerText?: string;
   subheaderText?: string;
   enableGenerativeAI?: boolean;
   generatedImageCallback?: CallableFunction;
+  defaultImageUrl?: string;
+  defaultImageBehavior?: string;
+  name?: string;
   uploadCompleteCallback: CallableFunction;
 };
+
+export enum ImageAs {
+  Cover = 'cover',
+  Background = 'background',
+}
+
+export enum ImageBehavior {
+  Fill = 'cover',
+  Tiled = 'repeat',
+}
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
 export default class CWCoverImageUploader extends ClassComponent<CoverImageUploaderAttrs> {
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;
+  private uploadStatusMessage: string;
+  private imageBehavior: ImageBehavior;
   private prompt: string;
   private isPrompting: boolean;
   private isGenerating: boolean;
@@ -71,11 +87,13 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
 
       if (this.isPrompting) {
         this.imageURL = res.result.imageUrl;
+        if (!this.imageBehavior) this.imageBehavior = ImageBehavior.Fill;
         this.uploadStatus = 'success';
+        this.uploadStatusMessage = 'Image upload succeeded.';
         attachButton.style.display = 'none';
         if (vnode.attrs.generatedImageCallback)
-          vnode.attrs.generatedImageCallback(this.imageURL);
-        vnode.attrs.uploadCompleteCallback(this.imageURL);
+          vnode.attrs.generatedImageCallback(this.imageURL, this.imageBehavior);
+        vnode.attrs.uploadCompleteCallback(this.imageURL, this.imageBehavior);
       }
 
       this.isUploading = false;
@@ -86,19 +104,29 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
       return res.result.imageUrl;
     } catch (e) {
       this.uploadStatus = 'failure';
+      this.uploadStatusMessage =
+        'Image generator failed, try uploading an image.';
       this.isUploading = false;
       this.isPrompting = false;
       this.isGenerating = false;
-      throw new Error(e);
+      m.redraw();
     }
   }
 
   oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
-    const attachZone = document.querySelector('.attach-zone') as HTMLElement;
-    const attachButton = document.querySelector('.attach-btn') as HTMLElement;
-    const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
+    const attachZone = document.querySelector(
+      `.attach-zone.${vnode.attrs.name}`
+    ) as HTMLElement;
+    const attachButton = document.querySelector(
+      `.attach-btn.${vnode.attrs.name}`
+    ) as HTMLElement;
+    const pseudoInput = document.querySelector(
+      `#pseudo-input-${vnode.attrs.name}`
+    ) as HTMLElement;
 
     this.isPrompting = false;
+    this.imageURL = vnode.attrs.defaultImageUrl;
+    this.imageBehavior = vnode.attrs.defaultImageBehavior as ImageBehavior;
 
     // Drag'n'Drop helper function
     const handleDragEvent = (event, hoverAttachZone?: boolean) => {
@@ -116,11 +144,16 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
       const [imageURL, uploadStatus] = await this.uploadImage(file);
       this.isUploading = false;
       this.uploadStatus = uploadStatus;
+      this.uploadStatusMessage =
+        uploadStatus === 'success'
+          ? 'Image upload succeeded.'
+          : 'Image upload failed.';
 
       if (imageURL) {
         this.imageURL = imageURL;
+        if (!this.imageBehavior) this.imageBehavior = ImageBehavior.Fill;
         attachButton.style.display = 'none';
-        vnode.attrs.uploadCompleteCallback(imageURL);
+        vnode.attrs.uploadCompleteCallback(this.imageURL, this.imageBehavior);
       }
 
       m.redraw();
@@ -170,16 +203,26 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
       imageURL,
       isUploading,
       uploadStatus,
-      prompt,
       isPrompting,
       isGenerating,
+      imageBehavior,
     } = this;
     const {
+      name,
       headerText,
       subheaderText,
       enableGenerativeAI,
-      generatedImageCallback,
+      uploadCompleteCallback,
     } = vnode.attrs;
+
+    const isFillImage = imageBehavior === ImageBehavior.Fill;
+
+    const backgroundStyles = {
+      backgroundImage: imageURL ? `url(${imageURL})` : 'none',
+      backgroundSize: isFillImage ? 'cover' : '100px',
+      backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
+      backgroundPosition: isFillImage ? 'center' : '0 0',
+    };
 
     return (
       <div class="CoverImageUploader">
@@ -191,13 +234,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
         <MessageRow
           label={subheaderText || 'Accepts JPG and PNG files.'}
           hasFeedback={true}
-          statusMessage={
-            this.uploadStatus === 'success'
-              ? 'Image upload succeeded.'
-              : this.uploadStatus === 'failure'
-              ? 'Image upload failed.'
-              : null
-          }
+          statusMessage={this.uploadStatusMessage}
           validationStatus={this.uploadStatus}
         />
         <div
@@ -209,13 +246,13 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
               isUploading,
               uploadStatus,
             },
-            'attach-zone'
+            `attach-zone ${name}`
           )}
-          style={`background-image: url(${imageURL})`}
+          style={!isPrompting && !isGenerating && backgroundStyles}
         >
           {this.uploadStatus === 'success' && enableGenerativeAI && (
             <CWButton
-              label="retry"
+              label="Regenerate"
               buttonType="mini-black"
               className="retry-button"
               onclick={(e) => {
@@ -282,22 +319,26 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
             <input
               type="file"
               accept="image/jpeg, image/jpg, image/png"
-              id="pseudo-input"
+              id={`pseudo-input-${name}`}
               class="pseudo-input"
             />
           )}
           {this.isUploading && <CWSpinner active="true" size="large" />}
-          <div class="attach-btn">
+          <div class={`attach-btn ${name}`}>
             {!this.isUploading && (
-              <CWIcon iconName="imageUpload" iconSize="medium" />
+              <CWIcon
+                iconName="imageUpload"
+                iconSize="large"
+                iconButtonTheme="hasBackground"
+              />
             )}
             <CWText type="caption" fontWeight="medium">
-              Drag or upload your image here
+              {headerText}
             </CWText>
             {enableGenerativeAI && !this.isUploading && (
               <CWButton
                 buttonType="mini-white"
-                label="Generate Image"
+                label="Generate image"
                 className="generate-btn"
                 onclick={(e) => {
                   this.prompt = '';
@@ -307,6 +348,33 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
               />
             )}
           </div>
+        </div>
+        <div className="options">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="cover-image-title"
+          >
+            Choose image behavior
+          </CWText>
+          <CWRadioGroup
+            name="image-behaviour"
+            onchange={(e) => {
+              this.imageBehavior = e.target.value;
+              uploadCompleteCallback(this.imageURL, this.imageBehavior);
+            }}
+            toggledOption={imageBehavior}
+            options={[
+              {
+                label: 'Fill',
+                value: ImageBehavior.Fill,
+              },
+              {
+                label: 'Tile',
+                value: ImageBehavior.Tiled,
+              },
+            ]}
+          />
         </div>
       </div>
     );

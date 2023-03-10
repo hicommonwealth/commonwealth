@@ -1,0 +1,119 @@
+@import '../shared';
+
+.ProfilePreview {
+  border: 1px solid $neutral-200;
+  border-radius: 5px;
+  margin-bottom: 48px;
+
+  @include smallInclusive {
+    margin-bottom: 24px;
+  }
+
+  .profile {
+    display: flex;
+    flex-direction: row;
+    padding: 24px;
+    gap: 40px;
+    border-bottom: 1px solid $neutral-200;
+    width: 100%;
+
+    @include smallInclusive {
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .avatar {
+      @include smallInclusive {
+        display: flex;
+        justify-content: center;
+      }
+
+      img {
+        height: 160px;
+        width: 160px;
+        max-width: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+    }
+
+    .content {
+      width: 100%;
+
+      .h4 {
+        margin-bottom: 16px;
+
+        @include smallInclusive {
+          display: flex;
+          justify-content: center;
+        }
+      }
+
+      .b1 {
+        margin-bottom: 16px;
+      }
+
+      .actions {
+        display: none;
+        gap: 8px;
+        width: 100%;
+        margin-bottom: 16px;
+
+        @include mediumInclusive {
+          display: flex;
+        }
+
+        @include smallInclusive {
+          justify-content: center;
+        }
+      }
+
+      .SocialAccounts {
+        max-width: none;
+        justify-content: flex-start;
+        margin-bottom: 0;
+
+        > :first-child {
+          svg {
+            margin-left: 0;
+          }
+        }
+
+        @include smallInclusive {
+          justify-content: center;
+        }
+      }
+    }
+
+    .desktop-actions {
+      display: flex;
+      gap: 8px;
+
+      @include mediumInclusive {
+        display: none;
+      }
+    }
+  }
+
+  .addresses {
+    padding: 24px;
+
+    .title {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+
+      &.no-margin {
+        margin-bottom: 0;
+      }
+
+      @include smallInclusive {
+        flex-direction: column;
+
+        .Button {
+          margin-top: 16px;
+        }
+      }
+    }
+  }
+}

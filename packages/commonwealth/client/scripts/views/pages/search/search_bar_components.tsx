@@ -154,7 +154,7 @@ export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRo
     return (
       <div class="SearchBarMemberPreviewRow">
         {m(User, {
-          user: app.profiles.getProfile(
+          user: app.newProfiles.getProfile(
             searchResult.chain,
             searchResult.address
           ),
