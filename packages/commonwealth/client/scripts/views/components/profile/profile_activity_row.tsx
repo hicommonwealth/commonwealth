@@ -61,7 +61,9 @@ export class NewProfileActivityRow extends ClassComponent<ProfileActivityRowAttr
             </span>
             {isThread
               ? link('a', `/${chain}/discussion/${id}`, [`${title}`])
-              : link('a', `/${chain}/discussion/${comment.thread?.id}`, [`${decodedTitle}`,])}
+              : link('a', `/${chain}/discussion/${comment.thread?.id}`, [
+                  `${decodedTitle}`,
+                ])}
           </CWText>
         </div>
         <div className="content">
