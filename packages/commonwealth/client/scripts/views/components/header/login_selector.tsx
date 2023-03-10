@@ -118,14 +118,6 @@ export const LoginSelectorMenuLeft = ({
         <div
           className="login-menu-item"
           onClick={() => {
-            navigate(`/profile/manage`);
-          }}
-        >
-          <CWText type="caption">Manage profiles</CWText>
-        </div>
-        <div
-          className="login-menu-item"
-          onClick={() => {
             if (nAccountsWithoutRole > 0) {
               setIsSelectAddressModalOpen(true);
             } else {

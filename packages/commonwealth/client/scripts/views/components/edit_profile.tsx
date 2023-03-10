@@ -172,36 +172,6 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
     checkForUpdates();
   };
 
-  const handleDeleteProfile = async () => {
-    if (addresses?.length > 0) {
-      notifyError(
-        'You must unlink all addresses before deleting your profile.'
-      );
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response: any = await $.post(`${app.serverUrl()}/deleteProfile`, {
-        profileId: profile.id,
-        jwt: app.user.jwt,
-      });
-      if (response?.status === 'Success') {
-        // Redirect
-        setTimeout(() => {
-          setLoading(false);
-          navigate('/profile/manage');
-        }, 1500);
-      }
-    } catch (err) {
-      setTimeout(() => {
-        setLoading(false);
-        notifyError(err.responseJSON?.error || 'Something went wrong.');
-      }, 1500);
-    }
-  };
-
   React.useEffect(() => {
     if (!app.isLoggedIn()) {
       navigate(`/profile/id/${props.profileId}`);
@@ -260,18 +230,13 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
           actions={
             <div className="buttons-container">
               <div className="buttons">
-                <CWButton
-                  label="Delete profile"
-                  onClick={() => handleDeleteProfile()}
-                  buttonType="tertiary-black"
-                />
                 <div className="buttons-right">
                   <CWButton
                     label="Cancel Edits"
                     onClick={() => {
                       setLoading(true);
                       setTimeout(() => {
-                        navigate(`/profile/${props.username}`);
+                        navigate(`/profile/id/${props.profileId}`);
                       }, 1000);
                     }}
                     className="save-button"

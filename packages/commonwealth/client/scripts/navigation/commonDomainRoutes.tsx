@@ -64,10 +64,6 @@ const NewSnapshotProposalPage = lazy(
 const ProfilePage = lazy(() => import('views/pages/profile'));
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
-const ManageProfilesPage = lazy(() => import('views/pages/manage_profiles'));
-const CreateNewProfilePage = lazy(
-  () => import('views/pages/create_new_profile')
-);
 
 const getCommonDomainsRoutes = () => (
   <>
@@ -439,20 +435,6 @@ const getCommonDomainsRoutes = () => (
     <Route
       path="/profile/id/:profileId/edit"
       element={withLayout(EditNewProfilePage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/profile/manage"
-      element={withLayout(ManageProfilesPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/profile/new"
-      element={withLayout(CreateNewProfilePage, {
         scoped: true,
         deferChain: true,
       })}
