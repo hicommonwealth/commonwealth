@@ -8,7 +8,7 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
+import { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
 
 import 'pages/view_thread/index.scss';
@@ -720,8 +720,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         content={
           <ChangeTopicModal
             onChangeHandler={(topic: Topic) => {
-              thread.topic = topic;
-              setThread(thread);
+              const newThread = new Thread({ ...thread, topic })
+              setThread(newThread);
             }}
             thread={thread}
             onModalClose={() => setIsChangeTopicModalOpen(false)}
@@ -735,9 +735,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
-            onCollaboratorsUpdated={(newEditors: IThreadCollaborator[]) => {
-              thread.collaborators = newEditors;
-              setThread(thread);
+            onCollaboratorsUpdated={(collaborators: IThreadCollaborator[]) => {
+              const newThread = new Thread({ ...thread, collaborators })
+              setThread(newThread);
             }}
           />
         }
