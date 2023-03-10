@@ -13,8 +13,6 @@ import {JsonRpcProvider} from "@ethersproject/providers";
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;
 
-  private _listener: Listener | null;
-
   private subIntervalId: Timeout;
 
   protected readonly log;
