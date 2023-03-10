@@ -52,10 +52,6 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
 
   private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
     const provider = this._api.governance.provider;
-    if (this.subIntervalId) {
-      this.log.info('Already subscribed!');
-      return;
-    }
 
     // retrieves the last numEstimateBlocks blocks to estimate block time
     const currentBlockNum = await provider.getBlockNumber();
@@ -127,12 +123,13 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
    * @param numEstimateBlocks The number of blocks to search for the max block time
    */
   public async subscribe(cb: (event: RawEvent) => void, eventSourceMap: EvmEventSourceMapType, numEstimateBlocks = 10): Promise<void> {
-    this.eventSourceMap = eventSourceMap;
     const provider = this._api.governance.provider;
     if (this.subIntervalId) {
       this.log.info('Already subscribed!');
       return;
     }
+
+    this.eventSourceMap = eventSourceMap;
 
     const maxBlockTime = await this.estimateBlockTime(numEstimateBlocks);
 
@@ -141,11 +138,9 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   }
 
   public unsubscribe(): void {
-    if (this._listener) {
-      this._api.governance.off('*', this._listener);
-      this._api.aaveToken?.off('*', this._listener);
-      this._api.stkAaveToken?.off('*', this._listener);
-      this._listener = null;
+    if (this.subIntervalId) {
+      clearInterval(this.subIntervalId);
+      this.subIntervalId = undefined;
     }
   }
 }

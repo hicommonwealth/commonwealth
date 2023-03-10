@@ -5,13 +5,14 @@ import type {Listener, Log} from '@ethersproject/providers';
 import sleep from 'sleep-promise';
 import BN from 'bn.js';
 
-import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
+import {EvmEventSourceMapType, IEventSubscriber, SupportedNetwork} from '../../interfaces';
 import {ERC20, ERC20__factory as ERC20Factory} from '../../contractTypes';
 import { addPrefix, factory } from '../../logging';
 
 import type {RawEvent, IErc20Contracts} from './types';
 import Timeout = NodeJS.Timeout;
 import {ethers} from "ethers";
+import {JsonRpcProvider} from "@ethersproject/providers";
 
 export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
   private _name: string;
@@ -22,6 +23,10 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
 
   protected readonly log;
 
+  private eventSourceMap: EvmEventSourceMapType;
+
+  protected lastBlockNumber: number;
+
   constructor(api: IErc20Contracts, name: string, verbose = false) {
     super(api, verbose);
     this._name = name;
@@ -30,82 +35,90 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
     );
   }
 
+  private async estimateBlockTime(numEstimateBlocks = 10): Promise<number> {
+    const provider = this._api.provider;
+
+    // retrieves the last numEstimateBlocks blocks to estimate block time
+    const currentBlockNum = await provider.getBlockNumber();
+    this.log.info(`Current Block: ${currentBlockNum}`);
+    const blockPromises = [];
+    for (let i = currentBlockNum; i > currentBlockNum - numEstimateBlocks; i--) {
+      blockPromises.push(provider.getBlock(i));
+    }
+    const blocks = await Promise.all(blockPromises);
+    const timestamps = blocks.map(x => x.timestamp).reverse();
+    let maxBlockTime = 0;
+
+    for (let i = 1; i < timestamps.length; i++) {
+      if (maxBlockTime < timestamps[i] - timestamps[i - 1]) maxBlockTime = timestamps[i] - timestamps[i - 1];
+    }
+
+    if (maxBlockTime === 0) {
+      this.log.error(`Failed to estimate block time.`, new Error(`maxBlockTime is 0.`));
+      // default to Ethereum block time
+      return 15;
+    }
+
+    this.log.info(`Polling interval: ${maxBlockTime} seconds`);
+    return maxBlockTime;
+  }
+
+  private async fetchLogs(provider: JsonRpcProvider, cb: (event: RawEvent) => void) {
+    const currentBlockNum = await provider.getBlockNumber();
+    console.log("New current block number:", currentBlockNum);
+    if (this.lastBlockNumber && this.lastBlockNumber != currentBlockNum) {
+      for (let i = this.lastBlockNumber + 1; i <= currentBlockNum; i++) {
+        const logs = await provider.getLogs({
+          fromBlock: this.lastBlockNumber,
+          toBlock: currentBlockNum,
+        });
+
+        // filter the logs we need
+        for (const log of logs) {
+          if (this.eventSourceMap[log.address.toLowerCase()]?.eventSignatures.includes(log.topics[0])) {
+            const parsedRawEvent = this.eventSourceMap[log.address.toLowerCase()].parseLog(log);
+
+            const rawEvent: RawEvent = {
+              address: log.address.toLowerCase(),
+              args: parsedRawEvent.args as any,
+              name: parsedRawEvent.name,
+              blockNumber: log.blockNumber
+            }
+
+            const logStr = `Found the following event log in block ${log.blockNumber}: ${JSON.stringify(
+              rawEvent,
+              null,
+              2
+            )}.`;
+            // eslint-disable-next-line no-unused-expressions
+            this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
+
+            cb(rawEvent);
+          }
+        }
+      }
+    }
+    this.lastBlockNumber = currentBlockNum;
+  }
+
   /**
    * Initializes subscription to chain and starts emitting events.
    * @param cb A callback to execute for each event
+   * @param eventSourceMap
    * @param numEstimateBlocks The number of blocks to search for the max block time
    */
-  public async subscribe(cb: (event: RawEvent) => void, numEstimateBlocks = 10): Promise<void> {
+  public async subscribe(cb: (event: RawEvent) => void, eventSourceMap: EvmEventSourceMapType, numEstimateBlocks = 10): Promise<void> {
     if (this.subIntervalId) {
       this.log.info('Already subscribed!');
       return;
     }
 
-    // retrieves the last numEstimateBlocks blocks to estimate block time
-    const currentBlockNum = await this._api.provider.getBlockNumber();
-    this.log.info(`Current Block: ${currentBlockNum}`);
-    const blockPromises = [];
-    for (let i = currentBlockNum; i > currentBlockNum - numEstimateBlocks; i--) {
-      blockPromises.push(this._api.provider.getBlock(i));
-    }
-    const blocks = await Promise.all(blockPromises);
-    const timestamps = blocks.map(x => x.timestamp).reverse();
-    let maxBlockTime = 0;
-    for (let i = 1; i < timestamps.length; i++) {
-      if (maxBlockTime < timestamps[i] - timestamps[i - 1]) maxBlockTime = timestamps[i] - timestamps[i - 1];
-    }
-    this.log.info(`Polling interval: ${maxBlockTime} seconds`);
+    this.eventSourceMap = eventSourceMap;
+
+    const maxBlockTime = await this.estimateBlockTime(numEstimateBlocks);
 
     // TODO: keep track of the number of requests that return no blocks - adjust accordingly
-    let lastBlockNumber: number;
-    this.subIntervalId = setInterval(async () => {
-      const currentBlockNum = await this._api.provider.getBlockNumber();
-      console.log("New current block number:", currentBlockNum);
-      if (lastBlockNumber && lastBlockNumber != currentBlockNum) {
-        for (let i = lastBlockNumber + 1; i <= currentBlockNum; i++) {
-          const block = await this._api.provider.getBlock(i)
-          const logStr = `Received ${this._name} block: ${JSON.stringify(
-            block,
-            null,
-            2
-          )}.`;
-          // eslint-disable-next-line no-unused-expressions
-          this._verbose ? this.log.info(logStr) : this.log.trace(logStr);
-
-          const logs = await this._api.provider.getLogs({
-            fromBlock: lastBlockNumber,
-            toBlock: currentBlockNum,
-          });
-
-          // create an object where the keys are contract addresses and the values are arrays containing all of the
-          // event signatures from that contract that we want to listen for
-          const tokenHashMap: { [address: string]: { eventSignatures: string[], contract: ERC20 }} = {};
-          for (const token of this._api.tokens) {
-            tokenHashMap[token.contract.address.toLowerCase()] = {
-              eventSignatures: Object.keys(token.contract.interface.events).map(x => ethers.utils.id(x)),
-              contract: token.contract
-            };
-            console.log(token.tokenName);
-          }
-
-          // filter the logs we need
-          for (const log of logs) {
-            if (tokenHashMap[log.address.toLowerCase()]?.eventSignatures.includes(log.topics[0])) {
-              const parsedRawEvent = tokenHashMap[log.address.toLowerCase()].contract.interface.parseLog(log);
-
-              const rawEvent: RawEvent = {
-                address: log.address,
-                args: parsedRawEvent.args as any,
-                name: parsedRawEvent.name,
-                blockNumber: log.blockNumber
-              }
-              cb(rawEvent);
-            }
-          }
-        }
-      }
-      lastBlockNumber = currentBlockNum;
-    }, maxBlockTime * 1000);
+    this.subIntervalId = setInterval(this.fetchLogs.bind(this), maxBlockTime * 1000);
   }
 
   public unsubscribe(): void {
