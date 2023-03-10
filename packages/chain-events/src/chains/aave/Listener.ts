@@ -1,5 +1,5 @@
 import { Listener as BaseListener } from '../../Listener';
-import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import type {CWEvent, EvmEventSourceMapType, IDisconnectedRange} from '../../interfaces';
 import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
@@ -14,6 +14,7 @@ import { createApi } from './subscribeFunc';
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
+import {ethers} from "ethers";
 
 export class Listener extends BaseListener<
   Api,
@@ -91,11 +92,31 @@ export class Listener extends BaseListener<
       this.log.info(
         `Subscribing to Aave contract: ${this._chain}, on url ${this._options.url}`
       );
-      await this._subscriber.subscribe(this.processBlock.bind(this));
+      await this._subscriber.subscribe(this.processBlock.bind(this), this.getEventSourceMap());
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
       throw error;
+    }
+  }
+
+  private getEventSourceMap(): EvmEventSourceMapType {
+    const gov = this._api.governance;
+    const aaveToken = this._api.aaveToken;
+    const stkAaveToken = this._api.stkAaveToken;
+    return {
+      [gov.address]: {
+        eventSignatures: Object.keys(gov.interface.events).map(x => ethers.utils.id(x)),
+        parseLog: gov.interface.parseLog
+      },
+      [aaveToken.address]: {
+        eventSignatures: Object.keys(aaveToken.interface.events).map(x => ethers.utils.id(x)),
+        parseLog: aaveToken.interface.parseLog
+      },
+      [stkAaveToken.address]: {
+        eventSignatures: Object.keys(stkAaveToken.interface.events).map(x => ethers.utils.id(x)),
+        parseLog: stkAaveToken.interface.parseLog
+      }
     }
   }
 

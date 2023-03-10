@@ -21,6 +21,7 @@ import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as CommonwealthApi } from './chains/commonwealth/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
+import {LogDescription} from "@ethersproject/abi/src.ts/interface";
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -137,10 +138,12 @@ export abstract class IEventSubscriber<Api, RawEvent> {
   }
 
   // throws on error
-  public abstract subscribe(cb: (event: RawEvent) => void): Promise<void>;
+  public abstract subscribe(cb: (event: RawEvent) => void, ...args: any): Promise<void>;
 
   public abstract unsubscribe(): void;
 }
+
+export type EvmEventSourceMapType = { [address: string]: { eventSignatures: string[], parseLog: (log: { topics: Array<string>, data: string}) => LogDescription }}
 
 export interface IDisconnectedRange {
   startBlock?: number;
