@@ -9,13 +9,13 @@ import app, { LoginState } from 'state';
 import { LandingPageHeader } from './landing_page_header';
 import { TokensCommunityHero } from './tokens_community_hero';
 import { CreatorsCardSection } from './creators_card_section';
-import { ChainsSlider } from './chains_slider';
 import { FindYourCommunitySection } from './find_your_community_section';
 import { CrowdfundingCardSection } from './crowdfunding_card_section';
 import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
 import useForceRerender from 'hooks/useForceRerender';
 import { CWText } from '../../components/component_kit/cw_text';
+import { ChainsSlider } from './chains_slider';
 // import { MixpanelPageViewEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
@@ -119,7 +119,9 @@ const LandingPage = () => {
         <FindYourCommunitySection />
         <CrowdfundingCardSection />
         <div className="join-section">
-          <CWText className="join-text">A community for every token.</CWText>
+          <CWText className="join-text" type="h3" fontWeight="semiBold">
+            A community for every token.
+          </CWText>
           <CWText className="join-text">Join Commonwealth today.</CWText>
         </div>
         <Footer />

@@ -5,9 +5,7 @@ import 'pages/landing/landing_page_header.scss';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 
 type LandingPageHeaderProps = {
@@ -15,8 +13,6 @@ type LandingPageHeaderProps = {
 };
 
 export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
-  const navigate = useCommonNavigate();
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isWindowMediumSmall, setIsWindowMediumSmall] = useState(
     isWindowMediumSmallInclusive(window.innerWidth)
@@ -48,16 +44,11 @@ export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
             onClick={() => console.log('menu open')}
           />
         ) : (
-          <>
-            <CWText onClick={() => navigate('/whyCommonwealth')}>
-              Why Commonwealth?
-            </CWText>
-            <CWButton
-              label="Login"
-              buttonType="primary-black"
-              onClick={() => setIsModalOpen(true)}
-            />
-          </>
+          <CWButton
+            label="Login"
+            buttonType="primary-black"
+            onClick={() => setIsModalOpen(true)}
+          />
         )}
       </div>
       <Modal
