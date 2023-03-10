@@ -77,7 +77,8 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
               address: log.address.toLowerCase(),
               args: parsedRawEvent.args as any,
               name: parsedRawEvent.name,
-              blockNumber: log.blockNumber
+              blockNumber: log.blockNumber,
+              data: log.data
             }
 
             const logStr = `Found the following event log in block ${log.blockNumber}: ${JSON.stringify(
@@ -114,7 +115,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     const maxBlockTime = await this.estimateBlockTime(numEstimateBlocks);
 
     // TODO: keep track of the number of requests that return no blocks - adjust accordingly
-    this.subIntervalId = setInterval(this.fetchLogs.bind(this), maxBlockTime * 1000, provider);
+    this.subIntervalId = setInterval(this.fetchLogs.bind(this), maxBlockTime * 1000, provider, cb);
   }
 
   public unsubscribe(): void {

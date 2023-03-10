@@ -119,7 +119,7 @@ export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
     const maxBlockTime = await this.estimateBlockTime(numEstimateBlocks);
 
     // TODO: keep track of the number of requests that return no blocks - adjust accordingly
-    this.subIntervalId = setInterval(this.fetchLogs.bind(this), maxBlockTime * 1000, provider);
+    this.subIntervalId = setInterval(this.fetchLogs.bind(this), maxBlockTime * 1000, provider, cb);
   }
 
   public unsubscribe(): void {
