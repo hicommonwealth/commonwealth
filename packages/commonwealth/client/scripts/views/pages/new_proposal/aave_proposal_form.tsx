@@ -51,6 +51,7 @@ export const AaveProposalForm = () => {
         <div className="executors-container">
           {aave.governance.api.Executors.map((r) => (
             <div
+              key={r.address}
               className={`executor ${
                 executor === r.address && 'selected-executor'
               }`}
@@ -78,6 +79,7 @@ export const AaveProposalForm = () => {
         <CWTabBar>
           {aaveProposalState.map((_, index) => (
             <CWTab
+              key={`Call ${index + 1}`}
               label={`Call ${index + 1}`}
               isSelected={activeTabIndex === index}
               onClick={() => {
