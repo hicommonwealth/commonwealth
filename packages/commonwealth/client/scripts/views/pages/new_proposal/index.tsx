@@ -48,7 +48,6 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   if (!app.chain || !loaded || !app.chain.meta) {
     return <PageLoading />;
   }
-  console.log('internalType', internalType);
 
   // infer proposal type if possible
   if (!internalType) {
@@ -64,16 +63,12 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     }
   }
 
-  console.log('app.chain.loaded', app.chain.loaded);
-
   // check if module is still initializing
   const c = proposalSlugToClass()?.get(internalType) as ProposalModule<
     any,
     any,
     any
   >;
-
-  console.log('c', c);
 
   if (!c || !c.ready) {
     app.chain.loadModules([c]);
