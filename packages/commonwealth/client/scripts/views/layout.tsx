@@ -1,6 +1,5 @@
-import React, { Suspense } from 'react';
-import { RecoilRoot } from 'recoil';
-
+import React, { Suspense, useEffect } from 'react';
+import { atom, useSetAtom } from 'jotai';
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode, ClassComponentRouter } from 'mithrilInterop';
 
@@ -149,8 +148,14 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
   }
 }
 
+export const paramsAtom = atom<Record<string, string>>({});
+
 export const LayoutWrapper = ({ Component, params }) => {
   const routerParams = useParams();
+  const setParamsAtom = useSetAtom(paramsAtom);
+  useEffect(() => {
+    setParamsAtom(routerParams);
+  }, [routerParams]);
   const LayoutComp = withRouter(LayoutComponent);
 
   return (
@@ -162,10 +167,8 @@ export const LayoutWrapper = ({ Component, params }) => {
 
 export const withLayout = (Component, params) => {
   return (
-    <RecoilRoot>
-      <Suspense fallback={null}>
-        <LayoutWrapper Component={Component} params={params} />
-      </Suspense>
-    </RecoilRoot>
+    <Suspense fallback={null}>
+      <LayoutWrapper Component={Component} params={params} />
+    </Suspense>
   );
 };

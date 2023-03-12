@@ -61,6 +61,7 @@ class Poll {
     return this.votes;
   }
 
+  // TODO: this should be optimistically redrawn
   public async submitVote(
     authorChain: string,
     address: string,

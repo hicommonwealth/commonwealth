@@ -1,18 +1,18 @@
-import React, { useEffect } from 'react';
-import app from 'state';
-import { useSetRecoilState, useRecoilValue } from 'recoil';
+import React from 'react';
+import { useAtom } from 'jotai';
 
 import Sublayout from 'views/sublayout';
-import { PageLoading } from './loading';
 import { ThreadPollCard } from './view_thread/poll_cards';
-import { pollSelector } from 'controllers/server/polls';
+import { pollAtom } from 'controllers/server/polls';
 
-const PollPage = ({ scope, thread_id }) => {
-  const poll = useRecoilValue(pollSelector(thread_id));
+const PollPage = () => {
+  const [polls] = useAtom(pollAtom);
 
   return (
     <Sublayout>
-      <ThreadPollCard poll={poll} />
+      <>
+        {polls.map((poll) => <ThreadPollCard poll={poll} key={poll.id} />)}
+      </>
     </Sublayout>
   );
 };

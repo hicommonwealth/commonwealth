@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
 
+import { pollAtom } from 'controllers/server/polls';
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -43,7 +45,6 @@ import { Modal } from '../../components/component_kit/cw_modal';
 export type ThreadPrefetch = {
   [identifier: string]: {
     commentsStarted: boolean;
-    pollsStarted?: boolean;
     profilesFinished: boolean;
     profilesStarted: boolean;
     viewCountStarted?: boolean;
@@ -61,7 +62,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [comments, setComments] = useState<Array<Comment<Thread>>>([]);
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
-  const [polls, setPolls] = useState<Array<Poll>>([]);
   const [prefetch, setPrefetch] = useState<ThreadPrefetch>({});
   const [recentlyEdited, setRecentlyEdited] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -72,10 +72,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [title, setTitle] = useState('');
   const [viewCount, setViewCount] = useState(null);
   const [initializedComments, setInitializedComments] = useState(false);
-  const [initializedPolls, setInitializedPolls] = useState(false);
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
     useState(false);
+
+  // note: this will query polls based on the useParams() hook. Need to determine
+  //   to what extent prefetching is necessary + how to achieve it.
+  const [polls] = useAtom(pollAtom);
 
   const threadId = identifier.split('-')[0];
   const threadIdAndType = `${threadId}-${ProposalType.Thread}`;
@@ -100,7 +103,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       ...prevState,
       [threadIdAndType]: {
         commentsStarted: false,
-        pollsStarted: false,
         viewCountStarted: false,
         profilesStarted: false,
         profilesFinished: false,
@@ -241,40 +243,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       updatedCommentsCallback();
     }
   }, [initializedComments, updatedCommentsCallback]);
-
-  useEffect(() => {
-    if (!initializedPolls) {
-      setInitializedPolls(true);
-      setPolls(app.polls.getByThreadId(thread?.id));
-    }
-  }, [initializedPolls, thread?.id]);
-
-  useEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    // load polls
-    if (!prefetch[threadIdAndType]['pollsStarted']) {
-      app.polls
-        .fetchPolls(app.activeChainId(), thread?.id)
-        .then(() => {
-          setPolls(app.polls.getByThreadId(thread.id));
-        })
-        .catch(() => {
-          notifyError('Failed to load polls');
-          setPolls([]);
-        });
-
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadIdAndType]: {
-          ...prevState[threadIdAndType],
-          pollsStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, thread?.id, threadIdAndType]);
 
   useEffect(() => {
     if (!thread) {

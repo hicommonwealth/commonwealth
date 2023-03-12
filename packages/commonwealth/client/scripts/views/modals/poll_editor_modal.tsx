@@ -17,6 +17,8 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
+import { useAtom } from 'jotai';
+import { createPollAtom } from 'controllers/server/polls';
 
 const getPollDurationCopy = (
   customDuration: string,
@@ -56,6 +58,7 @@ export const PollEditorModal = ({
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
   const [options, setOptions] = useState(TWO_EMPTY_OPTIONS);
   const [prompt, setPrompt] = useState('');
+  const [, mutate] = useAtom(createPollAtom);
 
   const handleInputChange = (value: string, index: number) => {
     setOptions((prevState) => {
@@ -95,14 +98,14 @@ export const PollEditorModal = ({
     }
 
     try {
-      await app.polls.setPolling({
+      mutate([{
         threadId: thread.id,
         prompt,
         options,
         customDuration: customDurationEnabled ? customDuration : null,
         address: app.user.activeAccount.address,
         authorChain: app.user.activeAccount.chain.id,
-      });
+      }]);
       notifySuccess('Poll creation succeeded');
     } catch (err) {
       console.error(err);

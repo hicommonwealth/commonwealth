@@ -3,7 +3,9 @@ import $ from 'jquery';
 import { Poll, Vote } from 'models';
 import moment from 'moment';
 import app from 'state';
-import { atom, selectorFamily } from 'recoil';
+import { atom } from 'jotai'
+import { atomsWithQuery, atomsWithMutation } from 'jotai-tanstack-query'
+import { paramsAtom } from 'views/layout';
 
 export const modelFromServer = (poll) => {
   const {
@@ -36,77 +38,51 @@ export const modelFromServer = (poll) => {
   });
 };
 
-export const pollSelector = selectorFamily({
-  key: 'PollSelector',
-  get: (thread_id) => async () => {
-    // TODO: add state check here
+const threadIdAtom = atom(
+  (get) => {
+    const params = get(paramsAtom);
+    // POLLS PAGE (dummy page)
+    if (params.thread_id) return params?.thread_id;
+
+    // view thread page (not dummy page)
+    // TODO: this value should be accessible from the thread store
+    //   as an atom defining the current thread loaded. However, in the
+    //   interim, we can parse it out directly.
+    if (params.identifier) {
+      return params.identifier.split('-')[0];
+    }
+  }
+);
+
+export const [pollAtom] = atomsWithQuery<Poll[]>((get) => ({
+  queryKey: ['polls', get(threadIdAtom)],
+  queryFn: async ({ queryKey: [, thread_id] }) => {
+    if (!thread_id) return [];
     const response = await $.get(
       `${app.serverUrl()}/getPolls`,
       {
         chain: app.activeChainId(),
-        thread_id: thread_id,
+        thread_id,
       }
     );
-    for (const poll of response.result) {
-      const modeledPoll = modelFromServer(poll);
-      // TODO: sync with state here
-      return modeledPoll;
-    }
+    return response.result.map(modelFromServer);
   },
-});
+}));
 
-// --------------------------------------------
-
-import PollStore from 'stores/PollStore';
-
-class PollsController {
-  private _store = new PollStore();
-
-  public get store() {
-    return this._store;
-  }
-
-  public async fetchPolls(chainId: string, threadId: number) {
-    await $.ajax({
-      url: `${app.serverUrl()}/getPolls`,
-      type: 'GET',
-      data: {
-        chain: chainId,
-        thread_id: threadId,
-      },
-      success: (response) => {
-        for (const poll of response.result) {
-          const modeledPoll = modelFromServer(poll);
-          const existingPoll = this._store.getById(modeledPoll.id);
-          if (existingPoll) {
-            this._store.remove(existingPoll);
-          }
-          this._store.add(modeledPoll);
-        }
-      },
-      error: (err) => {
-        console.log('Failed to fetch thread polls');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to fetch thread polls'
-        );
-      },
-    });
-  }
-
-  public async setPolling(args: {
+// TODO: this needs to trigger an invalidation/redraw of the queried proposals atom above
+export const [, createPollAtom] = atomsWithMutation((get) => ({
+  mutationKey: ['createPoll'],
+  mutationFn: async (args: {
     threadId: number;
     prompt: string;
     options: string[];
     customDuration?: string;
     authorChain: string;
     address: string;
-  }) {
-    const { threadId, prompt, options, customDuration, authorChain, address } =
-      args;
+  }) => {
+    const { threadId, prompt, options, customDuration, authorChain, address } = args;
 
-    await $.ajax({
+    const response = await $.ajax({
       url: `${app.serverUrl()}/createPoll`,
       type: 'POST',
       data: {
@@ -118,25 +94,11 @@ class PollsController {
         author_chain: authorChain,
         address,
         jwt: app.user.jwt,
-      },
-      success: (response) => {
-        const modeledPoll = modelFromServer(response.result);
-        this._store.add(modeledPoll);
-      },
-      error: (err) => {
-        console.log('Failed to initialize polling');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to initialize polling'
-        );
-      },
+      }
     });
-  }
-
-  public getByThreadId(threadId) {
-    return this._store.getByThreadId(threadId);
-  }
-}
-
-export default PollsController;
+    if (response?.status !== 'Success') {
+      throw new Error(response?.error || 'Failed to initialize polling');
+    }
+    return modelFromServer(response.result);
+  },
+}));
