@@ -61,7 +61,7 @@ class Poll {
     return this.votes;
   }
 
-  // TODO: this should be optimistically redrawn
+  // TODO: this should be optimistically redrawn => really should be represented as separate atoms
   public async submitVote(
     authorChain: string,
     address: string,

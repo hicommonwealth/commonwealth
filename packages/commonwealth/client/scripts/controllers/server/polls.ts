@@ -70,6 +70,7 @@ export const [pollAtom] = atomsWithQuery<Poll[]>((get) => ({
 }));
 
 // TODO: this needs to trigger an invalidation/redraw of the queried proposals atom above
+//  -- really, need to figure out dispatching / SAGA pattern here.
 export const [, createPollAtom] = atomsWithMutation((get) => ({
   mutationKey: ['createPoll'],
   mutationFn: async (args: {
