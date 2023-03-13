@@ -739,8 +739,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         content={
           <ChangeTopicModal
             onChangeHandler={(topic: Topic) => {
-              thread.topic = topic;
-              setThread(thread);
+              const newThread = new Thread({ ...thread, topic })
+              setThread(newThread);
             }}
             thread={thread}
             onModalClose={() => setIsChangeTopicModalOpen(false)}
@@ -754,9 +754,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
-            onCollaboratorsUpdated={(newEditors: IThreadCollaborator[]) => {
-              thread.collaborators = newEditors;
-              setThread(thread);
+            onCollaboratorsUpdated={(collaborators: IThreadCollaborator[]) => {
+              const newThread = new Thread({ ...thread, collaborators })
+              setThread(newThread);
             }}
           />
         }
