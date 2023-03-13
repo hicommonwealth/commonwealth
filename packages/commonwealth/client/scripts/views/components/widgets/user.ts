@@ -6,14 +6,14 @@ import jdenticon from 'jdenticon';
 import { capitalize } from 'lodash';
 
 import m from 'mithril';
-import { Profile } from 'models';
+import { Profile, MinimumProfile, AddressAccount } from 'models';
 
 import app from 'state';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { AddressAccount } from 'models';
+import { CWAvatar } from '../component_kit/cw_avatar';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -23,18 +23,23 @@ export interface IAddressDisplayOptions {
   maxCharLength?: number;
 }
 
-const User: m.Component<{
-  user: AddressAccount | Profile;
-  avatarSize?: number;
-  avatarOnly?: boolean; // overrides most other properties
-  hideAvatar?: boolean;
-  showAddressWithDisplayName?: boolean; // show address inline with the display name
-  addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
-  linkify?: boolean;
-  onclick?: any;
-  popover?: boolean;
-  showRole?: boolean;
-}> = {
+const User: m.Component<
+  {
+    user: AddressAccount | MinimumProfile;
+    avatarSize?: number;
+    avatarOnly?: boolean; // overrides most other properties
+    hideAvatar?: boolean;
+    showAddressWithDisplayName?: boolean; // show address inline with the display name
+    addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
+    linkify?: boolean;
+    onclick?: any;
+    popover?: boolean;
+    showRole?: boolean;
+  },
+  {
+    profileId: number;
+  }
+> = {
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
@@ -56,7 +61,7 @@ const User: m.Component<{
     if (!user) return;
 
     let addressAccount: AddressAccount;
-    let profile: Profile;
+    let profile: MinimumProfile;
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
@@ -81,13 +86,12 @@ const User: m.Component<{
       if (!user.chain || !user.address) return;
       addressAccount = user;
 
-      if (user.profile) profile = user.profile;
-      else profile = app.profiles.getProfile(user.chain.id, user.address);
+      profile = app.newProfiles.getProfile(chainId.id, address);
 
       role = adminsAndMods.find(
         (r) => r.address === user.address && r.address_chain === user.chain.id
       );
-    } else if (vnode.attrs.user instanceof Profile) {
+    } else if (vnode.attrs.user instanceof MinimumProfile) {
       profile = vnode.attrs.user;
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
@@ -124,17 +128,26 @@ const User: m.Component<{
       }
     );
 
+    const defaultAvatar = jdenticon.toSvg(profile.id, 90);
+    const svgSource = `data:image/svg+xml;utf8,${encodeURIComponent(
+      defaultAvatar
+    )}`;
+
+    const profileAvatar = profile?.avatarUrl
+      ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize })
+      : m('img', { src: svgSource });
+
+    const profileAvatarPopover = profile?.avatarUrl
+      ? m(CWAvatar, { avatarUrl: profile.avatarUrl, size: avatarSize + 12 })
+      : m('img', { src: svgSource });
+
     const userFinal = avatarOnly
       ? m(
           '.User.avatar-only',
           {
             key: profile?.address || '-',
           },
-          !profile
-            ? null
-            : profile.avatarUrl
-            ? profile.getAvatar(avatarSize)
-            : profile.getAvatar(avatarSize - 4)
+          !profile ? null : profileAvatar
         )
       : m(
           '.User',
@@ -149,25 +162,21 @@ const User: m.Component<{
                 {
                   style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
                 },
-                profile && profile.getAvatar(avatarSize)
+                profile && profileAvatar
               ),
             [
               // non-substrate name
               linkify
                 ? link(
                     'a.user-display-name.username',
-                    profile
-                      ? `/${app.activeChainId() || profile.chain}/account/${
-                          profile.address
-                        }?base=${profile.chain}`
-                      : 'javascript:',
+                    profile ? `/profile/id/${profile.id}` : 'javascript:',
                     [
                       !profile
                         ? addrShort
                         : !showAddressWithDisplayName
-                        ? profile.displayName
+                        ? profile.name
                         : [
-                            profile.displayName,
+                            profile.name,
                             m(
                               '.id-short',
                               formatAddressShort(profile.address, profile.chain)
@@ -180,9 +189,9 @@ const User: m.Component<{
                     !profile
                       ? addrShort
                       : !showAddressWithDisplayName
-                      ? profile.displayName
+                      ? profile.name
                       : [
-                          profile.displayName,
+                          profile.name,
                           m(
                             '.id-short',
                             formatAddressShort(profile.address, profile.chain)
@@ -208,27 +217,17 @@ const User: m.Component<{
         },
       },
       [
-        m('.user-avatar', [
-          !profile
-            ? null
-            : profile.avatarUrl
-            ? profile.getAvatar(36)
-            : profile.getAvatar(32),
-        ]),
+        m('.user-avatar', [!profile ? null : profileAvatarPopover]),
         m('.user-name', [
           link(
             'a.user-display-name',
-            profile
-              ? `/${app.activeChainId() || profile.chain}/account/${
-                  profile.address
-                }?base=${profile.chain}`
-              : 'javascript:',
+            profile ? `/profile/id/${profile.id}` : 'javascript:',
             !profile
               ? addrShort
               : !showAddressWithDisplayName
-              ? profile.displayName
+              ? profile.name
               : [
-                  profile.displayName,
+                  profile.name,
                   m(
                     '.id-short',
                     formatAddressShort(profile.address, profile.chain)
@@ -246,7 +245,7 @@ const User: m.Component<{
               maxCharLength
             )
           ),
-        friendlyChainName && m('.user-chain', friendlyChainName),
+        // friendlyChainName && m('.user-chain', friendlyChainName),
         getRoleTags(), // always show roleTags in .UserPopover
 
         // If Admin Allow Banning
@@ -280,45 +279,32 @@ const User: m.Component<{
   },
 };
 
-export const UserBlock: m.Component<{
-  user: AddressAccount | Profile;
-  popover?: boolean;
-  showRole?: boolean;
-  showAddressWithDisplayName?: boolean;
-  addressDisplayOptions?: IAddressDisplayOptions;
-  searchTerm?: string;
-  showChainName?: boolean;
-  hideOnchainRole?: boolean;
-  selected?: boolean;
-  compact?: boolean;
-  linkify?: boolean;
-  avatarSize?: number;
-}> = {
+export const UserBlock: m.Component<
+  {
+    user: AddressAccount | MinimumProfile;
+    popover?: boolean;
+    showRole?: boolean;
+    showAddressWithDisplayName?: boolean;
+    addressDisplayOptions?: IAddressDisplayOptions;
+    searchTerm?: string;
+    showChainName?: boolean;
+    hideOnchainRole?: boolean;
+    selected?: boolean;
+    compact?: boolean;
+    linkify?: boolean;
+    avatarSize?: number;
+    hideAvatar?: boolean;
+  },
+  {
+    profileId: number;
+  }
+> = {
   view: (vnode) => {
-    const {
-      user,
-      popover,
-      showRole,
-      searchTerm,
-      showAddressWithDisplayName,
-      showChainName,
-      selected,
-      compact,
-      linkify,
-      addressDisplayOptions,
-    } = vnode.attrs;
+    const { user, searchTerm, showChainName, compact, linkify } = vnode.attrs;
 
-    const { showFullAddress } = vnode.attrs.addressDisplayOptions || {};
+    const chain = typeof user.chain === 'string' ? user.chain : user.chain?.id;
 
-    let profile;
-
-    if (user instanceof AddressAccount) {
-      if (!user.chain || !user.address) return;
-      if (user.profile) profile = user.profile;
-      else profile = app.profiles.getProfile(user.chain.id, user.address);
-    } else if (user instanceof Profile) {
-      profile = user;
-    }
+    const profile = app.newProfiles.getProfile(chain, user.address);
 
     const highlightSearchTerm =
       profile?.address &&
@@ -339,25 +325,7 @@ export const UserBlock: m.Component<{
       : null;
 
     const children = [
-      m('.user-block-left', [
-        m(User, {
-          user,
-          avatarOnly: true,
-          avatarSize: vnode.attrs.avatarSize || 28,
-          popover,
-        }),
-      ]),
       m('.user-block-center', [
-        m('.user-block-name', [
-          m(User, {
-            user,
-            hideAvatar: true,
-            showAddressWithDisplayName,
-            addressDisplayOptions,
-            popover,
-            showRole,
-          }),
-        ]),
         m(
           '.user-block-address',
           {
@@ -368,9 +336,9 @@ export const UserBlock: m.Component<{
               '',
               highlightSearchTerm
                 ? highlightedAddress
-                : showFullAddress
-                ? profile.address
-                : formatAddressShort(profile.address, profile.chain)
+                : `${profile.address.slice(0, 8)}...${profile.address.slice(
+                    -5
+                  )}`
             ),
             profile?.address && showChainName && m('.address-divider', ' · '),
             showChainName &&
@@ -386,16 +354,12 @@ export const UserBlock: m.Component<{
       m('.user-block-right', [
         m(
           '.user-block-selected',
-          selected ? m(CWIcon, { iconName: 'check' }) : ''
+          m(CWIcon, { iconName: 'check', iconSize: 'small' })
         ),
       ]),
     ];
 
-    const userLink = profile
-      ? `/${app.activeChainId() || profile.chain}/account/${
-          profile.address
-        }?base=${profile.chain}`
-      : 'javascript:';
+    const userLink = profile ? `/profile/id/${profile.id}` : 'javascript:';
 
     return linkify
       ? link('.UserBlock', userLink, children)

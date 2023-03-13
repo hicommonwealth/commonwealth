@@ -1,6 +1,5 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
@@ -38,18 +37,14 @@ const renderCommunity = (item: ChainInfo) => {
       <CommunityLabel community={item} />
       {app.isLoggedIn() && roles.length > 0 && (
         <div class="roles-and-star">
-          {roles.map((role) => {
-            return m(User, {
-              avatarSize: 18,
-              avatarOnly: true,
-              user: new AddressAccount({
-                addressId: role.address_id,
-                address: role.address,
-                chain: app.config.chains.getById(
-                  role.address_chain || role.chain_id
-                ),
-              }),
-            });
+          {m(User, {
+            avatarSize: 18,
+            avatarOnly: true,
+            user: new AddressAccount(
+              addressId: roles[0].address_id,
+              address: roles[0].address,
+              chain: roles[0].address_chain || roles[0].chain_id,
+            ),
           })}
           <div
             class={
@@ -156,20 +151,6 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
                 m.route.set('/notification-settings');
-              },
-            },
-            {
-              type: 'default',
-              label: 'Account settings',
-              iconLeft: 'bell',
-              onclick: () => {
-                if (app.activeChainId()) {
-                  navigateToSubpage('/settings');
-                } else {
-                  app.sidebarToggled = false;
-                  app.sidebarMenu = 'default';
-                  m.route.set('/settings');
-                }
               },
             } as MenuItem,
           ].map((item: MenuItem) => {

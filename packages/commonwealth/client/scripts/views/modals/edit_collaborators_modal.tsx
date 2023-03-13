@@ -10,7 +10,8 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import 'modals/edit_collaborators_modal.scss';
-import type { Profile, Thread } from 'models';
+import type { Thread } from 'models';
+import type { MinimumProfile as Profile } from 'models';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
@@ -102,7 +103,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
               />
               <div class="collaborator-rows-container">
                 {items.map((c) => {
-                  const user: Profile = app.profiles.getProfile(
+                  const user: Profile = app.newProfiles.getProfile(
                     c.chain_id,
                     c.Address.address
                   );
@@ -150,7 +151,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
               <CWLabel label="Selected collaborators" />
               <div class="collaborator-rows-container">
                 {allCollaborators.map((c) => {
-                  const user: Profile = app.profiles.getProfile(
+                  const user: Profile = app.newProfiles.getProfile(
                     c.chain,
                     c.address
                   );

@@ -15,6 +15,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import type Near from 'controllers/chain/near/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import $ from 'jquery';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 
 import type { IWebWallet } from 'models';
@@ -230,8 +231,8 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       console.log('Started new session for', wallet.chain, chainId);
 
       const newlyCreated = false;
-      linking = false;
-      accountVerifiedCallback(account, newlyCreated, linking);
+      const isLinking = false;
+      accountVerifiedCallback(account, newlyCreated, isLinking);
     }
     async function handleNormalWalletLogin(
       wallet: IWebWallet<any>,
@@ -448,14 +449,10 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                 interactionType="click"
                 tooltipContent={
                   <>
-                    <CWText type="caption">
-                      If you don’t see your wallet then make sure:
-                    </CWText>
-                    <CWText type="caption">
-                      • Your wallet chrome extension installed?
-                    </CWText>
-                    <CWText type="caption">
-                      • Your wallet chrome extension active?
+                    <CWText type="caption" className="no-wallets-popover">
+                      If you cannot see your wallet, please ensure that your
+                      wallet Chrome extension is <b>installed</b> and{' '}
+                      <b>activated</b>.
                     </CWText>
                   </>
                 }

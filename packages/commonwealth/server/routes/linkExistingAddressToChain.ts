@@ -66,13 +66,6 @@ const linkExistingAddressToChain = async (
     return next(new AppError(Errors.NotVerifiedAddressOrUser));
   }
 
-  const originalProfile = await models.OffchainProfile.findOne({
-    where: { address_id: originalAddress.id },
-  });
-
-  const profileData =
-    originalProfile && originalProfile.data ? originalProfile.data : null;
-
   // check if the original address's token is expired. refer edge case 1)
   let verificationToken = originalAddress.verification_token;
   let verificationTokenExpires = originalAddress.verification_token_expires;
@@ -157,28 +150,6 @@ const linkExistingAddressToChain = async (
 
     // assertion check
     await assertAddressOwnership(models, encodedAddress);
-
-    const existingProfile = await models.OffchainProfile.findOne({
-      where: { address_id: addressId },
-    });
-
-    if (existingProfile) {
-      await models.OffchainProfile.update(
-        {
-          data: profileData,
-        },
-        {
-          where: {
-            address_id: addressId,
-          },
-        }
-      );
-    } else {
-      await models.OffchainProfile.create({
-        address_id: addressId,
-        data: profileData,
-      });
-    }
 
     const ownedAddresses = await models.Address.findAll({
       where: { user_id: originalAddress.user_id },

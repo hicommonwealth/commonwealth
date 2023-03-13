@@ -172,7 +172,7 @@ class AdminActions extends ClassComponent {
   private success: boolean;
 
   oninit() {
-    const profiles = app.profiles.store.getAll();
+    const profiles = app.newProfiles.store.getAll();
     this.profiles = {};
 
     for (const profile in profiles) {

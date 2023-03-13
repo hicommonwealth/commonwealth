@@ -317,17 +317,17 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
     // load profiles
     if (this.prefetch[threadIdAndType]['profilesStarted'] === undefined) {
-      app.profiles.getProfile(thread.authorChain, thread.author);
+      app.newProfiles.getProfile(thread.authorChain, thread.author);
 
       this.comments.forEach((comment) => {
-        app.profiles.getProfile(comment.authorChain, comment.author);
+        app.newProfiles.getProfile(comment.authorChain, comment.author);
       });
 
       this.prefetch[threadIdAndType]['profilesStarted'] = true;
     }
 
     if (
-      !app.profiles.allLoaded() &&
+      !app.newProfiles.allLoaded() &&
       !this.prefetch[threadIdAndType]['profilesFinished']
     ) {
       return (
