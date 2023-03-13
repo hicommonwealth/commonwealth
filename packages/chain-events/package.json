@@ -80,7 +80,6 @@
     "pg": "^8.6.0",
     "pg-format": "^1.0.4",
     "rollbar": "^2.25.2",
-    "sequelize": "^6.16.1",
     "sleep-promise": "^8.0.1",
     "typescript-logging": "^0.6.4",
     "underscore": "^1.10.2",
