@@ -173,12 +173,6 @@ const listenerOptions = {
     skipCatchup: false,
     enricherConfig: { balanceTransferThresholdPermill: 10_000 },
   },
-  moloch: {
-    url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-    skipCatchup: false,
-    contractAddress: '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
-    contractVersion: 2,
-  },
   marlin: {
     url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
     skipCatchup: false,

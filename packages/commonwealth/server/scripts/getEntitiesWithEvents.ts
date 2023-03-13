@@ -51,8 +51,6 @@ async function main() {
         network = SupportedNetwork.Compound;
       else if (row.network === ChainNetwork.Aave)
         network = SupportedNetwork.Aave;
-      else if (row.network === ChainNetwork.Moloch)
-        network = SupportedNetwork.Moloch;
       const temp = eventToEntity(network, row.event_data.kind);
       if (!temp) {
         return false;

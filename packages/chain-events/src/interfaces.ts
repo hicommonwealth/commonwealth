@@ -7,14 +7,12 @@ import type { ApiPromise as SubstrateApi } from '@polkadot/api';
 import type { ChainEventInstance } from '../services/database/models/chain_event';
 
 import * as SubstrateTypes from './chains/substrate/types';
-import * as MolochTypes from './chains/moloch/types';
 import * as CompoundTypes from './chains/compound/types';
 import * as Erc20Types from './chains/erc20/types';
 import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CommonwealthTypes from './chains/commonwealth/types';
 import * as CosmosTypes from './chains/cosmos/types';
-import type { Api as MolochApi } from './chains/moloch/types';
 import type { IErc721Contracts as ERC721Api } from './chains/erc721/types';
 import type { IErc20Contracts as ERC20Api } from './chains/erc20/types';
 import type { Api as CompoundApi } from './chains/compound/types';
@@ -25,14 +23,12 @@ import type { Listener } from './Listener';
 // add other events here as union types
 export type IChainEntityKind =
   | SubstrateTypes.EntityKind
-  | MolochTypes.EntityKind
   | CompoundTypes.EntityKind
   | AaveTypes.EntityKind
   | CommonwealthTypes.EntityKind
   | CosmosTypes.EntityKind;
 export type IChainEventData =
   | SubstrateTypes.IEventData
-  | MolochTypes.IEventData
   | CompoundTypes.IEventData
   | AaveTypes.IEventData
   | Erc20Types.IEventData
@@ -41,7 +37,6 @@ export type IChainEventData =
   | CosmosTypes.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
-  | MolochTypes.EventKind
   | CompoundTypes.EventKind
   | AaveTypes.EventKind
   | Erc20Types.EventKind
@@ -50,7 +45,6 @@ export type IChainEventKind =
   | CosmosTypes.EventKind;
 export type IAPIs =
   | SubstrateApi
-  | MolochApi
   | ERC721Api
   | ERC20Api
   | CompoundApi
@@ -66,7 +60,6 @@ export type IAnyListener = Listener<
 
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
-  ...MolochTypes.EventKinds,
   ...CompoundTypes.EventKinds,
   ...AaveTypes.EventKinds,
   ...Erc20Types.EventKinds,
@@ -80,7 +73,6 @@ export enum SupportedNetwork {
   Substrate = 'substrate',
   Aave = 'aave',
   Compound = 'compound',
-  Moloch = 'moloch',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
   Commonwealth = 'commonwealth',
@@ -229,9 +221,6 @@ export function getUniqueEntityKey(
   if (network === SupportedNetwork.Aave) {
     return 'id';
   }
-  if (network === SupportedNetwork.Moloch) {
-    return 'proposalIndex';
-  }
   if (network === SupportedNetwork.Commonwealth) {
     return 'id';
   }
@@ -267,24 +256,6 @@ export function eventToEntity(
   network: SupportedNetwork,
   event: IChainEventKind
 ): [IChainEntityKind, EntityEventKind] {
-  if (network === SupportedNetwork.Moloch) {
-    switch (event) {
-      case MolochTypes.EventKind.SubmitProposal: {
-        return [MolochTypes.EntityKind.Proposal, EntityEventKind.Create];
-      }
-      case MolochTypes.EventKind.SubmitVote: {
-        return [MolochTypes.EntityKind.Proposal, EntityEventKind.Vote];
-      }
-      case MolochTypes.EventKind.ProcessProposal: {
-        return [MolochTypes.EntityKind.Proposal, EntityEventKind.Complete];
-      }
-      case MolochTypes.EventKind.Abort: {
-        return [MolochTypes.EntityKind.Proposal, EntityEventKind.Complete];
-      }
-      default:
-        return null;
-    }
-  }
   if (network === SupportedNetwork.Compound) {
     switch (event) {
       case CompoundTypes.EventKind.ProposalCanceled: {

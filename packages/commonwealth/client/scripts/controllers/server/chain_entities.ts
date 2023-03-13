@@ -25,7 +25,6 @@ export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.network === ChainNetwork.ERC721) return SupportedNetwork.ERC721;
   if (c.network === ChainNetwork.Compound) return SupportedNetwork.Compound;
   if (c.network === ChainNetwork.Aave) return SupportedNetwork.Aave;
-  if (c.network === ChainNetwork.Moloch) return SupportedNetwork.Moloch;
   throw new Error(
     `Invalid event chain: ${c.id}, on network ${c.network}, base ${c.base}`
   );
