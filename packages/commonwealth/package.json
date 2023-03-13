@@ -164,7 +164,6 @@
     "express-validator": "^6.14.2",
     "faker": "^4.1.0",
     "fast-sass-loader": "^2.0.1",
-    "friendly-username-generator": "^2.0.4",
     "graphql": "^15.5.0",
     "graphql-tag": "^2.12.4",
     "highlight-words-core": "^1.2.2",

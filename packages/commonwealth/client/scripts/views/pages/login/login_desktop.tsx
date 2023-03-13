@@ -149,7 +149,7 @@ export const LoginDesktop = ({
               </CWText>
             </div>
             <CWAvatarUsernameInput
-              address={'asdasdasd'}
+              address={address}
               value={username}
               onAvatarChangeHandler={handleSetAvatar}
               onUsernameChangeHandler={handleSetUsername}

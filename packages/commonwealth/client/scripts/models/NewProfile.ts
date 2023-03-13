@@ -2,7 +2,6 @@ import type { Image } from '../views/components/edit_profile';
 
 class NewProfile {
   private _name: string;
-  private _username: string;
   private _email: string;
   private _website: string;
   private _bio: string;
@@ -17,10 +16,6 @@ class NewProfile {
 
   get name() {
     return this._name;
-  }
-
-  get username() {
-    return this._username;
   }
 
   get email() {
@@ -69,7 +64,6 @@ class NewProfile {
 
   constructor({
     profile_name,
-    username,
     email,
     website,
     bio,
@@ -83,7 +77,6 @@ class NewProfile {
     background_image,
   }) {
     this._name = profile_name;
-    this._username = username;
     this._email = email;
     this._website = website;
     this._bio = bio;
@@ -99,7 +92,6 @@ class NewProfile {
 
   public initialize(
     name,
-    username,
     email,
     website,
     bio,
@@ -113,7 +105,6 @@ class NewProfile {
     backgroundImage
   ) {
     this._name = name;
-    this._username = username;
     this._email = email;
     this._website = website;
     this._bio = bio;

@@ -14,6 +14,7 @@ import ProfileActivity from './profile_activity';
 import { CWSpinner } from '../component_kit/cw_spinner';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../../pages/404';
+import Sublayout from '../../sublayout';
 
 enum ProfileError {
   None,
@@ -120,75 +121,79 @@ const ProfileComponent = (props: ProfileProps) => {
     }
 
     return (
-      <div
-        className="Profile"
-        style={
-          profile.backgroundImage
-            ? {
-                backgroundImage: `url(${backgroundUrl})`,
+      <Sublayout>
+        <div
+          className="Profile"
+          style={
+            profile.backgroundImage
+              ? {
+                  backgroundImage: `url(${backgroundUrl})`,
+                  backgroundRepeat: `${
+                    backgroundImageBehavior === ImageBehavior.Fill
+                      ? 'no-repeat'
+                      : 'repeat'
+                  }`,
+                  backgroundSize:
+                    backgroundImageBehavior === ImageBehavior.Fill
+                      ? 'cover'
+                      : '100px',
+                  backgroundPosition:
+                    backgroundImageBehavior === ImageBehavior.Fill
+                      ? 'center'
+                      : '56px 56px',
+                  backgroundAttachment: 'fixed',
+                }
+              : {}
+          }
+        >
+          {profile.coverImage && (
+            <div
+              style={{
+                backgroundImage: `url(${coverUrl})`,
                 backgroundRepeat: `${
-                  backgroundImageBehavior === ImageBehavior.Fill
+                  coverImageBehavior === ImageBehavior.Fill
                     ? 'no-repeat'
                     : 'repeat'
                 }`,
                 backgroundSize:
-                  backgroundImageBehavior === ImageBehavior.Fill
-                    ? 'cover'
-                    : '100px',
+                  coverImageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
                 backgroundPosition:
-                  backgroundImageBehavior === ImageBehavior.Fill
-                    ? 'center'
-                    : '56px 56px',
-                backgroundAttachment: 'fixed',
-              }
-            : {}
-        }
-      >
-        {profile.coverImage && (
+                  coverImageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
+                height: '240px',
+              }}
+            />
+          )}
           <div
-            style={{
-              backgroundImage: `url(${coverUrl})`,
-              backgroundRepeat: `${
-                coverImageBehavior === ImageBehavior.Fill
-                  ? 'no-repeat'
-                  : 'repeat'
-              }`,
-              backgroundSize:
-                coverImageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
-              backgroundPosition:
-                coverImageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
-              height: '240px',
-            }}
-          />
-        )}
-        <div
-          className={
-            profile.backgroundImage
-              ? 'ProfilePageContainer'
-              : 'ProfilePageContainer smaller-margins'
-          }
-        >
-          <ProfileHeader profile={profile} isOwner={isOwner} />
-          <ProfileActivity
-            threads={threads}
-            comments={comments}
-            addresses={addresses}
-          />
+            className={
+              profile.backgroundImage
+                ? 'ProfilePageContainer'
+                : 'ProfilePageContainer smaller-margins'
+            }
+          >
+            <ProfileHeader profile={profile} isOwner={isOwner} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              addresses={addresses}
+            />
+          </div>
         </div>
-      </div>
+      </Sublayout>
     );
   } else {
     return (
-      <div className="Profile">
-        <div className="ProfilePageContainer">
-          <ProfileHeader profile={profile} isOwner={isOwner} />
-          <ProfileActivity
-            threads={threads}
-            comments={comments}
-            addresses={addresses}
-          />
+      <Sublayout>
+        <div className="Profile">
+          <div className="ProfilePageContainer">
+            <ProfileHeader profile={profile} isOwner={isOwner} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              addresses={addresses}
+            />
+          </div>
         </div>
-      </div>
+      </Sublayout>
     );
   }
 };
