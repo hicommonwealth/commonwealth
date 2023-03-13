@@ -349,7 +349,11 @@ const getActivityCounts = async (models: DB, communityId: string) => {
   return { totalComments, totalThreads };
 };
 
-export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
+export const emailDigestBuilder = async (
+  models: DB,
+  digestLevel: number,
+  confirmationEmail: string
+) => {
   // Go through each community on CW
   const communities = await models.Chain.findAll();
 
@@ -486,6 +490,18 @@ export const emailDigestBuilder = async (models: DB, digestLevel: number) => {
   }
 
   console.log('Sent emails to ', emailsSent, ' users.');
+
+  try {
+    const msg = {
+      to: confirmationEmail,
+      from: 'Commonwealth <no-reply@commonwealth.im>',
+      subject: 'Common Weekly Digest',
+      text: `Sent emails to ${emailsSent} users.`,
+    };
+    await sgMail.send(msg);
+  } catch (e) {
+    console.log(e);
+  }
 
   return allEmailObjects;
 };

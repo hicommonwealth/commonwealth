@@ -12,10 +12,14 @@ const Errors = {
 
 const runDigestScript = async (
   models: DB,
-  req: TypedRequestBody<{ digestLevel: number; secret: string }>,
-  res: TypedResponse<{ message: Array<any> }>
+  req: TypedRequestBody<{
+    digestLevel: number;
+    secret: string;
+    confirmationEmail: string;
+  }>,
+  res: TypedResponse<{ message: string }>
 ) => {
-  const { digestLevel, secret } = req.body;
+  const { digestLevel, secret, confirmationEmail } = req.body;
 
   if (
     !secret ||
@@ -30,8 +34,11 @@ const runDigestScript = async (
   }
 
   try {
-    const emails = await emailDigestBuilder(models, digestLevel);
-    return success(res, { message: emails });
+    emailDigestBuilder(models, digestLevel, confirmationEmail);
+    return success(res, {
+      message:
+        'Kicked off email digest. You will receive an email when the emails have been sent. Check spam if you do not see it initially.',
+    });
   } catch (e) {
     console.error(e);
     throw new AppError(Errors.EmailFailed);
