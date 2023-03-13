@@ -29,16 +29,19 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   const [internalType, setInternalType] = useState<ProposalType>(type);
   const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
   // isLoggedIn is not referenced, but is used to trigger re-render
-  const [isLoggedIn, setIsLoggedIn] = useState(app.isLoggedIn);
+  const [isLoggedIn, setIsLoggedIn] = useState(app.isLoggedIn());
 
   useEffect(() => {
     app.runWhenReady(() => {
+      console.log('app.chain.loaded', app.chain.loaded);
+
       setIsLoaded(app.chain.loaded);
     });
   }, [app.chain?.loaded]);
 
   useEffect(() => {
     app.loginStateEmitter.on('redraw', () => {
+      console.log('app.isLoggedIn()', app.isLoggedIn());
       setIsLoggedIn(app.isLoggedIn());
     });
 
