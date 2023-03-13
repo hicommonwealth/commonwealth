@@ -38,7 +38,6 @@ import updateBanner from '../routes/updateBanner';
 import communityStats from '../routes/communityStats';
 import fetchEtherscanContract from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
-import runDigestScript from '../routes/runDigestScript';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -775,8 +774,6 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     setAddressWallet.bind(this, models)
   );
-
-  router.post('/runDigestScript', runDigestScript.bind(this, models));
 
   // chain categories
   router.post(
