@@ -6,17 +6,13 @@ import { useCommonNavigate } from 'navigation/helpers';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 
-type CommunitySearchOptionProps = {
+type SearchOptionProps = {
   iconImg: string;
   route: string;
   text: string;
 };
 
-export const CommunitySearchOption = ({
-  iconImg,
-  route,
-  text,
-}: CommunitySearchOptionProps) => {
+export const SearchOption = ({ iconImg, route, text }: SearchOptionProps) => {
   const navigate = useCommonNavigate();
 
   let tokenImage;
@@ -61,19 +57,19 @@ export const CommunitySearchOption = ({
   );
 };
 
-type InputTokenListProps = {
+type CommunitySearchOptionsProps = {
   inputValue: string;
   maxOptions: number;
   optionList: Array<Token | Chain | typeof placeholderChain>;
   refilterResults: boolean;
 };
 
-export const InputTokenList = ({
+export const CommunitySearchOptions = ({
   inputValue,
   maxOptions,
   optionList,
   refilterResults,
-}: InputTokenListProps) => {
+}: CommunitySearchOptionsProps) => {
   const [oldValue, setOldValue] = useState('');
   const [options, setOptions] = useState<Array<any>>();
 
@@ -131,7 +127,7 @@ export const InputTokenList = ({
       option = option as Token;
 
       return (
-        <CommunitySearchOption
+        <SearchOption
           route={option.address}
           iconImg={option.logoURI}
           text={option.name}
@@ -141,7 +137,7 @@ export const InputTokenList = ({
       option = option as Chain;
 
       return (
-        <CommunitySearchOption
+        <SearchOption
           route={option.id}
           iconImg={option.img}
           text={option.name}

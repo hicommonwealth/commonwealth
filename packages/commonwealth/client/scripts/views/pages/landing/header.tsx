@@ -36,7 +36,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
 
   return (
     <>
-      <div className="LandingPageHeader">
+      <div className="Header">
         <img
           src="static/img/commonLogoWithText.svg"
           alt="Commonwealth"

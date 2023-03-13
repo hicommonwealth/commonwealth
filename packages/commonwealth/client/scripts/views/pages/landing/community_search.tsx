@@ -5,7 +5,7 @@ import 'pages/landing/community_search.scss';
 import type { Chain } from './index';
 
 import { notifyError } from 'controllers/app/notifications';
-import { InputTokenList } from './community_search_option';
+import { CommunitySearchOptions } from './community_search_options';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -85,7 +85,7 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
           }}
         />
         {inputTokenValue && inputTokenValue.length > 2 && (
-          <InputTokenList
+          <CommunitySearchOptions
             optionList={[placeholderChain, ...chains]}
             inputValue={inputTokenValue}
             maxOptions={20}
