@@ -88,7 +88,7 @@ const SearchPage = () => {
       <div className="SearchPage">
         <div className="search-results">
           <CWTabBar>
-            {searchQuery.getSearchScope().map((s, i) => (
+            {scopeTabs.map((s, i) => (
               <CWTab
                 key={i}
                 label={s}
