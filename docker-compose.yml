@@ -1,13 +1,28 @@
 version: '3.9'
+
+x-server: &server
+  container_name: server
+  restart: always
+  env_file: ./packages/commonwealth/.env
+  volumes:
+    - .:/commonwealth
+  build:
+    context: ./
+    dockerfile: ./packages/commonwealth/Dockerfile
+    args:
+      - PORT=8080
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+      - REDIS_URL=redis:6379
+      - DATABASE_URL=postgresql://commonwealth:edgeware@postgres/commonwealth
+  ports:
+    - '8080:8080'
+  expose:
+    - '8080'
+
 services:
   # runs on "docker compose up". Fully dockerized commonwealth.
   server:
-    extends:
-      file: docker-compose.base.yml
-      service: base_server
-    container_name: server
-    volumes:
-      - .:/commonwealth
+    <<: *server
     depends_on:
       postgres:
         condition: service_healthy
@@ -65,10 +80,7 @@ services:
 
   # base server + host postgres
   server-external-db:
-    extends:
-      file: docker-compose.base.yml
-      service: base_server
-    container_name: server
+    <<: *server
     build:
       args:  # Uses host db by default, change this URI for db outside of host
         - DATABASE_URL=postgresql://commonwealth:edgeware@host.docker.internal/commonwealth
