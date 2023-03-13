@@ -26,7 +26,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
     <div
       className="search-result-row"
       onClick={() => {
-        setRoute(`/${chain}/discussion/${proposalId}`);
+        setRoute(`/discussion/${proposalId}`);
       }}
     >
       <CWIcon iconName="feedback" />
@@ -51,10 +51,10 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
           </CWText>
         </div>
         <CWText noWrap>
-          {renderQuillTextBody(thread.body, {
+          {/* {renderQuillTextBody(thread.body, {
             hideFormatting: true,
             searchTerm,
-          })}
+          })} */}
         </CWText>
       </div>
     </div>
@@ -71,11 +71,7 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
     <div
       className="search-result-row"
       onClick={() => {
-        setRoute(
-          `/${chain}/discussion/${proposalId.split('_')[0]}/${
-            proposalId.split('_')[1]
-          }`
-        );
+        setRoute(`/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
       }}
     >
       <CWIcon iconName="feedback" />
@@ -102,10 +98,10 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
           </CWText>
         </div>
         <CWText noWrap>
-          {renderQuillTextBody(comment.text, {
+          {/* {renderQuillTextBody(comment.text, {
             hideFormatting: true,
             searchTerm,
-          })}
+          })} */}
         </CWText>
       </div>
     </div>
@@ -157,7 +153,6 @@ const getMemberResult = (addr) => {
 export const getListing = (
   results: any,
   searchTerm: string,
-  pageCount: number,
   sort: SearchSort,
   searchType: SearchScope,
   setRoute: any
@@ -176,7 +171,7 @@ export const getListing = (
         ? getCommentResult(res, searchTerm, setRoute)
         : null;
     })
-    .slice(0, pageCount * 50);
+    .slice(0, 50);
 
   return tabScopedResults;
 };
