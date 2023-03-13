@@ -46,6 +46,7 @@ export const PollOptions = ({
               checked={false}
               value=""
               label={option.label}
+              key={option.value}
               onChange={() => {
                 // TODO: Build this out when multiple vote options are introduced.
                 // Something like: selectedOptions.push(option.value);
@@ -55,6 +56,7 @@ export const PollOptions = ({
           ))
         : voteInformation.map((option) => (
             <CWRadioButton
+              key={option.value}
               checked={
                 selectedOptions.length > 0 &&
                 option.value === selectedOptions[0]
@@ -261,6 +263,7 @@ export const ResultsSection = ({
                     ? (option.voteCount / totalVoteCount) * 100
                     : 0
                 }
+                key={option.value}
                 progressStatus={calculateProgressStatus(option, index)}
                 label={option.label}
                 iconName={option.label === votedFor ? 'check' : undefined}

@@ -718,13 +718,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             polls?.map((poll) => [poll.id, poll])
                           ).values(),
                         ].map((poll: Poll) => {
-                          return <ThreadPollCard poll={poll} />;
+                          return <ThreadPollCard poll={poll} key={poll.id} />;
                         })}
                         {isAuthor &&
                           (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
                             <ThreadPollEditorCard
                               thread={thread}
                               threadAlreadyHasPolling={!polls?.length}
+                              onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
                       </div>
@@ -739,7 +740,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         content={
           <ChangeTopicModal
             onChangeHandler={(topic: Topic) => {
-              const newThread = new Thread({ ...thread, topic })
+              const newThread = new Thread({ ...thread, topic });
               setThread(newThread);
             }}
             thread={thread}
@@ -755,7 +756,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
             onCollaboratorsUpdated={(collaborators: IThreadCollaborator[]) => {
-              const newThread = new Thread({ ...thread, collaborators })
+              const newThread = new Thread({ ...thread, collaborators });
               setThread(newThread);
             }}
           />

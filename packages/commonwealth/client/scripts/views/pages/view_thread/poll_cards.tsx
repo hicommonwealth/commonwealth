@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import type { Poll, Thread } from 'models';
 
@@ -18,15 +18,18 @@ import { Modal } from '../../components/component_kit/cw_modal';
 type ThreadPollEditorCardProps = {
   thread: Thread;
   threadAlreadyHasPolling: boolean;
+  onPollCreate: () => void;
 };
 
-export const ThreadPollEditorCard = (props: ThreadPollEditorCardProps) => {
-  const { thread, threadAlreadyHasPolling } = props;
-
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+export const ThreadPollEditorCard = ({
+  thread,
+  threadAlreadyHasPolling,
+  onPollCreate,
+}: ThreadPollEditorCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <CWContentPageCard
         header={`Add ${
           threadAlreadyHasPolling ? 'an' : 'another'
@@ -50,12 +53,13 @@ export const ThreadPollEditorCard = (props: ThreadPollEditorCardProps) => {
           <PollEditorModal
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
+            onPollCreate={onPollCreate}
           />
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };
 
@@ -63,13 +67,11 @@ type ThreadPollCardProps = {
   poll: Poll;
 };
 
-export const ThreadPollCard = (props: ThreadPollCardProps) => {
-  const { poll } = props;
-
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+export const ThreadPollCard = ({ poll }: ThreadPollCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <PollCard
         multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
@@ -127,6 +129,6 @@ export const ThreadPollCard = (props: ThreadPollCardProps) => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };
