@@ -14,7 +14,7 @@ The EVM testing tools provide an out of the box environment for testing various 
 ## Setup 
 
 The easiest way to access the tool is to run `docker compose up` this will create a docker deployment with two containers. The following networking configuration is as follows:
-1. Ganache Privat Chain container - `localhost:8545`
+1. Ganache Private Chain container - `localhost:8545`
 2. Abstraction API container - `localhost:3000`
 
 From here API routes can be used and the private chain can be used as an RPC host anywhere this is used(ie metamask)
