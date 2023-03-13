@@ -6,4 +6,10 @@
   @include smallInclusive {
     width: 100%;
   }
+
+  .buttons-row {
+    justify-content: end;
+    display: flex;
+    gap: 8px;
+  }
 }
