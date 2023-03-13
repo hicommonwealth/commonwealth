@@ -141,19 +141,15 @@ export class compoundGovernor implements IGovernor {
     );
     if (currBalance.lt(tokensNeeded)) {
       try {
-        await compToken.methods
-          .transfer(accounts, tokensNeeded)
-          .send({
-            from: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
-            gasLimit: 100000,
-          });
+        await compToken.methods.transfer(accounts, tokensNeeded).send({
+          from: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
+          gasLimit: 100000,
+        });
       } catch {
-        await compToken.methods
-          .transfer(accounts, tokensNeeded)
-          .send({
-            from: '0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7',
-            gasLimit: 100000,
-          });
+        await compToken.methods.transfer(accounts, tokensNeeded).send({
+          from: '0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7',
+          gasLimit: 100000,
+        });
       }
     }
     try {

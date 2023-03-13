@@ -3,6 +3,7 @@ import Ganache from 'ganache';
 import Web3 from 'web3';
 import getProvider from '../utils/getProvider';
 import axios from 'axios';
+import { chainAdvanceTime, chainGetEth } from '../types';
 
 const getBlockInfo = async () => {
   const provider = getProvider();
@@ -80,11 +81,12 @@ export const advanceEvmTime = async (
 };
 export const advanceTimestamp = async (req: Request, res: Response) => {
   try {
+    const request: chainAdvanceTime = req.body;
     const results = {
       preTime: (await getBlockInfo()).timestamp.toString(),
       postTime: '0',
     };
-    await advanceEvmTime(req.body.seconds, 1);
+    await advanceEvmTime(request.seconds, 1);
     results.postTime = (await getBlockInfo()).timestamp.toString();
     res.status(200).json(results).send();
   } catch (err) {
@@ -100,12 +102,13 @@ export const advanceTimestamp = async (req: Request, res: Response) => {
 
 export const getETH = async (req: Request, res: Response) => {
   try {
+    const request: chainGetEth = req.body;
     const provider = getProvider();
     const accounts = await provider.eth.getAccounts();
     await provider.eth.sendTransaction({
       from: accounts[7],
-      to: req.body.toAddress,
-      value: provider.utils.toWei(req.body.amount),
+      to: request.toAddress,
+      value: provider.utils.toWei(request.amount),
     });
     res.status(200).send();
   } catch (err) {

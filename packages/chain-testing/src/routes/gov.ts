@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { govCompGetVotes, govCompVote } from '../types';
+import { govCompGetVotes, govCompProposalId, govCompVote } from '../types';
 import { compoundGovernor } from '../utils/governance/compoundGov';
 
 export const createProposal = async (req: Request, res: Response) => {
@@ -20,8 +20,9 @@ export const createProposal = async (req: Request, res: Response) => {
 
 export const cancelProposal = async (req: Request, res: Response) => {
   try {
+    const request: govCompProposalId = req.body;
     const gov = new compoundGovernor();
-    const id = await gov.cancelProposal(req.body.proposalId);
+    const id = await gov.cancelProposal(request.proposalId);
     res.status(200).json(id).send();
   } catch (err) {
     res
@@ -72,8 +73,9 @@ export const castVote = async (req: Request, res: Response) => {
 
 export const queueProposal = async (req: Request, res: Response) => {
   try {
+    const request: govCompProposalId = req.body;
     const gov = new compoundGovernor();
-    await gov.queueProposal(req.body.proposalId, true);
+    await gov.queueProposal(request.proposalId, true);
     res.status(200).send();
   } catch (err) {
     res
@@ -88,8 +90,9 @@ export const queueProposal = async (req: Request, res: Response) => {
 
 export const executeProposal = async (req: Request, res: Response) => {
   try {
+    const request: govCompProposalId = req.body;
     const gov = new compoundGovernor();
-    await gov.executeProposal(req.body.proposalId, true);
+    await gov.executeProposal(request.proposalId, true);
     res.status(200).send();
   } catch (err) {
     res
@@ -120,8 +123,9 @@ export const runFullCycle = async (req: Request, res: Response) => {
 
 export const getProposalDetails = async (req: Request, res: Response) => {
   try {
+    const request: govCompProposalId = req.body;
     const gov = new compoundGovernor();
-    const details = await gov.getProposalDetails(req.body.proposalId);
+    const details = await gov.getProposalDetails(request.proposalId);
     res.status(200).json(details).send();
   } catch (err) {
     res

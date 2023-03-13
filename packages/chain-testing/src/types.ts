@@ -37,3 +37,18 @@ export interface govCompGetVotes {
   accountIndex: number;
   numberOfVotes: string;
 }
+
+export interface govCompProposalId {
+  proposalId: string;
+}
+
+export interface chainAdvanceTime {
+  seconds: string;
+}
+
+export interface chainGetEth {
+  toAddress: string;
+  amount: string;
+}
+
+//TODO: Add for unconvered endpoints
