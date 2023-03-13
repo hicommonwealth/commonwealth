@@ -1,12 +1,12 @@
 import React from 'react';
 
-import 'pages/landing/find_your_community_section.scss';
+import 'pages/landing/token_holders.scss';
 
 import { CWText } from '../../components/component_kit/cw_text';
 
-export const FindYourCommunitySection = () => {
+export const TokenHolders = () => {
   return (
-    <section className="FindYourCommunitySection">
+    <section className="TokenHolders">
       <div className="header">
         <CWText type="h3" fontWeight="semiBold">
           Token holders come together

@@ -6,16 +6,16 @@ import 'pages/landing/index.scss';
 import type { ChainInfo } from 'models';
 
 import app, { LoginState } from 'state';
-import { LandingPageHeader } from './landing_page_header';
-import { TokensCommunityHero } from './tokens_community_hero';
-import { CreatorsCardSection } from './creators_card_section';
-import { FindYourCommunitySection } from './find_your_community_section';
-import { CrowdfundingCardSection } from './crowdfunding_card_section';
+import { Header } from './header';
+import { CommunitySearch } from './community_search';
+import { CreatorsGallery } from './creators_gallery';
+import { TokenHolders } from './token_holders';
+import { CrowdfundingGallery } from './crowdfunding_gallery';
 import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
 import useForceRerender from 'hooks/useForceRerender';
 import { CWText } from '../../components/component_kit/cw_text';
-import { ChainsSlider } from './chains_slider';
+import { Carousel } from './carousel';
 // import { MixpanelPageViewEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
@@ -76,10 +76,10 @@ const LandingPage = () => {
   if (app.loginState !== LoginState.LoggedIn) {
     return (
       <div className="LandingPage">
-        <LandingPageHeader onLogin={forceRerender} />
-        <TokensCommunityHero chains={chains} />
+        <Header onLogin={forceRerender} />
+        <CommunitySearch chains={chains} />
         {/* {chains && (
-            <ChainsSlider
+            <Carousel
               oncreateSlider={() => {
                 return new (Glide as any)('.glide', {
                   type: 'carousel',
@@ -115,9 +115,9 @@ const LandingPage = () => {
               chains={chains}
             />
           )} */}
-        <CreatorsCardSection />
-        <FindYourCommunitySection />
-        <CrowdfundingCardSection />
+        <CreatorsGallery />
+        <TokenHolders />
+        <CrowdfundingGallery />
         <div className="join-section">
           <CWText className="join-text" type="h3" fontWeight="semiBold">
             A community for every token.

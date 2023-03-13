@@ -10,11 +10,11 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 
-type LandingPageHeaderProps = {
+type HeaderProps = {
   onLogin: () => void;
 };
 
-export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
+export const Header = ({ onLogin }: HeaderProps) => {
   const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -45,7 +45,7 @@ export const LandingPageHeader = ({ onLogin }: LandingPageHeaderProps) => {
         {isWindowMediumSmall ? (
           <CWIconButton
             iconName="hamburger"
-            onClick={() => console.log('menu open')}
+            onClick={() => setIsModalOpen(true)}
           />
         ) : (
           <div className="desktop-login">

@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import 'pages/landing/crowdfunding_card_section.scss';
 
 import { CWText } from '../../components/component_kit/cw_text';
-import { GalleryCard } from './creators_card_section';
+import { GalleryCard } from './creators_gallery';
 
-export const CrowdfundingCardSection = () => {
+export const CrowdfundingGallery = () => {
   const [selectedCard, setSelectedCard] = useState(1);
 
   return (
-    <div className="CrowdfundingCardSection">
+    <div className="CrowdfundingGallery">
       <div className="header">
         <img src="static/img/misc.png" alt="" />
         <CWText type="h3" fontWeight="semiBold">

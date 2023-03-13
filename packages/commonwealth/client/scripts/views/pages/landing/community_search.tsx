@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-import 'pages/landing/tokens_community_hero.scss';
+import 'pages/landing/community_search.scss';
 
 import type { Chain } from './index';
 
 import { notifyError } from 'controllers/app/notifications';
-import { InputTokenList } from './input_tokens_lists';
+import { InputTokenList } from './community_search_option';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -18,11 +18,11 @@ export const placeholderChain = {
   placeholder: true,
 };
 
-type TokensCommunityHeroProps = {
+type CommunitySearchProps = {
   chains: Array<Chain>;
 };
 
-export const TokensCommunityHero = ({ chains }: TokensCommunityHeroProps) => {
+export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
   const navigate = useCommonNavigate();
 
   const [inputTimeout, setInputTimeout] = useState<any>();
@@ -50,7 +50,7 @@ export const TokensCommunityHero = ({ chains }: TokensCommunityHeroProps) => {
   };
 
   return (
-    <div className="TokensCommunityHero">
+    <div className="CommunitySearch">
       <div className="search-section">
         <CWText className="header-text" type="h2" fontWeight="semiBold">
           A <span className="community-span"> community </span>
@@ -100,21 +100,21 @@ export const TokensCommunityHero = ({ chains }: TokensCommunityHeroProps) => {
             <CWIconButton
               iconName="discord"
               onClick={() => {
-                console.log('https://discord.gg/t9XscHdZrG');
+                window.open('https://discord.gg/t9XscHdZrG', '_blank');
               }}
               iconSize="large"
             />
             <CWIconButton
               iconName="telegram"
               onClick={() => {
-                console.log('https://t.me/HiCommonwealth');
+                window.open('https://t.me/HiCommonwealth', '_blank');
               }}
               iconSize="large"
             />
             <CWIconButton
               iconName="twitter"
               onClick={() => {
-                console.log('https://twitter.com/hicommonwealth');
+                window.open('https://twitter.com/hicommonwealth', '_blank');
               }}
               iconSize="large"
             />

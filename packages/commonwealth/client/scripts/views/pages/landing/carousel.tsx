@@ -6,12 +6,12 @@ import type { Chain } from './index';
 
 import { useCommonNavigate } from 'navigation/helpers';
 
-type ChainsSliderProps = {
+type CarouselProps = {
   chains: Array<Chain>;
   oncreateSlider: () => any;
 };
 
-export const ChainsSlider = ({ chains, oncreateSlider }: ChainsSliderProps) => {
+export const Carousel = ({ chains, oncreateSlider }: CarouselProps) => {
   const navigate = useCommonNavigate();
 
   const [index, setIndex] = useState<number>(0);

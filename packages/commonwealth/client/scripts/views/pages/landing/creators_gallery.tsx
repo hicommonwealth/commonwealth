@@ -42,11 +42,11 @@ export const GalleryCard = ({
   );
 };
 
-export const CreatorsCardSection = () => {
+export const CreatorsGallery = () => {
   const [selectedCard, setSelectedCard] = useState(1);
 
   return (
-    <div className="CreatorsCardSection">
+    <div className="CreatorsGallery">
       <div className="header">
         <CWText type="h3" fontWeight="semiBold">
           Token creators are empowered.
