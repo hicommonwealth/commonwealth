@@ -65,9 +65,10 @@ export const ThreadPollEditorCard = ({
 
 type ThreadPollCardProps = {
   poll: Poll;
+  onVote: () => void;
 };
 
-export const ThreadPollCard = ({ poll }: ThreadPollCardProps) => {
+export const ThreadPollCard = ({ poll, onVote }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -109,9 +110,9 @@ export const ThreadPollCard = ({ poll }: ThreadPollCardProps) => {
             ? null
             : 'You must join this community to vote.'
         }
-        onVoteCast={(option, callback, isSelected) =>
-          handlePollVote(poll, option, isSelected, callback)
-        }
+        onVoteCast={(option, isSelected) => {
+          handlePollVote(poll, option, isSelected, onVote);
+        }}
         onResultsClick={(e) => {
           e.preventDefault();
           if (poll.votes.length > 0) {

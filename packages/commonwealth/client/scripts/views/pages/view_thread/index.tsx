@@ -718,7 +718,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             polls?.map((poll) => [poll.id, poll])
                           ).values(),
                         ].map((poll: Poll) => {
-                          return <ThreadPollCard poll={poll} key={poll.id} />;
+                          return (
+                            <ThreadPollCard
+                              poll={poll}
+                              key={poll.id}
+                              onVote={() => setInitializedPolls(false)}
+                            />
+                          );
                         })}
                         {isAuthor &&
                           (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
