@@ -12,9 +12,10 @@ RUN npm install
 COPY . .
 
 ENV RPC_HOST=ganache
+ENV CHAIN_PORT=3000
 
 RUN npm run build
 
-EXPOSE 8080
+EXPOSE 3000
 
 CMD npm start

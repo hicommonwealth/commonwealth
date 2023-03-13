@@ -1,5 +1,5 @@
 import express, { json } from 'express';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 import setupRouter from './router';
 dotenv.config();
 
@@ -8,7 +8,7 @@ const router = setupRouter();
 
 app.use(json());
 app.use('/', router);
-const port = 8080
+const port = process.env.CHAIN_PORT;
 app.set('port', port);
 
 app.listen(port, () => {

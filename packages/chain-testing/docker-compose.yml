@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   app:
@@ -6,11 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - '3000:3000'
     links:
       - chain
   chain:
     image: trufflesuite/ganache
-    command: "--fork --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7"
+    command: '--fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7'
     ports:
-      - "8545:8545"
+      - '8545:8545'
