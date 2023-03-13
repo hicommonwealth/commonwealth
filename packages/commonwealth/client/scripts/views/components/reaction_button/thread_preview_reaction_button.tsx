@@ -10,7 +10,11 @@ import type { ChainInfo, Thread } from 'models';
 
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { fetchReactionsByPost, getDisplayedReactorsForPopup, onReactionClick, } from './helpers';
+import {
+  fetchReactionsByPost,
+  getDisplayedReactorsForPopup,
+  onReactionClick,
+} from './helpers';
 
 type ThreadPreviewReactionButtonAttrs = {
   thread: Thread;
@@ -42,8 +46,9 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
 
     const activeAddress = app.user.activeAccount?.address;
 
-    const hasReacted = activeAddress ?
-      thread.associatedReactions.filter(r => r.address === activeAddress).length > 0
+    const hasReacted = activeAddress
+      ? thread.associatedReactions.filter((r) => r.address === activeAddress)
+          .length > 0
       : false;
 
     const dislike = async (userAddress: string) => {
@@ -57,13 +62,13 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
         });
 
       this.loading = true;
-      app.threadReactions
-        .deleteOnThread(userAddress, thread)
-        .then(() => {
-          this.loading = false;
-          thread.associatedReactions = thread.associatedReactions.filter(r => r.address !== activeAddress);
-          m.redraw();
-        });
+      app.threadReactions.deleteOnThread(userAddress, thread).then(() => {
+        this.loading = false;
+        thread.associatedReactions = thread.associatedReactions.filter(
+          (r) => r.address !== activeAddress
+        );
+        m.redraw();
+      });
     };
 
     const like = async (
@@ -81,7 +86,11 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
         .createOnThread(userAddress, thread, 'like')
         .then((reaction) => {
           this.loading = false;
-          thread.associatedReactions.push({id: reaction.id, type: reaction.reaction, address: activeAddress});
+          thread.associatedReactions.push({
+            id: reaction.id,
+            type: reaction.reaction,
+            address: activeAddress,
+          });
           m.redraw();
         });
     };
@@ -103,18 +112,18 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
 
     return thread.associatedReactions.length > 0
       ? m(Popover, {
-        interactionType: 'hover',
-        content: (
-          <div class="reaction-button-tooltip-contents">
-            {getDisplayedReactorsForPopup({
-              likes: thread.associatedReactions.length,
-              reactors: app.threadReactions.getByThreadId(thread.id),
-            })}
-          </div>
-        ),
-        trigger: reactionButtonComponent,
-        hoverOpenDelay: 100,
-      })
+          interactionType: 'hover',
+          content: (
+            <div class="reaction-button-tooltip-contents">
+              {getDisplayedReactorsForPopup({
+                likes: thread.associatedReactions.length,
+                reactors: app.threadReactions.getByThreadId(thread.id),
+              })}
+            </div>
+          ),
+          trigger: reactionButtonComponent,
+          hoverOpenDelay: 100,
+        })
       : reactionButtonComponent;
   }
 }

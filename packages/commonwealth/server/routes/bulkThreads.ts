@@ -158,7 +158,9 @@ const bulkThreads = async (
         },
         numberOfComments: t.number_of_comments,
         reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
-        addressesReacted: t.addresses_reacted ? t.addresses_reacted.split(',') : [],
+        addressesReacted: t.addresses_reacted
+          ? t.addresses_reacted.split(',')
+          : [],
         reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
       };
       if (t.topic_id) {

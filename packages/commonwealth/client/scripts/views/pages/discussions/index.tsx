@@ -78,10 +78,12 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       })
     ) {
       this.initializing = true;
-      app.threads.loadNextPage({ topicName, stageName, includePinnedThreads: true }).then(() => {
-        this.initializing = false;
-        m.redraw();
-      });
+      app.threads
+        .loadNextPage({ topicName, stageName, includePinnedThreads: true })
+        .then(() => {
+          this.initializing = false;
+          m.redraw();
+        });
     }
 
     const pinnedThreads = app.threads.listingStore.getThreads({

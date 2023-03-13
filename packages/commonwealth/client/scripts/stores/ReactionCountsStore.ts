@@ -58,7 +58,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
 
   public getPostIdentifier(
     rxnOrPost:
-      | Reaction<any>
+      | Reaction
       | Thread
       | AbridgedThread
       | AnyProposal

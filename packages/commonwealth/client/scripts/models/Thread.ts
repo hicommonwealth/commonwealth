@@ -23,7 +23,7 @@ export type AssociatedReaction = {
   id: number;
   type: ReactionType;
   address: string;
-}
+};
 
 class Thread implements IUniqueId {
   public readonly author: string;

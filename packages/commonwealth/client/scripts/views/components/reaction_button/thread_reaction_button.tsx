@@ -52,7 +52,7 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
     const activeAddress = app.user.activeAccount?.address;
 
     const dislike = async (userAddress: string) => {
-      const reaction: Reaction<Thread> = (
+      const reaction: Reaction = (
         await fetchReactionsByPost(thread)
       ).find((r) => {
         return r.Address.address === activeAddress;
