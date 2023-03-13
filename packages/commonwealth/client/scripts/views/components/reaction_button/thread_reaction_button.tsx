@@ -52,11 +52,11 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
     const activeAddress = app.user.activeAccount?.address;
 
     const dislike = async (userAddress: string) => {
-      const reaction: Reaction = (
-        await fetchReactionsByPost(thread)
-      ).find((r) => {
-        return r.Address.address === activeAddress;
-      });
+      const reaction: Reaction = (await fetchReactionsByPost(thread)).find(
+        (r) => {
+          return r.Address.address === activeAddress;
+        }
+      );
 
       const { session, action, hash } =
         await app.sessions.signDeleteThreadReaction({
