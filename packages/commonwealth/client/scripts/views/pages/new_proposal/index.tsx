@@ -41,6 +41,10 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     app.loginStateEmitter.on('redraw', () => {
       setIsLoggedIn(app.isLoggedIn);
     });
+
+    return () => {
+      app.loginStateEmitter.removeAllListeners();
+    };
   }, [app.loginState]);
 
   // wait for chain
