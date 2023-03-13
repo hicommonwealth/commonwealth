@@ -2,6 +2,7 @@ import React from 'react';
 import ReactQuill from 'react-quill';
 import type { DeltaStatic } from 'quill';
 import type { QuillMode } from '../quill/types';
+import 'react-quill/dist/quill.snow.css';
 
 type ReactQuillEditorProps = {
   className?: string
