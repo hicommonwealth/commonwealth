@@ -25,13 +25,12 @@ const SearchPage = () => {
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
 
-  const searchQuery = SearchQuery.fromUrlParams(
-    Object.fromEntries(searchParams.entries())
+  const [searchQuery, setSearchQuery] = useState<SearchQuery>(
+    SearchQuery.fromUrlParams(Object.fromEntries(searchParams.entries()))
   );
-
-  const scopeTabs = searchQuery.getSearchScope();
-
-  const [activeTab, setActiveTab] = useState<SearchScope>(scopeTabs[0]);
+  const [activeTab, setActiveTab] = useState<SearchScope>(
+    searchQuery.getSearchScope()[0]
+  );
   const [searchResults, setSearchResults] = useState({});
 
   useEffect(() => {
@@ -53,7 +52,7 @@ const SearchPage = () => {
     };
 
     search();
-  }, []);
+  }, [searchQuery]);
 
   const tabScopedListing = getListing(
     searchResults,
@@ -88,7 +87,7 @@ const SearchPage = () => {
       <div className="SearchPage">
         <div className="search-results">
           <CWTabBar>
-            {scopeTabs.map((s, i) => (
+            {searchQuery.getSearchScope().map((s, i) => (
               <CWTab
                 key={i}
                 label={s}
@@ -105,7 +104,10 @@ const SearchPage = () => {
                 href="#"
                 className="search-all-communities"
                 onClick={() => {
-                  searchQuery.chainScope = undefined;
+                  setSearchQuery(
+                    (prevState) =>
+                      ({ ...prevState, chainScope: undefined } as SearchQuery)
+                  );
                   navigate(`/search?${searchQuery.toUrlParams()}`);
                 }}
               >
@@ -128,7 +130,13 @@ const SearchPage = () => {
                   { label: 'Oldest', value: 'Oldest' },
                 ]}
                 onSelect={(o) => {
-                  searchQuery.sort = SearchSort[o.value];
+                  setSearchQuery(
+                    (prevState) =>
+                      ({
+                        ...prevState,
+                        sort: SearchSort[o.value],
+                      } as SearchQuery)
+                  );
                   navigate(`/search?${searchQuery.toUrlParams()}`);
                 }}
               />
