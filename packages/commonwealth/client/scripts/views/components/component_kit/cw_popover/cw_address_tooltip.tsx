@@ -44,6 +44,7 @@ export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
         }
         tooltipType="singleLine"
         trigger={trigger}
+        hoverCloseDelay={100}
       />
     );
   }
