@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { capitalize, isEqual } from 'lodash';
-import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 
 import 'pages/search/index.scss';
 
@@ -26,38 +25,35 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 
 const SearchPage = () => {
   const navigate = useCommonNavigate();
-  const [searchParams] = useSearchParams();
-  const url = searchParams.get('search');
+  const params = useParams();
+  const location = useLocation();
+  const [searchParams, _] = useSearchParams();
+  const stageName: string = searchParams.get('stage');
 
-  console.log('searchParams', searchParams);
-  console.log('_DEPRECATED_getSearchParams', _DEPRECATED_getSearchParams());
-  console.log('url', url);
-  console.log('.entries()', searchParams.entries());
+  // console.log('params', params);
+  console.log('location', searchParams.get('stage'));
+  // console.log('search params', url);
 
   const [activeTab, setActiveTab] = useState<SearchScope>();
   const [errorText, setErrorText] = useState('');
   const [pageCount, setPageCount] = useState<number>();
   const [shouldRefreshResults, setShouldRefreshResults] = useState(false);
   const [results, setResults] = useState({});
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>();
-
-  useEffect(() => {
-    setSearchQuery(
-      SearchQuery.fromUrlParams({
-        url,
-      })
-    );
-  }, []);
+  const [searchQuery, setSearchQuery] = useState<SearchQuery>(
+    SearchQuery.fromUrlParams({
+      url: location.search,
+    })
+  );
 
   const { chainScope, searchTerm } = searchQuery;
 
   const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
 
-  // if (!app.search.isValidQuery(searchQuery)) {
-  //   setErrorText(
-  //     'Please enter a query longer than 3 characters to begin searching'
-  //   );
-  // }
+  if (!app.search.isValidQuery(searchQuery)) {
+    setErrorText(
+      'Please enter a query longer than 3 characters to begin searching'
+    );
+  }
 
   const search = async () => {
     try {

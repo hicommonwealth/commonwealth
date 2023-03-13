@@ -96,6 +96,21 @@ export default class SearchQuery implements SearchParams {
     return `q=${this.toEncodedString().trim().replace(/\s+/g, '&')}`;
   }
 
+  public static fromUrlString(url: string) {
+    // ?q=abuse&chainScope=dydx&sort=Best
+
+    console.log('fromUrlParams', url);
+
+    const sq = new SearchQuery(url['q']);
+
+    sq.chainScope = url['chainScope'] || undefined;
+    sq.isSearchPreview = url['preview'] === 'true';
+    sq.sort = url['sort'] || SearchSort.Best;
+    sq.searchScope = url['scope'] || [SearchScope.All];
+
+    return sq;
+  }
+
   public static fromUrlParams(url: Record<string, any>) {
     console.log('fromUrlParams', url);
     const sq = new SearchQuery(url['q']);
