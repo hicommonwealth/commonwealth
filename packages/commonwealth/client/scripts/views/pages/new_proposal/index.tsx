@@ -39,7 +39,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
 
   useEffect(() => {
     app.loginStateEmitter.on('redraw', () => {
-      setIsLoggedIn(app.isLoggedIn);
+      setIsLoggedIn(app.isLoggedIn());
     });
 
     return () => {
