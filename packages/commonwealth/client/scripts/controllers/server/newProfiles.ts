@@ -2,6 +2,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import { redraw } from 'mithrilInterop';
 import { MinimumProfile as Profile } from 'models';
+import { EventEmitter } from 'events';
 
 import app from 'state';
 import { NewProfileStore } from 'stores';
@@ -20,6 +21,8 @@ class NewProfilesController {
   public allLoaded() {
     return this._unfetched.length === 0;
   }
+
+  public isFetched = new EventEmitter();
 
   public constructor() {
     this._unfetched = [];

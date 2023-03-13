@@ -7,10 +7,8 @@ import 'components/user/user.scss';
 
 import app from 'state';
 import type { Account } from 'models';
-import { AddressInfo, Profile } from 'models';
-import { formatAddressShort } from '../../../../../shared/utils';
+import { AddressInfo , MinimumProfile as Profile } from 'models';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { User } from './user';
 import type { AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
 
@@ -26,31 +24,24 @@ export const UserBlock = (props: {
   showChainName?: boolean;
   showRole?: boolean;
   user: Account | AddressInfo | Profile;
+  hideAvatar?: boolean;
 }) => {
   const {
-    addressDisplayOptions,
-    avatarSize,
     compact,
-    popover,
     searchTerm,
-    selected,
-    showAddressWithDisplayName,
     showChainName,
-    showRole,
     user,
   } = props;
-
-  const { showFullAddress } = addressDisplayOptions || {};
 
   let profile;
 
   if (user instanceof AddressInfo) {
     if (!user.chain || !user.address) return;
-    profile = app.profiles.getProfile(user.chain.id, user.address);
+    profile = app.newProfiles.getProfile(user.chain.id, user.address);
   } else if (user instanceof Profile) {
     profile = user;
   } else {
-    profile = app.profiles.getProfile(user.chain.id, user.address);
+    profile = app.newProfiles.getProfile(user.chain.id, user.address);
   }
 
   const highlightSearchTerm =
@@ -77,25 +68,7 @@ export const UserBlock = (props: {
 
   const children = (
     <>
-      <div className="user-block-left">
-        <User
-          user={user}
-          avatarOnly
-          avatarSize={avatarSize || 28}
-          popover={popover}
-        />
-      </div>
       <div className="user-block-center">
-        <div className="user-block-name">
-          <User
-            user={user}
-            hideAvatar
-            showAddressWithDisplayName={showAddressWithDisplayName}
-            addressDisplayOptions={addressDisplayOptions}
-            popover={popover}
-            showRole={showRole}
-          />
-        </div>
         <div
           className={`user-block-address${
             profile?.address ? '' : 'no-address'
@@ -104,9 +77,10 @@ export const UserBlock = (props: {
           <div>
             {highlightSearchTerm
               ? highlightedAddress
-              : showFullAddress
-              ? profile.address
-              : formatAddressShort(profile.address, profile.chain)}
+              : `${profile.address.slice(0, 8)}...${profile.address.slice(
+                -5
+              )}`
+            }
           </div>
           {profile?.address && showChainName && (
             <div className="address-divider"> · </div>
@@ -122,7 +96,7 @@ export const UserBlock = (props: {
       </div>
       <div className="user-block-right">
         <div className="user-block-selected">
-          {selected ? <CWIcon iconName="check" /> : ''}
+          <CWIcon iconName="check" iconSize="small" />
         </div>
       </div>
     </>

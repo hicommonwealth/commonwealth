@@ -109,7 +109,7 @@ export const User = (props: UserAttrs) => {
 
     profile = app.newProfiles.getProfile(chainId.id, address);
     if (!profile.initialized) {
-      app.profiles.isFetched.on('redraw', () => {
+      app.newProfiles.isFetched.on('redraw', () => {
         updateState({});
       });
     }
@@ -142,7 +142,7 @@ export const User = (props: UserAttrs) => {
     profile = app.newProfiles.getProfile(chainId, account.address);
 
     if (!profile.initialized) {
-      app.profiles.isFetched.on('redraw', () => {
+      app.newProfiles.isFetched.on('redraw', () => {
         updateState({});
       });
     }
@@ -195,10 +195,10 @@ export const User = (props: UserAttrs) => {
                 {!profile ? (
                   addrShort
                 ) : !showAddressWithDisplayName ? (
-                  profile.displayName
+                  profile.name
                 ) : (
                   <>
-                    {profile.displayName}
+                    {profile.name}
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
@@ -213,7 +213,7 @@ export const User = (props: UserAttrs) => {
               {!profile ? (
                 addrShort
               ) : !showAddressWithDisplayName ? (
-                profile.displayName
+                profile.name
               ) : (
                 <>
                   {profile.displayName}
@@ -265,10 +265,10 @@ export const User = (props: UserAttrs) => {
               !profile ? (
                 addrShort
               ) : !showAddressWithDisplayName ? (
-                profile.displayName
+                profile.name
               ) : (
                 <React.Fragment>
-                  {profile.displayName}
+                  {profile.name}
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
