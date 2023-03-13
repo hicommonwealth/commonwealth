@@ -26,14 +26,22 @@ type NewProposalPageProps = {
 
 const NewProposalPage = (props: NewProposalPageProps) => {
   const { type } = props;
-  const [internalType, setInternalType] = React.useState<ProposalType>(type);
-  const [loaded, setLoaded] = useState(false);
+  const [internalType, setInternalType] = useState<ProposalType>(type);
+  const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
+  // isLoggedIn is not referenced, but is used to trigger re-render
+  const [isLoggedIn, setIsLoggedIn] = useState(app.isLoggedIn);
 
   useEffect(() => {
-    app.chainModuleReady.once('ready', () => {
-      setLoaded(app.chain.loaded);
+    app.runWhenReady(() => {
+      setIsLoaded(app.chain.loaded);
     });
-  }, [app.chain.loaded]);
+  }, [app.chain?.loaded]);
+
+  useEffect(() => {
+    app.loginStateEmitter.on('redraw', () => {
+      setIsLoggedIn(app.isLoggedIn);
+    });
+  }, [app.loginState]);
 
   // wait for chain
   if (app.chain?.failed) {
@@ -45,7 +53,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     );
   }
 
-  if (!app.chain || !loaded || !app.chain.meta) {
+  if (!app.chain || !isLoaded || !app.chain.meta) {
     return <PageLoading />;
   }
 
