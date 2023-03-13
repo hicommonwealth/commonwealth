@@ -51,15 +51,17 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
         return r.Address.address === activeAddress;
       });
 
-      await app.sessions.signDeleteThreadReaction({
-        thread_id: reaction.canvasId,
-      });
+      const { session, action, hash } =
+        await app.sessions.signDeleteThreadReaction({
+          thread_id: reaction.canvasId,
+        });
 
       this.loading = true;
       app.threadReactions
         .deleteOnThread(userAddress, thread)
         .then(() => {
           this.loading = false;
+          thread.associatedReactions = thread.associatedReactions.filter(r => r.address !== activeAddress);
           m.redraw();
         });
     };
@@ -77,8 +79,9 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
       this.loading = true;
       app.threadReactions
         .createOnThread(userAddress, thread, 'like')
-        .then(() => {
+        .then((reaction) => {
           this.loading = false;
+          thread.associatedReactions.push({id: reaction.id, type: reaction.reaction, address: activeAddress});
           m.redraw();
         });
     };

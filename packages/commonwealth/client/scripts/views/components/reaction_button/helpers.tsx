@@ -26,15 +26,11 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
   const slicedReactors = reactors
     .slice(0, MAX_VISIBLE_REACTING_ACCOUNTS)
     .map((rxn) => {
-      const {
-        Address: { address, chain },
-      } = rxn;
-
       return (
         <div style="display: flex; width: 120px;">
           <CWText noWrap>
             {m(User, {
-              user: new AddressInfo(null, address, chain?.id || chain, null),
+              user: new AddressInfo(null, rxn.address, app.chain.id, null),
               linkify: true,
             })}
           </CWText>

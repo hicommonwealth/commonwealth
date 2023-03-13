@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Thread, { AssociatedReaction } from '../../../models/Thread';
 import app from '../../../state';
 import { notifyError } from '../../app/notifications';
@@ -43,10 +44,10 @@ class ThreadReactionsController {
     };
 
     try {
-      const response = await $.post(
+      const response = (await axios.post(
         `${app.serverUrl()}/createReaction`,
         options
-      );
+      )).data;
 
       const existingReactions = this._threadIdToReactions.get(thread.id);
       if (!existingReactions) {
@@ -60,6 +61,7 @@ class ThreadReactionsController {
           }]
         );
       }
+      return response.result;
     } catch (err) {
       notifyError('Failed to save reaction');
     }
@@ -75,7 +77,7 @@ class ThreadReactionsController {
     });
 
     try {
-      await $.post(`${app.serverUrl()}/deleteReaction`, {
+      await axios.post(`${app.serverUrl()}/deleteReaction`, {
         jwt: app.user.jwt,
         reaction_id: thread.associatedReactions.filter(r => r.address === address)[0].id,
         canvas_action: action,

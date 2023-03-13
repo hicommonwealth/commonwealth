@@ -726,7 +726,7 @@ class ThreadsController {
       return this.modelFromServer(t);
     });
 
-    app.threadReactions.refreshReactionsFromThreads(threads);
+    app.threadReactions.refreshReactionsFromThreads(modeledThreads);
 
     modeledThreads.forEach((thread) => {
       try {
