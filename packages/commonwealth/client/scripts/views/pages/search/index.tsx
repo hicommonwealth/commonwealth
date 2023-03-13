@@ -55,14 +55,6 @@ const SearchPage = () => {
     search();
   }, []);
 
-  if (!app.search.getByQuery(searchQuery)?.loaded) {
-    return <PageLoading />;
-  }
-
-  if (!activeTab) {
-    setActiveTab(searchQuery.getSearchScope()[0]);
-  }
-
   const tabScopedListing = getListing(
     searchResults,
     searchQuery.searchTerm,
@@ -89,7 +81,9 @@ const SearchPage = () => {
     }
   };
 
-  return (
+  return !app.search.getByQuery(searchQuery)?.loaded ? (
+    <PageLoading />
+  ) : (
     <Sublayout>
       <div className="SearchPage">
         <div className="search-results">
