@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { redraw } from 'mithrilInterop';
-
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
@@ -16,7 +14,7 @@ import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { DeltaStatic } from 'quill';
-import { EMPTY_OPS, ReactQuillEditor } from '../components/react_quill_editor';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -26,8 +24,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const { onModalClose } = props;
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(EMPTY_OPS);
-  const [editorValue, setEditorValue] = React.useState<string>('');
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
   const [featuredInNewPost, setFeaturedInNewPost] =
@@ -36,6 +33,8 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
     React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
   const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
+
+  const editorValue = getTextFromDelta(contentDelta);
 
   const hasValidationError = React.useMemo(() => {
     if (!name || name.trim().length === 0) {
@@ -146,7 +145,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
           <ReactQuillEditor
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
-            onChange={(v) => setEditorValue(v)}
           />
         )}
         <CWButton

@@ -11,7 +11,6 @@ type ReactQuillEditorProps = {
   mode?: QuillMode; // Use in order to limit editor to only MD or RT support
   contentDelta: DeltaStatic
   setContentDelta: (d: DeltaStatic) => void
-  onChange?: (v: string) => void
 }
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
@@ -22,12 +21,10 @@ const ReactQuillEditor = ({
     theme,
     contentDelta,
     setContentDelta,
-    onChange
   } : ReactQuillEditorProps) => {
 
   const handleChange = (value, delta, source, editor) => {
     setContentDelta(editor.getContents())
-    onChange?.(value)
   }
 
   return (

@@ -6,9 +6,9 @@ import type { Comment } from 'models';
 import app from 'state';
 import { ContentType } from 'types';
 import { CWButton } from '../component_kit/cw_button';
-import type { QuillEditor } from '../quill/quill_editor';
-import { QuillEditorComponent } from '../quill/quill_editor_component';
 import { clearEditingLocalStorage } from './helpers';
+import { DeltaStatic } from 'quill';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../react_quill_editor';
 
 type EditCommentProps = {
   comment: Comment<any>;
@@ -27,22 +27,19 @@ export const EditComment = (props: EditCommentProps) => {
     updatedCommentsCallback,
   } = props;
 
-  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
+  const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(body));
   const [saving, setSaving] = React.useState<boolean>();
 
-  const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+  const editorValue = getTextFromDelta(contentDelta);
 
   return (
     <div className="EditComment">
-      {/* TODO: replace with ReactQuillEditor, but must fix bug preventing this parent component from rendering */}
-      <QuillEditorComponent
-        contentsDoc={body}
-        oncreateBind={(state: QuillEditor) => {
-          setQuillEditorState(state);
-        }}
-        imageUploader
-        theme="snow"
-        editorNamespace={`edit-comment-${comment.id}`}
+      <ReactQuillEditor
+        theme='snow'
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
       />
       <div className="buttons-row">
         <CWButton
@@ -54,9 +51,7 @@ export const EditComment = (props: EditCommentProps) => {
 
             let confirmed = true;
 
-            const commentText = quillEditorState.textContentsAsString;
-
-            if (commentText !== body) {
+            if (editorValue !== body) {
               confirmed = window.confirm(
                 'Cancel editing? Changes will not be saved.'
               );
@@ -76,11 +71,7 @@ export const EditComment = (props: EditCommentProps) => {
 
             setSaving(true);
 
-            quillEditorState.disable();
-
-            const itemText = quillEditorState.textContentsAsString;
-
-            app.comments.edit(comment, itemText).then(() => {
+            app.comments.edit(comment, editorValue).then(() => {
               setSaving(false);
               clearEditingLocalStorage(comment.id, ContentType.Comment);
               setIsEditing(false);

@@ -18,7 +18,7 @@ import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
 import { Modal } from '../component_kit/cw_modal';
-import { createInsertOps, EMPTY_OPS, ReactQuillEditor } from '../react_quill_editor';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../react_quill_editor';
 import { DeltaStatic } from 'quill';
 
 type CreateCommmentProps = {
@@ -30,10 +30,11 @@ type CreateCommmentProps = {
 
 export const CreateComment = (props: CreateCommmentProps) => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(EMPTY_OPS);
-  const [editorValue, setEditorValue] = React.useState<string>('');
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
   const [sendingComment, setSendingComment] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+  const editorValue = getTextFromDelta(contentDelta);
 
   const {
     handleIsReplying,
@@ -69,8 +70,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
 
-      setContentDelta(EMPTY_OPS);
-      setEditorValue('')
+      setContentDelta(createDeltaFromText(''));
 
       jumpHighlightComment(res.id);
     } catch (err) {
@@ -155,7 +155,6 @@ export const CreateComment = (props: CreateCommmentProps) => {
           <ReactQuillEditor
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
-            onChange={(v) => setEditorValue(v)}
           />
           {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
             <CWText className="token-req-text">

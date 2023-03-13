@@ -15,7 +15,7 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
-import { EMPTY_OPS, ReactQuillEditor } from '../components/react_quill_editor';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
 
 type EditTopicModalProps = {
   defaultOffchainTemplate: string;
@@ -41,8 +41,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
   const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(EMPTY_OPS);
-  const [editorValue, setEditorValue] = React.useState<string>('');
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(defaultOffchainTemplate));
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
 
   const [description, setDescription] = React.useState<string>(descriptionProp);
@@ -54,6 +53,7 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
   );
   const [name, setName] = React.useState<string>(nameProp);
 
+  const editorValue = getTextFromDelta(contentDelta);
 
   const updateTopic = async () => {
     if (featuredInNewPost && editorValue.length === 0) {
@@ -157,7 +157,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
           <ReactQuillEditor
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
-            onChange={(v) => setEditorValue(v)}
           />
         )}
         <div className="buttons-row">
@@ -176,7 +175,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
                 })
                 .catch(() => {
                   setIsSaving(false);
-                  // redraw();
                 });
             }}
             label="Save changes"
@@ -197,7 +195,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
                 })
                 .catch(() => {
                   setIsSaving(false);
-                  // redraw();
                 });
             }}
             label="Delete topic"

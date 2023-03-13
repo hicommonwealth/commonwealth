@@ -95,6 +95,10 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          if (isModalOpen) {
+                            // don't proceed if the edit topic modal is open
+                            return
+                          }
                           navigate(`/discussions/${name}`);
                         }}
                         iconRight={
