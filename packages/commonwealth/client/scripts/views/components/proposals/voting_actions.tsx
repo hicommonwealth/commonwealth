@@ -63,6 +63,10 @@ export const VotingActions = (props: VotingActionsProps) => {
     app.loginStateEmitter.once('redraw', () => {
       setIsLoggedIn(app.isLoggedIn());
     });
+
+    return () => {
+      app.loginStateEmitter.removeAllListeners();
+    };
   }, [app.loginState]);
 
   if (

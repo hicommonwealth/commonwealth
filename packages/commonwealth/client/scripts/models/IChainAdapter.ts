@@ -150,7 +150,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       throw new Error('secondary loading cmd called before chain load');
     }
     // TODO: does this need debouncing?
-    if (modules.some((mod) => !mod.initializing && !mod.ready)) {
+    if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
       await Promise.all(
         modules.map((mod) => mod.init(this.chain, this.accounts))
       );
