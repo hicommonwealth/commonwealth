@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import 'pages/landing/landing_page_header.scss';
+import 'pages/landing/header.scss';
 
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
