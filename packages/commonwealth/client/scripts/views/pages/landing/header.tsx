@@ -18,13 +18,14 @@ export const Header = ({ onLogin }: HeaderProps) => {
   const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isWindowMediumSmall, setIsWindowMediumSmall] = useState(
-    isWindowMediumSmallInclusive(window.innerWidth)
-  );
+  const [windowIsMediumSmallInclusive, setWindowIsMediumSmallInclusive] =
+    useState(isWindowMediumSmallInclusive(window.innerWidth));
 
   useEffect(() => {
     const onResize = () => {
-      setIsWindowMediumSmall(isWindowMediumSmallInclusive(window.innerWidth));
+      setWindowIsMediumSmallInclusive(
+        isWindowMediumSmallInclusive(window.innerWidth)
+      );
     };
 
     window.addEventListener('resize', onResize);
@@ -42,7 +43,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
           alt="Commonwealth"
           className="logo-with-text"
         />
-        {isWindowMediumSmall ? (
+        {windowIsMediumSmallInclusive ? (
           <CWIconButton
             iconName="hamburger"
             onClick={() => setIsModalOpen(true)}
@@ -67,7 +68,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
             onModalClose={() => setIsModalOpen(false)}
           />
         }
-        isFullScreen={isWindowMediumSmall}
+        isFullScreen={windowIsMediumSmallInclusive}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />

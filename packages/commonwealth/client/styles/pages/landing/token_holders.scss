@@ -13,6 +13,10 @@
     padding: 56px;
   }
 
+  @include smallInclusive {
+    padding: 56px 96px;
+  }
+
   .header {
     align-items: center;
     display: flex;

@@ -4,13 +4,35 @@
   display: flex;
   min-height: 624px;
 
+  @include extraSmall {
+    min-height: unset;
+  }
+
   .search-section {
     display: flex;
     flex-direction: column;
     gap: 24px;
     justify-content: center;
-    padding: 128px 56px 56px;
+    padding: 96px 56px 56px;
     width: 50%;
+
+    @include medium {
+      padding: 80px 56px 56px;
+    }
+
+    @include mediumSmall {
+      padding: 172px 56px 56px;
+    }
+
+    @include small {
+      padding: 104px 56px 56px;
+      width: 100%;
+    }
+
+    @include extraSmall {
+      padding: 168px 56px 56px;
+      width: 100%;
+    }
 
     .header-text.Text {
       display: inline-block;
@@ -49,6 +71,10 @@
       gap: 16px;
       justify-content: center;
 
+      @include extraSmall {
+        flex-wrap: wrap;
+      }
+
       .links-container {
         align-items: center;
         display: flex;
@@ -61,6 +87,10 @@
     display: flex;
     position: relative;
     width: 50%;
+
+    @include smallInclusive {
+      display: none;
+    }
 
     background: linear-gradient(
       135deg,

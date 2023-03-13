@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'pages/landing/chains_slider.scss';
+import 'pages/landing/carousel.scss';
 
 import type { Chain } from './index';
 

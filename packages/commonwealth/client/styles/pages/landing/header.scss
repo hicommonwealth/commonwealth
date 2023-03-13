@@ -14,11 +14,20 @@
   width: 80%;
   z-index: 5;
 
+  @include extraSmall {
+    padding: 24px;
+    justify-content: center;
+  }
+
   .logo-with-text {
     max-height: 40px;
 
+    @include small {
+      max-height: 24px;
+    }
+
     @include extraSmall {
-      height: 16px;
+      max-height: 16px;
     }
   }
 

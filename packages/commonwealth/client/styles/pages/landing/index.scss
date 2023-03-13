@@ -17,6 +17,10 @@
     padding: 0 268px;
     width: 100%;
 
+    @include mediumSmallInclusive {
+      padding: 0 64px;
+    }
+
     .join-text.Text {
       color: $white;
     }
