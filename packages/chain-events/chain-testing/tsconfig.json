@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "es2019" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
     "jsx": "preserve" /* Specify what JSX code is generated. */,
