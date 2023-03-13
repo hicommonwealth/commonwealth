@@ -240,9 +240,6 @@ export function getUniqueEntityKey(
     case SubstrateTypes.EntityKind.TreasuryProposal: {
       return 'proposalIndex';
     }
-    case SubstrateTypes.EntityKind.SignalingProposal: {
-      return 'proposalHash';
-    }
     case SubstrateTypes.EntityKind.TipProposal: {
       return 'proposalHash';
     }
@@ -418,30 +415,6 @@ export function eventToEntity(
           SubstrateTypes.EntityKind.TreasuryProposal,
           EntityEventKind.Complete,
         ];
-      }
-
-      // Signaling Events
-      case SubstrateTypes.EventKind.SignalingNewProposal: {
-        return [
-          SubstrateTypes.EntityKind.SignalingProposal,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.SignalingCommitStarted:
-      case SubstrateTypes.EventKind.SignalingVotingStarted: {
-        return [
-          SubstrateTypes.EntityKind.SignalingProposal,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.SignalingVotingCompleted: {
-        return [
-          SubstrateTypes.EntityKind.SignalingProposal,
-          EntityEventKind.Complete,
-        ];
-      }
-      default: {
-        return null;
       }
     }
   }

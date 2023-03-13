@@ -488,50 +488,6 @@ export const Label: LabelerFilter = (
     }
 
     /**
-     * Signaling Events
-     */
-    case EventKind.SignalingNewProposal: {
-      const { proposer, voteId } = data;
-      return {
-        heading: 'New Signaling Proposal',
-        label: `A new signaling proposal was created by ${fmtAddr(proposer)}.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/signalingproposal/${voteId}`
-          : null,
-      };
-    }
-    case EventKind.SignalingCommitStarted: {
-      const { endBlock, voteId } = data;
-      return {
-        heading: 'Signaling Proposal Commit Started',
-        label: `A signaling proposal's commit phase started, and will last until block ${endBlock}.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/signalingproposal/${voteId}`
-          : null,
-      };
-    }
-    case EventKind.SignalingVotingStarted: {
-      const { endBlock, voteId } = data;
-      return {
-        heading: 'Signaling Proposal Voting Started',
-        label: `A signaling proposal's voting phase started, and will last until block ${endBlock}.`,
-        linkUrl: chainId
-          ? `/${chainId}/proposal/signalingproposal/${voteId}`
-          : null,
-      };
-    }
-    case EventKind.SignalingVotingCompleted: {
-      const { voteId } = data;
-      return {
-        heading: 'Signaling Proposal Completed',
-        label: "A signaling proposal's voting phase completed.",
-        linkUrl: chainId
-          ? `/${chainId}/proposal/signalingproposal/${voteId}`
-          : null,
-      };
-    }
-
-    /**
      * Tip Events
      */
     case EventKind.NewTip: {

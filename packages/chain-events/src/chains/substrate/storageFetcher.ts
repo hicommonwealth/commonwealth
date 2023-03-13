@@ -34,10 +34,6 @@ import type {
   IDemocracyPassed,
   IPreimageNoted,
   ITreasuryProposed,
-  ISignalingNewProposal,
-  ISignalingCommitStarted,
-  ISignalingVotingStarted,
-  ISignalingVotingCompleted,
   IEventData,
   IIdentitySet,
   IdentityJudgement,
@@ -131,10 +127,10 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         return this.fetchDemocracyProposals(blockNumber, id);
       case EntityKind.DemocracyReferendum:
         return this.fetchDemocracyReferenda(blockNumber, id);
-      case EntityKind.SignalingProposal:
-        return this.fetchSignalingProposals(blockNumber, id);
       case EntityKind.TreasuryProposal:
         return this.fetchTreasuryProposals(blockNumber, id);
+      case EntityKind.TipProposal:
+        return this.fetchTips(blockNumber, id);
       default:
         return null;
     }
@@ -174,18 +170,12 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     /** tips */
     const tipsEvents = await this.fetchTips(blockNumber);
 
-    /** signaling proposals */
-    const signalingProposalEvents = await this.fetchSignalingProposals(
-      blockNumber
-    );
-
     this.log.info('Fetch complete.');
     return [
       ...democracyProposalEvents,
       ...democracyReferendaEvents,
       ...democracyPreimageEvents,
       ...treasuryProposalEvents,
-      ...signalingProposalEvents,
       ...tipsEvents,
     ];
   }
@@ -514,142 +504,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
 
     const newTips = results.filter((v) => v.data.kind === EventKind.NewTip);
     this.log.info(`Found ${newTips.length} open tips!`);
-    return results;
-  }
-
-  public async fetchSignalingProposals(
-    blockNumber: number,
-    id?: string
-  ): Promise<
-    CWEvent<
-      | ISignalingNewProposal
-      | ISignalingCommitStarted
-      | ISignalingVotingStarted
-      | ISignalingVotingCompleted
-    >[]
-  > {
-    if (!this._api.query.signaling || !this._api.query.voting) {
-      this.log.info('Signaling module not detected.');
-      return [];
-    }
-
-    this.log.info('Migrating signaling proposals...');
-    if (!this._api.query.voting || !this._api.query.signaling) {
-      this.log.info('Found no signaling proposals (wrong chain)!');
-      return [];
-    }
-    // in "prevoting" phase
-    const inactiveProposals = await this._api.query.signaling.inactiveProposals<
-      Vec<[Hash, BlockNumber] & Codec>
-    >();
-    // in "commit" or "voting" phase
-    const activeProposals = await this._api.query.signaling.activeProposals<
-      Vec<[Hash, BlockNumber] & Codec>
-    >();
-    // in "completed" phase
-    const completedProposals =
-      await this._api.query.signaling.completedProposals<
-        Vec<[Hash, BlockNumber] & Codec>
-      >();
-    const proposalHashes = [
-      ...inactiveProposals,
-      ...activeProposals,
-      ...completedProposals,
-    ].map(([hash]) => hash);
-
-    // fetch records
-    const proposalRecordOpts = await this._api.queryMulti(
-      proposalHashes.map((hash) => [this._api.query.signaling.proposalOf, hash])
-    );
-    const proposalRecords = _.zip(proposalRecordOpts, proposalHashes)
-      .filter(([p]) => p.isSome)
-      .map(([p, hash]) => [p.unwrap(), hash]);
-    const voteRecordOpts = await this._api.queryMulti(
-      proposalRecords.map(([p]) => [
-        this._api.query.voting.voteRecords,
-        p.vote_id,
-      ])
-    );
-    const allRecords = _.zip(proposalRecords, voteRecordOpts)
-      .filter(([, voteOpt]) => voteOpt.isSome)
-      .map(([[record, hash], vote]) => [hash, record, vote.unwrap()]);
-
-    // generate events
-    const newProposalEvents = allRecords.map(([hash, proposal, voting]) => {
-      return {
-        kind: EventKind.SignalingNewProposal,
-        proposer: proposal.author.toString(),
-        proposalHash: hash.toString(),
-        voteId: voting.id.toString(),
-        title: proposal.title.toString(),
-        description: proposal.contents.toString(),
-        tallyType: voting.data.tally_type.toString(),
-        voteType: voting.data.vote_type.toString(),
-        choices: voting.outcomes.map((outcome) => outcome.toString()),
-      } as ISignalingNewProposal;
-    });
-
-    // we're not using commit in production, but check anyway
-    const commitStartedEvents = allRecords
-      .filter(([, proposal]) => proposal.stage.isCommit)
-      .map(([hash, proposal, voting]) => {
-        return {
-          kind: EventKind.SignalingCommitStarted,
-          proposalHash: hash.toString(),
-          voteId: voting.id.toString(),
-          endBlock: +proposal.transition_time,
-        } as ISignalingCommitStarted;
-      });
-
-    // assume all voting/completed proposals skipped straight there without commit
-    const votingStartedEvents = allRecords
-      .filter(
-        ([, proposal]) => proposal.stage.isVoting || proposal.stage.isCompleted
-      )
-      .map(([hash, proposal, voting]) => {
-        return {
-          kind: EventKind.SignalingVotingStarted,
-          proposalHash: hash.toString(),
-          voteId: voting.id.toString(),
-          endBlock: +proposal.transition_time,
-        } as ISignalingVotingStarted;
-      });
-
-    const completedEvents = allRecords
-      .filter(([, proposal]) => proposal.stage.isCompleted)
-      .map(([hash, , voting]) => {
-        return {
-          kind: EventKind.SignalingVotingCompleted,
-          proposalHash: hash.toString(),
-          voteId: voting.id.toString(),
-        } as ISignalingVotingCompleted;
-      });
-
-    const events = [
-      ...newProposalEvents,
-      ...commitStartedEvents,
-      ...votingStartedEvents,
-      ...completedEvents,
-    ];
-    // we could plausibly populate the completed events with block numbers, but not necessary
-    const results = events.map((data) => ({
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data,
-    }));
-
-    // no easier way to only fetch one than to fetch em all
-    if (id !== undefined) {
-      const data = results.filter(
-        ({ data: { proposalHash } }) => proposalHash === id
-      );
-      if (data.length === 0) {
-        this.log.error(`No referendum found with id ${id}!`);
-        return null;
-      }
-      return data;
-    }
-    this.log.info(`Found ${newProposalEvents.length} signaling proposals!`);
     return results;
   }
 }

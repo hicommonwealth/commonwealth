@@ -119,19 +119,6 @@ export function ParseType(
         default:
           return null;
       }
-    case 'signaling':
-      switch (method) {
-        case 'NewProposal':
-          return EventKind.SignalingNewProposal;
-        case 'CommitStarted':
-          return EventKind.SignalingCommitStarted;
-        case 'VotingStarted':
-          return EventKind.SignalingVotingStarted;
-        case 'VotingCompleted':
-          return EventKind.SignalingVotingCompleted;
-        default:
-          return null;
-      }
     case 'tips':
       switch (method) {
         case 'NewTip': {

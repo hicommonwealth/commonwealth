@@ -252,33 +252,6 @@ export const Title: TitlerFilter = (
     }
 
     /**
-     * Signaling Events
-     */
-    case EventKind.SignalingNewProposal: {
-      return {
-        title: 'New Signaling Proposal',
-        description: 'A new signaling proposal is introduced.',
-      };
-    }
-    case EventKind.SignalingCommitStarted: {
-      return {
-        title: 'Signaling Proposal Commit Started',
-        description: "A signaling proposal's commit phase begins.",
-      };
-    }
-    case EventKind.SignalingVotingStarted: {
-      return {
-        title: 'Signaling Proposal Voting Started',
-        description: "A signaling proposal's voting phase begins.",
-      };
-    }
-    case EventKind.SignalingVotingCompleted: {
-      return {
-        title: 'Signaling Proposal Voting Completed',
-        description: 'A signaling proposal is completed.',
-      };
-    }
-    /**
      * TreasuryReward events
      */
     case EventKind.TreasuryRewardMinting:

@@ -104,7 +104,6 @@ export enum EntityKind {
   DemocracyReferendum = 'democracy-referendum',
   DemocracyPreimage = 'democracy-preimage',
   TreasuryProposal = 'treasury-proposal',
-  SignalingProposal = 'signaling-proposal',
   TipProposal = 'tip-proposal',
 }
 
@@ -160,11 +159,6 @@ export enum EventKind {
   ElectionCandidacySubmitted = 'election-candidacy-submitted',
   ElectionMemberKicked = 'election-member-kicked',
   ElectionMemberRenounced = 'election-member-renounced',
-
-  SignalingNewProposal = 'signaling-new-proposal',
-  SignalingCommitStarted = 'signaling-commit-started',
-  SignalingVotingStarted = 'signaling-voting-started',
-  SignalingVotingCompleted = 'signaling-voting-completed',
 
   TreasuryRewardMinting = 'treasury-reward-minting',
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
@@ -500,42 +494,6 @@ export interface IElectionMemberRenounced extends IEvent {
 }
 
 /**
- * Signaling Events
- */
-export interface ISignalingNewProposal extends IEvent {
-  kind: EventKind.SignalingNewProposal;
-  proposer: AccountId;
-  proposalHash: string;
-  voteId: BigIntString;
-  title: string;
-  description: string;
-  tallyType: string;
-  voteType: string;
-  choices: string[];
-}
-
-export interface ISignalingCommitStarted extends IEvent {
-  kind: EventKind.SignalingCommitStarted;
-  proposalHash: string;
-  voteId: BigIntString;
-  endBlock: number;
-}
-
-export interface ISignalingVotingStarted extends IEvent {
-  kind: EventKind.SignalingVotingStarted;
-  proposalHash: string;
-  voteId: BigIntString;
-  endBlock: number;
-}
-
-export interface ISignalingVotingCompleted extends IEvent {
-  kind: EventKind.SignalingVotingCompleted;
-  proposalHash: string;
-  voteId: BigIntString;
-  // TODO: worth enriching with tally?
-}
-
-/**
  * TreasuryReward events
  */
 export interface ITreasuryRewardMinting extends IEvent {
@@ -610,10 +568,6 @@ export type IEventData =
   | ICandidacySubmitted
   | IElectionMemberKicked
   | IElectionMemberRenounced
-  | ISignalingNewProposal
-  | ISignalingCommitStarted
-  | ISignalingVotingStarted
-  | ISignalingVotingCompleted
   | ITreasuryRewardMinting
   | ITreasuryRewardMintingV2
   | IIdentitySet
@@ -653,8 +607,3 @@ export type ITreasuryProposalEvents =
   | ITreasuryProposed
   | ITreasuryRejected
   | ITreasuryAwarded;
-export type ISignalingProposalEvents =
-  | ISignalingNewProposal
-  | ISignalingCommitStarted
-  | ISignalingVotingStarted
-  | ISignalingVotingCompleted;
