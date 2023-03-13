@@ -25,29 +25,21 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 
 const SearchPage = () => {
   const navigate = useCommonNavigate();
-  const params = useParams();
-  const location = useLocation();
   const [searchParams, _] = useSearchParams();
-  const stageName: string = searchParams.get('stage');
-
-  // console.log('params', params);
-  console.log('location', searchParams.get('stage'));
-  // console.log('search params', url);
-
   const [activeTab, setActiveTab] = useState<SearchScope>();
   const [errorText, setErrorText] = useState('');
   const [pageCount, setPageCount] = useState<number>();
   const [shouldRefreshResults, setShouldRefreshResults] = useState(false);
   const [results, setResults] = useState({});
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>(
-    SearchQuery.fromUrlParams({
-      url: location.search,
-    })
+  const [searchQuery,] = useState<SearchQuery>(
+    SearchQuery.fromUrlParams(
+      Object.fromEntries(searchParams.entries())
+    )
   );
-
-  const { chainScope, searchTerm } = searchQuery;
-
-  const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
+  const [scope,] = useState<string>(
+    app.isCustomDomain() ? app.customDomainId() : searchQuery.chainScope
+  );
+  console.log(searchQuery, scope);
 
   if (!app.search.isValidQuery(searchQuery)) {
     setErrorText(
@@ -106,7 +98,7 @@ const SearchPage = () => {
 
   const tabScopedListing = getListing(
     results,
-    searchTerm,
+    searchQuery.searchTerm,
     pageCount,
     searchQuery.sort,
     activeTab,
