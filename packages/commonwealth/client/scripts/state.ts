@@ -15,6 +15,7 @@ import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
 import PollsController from './controllers/server/polls';
 import ProfilesController from './controllers/server/profiles';
+import NewProfilesController from './controllers/server/newProfiles';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
 import { RolesController } from './controllers/server/roles';
@@ -84,6 +85,7 @@ export interface IApp {
   roles: RolesController;
   recentActivity: RecentActivityController;
   profiles: ProfilesController;
+  newProfiles: NewProfilesController;
   sessions: SessionsController;
 
   // Web3
@@ -186,6 +188,7 @@ const app: IApp = {
   roles,
   recentActivity: new RecentActivityController(),
   profiles: new ProfilesController(),
+  newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
 

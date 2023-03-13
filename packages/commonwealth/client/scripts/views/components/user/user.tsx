@@ -1,6 +1,5 @@
 /* eslint-disable no-script-url */
-import React, { useEffect } from 'react';
-import $ from 'jquery';
+import React from 'react';
 
 import { link } from 'helpers';
 
@@ -9,7 +8,8 @@ import 'components/user/user.scss';
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
 import type { Account } from 'models';
-import { AddressInfo, Profile } from 'models';
+import { MinimumProfile as Profile } from 'models';
+import { AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
@@ -53,7 +53,6 @@ export const User = (props: UserAttrs) => {
   const navigate = useCommonNavigate();
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [profileId, setProfileId] = React.useState<string>();
   const [, updateState] = React.useState({});
 
   const popoverProps = usePopover();
@@ -69,22 +68,6 @@ export const User = (props: UserAttrs) => {
   let account: Account;
 
   let profile: Profile;
-
-  useEffect(() => {
-    getProfileId(user);
-  }, []);
-
-  const getProfileId = async (passedUser: Account | AddressInfo | Profile) => {
-    const { result } = await $.post(`${app.serverUrl()}/getAddressProfile`, {
-      address: passedUser.address,
-      chain:
-        typeof passedUser.chain === 'string'
-          ? passedUser.chain
-          : passedUser.chain?.id,
-      jwt: app.user.jwt,
-    });
-    setProfileId(result.profileId);
-  };
 
   const loggedInUserIsAdmin =
     app.user.isSiteAdmin ||
@@ -124,7 +107,7 @@ export const User = (props: UserAttrs) => {
       }
     }
 
-    profile = app.profiles.getProfile(chainId.id, address);
+    profile = app.newProfiles.getProfile(chainId.id, address);
     if (!profile.initialized) {
       app.profiles.isFetched.on('redraw', () => {
         updateState({});
@@ -156,7 +139,7 @@ export const User = (props: UserAttrs) => {
     // but we currently inject objects of type 'any' on the profile page
     const chainId = account.chain.id;
 
-    profile = account.profile;
+    profile = app.newProfiles.getProfile(chainId, account.address);
 
     if (!profile.initialized) {
       app.profiles.isFetched.on('redraw', () => {
@@ -207,10 +190,7 @@ export const User = (props: UserAttrs) => {
           {linkify ? (
             link(
               'a.user-display-name.username',
-              profile
-                ? // TODO: switch to profile.username once PR4 is merged
-                  `/profile/id/${profileId}`
-                : 'javascript:',
+              profile ? `/profile/id/${profile.id}` : 'javascript:',
               <>
                 {!profile ? (
                   addrShort
@@ -226,7 +206,7 @@ export const User = (props: UserAttrs) => {
                 )}
                 {getRoleTags(false)}
               </>,
-              navigate
+              () => navigate(`/profile/id/${profile.id}`, {}, null)
             )
           ) : (
             <a className="user-display-name username">
@@ -281,10 +261,7 @@ export const User = (props: UserAttrs) => {
             app.chain.base === ChainBase.Substrate &&
             link(
               'a.user-display-name',
-              profile
-                ? // TODO: switch to profile.username once PR4 is merged
-                  `/profile/id/${profileId}`
-                : 'javascript:',
+              profile ? `/profile/id/${profile.id}` : 'javascript:',
               !profile ? (
                 addrShort
               ) : !showAddressWithDisplayName ? (
@@ -297,7 +274,7 @@ export const User = (props: UserAttrs) => {
                   </div>
                 </React.Fragment>
               ),
-              navigate
+              () => navigate(`/profile/id/${profile.id}`, {}, null)
             )}
         </div>
         {profile?.address && (

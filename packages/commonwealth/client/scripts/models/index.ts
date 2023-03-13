@@ -22,6 +22,7 @@ export { default as Poll } from './Poll';
 export { default as Vote } from './Vote';
 export { default as Profile } from './Profile';
 export { default as NewProfile } from './NewProfile';
+export { default as MinimumProfile } from './MinimumProfile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
 export { default as RoleInfo } from './RoleInfo';
