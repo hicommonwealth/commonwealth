@@ -1,5 +1,7 @@
 # EVM Chain Testing Tools
 
+Check the [Wiki](https://github.com/hicommonwealth/commonwealth/wiki/Chain-Testing-Overview) for up to date info and API docs
+
 The EVM testing tools provide an out of the box environment for testing various EVM funcitonalities. The following tools are provided:
 * Fully configured ganache private blockchain
     * Default ETH mainnet fork at latest block
@@ -52,7 +54,3 @@ Governance Routes\
 `POST /gov/compound/execute`\
 `GET /gov/compound/runFullCylce`\
 
-Open TODOs:
-* Wiki
-* API docs
-* GH actions configs
