@@ -61,7 +61,6 @@ const NewSnapshotProposalPage = lazy(
   () => import('views/pages/new_snapshot_proposal')
 );
 
-const ProfilePage = lazy(() => import('views/pages/profile'));
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
