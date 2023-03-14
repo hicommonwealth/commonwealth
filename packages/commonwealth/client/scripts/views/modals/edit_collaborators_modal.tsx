@@ -109,7 +109,7 @@ export const EditCollaboratorsModal = ({
                   }
                 >
                   <User
-                    user={app.profiles.getProfile(
+                    user={app.newProfiles.getProfile(
                       c.chain_id,
                       c.Address.address
                     )}
@@ -131,7 +131,7 @@ export const EditCollaboratorsModal = ({
             <div className="collaborator-rows-container">
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
-                  <User user={app.profiles.getProfile(c.chain, c.address)} />
+                  <User user={app.newProfiles.getProfile(c.chain, c.address)} />
                   <CWIconButton
                     iconName="close"
                     iconSize="small"

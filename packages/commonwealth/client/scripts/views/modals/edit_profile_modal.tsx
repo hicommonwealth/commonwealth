@@ -112,7 +112,7 @@ export const EditProfileModal = (props: EditProfileModalProps) => {
 
               setIsSaving(true);
 
-              app.profiles
+              app.newProfiles
                 .updateProfileForAccount(account, data)
                 .then(() => {
                   setIsSaving(false);

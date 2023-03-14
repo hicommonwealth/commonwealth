@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import $ from 'jquery';
-import m from 'mithril';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 
@@ -35,10 +34,10 @@ export const UpgradeRolesForm = ({
     // @TODO: @Profiles upgrade, clean this up
     const chainId = _role.chain_id ? _role.chain_id : _role.Address?.chain?.id;
 
-    const displayName = app.profiles.getProfile(
+    const displayName = app.newProfiles.getProfile(
       chainId as string,
       _role.Address.address
-    ).displayName;
+    ).name;
 
     const roletext = _role.permission === 'moderator' ? '(moderator)' : '';
 

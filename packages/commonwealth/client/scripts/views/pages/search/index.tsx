@@ -16,7 +16,7 @@ import app from 'state';
 import { SearchContentType } from 'types';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
 import { AddressInfo, SearchQuery } from 'models';
-import type { Profile } from 'models';
+import type { MinimumProfile as Profile } from 'models';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CommunityLabel } from '../../components/community_label';
@@ -153,8 +153,8 @@ const getCommunityResult = (community, setRoute) => {
 };
 
 const getMemberResult = (addr) => {
-  const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
-  if (addr.name) profile.initialize(addr.name, null, null, null, null);
+  const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
+  if (addr.name) profile.initialize(addr.name, null, null, null, null, null);
 
   if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
 
