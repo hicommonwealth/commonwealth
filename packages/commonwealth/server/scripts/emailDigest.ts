@@ -292,8 +292,10 @@ export const emailDigestBuilder = async (
 
     if (process.env.NODE_ENV === 'production' && dynamicData.data.length > 0) {
       try {
-        await sgMail.send(msg);
-        emailsSent += 1;
+        if (user.email) {
+          await sgMail.send(msg);
+          emailsSent += 1;
+        }
       } catch (e) {
         console.log(e);
       }
