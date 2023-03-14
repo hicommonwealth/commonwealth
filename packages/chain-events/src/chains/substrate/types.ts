@@ -104,10 +104,7 @@ export enum EntityKind {
   DemocracyReferendum = 'democracy-referendum',
   DemocracyPreimage = 'democracy-preimage',
   TreasuryProposal = 'treasury-proposal',
-  CollectiveProposal = 'collective-proposal',
-  SignalingProposal = 'signaling-proposal',
   TipProposal = 'tip-proposal',
-  TreasuryBounty = 'treasury-bounty',
 }
 
 // Each kind of event we handle
@@ -150,14 +147,6 @@ export enum EventKind {
   TreasuryAwarded = 'treasury-awarded',
   TreasuryRejected = 'treasury-rejected',
 
-  TreasuryBountyProposed = 'treasury-bounty-proposed',
-  TreasuryBountyAwarded = 'treasury-bounty-awarded',
-  TreasuryBountyRejected = 'treasury-bounty-rejected',
-  TreasuryBountyBecameActive = 'treasury-bounty-became-active',
-  TreasuryBountyClaimed = 'treasury-bounty-claimed',
-  TreasuryBountyCanceled = 'treasury-bounty-canceled',
-  TreasuryBountyExtended = 'treasury-bounty-extended',
-
   NewTip = 'new-tip',
   TipVoted = 'tip-voted',
   TipClosing = 'tip-closing',
@@ -171,24 +160,10 @@ export enum EventKind {
   ElectionMemberKicked = 'election-member-kicked',
   ElectionMemberRenounced = 'election-member-renounced',
 
-  CollectiveProposed = 'collective-proposed',
-  CollectiveVoted = 'collective-voted',
-  CollectiveApproved = 'collective-approved',
-  CollectiveDisapproved = 'collective-disapproved',
-  CollectiveExecuted = 'collective-executed',
-  CollectiveMemberExecuted = 'collective-member-executed',
-  // TODO: do we want to track votes as events, in collective?
-
-  SignalingNewProposal = 'signaling-new-proposal',
-  SignalingCommitStarted = 'signaling-commit-started',
-  SignalingVotingStarted = 'signaling-voting-started',
-  SignalingVotingCompleted = 'signaling-voting-completed',
-
   TreasuryRewardMinting = 'treasury-reward-minting',
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
 
   IdentitySet = 'identity-set',
-  JudgementGiven = 'identity-judgement-given',
   IdentityCleared = 'identity-cleared',
   IdentityKilled = 'identity-killed',
 
@@ -440,65 +415,6 @@ export interface ITreasuryRejected extends IEvent {
   // cannot fetch other data because proposal data disappears on rejection
 }
 
-// Treasury Bounty Event Interfaces
-
-export interface ITreasuryBountyProposed extends IEvent {
-  // New bounty proposal. [index]
-  kind: EventKind.TreasuryBountyProposed;
-  bountyIndex: number;
-  proposer: AccountId;
-  value: BalanceString;
-  fee: BalanceString;
-  curatorDeposit: BalanceString;
-  bond: BalanceString;
-  description?: string;
-}
-
-export interface ITreasuryBountyAwarded extends IEvent {
-  // A bounty is awarded to a beneficiary. [index, beneficiary]
-  kind: EventKind.TreasuryBountyAwarded;
-  bountyIndex: number;
-  beneficiary: AccountId;
-  curator: AccountId;
-  unlockAt: number;
-}
-
-export interface ITreasuryBountyRejected extends IEvent {
-  // A bounty proposal was rejected; funds were slashed. [index, bond]
-  kind: EventKind.TreasuryBountyRejected;
-  bountyIndex: number;
-  bond: BalanceString;
-}
-
-export interface ITreasuryBountyBecameActive extends IEvent {
-  // A bounty proposal is funded and became active. [index]
-  kind: EventKind.TreasuryBountyBecameActive;
-  bountyIndex: number;
-  curator: AccountId;
-  updateDue: number;
-}
-
-export interface ITreasuryBountyClaimed extends IEvent {
-  // A bounty is claimed by beneficiary. [index, payout, beneficiary]
-  kind: EventKind.TreasuryBountyClaimed;
-  bountyIndex: number;
-  payout: BalanceString;
-  beneficiary: AccountId;
-}
-
-export interface ITreasuryBountyCanceled extends IEvent {
-  // A bounty is cancelled. [index]
-  kind: EventKind.TreasuryBountyCanceled;
-  bountyIndex: number;
-}
-
-export interface ITreasuryBountyExtended extends IEvent {
-  // A bounty expiry is extended. [index, remark]
-  kind: EventKind.TreasuryBountyExtended;
-  bountyIndex: number;
-  remark: string;
-}
-
 /**
  * Tips Events
  */
@@ -578,94 +494,6 @@ export interface IElectionMemberRenounced extends IEvent {
 }
 
 /**
- * Collective Events
- */
-export interface ICollectiveProposed extends IEvent {
-  kind: EventKind.CollectiveProposed;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposer: AccountId;
-  proposalIndex: number;
-  proposalHash: string;
-  threshold: number;
-  // TODO: add end block?
-  call: {
-    method: string;
-    section: string;
-    args: string[];
-  };
-}
-
-export interface ICollectiveVoted extends IEvent {
-  kind: EventKind.CollectiveVoted;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-  voter: AccountId;
-  vote: boolean;
-}
-
-export interface ICollectiveApproved extends IEvent {
-  kind: EventKind.CollectiveApproved;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-}
-
-export interface ICollectiveDisapproved extends IEvent {
-  kind: EventKind.CollectiveDisapproved;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-}
-
-export interface ICollectiveExecuted extends IEvent {
-  kind: EventKind.CollectiveExecuted;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-  executionOk: boolean;
-}
-
-export interface ICollectiveMemberExecuted extends IEvent {
-  kind: EventKind.CollectiveMemberExecuted;
-  collectiveName?: 'council' | 'technicalCommittee';
-  proposalHash: string;
-  executionOk: boolean;
-}
-
-/**
- * Signaling Events
- */
-export interface ISignalingNewProposal extends IEvent {
-  kind: EventKind.SignalingNewProposal;
-  proposer: AccountId;
-  proposalHash: string;
-  voteId: BigIntString;
-  title: string;
-  description: string;
-  tallyType: string;
-  voteType: string;
-  choices: string[];
-}
-
-export interface ISignalingCommitStarted extends IEvent {
-  kind: EventKind.SignalingCommitStarted;
-  proposalHash: string;
-  voteId: BigIntString;
-  endBlock: number;
-}
-
-export interface ISignalingVotingStarted extends IEvent {
-  kind: EventKind.SignalingVotingStarted;
-  proposalHash: string;
-  voteId: BigIntString;
-  endBlock: number;
-}
-
-export interface ISignalingVotingCompleted extends IEvent {
-  kind: EventKind.SignalingVotingCompleted;
-  proposalHash: string;
-  voteId: BigIntString;
-  // TODO: worth enriching with tally?
-}
-
-/**
  * TreasuryReward events
  */
 export interface ITreasuryRewardMinting extends IEvent {
@@ -687,13 +515,6 @@ export interface IIdentitySet extends IEvent {
   who: AccountId;
   displayName: string;
   judgements: [AccountId, IdentityJudgement][];
-}
-
-export interface IJudgementGiven extends IEvent {
-  kind: EventKind.JudgementGiven;
-  who: AccountId;
-  registrar: AccountId;
-  judgement: IdentityJudgement;
 }
 
 export interface IIdentityCleared extends IEvent {
@@ -736,13 +557,6 @@ export type IEventData =
   | ITreasuryProposed
   | ITreasuryAwarded
   | ITreasuryRejected
-  | ITreasuryBountyProposed
-  | ITreasuryBountyAwarded
-  | ITreasuryBountyRejected
-  | ITreasuryBountyBecameActive
-  | ITreasuryBountyCanceled
-  | ITreasuryBountyClaimed
-  | ITreasuryBountyExtended
   | INewTip
   | ITipVoted
   | ITipClosing
@@ -754,20 +568,9 @@ export type IEventData =
   | ICandidacySubmitted
   | IElectionMemberKicked
   | IElectionMemberRenounced
-  | ICollectiveProposed
-  | ICollectiveVoted
-  | ICollectiveApproved
-  | ICollectiveDisapproved
-  | ICollectiveExecuted
-  | ICollectiveMemberExecuted
-  | ISignalingNewProposal
-  | ISignalingCommitStarted
-  | ISignalingVotingStarted
-  | ISignalingVotingCompleted
   | ITreasuryRewardMinting
   | ITreasuryRewardMintingV2
   | IIdentitySet
-  | IJudgementGiven
   | IIdentityCleared
   | IIdentityKilled
   | INewSession
@@ -804,29 +607,3 @@ export type ITreasuryProposalEvents =
   | ITreasuryProposed
   | ITreasuryRejected
   | ITreasuryAwarded;
-export type ICollectiveProposalEvents =
-  | ICollectiveProposed
-  | ICollectiveVoted
-  | ICollectiveApproved
-  | ICollectiveDisapproved
-  | ICollectiveExecuted;
-export type ISignalingProposalEvents =
-  | ISignalingNewProposal
-  | ISignalingCommitStarted
-  | ISignalingVotingStarted
-  | ISignalingVotingCompleted;
-export type ITipProposalEvents =
-  | INewTip
-  | ITipVoted
-  | ITipClosing
-  | ITipClosed
-  | ITipRetracted
-  | ITipSlashed;
-export type ITreasuryBountyEvents =
-  | ITreasuryBountyBecameActive
-  | ITreasuryBountyCanceled
-  | ITreasuryBountyClaimed
-  | ITreasuryBountyAwarded
-  | ITreasuryBountyExtended
-  | ITreasuryBountyProposed
-  | ITreasuryBountyRejected;
