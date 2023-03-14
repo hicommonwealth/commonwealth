@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Commonwealth Tests
+    name: Commonwealth E2E Test
     runs-on: ubuntu-latest
 
     services:
@@ -73,11 +73,11 @@ jobs:
           path: coverage
 
   # These tests run quickly, so run them in a separate job
-  remaining-commonwealth-tests:
+  commonwealth-unit+integration:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Remaining commonwealth tests
+    name: All Commonwealth Unit+Integration Tests
     runs-on: ubuntu-latest
 
     services:
