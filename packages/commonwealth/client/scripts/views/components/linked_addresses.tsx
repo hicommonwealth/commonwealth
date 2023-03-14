@@ -29,13 +29,13 @@ type LinkedAddressesAttrs = {
 class Address extends ClassComponent<AddressAttrs> {
   view(vnode: ResultNode<AddressAttrs>) {
     const { addressInfo, toggleRemoveModal } = vnode.attrs;
-    const { address } = addressInfo;
+    const { address, chain } = addressInfo;
 
     return (
       <div className="AddressContainer">
         <CWAddressTooltip
           address={address}
-          renderTrigger={() => <CWTruncatedAddress address={address} />}
+          renderTrigger={() => <CWTruncatedAddress address={address} communityInfo={chain} />}
         />
         <PopoverMenu
           menuItems={[
