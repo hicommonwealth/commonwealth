@@ -1,7 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { redraw } from 'mithrilInterop';
-import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
 import 'modals/edit_topic_modal.scss';
@@ -20,55 +18,55 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
 
 type EditTopicModalProps = {
-  defaultOffchainTemplate: string;
-  description: string;
-  featuredInNewPost: boolean;
-  featuredInSidebar: boolean;
-  id: number;
   onModalClose: () => void;
-  name: string;
+  topic: Topic;
 };
 
-export const EditTopicModal = (props: EditTopicModalProps) => {
+export const EditTopicModal = ({
+  topic,
+  onModalClose,
+}: EditTopicModalProps) => {
   const {
     defaultOffchainTemplate,
     description: descriptionProp,
     featuredInNewPost: featuredInNewPostProp,
     featuredInSidebar: featuredInSidebarProp,
     id,
-    onModalClose,
     name: nameProp,
-  } = props;
+  } = topic;
 
   const navigate = useCommonNavigate();
 
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
-  const [isSaving, setIsSaving] = React.useState<boolean>(false);
-  const [contentsDoc, setContentsDoc] = React.useState<QuillTextContents>();
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [quillEditorState, setQuillEditorState] = useState<QuillEditor>();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [contentsDoc, setContentsDoc] = useState<QuillTextContents>();
 
-  const [description, setDescription] = React.useState<string>(descriptionProp);
-  const [featuredInNewPost, setFeaturedInNewPost] = React.useState<boolean>(
+  const [description, setDescription] = useState<string>(descriptionProp);
+  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
     featuredInNewPostProp
   );
-  const [featuredInSidebar, setFeaturedInSidebar] = React.useState<boolean>(
+  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
     featuredInSidebarProp
   );
-  const [name, setName] = React.useState<string>(nameProp);
+  const [name, setName] = useState<string>(nameProp);
 
-  if (defaultOffchainTemplate) {
-    try {
-      setContentsDoc(JSON.parse(defaultOffchainTemplate));
-    } catch (e) {
-      setContentsDoc(defaultOffchainTemplate);
+  useEffect(() => {
+    if (defaultOffchainTemplate) {
+      try {
+        setContentsDoc(JSON.parse(defaultOffchainTemplate));
+      } catch (e) {
+        setContentsDoc(defaultOffchainTemplate);
+      }
     }
-  }
+  }, [defaultOffchainTemplate]);
 
-  const updateTopic = async () => {
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+
     if (featuredInNewPost) {
       if (!quillEditorState || quillEditorState?.isBlank()) {
         setErrorMsg('Must provide template.');
-        return false;
       } else {
         quillEditorState?.disable();
       }
@@ -89,15 +87,21 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
 
     try {
       await app.topics.edit(new Topic(topicInfo));
-      return true;
+      navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
       setErrorMsg(err.message || err);
-      redraw();
-      return false;
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const deleteTopic = async () => {
+  const handleDeleteTopic = async () => {
+    const confirmed = window.confirm('Delete this topic?');
+
+    if (!confirmed) {
+      return;
+    }
+
     const topicInfo = {
       id,
       name: name,
@@ -133,7 +137,6 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
               )} 
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
-              redraw();
               return ['failure', newErrorMsg];
             }
 
@@ -180,45 +183,11 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
           />
         )}
         <div className="buttons-row">
-          <CWButton
-            onClick={async (e) => {
-              e.preventDefault();
-
-              updateTopic()
-                .then((closeModal) => {
-                  if (closeModal) {
-                    $(e.target).trigger('modalexit');
-                    navigate(
-                      `/discussions/${encodeURI(name.toString().trim())}`
-                    );
-                  }
-                })
-                .catch(() => {
-                  setIsSaving(false);
-                  redraw();
-                });
-            }}
-            label="Save changes"
-          />
+          <CWButton onClick={handleSaveChanges} label="Save changes" />
           <CWButton
             buttonType="primary-red"
             disabled={isSaving}
-            onClick={async (e) => {
-              e.preventDefault();
-              const confirmed = window.confirm('Delete this topic?');
-
-              if (!confirmed) return;
-
-              deleteTopic()
-                .then(() => {
-                  $(e.target).trigger('modalexit');
-                  navigate('/');
-                })
-                .catch(() => {
-                  setIsSaving(false);
-                  redraw();
-                });
-            }}
+            onClick={handleDeleteTopic}
             label="Delete topic"
           />
         </div>
