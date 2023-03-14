@@ -27,15 +27,6 @@ export type Chain = {
   placeholder?: boolean;
 };
 
-export type Token = {
-  address: string;
-  chainId: number;
-  decimals: number;
-  logoURI: string;
-  name: string;
-  symbol: string;
-};
-
 const sortedChains = app.config.chains
   .getAll()
   .sort((a, b) => {

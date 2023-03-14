@@ -1,5 +1,11 @@
 @import '../../shared';
 
+@mixin sharedIconStyles {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .CommunitySearch {
   display: flex;
   min-height: 624px;
@@ -42,26 +48,81 @@
       }
     }
 
-    input {
-      @include b1;
+    .search-input-container {
+      margin: 0 auto;
+      width: 400px;
 
-      border: 1px solid $neutral-300;
-      border-radius: $border-radius-rounded-corners;
-      color: $neutral-800;
-      height: 52px;
-      padding: 8px 24px;
-      width: 100%;
-
-      &::placeholder {
-        color: $neutral-500;
+      @include mediumSmallInclusive {
+        width: 100%;
       }
 
-      &:focus {
-        outline: none;
-      }
+      .search-and-icon-container {
+        position: relative;
 
-      &:focus-within {
-        border-color: $primary-500;
+        input {
+          @include b1;
+
+          border: 1px solid $neutral-300;
+          border-radius: $border-radius-rounded-corners;
+          color: $neutral-800;
+          height: 52px;
+          padding: 8px 16px 8px 48px;
+          width: 100%;
+
+          &.isClearable {
+            padding: 8px 48px;
+          }
+
+          &::placeholder {
+            color: $neutral-500;
+          }
+
+          &:focus {
+            outline: none;
+          }
+
+          &:focus-within {
+            border-color: $primary-500;
+          }
+        }
+
+        .search-icon {
+          @include sharedIconStyles;
+
+          left: 16px;
+        }
+
+        .clear-icon {
+          @include sharedIconStyles;
+
+          right: 16px;
+        }
+
+        .search-results-dropdown {
+          background-color: $white;
+          border-radius: 0 0 $border-radius-corners $border-radius-corners;
+          box-shadow: $elevation-3;
+          display: flex;
+          flex-direction: column;
+          margin-top: 8px;
+          overflow: hidden;
+          position: absolute;
+          user-select: none;
+          width: 100%;
+          z-index: 1001;
+
+          .search-result-row {
+            align-items: center;
+            cursor: pointer;
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+
+            &:hover {
+              background-color: $neutral-100;
+            }
+          }
+        }
       }
     }
 

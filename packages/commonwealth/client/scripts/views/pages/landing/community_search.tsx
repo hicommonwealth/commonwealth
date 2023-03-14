@@ -1,21 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { useDebounce } from 'usehooks-ts';
 
 import 'pages/landing/community_search.scss';
 
 import type { Chain } from './index';
 
-import { notifyError } from 'controllers/app/notifications';
-import { CommunitySearchOptions } from './community_search_options';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { getClasses } from '../../components/component_kit/helpers';
+import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 
-export const placeholderChain = {
-  img: 'static/img/add.svg',
-  id: 'placeholder',
-  chainInfo: { symbol: 'PLACEHOLDER' },
-  name: 'Add your token!',
-  placeholder: true,
+const strip = (str: string) => {
+  return str.replace(/\s/g, '').toLowerCase();
 };
 
 type CommunitySearchProps = {
@@ -25,29 +23,33 @@ type CommunitySearchProps = {
 export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
   const navigate = useCommonNavigate();
 
-  const [inputTimeout, setInputTimeout] = useState<any>();
-  const [inputTokenValue, setInputTokenValue] = useState('');
-  const [refilterResults, setRefilterResults] = useState(true);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<Array<Chain>>([]);
 
-  const initiateFullSearch = (searchTerm: string) => {
-    if (
-      !searchTerm ||
-      !searchTerm.toString().trim() ||
-      !searchTerm.match(/[A-Za-z]+/)
-    ) {
-      return;
-    }
+  const debouncedValue = useDebounce<string>(searchTerm, 500);
 
-    if (searchTerm.length < 3) {
-      notifyError('Query must be at least 3 characters');
-    }
-
-    const params = `q=${encodeURIComponent(
-      searchTerm.toString().trim()
-    )}&scope[]=Communities`;
-
-    navigate(`/search?${params}`);
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
   };
+
+  useEffect(() => {
+    const search = () => {
+      const results = chains
+        .filter(
+          (c) =>
+            strip(c.name).includes(strip(searchTerm)) ||
+            strip(c.id).includes(strip(searchTerm))
+        )
+        .slice(0, 5);
+
+      setSearchResults(results);
+    };
+
+    if (debouncedValue.length > 0) {
+      search();
+    }
+  }, [debouncedValue]);
 
   return (
     <div className="CommunitySearch">
@@ -61,37 +63,54 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
           discuss, vote, and fund projects together. Never miss an on-chain
           event, proposal, or important discussion again.
         </CWText>
-        <input
-          autoComplete="off"
-          type="text"
-          placeholder="Find your community"
-          onInput={(event: any) => {
-            setInputTokenValue(event.target.value);
-            setRefilterResults(false);
-            clearTimeout(inputTimeout);
-            setInputTimeout(
-              setTimeout(() => {
-                setRefilterResults(true);
-              }, 200)
-            );
-          }}
-          onKeyUp={(event: any) => {
-            if (event.key === 'Enter') {
-              // initiateFullSearch(event.target.value);
-            }
-          }}
-          onClick={() => {
-            // initiateFullSearch(inputTokenValue);
-          }}
-        />
-        {inputTokenValue && inputTokenValue.length > 2 && (
-          <CommunitySearchOptions
-            optionList={[placeholderChain, ...chains]}
-            inputValue={inputTokenValue}
-            maxOptions={20}
-            refilterResults={refilterResults}
-          />
-        )}
+        <div className="search-input-container">
+          <div className="search-and-icon-container">
+            <div className="search-icon">
+              <CWIconButton iconName="search" />
+            </div>
+            <input
+              className={getClasses<{ isClearable: boolean }>({
+                isClearable: searchTerm?.length > 0,
+              })}
+              autoComplete="off"
+              type="text"
+              placeholder="Find your community"
+              value={searchTerm}
+              onInput={handleChange}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => {
+                setTimeout(() => {
+                  setShowDropdown(false);
+                }, 500); // hack to prevent the dropdown closing too quickly on click
+              }}
+            />
+            {searchTerm?.length > 0 && (
+              <div className="clear-icon">
+                <CWIconButton
+                  iconName="close"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSearchResults([]);
+                  }}
+                />
+              </div>
+            )}
+            {searchResults.length > 0 && showDropdown && (
+              <div className="search-results-dropdown">
+                {searchResults.map((c, i) => (
+                  <div
+                    key={i}
+                    onClick={() => navigate(c.id)}
+                    className="search-result-row"
+                  >
+                    <CWCommunityAvatar community={c.chainInfo} size="small" />
+                    <CWText>{c.name}</CWText>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
         <div className="links-section">
           <CWText type="h3" fontWeight="semiBold">
             We’re also here
