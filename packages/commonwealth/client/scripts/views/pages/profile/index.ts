@@ -20,7 +20,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import type { Comment, Thread } from 'models';
-import { Profile } from 'models';
+import { MinimumProfile as Profile } from 'models';
 import 'pages/profile.scss';
 
 import app from 'state';
