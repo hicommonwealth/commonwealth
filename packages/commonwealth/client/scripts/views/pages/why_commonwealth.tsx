@@ -56,7 +56,7 @@ class WhyCommonwealthPage extends ClassComponent {
               project's most important on-chain actions like staking and voting.
               Commonwealth has a growing list of integrations--including
               Ethereum, NEAR, Cosmos, Substrate, and popular DAO frameworks
-              Aragon.
+              like Aragon.
             </CWText>
             <CWText>
               Fork, develop, alter, share - Commonwealth is explicitly designed
