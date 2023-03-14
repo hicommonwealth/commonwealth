@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
 
@@ -12,6 +12,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { subscribeToThread } from './helpers';
+import { NotificationSubscription } from 'client/scripts/models';
 
 type UserDashboardRowBottomProps = {
   commentCount: number;
@@ -23,6 +24,22 @@ type UserDashboardRowBottomProps = {
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const { threadId, commentCount, commentId, chainId, commenters } = props;
+  const [update, setUpdate] = useState<boolean>(false);
+
+  const setSubscription = async (
+    threadId: string,
+    bothActive: boolean,
+    commentSubscription: NotificationSubscription,
+    reactionSubscription: NotificationSubscription
+  ) => {
+    await subscribeToThread(
+      threadId,
+      bothActive,
+      commentSubscription,
+      reactionSubscription
+    );
+    setUpdate(!update); // just to trigger a new render
+  };
 
   const adjustedId = `discussion_${threadId}`;
 
@@ -61,7 +78,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           menuItems={[
             {
               onClick: () => {
-                subscribeToThread(
+                setSubscription(
                   threadId,
                   bothActive,
                   commentSubscription,
