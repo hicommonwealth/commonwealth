@@ -319,7 +319,7 @@ export const emailDigestBuilder = async (
   return allEmailObjects;
 };
 
-emailDigestBuilder(3, 'alexyoung23j@gmail.com')
+emailDigestBuilder(3, 'alex@common.xyz')
   .then(() => {
     process.exit(0);
   })
