@@ -26,8 +26,10 @@ const crowdfundingGalleryText = [
 
 export const CrowdfundingGallery = () => {
   const [selectedCard, setSelectedCard] = useState(1);
-  const [windowIsMediumSmallInclusive, setWindowIsMediumSmallInclusive] =
-    useState(isWindowMediumSmallInclusive(window.innerWidth));
+  const [
+    windowIsMediumSmallInclusive,
+    setWindowIsMediumSmallInclusive,
+  ] = useState(isWindowMediumSmallInclusive(window.innerWidth));
 
   useEffect(() => {
     const onResize = () => {
@@ -47,7 +49,7 @@ export const CrowdfundingGallery = () => {
     <div className="CrowdfundingGallery">
       <div className="header">
         <img src="static/img/misc.png" alt="" />
-        <CWText type="h3" fontWeight="semiBold">
+        <CWText type="h3" fontWeight="semiBold" isCentered>
           Leverage on-chain crowdfunding
         </CWText>
       </div>

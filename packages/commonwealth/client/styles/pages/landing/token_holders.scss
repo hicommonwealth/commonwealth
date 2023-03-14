@@ -31,7 +31,21 @@
     gap: 40px;
 
     .holder-card {
+      align-items: center;
+      display: flex;
       flex: 1;
+      flex-direction: column;
+
+      img {
+        height: 112px;
+        width: 112px;
+      }
+
+      .text-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
     }
   }
 }
