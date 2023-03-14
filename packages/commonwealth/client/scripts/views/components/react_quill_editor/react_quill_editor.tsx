@@ -8,7 +8,6 @@ type ReactQuillEditorProps = {
   className?: string
   placeholder?: string;
   tabIndex?: number;
-  theme?: string;
   mode?: QuillMode; // Use in order to limit editor to only MD or RT support
   contentDelta: DeltaStatic
   setContentDelta: (d: DeltaStatic) => void
@@ -19,7 +18,6 @@ const ReactQuillEditor = ({
     className = '',
     placeholder,
     tabIndex,
-    theme,
     contentDelta,
     setContentDelta,
   } : ReactQuillEditorProps) => {
@@ -33,7 +31,7 @@ const ReactQuillEditor = ({
       className={`QuillEditor ${className}`}
       placeholder={placeholder}
       tabIndex={tabIndex}
-      theme={theme}
+      theme='snow'
       value={contentDelta}
       onChange={handleChange}
     />

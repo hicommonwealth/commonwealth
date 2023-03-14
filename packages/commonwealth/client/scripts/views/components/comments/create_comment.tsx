@@ -59,7 +59,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
         author.address,
         rootProposal.uniqueIdentifier,
         chainId,
-        editorValue,
+        JSON.stringify(contentDelta),
         parentCommentId
       );
 
@@ -99,8 +99,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
     userBalance?.gtn(0) &&
     userBalance.lt(tokenPostingThreshold);
 
-  // TODO: disabled if no content
-  const disabled = sendingComment || userFailsThreshold;
+  const disabled = editorValue.length === 0 || sendingComment || userFailsThreshold;
 
   const decimals = getDecimals(app.chain);
 
@@ -153,6 +152,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
             )}
           </div>
           <ReactQuillEditor
+            className='editor'
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
           />

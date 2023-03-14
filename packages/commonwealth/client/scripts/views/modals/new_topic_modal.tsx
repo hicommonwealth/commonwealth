@@ -54,8 +54,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
     ? 6
     : 18;
 
-  console.log({ isSaving, errorMsg, hasValidationError })
-
   return (
     <div className="NewTopicModal">
       <div className="compact-modal-title">

@@ -37,7 +37,6 @@ export const EditComment = (props: EditCommentProps) => {
   return (
     <div className="EditComment">
       <ReactQuillEditor
-        theme='snow'
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
       />
