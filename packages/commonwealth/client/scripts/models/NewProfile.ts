@@ -11,7 +11,6 @@ class NewProfile {
   private _socials: string[];
   private _id: number;
   private _isOwner: boolean;
-  private _coverImage: Image;
   private _backgroundImage: Image;
 
   get name() {
@@ -54,10 +53,6 @@ class NewProfile {
     return this._isOwner;
   }
 
-  get coverImage() {
-    return this._coverImage;
-  }
-
   get backgroundImage() {
     return this._backgroundImage;
   }
@@ -73,7 +68,6 @@ class NewProfile {
     socials,
     id,
     is_owner,
-    cover_image,
     background_image,
   }) {
     this._name = profile_name;
@@ -86,7 +80,6 @@ class NewProfile {
     this._socials = socials;
     this._id = id;
     this._isOwner = is_owner;
-    this._coverImage = cover_image;
     this._backgroundImage = background_image;
   }
 
@@ -101,7 +94,6 @@ class NewProfile {
     socials,
     id,
     isOwner,
-    coverImage,
     backgroundImage
   ) {
     this._name = name;
@@ -114,7 +106,6 @@ class NewProfile {
     this._socials = socials;
     this._id = id;
     this._isOwner = isOwner;
-    this._coverImage = coverImage;
     this._backgroundImage = backgroundImage;
   }
 

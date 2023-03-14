@@ -6,6 +6,12 @@
   flex-direction: column;
   width: 100%;
 
+  &.loading {
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
   .ProfilePageContainer {
     display: flex;
     flex-direction: row;

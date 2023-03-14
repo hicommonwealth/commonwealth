@@ -90,7 +90,7 @@ const ProfileComponent = (props: ProfileProps) => {
 
   if (loading)
     return (
-      <div className="Profile">
+      <div className="Profile loading">
         <div className="loading-spinner">
           <CWSpinner />
         </div>
@@ -103,16 +103,8 @@ const ProfileComponent = (props: ProfileProps) => {
   if (error === ProfileError.None) {
     if (!profile) return;
 
-    let coverUrl;
-    let coverImageBehavior;
     let backgroundUrl;
     let backgroundImageBehavior;
-
-    if (profile.coverImage) {
-      const { url, imageBehavior } = profile.coverImage;
-      coverUrl = url;
-      coverImageBehavior = imageBehavior;
-    }
 
     if (profile.backgroundImage) {
       const { url, imageBehavior } = profile.backgroundImage;
@@ -146,23 +138,6 @@ const ProfileComponent = (props: ProfileProps) => {
               : {}
           }
         >
-          {profile.coverImage && (
-            <div
-              style={{
-                backgroundImage: `url(${coverUrl})`,
-                backgroundRepeat: `${
-                  coverImageBehavior === ImageBehavior.Fill
-                    ? 'no-repeat'
-                    : 'repeat'
-                }`,
-                backgroundSize:
-                  coverImageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
-                backgroundPosition:
-                  coverImageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
-                height: '240px',
-              }}
-            />
-          )}
           <div
             className={
               profile.backgroundImage
