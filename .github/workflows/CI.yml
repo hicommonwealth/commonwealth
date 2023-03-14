@@ -73,11 +73,11 @@ jobs:
           path: coverage
 
   # These tests run quickly, so run them in a separate job
-  commonwealth-unit+integration:
+  commonwealth-unit-integration:
     strategy:
       matrix:
         node: [ 18 ]
-    name: All Commonwealth Unit+Integration Tests
+    name: All Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
 
     services:
