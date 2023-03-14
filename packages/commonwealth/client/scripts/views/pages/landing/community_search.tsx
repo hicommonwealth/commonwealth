@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { useDebounce } from 'usehooks-ts';
+import { sortBy } from 'lodash';
 
 import 'pages/landing/community_search.scss';
 
@@ -43,7 +44,9 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
         )
         .slice(0, 5);
 
-      setSearchResults(results);
+      const sortedResults = sortBy(results, ['name', 'id']);
+
+      setSearchResults(sortedResults);
     };
 
     if (debouncedValue.length > 0) {
@@ -70,7 +73,7 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
             </div>
             <input
               className={getClasses<{ isClearable: boolean }>({
-                isClearable: searchTerm?.length > 0,
+                isClearable: searchTerm.length > 0,
               })}
               autoComplete="off"
               type="text"
@@ -84,7 +87,7 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
                 }, 500); // hack to prevent the dropdown closing too quickly on click
               }}
             />
-            {searchTerm?.length > 0 && (
+            {searchTerm.length > 0 && (
               <div className="clear-icon">
                 <CWIconButton
                   iconName="close"
@@ -104,7 +107,7 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
                     className="search-result-row"
                   >
                     <CWCommunityAvatar community={c.chainInfo} size="small" />
-                    <CWText>{c.name}</CWText>
+                    <CWText fontWeight="medium">{c.name}</CWText>
                   </div>
                 ))}
               </div>

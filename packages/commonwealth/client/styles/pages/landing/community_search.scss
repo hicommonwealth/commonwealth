@@ -115,8 +115,8 @@
             align-items: center;
             cursor: pointer;
             display: flex;
-            gap: 8px;
-            padding: 8px;
+            gap: 16px;
+            padding: 8px 16px;
 
             &:hover {
               background-color: $neutral-100;
