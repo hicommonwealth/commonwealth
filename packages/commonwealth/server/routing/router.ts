@@ -94,7 +94,6 @@ import editDraft from '../routes/drafts/editDraft';
 import getDrafts from '../routes/drafts/getDrafts';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
-import bulkProfiles from '../routes/bulkProfiles';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
@@ -644,9 +643,6 @@ function setupRouter(
     databaseValidationService.validateChain,
     setDefaultRole.bind(this, models)
   );
-
-  // profiles
-  router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
   // new profile
   router.post(
