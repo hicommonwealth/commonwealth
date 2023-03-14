@@ -39,8 +39,6 @@ const FeedPage = lazy(() => import('views/pages/feed'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
 const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
 
-const SettingsPage = lazy(() => import('views/pages/settings'));
-
 const TreasuryPage = lazy(() => import('views/pages/treasury'));
 const TipsPage = lazy(() => import('views/pages/tips'));
 
@@ -278,16 +276,6 @@ const getCommonDomainsRoutes = () => (
       })}
     />
     {/* CONTRACTS END*/}
-
-    {/* SETTINGS */}
-    <Route
-      path="/:scope/settings"
-      element={withLayout(SettingsPage, {
-        scoped: true,
-      })}
-    />
-    <Route path="/settings" element={<Navigate to="/edgeware/settings" />} />
-    {/* SETTINGS END*/}
 
     {/* TREASURY */}
     <Route
