@@ -17,10 +17,14 @@ export const Carousel = ({ chains }: CarouselProps) => {
   const navigate = useCommonNavigate();
 
   const [currentChainsIdx, setCurrentChainsIdx] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  useInterval(() => {
-    setCurrentChainsIdx(currentChainsIdx + 4);
-  }, 3000);
+  useInterval(
+    () => {
+      setCurrentChainsIdx(currentChainsIdx + 4);
+    },
+    !isPaused ? 3000 : null
+  );
 
   return (
     <div className="Carousel">
@@ -36,7 +40,13 @@ export const Carousel = ({ chains }: CarouselProps) => {
       </div>
       <div className="cards-row">
         {chains.slice(currentChainsIdx, currentChainsIdx + 4).map((c, i) => (
-          <div key={i} className="carousel-card" onClick={() => navigate(c.id)}>
+          <div
+            key={i}
+            className="carousel-card"
+            onClick={() => navigate(c.id)}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
             <CWCommunityAvatar community={c.chainInfo} size="xxl" />
             <CWText type="h4" fontWeight="semiBold" isCentered>
               {c.name}
