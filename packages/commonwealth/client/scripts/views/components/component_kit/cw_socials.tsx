@@ -87,7 +87,7 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
             }}
           />
           <CWIconButton
-            iconButtonTheme="primary"
+            iconButtonTheme="neutral"
             iconName="trash"
             onClick={() => this.deleteInputRow(i, handleInputChange)}
           />

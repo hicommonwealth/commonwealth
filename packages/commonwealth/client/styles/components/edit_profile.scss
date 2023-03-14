@@ -15,41 +15,21 @@
   }
 
   .buttons-container {
+    display: flex;
+    justify-content: flex-end;
+
     .buttons {
       display: flex;
-      justify-content: flex-end;
+      gap: 16px;
       align-items: center;
+
+      .Button {
+        height: 32px;
+        padding: 0 24px;
+      }
 
       .tertiary-black {
         padding-left: 0;
-      }
-
-      .buttons-right {
-        display: flex;
-        gap: 16px;
-
-        .save-button {
-          &.confirm {
-            background-color: green;
-            color: white;
-          }
-
-          &.fail {
-            background-color: red;
-            color: white;
-          }
-        }
-      }
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      margin-top: 8px;
-
-      @include smallInclusive {
-        margin-top: 0;
       }
     }
   }
@@ -66,12 +46,12 @@
       }
     }
 
-    .profile-image-section {
-      .description {
-        margin-top: 8px;
-        color: $neutral-500;
-      }
+    .description {
+      margin-top: 8px;
+      color: $neutral-500;
+    }
 
+    .profile-image-section {
       .image-upload {
         position: relative;
         display: flex;
@@ -95,12 +75,12 @@
       .TextInput {
         margin-bottom: 16px;
 
-        .username {
+        .display-name-label {
           color: $neutral-500;
+        }
 
-          .blue-star {
-            color: $primary-500;
-          }
+        .blue-star {
+          color: $primary-500;
         }
       }
     }
@@ -162,6 +142,29 @@
 
     .CoverImageUploader {
       margin: 16px 0;
+    }
+
+    .LinkedAddresses {
+      margin-bottom: 32px;
+    }
+
+    .connect-address-button {
+      display: flex;
+      align-items: center;
+
+      .caption {
+        color: $neutral-800;
+        margin-left: 4px;
+
+        &:hover {
+          color: $neutral-600;
+        }
+      }
+
+      &:hover {
+        color: $neutral-600;
+        cursor: pointer;
+      }
     }
   }
 }

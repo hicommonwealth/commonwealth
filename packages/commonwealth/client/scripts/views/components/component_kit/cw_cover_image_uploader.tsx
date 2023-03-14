@@ -353,7 +353,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
           fontWeight="medium"
           className="cover-image-title"
         >
-          Choose Image Behavior
+          Choose image behavior
         </CWText>
         <CWRadioGroup
           name="image-behaviour"

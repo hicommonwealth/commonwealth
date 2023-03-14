@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import $ from 'jquery';
 import _ from 'underscore';
@@ -12,8 +12,8 @@ import { notifyError } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
   Account,
-  Profile as OldProfile,
   AddressInfo,
+  MinimumProfile,
 } from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -27,6 +27,7 @@ import { CWSocials } from '../components/component_kit/cw_socials';
 import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
 import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../pages/404';
+import { LinkedAddresses } from './linked_addresses';
 
 enum EditProfileError {
   None,
@@ -46,24 +47,21 @@ export type Image = {
 
 const EditProfileComponent = (props: EditNewProfileProps) => {
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState<string>('');
-  const [error, setError] = React.useState<EditProfileError>(
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState<EditProfileError>(
     EditProfileError.None
   );
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [socials, setSocials] = React.useState<string[]>();
-  const [profile, setProfile] = React.useState<Profile>();
-  const [username, setUsername] = React.useState<string>('');
-  const [name, setName] = React.useState<string>('');
-  const [avatarUrl, setAvatarUrl] = React.useState<string>();
-  const [bio, setBio] = React.useState<QuillEditor>();
-  const [addresses, setAddresses] = React.useState<AddressInfo[]>();
-  const [isOwner, setIsOwner] = React.useState<boolean>();
-  const [coverImage, setCoverImage] = React.useState<Image>();
-  const [backgroundImage, setBackgroundImage] = React.useState<Image>();
-  const coverImageRef = React.useRef<Image>();
-  coverImageRef.current = coverImage;
-  const backgroundImageRef = React.useRef<Image>();
+  const [loading, setLoading] = useState(true);
+  const [socials, setSocials] = useState<string[]>();
+  const [profile, setProfile] = useState<Profile>();
+  const [name, setName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState();
+  const [bio, setBio] = useState();
+  const [addresses, setAddresses] = useState<AddressInfo[]>();
+  const [isOwner, setIsOwner] = useState();
+  const [backgroundImage, setBackgroundImage] = useState<Image>();
+  const [displayNameValid, setDisplayNameValid] = useState(true);
+  const backgroundImageRef = useRef<Image>();
   backgroundImageRef.current = backgroundImage;
 
   const getProfile = async (query: string) => {
@@ -75,11 +73,9 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
       setProfile(new Profile(result.profile));
       setName(result.profile.profile_name || '');
-      setUsername(result.profile.username || '');
       setEmail(result.profile.email || '');
       setSocials(result.profile.socials);
       setAvatarUrl(result.profile.avatar_url);
-      setCoverImage(result.profile.cover_image);
       setBackgroundImage(result.profile.background_image);
       setAddresses(
         result.addresses.map(
@@ -117,7 +113,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
       if (result?.status === 'Success') {
         setTimeout(() => {
           setLoading(false);
-          navigate(`/profile/${username}`);
+          navigate(`/profile/id/${profile.id}`);
         }, 1500);
       }
     } catch (err) {
@@ -130,9 +126,6 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
   const checkForUpdates = () => {
     const profileUpdate: any = {};
-
-    if (!_.isEqual(username, profile?.username) && username !== '')
-      profileUpdate.username = username;
 
     if (!_.isEqual(name, profile?.name) && name !== '')
       profileUpdate.name = name;
@@ -149,9 +142,6 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
     if (!_.isEqual(socials, profile?.socials))
       profileUpdate.socials = JSON.stringify(socials);
 
-    if (!_.isEqual(coverImageRef.current, profile?.coverImage))
-      profileUpdate.coverImage = JSON.stringify(coverImageRef.current);
-
     if (!_.isEqual(backgroundImageRef.current, profile?.backgroundImage))
       profileUpdate.backgroundImage = JSON.stringify(
         backgroundImageRef.current
@@ -162,13 +152,20 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
     } else {
       setTimeout(() => {
         setLoading(false);
-        notifyError('No updates found.');
+        navigate(`/profile/id/${profile.id}`);
       }, 1500);
     }
   };
 
   const handleSaveProfile = () => {
     setLoading(true);
+    if (!name) {
+      setDisplayNameValid(false);
+      notifyError('Please fill all required fields.');
+      setLoading(false);
+      return;
+    }
+
     checkForUpdates();
   };
 
@@ -206,12 +203,19 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
     // should refactor AvatarUpload to make it work with new profiles
     let account: Account | null;
     if (addresses?.length > 0) {
-      const oldProfile = new OldProfile(
+      const oldProfile = new MinimumProfile(
         addresses[0].chain.name,
         addresses[0].address
       );
 
-      oldProfile.initialize(username, null, bio, avatarUrl, null);
+      oldProfile.initialize(
+        name,
+        addresses[0].address,
+        avatarUrl,
+        profile.id,
+        addresses[0].chain.name,
+        null
+      );
 
       account = new Account({
         chain: addresses[0].chain,
@@ -226,42 +230,38 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
       <div className="EditProfile">
         <CWForm
           title="Edit Profile"
-          description="Create and edit profiles and manage your connected addresses."
+          description="Add or change your general info and customize your profile."
           actions={
             <div className="buttons-container">
               <div className="buttons">
-                <div className="buttons-right">
-                  <CWButton
-                    label="Cancel Edits"
-                    onClick={() => {
-                      setLoading(true);
-                      setTimeout(() => {
-                        navigate(`/profile/id/${props.profileId}`);
-                      }, 1000);
-                    }}
-                    className="save-button"
-                    buttonType="mini-white"
-                  />
-                  <CWButton
-                    label="Save"
-                    onClick={() => {
-                      handleSaveProfile();
-                    }}
-                    className="save-button"
-                    buttonType="mini-black"
-                  />
-                </div>
+                <CWButton
+                  label="Cancel"
+                  onClick={() => {
+                    setLoading(true);
+                    setTimeout(() => {
+                      navigate(`/profile/id/${profile.id}`);
+                    }, 1000);
+                  }}
+                  className="save-button"
+                  buttonType="secondary-black"
+                />
+                <CWButton
+                  label="Save"
+                  onClick={() => handleSaveProfile()}
+                  className="save-button"
+                  buttonType="primary-black"
+                />
               </div>
             </div>
           }
         >
           <CWFormSection
             title="General Info"
-            description="Some helpful text that makes the user feel welcome. This process will be quick and easy."
+            description="Let your community and others get to know you by sharing a bit about yourself."
           >
             <div className="profile-image-section">
               <CWText type="caption" fontWeight="medium">
-                Profile Image
+                Profile image
               </CWText>
               <CWText type="caption" className="description">
                 Select an image from your files to upload
@@ -270,35 +270,17 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
                 <AvatarUpload
                   scope="user"
                   account={account}
-                  uploadCompleteCallback={(file) => {
-                    if (!file.uploadURL) return;
-                    const url = file.uploadURL.replace(/\?.*/, '').trim();
-                    setAvatarUrl(url);
+                  uploadCompleteCallback={(files) => {
+                    files.forEach((f) => {
+                      if (!f.data.result) return;
+                      const url = f.data.result.replace(/\?.*/, '').trim();
+                      setAvatarUrl(url);
+                    });
                   }}
                 />
               </div>
             </div>
             <div className="info-section">
-              <CWTextInput
-                name="username-form-field"
-                inputValidationFn={(val: string) => {
-                  if (val.match(/[^A-Za-z0-9]/)) {
-                    return ['failure', 'Must enter characters A-Z, 0-9'];
-                  } else {
-                    return ['success', 'Input validated'];
-                  }
-                }}
-                label={
-                  <CWText type="caption" className="username">
-                    Username <span className="blue-star">&nbsp;*</span>
-                  </CWText>
-                }
-                value={username}
-                placeholder="username"
-                onInput={(e) => {
-                  setUsername(e.target.value);
-                }}
-              />
               <CWTextInput
                 name="name-form-field"
                 inputValidationFn={(val: string) => {
@@ -308,12 +290,25 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
                     return ['success', 'Input validated'];
                   }
                 }}
-                label="Display Name"
+                label={
+                  <>
+                    <CWText type="caption" className="display-name-label">
+                      Display name
+                    </CWText>
+                    <div className="blue-star">*</div>
+                  </>
+                }
                 value={name}
                 placeholder="display name"
                 onInput={(e) => {
+                setDisplayNameValid(true);
                   setName(e.target.value);
                 }}
+                inputClassName={displayNameValid ? '' : 'failure'}
+                manualStatusMessage={displayNameValid ? '' : 'No input'}
+                manualValidationStatus={
+                  displayNameValid ? 'success' : 'failure'
+                }
               />
               <CWTextInput
                 name="email-form-field"
@@ -345,11 +340,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
             </div>
             <CWDivider />
             <div className="socials-section">
-              <CWText type="b1">Social Links</CWText>
-              <CWText type="caption">
-                Add any of your community's links (Websites, social platforms,
-                etc) These can be added and edited later.
-              </CWText>
+              <CWText type="caption">Social links</CWText>
               <CWSocials
                 socials={profile?.socials}
                 handleInputChange={(e) => {
@@ -362,32 +353,8 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
             title="Personalize Your Profile"
             description="Express yourself through imagery."
           >
-            <CWText fontWeight="medium">Cover Image</CWText>
-            <CWCoverImageUploader
-              uploadCompleteCallback={(
-                url: string,
-                imageBehavior: ImageBehavior
-              ) => {
-                setCoverImage({
-                  url,
-                  imageBehavior,
-                });
-              }}
-              generatedImageCallback={(
-                url: string,
-                imageBehavior: ImageBehavior
-              ) => {
-                setCoverImage({
-                  url,
-                  imageBehavior,
-                });
-              }}
-              enableGenerativeAI
-              defaultImageUrl={coverImage?.url}
-              defaultImageBehavior={coverImage?.imageBehavior}
-            />
-            <CWDivider />
-            <CWText fontWeight="medium">Background Image</CWText>
+            <CWText fontWeight="medium">Image upload</CWText>
+            <CWText type="caption" className="description">Add a background image.</CWText>
             <CWCoverImageUploader
               uploadCompleteCallback={(
                 url: string,
@@ -412,6 +379,24 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
               defaultImageBehavior={backgroundImage?.imageBehavior}
             />
           </CWFormSection>
+          <CWFormSection
+              title="Linked addresses"
+              description="Manage your addresses."
+            >
+              <LinkedAddresses
+                addresses={addresses}
+                profile={profile}
+                refreshProfiles={(address: string) => {
+                  getProfile(props.profileId);
+                  // Remove from all address stores in the frontend state
+                  const index = app.user.addresses.indexOf(
+                    app.user.addresses.find((a) => a.address === address)
+                  );
+                  app.user.addresses.splice(index, 1);
+                }}
+              />
+              <CWText type="caption" fontWeight="medium">Link new addresses via the profile dropdown menu</CWText>
+            </CWFormSection>
         </CWForm>
       </div>
     );
