@@ -15,11 +15,6 @@ import { Listener as SubstrateListener } from './chains/substrate/Listener';
 import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
 import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
 import {
-  Listener as MolochListener,
-  Title as MolochTitle,
-  Label as MolochLabel,
-} from './chains/moloch';
-import {
   Listener as CompoundListener,
   Title as CompoundTitle,
   Label as CompoundLabel,
@@ -67,8 +62,6 @@ export function Title(
       return Erc20Title(kind);
     case SupportedNetwork.ERC721:
       return Erc721Title(kind);
-    case SupportedNetwork.Moloch:
-      return MolochTitle(kind);
     case SupportedNetwork.Commonwealth:
       return CommonwealthTitle(kind);
     case SupportedNetwork.Cosmos:
@@ -90,8 +83,6 @@ export function Label(chain: string, event: CWEvent): IEventLabel {
       return Erc20Label(event.blockNumber, chain, event.data);
     case SupportedNetwork.ERC721:
       return Erc721Label(event.blockNumber, chain, event.data);
-    case SupportedNetwork.Moloch:
-      return MolochLabel(event.blockNumber, chain, event.data);
     case SupportedNetwork.Commonwealth:
       return CommonwealthLabel(event.blockNumber, chain, event.data);
     case SupportedNetwork.Cosmos:
@@ -114,7 +105,6 @@ export async function createListener(
     address?: string;
     tokenAddresses?: string[];
     tokenNames?: string[];
-    MolochContractVersion?: 1 | 2;
     verbose?: boolean;
     skipCatchup?: boolean;
     startBlock?: number;
@@ -153,16 +143,6 @@ export async function createListener(
       options.startBlock || 0,
       !!options.skipCatchup,
       options.enricherConfig,
-      !!options.verbose,
-      options.discoverReconnectRange
-    );
-  } else if (network === SupportedNetwork.Moloch) {
-    listener = new MolochListener(
-      chain,
-      options.MolochContractVersion ? options.MolochContractVersion : 2,
-      options.address,
-      options.url,
-      !!options.skipCatchup,
       !!options.verbose,
       options.discoverReconnectRange
     );

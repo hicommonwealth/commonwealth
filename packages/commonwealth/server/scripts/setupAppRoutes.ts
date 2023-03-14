@@ -209,8 +209,6 @@ const setupAppRoutes = (
       proposalType = ProposalType.CosmosProposal;
     } else if (chain?.network === ChainNetwork.Sputnik) {
       proposalType = ProposalType.SputnikProposal;
-    } else if (chain?.network === ChainNetwork.Moloch) {
-      proposalType = ProposalType.MolochProposal;
     } else if (chain?.network === ChainNetwork.Compound) {
       proposalType = ProposalType.CompoundProposal;
     } else if (chain?.network === ChainNetwork.Aave) {
