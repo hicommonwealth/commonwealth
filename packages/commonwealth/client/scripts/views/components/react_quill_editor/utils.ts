@@ -13,6 +13,9 @@ export const createDeltaFromText = (str: string) : DeltaStatic => {
 
 // getTextFromDelta returns the text from a DeltaStatic
 export const getTextFromDelta = (delta: DeltaStatic) : string => {
+  if (!delta?.ops) {
+    return ''
+  }
   return delta.ops
     .filter((op) => op.insert?.trim().length > 0)
     .reduce((acc, op) => {
