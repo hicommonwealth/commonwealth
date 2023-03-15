@@ -6,6 +6,7 @@ import '../styles/normalize.css'; // reset
 import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
 import 'lity/dist/lity.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 import App from './app';
 
