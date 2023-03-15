@@ -72,23 +72,18 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
         <CommunityLabel community={item} />
         {app.isLoggedIn() && roles.length > 0 && (
           <div className="roles-and-star">
-            {roles.map((role, i) => {
-              return (
-                <User
-                  key={i}
-                  avatarSize={18}
-                  avatarOnly
-                  user={
-                    new AddressInfo(
-                      role.address_id,
-                      role.address,
-                      role.address_chain || role.chain_id,
-                      null
-                    )
-                  }
-                />
-              );
-            })}
+            <User
+              avatarSize={18}
+              avatarOnly
+              user={
+                new AddressInfo(
+                  roles[0].address_id,
+                  roles[0].address,
+                  roles[0].address_chain || roles[0].chain_id,
+                  null
+                )
+              }
+            />
             <div
               className={
                 app.communities.isStarred(item.id)
