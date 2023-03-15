@@ -60,12 +60,22 @@ export const LoginSelectorMenuLeft = ({
   nAccountsWithoutRole,
 }: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSelectAddressModalOpen, setIsSelectAddressModalOpen] =
     useState(false);
   const [profileId, setProfileId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
+
+  useEffect(() => {
+    // force rerender when new address is connected
+    app.user.isFetched.on('redraw', () => {
+      const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
+      setSelectedAddress(activeAccount.address);
+      forceRerender();
+    });
+  }, []);
 
   useEffect(() => {
     const activeAccount = app.user.activeAccount ?? app.user.addresses[0];

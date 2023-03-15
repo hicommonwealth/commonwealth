@@ -27,7 +27,7 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
   const { profile, isOwner } = props;
 
   if (!profile) return;
-  const { bio, name, username } = profile;
+  const { bio, name } = profile;
 
   const isCurrentUser = app.isLoggedIn() && isOwner;
 
@@ -54,7 +54,7 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
       </div>
       <div className="profile-name-and-bio">
         <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
-          {name || username || 'Anonymous user'}
+          {name || 'Anonymous user'}
         </CWText>
         <div className="buttons">
           {/* TODO: Add delegate and follow buttons */}

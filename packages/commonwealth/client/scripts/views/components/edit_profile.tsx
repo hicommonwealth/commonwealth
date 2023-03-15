@@ -395,11 +395,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
                 profile={profile}
                 refreshProfiles={(address: string) => {
                   getProfile(props.profileId);
-                  // Remove from all address stores in the frontend state
-                  const index = app.user.addresses.indexOf(
-                    app.user.addresses.find((a) => a.address === address)
-                  );
-                  app.user.addresses.splice(index, 1);
+                  app.user.removeAddress(addresses.find(a => a.address === address));
                 }}
               />
               <CWText type="caption" fontWeight="medium">Link new addresses via the profile dropdown menu</CWText>
