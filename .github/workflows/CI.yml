@@ -122,9 +122,6 @@ jobs:
       - name: Run linter
         run: yarn lint-branch
 
-      - name: Typecheck
-        run: yarn --cwd packages/commonwealth check-types
-
       - name: Run Token Balance Cache Unit Tests
         run: yarn --cwd packages/token-balance-cache test
 
@@ -138,3 +135,6 @@ jobs:
         run: yarn --cwd packages/commonwealth test-api
         env:
           NO_CLIENT: true
+
+      - name: Typecheck
+        run: yarn --cwd packages/commonwealth check-types

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script is like a health check. It waits for the server to start on the specified port before returning.
+
 attempt_counter=0
 max_attempts=20
 
