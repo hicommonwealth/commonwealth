@@ -66,386 +66,499 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
-const getCommonDomainsRoutes = () => (
-  <>
-    <Route
-      path="/whyCommonwealth"
-      element={withLayout(WhyCommonwealthPage, { hideSidebar: true })}
-    />
-    <Route
-      path="/dashboard"
-      element={withLayout(DashboardPage, {
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/dashboard/:type"
-      element={withLayout(DashboardPage, {
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/communities"
-      element={withLayout(CommunitiesPage, {
-        hideSidebar: false,
-      })}
-    />
-    <Route
-      path="/search"
-      element={withLayout(SearchPage, {
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/web3login"
-      element={withLayout(Web3LoginPage, {
-        deferChain: true,
-      })}
-    />
-    {/*scoped */}
-    <Route
-      path="/:scope/overview"
-      element={withLayout(OverviewPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/search"
-      element={withLayout(SearchPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/members"
-      element={withLayout(MembersPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/sputnik-daos"
-      element={withLayout(SputnikDaosPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/finishNearLogin"
-      element={withLayout(FinishNearLoginPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/finishaxielogin"
-      element={withLayout(FinishAxieLoginPage, {})}
-    />
-    {/* NOTIFICATIONS */}
-    <Route
-      path="/:scope/notifications"
-      element={withLayout(NotificationsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/notification-settings"
-      element={withLayout(NotificationSettingsPage, {
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/notification-settings"
-      element={<Navigate to="/notification-settings" />}
-    />
-    <Route
-      path="/notifications"
-      element={<Navigate to={'/edgeware/notifications'} />}
-    />
-    {/* NOTIFICATIONS END*/}
+const commonDomainsRoutes = () => [
+  <Route
+    path="/whyCommonwealth"
+    element={withLayout(WhyCommonwealthPage, { hideSidebar: true })}
+  />,
+  <Route
+    path="/dashboard"
+    element={withLayout(DashboardPage, {
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/dashboard/:type"
+    element={withLayout(DashboardPage, {
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/communities"
+    element={withLayout(CommunitiesPage, {
+      hideSidebar: false,
+    })}
+  />,
+  <Route
+    path="/search"
+    element={withLayout(SearchPage, {
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/web3login"
+    element={withLayout(Web3LoginPage, {
+      deferChain: true,
+    })}
+  />,
+  // scoped
+  <Route
+    path="/:scope/overview"
+    element={withLayout(OverviewPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/search"
+    element={withLayout(SearchPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/members"
+    element={withLayout(MembersPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/sputnik-daos"
+    element={withLayout(SputnikDaosPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/finishNearLogin"
+    element={withLayout(FinishNearLoginPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/finishaxielogin"
+    element={withLayout(FinishAxieLoginPage, {})}
+  />,
+  // NOTIFICATIONS
+  <Route
+    path="/:scope/notifications"
+    element={withLayout(NotificationsPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/notification-settings"
+    element={withLayout(NotificationSettingsPage, {
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/notification-settings"
+    element={<Navigate to="/notification-settings" />}
+  />,
+  <Route
+    path="/notifications"
+    element={<Navigate to={'/edgeware/notifications'} />}
+  />,
+  // NOTIFICATIONS END
 
-    {/* GOVERNANCE */}
-    <Route
-      path="/:scope/referenda"
-      element={withLayout(ReferendaPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/proposals"
-      element={withLayout(ProposalsPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/proposal/:type/:identifier"
-      element={withLayout(ViewProposalPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/proposal/:identifier"
-      element={withLayout(ViewProposalPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/new/proposal/:type"
-      element={withLayout(NewProposalPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/new/proposal"
-      element={withLayout(NewProposalPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/proposal/discussion/:identifier"
-      element={
-        <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
-      }
-    />
-    {/* GOVERNANCE END*/}
+  // GOVERNANCE
+  <Route
+    path="/:scope/referenda"
+    element={withLayout(ReferendaPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/proposals"
+    element={withLayout(ProposalsPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/proposal/:type/:identifier"
+    element={withLayout(ViewProposalPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/proposal/:identifier"
+    element={withLayout(ViewProposalPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/new/proposal/:type"
+    element={withLayout(NewProposalPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/new/proposal"
+    element={withLayout(NewProposalPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/proposal/discussion/:identifier"
+    element={
+      <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
+    }
+  />,
+  // GOVERNANCE END
 
-    {/* DISCUSSIONS */}
-    <Route
-      path="/:scope/discussions"
-      element={withLayout(DiscussionsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/discussions/:topicName"
-      element={withLayout(DiscussionsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/discussion/:identifier"
-      element={withLayout(ViewThreadPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/new/discussion"
-      element={withLayout(NewThreadPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/proposal/discussion/:identifier"
-      element={
-        <Navigate
-          to={(parameters) =>
-            `/${parameters.scope}/discussion/${parameters.identifier}`
-          }
-        />
-      }
-    />
-    <Route
-      path="/:scope"
-      element={withLayout(DiscussionsRedirectPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/feed"
-      element={withLayout(FeedPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    {/* DISCUSSIONS END*/}
+  // DISCUSSIONS
+  <Route
+    path="/:scope/discussions"
+    element={withLayout(DiscussionsPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/discussions/:topicName"
+    element={withLayout(DiscussionsPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/discussion/:identifier"
+    element={withLayout(ViewThreadPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/new/discussion"
+    element={withLayout(NewThreadPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/proposal/discussion/:identifier"
+    element={
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/discussion/${parameters.identifier}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope"
+    element={withLayout(DiscussionsRedirectPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/feed"
+    element={withLayout(FeedPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  // DISCUSSIONS END
 
-    {/* CONTRACTS */}
-    <Route
-      path="/:scope/new/contract"
-      element={withLayout(NewContractPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/contract/:contractAddress"
-      element={withLayout(GeneralContractPage, {
-        scoped: true,
-      })}
-    />
-    {/* CONTRACTS END*/}
+  // CONTRACTS
+  <Route
+    path="/:scope/new/contract"
+    element={withLayout(NewContractPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/contract/:contractAddress"
+    element={withLayout(GeneralContractPage, {
+      scoped: true,
+    })}
+  />,
+  // CONTRACTS END
 
-    {/* SETTINGS */}
-    <Route
-      path="/:scope/settings"
-      element={withLayout(SettingsPage, {
-        scoped: true,
-      })}
-    />
-    <Route path="/settings" element={<Navigate to="/edgeware/settings" />} />
-    {/* SETTINGS END*/}
+  // SETTINGS
+  <Route
+    path="/:scope/settings"
+    element={withLayout(SettingsPage, {
+      scoped: true,
+    })}
+  />,
+  <Route path="/settings" element={<Navigate to="/edgeware/settings" />} />,
+  // SETTINGS END
 
-    {/* TREASURY */}
-    <Route
-      path="/:scope/treasury"
-      element={withLayout(TreasuryPage, {
-        scoped: true,
-      })}
-    />
-    <Route
-      path="/:scope/tips"
-      element={withLayout(TipsPage, {
-        scoped: true,
-      })}
-    />
-    {/* TREASURY END*/}
-    {/* ADMIN */}
-    <Route
-      path="/:scope/manage"
-      element={withLayout(ManageCommunityPage, {
-        scoped: true,
-      })}
-    />
-    <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />
-    <Route
-      path="/:scope/analytics"
-      element={withLayout(AnalyticsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/snapshot/:snapshotId"
-      element={withLayout(SnapshotProposalPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/multiple-snapshots"
-      element={withLayout(ViewMultipleSnapshotsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/snapshot/:snapshotId/:identifier"
-      element={withLayout(ViewSnapshotsProposalPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/new/snapshot/:snapshotId"
-      element={withLayout(NewSnapshotProposalPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    {/*// snapshot proposals redirects */}
-    <Route
-      path="/:scope/snapshot-proposals/:snapshotId"
-      element={
-        // redirect to SnapshotProposalPage
-        <Navigate
-          to={(parameters) =>
-            `/${parameters.scope}/snapshot/${parameters.snapshotId}`
-          }
-        />
-      }
-    />
-    <Route
-      path="/:scope/snapshot-proposal/:snapshotId/:identifier"
-      element={
-        // redirect to ViewSnapshotsProposalPage
-        <Navigate
-          to={(parameters) =>
-            `/${parameters.scope}/snapshot/${parameters.snapshotId}/${parameters.identifier}`
-          }
-        />
-      }
-    />
-    <Route
-      path="/:scope/snapshot-proposals/:snapshotId/:identifier"
-      element={
-        // redirect to ViewSnapshotsProposalPage
-        <Navigate
-          to={(parameters) =>
-            `/${parameters.scope}/snapshot/${parameters.snapshotId}/${parameters.identifier}`
-          }
-        />
-      }
-    />
-    <Route
-      path="/:scope/new/snapshot-proposal/:snapshotId"
-      element={
-        // redirect to NewSnapshotProposalPage
-        <Navigate
-          to={(parameters) =>
-            `/${parameters.scope}/new/snapshot/${parameters.snapshotId}`
-          }
-        />
-      }
-    />
-    <Route
-      path="/:scope/new/snapshot-proposals/:snapshotId"
-      element={
-        // redirect to NewSnapshotProposalPage
-        <Navigate
-          to={(parameters) =>
-            `/${parameters.scope}/new/snapshot/${parameters.snapshotId}`
-          }
-        />
-      }
-    />
-    {/* ADMIN END*/}
-    {/* PROFILES*/}
-    <Route
-      path="/:scope/account/:address"
-      element={withLayout(ProfilePageRedirect, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/:scope/account"
-      element={withLayout(ProfilePageRedirect, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    {/* PROFILES END*/}
-    {/* NEW PROFILES */}
-    <Route
-      path="/profile/id/:profileId"
-      element={withLayout(NewProfilePage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    <Route
-      path="/profile/id/:profileId/edit"
-      element={withLayout(EditNewProfilePage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />
-    {/* NEW PROFILES END*/}
-    {/*  LEGACY REDIRECTS */}
-    {/*//here for compatibility only*/}
-    <Route path="/discussions" element={<Navigate to="/" />} />
-    <Route path="/home" element={<Navigate to="/" />} />
-    <Route
-      path="/:scope/home"
-      element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
-    />
-    {/*  LEGACY REDIRECTS END */}
-  </>
-);
+  // TREASURY
+  <Route
+    path="/:scope/treasury"
+    element={withLayout(TreasuryPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/tips"
+    element={withLayout(TipsPage, {
+      scoped: true,
+    })}
+  />,
+  // TREASURY END
 
-export default getCommonDomainsRoutes;
+  // ADMIN
+  <Route
+    path="/:scope/manage"
+    element={withLayout(ManageCommunityPage, {
+      scoped: true,
+    })}
+  />,
+  <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />,
+  <Route
+    path="/:scope/analytics"
+    element={withLayout(AnalyticsPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/snapshot/:snapshotId"
+    element={withLayout(SnapshotProposalPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/multiple-snapshots"
+    element={withLayout(ViewMultipleSnapshotsPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/snapshot/:snapshotId/:identifier"
+    element={withLayout(ViewSnapshotsProposalPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/new/snapshot/:snapshotId"
+    element={withLayout(NewSnapshotProposalPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  // snapshot proposals redirects
+  <Route
+    path="/:scope/snapshot-proposals/:snapshotId"
+    element={
+      // redirect to SnapshotProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/snapshot/${parameters.snapshotId}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope/snapshot-proposal/:snapshotId/:identifier"
+    element={
+      // redirect to ViewSnapshotsProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/snapshot/${parameters.snapshotId}/${parameters.identifier}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope/snapshot-proposals/:snapshotId/:identifier"
+    element={
+      // redirect to ViewSnapshotsProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/snapshot/${parameters.snapshotId}/${parameters.identifier}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope/new/snapshot-proposal/:snapshotId"
+    element={
+      // redirect to NewSnapshotProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/new/snapshot/${parameters.snapshotId}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope/new/snapshot-proposals/:snapshotId"
+    element={
+      // redirect to NewSnapshotProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/new/snapshot/${parameters.snapshotId}`
+        }
+      />
+    }
+  />,
+  // ADMIN END
+
+  // PROFILES
+  <Route
+    path="/:scope/account/:address"
+    element={withLayout(ProfilePageRedirect, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/account"
+    element={withLayout(ProfilePageRedirect, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  // PROFILES END
+
+  // NEW PROFILES
+  <Route
+    path="/profile/id/:profileId"
+    element={withLayout(NewProfilePage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/profile/id/:profileId/edit"
+    element={withLayout(EditNewProfilePage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  // NEW PROFILES END
+
+  // LEGACY REDIRECTS
+  //here for compatibility only
+  <Route path="/discussions" element={<Navigate to="/" />} />,
+  <Route path="/home" element={<Navigate to="/" />} />,
+  <Route
+    path="/:scope/home"
+    element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
+  />,
+  // LEGACY REDIRECTS END
+
+  // ADMIN
+  <Route
+    path="/:scope/manage"
+    element={withLayout(ManageCommunityPage, {
+      scoped: true,
+    })}
+  />,
+  <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />,
+  <Route
+    path="/:scope/analytics"
+    element={withLayout(AnalyticsPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/snapshot/:snapshotId"
+    element={withLayout(SnapshotProposalPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/multiple-snapshots"
+    element={withLayout(ViewMultipleSnapshotsPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/snapshot/:snapshotId/:identifier"
+    element={withLayout(ViewSnapshotsProposalPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/:scope/new/snapshot/:snapshotId"
+    element={withLayout(NewSnapshotProposalPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  // snapshot proposals redirects
+  <Route
+    path="/:scope/snapshot-proposals/:snapshotId"
+    element={
+      // redirect to SnapshotProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/snapshot/${parameters.snapshotId}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope/snapshot-proposal/:snapshotId/:identifier"
+    element={
+      // redirect to ViewSnapshotsProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/snapshot/${parameters.snapshotId}/${parameters.identifier}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope/snapshot-proposals/:snapshotId/:identifier"
+    element={
+      // redirect to ViewSnapshotsProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/snapshot/${parameters.snapshotId}/${parameters.identifier}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope/new/snapshot-proposal/:snapshotId"
+    element={
+      // redirect to NewSnapshotProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/new/snapshot/${parameters.snapshotId}`
+        }
+      />
+    }
+  />,
+  <Route
+    path="/:scope/new/snapshot-proposals/:snapshotId"
+    element={
+      // redirect to NewSnapshotProposalPage
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/new/snapshot/${parameters.snapshotId}`
+        }
+      />
+    }
+  />,
+  // ADMIN END
+
+  // LEGACY REDIRECTS
+  //here for compatibility only
+  <Route path="/discussions" element={<Navigate to="/" />} />,
+  <Route path="/home" element={<Navigate to="/" />} />,
+  <Route
+    path="/:scope/home"
+    element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
+  />,
+  // LEGACY REDIRECTS END
+];
+
+export default commonDomainsRoutes;
