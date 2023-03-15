@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import type { Poll, Thread } from 'models';
 
@@ -18,15 +18,18 @@ import { Modal } from '../../components/component_kit/cw_modal';
 type ThreadPollEditorCardProps = {
   thread: Thread;
   threadAlreadyHasPolling: boolean;
+  onPollCreate: () => void;
 };
 
-export const ThreadPollEditorCard = (props: ThreadPollEditorCardProps) => {
-  const { thread, threadAlreadyHasPolling } = props;
-
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+export const ThreadPollEditorCard = ({
+  thread,
+  threadAlreadyHasPolling,
+  onPollCreate,
+}: ThreadPollEditorCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <CWContentPageCard
         header={`Add ${
           threadAlreadyHasPolling ? 'an' : 'another'
@@ -50,26 +53,26 @@ export const ThreadPollEditorCard = (props: ThreadPollEditorCardProps) => {
           <PollEditorModal
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
+            onPollCreate={onPollCreate}
           />
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };
 
 type ThreadPollCardProps = {
   poll: Poll;
+  onVote: () => void;
 };
 
-export const ThreadPollCard = (props: ThreadPollCardProps) => {
-  const { poll } = props;
-
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+export const ThreadPollCard = ({ poll, onVote }: ThreadPollCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <PollCard
         multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
@@ -107,9 +110,9 @@ export const ThreadPollCard = (props: ThreadPollCardProps) => {
             ? null
             : 'You must join this community to vote.'
         }
-        onVoteCast={(option, callback, isSelected) =>
-          handlePollVote(poll, option, isSelected, callback)
-        }
+        onVoteCast={(option, isSelected) => {
+          handlePollVote(poll, option, isSelected, onVote);
+        }}
         onResultsClick={(e) => {
           e.preventDefault();
           if (poll.votes.length > 0) {
@@ -127,6 +130,6 @@ export const ThreadPollCard = (props: ThreadPollCardProps) => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

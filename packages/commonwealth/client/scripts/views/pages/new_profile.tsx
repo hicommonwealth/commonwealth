@@ -9,9 +9,7 @@ type NewProfileAttrs = {
 };
 
 const NewProfile = (props: NewProfileAttrs) => {
-  return (
-    <ProfileComponent profileId={props.profileId} />
-  );
+  return <ProfileComponent profileId={props.profileId} />;
 };
 
 export default NewProfile;

@@ -60,12 +60,22 @@ export const LoginSelectorMenuLeft = ({
   nAccountsWithoutRole,
 }: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSelectAddressModalOpen, setIsSelectAddressModalOpen] =
     useState(false);
   const [profileId, setProfileId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
+
+  useEffect(() => {
+    // force rerender when new address is connected
+    app.user.isFetched.on('redraw', () => {
+      const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
+      setSelectedAddress(activeAccount.address);
+      forceRerender();
+    });
+  }, []);
 
   useEffect(() => {
     const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
@@ -91,7 +101,9 @@ export const LoginSelectorMenuLeft = ({
             return (
               <div
                 key={i}
-                className={`login-menu-item ${selectedAddress === account.address ? 'selected' : ''}`}
+                className={`login-menu-item ${
+                  selectedAddress === account.address ? 'selected' : ''
+                }`}
                 onClick={async () => {
                   await setActiveAccount(account);
                   setSelectedAddress(account.address);
@@ -109,34 +121,34 @@ export const LoginSelectorMenuLeft = ({
             );
           })}
         </>
-        )}
-        {activeAccounts.length > 0 && <CWDivider />}
-          <div
-            className="login-menu-item"
-            onClick={() => {
-              navigate(`/profile/id/${profileId}`, {}, null);
-            }}
-          >
-            <CWText type="caption">View profile</CWText>
-          </div>
-        <div
-          className="login-menu-item"
-          onClick={() => {
-            navigate(`/profile/id/${profileId}/edit`, {}, null);
-          }}
-        >
-          <CWText type="caption">Edit profile</CWText>
-        </div>
-        <div
-          className="login-menu-item"
-          onClick={() => {
-            if (nAccountsWithoutRole > 0) {
-              setIsSelectAddressModalOpen(true);
-            } else {
-              setIsLoginModalOpen(true);
-            }
-          }}
-        >
+      )}
+      {activeAccounts.length > 0 && <CWDivider />}
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          navigate(`/profile/id/${profileId}`, {}, null);
+        }}
+      >
+        <CWText type="caption">View profile</CWText>
+      </div>
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          navigate(`/profile/id/${profileId}/edit`, {}, null);
+        }}
+      >
+        <CWText type="caption">Edit profile</CWText>
+      </div>
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          if (nAccountsWithoutRole > 0) {
+            setIsSelectAddressModalOpen(true);
+          } else {
+            setIsLoginModalOpen(true);
+          }
+        }}
+      >
         <CWText type="caption">
           {nAccountsWithoutRole > 0
             ? `${pluralize(nAccountsWithoutRole, 'other address')}...`

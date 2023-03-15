@@ -32,7 +32,6 @@ export const handlePollVote = async (
     .submitVote(...userInfo, option)
     .then(() => {
       callback();
-      redraw();
     })
     .catch(() => {
       window.confirm(

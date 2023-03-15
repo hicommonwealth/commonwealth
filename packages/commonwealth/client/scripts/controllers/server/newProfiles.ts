@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import _ from 'lodash';
-import { redraw } from 'mithrilInterop';
 import { MinimumProfile as Profile } from 'models';
 import { EventEmitter } from 'events';
 
@@ -117,7 +116,7 @@ class NewProfilesController {
         }
       })
     );
-    redraw();
+    this.isFetched.emit('redraw');
   }
 }
 

@@ -71,7 +71,7 @@ class MinimumProfile {
   public getAvatar(size: number) {
     return this.avatarUrl
       ? render(CWAvatar, { avatarUrl: this.avatarUrl, size })
-      : render(CWJdenticon, { address: this.address, size });
+      : render(CWJdenticon, { address: this.id, size });
   }
 
   public static getSVGAvatar(address, size) {

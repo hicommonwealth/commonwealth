@@ -1,5 +1,5 @@
 /* eslint-disable no-script-url */
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { link } from 'helpers';
 
@@ -51,6 +51,12 @@ export const User = (props: UserAttrs) => {
     showRole,
   } = props;
   const navigate = useCommonNavigate();
+
+  useEffect(() => {
+    app.newProfiles.isFetched.on('redraw', () => {
+      updateState({});
+    });
+  }, []);
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [, updateState] = React.useState({});
@@ -108,11 +114,6 @@ export const User = (props: UserAttrs) => {
     }
 
     profile = app.newProfiles.getProfile(chainId.id, address);
-    if (!profile.initialized) {
-      app.newProfiles.isFetched.on('redraw', () => {
-        updateState({});
-      });
-    }
 
     role = adminsAndMods.find(
       (r) => r.address === address && r.address_chain === chainId.id
@@ -140,12 +141,6 @@ export const User = (props: UserAttrs) => {
     const chainId = account.chain.id;
 
     profile = app.newProfiles.getProfile(chainId, account.address);
-
-    if (!profile.initialized) {
-      app.newProfiles.isFetched.on('redraw', () => {
-        updateState({});
-      });
-    }
 
     role = adminsAndMods.find(
       (r) => r.address === account.address && r.address_chain === chainId
@@ -216,7 +211,7 @@ export const User = (props: UserAttrs) => {
                 profile.name
               ) : (
                 <>
-                  {profile.displayName}
+                  {profile.name}
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>

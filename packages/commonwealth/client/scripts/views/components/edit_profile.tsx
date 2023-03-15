@@ -48,9 +48,7 @@ export type Image = {
 const EditProfileComponent = (props: EditNewProfileProps) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [error, setError] = useState<EditProfileError>(
-    EditProfileError.None
-  );
+  const [error, setError] = useState<EditProfileError>(EditProfileError.None);
   const [loading, setLoading] = useState(true);
   const [socials, setSocials] = useState<string[]>();
   const [profile, setProfile] = useState<Profile>();
@@ -112,6 +110,10 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
       if (result?.status === 'Success') {
         setTimeout(() => {
+          // refresh profiles in store
+          addresses.forEach((a) => {
+            app.newProfiles.updateProfileForAccount(a.address, profileUpdate);
+          });
           setLoading(false);
           navigate(`/profile/id/${profile.id}`);
         }, 1500);
@@ -301,7 +303,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
                 value={name}
                 placeholder="display name"
                 onInput={(e) => {
-                setDisplayNameValid(true);
+                  setDisplayNameValid(true);
                   setName(e.target.value);
                 }}
                 inputClassName={displayNameValid ? '' : 'failure'}
@@ -354,7 +356,9 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
             description="Express yourself through imagery."
           >
             <CWText fontWeight="medium">Image upload</CWText>
-            <CWText type="caption" className="description">Add a background image.</CWText>
+            <CWText type="caption" className="description">
+              Add a background image.
+            </CWText>
             <CWCoverImageUploader
               uploadCompleteCallback={(
                 url: string,
@@ -380,23 +384,23 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
             />
           </CWFormSection>
           <CWFormSection
-              title="Linked addresses"
-              description="Manage your addresses."
-            >
-              <LinkedAddresses
-                addresses={addresses}
-                profile={profile}
-                refreshProfiles={(address: string) => {
-                  getProfile(props.profileId);
-                  // Remove from all address stores in the frontend state
-                  const index = app.user.addresses.indexOf(
-                    app.user.addresses.find((a) => a.address === address)
-                  );
-                  app.user.addresses.splice(index, 1);
-                }}
-              />
-              <CWText type="caption" fontWeight="medium">Link new addresses via the profile dropdown menu</CWText>
-            </CWFormSection>
+            title="Linked addresses"
+            description="Manage your addresses."
+          >
+            <LinkedAddresses
+              addresses={addresses}
+              profile={profile}
+              refreshProfiles={(address: string) => {
+                getProfile(props.profileId);
+                app.user.removeAddress(
+                  addresses.find((a) => a.address === address)
+                );
+              }}
+            />
+            <CWText type="caption" fontWeight="medium">
+              Link new addresses via the profile dropdown menu
+            </CWText>
+          </CWFormSection>
         </CWForm>
       </div>
     );

@@ -38,9 +38,7 @@ class ProfileActivityContent extends ClassComponent<ProfileActivityContentAttrs>
     ].sort((a, b) => +b.createdAt - +a.createdAt);
 
     return allActivities.map((activity, i) => {
-      return (
-        <NewProfileActivityRow key={i} activity={activity} />
-      );
+      return <NewProfileActivityRow key={i} activity={activity} />;
     });
   }
 }

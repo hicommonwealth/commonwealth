@@ -46,14 +46,10 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
       });
 
       if (response?.status === 'Success') {
-        setTimeout(() => {
-          notifySuccess('Address has been successfully removed.');
-        }, 1000);
+        notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {
-      setTimeout(() => {
-        notifyError('Address was not successfully deleted, please try again.');
-      }, 1000);
+      notifyError('Address was not successfully deleted, please try again.');
     }
 
     closeModal();
@@ -106,4 +102,4 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
       </div>
     </div>
   );
-}
+};

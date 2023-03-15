@@ -10,7 +10,7 @@ import { PageNotFound } from './404';
 type ProfileRedirectProps = {
   address: string;
   scope: string;
-}
+};
 
 const ProfileRedirect = (props: ProfileRedirectProps) => {
   const [profileId, setProfileId] = useState<number>(null);
@@ -32,16 +32,14 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
       setError(true);
     }
     setLoading(false);
-  }
+  };
 
   if (loading) {
     return <PageLoading />;
   }
 
   if (error) {
-    return (
-      <PageNotFound message="There was an error loading this profile." />
-    );
+    return <PageNotFound message="There was an error loading this profile." />;
   }
 
   let { address, scope } = props;
@@ -53,6 +51,6 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   if (profileId) {
     navigate(`/profile/id/${profileId}`, {}, null);
   }
-}
+};
 
 export default ProfileRedirect;

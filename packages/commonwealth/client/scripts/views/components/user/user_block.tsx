@@ -7,7 +7,7 @@ import 'components/user/user.scss';
 
 import app from 'state';
 import type { Account } from 'models';
-import { AddressInfo , MinimumProfile as Profile } from 'models';
+import { AddressInfo, MinimumProfile as Profile } from 'models';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import type { AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
@@ -26,12 +26,7 @@ export const UserBlock = (props: {
   user: Account | AddressInfo | Profile;
   hideAvatar?: boolean;
 }) => {
-  const {
-    compact,
-    searchTerm,
-    showChainName,
-    user,
-  } = props;
+  const { compact, searchTerm, showChainName, user } = props;
 
   let profile;
 
@@ -77,10 +72,7 @@ export const UserBlock = (props: {
           <div>
             {highlightSearchTerm
               ? highlightedAddress
-              : `${profile.address.slice(0, 8)}...${profile.address.slice(
-                -5
-              )}`
-            }
+              : `${profile.address.slice(0, 8)}...${profile.address.slice(-5)}`}
           </div>
           {profile?.address && showChainName && (
             <div className="address-divider"> · </div>

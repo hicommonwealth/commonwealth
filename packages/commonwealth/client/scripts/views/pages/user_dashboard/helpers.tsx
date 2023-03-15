@@ -56,6 +56,7 @@ export const subscribeToThread = async (
     ]);
 
     notifySuccess('Unsubscribed!');
+    return Promise.resolve();
   } else if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
       app.user.notifications.subscribe(
@@ -69,6 +70,7 @@ export const subscribeToThread = async (
     ]);
 
     notifySuccess('Subscribed!');
+    return Promise.resolve();
   } else {
     await app.user.notifications.enableSubscriptions([
       commentSubscription,
@@ -76,6 +78,7 @@ export const subscribeToThread = async (
     ]);
 
     notifySuccess('Subscribed!');
+    return Promise.resolve();
   }
 };
 
