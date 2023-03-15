@@ -60,23 +60,21 @@ const ProfileComponent = (props: ProfileProps) => {
       });
       setComments(commentsWithAssociatedThread);
       setAddresses(
-        result.addresses.map(
-          (a) => {
-            try {
-              return new AddressInfo(
-                a.id,
-                a.address,
-                a.chain,
-                a.keytype,
-                a.wallet_id,
-                a.ghost_address
-              )
-            } catch (err) {
-              console.error(`Could not return AddressInfo: "${err}"`);
-              return null;
-            }
+        result.addresses.map((a) => {
+          try {
+            return new AddressInfo(
+              a.id,
+              a.address,
+              a.chain,
+              a.keytype,
+              a.wallet_id,
+              a.ghost_address
+            );
+          } catch (err) {
+            console.error(`Could not return AddressInfo: "${err}"`);
+            return null;
           }
-        )
+        })
       );
       setIsOwner(result.isOwner);
     } catch (err) {
