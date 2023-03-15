@@ -112,6 +112,13 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
       if (result?.status === 'Success') {
         setTimeout(() => {
+          // refresh profiles in store
+          addresses.forEach((a) => {
+            app.newProfiles.updateProfileForAccount(
+              a.address,
+              profileUpdate
+            );
+          });
           setLoading(false);
           navigate(`/profile/id/${profile.id}`);
         }, 1500);
