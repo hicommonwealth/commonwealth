@@ -160,7 +160,9 @@ export const CWTextInput = (props: TextInputProps) => {
           hasFeedback={!!inputValidationFn}
           label={label}
           statusMessage={manualStatusMessage || validationProps.statusMessage}
-          validationStatus={manualValidationStatus || validationProps.validationStatus}
+          validationStatus={
+            manualValidationStatus || validationProps.validationStatus
+          }
         />
       )}
       <div className="input-and-icon-container">

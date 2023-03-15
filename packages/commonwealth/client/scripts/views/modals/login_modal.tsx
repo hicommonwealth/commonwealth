@@ -351,7 +351,10 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
       };
       try {
         if (this.username || this.avatarUrl) {
-          await app.newProfiles.updateProfileForAccount(this.primaryAccount.profile.address, data);
+          await app.newProfiles.updateProfileForAccount(
+            this.primaryAccount.profile.address,
+            data
+          );
         }
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
           vnode.attrs.onModalClose();

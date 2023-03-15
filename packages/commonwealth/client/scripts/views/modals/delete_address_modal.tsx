@@ -102,4 +102,4 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
       </div>
     </div>
   );
-}
+};

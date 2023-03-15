@@ -19,14 +19,8 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
   const navigate = useCommonNavigate();
 
   if (props.type === 'default') {
-    const {
-      disabled,
-      iconLeft,
-      iconRight,
-      isSecondary,
-      label,
-      onClick,
-    } = props;
+    const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
+      props;
 
     return (
       <div

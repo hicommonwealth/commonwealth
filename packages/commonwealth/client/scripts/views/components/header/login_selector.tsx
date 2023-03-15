@@ -101,7 +101,9 @@ export const LoginSelectorMenuLeft = ({
             return (
               <div
                 key={i}
-                className={`login-menu-item ${selectedAddress === account.address ? 'selected' : ''}`}
+                className={`login-menu-item ${
+                  selectedAddress === account.address ? 'selected' : ''
+                }`}
                 onClick={async () => {
                   await setActiveAccount(account);
                   setSelectedAddress(account.address);
@@ -119,34 +121,34 @@ export const LoginSelectorMenuLeft = ({
             );
           })}
         </>
-        )}
-        {activeAccounts.length > 0 && <CWDivider />}
-          <div
-            className="login-menu-item"
-            onClick={() => {
-              navigate(`/profile/id/${profileId}`, {}, null);
-            }}
-          >
-            <CWText type="caption">View profile</CWText>
-          </div>
-        <div
-          className="login-menu-item"
-          onClick={() => {
-            navigate(`/profile/id/${profileId}/edit`, {}, null);
-          }}
-        >
-          <CWText type="caption">Edit profile</CWText>
-        </div>
-        <div
-          className="login-menu-item"
-          onClick={() => {
-            if (nAccountsWithoutRole > 0) {
-              setIsSelectAddressModalOpen(true);
-            } else {
-              setIsLoginModalOpen(true);
-            }
-          }}
-        >
+      )}
+      {activeAccounts.length > 0 && <CWDivider />}
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          navigate(`/profile/id/${profileId}`, {}, null);
+        }}
+      >
+        <CWText type="caption">View profile</CWText>
+      </div>
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          navigate(`/profile/id/${profileId}/edit`, {}, null);
+        }}
+      >
+        <CWText type="caption">Edit profile</CWText>
+      </div>
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          if (nAccountsWithoutRole > 0) {
+            setIsSelectAddressModalOpen(true);
+          } else {
+            setIsLoginModalOpen(true);
+          }
+        }}
+      >
         <CWText type="caption">
           {nAccountsWithoutRole > 0
             ? `${pluralize(nAccountsWithoutRole, 'other address')}...`

@@ -35,7 +35,9 @@ class Address extends ClassComponent<AddressAttrs> {
       <div className="AddressContainer">
         <CWAddressTooltip
           address={address}
-          renderTrigger={() => <CWTruncatedAddress address={address} communityInfo={chain} />}
+          renderTrigger={() => (
+            <CWTruncatedAddress address={address} communityInfo={chain} />
+          )}
         />
         <PopoverMenu
           menuItems={[
