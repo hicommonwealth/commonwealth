@@ -30,6 +30,7 @@ export type PollOptionProps = {
   voteInformation: Array<VoteInformation>;
   selectedOptions?: Array<string>;
   disableVoteOptions?: boolean;
+  setSelectedOptions?: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 export const PollOptions = ({
@@ -37,6 +38,7 @@ export const PollOptions = ({
   multiSelect,
   selectedOptions,
   voteInformation,
+  setSelectedOptions,
 }: PollOptionProps) => {
   return (
     <div className="PollOptions">
@@ -46,6 +48,7 @@ export const PollOptions = ({
               checked={false}
               value=""
               label={option.label}
+              key={option.value}
               onChange={() => {
                 // TODO: Build this out when multiple vote options are introduced.
                 // Something like: selectedOptions.push(option.value);
@@ -55,14 +58,13 @@ export const PollOptions = ({
           ))
         : voteInformation.map((option) => (
             <CWRadioButton
+              key={option.value}
               checked={
                 selectedOptions.length > 0 &&
                 option.value === selectedOptions[0]
               }
               groupName="votes"
-              onChange={() => {
-                selectedOptions[0] = option.value;
-              }}
+              onChange={() => setSelectedOptions([option.value])}
               label={option.label}
               value={option.value}
               disabled={disableVoteOptions}
@@ -76,11 +78,7 @@ export type CastVoteProps = {
   disableVoteButton: boolean;
   timeRemaining: string;
   tooltipErrorMessage: string;
-  onVoteCast: (
-    selectedOption?: string,
-    handleVoteCast?: () => void,
-    isSelected?: boolean
-  ) => void;
+  onVoteCast: (selectedOption?: string, isSelected?: boolean) => void;
 };
 
 export const CastVoteSection = ({
@@ -262,6 +260,7 @@ export const ResultsSection = ({
                     ? (option.voteCount / totalVoteCount) * 100
                     : 0
                 }
+                key={option.value}
                 progressStatus={calculateProgressStatus(option, index)}
                 label={option.label}
                 iconName={option.label === votedFor ? 'check' : undefined}
@@ -290,7 +289,6 @@ export type PollCardProps = PollOptionProps &
 
 export const PollCard = ({
   disableVoteButton = false,
-  incrementalVoteCast,
   isPreview = false,
   multiSelect,
   onResultsClick,
@@ -302,14 +300,10 @@ export const PollCard = ({
   tooltipErrorMessage,
   votedFor,
   voteInformation,
-  ...props
+  hasVoted,
+  totalVoteCount,
 }: PollCardProps) => {
-  const [hasVoted, setHasVoted] = useState(props.hasVoted);
   const [selectedOptions, setSelectedOptions] = useState<Array<string>>([]);
-  const [totalVoteCount, setTotalVoteCount] = useState(props.totalVoteCount);
-  const [voteDirectionString, setVoteDirectionString] = useState(
-    votedFor ? buildVoteDirectionString(votedFor) : ''
-  );
 
   const resultString = 'Results';
 
@@ -323,17 +317,7 @@ export const PollCard = ({
       return;
     }
 
-    await onVoteCast(
-      selectedOptions[0],
-      () => {
-        if (!votedFor) {
-          setTotalVoteCount(totalVoteCount + incrementalVoteCast);
-        }
-        setVoteDirectionString(buildVoteDirectionString(selectedOptions[0]));
-        setHasVoted(true);
-      },
-      selectedOptions.length === 0
-    );
+    await onVoteCast(selectedOptions[0], selectedOptions.length === 0);
   };
 
   return (
@@ -348,6 +332,7 @@ export const PollCard = ({
               multiSelect={multiSelect}
               voteInformation={voteInformation}
               selectedOptions={selectedOptions}
+              setSelectedOptions={setSelectedOptions}
               disableVoteOptions={disableVoteButton}
             />
             <CastVoteSection
@@ -363,7 +348,11 @@ export const PollCard = ({
         {((hasVoted && !isPreview) || pollEnded) && (
           <VoteDisplay
             timeRemaining={timeRemaining}
-            voteDirectionString={voteDirectionString}
+            voteDirectionString={
+              votedFor
+                ? buildVoteDirectionString(votedFor)
+                : buildVoteDirectionString(selectedOptions[0])
+            }
             pollEnded={pollEnded}
             voteInformation={voteInformation}
           />

@@ -31,7 +31,6 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
-import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -40,6 +39,11 @@ import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
 import type { IThreadCollaborator } from 'models/Thread';
+import {
+  getCommentSubscription,
+  getReactionSubscription,
+  handleToggleSubscription,
+} from '../discussions/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -438,6 +442,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       chain: app.activeChainId(),
     });
 
+  const isSubscribed =
+    getCommentSubscription(thread)?.isActive &&
+    getReactionSubscription(thread)?.isActive;
+
   const showLinkedProposalOptions =
     thread.snapshotProposal?.length > 0 ||
     thread.chainEntities?.length > 0 ||
@@ -599,7 +607,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ]
         : []),
       { type: 'divider' as const },
-      getThreadSubScriptionMenuItem(thread),
+      {
+        onClick: () => {
+          handleToggleSubscription(
+            thread,
+            getCommentSubscription(thread),
+            getReactionSubscription(thread),
+            isSubscribed
+          ).then(() => {
+            setRecentlyEdited(true);
+          });
+        },
+        label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
+        iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
+      },
     ];
   };
 
@@ -718,13 +739,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             polls?.map((poll) => [poll.id, poll])
                           ).values(),
                         ].map((poll: Poll) => {
-                          return <ThreadPollCard poll={poll} />;
+                          return (
+                            <ThreadPollCard
+                              poll={poll}
+                              key={poll.id}
+                              onVote={() => setInitializedPolls(false)}
+                            />
+                          );
                         })}
                         {isAuthor &&
                           (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
                             <ThreadPollEditorCard
                               thread={thread}
                               threadAlreadyHasPolling={!polls?.length}
+                              onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
                       </div>
@@ -739,7 +767,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         content={
           <ChangeTopicModal
             onChangeHandler={(topic: Topic) => {
-              const newThread = new Thread({ ...thread, topic })
+              const newThread = new Thread({ ...thread, topic });
               setThread(newThread);
             }}
             thread={thread}
@@ -755,7 +783,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
             onCollaboratorsUpdated={(collaborators: IThreadCollaborator[]) => {
-              const newThread = new Thread({ ...thread, collaborators })
+              const newThread = new Thread({ ...thread, collaborators });
               setThread(newThread);
             }}
           />
