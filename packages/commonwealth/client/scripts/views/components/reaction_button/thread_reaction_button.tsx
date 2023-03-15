@@ -1,48 +1,38 @@
+import 'components/reaction_button/comment_reaction_button.scss';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+
+import type { ChainInfo, Thread } from 'models';
 import React, { useEffect, useState } from 'react';
 
-import 'components/reaction_button/comment_reaction_button.scss';
-
-import type { ChainInfo } from 'models';
-import type { Thread } from 'models';
-import type ReactionCount from 'models/ReactionCount';
-
 import app from 'state';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import { LoginModal } from '../../modals/login_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { Modal } from '../component_kit/cw_modal';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
-import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from '../component_kit/helpers';
-import {
-  fetchReactionsByPost,
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from './helpers';
-import { LoginModal } from '../../modals/login_modal';
-import { Modal } from '../component_kit/cw_modal';
+import { getClasses, isWindowMediumSmallInclusive, } from '../component_kit/helpers';
+import { fetchReactionsByPost, getDisplayedReactorsForPopup, onReactionClick, } from './helpers';
 
 export const useThreadReactionButton = (thread: Thread) => {
   const [isLoading, setIsLoading] = useState(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
   const [likes, setLikes] = useState(0);
   const [hasReacted, setHasReacted] = useState(false);
-  const [reactionCounts, setReactionCounts] = useState<ReactionCount<Thread>>();
+  const [reactionCounts, setReactionCounts] = useState<number>(0);
 
   useEffect(() => {
     const fetch = () => {
-      const _reactionCounts = app.reactionCounts.store.getByPost(thread);
-
-      if (_reactionCounts) {
-        setReactionCounts(_reactionCounts);
-        setLikes(_reactionCounts.likes);
-        setHasReacted(_reactionCounts.hasReacted);
+      if (app.user.activeAccount && thread.associatedReactions.filter((r) => r.address === activeAddress).length > 0) {
+        setHasReacted(true);
+      } else {
+        setHasReacted(false);
       }
+
+      setReactionCounts(thread.associatedReactions.length);
     };
 
     fetch();
-  }, [reactors, thread]);
+  }, [hasReacted, thread]);
 
   // token balance check if needed
   const isAdmin =
@@ -60,23 +50,14 @@ export const useThreadReactionButton = (thread: Thread) => {
   const activeAddress = app.user.activeAccount?.address;
 
   const dislike = async (userAddress: string) => {
-    const reaction = (await fetchReactionsByPost(thread)).find((r) => {
-      return r.Address.address === activeAddress;
-    });
     setIsLoading(true);
 
-    app.reactionCounts
-      .delete(reaction, {
-        ...reactionCounts,
-        likes: likes - 1,
-        hasReacted: false,
-      })
-      .then(() => {
-        setReactors(
-          reactors.filter(({ Address }) => Address.address !== userAddress)
-        );
-        setIsLoading(false);
-      });
+    app.threadReactions.deleteOnThread(userAddress, thread).then(() => {
+      thread.associatedReactions = thread.associatedReactions.filter(
+        (r) => r.address !== activeAddress
+      );
+      setIsLoading(false);
+    });
   };
 
   const like = async (
@@ -85,15 +66,16 @@ export const useThreadReactionButton = (thread: Thread) => {
     userAddress: string
   ) => {
     setIsLoading(true);
-    app.reactionCounts.create(userAddress, thread, 'like', chainId).then(() => {
-      setReactors([
-        ...reactors,
-        {
-          Address: { address: userAddress, chain },
-        },
-      ]);
-      setIsLoading(false);
-    });
+    app.threadReactions
+      .createOnThread(userAddress, thread, 'like')
+      .then((reaction) => {
+        thread.associatedReactions.push({
+          id: reaction.id,
+          type: reaction.reaction,
+          address: activeAddress,
+        });
+        setIsLoading(false);
+      });
   };
 
   return {
@@ -155,8 +137,8 @@ export const ThreadReactionButton = ({ thread }: ThreadReactionButtonProps) => {
             content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
-                  likes,
-                  reactors,
+                  likes: thread.associatedReactions.length,
+                  reactors: app.threadReactions.getByThreadId(thread.id),
                 })}
               </div>
             }
@@ -183,7 +165,7 @@ export const ThreadReactionButton = ({ thread }: ThreadReactionButtonProps) => {
         )}
       </div>
       <Modal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
+        content={<LoginModal onModalClose={() => setIsModalOpen(false)}/>}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}

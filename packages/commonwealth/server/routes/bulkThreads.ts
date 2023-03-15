@@ -104,7 +104,8 @@ const bulkThreads = async (
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics
-      ON threads.topic_id = topics.id`;
+      ON threads.topic_id = topics.id
+      ${includePinnedThreads ? 'ORDER BY threads.pinned DESC' : ''}`;
     let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {

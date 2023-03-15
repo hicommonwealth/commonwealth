@@ -23,23 +23,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
-    // set pinned threads
-    setThreads(
-      app.threads.listingStore.getThreads({
-        topicName,
-        stageName,
-        pinned: true,
-      })
-    );
-    app.threads.loadNextPage({ topicName, stageName }).then(() => {
-      // add unpinned threads
-      setThreads((oldThreads) => [
-        ...oldThreads,
-        ...app.threads.listingStore.getThreads({
-          topicName,
-          stageName,
-          pinned: false,
-        }),
+    app.threads.loadNextPage({ topicName, stageName, includePinnedThreads: true }).then((t) => {
+      // Fetch first 20 + unpinned threads
+      setThreads([
+        ...threads,
+        ...t,
       ]);
 
       setInitializing(false);

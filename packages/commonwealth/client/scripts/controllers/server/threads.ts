@@ -704,7 +704,7 @@ class ThreadsController {
 
     // Update listing cutoff date (date up to which threads have been fetched)
     if (modeledThreads?.length) {
-      const lastThread = modeledThreads.sort(orderDiscussionsbyLastComment)[
+      const lastThread = [...modeledThreads].sort(orderDiscussionsbyLastComment)[
         modeledThreads.length - 1
       ];
       const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
