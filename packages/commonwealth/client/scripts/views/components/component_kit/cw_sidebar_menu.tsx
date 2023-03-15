@@ -154,21 +154,6 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               app.sidebarRedraw.emit('redraw');
               navigate('/notification-settings');
             },
-          },
-          {
-            type: 'default',
-            label: 'Account settings',
-            iconLeft: 'bell',
-            onClick: () => {
-              if (app.activeChainId()) {
-                navigate('/settings');
-              } else {
-                app.sidebarToggled = false;
-                app.sidebarMenu = 'default';
-                app.sidebarRedraw.emit('redraw');
-                navigate('/settings');
-              }
-            },
           } as MenuItem,
         ].map((item: MenuItem, i) => {
           return (

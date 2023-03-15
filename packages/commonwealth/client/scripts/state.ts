@@ -14,7 +14,6 @@ import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
 import PollsController from './controllers/server/polls';
-import ProfilesController from './controllers/server/profiles';
 import NewProfilesController from './controllers/server/newProfiles';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
@@ -84,7 +83,6 @@ export interface IApp {
   user: UserController;
   roles: RolesController;
   recentActivity: RecentActivityController;
-  profiles: ProfilesController;
   newProfiles: NewProfilesController;
   sessions: SessionsController;
 
@@ -189,7 +187,6 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  profiles: new ProfilesController(),
   newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,

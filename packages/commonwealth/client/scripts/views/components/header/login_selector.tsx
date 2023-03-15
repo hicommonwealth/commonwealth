@@ -196,9 +196,6 @@ export const LoginSelectorMenuRight = ({
         >
           <CWText type="caption">Notification settings</CWText>
         </div>
-        <div className="login-menu-item" onClick={() => navigate('/settings')}>
-          <CWText type="caption">Account settings</CWText>
-        </div>
         <div className="login-menu-item">
           <CWToggle
             checked={isDarkModeOn}
