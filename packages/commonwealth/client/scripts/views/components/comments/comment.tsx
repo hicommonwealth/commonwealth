@@ -135,7 +135,7 @@ export const Comment = (props: CommentProps) => {
         ) : (
           <>
             <CWText className="comment-text">
-              {/* {renderQuillTextBody(comment.text)} */}
+              {renderQuillTextBody(comment.text)}
             </CWText>
             {!comment.deleted && (
               <div className="comment-footer">
