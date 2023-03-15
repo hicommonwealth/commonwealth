@@ -329,7 +329,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       });
 
       app.newProfiles.isFetched.on('redraw', () => {
-        if (!prefetch[threadIdAndType]['profilesFinished']) {
+        if (!prefetch[threadIdAndType]?.['profilesFinished']) {
           setPrefetch((prevState) => ({
             ...prevState,
             [threadIdAndType]: {
@@ -402,7 +402,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   if (
     !app.newProfiles.allLoaded() &&
-    !prefetch[threadIdAndType]['profilesFinished']
+    !prefetch[threadIdAndType]?.['profilesFinished']
   ) {
     return <PageLoading />;
   }

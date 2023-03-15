@@ -51,6 +51,7 @@ class NotificationsController {
   private _numPages = 0;
   private _numUnread = 0;
 
+  public isLoaded = new EventEmitter();
   public isUpdated = new EventEmitter();
 
   public get numPages(): number {
@@ -393,11 +394,13 @@ class NotificationsController {
   }
 
   public async refresh() {
-    return Promise.all([
+    await Promise.all([
       this.getDiscussionNotifications(),
       this.getChainEventNotifications(),
       this.getSubscriptions(),
     ]);
+    this.isLoaded.emit('redraw');
+    return Promise.resolve();
   }
 }
 
