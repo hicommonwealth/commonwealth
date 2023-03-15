@@ -7,7 +7,7 @@ import type { DashboardActivityNotification } from 'models';
 
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 import { PageNotFound } from '../pages/404';
-import { PageLoading } from '../pages/loading';
+import { CWSpinner } from './component_kit/cw_spinner';
 
 type FeedProps = {
   fetchData: () => Promise<any>;
@@ -58,6 +58,8 @@ export const Feed = ({
     getData();
   }, []);
 
+  if (loading) return <CWSpinner />;
+
   if (error) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
@@ -72,9 +74,7 @@ export const Feed = ({
 
   if (currentCount > data.length) setCurrentCount(data.length);
 
-  return loading ? (
-    <PageLoading />
-  ) : (
+  return (
     <div className="Feed">
       <Virtuoso
         totalCount={currentCount}
