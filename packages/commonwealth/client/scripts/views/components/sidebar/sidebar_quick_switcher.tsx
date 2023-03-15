@@ -55,7 +55,7 @@ export const SidebarQuickSwitcher = () => {
             key={item.id}
             size="large"
             community={item}
-            onClick={link ? () => navigate(`/${item.id}`) : undefined}
+            onClick={link ? () => navigate(`/${item.id}`, {}, null) : undefined}
           />
         ))}
       </div>

@@ -64,9 +64,7 @@ export const TopicSummaryRow = (props: TopicSummaryRowProps) => {
             className="topic-name-text"
             onClick={(e) => {
               e.preventDefault();
-              navigate(
-                `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
-              );
+              navigate(`/discussions/${encodeURI(topic.name)}`);
             }}
           >
             {topic.name}

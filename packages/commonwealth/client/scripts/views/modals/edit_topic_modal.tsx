@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
@@ -8,70 +7,68 @@ import 'modals/edit_topic_modal.scss';
 import { Topic } from 'models';
 
 import app from 'state';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import type { QuillEditor } from '../components/quill/quill_editor';
-import type { QuillTextContents } from '../components/quill/types';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
+import { DeltaStatic } from 'quill';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
 
 type EditTopicModalProps = {
-  defaultOffchainTemplate: string;
-  description: string;
-  featuredInNewPost: boolean;
-  featuredInSidebar: boolean;
-  id: number;
   onModalClose: () => void;
-  name: string;
+  topic: Topic;
 };
 
-export const EditTopicModal = (props: EditTopicModalProps) => {
+export const EditTopicModal = ({
+  topic,
+  onModalClose,
+}: EditTopicModalProps) => {
   const {
     defaultOffchainTemplate,
     description: descriptionProp,
     featuredInNewPost: featuredInNewPostProp,
     featuredInSidebar: featuredInSidebarProp,
     id,
-    onModalClose,
     name: nameProp,
-  } = props;
+  } = topic;
 
   const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
-  const [isSaving, setIsSaving] = React.useState<boolean>(false);
-  const [contentsDoc, setContentsDoc] = React.useState<QuillTextContents>();
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const [description, setDescription] = React.useState<string>(descriptionProp);
-  const [featuredInNewPost, setFeaturedInNewPost] = React.useState<boolean>(
+  const [description, setDescription] = useState<string>(descriptionProp);
+  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
     featuredInNewPostProp
   );
-  const [featuredInSidebar, setFeaturedInSidebar] = React.useState<boolean>(
+  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
     featuredInSidebarProp
   );
-  const [name, setName] = React.useState<string>(nameProp);
+  const [name, setName] = useState<string>(nameProp);
 
-  if (defaultOffchainTemplate) {
-    try {
-      setContentsDoc(JSON.parse(defaultOffchainTemplate));
-    } catch (e) {
-      setContentsDoc(defaultOffchainTemplate);
-    }
-  }
+  const editorValue = getTextFromDelta(contentDelta);
 
-  const updateTopic = async () => {
-    if (featuredInNewPost) {
-      if (!quillEditorState || quillEditorState?.isBlank()) {
-        setErrorMsg('Must provide template.');
-        return false;
-      } else {
-        quillEditorState?.disable();
+  useEffect(() => {
+    if (defaultOffchainTemplate) {
+      try {
+        setContentDelta(JSON.parse(defaultOffchainTemplate));
+      } catch (e) {
+        setContentDelta(createDeltaFromText(defaultOffchainTemplate));
       }
+    }
+  }, [defaultOffchainTemplate]);
+
+  const handleSaveChanges = async () => {
+
+    setIsSaving(true);
+
+    if (featuredInNewPost && editorValue.length === 0) {
+      setErrorMsg('Must provide template.');
+      return
     }
 
     const topicInfo = {
@@ -82,22 +79,26 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
-      default_offchain_template: featuredInNewPost
-        ? quillEditorState.textContentsAsString
-        : null,
+      default_offchain_template: JSON.stringify(contentDelta)
     };
 
     try {
       await app.topics.edit(new Topic(topicInfo));
-      return true;
+      navigate(`/discussions/${encodeURI(name.toString().trim())}`);
     } catch (err) {
       setErrorMsg(err.message || err);
-      redraw();
-      return false;
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const deleteTopic = async () => {
+  const handleDeleteTopic = async () => {
+    const confirmed = window.confirm('Delete this topic?');
+
+    if (!confirmed) {
+      return;
+    }
+
     const topicInfo = {
       id,
       name: name,
@@ -130,10 +131,9 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
               newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
                 'char'
-              )} 
+              )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
-              redraw();
               return ['failure', newErrorMsg];
             }
 
@@ -170,55 +170,17 @@ export const EditTopicModal = (props: EditTopicModalProps) => {
           value=""
         />
         {featuredInNewPost && (
-          <QuillEditorComponent
-            contentsDoc={contentsDoc}
-            oncreateBind={(state: QuillEditor) => {
-              setQuillEditorState(state);
-            }}
-            editorNamespace="new-discussion"
-            tabIndex={3}
+          <ReactQuillEditor
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
           />
         )}
         <div className="buttons-row">
-          <CWButton
-            onClick={async (e) => {
-              e.preventDefault();
-
-              updateTopic()
-                .then((closeModal) => {
-                  if (closeModal) {
-                    $(e.target).trigger('modalexit');
-                    navigate(
-                      `/discussions/${encodeURI(name.toString().trim())}`
-                    );
-                  }
-                })
-                .catch(() => {
-                  setIsSaving(false);
-                  redraw();
-                });
-            }}
-            label="Save changes"
-          />
+          <CWButton onClick={handleSaveChanges} label="Save changes" />
           <CWButton
             buttonType="primary-red"
             disabled={isSaving}
-            onClick={async (e) => {
-              e.preventDefault();
-              const confirmed = window.confirm('Delete this topic?');
-
-              if (!confirmed) return;
-
-              deleteTopic()
-                .then(() => {
-                  $(e.target).trigger('modalexit');
-                  navigate('/');
-                })
-                .catch(() => {
-                  setIsSaving(false);
-                  redraw();
-                });
-            }}
+            onClick={handleDeleteTopic}
             label="Delete topic"
           />
         </div>

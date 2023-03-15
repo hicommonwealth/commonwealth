@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ChainNetwork, ProposalType } from 'common-common/src/types';
 import {
@@ -26,7 +26,29 @@ type NewProposalPageProps = {
 
 const NewProposalPage = (props: NewProposalPageProps) => {
   const { type } = props;
-  const [internalType, setInternalType] = React.useState<ProposalType>(type);
+  const [internalType, setInternalType] = useState<ProposalType>(type);
+  const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
+  // isLoggedIn is not referenced, but is used to trigger re-render
+  const [isLoggedIn, setIsLoggedIn] = useState(app.isLoggedIn());
+
+  useEffect(() => {
+    app.runWhenReady(() => {
+      console.log('app.chain.loaded', app.chain.loaded);
+
+      setIsLoaded(app.chain.loaded);
+    });
+  }, [app.chain?.loaded]);
+
+  useEffect(() => {
+    app.loginStateEmitter.on('redraw', () => {
+      console.log('app.isLoggedIn()', app.isLoggedIn());
+      setIsLoggedIn(app.isLoggedIn());
+    });
+
+    return () => {
+      app.loginStateEmitter.removeAllListeners();
+    };
+  }, [app.loginState]);
 
   // wait for chain
   if (app.chain?.failed) {
@@ -38,7 +60,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     );
   }
 
-  if (!app.chain || !app.chain.loaded || !app.chain.meta) {
+  if (!app.chain || !isLoaded || !app.chain.meta) {
     return <PageLoading />;
   }
 
@@ -57,13 +79,13 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   }
 
   // check if module is still initializing
-  const c = proposalSlugToClass().get(internalType) as ProposalModule<
+  const c = proposalSlugToClass()?.get(internalType) as ProposalModule<
     any,
     any,
     any
   >;
 
-  if (!c.ready) {
+  if (!c || !c.ready) {
     app.chain.loadModules([c]);
     return <PageLoading />;
   }

@@ -3,6 +3,7 @@ import type { DeltaStatic } from 'quill';
 
 import type { Topic } from 'models';
 import { ThreadKind } from 'models';
+import { createDeltaFromText } from '../../react_quill_editor';
 
 const useNewThreadForm = (authorName: string, hasTopics: boolean) => {
   const [threadKind, setThreadKind] = useState<ThreadKind>(
@@ -11,7 +12,7 @@ const useNewThreadForm = (authorName: string, hasTopics: boolean) => {
   const [threadTitle, setThreadTitle] = useState('');
   const [threadTopic, setThreadTopic] = useState<Topic>(null);
   const [threadUrl, setThreadUrl] = useState('');
-  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>();
+  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(createDeltaFromText(''));
   const [isSaving, setIsSaving] = useState(false);
 
   const hasOnlyNewLineCharacter = /^\s+$/.test(

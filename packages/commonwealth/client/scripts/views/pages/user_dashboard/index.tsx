@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'pages/user_dashboard/index.scss';
 
@@ -25,7 +25,7 @@ type UserDashboardProps = {
 const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
 
-  const [activePage, setActivePage] = React.useState<DashboardViews>(
+  const [activePage, setActivePage] = useState<DashboardViews>(
     DashboardViews.Global
   );
 
@@ -33,22 +33,24 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
-  if (!type) {
-    navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
-  } else if (type === 'for-you' && !loggedIn) {
-    navigate('/dashboard/global');
-  }
+  useEffect(() => {
+    if (!type) {
+      navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+    } else if (type === 'for-you' && !loggedIn) {
+      navigate('/dashboard/global');
+    }
+  }, []);
 
-  const subpage: DashboardViews =
-    type === 'chain-events'
-      ? DashboardViews.Chain
-      : type === 'global'
-      ? DashboardViews.Global
-      : loggedIn
-      ? DashboardViews.ForYou
-      : DashboardViews.Global;
+  useEffect(() => {
+    const subpage: DashboardViews =
+      type === 'chain-events'
+        ? DashboardViews.Chain
+        : type === 'global'
+        ? DashboardViews.Global
+        : loggedIn
+        ? DashboardViews.ForYou
+        : DashboardViews.Global;
 
-  React.useEffect(() => {
     if (!activePage || activePage !== subpage) {
       setActivePage(subpage);
     }

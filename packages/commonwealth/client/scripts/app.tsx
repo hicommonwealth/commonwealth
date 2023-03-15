@@ -1,20 +1,18 @@
 import React, { StrictMode } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 
 import useInitApp from 'hooks/useInitApp';
 import { ToastContainer } from 'react-toastify';
-import AppNavigator from 'navigation/AppNavigator';
-import 'react-toastify/dist/ReactToastify.css';
+
+import router from 'navigation/router';
 
 const App = () => {
   const { customDomain } = useInitApp();
 
   return (
     <StrictMode>
-      <BrowserRouter>
-        <AppNavigator customDomain={customDomain} />
-        <ToastContainer />
-      </BrowserRouter>
+      <RouterProvider router={router} />
+      <ToastContainer />
     </StrictMode>
   );
 };
