@@ -8,26 +8,24 @@ const PrivacyPage = lazy(() => import('views/pages/privacy'));
 const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const ComponentsPage = lazy(() => import('views/pages/components'));
 
-const getGeneralRoutes = () => (
-  <>
-    <Route
-      index
-      element={withLayout(LandingPage, {
-        scoped: false,
-        hideSidebar: false,
-      })}
-    />
-    <Route path="/terms" element={withLayout(TermsPage, {})} />
-    <Route path="/privacy" element={withLayout(PrivacyPage, {})} />
-    <Route
-      path="/createCommunity"
-      element={withLayout(CreateCommunityPage, {})}
-    />
-    <Route
-      path="/components"
-      element={withLayout(ComponentsPage, { hideSidebar: true })}
-    />
-  </>
-);
+const generalRoutes = () => [
+  <Route
+    index
+    element={withLayout(LandingPage, {
+      scoped: false,
+      hideSidebar: false,
+    })}
+  />,
+  <Route path="/terms" element={withLayout(TermsPage, {})} />,
+  <Route path="/privacy" element={withLayout(PrivacyPage, {})} />,
+  <Route
+    path="/createCommunity"
+    element={withLayout(CreateCommunityPage, {})}
+  />,
+  <Route
+    path="/components"
+    element={withLayout(ComponentsPage, { hideSidebar: true })}
+  />,
+];
 
-export default getGeneralRoutes;
+export default generalRoutes;
