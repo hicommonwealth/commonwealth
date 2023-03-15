@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
 
@@ -13,6 +13,7 @@ import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popove
 import { CWText } from '../../components/component_kit/cw_text';
 import { subscribeToThread } from './helpers';
 import { NotificationSubscription } from 'client/scripts/models';
+import useForceRerender from 'hooks/useForceRerender';
 
 type UserDashboardRowBottomProps = {
   commentCount: number;
@@ -24,7 +25,7 @@ type UserDashboardRowBottomProps = {
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const { threadId, commentCount, commentId, chainId, commenters } = props;
-  const [update, setUpdate] = useState<boolean>(false);
+  const forceRerender = useForceRerender();
 
   const setSubscription = async (
     threadId: string,
@@ -38,7 +39,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
       commentSubscription,
       reactionSubscription
     );
-    setUpdate(!update); // just to trigger a new render
+    forceRerender();
   };
 
   const adjustedId = `discussion_${threadId}`;
