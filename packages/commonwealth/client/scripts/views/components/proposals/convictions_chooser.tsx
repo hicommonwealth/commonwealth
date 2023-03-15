@@ -5,6 +5,7 @@ import {
   convictionToLocktime,
   convictionToWeight,
 } from 'controllers/chain/substrate/democracy_referendum';
+import m from 'mithril';
 import { CWDropdown } from '../component_kit/cw_dropdown';
 
 type ConvictionsChooserProps = { callback: (number) => void };

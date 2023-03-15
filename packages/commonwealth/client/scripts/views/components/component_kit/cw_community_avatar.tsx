@@ -1,6 +1,7 @@
 import React from 'react';
 
 import 'components/component_kit/cw_community_avatar.scss';
+import m from 'mithril';
 
 import type { ChainInfo } from 'models';
 import type { IconSize } from './cw_icons/types';

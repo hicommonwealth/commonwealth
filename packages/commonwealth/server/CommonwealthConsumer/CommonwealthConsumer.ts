@@ -14,10 +14,6 @@ import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 import { processChainEventTypeCUD } from './messageProcessors/chainEventTypeCUDQueue';
 import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
-import v8 from 'v8';
-
-const log = factory.getLogger(formatFilename(__filename));
-
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
     v8.getHeapStatistics().heap_size_limit / 1000000000

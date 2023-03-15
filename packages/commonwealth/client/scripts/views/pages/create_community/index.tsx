@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import $ from 'jquery';
+import m from 'mithril';
 
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';

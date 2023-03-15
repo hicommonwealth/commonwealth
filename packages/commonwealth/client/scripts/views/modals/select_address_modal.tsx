@@ -2,8 +2,10 @@ import React from 'react';
 
 import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/select_address_modal.scss';
+import type { Account, RoleInfo } from 'models';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';

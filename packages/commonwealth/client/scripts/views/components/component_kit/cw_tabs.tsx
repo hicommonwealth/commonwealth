@@ -12,7 +12,7 @@ type TabStyleProps = {
 };
 
 type TabProps = {
-  label: string;
+  label: string | React.ReactNode;
   onClick: () => void;
 } & TabStyleProps;
 

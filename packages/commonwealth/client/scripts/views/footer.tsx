@@ -1,6 +1,7 @@
 import React from 'react';
 
 import 'footer.scss';
+import m from 'mithril';
 
 import { isNotUndefined } from '../helpers/typeGuards';
 import { useCommonNavigate } from 'navigation/helpers';

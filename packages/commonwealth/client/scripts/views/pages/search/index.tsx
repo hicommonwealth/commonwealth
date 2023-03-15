@@ -7,9 +7,15 @@ import 'pages/search/index.scss';
 import type { SearchScope } from 'models/SearchQuery';
 
 import app from 'state';
-import { pluralize } from 'helpers';
+
+import { SearchContentType } from 'types';
+import { SearchScope, SearchSort } from 'models/SearchQuery';
+import type { MinimumProfile as Profile } from 'models';
+
+import { AddressInfo, SearchQuery } from 'models';
 import { SearchSort } from 'models/SearchQuery';
-import { SearchQuery } from 'models';
+
+import { pluralize } from 'helpers';
 import { notifyError } from 'controllers/app/notifications';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
@@ -38,6 +44,17 @@ const SearchPage = () => {
       try {
         const response = await app.search.search(searchQuery);
 
+  return (
+    <div className="community-result-row" onClick={onSelect}>
+      <CommunityLabel {...params} />
+    </div>
+  );
+};
+
+const getMemberResult = (addr) => {
+  const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
+  if (addr.name) profile.initialize(addr.name, null, null, null, null, null);
+
         setSearchResults(
           Object.fromEntries(
             Object.entries(response.results).map(([k, v]) => [k, v.slice(0, 2)])
@@ -50,6 +67,7 @@ const SearchPage = () => {
         );
       }
     };
+
 
     search();
   }, [searchQuery]);
