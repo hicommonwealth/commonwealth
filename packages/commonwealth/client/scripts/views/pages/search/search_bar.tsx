@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import type { NavigateOptions, To } from 'react-router';
-import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
+import React, { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
+import { useDebounce } from 'usehooks-ts';
+import { isEmpty } from 'lodash';
 
 import 'pages/search/search_bar.scss';
 
@@ -20,96 +21,65 @@ import {
 } from './search_bar_components';
 import { useCommonNavigate } from 'navigation/helpers';
 
-const goToSearchPage = (
-  query: SearchQuery,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
-) => {
-  if (!query.searchTerm || !query.searchTerm.toString().trim()) {
-    notifyError('Enter a valid search term');
-    return;
-  }
-
-  if (query.searchTerm.length < 4) {
-    notifyError('Query must be at least 4 characters');
-  }
-
-  app.search.addToHistory(query);
-
-  setRoute(`/search?${query.toUrlParams()}`);
-};
-
 export const SearchBar = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [searchResults, setSearchResults] =
-    useState<Record<string, Array<any>>>();
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>();
-  const [searchTerm, setSearchTerm] = useState<Lowercase<string>>('');
-
   const navigate = useCommonNavigate();
 
-  // const historyList = app.search.getHistory().map((previousQuery) => (
-  //   <div
-  //     className="history-row"
-  //     onClick={() => {
-  //       searchTerm = previousQuery.searchTerm;
-  //       getSearchPreview(previousQuery, this);
-  //     }}
-  //   >
-  //     {previousQuery.searchTerm}
-  //     <CWIconButton
-  //       iconName="close"
-  //       onClick={(e) => {
-  //         e.stopPropagation();
-  //         app.search.removeFromHistory(previousQuery);
-  //       }}
-  //     />
-  //   </div>
-  // ));
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<
+    Record<string, Array<any>>
+  >({});
 
-  const handleGetSearchPreview = () => {
-    setSearchQuery(
-      new SearchQuery(searchTerm, {
-        isSearchPreview: true,
-        chainScope: app.activeChainId(),
-      })
-    );
+  const debouncedValue = useDebounce<string>(searchTerm, 500);
 
-    async () => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  useEffect(() => {
+    const search = async () => {
       try {
-        await app.search.search(searchQuery);
+        const response = await app.search.search(
+          new SearchQuery(searchTerm, {
+            isSearchPreview: true,
+            chainScope: app.activeChainId(),
+          })
+        );
+
+        setSearchResults(
+          Object.fromEntries(
+            Object.entries(response.results).map(([k, v]) => [k, v.slice(0, 2)])
+          )
+        );
       } catch (err) {
         setSearchResults({});
-
         notifyError(
           err.responseJSON?.error || err.responseText || err.toString()
         );
       }
-
-      setSearchResults(
-        Object.fromEntries(
-          Object.entries(app.search.getByQuery(searchQuery).results).map(
-            ([k, v]) => [k, v.slice(0, 2)]
-          )
-        )
-      );
-
-      app.search.addToHistory(searchQuery);
     };
-  };
+
+    if (debouncedValue.length > 0) {
+      search();
+    }
+  }, [debouncedValue]);
 
   const handleGoToSearchPage = () => {
-    if (searchTerm?.length < 3) {
-      return;
-    } else {
-      setSearchQuery(
-        new SearchQuery(searchTerm, {
-          isSearchPreview: false,
-          chainScope: app.activeChainId(),
-        })
-      );
-    }
+    if (searchTerm.length > 3) {
+      const newQuery = new SearchQuery(searchTerm, {
+        isSearchPreview: false,
+        chainScope: app.activeChainId(),
+      });
 
-    goToSearchPage(searchQuery, navigate);
+      if (!newQuery.searchTerm || !newQuery.searchTerm.toString().trim()) {
+        notifyError('Enter a valid search term');
+      }
+
+      // app.search.addToHistory(newQuery);
+      const searchUrl = `/search?${newQuery.toUrlParams()}`;
+      // console.log(searchUrl);
+      navigate(searchUrl);
+    }
   };
 
   return (
@@ -123,26 +93,15 @@ export const SearchBar = () => {
             isClearable: searchTerm?.length > 0,
           })}
           placeholder="Search Common"
-          defaultValue={_DEPRECATED_getSearchParams('q') || searchTerm}
-          // value={searchTerm}
+          value={searchTerm}
           autoComplete="off"
-          onFocus={() => {
-            setShowDropdown(true);
-          }}
+          onFocus={() => setShowDropdown(true)}
           onBlur={() => {
             setTimeout(() => {
               setShowDropdown(false);
             }, 500); // hack to prevent the dropdown closing too quickly on click
           }}
-          onInput={(e) => {
-            const lower =
-              e.currentTarget.value?.toLowerCase() as Lowercase<string>;
-            setSearchTerm(lower);
-
-            if (searchTerm?.length > 3) {
-              handleGetSearchPreview();
-            }
-          }}
+          onInput={handleChange}
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
               handleGoToSearchPage();
@@ -155,18 +114,23 @@ export const SearchBar = () => {
               iconName="close"
               onClick={() => {
                 setSearchTerm('');
+                setSearchResults({});
               }}
             />
           </div>
         )}
-        {searchResults && showDropdown && (
+        {!isEmpty(searchResults) && showDropdown && (
           <div className="search-results-dropdown">
             {Object.values(searchResults).flat(1).length > 0 ? (
               <div className="previews-section">
                 {Object.entries(searchResults).map(([k, v]) => {
                   if (k === SearchScope.Threads && v.length > 0) {
                     return (
-                      <div className="preview-section" key={k}>
+                      <div
+                        className="preview-section"
+                        key={k}
+                        onClick={() => console.log('in')}
+                      >
                         <div className="section-header">
                           <CWText
                             type="caption"
@@ -176,10 +140,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
+                        {v.map((res, i) => (
                           <SearchBarThreadPreviewRow
+                            key={i}
                             searchResult={res}
-                            searchTerm={searchQuery.searchTerm}
+                            searchTerm={searchTerm}
                           />
                         ))}
                       </div>
@@ -196,10 +161,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
+                        {v.map((res, i) => (
                           <SearchBarCommentPreviewRow
+                            key={i}
                             searchResult={res}
-                            searchTerm={searchQuery.searchTerm}
+                            searchTerm={searchTerm}
                           />
                         ))}
                       </div>
@@ -216,8 +182,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
-                          <SearchBarCommunityPreviewRow searchResult={res} />
+                        {v.map((res, i) => (
+                          <SearchBarCommunityPreviewRow
+                            key={i}
+                            searchResult={res}
+                          />
                         ))}
                       </div>
                     );
@@ -233,8 +202,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
-                          <SearchBarMemberPreviewRow searchResult={res} />
+                        {v.map((res, i) => (
+                          <SearchBarMemberPreviewRow
+                            key={i}
+                            searchResult={res}
+                          />
                         ))}
                       </div>
                     );
@@ -248,18 +220,6 @@ export const SearchBar = () => {
                 No Results
               </CWText>
             )}
-            {/* {historyList.length > 0 && (
-                <div className="history-section">
-                  <CWText
-                    type="caption"
-                    fontWeight="medium"
-                    className="search-history-header"
-                  >
-                    Search History
-                  </CWText>
-                  {historyList}
-                </div>
-              )} */}
           </div>
         )}
       </div>

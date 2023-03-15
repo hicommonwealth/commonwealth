@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
 import { capitalize } from 'lodash';
 
 import 'components/new_thread_form.scss';
@@ -21,6 +20,7 @@ import {
   checkNewThreadErrors,
   updateTopicList,
 } from './helpers';
+import { ReactQuillEditor } from '../react_quill_editor';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -154,6 +154,24 @@ export const NewThreadForm = () => {
                 tabIndex={4}
               />
             </div>
+
+              <div>
+                <ReactQuillEditor
+                  contentDelta={threadContentDelta}
+                  setContentDelta={setThreadContentDelta}
+                />
+              </div>
+
+              <div className="buttons-row">
+                <CWButton
+                  label="Create thread"
+                  disabled={isDisabled}
+                  onClick={handleNewThreadCreation}
+                  tabIndex={4}
+                />
+              </div>
+            </>
+
           </div>
         </div>
       </div>
