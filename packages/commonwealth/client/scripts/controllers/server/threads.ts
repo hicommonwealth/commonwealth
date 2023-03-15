@@ -141,6 +141,9 @@ class ThreadsController {
       last_commented_on,
       linked_threads,
       numberOfComments,
+      reactionIds,
+      reactionType,
+      addressesReacted,
     } = thread;
 
     const attachments = Attachments
@@ -245,6 +248,9 @@ class ThreadsController {
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
       linkedThreads,
       numberOfComments,
+      reactionIds,
+      reactionType,
+      addressesReacted,
     });
 
     ThreadsController.Instance.store.add(t);
@@ -651,11 +657,12 @@ class ThreadsController {
   public async loadNextPage(options: {
     topicName?: string;
     stageName?: string;
+    includePinnedThreads?: boolean;
   }) {
     if (this.listingStore.isDepleted(options)) {
       return;
     }
-    const { topicName, stageName } = options;
+    const { topicName, stageName, includePinnedThreads } = options;
     const chain = app.activeChainId();
     const params = {
       chain,
@@ -667,6 +674,8 @@ class ThreadsController {
 
     if (topicId) params['topic_id'] = topicId;
     if (stageName) params['stage'] = stageName;
+    if (includePinnedThreads)
+      params['includePinnedThreads'] = includePinnedThreads;
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
@@ -681,6 +690,8 @@ class ThreadsController {
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
     });
+
+    app.threadReactions.refreshReactionsFromThreads(modeledThreads);
 
     modeledThreads.forEach((thread) => {
       try {
