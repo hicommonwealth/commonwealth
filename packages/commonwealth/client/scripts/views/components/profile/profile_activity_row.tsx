@@ -28,6 +28,15 @@ class ProfileActivityRow extends ClassComponent<ProfileActivityRowAttrs> {
     const comment = activity as CommentWithAssociatedThread;
     const { iconUrl } = app.config.chains.getById(chain);
     const domain = document.location.origin;
+    let decodedTitle;
+
+    try {
+      decodedTitle = decodeURIComponent(title);
+    } catch (err) {
+      console.error(`Could not decode title: "${title}"`);
+      decodedTitle = title;
+    }
+
     const renderTrigger = (onclick) => (
       <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
     );
@@ -82,7 +91,7 @@ class ProfileActivityRow extends ClassComponent<ProfileActivityRowAttrs> {
                   );
                 }}
               >
-                {decodeURIComponent(comment.thread?.title)}
+                {decodedTitle}
               </a>
             )}
           </CWText>

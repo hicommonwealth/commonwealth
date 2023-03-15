@@ -77,15 +77,21 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
       setBackgroundImage(result.profile.background_image);
       setAddresses(
         result.addresses.map(
-          (a) =>
-            new AddressInfo(
-              a.id,
-              a.address,
-              a.chain,
-              a.keytype,
-              a.wallet_id,
-              a.ghost_address
-            )
+          (a) => {
+            try {
+              return new AddressInfo(
+                a.id,
+                a.address,
+                a.chain,
+                a.keytype,
+                a.wallet_id,
+                a.ghost_address
+              )
+            } catch (err) {
+              console.error(`Could not return AddressInfo: "${err}"`);
+              return null;
+            }
+          }
         )
       );
       setIsOwner(result.isOwner);
