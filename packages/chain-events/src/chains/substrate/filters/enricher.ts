@@ -752,129 +752,6 @@ export async function Enrich(
       }
 
       /**
-       * Bounty Events
-       */
-
-      case EventKind.TreasuryBountyProposed: {
-        const [bountyIndex] = event.data as unknown as [BountyIndex] & Codec;
-        const bounties = await api.derive.bounties.bounties();
-        if (!bounties) {
-          throw new Error(`could not fetch bounties`);
-        }
-        const bounty = bounties.find((b) => +b.index === +bountyIndex);
-        if (!bounty) {
-          throw new Error(`could not find bounty`);
-        }
-        return {
-          data: {
-            kind,
-            bountyIndex: +bountyIndex,
-            proposer: bounty.bounty.proposer.toString(),
-            value: bounty.bounty.value.toString(),
-            fee: bounty.bounty.fee.toString(),
-            curatorDeposit: bounty.bounty.curatorDeposit.toString(),
-            bond: bounty.bounty.bond.toString(),
-            description: bounty.description,
-          },
-        };
-      }
-
-      case EventKind.TreasuryBountyAwarded: {
-        const [bountyIndex, beneficiary] = event.data as unknown as [
-          BountyIndex,
-          AccountId
-        ] &
-          Codec;
-
-        const bounties = await api.derive.bounties.bounties();
-        if (!bounties) {
-          throw new Error(`could not fetch bounties`);
-        }
-        const bounty = bounties.find((b) => +b.index === +bountyIndex);
-        if (!bounty) {
-          throw new Error(`could not find bounty`);
-        }
-        if (!bounty.bounty.status.isPendingPayout) {
-          throw new Error(`invalid bounty status`);
-        }
-        return {
-          data: {
-            kind,
-            bountyIndex: +bountyIndex,
-            beneficiary: beneficiary.toString(),
-            curator: bounty.bounty.status.asPendingPayout.curator.toString(),
-            unlockAt: +bounty.bounty.status.asPendingPayout.unlockAt,
-          },
-        };
-      }
-
-      case EventKind.TreasuryBountyRejected: {
-        const [bountyIndex, bond] = event.data as unknown as [
-          BountyIndex,
-          Balance
-        ] &
-          Codec;
-        return {
-          data: {
-            kind,
-            bountyIndex: +bountyIndex,
-            bond: bond.toString(),
-          },
-        };
-      }
-
-      case EventKind.TreasuryBountyClaimed: {
-        const [bountyIndex, payout, beneficiary] = event.data as unknown as [
-          BountyIndex,
-          Balance,
-          AccountId
-        ] &
-          Codec;
-        return {
-          data: {
-            kind,
-            bountyIndex: +bountyIndex,
-            payout: payout.toString(),
-            beneficiary: beneficiary?.toString(),
-          },
-        };
-      }
-
-      case EventKind.TreasuryBountyCanceled: {
-        const [bountyIndex] = event.data as unknown as [BountyIndex] & Codec;
-        return {
-          data: {
-            kind,
-            bountyIndex: +bountyIndex,
-          },
-        };
-      }
-
-      case EventKind.TreasuryBountyBecameActive: {
-        const [bountyIndex] = event.data as unknown as [BountyIndex] & Codec;
-
-        const bounties = await api.derive.bounties.bounties();
-        if (!bounties) {
-          throw new Error(`could not fetch bounties`);
-        }
-        const bounty = bounties.find((b) => +b.index === +bountyIndex);
-        if (!bounty) {
-          throw new Error(`could not find bounty`);
-        }
-        if (!bounty.bounty.status.isActive) {
-          throw new Error(`invalid bounty status`);
-        }
-        return {
-          data: {
-            kind,
-            bountyIndex: +bountyIndex,
-            curator: bounty.bounty.status.asActive.curator.toString(),
-            updateDue: +bounty.bounty.status.asActive.updateDue,
-          },
-        };
-      }
-
-      /**
        * Elections Events
        */
       case EventKind.ElectionNewTerm: {
@@ -921,164 +798,6 @@ export async function Enrich(
           data: {
             kind,
             who: who.toString(),
-          },
-        };
-      }
-
-      /**
-       * Collective Events
-       */
-      case EventKind.CollectiveProposed: {
-        const [proposer, index, hash, threshold] = event.data as unknown as [
-          AccountId,
-          ProposalIndex,
-          Hash,
-          u32
-        ] &
-          Codec;
-        const proposalOpt = await api.query[event.section].proposalOf<
-          Option<Proposal>
-        >(hash);
-        if (!proposalOpt.isSome) {
-          throw new Error(`could not fetch method for collective proposal`);
-        }
-        return {
-          excludeAddresses: [proposer.toString()],
-          data: {
-            kind,
-            collectiveName:
-              event.section === 'council' ||
-              event.section === 'technicalCommittee'
-                ? event.section
-                : undefined,
-            proposer: proposer.toString(),
-            proposalIndex: +index,
-            proposalHash: hash.toString(),
-            threshold: +threshold,
-            call: {
-              method: proposalOpt.unwrap().method,
-              section: proposalOpt.unwrap().section,
-              args: proposalOpt.unwrap().args.map((c) => c.toString()),
-            },
-          },
-        };
-      }
-      case EventKind.CollectiveVoted: {
-        const [voter, hash, vote] = event.data as unknown as [
-          AccountId,
-          Hash,
-          bool
-        ] &
-          Codec;
-        return {
-          excludeAddresses: [voter.toString()],
-          data: {
-            kind,
-            collectiveName:
-              event.section === 'council' ||
-              event.section === 'technicalCommittee'
-                ? event.section
-                : undefined,
-            proposalHash: hash.toString(),
-            voter: voter.toString(),
-            vote: vote.isTrue,
-          },
-        };
-      }
-      case EventKind.CollectiveApproved:
-      case EventKind.CollectiveDisapproved: {
-        const [hash] = event.data as unknown as [Hash] & Codec;
-        return {
-          data: {
-            kind,
-            collectiveName:
-              event.section === 'council' ||
-              event.section === 'technicalCommittee'
-                ? event.section
-                : undefined,
-            proposalHash: hash.toString(),
-          },
-        };
-      }
-      case EventKind.CollectiveExecuted:
-      case EventKind.CollectiveMemberExecuted: {
-        const [hash, executionOk] = event.data as unknown as [Hash, bool] &
-          Codec;
-        return {
-          data: {
-            kind,
-            collectiveName:
-              event.section === 'council' ||
-              event.section === 'technicalCommittee'
-                ? event.section
-                : undefined,
-            proposalHash: hash.toString(),
-            executionOk: executionOk.isTrue,
-          },
-        };
-      }
-
-      /**
-       * Signaling Events
-       */
-      case EventKind.SignalingNewProposal: {
-        const [proposer, hash] = event.data as unknown as [AccountId, Hash] &
-          Codec;
-        const proposalInfoOpt = await api.query.signaling.proposalOf<
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          Option<any>
-        >(hash);
-        if (!proposalInfoOpt.isSome) {
-          throw new Error(`unable to fetch signaling proposal info`);
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const voteInfoOpt = await api.query.voting.voteRecords<Option<any>>(
-          proposalInfoOpt.unwrap().vote_id
-        );
-        if (!voteInfoOpt.isSome) {
-          throw new Error(`unable to fetch signaling proposal voting info`);
-        }
-        return {
-          excludeAddresses: [proposer.toString()],
-          data: {
-            kind,
-            proposer: proposer.toString(),
-            proposalHash: hash.toString(),
-            voteId: proposalInfoOpt.unwrap().vote_id.toString(),
-            title: proposalInfoOpt.unwrap().title.toString(),
-            description: proposalInfoOpt.unwrap().contents.toString(),
-            tallyType: voteInfoOpt.unwrap().data.tally_type.toString(),
-            voteType: voteInfoOpt.unwrap().data.vote_type.toString(),
-            choices: voteInfoOpt
-              .unwrap()
-              .outcomes.map((outcome) => outcome.toString()),
-          },
-        };
-      }
-      case EventKind.SignalingCommitStarted:
-      case EventKind.SignalingVotingStarted: {
-        const [hash, voteId, endBlock] = event.data as unknown as [
-          Hash,
-          u64,
-          BlockNumber
-        ] &
-          Codec;
-        return {
-          data: {
-            kind,
-            proposalHash: hash.toString(),
-            voteId: voteId.toString(),
-            endBlock: +endBlock,
-          },
-        };
-      }
-      case EventKind.SignalingVotingCompleted: {
-        const [hash, voteId] = event.data as unknown as [Hash, u64] & Codec;
-        return {
-          data: {
-            kind,
-            proposalHash: hash.toString(),
-            voteId: voteId.toString(),
           },
         };
       }
@@ -1159,39 +878,6 @@ export async function Enrich(
           },
         };
       }
-      case EventKind.JudgementGiven: {
-        const [who, registrarId] = event.data as unknown as [AccountId, u32] &
-          Codec;
-
-        // convert registrar from id to address
-        const registrars = await api.query.identity.registrars();
-        const registrarOpt = registrars[+registrarId];
-        if (!registrarOpt || !registrarOpt.isSome) {
-          throw new Error(`unable to retrieve registrar info`);
-        }
-        const registrar = registrarOpt.unwrap().account;
-
-        // query the actual judgement provided
-        const registrationOpt = await api.query.identity.identityOf(who);
-        if (!registrationOpt.isSome) {
-          throw new Error(`unable to retrieve identity info`);
-        }
-        const judgementTuple = registrationOpt
-          .unwrap()
-          .judgements.find(([id]) => +id === +registrarId);
-        if (!judgementTuple) {
-          throw new Error(`unable to find judgement`);
-        }
-        const judgement = parseJudgement(judgementTuple[1]);
-        return {
-          data: {
-            kind,
-            who: who.toString(),
-            registrar: registrar.toString(),
-            judgement,
-          },
-        };
-      }
       case EventKind.IdentityCleared: {
         const [who] = event.data as unknown as [AccountId] & Codec;
         return {
@@ -1258,7 +944,18 @@ export async function Enrich(
           },
         };
       }
-
+      case EventKind.TipVoted: {
+        const voter = extrinsic.signer.toString();
+        const [hash, value] = extrinsic.args as [Hash, Compact<BalanceOf>];
+        return {
+          data: {
+            kind,
+            proposalHash: hash.toString(),
+            who: voter,
+            value: value.toString(),
+          },
+        };
+      }
       case EventKind.ElectionCandidacySubmitted: {
         const candidate = extrinsic.signer.toString();
         const section = api.query.electionsPhragmen
@@ -1274,29 +971,6 @@ export async function Enrich(
           },
         };
       }
-      case EventKind.TipVoted: {
-        const voter = extrinsic.signer.toString();
-        const [hash, value] = extrinsic.args as [Hash, Compact<BalanceOf>];
-        return {
-          data: {
-            kind,
-            proposalHash: hash.toString(),
-            who: voter,
-            value: value.toString(),
-          },
-        };
-      }
-      case EventKind.TreasuryBountyExtended: {
-        const [idx, remark] = extrinsic.args as [BountyIndex, Bytes];
-        return {
-          data: {
-            kind,
-            bountyIndex: +idx,
-            remark: hexToString(remark.toString()),
-          },
-        };
-      }
-
       default: {
         throw new Error(`unknown event type: ${kind}`);
       }

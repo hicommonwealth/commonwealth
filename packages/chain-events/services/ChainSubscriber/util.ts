@@ -219,7 +219,6 @@ async function setupNewListeners(
 ) {
   for (const chain of newChains) {
     let network: SupportedNetwork;
-
     try {
       network = getChainEventNetwork(chain.network, chain.base);
     } catch (e) {
@@ -229,7 +228,6 @@ async function setupNewListeners(
       );
       continue;
     }
-
     try {
       log.info(`Starting listener for: ${chain.id}`);
       listenerInstances[chain.id] = await createListener(chain.id, network, {
@@ -261,6 +259,20 @@ async function setupNewListeners(
         SubstrateTypes.EventKind.TreasuryRewardMinting,
         SubstrateTypes.EventKind.TreasuryRewardMintingV2,
         SubstrateTypes.EventKind.HeartbeatReceived,
+        'treasury-bounty-proposed',
+        'treasury-bounty-awarded',
+        'treasury-bounty-rejected',
+        'treasury-bounty-became-active',
+        'treasury-bounty-claimed',
+        'treasury-bounty-canceled',
+        'treasury-bounty-extended',
+        'collective-proposed',
+        'collective-voted',
+        'collective-approved',
+        'collective-disapproved',
+        'collective-executed',
+        'collective-member-executed',
+        'identity-judgement-given',
       ];
 
     // add the rabbitmq handler and the events it should ignore

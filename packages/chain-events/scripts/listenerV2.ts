@@ -70,12 +70,6 @@ const shortcuts = {
     url: networkUrls.dydx,
     address: contracts.dydx,
   },
-  moloch: {
-    chain: 'moloch',
-    network: SupportedNetwork.Moloch,
-    url: networkUrls.moloch,
-    address: contracts.moloch,
-  },
   commonwealth: {
     chain: 'commonwealth',
     network: SupportedNetwork.Commonwealth,

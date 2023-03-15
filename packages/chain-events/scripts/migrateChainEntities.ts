@@ -119,10 +119,6 @@ async function migrateChainEntity(
     } else if (chainInstance.base === ChainBase.CosmosSDK) {
       const api = await CosmosEvents.createApi(node.private_url || node.url);
       fetcher = new CosmosEvents.StorageFetcher(api);
-    } else if (chainInstance.network === ChainNetwork.Moloch) {
-      // TODO: determine moloch API version
-      // TODO: construct dater
-      throw new Error('Moloch migration not yet implemented.');
     } else if (chainInstance.network === ChainNetwork.Compound) {
       const contracts = await fetchData(
         `${CW_SERVER_URL}/api/getChainContracts`,
