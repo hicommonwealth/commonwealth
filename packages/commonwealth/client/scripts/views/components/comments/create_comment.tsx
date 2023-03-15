@@ -7,6 +7,7 @@ import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { weiToTokens, getDecimals } from 'helpers';
 import type { AnyProposal } from 'models';
+import type { DeltaStatic } from 'quill';
 import { Thread } from 'models';
 
 import app from 'state';
@@ -18,8 +19,11 @@ import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
 import { Modal } from '../component_kit/cw_modal';
-import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../react_quill_editor';
-import { DeltaStatic } from 'quill';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  ReactQuillEditor,
+} from '../react_quill_editor';
 
 type CreateCommmentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -30,7 +34,9 @@ type CreateCommmentProps = {
 
 export const CreateComment = (props: CreateCommmentProps) => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
   const [sendingComment, setSendingComment] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
@@ -48,7 +54,6 @@ export const CreateComment = (props: CreateCommmentProps) => {
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
 
   const handleSubmitComment = async () => {
-
     setErrorMsg(null);
     setSendingComment(true);
 
@@ -99,7 +104,8 @@ export const CreateComment = (props: CreateCommmentProps) => {
     userBalance?.gtn(0) &&
     userBalance.lt(tokenPostingThreshold);
 
-  const disabled = editorValue.length === 0 || sendingComment || userFailsThreshold;
+  const disabled =
+    editorValue.length === 0 || sendingComment || userFailsThreshold;
 
   const decimals = getDecimals(app.chain);
 
@@ -152,7 +158,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
             )}
           </div>
           <ReactQuillEditor
-            className='editor'
+            className="editor"
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
           />
@@ -169,13 +175,11 @@ export const CreateComment = (props: CreateCommmentProps) => {
               )}
             </CWText>
           )}
-          <div
-            className="form-bottom"
-          >
+          <div className="form-bottom">
             <div className="form-buttons">
               <CWButton
                 disabled={
-                    !handleIsReplying ? editorValue.length > 0 : undefined
+                  !handleIsReplying ? editorValue.length > 0 : undefined
                 }
                 buttonType="secondary-blue"
                 onClick={(e) => {
