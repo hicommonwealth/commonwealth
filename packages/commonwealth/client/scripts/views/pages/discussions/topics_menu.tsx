@@ -6,7 +6,6 @@ import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import 'pages/discussions/stages_menu.scss';
 
 import app from 'state';
-import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import {
   Popover,
@@ -15,33 +14,26 @@ import {
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { ThreadsFilterMenuItem } from './stages_menu';
-import { Modal } from '../../components/component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
-
-type Topic = {
-  defaultOffchainTemplate?: string;
-  description: string;
-  featured_order?: number;
-  featuredInNewPost?: boolean;
-  featuredInSidebar?: boolean;
-  id: number;
-  name: string;
-  telegram?: string;
-};
+import type { Topic } from 'models';
 
 type TopicsMenuProps = {
   featuredTopics: Array<Topic>;
   otherTopics: Array<Topic>;
   selectedTopic: Topic;
   topic: string;
+  onEditClick: (topic: Topic) => void;
 };
 
-export const TopicsMenu = (props: TopicsMenuProps) => {
-  const { featuredTopics, otherTopics, selectedTopic, topic } = props;
-
+export const TopicsMenu = ({
+  featuredTopics,
+  otherTopics,
+  selectedTopic,
+  topic,
+  onEditClick,
+}: TopicsMenuProps) => {
   const navigate = useCommonNavigate();
   const popoverProps = usePopover();
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
@@ -66,73 +58,43 @@ export const TopicsMenu = (props: TopicsMenuProps) => {
                 }}
               />
               <CWDivider />
-              {featuredTopics
-                .concat(otherTopics)
-                .map(
-                  (
-                    {
-                      id,
-                      name,
-                      description,
-                      featuredInSidebar,
-                      featuredInNewPost,
-                      defaultOffchainTemplate,
-                    },
-                    i
-                  ) => {
-                    const active =
-                      _DEPRECATED_getRoute() ===
-                        `/${app.activeChainId()}/discussions/${encodeURI(
-                          name.toString().trim()
-                        )}` ||
-                      (topic && topic === name);
+              {featuredTopics.concat(otherTopics).map((t) => {
+                const active =
+                  _DEPRECATED_getRoute() ===
+                    `/${app.activeChainId()}/discussions/${encodeURI(
+                      t.name.toString().trim()
+                    )}` ||
+                  (topic && topic === t.name);
 
-                    return (
-                      <ThreadsFilterMenuItem
-                        key={`${i}`}
-                        label={name}
-                        isSelected={active}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          navigate(`/discussions/${name}`);
-                        }}
-                        iconRight={
-                          app.roles?.isAdminOfEntity({
-                            chain: app.activeChainId(),
-                          }) && (
-                            <React.Fragment>
-                              <CWIconButton
-                                iconName="write"
-                                iconSize="small"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setIsModalOpen(true);
-                                }}
-                              />
-                              <Modal
-                                content={
-                                  <EditTopicModal
-                                    id={id}
-                                    name={name}
-                                    description={description}
-                                    featuredInSidebar={featuredInSidebar}
-                                    featuredInNewPost={featuredInNewPost}
-                                    defaultOffchainTemplate={
-                                      defaultOffchainTemplate
-                                    }
-                                    onModalClose={() => setIsModalOpen(false)}
-                                  />
-                                }
-                                onClose={() => setIsModalOpen(false)}
-                                open={isModalOpen}
-                              />
-                            </React.Fragment>
-                          )
-                        }
-                      />
-                    );
-                  }
-                )}
+                return (
+                  <ThreadsFilterMenuItem
+                    key={t.id}
+                    label={t.name}
+                    isSelected={active}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(`/discussions/${t.name}`);
+                    }}
+                    iconRight={
+                      app.roles?.isAdminOfEntity({
+                        chain: app.activeChainId(),
+                      }) && (
+                        <>
+                          <CWIconButton
+                            iconName="write"
+                            iconSize="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              popoverProps.setAnchorEl(null);
+                              onEditClick(t);
+                            }}
+                          />
+                        </>
+                      )
+                    }
+                  />
+                );
+              })}
             </div>
           }
           {...popoverProps}
