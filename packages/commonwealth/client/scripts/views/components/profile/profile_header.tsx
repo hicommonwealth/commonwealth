@@ -18,11 +18,6 @@ type ProfileHeaderProps = {
 
 const ProfileHeader = (props: ProfileHeaderProps) => {
   const navigate = useNavigate();
-  const [defaultAvatar, setDefaultAvatar] = React.useState<string>();
-
-  React.useEffect(() => {
-    setDefaultAvatar(jdenticon.toSvg(props.profile.id, 90));
-  }, []);
 
   const { profile, isOwner } = props;
 
@@ -48,7 +43,9 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
           <img src={profile.avatarUrl} />
         ) : (
           <img
-            src={`data:image/svg+xml;utf8,${encodeURIComponent(defaultAvatar)}`}
+            src={`data:image/svg+xml;utf8,${encodeURIComponent(
+              jdenticon.toSvg(profile.id, 90)
+            )}`}
           />
         )}
       </div>

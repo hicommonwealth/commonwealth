@@ -24,7 +24,7 @@ const SocialAccount = (props: SocialAccountProps) => {
       <CWIcon iconName={iconName} className="social-icon" />
     </a>
   );
-}
+};
 
 export const SocialAccounts = (props: SocialAccountsProps) => {
   const { profile } = props;
@@ -51,4 +51,4 @@ export const SocialAccounts = (props: SocialAccountsProps) => {
       })}
     </div>
   );
-}
+};

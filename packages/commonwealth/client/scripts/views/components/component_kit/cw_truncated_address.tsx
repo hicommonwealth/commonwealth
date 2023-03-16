@@ -26,4 +26,4 @@ export const CWTruncatedAddress = (props: TruncatedAddressProps) => {
       {formatAddressShort(address)}
     </div>
   );
-}
+};

@@ -17,7 +17,9 @@ type SocialsProps = {
 };
 
 export const CWSocials = (props: SocialsProps) => {
-  const [socials, setSocials] = useState([]);
+  const [socials, setSocials] = useState(
+    props.socials ? [...props.socials] : []
+  );
 
   const addInputRow = () => {
     setSocials([...socials, '']);
@@ -26,12 +28,6 @@ export const CWSocials = (props: SocialsProps) => {
   const deleteInputRow = (index: number) => {
     setSocials(socials.filter((_, i) => i !== index));
   };
-
-  useEffect(() => {
-    if (props.socials) {
-      setSocials([...props.socials]);
-    }
-  }, []);
 
   useEffect(() => {
     const { handleInputChange } = props;
@@ -104,4 +100,4 @@ export const CWSocials = (props: SocialsProps) => {
       </div>
     </div>
   );
-}
+};

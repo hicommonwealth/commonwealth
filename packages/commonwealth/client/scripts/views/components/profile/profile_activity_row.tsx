@@ -143,6 +143,6 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
       </div>
     </div>
   );
-}
+};
 
 export default withRouter(ProfileActivityRow);

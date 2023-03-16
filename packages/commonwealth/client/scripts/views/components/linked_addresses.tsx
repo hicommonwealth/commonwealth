@@ -49,7 +49,7 @@ const Address = (props: AddressProps) => {
       />
     </div>
   );
-}
+};
 
 export const LinkedAddresses = (props: LinkedAddressesProps) => {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
@@ -66,10 +66,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
             profile={profile}
             addressInfo={addr}
             refreshProfiles={refreshProfiles}
-            toggleRemoveModal={(
-              val: boolean,
-              address: AddressInfo,
-            ) => {
+            toggleRemoveModal={(val: boolean, address: AddressInfo) => {
               setIsRemoveModalOpen(val);
               setCurrentAddress(address);
             }}
@@ -89,9 +86,9 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
             }}
           />
         }
-        onClose={() => (setCurrentAddress(null))}
+        onClose={() => setCurrentAddress(null)}
         open={isRemoveModalOpen}
       />
     </div>
   );
-}
+};

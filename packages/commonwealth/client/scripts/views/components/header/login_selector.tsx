@@ -68,13 +68,23 @@ export const LoginSelectorMenuLeft = ({
   const [profileId, setProfileId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
+  const changeSelectedAddress = () => {
+    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
+    setSelectedAddress(activeAccount.address);
+    forceRerender();
+  };
+
   useEffect(() => {
     // force rerender when new address is connected
     app.user.isFetched.on('redraw', () => {
-      const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
-      setSelectedAddress(activeAccount.address);
-      forceRerender();
+      changeSelectedAddress();
     });
+
+    return () => {
+      app.user.isFetched.off('redraw', () => {
+        changeSelectedAddress();
+      });
+    };
   }, []);
 
   useEffect(() => {

@@ -113,17 +113,11 @@ export const CreateComment = (props: CreateCommmentProps) => {
           <CWText type="caption">
             {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
           </CWText>
-          <CWText
-            type="caption"
-            fontWeight="medium"
-            className="user-link-text"
-          >
+          <CWText type="caption" fontWeight="medium" className="user-link-text">
             <User user={author} hideAvatar linkify />
           </CWText>
         </div>
-        {errorMsg && (
-          <CWValidationText message={errorMsg} status="failure" />
-        )}
+        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
       <ReactQuillEditor
         className="editor"
@@ -146,9 +140,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
       <div className="form-bottom">
         <div className="form-buttons">
           <CWButton
-            disabled={
-              !handleIsReplying ? editorValue.length > 0 : undefined
-            }
+            disabled={!handleIsReplying ? editorValue.length > 0 : undefined}
             buttonType="secondary-blue"
             onClick={(e) => {
               e.preventDefault();

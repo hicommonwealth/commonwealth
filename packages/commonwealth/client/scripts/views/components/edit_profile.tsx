@@ -2,12 +2,11 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import $ from 'jquery';
 import _ from 'underscore';
+import type { DeltaStatic } from 'quill';
 
 import 'components/edit_profile.scss';
 
 import app from 'state';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import type { QuillEditor } from 'views/components/quill/quill_editor';
 import { notifyError } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
@@ -28,6 +27,11 @@ import type { ImageBehavior } from '../components/component_kit/cw_cover_image_u
 import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../pages/404';
 import { LinkedAddresses } from './linked_addresses';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  ReactQuillEditor,
+} from './react_quill_editor';
 
 enum EditProfileError {
   None,
@@ -54,7 +58,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   const [profile, setProfile] = useState<Profile>();
   const [name, setName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState();
-  const [bio, setBio] = useState();
+  const [bio, setBio] = React.useState<DeltaStatic>(createDeltaFromText(''));
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [isOwner, setIsOwner] = useState();
   const [backgroundImage, setBackgroundImage] = useState<Image>();
@@ -74,6 +78,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
       setEmail(result.profile.email || '');
       setSocials(result.profile.socials);
       setAvatarUrl(result.profile.avatar_url);
+      setBio(result.profile.bio);
       setBackgroundImage(result.profile.background_image);
       setAddresses(
         result.addresses.map((a) => {
@@ -136,11 +141,11 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
     if (!_.isEqual(name, profile?.name) && name !== '')
       profileUpdate.name = name;
 
-    if (!_.isEqual(email, profile?.email) && email !== '')
-      profileUpdate.email = email;
+    if (!_.isEqual(email, profile?.email)) profileUpdate.email = email;
 
-    // if (!_.isEqual(this.bio.textContentsAsString, this.profile?.bio))
-    //   this.profileUpdate.bio = this.bio.textContentsAsString;
+    if (!_.isEqual(getTextFromDelta(bio), profile?.bio)) {
+      profileUpdate.bio = getTextFromDelta(bio) || '';
+    }
 
     if (!_.isEqual(avatarUrl, profile?.avatarUrl))
       profileUpdate.avatarUrl = avatarUrl;
@@ -335,13 +340,10 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
             </div>
             <div className="bio-section">
               <CWText type="caption">Bio</CWText>
-              <QuillEditorComponent
-                contentsDoc={profile?.bio}
-                oncreateBind={(state: QuillEditor) => {
-                  setBio(state);
-                }}
-                editorNamespace={`${document.location.pathname}-bio`}
-                imageUploader
+              <ReactQuillEditor
+                className="editor"
+                contentDelta={bio}
+                setContentDelta={setBio}
               />
             </div>
             <CWDivider />

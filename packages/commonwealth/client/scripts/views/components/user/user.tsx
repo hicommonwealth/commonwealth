@@ -17,6 +17,7 @@ import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
+import useForceRerender from 'hooks/useForceRerender';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -51,15 +52,19 @@ export const User = (props: UserAttrs) => {
     showRole,
   } = props;
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
 
   useEffect(() => {
     app.newProfiles.isFetched.on('redraw', () => {
-      updateState({});
+      forceRerender();
+    });
+
+    app.newProfiles.isFetched.off('redraw', () => {
+      forceRerender();
     });
   }, []);
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [, updateState] = React.useState({});
 
   const popoverProps = usePopover();
 

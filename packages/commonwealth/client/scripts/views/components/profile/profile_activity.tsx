@@ -27,7 +27,9 @@ type ProfileActivityProps = {
 };
 
 const ProfileActivity = (props: ProfileActivityProps) => {
-  const [selectedActivity, setSelectedActivity] = useState(ProfileActivityType.Comments);
+  const [selectedActivity, setSelectedActivity] = useState(
+    ProfileActivityType.Comments
+  );
   const { comments, threads } = props;
 
   return (
@@ -39,9 +41,7 @@ const ProfileActivity = (props: ProfileActivityProps) => {
             onClick={() => {
               setSelectedActivity(ProfileActivityType.Comments);
             }}
-            isSelected={
-              selectedActivity === ProfileActivityType.Comments
-            }
+            isSelected={selectedActivity === ProfileActivityType.Comments}
           />
           <CWTab
             label={
@@ -82,6 +82,6 @@ const ProfileActivity = (props: ProfileActivityProps) => {
       </div>
     </div>
   );
-}
+};
 
 export default ProfileActivity;
