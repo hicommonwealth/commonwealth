@@ -14,10 +14,10 @@ module.exports = {
       );
       await queryInterface.sequelize.query(
         `
-          UPDATE "ChainEvents" CE
-          SET network = (SELECT CET.event_network
-                       FROM "ChainEventTypes" CET
-                       WHERE CE.chain_event_type_id = CET.id);
+            UPDATE "ChainEvents" CE
+            SET network = CET.event_network
+            FROM "ChainEventTypes" CET
+            WHERE CE.chain_event_type_id = CET.id;
     `,
         { transaction: t }
       );
