@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import $ from 'jquery';
+import axios from 'axios';
 import _ from 'underscore';
 import type { DeltaStatic } from 'quill';
 
@@ -63,25 +63,28 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   const [isOwner, setIsOwner] = useState();
   const [backgroundImage, setBackgroundImage] = useState<Image>();
   const [displayNameValid, setDisplayNameValid] = useState(true);
+  const [account, setAccount] = useState<Account>();
   const backgroundImageRef = useRef<Image>();
   backgroundImageRef.current = backgroundImage;
 
   const getProfile = async (query: string) => {
     try {
-      const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
-        profileId: query,
-        jwt: app.user.jwt,
+      const response = await axios.get(`${app.serverUrl()}/profile/v2`, {
+        params: {
+          profileId: query,
+          jwt: app.user.jwt,
+        }
       });
 
-      setProfile(new Profile(result.profile));
-      setName(result.profile.profile_name || '');
-      setEmail(result.profile.email || '');
-      setSocials(result.profile.socials);
-      setAvatarUrl(result.profile.avatar_url);
-      setBio(result.profile.bio);
-      setBackgroundImage(result.profile.background_image);
+      setProfile(new Profile(response.data.result.profile));
+      setName(response.data.result.profile.profile_name || '');
+      setEmail(response.data.result.profile.email || '');
+      setSocials(response.data.result.profile.socials);
+      setAvatarUrl(response.data.result.profile.avatar_url);
+      setBio(response.data.result.profile.bio);
+      setBackgroundImage(response.data.result.profile.background_image);
       setAddresses(
-        result.addresses.map((a) => {
+        response.data.result.addresses.map((a) => {
           try {
             return new AddressInfo(
               a.id,
@@ -97,7 +100,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
           }
         })
       );
-      setIsOwner(result.isOwner);
+      setIsOwner(response.data.result.isOwner);
     } catch (err) {
       if (
         err.status === 500 &&
@@ -111,13 +114,13 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
   const updateProfile = async (profileUpdate: any) => {
     try {
-      const { result } = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
+      const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
         profileId: profile.id,
         ...profileUpdate,
         jwt: app.user.jwt,
       });
 
-      if (result?.status === 'Success') {
+      if (response.data.status === 'Success') {
         setTimeout(() => {
           // refresh profiles in store
           addresses.forEach((a) => {
@@ -153,9 +156,9 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
     if (!_.isEqual(socials, profile?.socials))
       profileUpdate.socials = JSON.stringify(socials);
 
-    if (!_.isEqual(backgroundImageRef.current, profile?.backgroundImage))
+    if (!_.isEqual(backgroundImageRef, profile?.backgroundImage))
       profileUpdate.backgroundImage = JSON.stringify(
-        backgroundImageRef.current
+        backgroundImageRef
       );
 
     if (Object.keys(profileUpdate)?.length > 0) {
@@ -180,7 +183,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
     checkForUpdates();
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!app.isLoggedIn()) {
       navigate(`/profile/id/${props.profileId}`);
     }
@@ -188,7 +191,36 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
     if (props.profileId) {
       getProfile(props.profileId);
     }
-  }, []);
+  }, [navigate, props.profileId]);
+
+  useEffect(() => {
+    // need to create an account to pass to AvatarUpload to see last upload
+    // not the best solution because address is not always available
+    // should refactor AvatarUpload to make it work with new profiles
+    if (addresses?.length > 0) {
+      const oldProfile = new MinimumProfile(
+        addresses[0].chain.name,
+        addresses[0].address
+      );
+
+      oldProfile.initialize(
+        name,
+        addresses[0].address,
+        avatarUrl,
+        profile.id,
+        addresses[0].chain.name,
+        null
+      );
+
+      setAccount(new Account({
+        chain: addresses[0].chain,
+        address: addresses[0].address,
+        profile: oldProfile,
+      }));
+    } else {
+      setAccount(null);
+    }
+  }, [addresses, avatarUrl, name, profile]);
 
   if (loading) {
     return (
@@ -207,34 +239,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   if (error === EditProfileError.None) {
     if (!isOwner) {
       navigate(`/profile/id/${props.profileId}`);
-    }
-
-    // need to create an account to pass to AvatarUpload to see last upload
-    // not the best solution because address is not always available
-    // should refactor AvatarUpload to make it work with new profiles
-    let account: Account | null;
-    if (addresses?.length > 0) {
-      const oldProfile = new MinimumProfile(
-        addresses[0].chain.name,
-        addresses[0].address
-      );
-
-      oldProfile.initialize(
-        name,
-        addresses[0].address,
-        avatarUrl,
-        profile.id,
-        addresses[0].chain.name,
-        null
-      );
-
-      account = new Account({
-        chain: addresses[0].chain,
-        address: addresses[0].address,
-        profile: oldProfile,
-      });
-    } else {
-      account = null;
+      return;
     }
 
     return (
