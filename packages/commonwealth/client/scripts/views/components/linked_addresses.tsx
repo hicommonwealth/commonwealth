@@ -1,7 +1,4 @@
-import React from 'react';
-
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
+import React, { useState } from 'react';
 
 import 'components/linked_addresses.scss';
 
@@ -13,96 +10,88 @@ import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
 import { CWAddressTooltip } from './component_kit/cw_popover/cw_address_tooltip';
 
-type AddressAttrs = {
+type AddressProps = {
   profile: Profile;
   addressInfo: AddressInfo;
   refreshProfiles: (address: string) => void;
   toggleRemoveModal: (val: boolean, address: AddressInfo) => void;
 };
 
-type LinkedAddressesAttrs = {
+type LinkedAddressesProps = {
   profile: Profile;
   addresses: AddressInfo[];
   refreshProfiles: (address: string) => void;
 };
 
-class Address extends ClassComponent<AddressAttrs> {
-  view(vnode: ResultNode<AddressAttrs>) {
-    const { addressInfo, toggleRemoveModal } = vnode.attrs;
-    const { address, chain } = addressInfo;
+const Address = (props: AddressProps) => {
+  const { addressInfo, toggleRemoveModal } = props;
+  const { address, chain } = addressInfo;
 
-    return (
-      <div className="AddressContainer">
-        <CWAddressTooltip
-          address={address}
-          renderTrigger={() => (
-            <CWTruncatedAddress address={address} communityInfo={chain} />
-          )}
-        />
-        <PopoverMenu
-          menuItems={[
-            {
-              label: 'Remove',
-              iconLeft: 'trash',
-              onClick: () => toggleRemoveModal(true, addressInfo),
-            },
-          ]}
-          renderTrigger={(onclick) => (
-            <CWIconButton iconName="dotsVertical" onClick={onclick} />
-          )}
-        />
-      </div>
-    );
-  }
+  return (
+    <div className="AddressContainer">
+      <CWAddressTooltip
+        address={address}
+        renderTrigger={() => (
+          <CWTruncatedAddress address={address} communityInfo={chain} />
+        )}
+      />
+      <PopoverMenu
+        menuItems={[
+          {
+            label: 'Remove',
+            iconLeft: 'trash',
+            onClick: () => toggleRemoveModal(true, addressInfo),
+          },
+        ]}
+        renderTrigger={(onclick) => (
+          <CWIconButton iconName="dotsVertical" onClick={onclick} />
+        )}
+      />
+    </div>
+  );
 }
 
-export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
-  private isRemoveModalOpen: boolean;
-  private currentAddress: AddressInfo;
+export const LinkedAddresses = (props: LinkedAddressesProps) => {
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState<AddressInfo>();
 
-  oninit() {
-    this.isRemoveModalOpen = false;
-  }
+  const { profile, addresses, refreshProfiles } = props;
 
-  view(vnode: ResultNode<LinkedAddressesAttrs>) {
-    const { profile, addresses, refreshProfiles } = vnode.attrs;
-
-    return (
-      <div className="LinkedAddresses">
-        {addresses.map((address, i) => {
-          return (
-            <Address
-              key={i}
-              profile={profile}
-              addressInfo={address}
-              refreshProfiles={refreshProfiles}
-              toggleRemoveModal={(
-                val: boolean,
-                currentAddress: AddressInfo
-              ) => {
-                this.isRemoveModalOpen = val;
-                this.currentAddress = currentAddress;
-              }}
-            />
-          );
-        })}
-        <Modal
-          content={
-            <DeleteAddressModal
-              profile={profile}
-              addresses={addresses}
-              address={this.currentAddress?.address}
-              chain={this.currentAddress?.chain.id}
-              closeModal={() => {
-                this.isRemoveModalOpen = false;
-                refreshProfiles(this.currentAddress.address);
-              }}
-            />
-          }
-          onClose={() => (this.currentAddress = null)}
-          open={this.isRemoveModalOpen}
-        />
-      </div>
-    );
-  }
+  return (
+    <div className="LinkedAddresses">
+      {addresses.map((addr, i) => {
+        return (
+          <Address
+            key={i}
+            profile={profile}
+            addressInfo={addr}
+            refreshProfiles={refreshProfiles}
+            toggleRemoveModal={(
+              val: boolean,
+              address: AddressInfo,
+            ) => {
+              setIsRemoveModalOpen(val);
+              setCurrentAddress(address);
+            }}
+          />
+        );
+      })}
+      <Modal
+        content={
+          <DeleteAddressModal
+            profile={profile}
+            addresses={addresses}
+            address={currentAddress?.address}
+            chain={currentAddress?.chain.id}
+            closeModal={() => {
+              setIsRemoveModalOpen(false);
+              refreshProfiles(currentAddress.address);
+            }}
+          />
+        }
+        onClose={() => (setCurrentAddress(null))}
+        open={isRemoveModalOpen}
+      />
+    </div>
+  );
 }

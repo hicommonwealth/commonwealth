@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_socials.scss';
 
@@ -12,97 +11,97 @@ import { CWIconButton } from './cw_icon_button';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
 
-type SocialsAttrs = {
+type SocialsProps = {
   socials: string[];
   handleInputChange?: (value: string[]) => void;
 };
 
-export class CWSocials extends ClassComponent<SocialsAttrs> {
-  private socials: string[];
+export const CWSocials = (props: SocialsProps) => {
+  const [socials, setSocials] = useState([]);
 
-  private addInputRow = () => {
-    this.socials = [...this.socials, ''];
+  const addInputRow = () => {
+    setSocials([...socials, '']);
   };
 
-  private deleteInputRow = (
-    index: number,
-    handleInputChange: (value: string[]) => void
-  ) => {
-    this.socials = this.socials.filter((_, i) => i !== index);
-    handleInputChange(this.socials);
+  const deleteInputRow = (index: number) => {
+    setSocials(socials.filter((_, i) => i !== index));
   };
 
-  oninit(vnode: ResultNode<SocialsAttrs>) {
-    this.socials = vnode.attrs.socials ? [...vnode.attrs.socials] : [];
-  }
+  useEffect(() => {
+    if (props.socials) {
+      setSocials([...props.socials]);
+    }
+  }, []);
 
-  view(vnode: ResultNode<SocialsAttrs>) {
-    const { handleInputChange } = vnode.attrs;
+  useEffect(() => {
+    const { handleInputChange } = props;
+    handleInputChange(socials);
+  }, [socials]);
 
-    const socialsList = this.socials?.map((social, i) => {
-      let name: string;
-      let icon: IconName;
-      let placeholder: string;
+  const socialsList = socials?.map((social, i) => {
+    let name: string;
+    let icon: IconName;
+    let placeholder: string;
 
-      if (social.includes('discord.com/')) {
-        name = 'discord';
-        icon = 'discord';
-        placeholder = 'https://discord.com/...';
-      } else if (social.includes('twitter.com/')) {
-        name = 'twitter';
-        icon = 'twitter';
-        placeholder = 'https://twitter.com/...';
-      } else if (social.includes('telegram.org/')) {
-        name = 'telegram';
-        icon = 'telegram';
-        placeholder = 'https://telegram.org/...';
-      } else if (social.includes('github.com/')) {
-        name = 'github';
-        icon = 'github';
-        placeholder = 'https://github.com/...';
-      } else {
-        name = 'website';
-        icon = 'website';
-        placeholder = 'https://example.com';
-      }
-
-      return (
-        <div className="input-row" key={i}>
-          <CWTextInput
-            name={name}
-            value={social}
-            inputValidationFn={(val: string) => {
-              if (!val.match(/^(http(s)?:\/\/.)?([\da-z.-]+)\.([a-z.])/)) {
-                return ['failure', 'Must enter valid website'];
-              } else {
-                return ['success', 'Input validated'];
-              }
-            }}
-            iconRight={icon}
-            placeholder={placeholder}
-            onInput={(e) => {
-              this.socials[i] = e.target.value;
-              handleInputChange(this.socials);
-              this.redraw();
-            }}
-          />
-          <CWIconButton
-            iconButtonTheme="neutral"
-            iconName="trash"
-            onClick={() => this.deleteInputRow(i, handleInputChange)}
-          />
-        </div>
-      );
-    });
+    if (social.includes('discord.com/')) {
+      name = 'discord';
+      icon = 'discord';
+      placeholder = 'https://discord.com/...';
+    } else if (social.includes('twitter.com/')) {
+      name = 'twitter';
+      icon = 'twitter';
+      placeholder = 'https://twitter.com/...';
+    } else if (social.includes('telegram.org/')) {
+      name = 'telegram';
+      icon = 'telegram';
+      placeholder = 'https://telegram.org/...';
+    } else if (social.includes('github.com/')) {
+      name = 'github';
+      icon = 'github';
+      placeholder = 'https://github.com/...';
+    } else {
+      name = 'website';
+      icon = 'website';
+      placeholder = 'https://example.com';
+    }
 
     return (
-      <div className={ComponentType.Socials}>
-        {socialsList}
-        <div className="add-social-link" onClick={this.addInputRow}>
-          <CWIcon iconName="plus" iconSize="small" />
-          <CWText>Add social link</CWText>
-        </div>
+      <div className="input-row" key={i}>
+        <CWTextInput
+          name={name}
+          value={social}
+          inputValidationFn={(val: string) => {
+            if (!val.match(/^(http(s)?:\/\/.)?([\da-z.-]+)\.([a-z.])/)) {
+              return ['failure', 'Must enter valid website'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          iconRight={icon}
+          placeholder={placeholder}
+          onInput={(e) => {
+            const newSocials = [...socials];
+            newSocials[i] = e.target.value;
+            setSocials(newSocials);
+            redraw(); // might not need this
+          }}
+        />
+        <CWIconButton
+          iconButtonTheme="neutral"
+          iconName="trash"
+          onClick={() => deleteInputRow(i)}
+        />
       </div>
     );
-  }
+  });
+
+  return (
+    <div className={ComponentType.Socials}>
+      {socialsList}
+      <div className="add-social-link" onClick={addInputRow}>
+        <CWIcon iconName="plus" iconSize="small" />
+        <CWText>Add social link</CWText>
+      </div>
+    </div>
+  );
 }

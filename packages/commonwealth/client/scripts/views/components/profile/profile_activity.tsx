@@ -1,7 +1,4 @@
-import React from 'react';
-
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
+import React, { useState } from 'react';
 
 import 'components/profile/profile_activity.scss';
 
@@ -23,73 +20,68 @@ export type CommentWithAssociatedThread = Comment<IUniqueId> & {
   thread: Thread;
 };
 
-type ProfileActivityAttrs = {
+type ProfileActivityProps = {
   addresses: AddressInfo[];
   comments: CommentWithAssociatedThread[];
   threads: Thread[];
 };
 
-class ProfileActivity extends ClassComponent<ProfileActivityAttrs> {
-  private selectedActivity: ProfileActivityType;
+const ProfileActivity = (props: ProfileActivityProps) => {
+  const [selectedActivity, setSelectedActivity] = useState(ProfileActivityType.Comments);
+  const { comments, threads } = props;
 
-  oninit() {
-    this.selectedActivity = ProfileActivityType.Comments;
-  }
-
-  view(vnode: ResultNode<ProfileActivityAttrs>) {
-    return (
-      <div className="ProfileActivity">
-        <div className="activity-nav">
-          <CWTabBar>
-            <CWTab
-              label="All Activity"
-              onClick={() => {
-                this.selectedActivity = ProfileActivityType.Comments;
-              }}
-              isSelected={
-                this.selectedActivity === ProfileActivityType.Comments
-              }
-            />
-            <CWTab
-              label={
-                <div className="tab-header">
-                  Threads
-                  <div className="count">{vnode.attrs.threads.length}</div>
-                </div>
-              }
-              onClick={() => {
-                this.selectedActivity = ProfileActivityType.Threads;
-              }}
-              isSelected={this.selectedActivity === ProfileActivityType.Threads}
-            />
-            {/* TODO: uncomment when communities are ready */}
-            {/* <div className="divider" />
-            <CWTab
-              label="Communities"
-              onclick={() => {
-                this.selectedActivity = ProfileActivity.Communities;
-              }}
-              isSelected={this.selectedActivity === ProfileActivity.Communities}
-            />
-            <CWTab
-              label="Addresses"
-              onclick={() => {
-                this.selectedActivity = ProfileActivity.Addresses;
-              }}
-              isSelected={this.selectedActivity === ProfileActivity.Addresses}
-            /> */}
-          </CWTabBar>
-        </div>
-        <div className="activity-content">
-          <ProfileActivityContent
-            option={this.selectedActivity}
-            threads={vnode.attrs.threads}
-            comments={vnode.attrs.comments}
+  return (
+    <div className="ProfileActivity">
+      <div className="activity-nav">
+        <CWTabBar>
+          <CWTab
+            label="All Activity"
+            onClick={() => {
+              setSelectedActivity(ProfileActivityType.Comments);
+            }}
+            isSelected={
+              selectedActivity === ProfileActivityType.Comments
+            }
           />
-        </div>
+          <CWTab
+            label={
+              <div className="tab-header">
+                Threads
+                <div className="count">{threads.length}</div>
+              </div>
+            }
+            onClick={() => {
+              setSelectedActivity(ProfileActivityType.Threads);
+            }}
+            isSelected={selectedActivity === ProfileActivityType.Threads}
+          />
+          {/* TODO: uncomment when communities are ready */}
+          {/* <div className="divider" />
+          <CWTab
+            label="Communities"
+            onclick={() => {
+              this.selectedActivity = ProfileActivity.Communities;
+            }}
+            isSelected={this.selectedActivity === ProfileActivity.Communities}
+          />
+          <CWTab
+            label="Addresses"
+            onclick={() => {
+              this.selectedActivity = ProfileActivity.Addresses;
+            }}
+            isSelected={this.selectedActivity === ProfileActivity.Addresses}
+          /> */}
+        </CWTabBar>
       </div>
-    );
-  }
+      <div className="activity-content">
+        <ProfileActivityContent
+          option={selectedActivity}
+          threads={threads}
+          comments={comments}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default ProfileActivity;
