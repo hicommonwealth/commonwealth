@@ -23,7 +23,7 @@ module.exports = {
       );
 
       await queryInterface.addColumn('Subscriptions', 'chain_entity_id', {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true,
         references: { model: 'ChainEntityMeta', key: 'id' },
       }, { transaction: t });
