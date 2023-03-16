@@ -3,7 +3,15 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      // await queryInterface.addColumn('network', {});
+      await queryInterface.addColumn(
+        'ChainEvents',
+        'network',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
 
       await queryInterface.sequelize.query(
         `

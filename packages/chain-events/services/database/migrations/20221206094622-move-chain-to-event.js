@@ -12,6 +12,7 @@ module.exports = {
         },
         { transaction: t }
       );
+
       await queryInterface.sequelize.query(
         `
             UPDATE "ChainEvents" CE
