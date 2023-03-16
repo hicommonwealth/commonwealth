@@ -26,7 +26,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
         references: { model: 'ChainEntityMeta', key: 'id' },
-      });
+      }, { transaction: t });
     });
   },
 
