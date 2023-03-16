@@ -81,8 +81,6 @@ const getProfiles = async (
     });
   }
 
-  flattenIncludedAddresses(profiles);
-
   return success(res, { profiles, count });
 };
 
