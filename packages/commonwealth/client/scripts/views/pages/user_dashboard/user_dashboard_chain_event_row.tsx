@@ -43,7 +43,7 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
               onclick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                m.route.set(`/${chain}`);
+                if (chain?.id) m.route.set(`/${chain.id}`);
               }}
             >
               {chain?.name || 'Unknown chain'}
