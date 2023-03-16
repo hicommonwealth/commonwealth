@@ -10,15 +10,17 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { Modal } from '../component_kit/cw_modal';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
-import { getClasses, isWindowMediumSmallInclusive, } from '../component_kit/helpers';
-import { fetchReactionsByPost, getDisplayedReactorsForPopup, onReactionClick, } from './helpers';
+import { getClasses, isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
 
-export const useThreadReactionButton = (thread: Thread) => {
+export const useThreadReactionButton = (thread: Thread, setReactors) => {
+  const activeAddress = app.user.activeAccount?.address;
+
   const [isLoading, setIsLoading] = useState(false);
-  const [reactors, setReactors] = useState<Array<any>>([]);
-  const [likes, setLikes] = useState(0);
-  const [hasReacted, setHasReacted] = useState(false);
-  const [reactionCounts, setReactionCounts] = useState<number>(0);
+
+  const thisUserReaction = thread.associatedReactions.filter(r => r.address === activeAddress);
+  const [hasReacted, setHasReacted] = useState(thisUserReaction.length !== 0);
+  const [reactedId, setReactedId] = useState(thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id);
 
   useEffect(() => {
     const fetch = () => {
@@ -28,11 +30,11 @@ export const useThreadReactionButton = (thread: Thread) => {
         setHasReacted(false);
       }
 
-      setReactionCounts(thread.associatedReactions.length);
+      setReactors(thread.associatedReactions.map(t => t.address));
     };
 
     fetch();
-  }, [hasReacted, thread]);
+  }, []);
 
   // token balance check if needed
   const isAdmin =
@@ -47,15 +49,17 @@ export const useThreadReactionButton = (thread: Thread) => {
 
   const isUserForbidden = !isAdmin && TopicGateCheck.isGatedTopic(topicName);
 
-  const activeAddress = app.user.activeAccount?.address;
+  const dislike = async () => {
+    if (reactedId === -1) {
+      return;
+    }
 
-  const dislike = async (userAddress: string) => {
     setIsLoading(true);
 
-    app.threadReactions.deleteOnThread(userAddress, thread).then(() => {
-      thread.associatedReactions = thread.associatedReactions.filter(
-        (r) => r.address !== activeAddress
-      );
+    app.threadReactions.deleteOnThread(thread, reactedId).then(() => {
+      setReactors(oldReactors => oldReactors.filter((r) => r !== activeAddress));
+      setReactedId(-1);
+      setHasReacted(false);
       setIsLoading(false);
     });
   };
@@ -69,11 +73,9 @@ export const useThreadReactionButton = (thread: Thread) => {
     app.threadReactions
       .createOnThread(userAddress, thread, 'like')
       .then((reaction) => {
-        thread.associatedReactions.push({
-          id: reaction.id,
-          type: reaction.reaction,
-          address: activeAddress,
-        });
+        setReactedId(reaction.id);
+        setReactors(oldReactors => [...oldReactors, activeAddress]);
+        setHasReacted(true);
         setIsLoading(false);
       });
   };
@@ -84,10 +86,7 @@ export const useThreadReactionButton = (thread: Thread) => {
     isLoading,
     isUserForbidden,
     like,
-    likes,
-    reactors,
     setIsLoading,
-    setReactors,
   };
 };
 
@@ -95,19 +94,17 @@ type ThreadReactionButtonProps = {
   thread: Thread;
 };
 
-export const ThreadReactionButton = ({ thread }: ThreadReactionButtonProps) => {
+export const ThreadReactionPreviewButtonSmall = ({ thread }: ThreadReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [reactors, setReactors] = useState([]);
 
   const {
     dislike,
     hasReacted,
     isLoading,
     isUserForbidden,
-    like,
-    likes,
-    reactors,
-    setReactors,
-  } = useThreadReactionButton(thread);
+    like
+  } = useThreadReactionButton(thread, setReactors);
 
   return (
     <>
@@ -117,7 +114,9 @@ export const ThreadReactionButton = ({ thread }: ThreadReactionButtonProps) => {
           'CommentReactionButton'
         )}
         onMouseEnter={async () => {
-          setReactors(await fetchReactionsByPost(thread));
+          if (reactors.length === 0) {
+            setReactors(thread.associatedReactions.map((addr) => addr));
+          }
         }}
       >
         <CWIconButton
@@ -125,6 +124,7 @@ export const ThreadReactionButton = ({ thread }: ThreadReactionButtonProps) => {
           iconSize="small"
           selected={hasReacted}
           onClick={async (e) => {
+            e.stopPropagation();
             if (!app.isLoggedIn() || !app.user.activeAccount) {
               setIsModalOpen(true);
             } else {
@@ -132,13 +132,12 @@ export const ThreadReactionButton = ({ thread }: ThreadReactionButtonProps) => {
             }
           }}
         />
-        {likes > 0 ? (
+        {reactors.length > 0 ? (
           <CWTooltip
             content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
-                  likes: thread.associatedReactions.length,
-                  reactors: app.threadReactions.getByThreadId(thread.id),
+                  reactors: reactors,
                 })}
               </div>
             }
@@ -150,7 +149,7 @@ export const ThreadReactionButton = ({ thread }: ThreadReactionButtonProps) => {
                 type="caption"
                 fontWeight="medium"
               >
-                {likes}
+                {reactors.length}
               </CWText>
             )}
           />
@@ -160,7 +159,7 @@ export const ThreadReactionButton = ({ thread }: ThreadReactionButtonProps) => {
             type="caption"
             fontWeight="medium"
           >
-            {likes}
+            {reactors.length}
           </CWText>
         )}
       </div>

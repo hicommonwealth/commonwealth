@@ -58,20 +58,18 @@ class ThreadReactionsController {
     }
   }
 
-  public async deleteOnThread(address, thread: Thread) {
+  public async deleteOnThread(thread: Thread, reaction_id: number) {
     try {
       await axios.post(`${app.serverUrl()}/deleteReaction`, {
         jwt: app.user.jwt,
-        reaction_id: thread.associatedReactions.filter(
-          (r) => r.address === address
-        )[0].id
+        reaction_id
       });
 
       this._threadIdToReactions.set(
         thread.id,
         this._threadIdToReactions
           .get(thread.id)
-          .filter((r) => r.address !== address)
+          .filter((r) => r.id !== reaction_id)
       );
     } catch (e) {
       console.error(e);

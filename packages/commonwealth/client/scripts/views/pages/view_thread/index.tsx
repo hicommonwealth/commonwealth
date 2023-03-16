@@ -28,7 +28,7 @@ import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { EditBody } from './edit_body';
@@ -461,7 +461,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const reactionsAndReplyButtons = (
     <div className="thread-footer-row">
-      <ThreadReactionButton thread={thread} />
+      <ThreadReactionPreviewButtonSmall thread={thread} />
       <div className="comments-count">
         <CWIcon iconName="feedback" iconSize="small" />
         <CWText type="caption">{commentCount} Comments</CWText>
