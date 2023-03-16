@@ -326,12 +326,12 @@ const NotificationRow: m.Component<
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
-      const chainId = notification.chainEvent.type.chain;
+      const chainId = notification.chainEvent.chain;
 
       // construct compatible CW event from DB by inserting network from type
       const chainEvent: CWEvent = {
         blockNumber: notification.chainEvent.blockNumber,
-        network: notification.chainEvent.type.eventNetwork,
+        network: notification.chainEvent.network,
         data: notification.chainEvent.data,
       };
       const chainName = app.config.chains.getById(chainId)?.name;
