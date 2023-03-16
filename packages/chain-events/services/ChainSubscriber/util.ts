@@ -8,7 +8,6 @@ import type { SubstrateEvents } from '../../src';
 import {
   createListener,
   ErcLoggingHandler,
-  getChainEventNetwork,
   LoggingHandler,
   SupportedNetwork,
 } from '../../src';
@@ -219,15 +218,15 @@ async function setupNewListeners(
 ) {
   for (const chain of newChains) {
     let network: SupportedNetwork;
-    try {
-      network = getChainEventNetwork(chain.network, chain.base);
-    } catch (e) {
-      log.error(
-        `Unknown chain base: ${chain.base} \tand network: ${chain.network}`,
-        e
-      );
-      continue;
-    }
+    if (chain.base === ChainBase.Substrate)
+      network = SupportedNetwork.Substrate;
+    else if (chain.base === ChainBase.CosmosSDK)
+      network = SupportedNetwork.Cosmos;
+    else if (chain.network === ChainNetwork.Compound)
+      network = SupportedNetwork.Compound;
+    else if (chain.network === ChainNetwork.Aave)
+      network = SupportedNetwork.Aave;
+
     try {
       log.info(`Starting listener for: ${chain.id}`);
       listenerInstances[chain.id] = await createListener(chain.id, network, {
@@ -380,8 +379,21 @@ export function getListenerNames(
 async function discoverReconnectRange(this: DB, chain: string) {
   let latestBlock;
   try {
+    const eventTypes = (
+      await this.ChainEventType.findAll({
+        where: { chain },
+      })
+    ).map((x) => x.id);
+
+    if (eventTypes.length === 0) {
+      log.info(`[${chain}]: No event types exist in the database`);
+      return { startBlock: null };
+    }
+
     latestBlock = await this.ChainEvent.max('block_number', {
-      where: { chain },
+      where: {
+        chain_event_type_id: eventTypes,
+      },
     });
 
     if (latestBlock) {

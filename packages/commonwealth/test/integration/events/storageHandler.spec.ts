@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable dot-notation */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
@@ -11,6 +13,7 @@ import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
 import type { BrokerConfig } from 'rascal';
 
+import { resetDatabase } from '../../../server-test';
 import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
@@ -25,6 +28,7 @@ let loggedInAddr, loggedInAddrId;
 
 describe('Event Storage Handler Tests', () => {
   before('reset database', async () => {
+    await resetDatabase();
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     loggedInAddrId = result.address_id;
@@ -53,12 +57,18 @@ describe('Event Storage Handler Tests', () => {
     assert.deepEqual(dbEvent.event_data, event.data);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
-        chain: 'edgeware',
+        chain_event_type_id: 'edgeware-democracy-started',
         block_number: 10,
       },
     });
     assert.lengthOf(chainEvents, 1);
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
+
+    const dbEventType = await dbEvent.getChainEventType();
+    const chainEventType = await models['ChainEventType'].findOne({
+      where: { id: 'edgeware-democracy-started' },
+    });
+    assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
 
   it('should truncate long preimage args', async () => {
@@ -101,7 +111,7 @@ describe('Event Storage Handler Tests', () => {
     assert.deepEqual(dbEvent.event_data, truncatedData);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
-        chain: 'edgeware',
+        chain_event_type_id: 'edgeware-preimage-noted',
         block_number: 10,
       },
     });
@@ -128,12 +138,18 @@ describe('Event Storage Handler Tests', () => {
     assert.deepEqual(dbEvent.event_data, event.data);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
-        chain: 'edgeware',
+        chain_event_type_id: 'edgeware-democracy-exploded',
         block_number: 13,
       },
     });
     assert.lengthOf(chainEvents, 1);
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
+
+    const dbEventType = await dbEvent.getChainEventType();
+    const chainEventType = await models['ChainEventType'].findOne({
+      where: { id: 'edgeware-democracy-exploded' },
+    });
+    assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
 
   it('should not create chain event for excluded event type', async () => {
@@ -156,7 +172,7 @@ describe('Event Storage Handler Tests', () => {
     assert.isUndefined(dbEvent);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
-        chain: 'edgeware',
+        chain_event_type_id: 'edgeware-reward',
         block_number: 13,
       },
     });
@@ -184,7 +200,7 @@ describe('Event Storage Handler Tests', () => {
     assert.deepEqual(dbEvent.event_data, event.data);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
-        chain: 'edgeware',
+        chain_event_type_id: 'edgeware-bonded',
         block_number: 14,
       },
     });
@@ -213,7 +229,7 @@ describe('Event Storage Handler Tests', () => {
     assert.isUndefined(dbEvent);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
-        chain: 'edgeware',
+        chain_event_type_id: 'edgeware-bonded',
         block_number: 15,
       },
     });
