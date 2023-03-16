@@ -17,7 +17,7 @@ export const deinitChainOrCommunity = async () => {
   }
 
   app.user.setSelectedChain(null);
-  app.user.setActiveAccounts([]);
+  app.user.setActiveAddressAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
   document.title = 'Commonwealth';
 };

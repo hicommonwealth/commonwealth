@@ -36,10 +36,10 @@ export async function setActiveAccount(account: AddressAccount): Promise<void> {
   if (!role || role.is_user_default) {
     app.user.ephemerallySetActiveAccount(account);
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+      app.user.activeAddressAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      app.user.setActiveAddressAccounts(app.user.activeAddressAccounts.concat([account]));
     }
     return;
   }
@@ -67,10 +67,10 @@ export async function setActiveAccount(account: AddressAccount): Promise<void> {
   role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
   if (
-    app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
+    app.user.activeAddressAccounts.filter((a) => isSameAccount(a, account)).length ===
     0
   ) {
-    app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+    app.user.setActiveAddressAccounts(app.user.activeAddressAccounts.concat([account]));
   }
 }
 
@@ -110,11 +110,11 @@ export async function completeClientLogin(addressAccount: AddressAccount) {
     // set the address as active
     await setActiveAccount(addressAccount);
     if (
-      app.user.activeAccounts.filter((a) => isSameAccount(a, addressAccount))
+      app.user.activeAddressAccounts.filter((a) => isSameAccount(a, addressAccount))
         .length === 0
     ) {
-      app.user.setActiveAccounts(
-        app.user.activeAccounts.concat([addressAccount])
+      app.user.setActiveAddressAccounts(
+        app.user.activeAddressAccounts.concat([addressAccount])
       );
     }
     m.redraw();
@@ -148,7 +148,7 @@ export async function updateLastVisited(
 export async function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
-  app.user.setActiveAccounts(
+  app.user.setActiveAddressAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
       .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
@@ -156,14 +156,14 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   );
 
   // select the address that the new chain should be initialized with
-  const memberAddresses = app.user.activeAccounts.filter((account) => {
+  const memberAddresses = app.user.activeAddressAccounts.filter((account) => {
     return app.roles.isMember({ chain: chain.id, addressAccount: account });
   });
 
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
     await setActiveAccount(memberAddresses[0]);
-  } else if (app.user.activeAccounts.length === 0) {
+  } else if (app.user.activeAddressAccounts.length === 0) {
     // no addresses - preview the community
   } else {
     const existingAddress = app.roles.getDefaultAddressInCommunity({
@@ -171,7 +171,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
     });
 
     if (existingAddress) {
-      const account = app.user.activeAccounts.find((a) => {
+      const account = app.user.activeAddressAccounts.find((a) => {
         return (
           a.chain.id === existingAddress.chain.id &&
           a.address === existingAddress.address
@@ -199,7 +199,7 @@ export function updateActiveUser(data) {
     app.user.setLastVisited({});
     app.user.setUnseenPosts({});
 
-    app.user.setActiveAccounts([]);
+    app.user.setActiveAddressAccounts([]);
     app.user.ephemerallySetActiveAccount(null);
   } else {
     app.user.setEmail(data.email);
@@ -275,16 +275,16 @@ export async function unlinkLogin(account: AddressAccount) {
   });
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.
-  let index = app.user.activeAccounts.indexOf(account);
-  app.user.activeAccounts.splice(index, 1);
+  let index = app.user.activeAddressAccounts.indexOf(account);
+  app.user.activeAddressAccounts.splice(index, 1);
   index = app.user.addresses.indexOf(
     app.user.addresses.find((a) => a.address === account.address)
   );
   app.user.addresses.splice(index, 1);
 
   if (!unlinkingCurrentlyActiveAccount) return;
-  if (app.user.activeAccounts.length > 0) {
-    await setActiveAccount(app.user.activeAccounts[0]);
+  if (app.user.activeAddressAccounts.length > 0) {
+    await setActiveAccount(app.user.activeAddressAccounts[0]);
   } else {
     app.user.ephemerallySetActiveAccount(null);
   }

@@ -8,7 +8,7 @@ import jdenticon from 'jdenticon';
 import 'modals/delete_address_modal.scss';
 
 import app from 'state';
-import type { AddressInfo, NewProfile as Profile } from 'client/scripts/models';
+import type { AddressAccount, NewProfile as Profile } from 'client/scripts/models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
@@ -17,7 +17,7 @@ import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_add
 
 type DeleteAddressModalAttrs = {
   profile: Profile;
-  addresses: AddressInfo[];
+  addresses: AddressAccount[];
   address: string;
   chain: string;
 };

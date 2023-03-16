@@ -14,9 +14,8 @@ import type { QuillEditor } from 'views/components/quill/quill_editor';
 import { notifyError } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
-  Account,
   MinimumProfile,
-  AddressInfo,
+  AddressAccount
 } from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -58,7 +57,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
   private name: string;
   private bio: QuillEditor;
   private avatarUrl: string;
-  private addresses: AddressInfo[];
+  private addresses: AddressAccount[];
   private isOwner: boolean;
   private backgroundImage: Image;
   private displayNameValid: boolean;
@@ -79,14 +78,14 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       this.backgroundImage = this.profile.backgroundImage;
       this.addresses = result.addresses.map(
         (a) =>
-          new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          )
+          new AddressAccount({
+            addressId: a.id,
+            address: a.address,
+            chain: a.chain,
+            keytype: a.keytype,
+            walletId: a.wallet_id,
+            ghostAddress: a.ghost_address
+          })
       );
       this.isOwner = result.isOwner;
     } catch (err) {
@@ -208,7 +207,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       // need to create an account to pass to AvatarUpload to see last upload
       // not the best solution because address is not always available
       // should refactor AvatarUpload to make it work with new profiles
-      let account: Account | null;
+      let account: AddressAccount | null;
       if (this.addresses?.length > 0) {
         const oldProfile = new MinimumProfile(
           this.addresses[0].chain.name,
@@ -224,7 +223,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
           null
         );
 
-        account = new Account({
+        account = new AddressAccount({
           chain: this.addresses[0].chain,
           address: this.addresses[0].address,
           profile: oldProfile,

@@ -6,7 +6,7 @@ import jdenticon from 'jdenticon';
 import { capitalize } from 'lodash';
 
 import m from 'mithril';
-import { Profile, MinimumProfile, AddressAccount } from 'models';
+import { MinimumProfile, AddressAccount } from 'models';
 
 import app from 'state';
 import { formatAddressShort } from '../../../../../shared/utils';
@@ -86,7 +86,7 @@ const User: m.Component<
       if (!user.chain || !user.address) return;
       addressAccount = user;
 
-      profile = app.newProfiles.getProfile(chainId.id, address);
+      profile = app.newProfiles.getProfile(user.chain.id, user.address);
 
       role = adminsAndMods.find(
         (r) => r.address === user.address && r.address_chain === user.chain.id

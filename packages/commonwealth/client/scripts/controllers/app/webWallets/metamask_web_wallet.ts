@@ -160,7 +160,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     await this._web3.givenProvider.on(
       'accountsChanged',
       async (accounts: string[]) => {
-        const updatedAddress = app.user.activeAccounts.find(
+        const updatedAddress = app.user.activeAddressAccounts.find(
           (addr) => addr.address === accounts[0]
         );
         if (!updatedAddress) return;

@@ -158,7 +158,7 @@ export default class AddressAccount {
         ({ address, ghostAddress, chain }) =>
           ghostAddress &&
           this.chain.id === chain.id &&
-          app.user.activeAccounts.some((account) => account.address === address)
+          app.user.activeAddressAccounts.some((account) => account.address === address)
       );
       if (hasGhostAddress) {
         const { success, ghostAddressId } = await $.post(
@@ -172,7 +172,7 @@ export default class AddressAccount {
               return !ghostAddress;
             })
           );
-          app.user.setActiveAccounts([]);
+          app.user.setActiveAddressAccounts([]);
         }
       }
     }

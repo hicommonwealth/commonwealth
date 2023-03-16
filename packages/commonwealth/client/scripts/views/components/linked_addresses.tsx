@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'components/linked_addresses.scss';
 
 import app from 'state';
-import type { AddressInfo, NewProfile as Profile } from 'models';
+import type { AddressAccount, NewProfile as Profile } from 'models';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
@@ -15,14 +15,14 @@ import { CWAddressTooltip } from './component_kit/cw_popover/cw_address_tooltip'
 
 type AddressAttrs = {
   profile: Profile;
-  addresses: AddressInfo[];
-  addressInfo: AddressInfo;
+  addresses: AddressAccount[];
+  addressInfo: AddressAccount;
   refreshProfiles: (address: string) => void;
 };
 
 type LinkedAddressesAttrs = {
   profile: Profile;
-  addresses: AddressInfo[];
+  addresses: AddressAccount[];
   refreshProfiles: (address: string) => void;
 };
 

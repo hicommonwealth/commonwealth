@@ -147,7 +147,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
         const encodedAccounts = accounts.map((a) =>
           encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a)
         );
-        const updatedAddress = app.user.activeAccounts.find(
+        const updatedAddress = app.user.activeAddressAccounts.find(
           (addr) => addr.address === encodedAccounts[0]
         );
         if (!updatedAddress) return;

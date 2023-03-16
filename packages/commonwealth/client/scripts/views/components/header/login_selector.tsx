@@ -63,7 +63,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
   }
 
   view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
-    const { nAccountsWithoutRole } = vnode.attrs;
+    const { nAddressAccountsWithoutRole } = vnode.attrs;
     const { activeAddressAccounts } = app.user;
 
     return (
@@ -81,7 +81,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
                 <div
                   class={`login-menu-item ${selected ? 'selected' : ''}`}
                   onclick={async () => {
-                    await setActiveAddressAccount(account);
+                    await setActiveAccount(account);
                     m.redraw();
                   }}
                 >
@@ -97,7 +97,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             })}
           </>
         )}
-        {activeAddrssAccounts.length > 0 && <CWDivider />}
+        {activeAddressAccounts.length > 0 && <CWDivider />}
         <div
           class="login-menu-item"
           onclick={() => {
@@ -118,7 +118,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         <div
           class="login-menu-item"
           onclick={() => {
-            if nAddressAccountsWithoutRole > 0) {
+            if (nAddressAccountsWithoutRole > 0) {
               app.modals.create({
                 modal: SelectAddressModal,
               });
@@ -266,7 +266,7 @@ export class LoginSelector extends ClassComponent {
       );
     }
 
-    const activeAddressesWithRole = app.user.activeAccounts.filter(
+    const activeAddressesWithRole = app.user.activeAddressAccounts.filter(
       (account) => {
         return app.roles.getRoleInCommunity({
           account,
@@ -275,7 +275,7 @@ export class LoginSelector extends ClassComponent {
       }
     );
 
-    const activeAddressAccountsByRole = app.roles.getActiveAddressAccountsByRole();
+    const activeAddressAccountsByRole = app.roles.getActiveAccountsByRole();
 
     const nAddressAccountsWithoutRole = activeAddressAccountsByRole.filter(
       ([role]) => !role
@@ -399,11 +399,11 @@ export class LoginSelector extends ClassComponent {
             }
             await setActiveAccount(account);
             if (
-              app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+              app.user.activeAddressAccounts.filter((a) => isSameAccount(a, account))
                 .length === 0
             ) {
-              app.user.setActiveAccounts(
-                app.user.activeAccounts.concat([account])
+              app.user.setActiveAddressAccounts(
+                app.user.activeAddressAccounts.concat([account])
               );
             }
           } else {
@@ -511,7 +511,7 @@ export class LoginSelector extends ClassComponent {
             content={
               <LoginSelectorMenuLeft
                 activeAddressesWithRole={activeAddressesWithRole}
-                nAccountsWithoutRole={nAddressAccountsWithoutRole}
+                nAddressAccountsWithoutRole={nAddressAccountsWithoutRole}
               />
             }
           />

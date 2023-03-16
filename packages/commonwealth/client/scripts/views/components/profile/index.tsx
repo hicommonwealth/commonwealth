@@ -8,7 +8,7 @@ import 'components/profile/index.scss';
 
 import app from 'state';
 import type { Thread } from 'models';
-import { AddressInfo, NewProfile as Profile } from 'models';
+import { AddressAccount, NewProfile as Profile } from 'models';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import { ProfileHeader } from './profile_header';
@@ -30,7 +30,7 @@ type NewProfileAttrs = {
 };
 
 export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
-  private addresses: AddressInfo[];
+  private addresses: AddressAccount[];
   private content: m.Vnode;
   private comments: CommentWithAssociatedThread[];
   private error: ProfileError;
@@ -59,14 +59,14 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
       this.comments = commentsWithAssociatedThread;
       this.addresses = result.addresses.map((a) => {
         try {
-          return new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          );
+          return new AddressAccount({
+            addressId: a.id,
+            address: a.address,
+            chain: a.chain,
+            keytype: a.keytype,
+            walletId: a.wallet_id,
+            ghostAddress: a.ghost_address
+          });
         } catch (err) {
           console.log(a.chain);
           return null;

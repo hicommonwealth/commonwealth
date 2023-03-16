@@ -122,9 +122,9 @@ class StatsPage extends ClassComponent {
               }
             });
 
-            (result.activeAccounts || []).forEach(({ date, new_items }) => {
+            (result.activeAddressAccounts || []).forEach(({ date, new_items }) => {
               if (data[date]) {
-                data[date].activeAccounts = new_items;
+                data[date].activeAddressAccounts = new_items;
               } else {
                 data[date] = { activeAccounts: new_items };
               }

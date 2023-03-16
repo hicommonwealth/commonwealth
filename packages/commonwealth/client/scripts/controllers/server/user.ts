@@ -67,13 +67,13 @@ export class UserController {
     this._addresses = addresses;
   }
 
-  private _activeAccounts: AddressAccount[] = [];
-  public get activeAccounts(): AddressAccount[] {
-    return this._activeAccounts;
+  private _activeAddressAccounts: AddressAccount[] = [];
+  public get activeAddressAccounts(): AddressAccount[] {
+    return this._activeAddressAccounts;
   }
 
-  private _setActiveAccounts(activeAccounts: AddressAccount[]): void {
-    this._activeAccounts = activeAccounts;
+  private _setActiveAddressAccounts(activeAddressAccounts: AddressAccount[]): void {
+    this._activeAddressAccounts = activeAddressAccounts;
   }
 
   private _socialAccounts: SocialAccount[] = [];
@@ -229,17 +229,17 @@ export class UserController {
     );
   }
 
-  public setActiveAccounts(activeAccounts: AddressAccount[]): void {
-    this._setActiveAccounts(activeAccounts);
+  public setActiveAddressAccounts(activeAddressAccounts: AddressAccount[]): void {
+    this._setActiveAddressAccounts(activeAddressAccounts);
   }
 
-  public addActiveAddress(address: AddressAccount): void {
-    this._activeAccounts.push(address);
+  public addActiveAddressAccount(address: AddressAccount): void {
+    this._activeAddressAccounts.push(address);
   }
 
-  public removeActiveAddress(address: AddressAccount): void {
-    this._activeAccounts.splice(
-      this._activeAccounts.findIndex((a) => a.address === address.address),
+  public removeActiveAddressAccount(address: AddressAccount): void {
+    this._activeAddressAccounts.splice(
+      this._activeAddressAccounts.findIndex((a) => a.address === address.address),
       1
     );
   }

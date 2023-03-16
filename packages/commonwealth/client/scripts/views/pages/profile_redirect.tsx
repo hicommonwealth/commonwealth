@@ -48,7 +48,7 @@ class ProfileRedirect extends ClassComponent {
     }
 
     let { address, scope } = vnode.attrs;
-    if (!address) address = app.user.activeAccount?.address;
+    if (!address) address = app.user.activeAddressAccount?.address;
     if (!scope) scope = app.activeChainId();
 
     if (address && scope && !this.profileId) this.getProfileId(address, scope);
