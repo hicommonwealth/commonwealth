@@ -24,7 +24,7 @@ import type { QuillActiveMode, QuillMode, QuillTextContents } from './types';
 // `formats` and the rich text toolbar (there doesn't appear to be a
 // way to unregister formats once the editor has been initialized)
 
-export type QuillEditorComponentAttrs = {
+type QuillEditorComponentAttrs = {
   className?: string;
   contentsDoc?;
   editorNamespace: string;

@@ -12,7 +12,6 @@ import { getClasses } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
 import { useCommonNavigate } from 'navigation/helpers';
-import { slugify } from 'utils';
 
 type SearchChipProps = {
   isActive: boolean;
@@ -52,13 +51,9 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   return (
     <div
       className="SearchBarThreadPreviewRow"
-      onClick={() => {
-        navigate(
-          `/discussion/${searchResult.proposalid}-${slugify(
-            searchResult.title
-          )}`
-        );
-      }}
+      onClick={() =>
+        navigate(`/${searchResult.chain}/discussion/${searchResult.proposalid}`)
+      }
     >
       <div className="header-row">
         <User
@@ -81,10 +76,10 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
         {decodeURIComponent(searchResult.title)}
       </CWText>
       <CWText type="caption" className="excerpt-text" fontWeight="medium">
-        {/* {renderQuillTextBody(searchResult.body, {
+        {renderQuillTextBody(searchResult.body, {
           hideFormatting: true,
           searchTerm,
-        })} */}
+        })}
       </CWText>
     </div>
   );
@@ -99,9 +94,9 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
       className="SearchBarCommentPreviewRow"
       onClick={() => {
         navigate(
-          `/${searchResult.proposalid.split('_')[0]}/${
-            searchResult.proposalid.split('_')[1]
-          }`
+          `/${searchResult.chain}/proposal/${
+            searchResult.proposalid.split('_')[0]
+          }/${searchResult.proposalid.split('_')[1]}`
         );
       }}
     >
@@ -113,10 +108,10 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
           {decodeURIComponent(searchResult.title)}
         </CWText> */}
       <CWText type="caption" className="excerpt-text">
-        {/* {renderQuillTextBody(searchResult.text, {
+        {renderQuillTextBody(searchResult.text, {
           hideFormatting: true,
           searchTerm,
-        })} */}
+        })}
       </CWText>
     </div>
   );

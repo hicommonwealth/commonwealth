@@ -1,7 +1,5 @@
 import React from 'react';
 
-import 'pages/view_proposal/proposal_header_links.scss';
-
 import app from 'state';
 import {
   externalLink,

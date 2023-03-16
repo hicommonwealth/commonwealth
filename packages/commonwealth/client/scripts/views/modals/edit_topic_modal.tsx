@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 
-import $ from 'jquery';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
 import 'modals/edit_topic_modal.scss';
 import { Topic } from 'models';
 
 import app from 'state';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import type { QuillEditor } from '../components/quill/quill_editor';
+import type { QuillTextContents } from '../components/quill/types';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
-import { DeltaStatic } from 'quill';
-import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -37,9 +37,10 @@ export const EditTopicModal = ({
 
   const navigate = useCommonNavigate();
 
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [quillEditorState, setQuillEditorState] = useState<QuillEditor>();
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [contentsDoc, setContentsDoc] = useState<QuillTextContents>();
 
   const [description, setDescription] = useState<string>(descriptionProp);
   const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
@@ -50,25 +51,25 @@ export const EditTopicModal = ({
   );
   const [name, setName] = useState<string>(nameProp);
 
-  const editorValue = getTextFromDelta(contentDelta);
-
   useEffect(() => {
     if (defaultOffchainTemplate) {
       try {
-        setContentDelta(JSON.parse(defaultOffchainTemplate));
+        setContentsDoc(JSON.parse(defaultOffchainTemplate));
       } catch (e) {
-        setContentDelta(createDeltaFromText(defaultOffchainTemplate));
+        setContentsDoc(defaultOffchainTemplate);
       }
     }
   }, [defaultOffchainTemplate]);
 
   const handleSaveChanges = async () => {
-
     setIsSaving(true);
 
-    if (featuredInNewPost && editorValue.length === 0) {
-      setErrorMsg('Must provide template.');
-      return
+    if (featuredInNewPost) {
+      if (!quillEditorState || quillEditorState?.isBlank()) {
+        setErrorMsg('Must provide template.');
+      } else {
+        quillEditorState?.disable();
+      }
     }
 
     const topicInfo = {
@@ -79,7 +80,9 @@ export const EditTopicModal = ({
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
-      default_offchain_template: JSON.stringify(contentDelta)
+      default_offchain_template: featuredInNewPost
+        ? quillEditorState.textContentsAsString
+        : null,
     };
 
     try {
@@ -131,7 +134,7 @@ export const EditTopicModal = ({
               newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
                 'char'
-              )}
+              )} 
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
               return ['failure', newErrorMsg];
@@ -170,9 +173,13 @@ export const EditTopicModal = ({
           value=""
         />
         {featuredInNewPost && (
-          <ReactQuillEditor
-            contentDelta={contentDelta}
-            setContentDelta={setContentDelta}
+          <QuillEditorComponent
+            contentsDoc={contentsDoc}
+            oncreateBind={(state: QuillEditor) => {
+              setQuillEditorState(state);
+            }}
+            editorNamespace="new-discussion"
+            tabIndex={3}
           />
         )}
         <div className="buttons-row">
