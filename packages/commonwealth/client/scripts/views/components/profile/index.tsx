@@ -65,7 +65,7 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
             chain: a.chain,
             keytype: a.keytype,
             walletId: a.wallet_id,
-            ghostAddress: a.ghost_address
+            ghostAddress: a.ghost_address,
           });
         } catch (err) {
           console.log(a.chain);

@@ -122,13 +122,15 @@ class StatsPage extends ClassComponent {
               }
             });
 
-            (result.activeAddressAccounts || []).forEach(({ date, new_items }) => {
-              if (data[date]) {
-                data[date].activeAddressAccounts = new_items;
-              } else {
-                data[date] = { activeAccounts: new_items };
+            (result.activeAddressAccounts || []).forEach(
+              ({ date, new_items }) => {
+                if (data[date]) {
+                  data[date].activeAddressAccounts = new_items;
+                } else {
+                  data[date] = { activeAccounts: new_items };
+                }
               }
-            });
+            );
 
             this.data = data;
           }

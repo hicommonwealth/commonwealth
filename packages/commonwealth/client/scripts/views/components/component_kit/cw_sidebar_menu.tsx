@@ -43,8 +43,10 @@ const renderCommunity = (item: ChainInfo) => {
             user: new AddressAccount({
               addressId: roles[0].address_id,
               address: roles[0].address,
-              chain: app.config.chains.getById(roles[0].address_chain || roles[0].chain_id),
-          }),
+              chain: app.config.chains.getById(
+                roles[0].address_chain || roles[0].chain_id
+              ),
+            }),
           })}
           <div
             class={

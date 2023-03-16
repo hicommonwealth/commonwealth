@@ -53,12 +53,16 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
   private profileId: number;
 
   oninit() {
-    const activeAddressAccount = app.user.activeAddressAccount ?? app.user.addresses[0];
+    const activeAddressAccount =
+      app.user.activeAddressAccount ?? app.user.addresses[0];
     const chain =
       typeof activeAddressAccount.chain === 'string'
         ? activeAddressAccount.chain
         : activeAddressAccount.chain?.id;
-    const profile = app.newProfiles.getProfile(chain, activeAddressAccount.address);
+    const profile = app.newProfiles.getProfile(
+      chain,
+      activeAddressAccount.address
+    );
     this.profileId = profile.id;
   }
 
@@ -76,7 +80,10 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               </CWText>
             )}
             {activeAddressAccounts.map((account) => {
-              const selected = isSameAccount(account, app.user.activeAddressAccount);
+              const selected = isSameAccount(
+                account,
+                app.user.activeAddressAccount
+              );
               return (
                 <div
                   class={`login-menu-item ${selected ? 'selected' : ''}`}
@@ -87,7 +94,10 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
                 >
                   {m(UserBlock, {
                     user: account,
-                    selected: isSameAccount(account, app.user.activeAddressAccount),
+                    selected: isSameAccount(
+                      account,
+                      app.user.activeAddressAccount
+                    ),
                     showRole: false,
                     compact: true,
                     hideAvatar: true,
@@ -399,8 +409,9 @@ export class LoginSelector extends ClassComponent {
             }
             await setActiveAccount(account);
             if (
-              app.user.activeAddressAccounts.filter((a) => isSameAccount(a, account))
-                .length === 0
+              app.user.activeAddressAccounts.filter((a) =>
+                isSameAccount(a, account)
+              ).length === 0
             ) {
               app.user.setActiveAddressAccounts(
                 app.user.activeAddressAccounts.concat([account])

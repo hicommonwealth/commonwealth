@@ -15,7 +15,7 @@ import { notifyError } from 'controllers/app/notifications';
 import {
   NewProfile as Profile,
   MinimumProfile,
-  AddressAccount
+  AddressAccount,
 } from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -84,7 +84,7 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
             chain: a.chain,
             keytype: a.keytype,
             walletId: a.wallet_id,
-            ghostAddress: a.ghost_address
+            ghostAddress: a.ghost_address,
           })
       );
       this.isOwner = result.isOwner;

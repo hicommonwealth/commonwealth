@@ -184,13 +184,15 @@ export class RolesController {
   }
 
   public getActiveAccountsByRole(): [AddressAccount, RoleInfo][] {
-    const activeAccountsByRole = this.User.activeAddressAccounts.map((account) => {
-      const role = this.getRoleInCommunity({
-        account,
-        chain: app.activeChainId(),
-      });
-      return [account, role];
-    });
+    const activeAccountsByRole = this.User.activeAddressAccounts.map(
+      (account) => {
+        const role = this.getRoleInCommunity({
+          account,
+          chain: app.activeChainId(),
+        });
+        return [account, role];
+      }
+    );
     return activeAccountsByRole.reduce(
       (
         arr: [AddressAccount, RoleInfo][],

@@ -10,7 +10,7 @@ import type Comment from 'client/scripts/models/Comment';
 import type { IUniqueId } from 'client/scripts/models/interfaces';
 import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
 import { ProfileActivityContent } from './profile_activity_content';
-import type { AddressAccount } from "models";
+import type { AddressAccount } from 'models';
 
 enum ProfileActivityType {
   Addresses,

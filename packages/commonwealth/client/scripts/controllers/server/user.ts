@@ -72,7 +72,9 @@ export class UserController {
     return this._activeAddressAccounts;
   }
 
-  private _setActiveAddressAccounts(activeAddressAccounts: AddressAccount[]): void {
+  private _setActiveAddressAccounts(
+    activeAddressAccounts: AddressAccount[]
+  ): void {
     this._activeAddressAccounts = activeAddressAccounts;
   }
 
@@ -229,7 +231,9 @@ export class UserController {
     );
   }
 
-  public setActiveAddressAccounts(activeAddressAccounts: AddressAccount[]): void {
+  public setActiveAddressAccounts(
+    activeAddressAccounts: AddressAccount[]
+  ): void {
     this._setActiveAddressAccounts(activeAddressAccounts);
   }
 
@@ -239,7 +243,9 @@ export class UserController {
 
   public removeActiveAddressAccount(address: AddressAccount): void {
     this._activeAddressAccounts.splice(
-      this._activeAddressAccounts.findIndex((a) => a.address === address.address),
+      this._activeAddressAccounts.findIndex(
+        (a) => a.address === address.address
+      ),
       1
     );
   }

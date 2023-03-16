@@ -39,7 +39,9 @@ export async function setActiveAccount(account: AddressAccount): Promise<void> {
       app.user.activeAddressAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
     ) {
-      app.user.setActiveAddressAccounts(app.user.activeAddressAccounts.concat([account]));
+      app.user.setActiveAddressAccounts(
+        app.user.activeAddressAccounts.concat([account])
+      );
     }
     return;
   }
@@ -67,10 +69,12 @@ export async function setActiveAccount(account: AddressAccount): Promise<void> {
   role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
   if (
-    app.user.activeAddressAccounts.filter((a) => isSameAccount(a, account)).length ===
-    0
+    app.user.activeAddressAccounts.filter((a) => isSameAccount(a, account))
+      .length === 0
   ) {
-    app.user.setActiveAddressAccounts(app.user.activeAddressAccounts.concat([account]));
+    app.user.setActiveAddressAccounts(
+      app.user.activeAddressAccounts.concat([account])
+    );
   }
 }
 
@@ -110,8 +114,9 @@ export async function completeClientLogin(addressAccount: AddressAccount) {
     // set the address as active
     await setActiveAccount(addressAccount);
     if (
-      app.user.activeAddressAccounts.filter((a) => isSameAccount(a, addressAccount))
-        .length === 0
+      app.user.activeAddressAccounts.filter((a) =>
+        isSameAccount(a, addressAccount)
+      ).length === 0
     ) {
       app.user.setActiveAddressAccounts(
         app.user.activeAddressAccounts.concat([addressAccount])
