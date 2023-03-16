@@ -13,11 +13,10 @@ import {
 import { SubstrateTypes } from 'chain-events/src/types';
 import type { ProposalType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import getFetch from 'helpers/getFetch';
+import { getBaseUrl, getFetch } from 'helpers/getUrl';
 import type { ChainInfo } from 'models';
-import { ChainEntity, ChainEvent } from 'models';
+import { ChainEntity, ChainEvent, ChainEventType } from 'models';
 import { proposalSlugToChainEntityType } from '../../identifiers';
-import app from 'state';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
@@ -96,8 +95,8 @@ class ChainEntityController {
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
-      getFetch(`${app.serverUrl()}/ce/entities`, options),
-      getFetch(`${app.serverUrl()}/getEntityMeta`, options),
+      getFetch(getBaseUrl() + '/entities', options),
+      getFetch(getBaseUrl() + '/getEntityMeta', options),
     ]);
 
     const data = [];
@@ -128,9 +127,7 @@ class ChainEntityController {
   }
 
   public async getRawEntities(chain: string): Promise<ChainEntity[]> {
-    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, {
-      chain,
-    });
+    const entities = await getFetch(getBaseUrl() + '/entities', { chain });
     const data = [];
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
@@ -174,9 +171,20 @@ class ChainEntityController {
       // eslint-disable-next-line no-continue
       if (!eventEntity) continue;
       const [entityKind] = eventEntity;
+      // create event type
+      const eventType = new ChainEventType(
+        `${chain}-${cwEvent.data.kind.toString()}`,
+        chain,
+        network,
+        cwEvent.data.kind.toString()
+      );
 
       // create event
-      const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data);
+      const event = new ChainEvent(
+        cwEvent.blockNumber,
+        cwEvent.data,
+        eventType
+      );
 
       // create entity
       const fieldName = getUniqueEntityKey(network, entityKind);

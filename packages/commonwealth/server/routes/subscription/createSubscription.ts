@@ -66,6 +66,19 @@ export default async (
         });
         if (!comment) return next(new AppError(Errors.NoComment));
         obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain };
+      } else {
+        if (!req.body.chain_id)
+          return next(new AppError(Errors.ChainRequiredForEntity));
+        const chainEntityMeta = await models.ChainEntityMeta.findOne({
+          where: {
+            ce_id: req.body.chain_entity_id,
+          },
+        });
+        if (!chainEntityMeta) return next(new AppError(Errors.NoChainEntity));
+        obj = {
+          chain_id: chainEntityMeta.chain,
+          chain_entity_id: chainEntityMeta.ce_id,
+        };
       }
       break;
     }
@@ -79,26 +92,27 @@ export default async (
         },
       });
       if (!chain) return next(new AppError(Errors.InvalidChain));
-
-      // object_id = req.body.object_id = [chain_id]_chainEvents
-      obj = { chain_id: p_entity };
+      const chainEventType = await models.ChainEventType.findOne({
+        where: {
+          id: req.body.object_id,
+        },
+      });
+      if (!chainEventType)
+        return next(new AppError(Errors.InvalidChainEventId));
+      obj = { chain_id: p_entity, chain_event_type_id: req.body.object_id };
       break;
     }
     default:
       return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
-  const subscription = (
-    await models.Subscription.create({
-      subscriber_id: req.user.id,
-      category_id: req.body.category,
-      object_id: req.body.object_id,
-      is_active: !!req.body.is_active,
-      ...obj,
-    })
-  ).toJSON();
+  const subscription = await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: req.body.category,
+    object_id: req.body.object_id,
+    is_active: !!req.body.is_active,
+    ...obj,
+  });
 
-  subscription.Chain = chain.toJSON();
-
-  return res.json({ status: 'Success', result: subscription });
+  return res.json({ status: 'Success', result: subscription.toJSON() });
 };
