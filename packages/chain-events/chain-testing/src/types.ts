@@ -29,7 +29,6 @@ export interface dexGetTokens {
 export interface govCompVote {
   proposalId: string | number;
   accountIndex: number;
-  numberOfVotes: string;
   forAgainst: boolean;
 }
 
@@ -40,6 +39,10 @@ export interface govCompGetVotes {
 
 export interface govCompProposalId {
   proposalId: string;
+}
+
+export interface govCompCreate {
+  accountIndex: number;
 }
 
 export interface chainAdvanceTime {

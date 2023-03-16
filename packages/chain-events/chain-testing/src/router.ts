@@ -34,7 +34,7 @@ function setupRouter(): Router {
   router.post('/erc20/dex/getTokens', getTokens);
 
   //Governance Routes
-  router.get('/gov/compound/createProposal', createProposal);
+  router.post('/gov/compound/createProposal', createProposal);
   router.post('/gov/compound/cancelProposal', cancelProposal);
   router.post('/gov/compound/castVote', castVote);
   router.post('/gov/compound/proposalDetails', getProposalDetails);

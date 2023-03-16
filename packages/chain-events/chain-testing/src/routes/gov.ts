@@ -1,11 +1,17 @@
 import { Request, Response } from 'express';
-import { govCompGetVotes, govCompProposalId, govCompVote } from '../types';
+import {
+  govCompCreate,
+  govCompGetVotes,
+  govCompProposalId,
+  govCompVote,
+} from '../types';
 import { compoundGovernor } from '../utils/governance/compoundGov';
 
 export const createProposal = async (req: Request, res: Response) => {
   try {
+    const request: govCompCreate = req.body;
     const gov = new compoundGovernor();
-    const id = await gov.createArbitraryProposal(3);
+    const id = await gov.createArbitraryProposal(request.accountIndex, 3);
     res.status(200).json(id).send();
   } catch (err) {
     res

@@ -10,23 +10,29 @@ export class compoundGovernor implements IGovernor {
   readonly admin = '0x6d903f6003cca6255D85CcA4D3B5E5146dC33925';
 
   public async createArbitraryProposal(
+    accountIndex: number,
     advanceDays?: string | number
   ): Promise<string> {
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
-    const accounts = await provider.eth.getAccounts();
+    const accounts = (await provider.eth.getAccounts())[accountIndex];
     const compToken = erc20(this.compToken, provider);
     // Get min proposal COMP from 'bank'
-    await compToken.methods
-      .transfer(accounts[2], Web3.utils.toWei('30000'))
-      .send({
-        from: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
-        gasLimit: 100000,
-      });
+    const bal = provider.utils.toBN(
+      await compToken.methods.balanceOf(accounts).call()
+    );
+    if (bal.lt(provider.utils.toBN(Web3.utils.toWei('30000')))) {
+      await compToken.methods
+        .transfer(accounts, Web3.utils.toWei('30000'))
+        .send({
+          from: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
+          gasLimit: 100000,
+        });
+    }
     // Delegate to proposer
     await compToken.methods
-      .delegate(accounts[0])
-      .send({ from: accounts[2], gasLimit: 150000 });
+      .delegate(accounts)
+      .send({ from: accounts, gasLimit: 150000 });
     // Create Proposal
     const proposalId = await contract.methods
       .propose(
@@ -38,7 +44,7 @@ export class compoundGovernor implements IGovernor {
         ],
         'Liquidation ratio propoasl'
       )
-      .send({ from: accounts[0], gasLimit: 1000000 });
+      .send({ from: accounts, gasLimit: 1000000 });
 
     // Advance blocks/timestamp to make proposal active
     if (advanceDays) {
@@ -166,7 +172,7 @@ export class compoundGovernor implements IGovernor {
     for (const idx of accts) {
       await this.getVotes(idx, '120000');
     }
-    const proposalId = await this.createArbitraryProposal(3);
+    const proposalId = await this.createArbitraryProposal(0, 3);
     for (const idx of accts) {
       await this.castVote(proposalId, idx, true);
     }

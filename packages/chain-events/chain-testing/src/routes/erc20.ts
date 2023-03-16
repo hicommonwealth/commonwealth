@@ -39,13 +39,14 @@ export const getBalance = async (req: Request, res: Response) => {
 
 export const transfer = async (req: Request, res: Response) => {
   try {
+    console.log(req.body);
     const request: erc20Transfer = req.body;
     const provider = getProvider();
     const contract = erc20(request.tokenAddress, provider);
     const account = request.fromBank
       ? '0xF977814e90dA44bFA03b6295A0616a897441aceC'
       : (await provider.eth.getAccounts())[request.accountIndex ?? 0];
-    if (request.from) {
+    if (!request.fromBank && request.from) {
       await contract.methods
         .transferFrom(
           request.to,
@@ -60,6 +61,7 @@ export const transfer = async (req: Request, res: Response) => {
     }
     res.status(200).send();
   } catch (err) {
+    console.log(err);
     res
       .status(500)
       .json({
