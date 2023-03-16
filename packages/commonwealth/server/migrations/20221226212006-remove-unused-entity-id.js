@@ -7,7 +7,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('Subscriptions', 'chain_entity_id', {
-      type: Sequelize.STRING,
+      type: Sequelize.INTEGER,
       allowNull: true,
       references: { model: 'ChainEntityMeta', key: 'id' },
     });
