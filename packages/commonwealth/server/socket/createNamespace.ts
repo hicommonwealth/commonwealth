@@ -32,16 +32,19 @@ export function createNamespace(io: Server, namespace: WebsocketNamespaces) {
       );
     });
 
-    socket.on(WebsocketMessageNames.NewSubscriptions, (chain: string[]) => {
-      if (chain.length > 0) {
-        log.info(
-          `socket_id = ${socket.id}, user_id = ${
-            (<any>socket).user.id
-          } joining ${JSON.stringify(chain)}`
-        );
-        socket.join(chain);
+    socket.on(
+      WebsocketMessageNames.NewSubscriptions,
+      (eventTypes: string[]) => {
+        if (eventTypes.length > 0) {
+          log.info(
+            `socket_id = ${socket.id}, user_id = ${
+              (<any>socket).user.id
+            } joining ${JSON.stringify(eventTypes)}`
+          );
+          socket.join(eventTypes);
+        }
       }
-    });
+    );
 
     socket.on(
       WebsocketMessageNames.DeleteSubscriptions,
@@ -85,7 +88,7 @@ export async function publishToChainEventsRoom(
   notification: ChainEventNotification
 ) {
   this.server
-    .to(notification.ChainEvent.chain)
+    .to(notification.ChainEvent.ChainEventType.id)
     .emit(WebsocketMessageNames.ChainEventNotification, notification);
 }
 

@@ -28,7 +28,6 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { NotificationCategories } from '../../../../../../common-common/src/types';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -54,29 +53,7 @@ class NotificationSettingsPage extends ClassComponent {
       return <PageLoading />;
     }
 
-    // bundled discussion subscriptions
-    const bundledSubs = bundleSubs(
-      app.user.notifications.subscriptions.filter(
-        (x) => x.category !== 'chain-event'
-      )
-    );
-    // bundled chain-event subscriptions
-    const chainEventSubs = bundleSubs(
-      app.user.notifications.subscriptions.filter(
-        (x) => x.category === 'chain-event'
-      )
-    );
-
-    const subscribedChainIds =
-      app.user.notifications.chainEventSubscribedChainIds;
-
-    // chains/communities the user has addresses for but does not have existing subscriptions for
-    const relevantSubscribedChains = app.user.addresses
-      .map((x) => x.chain)
-      .filter(
-        (x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]
-      );
-
+    const bundledSubs = bundleSubs(app.user.notifications.subscriptions);
     const currentFrequency = app.user.emailInterval;
 
     return (
@@ -90,133 +67,6 @@ class NotificationSettingsPage extends ClassComponent {
           <CWText className="page-subheader-text">
             Notification settings for all new threads, comments, mentions,
             likes, and chain events in the following communities.
-          </CWText>
-          <CWText
-            type="h4"
-            fontWeight="semiBold"
-            className="chain-events-section-margin"
-          >
-            Chain Events
-          </CWText>
-          <div class="column-header-row">
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="column-header-text"
-            >
-              Community
-            </CWText>
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="column-header-text"
-            >
-              Email
-            </CWText>
-            <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
-              fontWeight="medium"
-              className="last-column-header-text"
-            >
-              In-App
-            </CWText>
-          </div>
-          {relevantSubscribedChains.map((chain) => {
-            return (
-              <div class="notification-row chain-events-subscriptions-padding">
-                <div class="notification-row-header">
-                  <div class="left-content-container">
-                    <div class="avatar-and-name">
-                      <CWCommunityAvatar size="medium" community={chain} />
-                      <CWText type="h5" fontWeight="medium">
-                        {chain.name}
-                      </CWText>
-                    </div>
-                  </div>
-                  <CWCheckbox
-                    label="Receive Emails"
-                    disabled={true}
-                    checked={false}
-                    onchange={() => {
-                      app.user.notifications
-                        .enableImmediateEmails([])
-                        .then(() => {
-                          m.redraw();
-                        });
-                    }}
-                  />
-                  <CWToggle
-                    checked={false}
-                    onchange={() => {
-                      app.user.notifications
-                        .subscribe(NotificationCategories.ChainEvent, chain.id)
-                        .then(() => {
-                          m.redraw();
-                        });
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-          {Object.entries(chainEventSubs).map(([chainName, subs]) => {
-            const chainInfo = app.config.chains.getById(chainName);
-            const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
-            const hasSomeInAppSubs = subs.some((s) => s.isActive);
-            return (
-              <div class="notification-row chain-events-subscriptions-padding">
-                <div class="notification-row-header">
-                  <div className="left-content-container">
-                    <div class="avatar-and-name">
-                      <CWCommunityAvatar size="medium" community={chainInfo} />
-                      <CWText type="h5" fontWeight="medium">
-                        {chainInfo?.name}
-                      </CWText>
-                    </div>
-                  </div>
-                  <CWCheckbox
-                    label="Receive Emails"
-                    checked={hasSomeEmailSubs}
-                    onchange={() => {
-                      hasSomeEmailSubs
-                        ? app.user.notifications
-                            .disableImmediateEmails(subs)
-                            .then(() => {
-                              m.redraw();
-                            })
-                        : app.user.notifications
-                            .enableImmediateEmails(subs)
-                            .then(() => {
-                              m.redraw();
-                            });
-                    }}
-                  />
-                  <CWToggle
-                    checked={subs.some((s) => s.isActive)}
-                    onchange={() => {
-                      hasSomeInAppSubs
-                        ? app.user.notifications
-                            .disableSubscriptions(subs)
-                            .then(() => {
-                              m.redraw();
-                            })
-                        : app.user.notifications
-                            .enableSubscriptions(subs)
-                            .then(() => {
-                              m.redraw();
-                            });
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-          <CWText
-            type="h4"
-            fontWeight="semiBold"
-            className="discussion-section-margin"
-          >
-            Discussion
           </CWText>
           <div class="email-management-section">
             <div class="text-description">
