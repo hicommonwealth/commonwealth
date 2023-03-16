@@ -189,7 +189,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       hideConnectAnotherWayLink,
     } = vnode.attrs;
 
-    let { linking } = vnode.attrs;
+    const { linking } = vnode.attrs;
 
     // We call handleNormalWalletLogin if we're using connecting a new wallet, and
     // handleSessionKeyRevalidation if we're regenerating a session key.
