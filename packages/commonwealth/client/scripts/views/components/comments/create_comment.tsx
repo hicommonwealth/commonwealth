@@ -179,7 +179,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
             <div className="form-buttons">
               <CWButton
                 disabled={
-                  !handleIsReplying ? editorValue.length > 0 : undefined
+                  !handleIsReplying ? editorValue.length === 0 : undefined
                 }
                 buttonType="secondary-blue"
                 onClick={(e) => {

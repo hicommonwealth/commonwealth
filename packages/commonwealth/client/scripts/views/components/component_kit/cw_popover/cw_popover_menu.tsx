@@ -61,7 +61,7 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                         isSecondary?: boolean;
                       }>({ disabled, isSecondary }, 'PopoverMenuItem')}
                       onClick={(e) => {
-                        onClick();
+                        onClick(e);
                         popoverProps.handleInteraction(e);
                       }}
                       key={i}
