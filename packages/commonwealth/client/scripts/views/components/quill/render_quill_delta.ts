@@ -1,7 +1,6 @@
 import { render } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
-import m from 'mithril';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
 
 export const renderQuillDelta = (

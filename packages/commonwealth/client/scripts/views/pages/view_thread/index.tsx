@@ -322,13 +322,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
     // load profiles
     if (!prefetch[threadIdAndType]['profilesStarted']) {
-      app.newProfiles.getProfile(thread.authorChain, thread.author);
+      app.profiles.getProfile(thread.authorChain, thread.author);
 
       comments.forEach((comment) => {
-        app.newProfiles.getProfile(comment.authorChain, comment.author);
+        app.profiles.getProfile(comment.authorChain, comment.author);
       });
 
-      app.newProfiles.isFetched.on('redraw', () => {
+      app.profiles.isFetched.on('redraw', () => {
         if (!prefetch[threadIdAndType]['profilesFinished']) {
           setPrefetch((prevState) => ({
             ...prevState,
@@ -401,7 +401,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   if (
-    !app.newProfiles.allLoaded() &&
+    !app.profiles.allLoaded() &&
     !prefetch[threadIdAndType]['profilesFinished']
   ) {
     return <PageLoading />;

@@ -5,12 +5,13 @@ import { detectURL } from 'helpers/threads';
 import $ from 'jquery';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import _ from 'lodash';
-import { MinimumProfile as Profile } from 'models';
+import { Profile } from 'models';
 import moment from 'moment';
 import Quill from 'quill';
 import type QuillMention from 'quill-mention';
 
 import app from 'state';
+import { PreviewModal } from 'views/modals/preview_modal';
 import type {
   DeltaOps,
   QuillActiveMode,
@@ -663,7 +664,7 @@ export default class QuillEditorInternal {
         chainScope: app.activeChainId(),
       });
       formattedMatches = members.map((addr) => {
-        const profile: Profile = app.newProfiles.getProfile(
+        const profile: Profile = app.profiles.getProfile(
           addr.chain,
           addr.address
         );

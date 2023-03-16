@@ -1,5 +1,5 @@
 /* eslint-disable no-script-url */
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { link } from 'helpers';
 
@@ -8,8 +8,7 @@ import 'components/user/user.scss';
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
 import type { Account } from 'models';
-import { MinimumProfile as Profile } from 'models';
-import { AddressInfo } from 'models';
+import { AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
@@ -51,12 +50,6 @@ export const User = (props: UserAttrs) => {
     showRole,
   } = props;
   const navigate = useCommonNavigate();
-
-  useEffect(() => {
-    app.newProfiles.isFetched.on('redraw', () => {
-      updateState({});
-    });
-  }, []);
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [, updateState] = React.useState({});
@@ -113,7 +106,12 @@ export const User = (props: UserAttrs) => {
       }
     }
 
-    profile = app.newProfiles.getProfile(chainId.id, address);
+    profile = app.profiles.getProfile(chainId.id, address);
+    if (!profile.initialized) {
+      app.profiles.isFetched.on('redraw', () => {
+        updateState({});
+      });
+    }
 
     role = adminsAndMods.find(
       (r) => r.address === address && r.address_chain === chainId.id
@@ -140,7 +138,13 @@ export const User = (props: UserAttrs) => {
     // but we currently inject objects of type 'any' on the profile page
     const chainId = account.chain.id;
 
-    profile = app.newProfiles.getProfile(chainId, account.address);
+    profile = account.profile;
+
+    if (!profile.initialized) {
+      app.profiles.isFetched.on('redraw', () => {
+        updateState({});
+      });
+    }
 
     role = adminsAndMods.find(
       (r) => r.address === account.address && r.address_chain === chainId
@@ -185,15 +189,19 @@ export const User = (props: UserAttrs) => {
           {linkify ? (
             link(
               'a.user-display-name.username',
-              profile ? `/profile/id/${profile.id}` : 'javascript:',
+              profile
+                ? `/${app.activeChainId() || profile.chain}/account/${
+                    profile.address
+                  }?base=${profile.chain}`
+                : 'javascript:',
               <>
                 {!profile ? (
                   addrShort
                 ) : !showAddressWithDisplayName ? (
-                  profile.name
+                  profile.displayName
                 ) : (
                   <>
-                    {profile.name}
+                    {profile.displayName}
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
@@ -201,17 +209,17 @@ export const User = (props: UserAttrs) => {
                 )}
                 {getRoleTags(false)}
               </>,
-              () => navigate(`/profile/id/${profile.id}`, {}, null)
+              navigate
             )
           ) : (
             <a className="user-display-name username">
               {!profile ? (
                 addrShort
               ) : !showAddressWithDisplayName ? (
-                profile.name
+                profile.displayName
               ) : (
                 <>
-                  {profile.name}
+                  {profile.displayName}
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
@@ -256,20 +264,24 @@ export const User = (props: UserAttrs) => {
             app.chain.base === ChainBase.Substrate &&
             link(
               'a.user-display-name',
-              profile ? `/profile/id/${profile.id}` : 'javascript:',
+              profile
+                ? `/${app.activeChainId() || profile.chain}/account/${
+                    profile.address
+                  }?base=${profile.chain}`
+                : 'javascript:',
               !profile ? (
                 addrShort
               ) : !showAddressWithDisplayName ? (
-                profile.name
+                profile.displayName
               ) : (
                 <React.Fragment>
-                  {profile.name}
+                  {profile.displayName}
                   <div className="id-short">
                     {formatAddressShort(profile.address, profile.chain)}
                   </div>
                 </React.Fragment>
               ),
-              () => navigate(`/profile/id/${profile.id}`, {}, null)
+              navigate
             )}
         </div>
         {profile?.address && (

@@ -192,8 +192,6 @@
 
 .UserBlock {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
 
   .user-block-left {
     padding-right: 13px;
@@ -201,8 +199,7 @@
   }
 
   .user-block-center {
-    display: flex;
-    align-items: center;
+    flex: 1;
 
     .user-block-name,
     .user-block-address {
@@ -211,11 +208,17 @@
 
     .user-block-address {
       font-size: 0.85em;
+      opacity: 0.6;
       margin-top: -2px;
     }
   }
 
   .user-block-right {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    width: 60px;
+
     .user-block-selected {
       text-align: right;
       position: relative;

@@ -36,7 +36,7 @@ export const TipDetail = (props: TipDetailProps) => {
           <div className="proposal-page-row">
             <div className="label">Beneficiary</div>
             <User
-              user={app.newProfiles.getProfile(proposal.author.chain.id, who)}
+              user={app.profiles.getProfile(proposal.author.chain.id, who)}
               linkify
               popover
               showAddressWithDisplayName

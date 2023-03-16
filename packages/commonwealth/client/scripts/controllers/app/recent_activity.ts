@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import type { Thread, Topic } from 'models';
-import { AbridgedThread, MinimumProfile as Profile } from 'models';
+import { AbridgedThread, Profile } from 'models';
 import moment from 'moment';
 import app from 'state';
 
@@ -59,9 +59,9 @@ class RecentActivityController {
   public setMostActiveUsers(users) {
     this._activeUsers = users.map((user) => {
       const { count } = user;
-      const { chain, address, name, id, avatarUrl, lastActive } = user.info;
-      const info = new Profile(address, chain);
-      info.initialize(name, address, avatarUrl, id, chain, lastActive);
+      const { chain, address, name, headline, bio, avatarUrl } = user.info;
+      const info = new Profile(chain, address);
+      info.initialize(name, headline, bio, avatarUrl, null);
       return { info, count };
     });
   }

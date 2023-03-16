@@ -792,7 +792,6 @@ export const ComponentShowcase = () => {
           uploadCompleteCallback={(url: string) => {
             notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
           }}
-          enableGenerativeAI
         />
       </div>
       <div className="choice-gallery">

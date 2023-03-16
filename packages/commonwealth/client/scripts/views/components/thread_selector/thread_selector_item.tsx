@@ -16,7 +16,7 @@ export const ThreadSelectorItem = ({
   onClick,
   isSelected,
 }: ThreadSelectorItemProps) => {
-  const author = app.newProfiles.getProfile(thread.authorChain, thread.author);
+  const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
   return (
     <div className="thread-selector-item-row" onClick={() => onClick(thread)}>

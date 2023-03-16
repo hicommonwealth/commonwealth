@@ -3,7 +3,6 @@ import React from 'react';
 import 'components/component_kit/cw_popover/cw_address_tooltip.scss';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import m from 'mithril';
 import { CWIconButton } from '../cw_icon_button';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';

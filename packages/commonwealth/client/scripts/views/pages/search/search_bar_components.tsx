@@ -152,7 +152,7 @@ export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
   return (
     <div className="SearchBarMemberPreviewRow">
       <User
-        user={app.newProfiles.getProfile(searchResult.chain, searchResult.address)}
+        user={app.profiles.getProfile(searchResult.chain, searchResult.address)}
         linkify
       />
     </div>

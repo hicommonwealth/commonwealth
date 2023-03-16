@@ -59,7 +59,7 @@ export const ThreadSelector = ({
             setSearchResults(results);
             setLoading(false);
             results.forEach((thread) => {
-              app.newProfiles.getProfile(thread.authorChain, thread.author);
+              app.profiles.getProfile(thread.authorChain, thread.author);
             });
           })
           .catch(() => {

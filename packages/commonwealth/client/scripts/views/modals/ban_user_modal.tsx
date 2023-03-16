@@ -3,7 +3,7 @@ import React from 'react';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';
 
-import type { MinimumProfile as Profile } from 'models';
+import type { Profile } from 'models';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';

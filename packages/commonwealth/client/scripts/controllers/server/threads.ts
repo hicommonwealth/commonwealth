@@ -9,7 +9,7 @@ import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 
 import { redraw } from 'mithrilInterop';
-import type { ChainEntity, MinimumProfile as Profile, Topic } from 'models';
+import type { ChainEntity, Profile, Topic } from 'models';
 import {
   Attachment,
   NotificationSubscription,

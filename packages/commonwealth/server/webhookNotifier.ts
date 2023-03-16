@@ -114,16 +114,13 @@ const getFilteredContent = (content, address) => {
 
 const send = async (models, content: WebhookContent) => {
   let address;
-  let profile;
   try {
     address = await models.Address.findOne({
       where: {
         address: content.user,
         chain: content.author_chain,
       },
-      include: [models.Profile],
     });
-    profile = await address.getProfile();
   } catch (err) {
     // pass nothing if no matching address is found
   }
@@ -167,8 +164,13 @@ const send = async (models, content: WebhookContent) => {
     ? `${SERVER_URL}/${address.chain}/account/${address.address}`
     : null;
 
-  if (profile) {
-    actorAvatarUrl = profile.avatar_url;
+  if (address?.id) {
+    const actorProfile = await models.OffchainProfile.findOne({
+      where: { address_id: address.id },
+    });
+    if (actorProfile?.data) {
+      actorAvatarUrl = JSON.parse(actorProfile.data).avatarUrl;
+    }
   }
 
   let previewImageUrl = null; // image url of webhook preview

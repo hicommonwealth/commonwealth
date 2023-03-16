@@ -34,10 +34,10 @@ export const UpgradeRolesForm = ({
     // @TODO: @Profiles upgrade, clean this up
     const chainId = _role.chain_id ? _role.chain_id : _role.Address?.chain?.id;
 
-    const displayName = app.newProfiles.getProfile(
+    const displayName = app.profiles.getProfile(
       chainId as string,
       _role.Address.address
-    ).name;
+    ).displayName;
 
     const roletext = _role.permission === 'moderator' ? '(moderator)' : '';
 

@@ -26,6 +26,7 @@ import type { LoginTokenModelStatic } from './models/login_token';
 import type { NotificationModelStatic } from './models/notification';
 import type { NotificationCategoryModelStatic } from './models/notification_category';
 import type { NotificationsReadModelStatic } from './models/notifications_read';
+import type { OffchainProfileModelStatic } from './models/offchain_profile';
 import type { PollModelStatic } from './models/poll';
 import type { ProfileModelStatic } from './models/profile';
 import type { ReactionModelStatic } from './models/reaction';
@@ -75,6 +76,7 @@ export type Models = {
   Attachment: AttachmentModelStatic;
   Comment: CommentModelStatic;
   Poll: PollModelStatic;
+  OffchainProfile: OffchainProfileModelStatic;
   Reaction: ReactionModelStatic;
   Thread: ThreadModelStatic;
   Topic: TopicModelStatic;

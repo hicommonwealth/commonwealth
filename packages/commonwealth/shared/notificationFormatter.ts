@@ -43,7 +43,7 @@ export const getForumNotificationCopy = async (
       : 'New activity on Commonwealth';
 
   // author
-  const authorProfile = await models.Profile.findOne({
+  const authorProfile = await models.OffchainProfile.findOne({
     include: [
       {
         model: models.Address,

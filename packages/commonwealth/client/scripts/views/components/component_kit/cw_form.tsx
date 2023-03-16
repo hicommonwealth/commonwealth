@@ -8,11 +8,11 @@ import { ComponentType } from './types';
 type FormProps = {
   description: string;
   title: string;
-  actions?: React.ReactNode;
+  topRightElement?: React.ReactNode;
 } & React.PropsWithChildren;
 
 export const CWForm = (props: FormProps) => {
-  const { description, title, actions } = props;
+  const { description, title, topRightElement } = props;
 
   return (
     <div className={ComponentType.Form}>
@@ -23,11 +23,12 @@ export const CWForm = (props: FormProps) => {
           </CWText>
           <CWText type="b1">{description}</CWText>
         </div>
-        {actions && <div className="actions top">{actions}</div>}
+        {topRightElement && (
+          <div className="top-right-element">{topRightElement}</div>
+        )}
       </div>
       <CWDivider />
       <div className="content">{props.children}</div>
-      {actions && <div className="actions">{actions}</div>}
     </div>
   );
 };

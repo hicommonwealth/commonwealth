@@ -1,0 +1,21 @@
+@import '../shared';
+
+.EditProfileModal {
+  width: 480px;
+
+  @include smallInclusive {
+    width: 100%;
+  }
+
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .buttons-row {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+  }
+}

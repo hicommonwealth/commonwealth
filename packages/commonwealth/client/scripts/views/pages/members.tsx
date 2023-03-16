@@ -4,7 +4,7 @@ import { Virtuoso } from 'react-virtuoso';
 import 'pages/members.scss';
 
 import app from 'state';
-import type { MinimumProfile as Profile } from 'models';
+import type { Profile } from 'models';
 import { AccessLevel } from 'models';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
@@ -35,7 +35,7 @@ const MembersPage = () => {
 
       const profiles: Array<MemberInfo> = membersCopySortedByPerms.map(
         (role) => ({
-          profile: app.newProfiles.getProfile(role.address_chain, role.address),
+          profile: app.profiles.getProfile(role.address_chain, role.address),
         })
       );
 

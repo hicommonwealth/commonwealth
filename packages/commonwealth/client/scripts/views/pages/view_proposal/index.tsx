@@ -211,21 +211,21 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
     if (this.prefetch[proposalIdAndType]['profilesStarted'] === undefined) {
       if (this.proposal.author instanceof Account) {
         // AnyProposal
-        app.newProfiles.getProfile(
+        app.profiles.getProfile(
           this.proposal.author.chain.id,
           this.proposal.author.address
         );
       }
 
       this.comments.forEach((comment) => {
-        app.newProfiles.getProfile(comment.authorChain, comment.author);
+        app.profiles.getProfile(comment.authorChain, comment.author);
       });
 
       this.prefetch[proposalIdAndType]['profilesStarted'] = true;
     }
 
     if (
-      !app.newProfiles.allLoaded() &&
+      !app.profiles.allLoaded() &&
       !this.prefetch[proposalIdAndType]['profilesFinished']
     ) {
       return (
