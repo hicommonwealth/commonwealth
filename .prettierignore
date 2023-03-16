@@ -1,5 +1,4 @@
 **/build
-**/dist
 **/.github
 **/*.env
 **/node_modules
@@ -17,7 +16,6 @@ packages/chain-events/.eslintrc.js
 **/contractTypes
 **/factories
 **/eth/types
-**/eth/artifacts
 **/.eslintrc.js
 **/ios/App/App
 
