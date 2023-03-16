@@ -5,6 +5,7 @@ import {
   chainGetEth,
   erc20BalanceReq,
   erc20Transfer,
+  govCompCreate,
   govCompGetVotes,
   govCompProposalId,
   govCompVote,
@@ -112,9 +113,12 @@ export class ChainTesting {
    * Creates an arbitrary Compound proposal
    * @returns proposalId of create Proposal
    */
-  public async createProposal(): Promise<string> {
-    const response = await axios.get(
-      `${this.host}/gov/compound/createProposal`
+  public async createProposal(accountIndex: number): Promise<string> {
+    const request: govCompCreate = { accountIndex };
+    const response = await axios.post(
+      `${this.host}/gov/compound/createProposal`,
+      JSON.stringify(request),
+      this.header
     );
     return response.data;
   }

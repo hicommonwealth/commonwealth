@@ -1,5 +1,4 @@
 import Web3 from 'web3';
-import Ganache from 'ganache';
 
 const getProvider = () => {
   if (process.env.RPC_HOST === 'ganache') {

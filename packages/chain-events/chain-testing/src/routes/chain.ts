@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import Ganache from 'ganache';
 import Web3 from 'web3';
 import getProvider from '../utils/getProvider';
 import axios from 'axios';
