@@ -53,7 +53,6 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         app.chain.network === ChainNetwork.Sputnik ||
         (app.chain.base === ChainBase.Substrate &&
           app.chain.network !== ChainNetwork.Plasm) ||
-        app.chain.network === ChainNetwork.Moloch ||
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
         // app.chain.network === ChainNetwork.CommonProtocol ||
@@ -83,7 +82,6 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       (app.chain?.base === ChainBase.CosmosSDK &&
         app.chain.network !== ChainNetwork.Terra) ||
       app.chain?.network === ChainNetwork.Sputnik ||
-      app.chain?.network === ChainNetwork.Moloch ||
       app.chain?.network === ChainNetwork.Compound ||
       app.chain?.network === ChainNetwork.Aave;
 
