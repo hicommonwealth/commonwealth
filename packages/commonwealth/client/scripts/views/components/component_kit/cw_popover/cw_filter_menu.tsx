@@ -2,13 +2,6 @@ import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
-import m from 'mithril';
-import { CWButton } from '../cw_button';
-import type { CheckboxType } from '../cw_checkbox';
-import { CWCheckbox } from '../cw_checkbox';
-import { CWText } from '../cw_text';
-import { getClasses } from '../helpers';
-import { ComponentType } from '../types';
 
 import type { CheckboxType } from '../cw_checkbox';
 import { CWCheckbox } from '../cw_checkbox';

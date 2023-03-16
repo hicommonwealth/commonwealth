@@ -1,7 +1,6 @@
 import React from 'react';
 
 import 'components/component_kit/cw_empty_state.scss';
-import m from 'mithril';
 
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
