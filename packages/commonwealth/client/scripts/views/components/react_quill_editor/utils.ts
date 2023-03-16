@@ -1,4 +1,4 @@
-import { DeltaStatic } from "quill"
+import type { DeltaStatic } from "quill";
 
 // createDeltaFromText creates a new DeltaStatic object from a string
 export const createDeltaFromText = (str: string) : DeltaStatic => {
