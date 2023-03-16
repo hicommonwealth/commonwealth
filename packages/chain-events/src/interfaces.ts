@@ -224,7 +224,6 @@ export function getChainEventNetwork(
   else if (chainNetwork === ChainNetwork.Compound)
     return SupportedNetwork.Compound;
   else if (chainNetwork === ChainNetwork.Aave) return SupportedNetwork.Aave;
-  else if (chainNetwork === ChainNetwork.Moloch) return SupportedNetwork.Moloch;
   else throw new Error('No matching SupportedNetwork');
 }
 
