@@ -62,12 +62,12 @@ module.exports = {
       );
       console.log('New notifications table created');
 
-      await queryInterface.dropTable('OldNotifications', {
-        transaction: t,
-        raw: true,
-        cascade: true,
-      });
-      console.log('Old notifications table dropped');
+      // await queryInterface.dropTable('OldNotifications', {
+      //   transaction: t,
+      //   raw: true,
+      //   cascade: true,
+      // });
+      // console.log('Old notifications table dropped');
 
       await queryInterface.sequelize.query(
         `
@@ -171,12 +171,12 @@ module.exports = {
       );
       console.log('New subscriptions table created');
 
-      await queryInterface.dropTable('OldSubscriptions', {
-        transaction: t,
-        raw: true,
-        cascade: true,
-      });
-      console.log('Old subscriptions table dropped');
+      // await queryInterface.dropTable('OldSubscriptions', {
+      //   transaction: t,
+      //   raw: true,
+      //   cascade: true,
+      // });
+      // console.log('Old subscriptions table dropped');
 
       await queryInterface.sequelize.query(
         `

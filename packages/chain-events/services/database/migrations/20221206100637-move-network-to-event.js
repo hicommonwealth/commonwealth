@@ -3,6 +3,8 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
+      // await queryInterface.addColumn('network', {});
+
       await queryInterface.sequelize.query(
         `
             UPDATE "ChainEvents" CE
