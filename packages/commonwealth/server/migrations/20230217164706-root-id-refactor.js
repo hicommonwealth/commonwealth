@@ -16,131 +16,134 @@ module.exports = {
       const threadComments = await queryInterface.sequelize.query(
         `SELECT * FROM "Comments" WHERE "root_id" ILIKE '%discussion%'`
       );
-
-      // for each comment that is part of a discussion, replace its root_id with the thread_id
-      threadComments[0].forEach((c) => {
-        updateQueries.push(
-          queryInterface.sequelize.query(
-            `UPDATE "Comments" SET "root_id" = ${
+      if (threadComments[0].length > 0) {
+        // for each comment that is part of a discussion, replace its root_id with the thread_id
+        threadComments[0].forEach((c) => {
+          updateQueries.push(
+            queryInterface.sequelize.query(
+              `UPDATE "Comments" SET "root_id" = ${
               c.root_id.split('_')[1]
             } WHERE "id"=${c.id}`,
-            { transaction: t }
-          )
-        );
-      });
-
-      // we will now perform the same operation with proposal comments, but in order to do so we must create threads
-      // to backlink to proposals
-      const proposalComments = await queryInterface.sequelize.query(
-        `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`
-      );
-
-      // maps [chain, root_id] -> newThread it creates
-      const newThreads = new Map();
-      const urlToRootId = new Map();
-      proposalComments[0].forEach((c) => {
-        if (newThreads.get(tupleToKey([c.chain, c.root_id]))) {
-          return; // if we already had created thread to backlink proposal comments, don't create another one
-        }
-
-        let rootParts = c.root_id.split('_');
-        let key = tupleToKey([c.chain, c.root_id]);
-        // handle cosmosproposals and onchainproposal differently
-        if (
-          rootParts[0] === 'cosmosproposal' ||
-          rootParts[0] === 'onchainproposal'
-        ) {
-          rootParts = ['proposal', rootParts[1]];
-          key = tupleToKey([c.chain, rootParts.join('_')]);
-        } else {
-          rootParts = [`proposal/${rootParts[0]}`, rootParts[1]];
-        }
-
-        const url = `https://commonwealth.im/${c.chain}/${rootParts[0]}/${rootParts[1]}`;
-        // otherwise map the root_id to a new thread to backlink proposal comments
-        newThreads.set(key, {
-          address_id: 1,
-          title: `Thread for ${c.chain}'s ${rootParts[0]} ${rootParts[1]}`,
-          kind: 'link',
-          body: '',
-          url: url,
-          chain: c.chain,
-          read_only: true,
-          stage: 'discussion',
-          canvas_action: null,
-          canvas_hash: null,
-          canvas_session: null,
-          // set the dates to a year back so they dont spam chain's home page
-          created_at: new Date(
-            new Date().setFullYear(new Date().getFullYear() - 1)
-          ),
-          updated_at: new Date(
-            new Date().setFullYear(new Date().getFullYear() - 1)
-          ),
+              {transaction: t}
+            )
+          );
         });
 
-        urlToRootId.set(url, c.root_id);
-      });
+        // we will now perform the same operation with proposal comments, but in order to do so we must create threads
+        // to backlink to proposals
+        const proposalComments = await queryInterface.sequelize.query(
+          `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`
+        );
 
-      const inserted = await queryInterface.bulkInsert(
-        'Threads',
-        [...newThreads.values()],
-        { returning: true, transaction: t }
-      );
+        if (proposalComments[0].length > 0) {
+          // maps [chain, root_id] -> newThread it creates
+          const newThreads = new Map();
+          const urlToRootId = new Map();
+          proposalComments[0].forEach((c) => {
+            if (newThreads.get(tupleToKey([c.chain, c.root_id]))) {
+              return; // if we already had created thread to backlink proposal comments, don't create another one
+            }
 
-      // create map of rootId -> thread_id
-      const rootToThreadMap = new Map(
-        inserted.map((thread) => {
-          return [
-            tupleToKey([thread.chain, urlToRootId.get(thread.url)]),
-            thread.id,
-          ];
-        })
-      );
+            let rootParts = c.root_id.split('_');
+            let key = tupleToKey([c.chain, c.root_id]);
+            // handle cosmosproposals and onchainproposal differently
+            if (
+              rootParts[0] === 'cosmosproposal' ||
+              rootParts[0] === 'onchainproposal'
+            ) {
+              rootParts = ['proposal', rootParts[1]];
+              key = tupleToKey([c.chain, rootParts.join('_')]);
+            } else {
+              rootParts = [`proposal/${rootParts[0]}`, rootParts[1]];
+            }
 
-      // for each proposal comment, set its root_id to thread_id
-      proposalComments[0].forEach((c) => {
-        if (
-          c.root_id.includes('councilcandidate') ||
-          c.root_id.includes('councilmotion')
-        ) {
-          deleteCommentIds.push(c.id);
-          return;
-        }
-        updateQueries.push(
-          queryInterface.sequelize.query(
-            `UPDATE "Comments" SET "root_id" = ${rootToThreadMap.get(
+            const url = `https://commonwealth.im/${c.chain}/${rootParts[0]}/${rootParts[1]}`;
+            // otherwise map the root_id to a new thread to backlink proposal comments
+            newThreads.set(key, {
+              address_id: 1,
+              title: `Thread for ${c.chain}'s ${rootParts[0]} ${rootParts[1]}`,
+              kind: 'link',
+              body: '',
+              url: url,
+              chain: c.chain,
+              read_only: true,
+              stage: 'discussion',
+              canvas_action: null,
+              canvas_hash: null,
+              canvas_session: null,
+              // set the dates to a year back so they dont spam chain's home page
+              created_at: new Date(
+                new Date().setFullYear(new Date().getFullYear() - 1)
+              ),
+              updated_at: new Date(
+                new Date().setFullYear(new Date().getFullYear() - 1)
+              ),
+            });
+
+            urlToRootId.set(url, c.root_id);
+          });
+
+          const inserted = await queryInterface.bulkInsert(
+            'Threads',
+            [...newThreads.values()],
+            {returning: true, transaction: t}
+          );
+
+          // create map of rootId -> thread_id
+          const rootToThreadMap = new Map(
+            inserted.map((thread) => {
+              return [
+                tupleToKey([thread.chain, urlToRootId.get(thread.url)]),
+                thread.id,
+              ];
+            })
+          );
+
+          // for each proposal comment, set its root_id to thread_id
+          proposalComments[0].forEach((c) => {
+            if (
+              c.root_id.includes('councilcandidate') ||
+              c.root_id.includes('councilmotion')
+            ) {
+              deleteCommentIds.push(c.id);
+              return;
+            }
+            updateQueries.push(
+              queryInterface.sequelize.query(
+                `UPDATE "Comments" SET "root_id" = ${rootToThreadMap.get(
               tupleToKey([c.chain, c.root_id])
             )} WHERE "id"=${c.id}`,
-            { transaction: t }
-          )
-        );
-      });
+                {transaction: t}
+              )
+            );
+          });
 
-      const deleteQueries = [];
-      deleteCommentIds.forEach((id) => {
-        deleteQueries.push(
-          queryInterface.bulkDelete(
-            'Reactions',
-            { comment_id: id },
-            { transaction: t }
-          )
-        );
-      });
+          const deleteQueries = [];
+          deleteCommentIds.forEach((id) => {
+            deleteQueries.push(
+              queryInterface.bulkDelete(
+                'Reactions',
+                {comment_id: id},
+                {transaction: t}
+              )
+            );
+          });
 
-      deleteCommentIds.forEach((id) => {
-        deleteQueries.push(
-          queryInterface.bulkDelete('Comments', { id: id }, { transaction: t })
-        );
-      });
+          deleteCommentIds.forEach((id) => {
+            deleteQueries.push(
+              queryInterface.bulkDelete('Comments', {id: id}, {transaction: t})
+            );
+          });
 
-      await Promise.all([...deleteQueries, ...updateQueries]);
+          await Promise.all([...deleteQueries, ...updateQueries]);
+
+        }
+      }
 
       await queryInterface.renameColumn('Comments', 'root_id', 'thread_id', {
         transaction: t,
       });
     });
-
     // cant be part of the transaction, or it will cause db to deadlock
     await queryInterface.changeColumn('Comments', 'thread_id', {
       type: 'INTEGER USING CAST("thread_id" as INTEGER)',
