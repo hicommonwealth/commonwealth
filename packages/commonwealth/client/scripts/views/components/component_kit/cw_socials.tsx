@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-
-import { redraw } from 'mithrilInterop';
+import React, { useState } from 'react';
 
 import 'components/component_kit/cw_socials.scss';
 
@@ -17,22 +15,17 @@ type SocialsProps = {
 };
 
 export const CWSocials = (props: SocialsProps) => {
-  const [socials, setSocials] = useState(
-    props.socials ? [...props.socials] : []
-  );
+  const [socials, setSocials] = useState(props.socials);
 
   const addInputRow = () => {
     setSocials([...socials, '']);
   };
 
   const deleteInputRow = (index: number) => {
-    setSocials(socials.filter((_, i) => i !== index));
+    const newSocials = socials.filter((_, i) => i !== index);
+    setSocials(newSocials);
+    props.handleInputChange(newSocials);
   };
-
-  useEffect(() => {
-    const { handleInputChange } = props;
-    handleInputChange(socials);
-  }, [socials]);
 
   const socialsList = socials?.map((social, i) => {
     let name: string;
@@ -79,7 +72,7 @@ export const CWSocials = (props: SocialsProps) => {
             const newSocials = [...socials];
             newSocials[i] = e.target.value;
             setSocials(newSocials);
-            redraw(); // might not need this
+            props.handleInputChange(newSocials);
           }}
         />
         <CWIconButton

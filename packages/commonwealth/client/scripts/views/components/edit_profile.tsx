@@ -61,11 +61,9 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   const [bio, setBio] = React.useState<DeltaStatic>(createDeltaFromText(''));
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [isOwner, setIsOwner] = useState();
-  const [backgroundImage, setBackgroundImage] = useState<Image>();
   const [displayNameValid, setDisplayNameValid] = useState(true);
   const [account, setAccount] = useState<Account>();
   const backgroundImageRef = useRef<Image>();
-  backgroundImageRef.current = backgroundImage;
 
   const getProfile = async (query: string) => {
     try {
@@ -82,7 +80,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
       setSocials(response.data.result.profile.socials);
       setAvatarUrl(response.data.result.profile.avatar_url);
       setBio(response.data.result.profile.bio);
-      setBackgroundImage(response.data.result.profile.background_image);
+      backgroundImageRef.current = response.data.result.profile.background_image;
       setAddresses(
         response.data.result.addresses.map((a) => {
           try {
@@ -158,7 +156,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
     if (!_.isEqual(backgroundImageRef, profile?.backgroundImage))
       profileUpdate.backgroundImage = JSON.stringify(
-        backgroundImageRef
+        backgroundImageRef.current
       );
 
     if (Object.keys(profileUpdate)?.length > 0) {
@@ -375,23 +373,23 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
                 url: string,
                 imageBehavior: ImageBehavior
               ) => {
-                setBackgroundImage({
+                backgroundImageRef.current = {
                   url,
                   imageBehavior,
-                });
+                };
               }}
               generatedImageCallback={(
                 url: string,
                 imageBehavior: ImageBehavior
               ) => {
-                setBackgroundImage({
+                backgroundImageRef.current = {
                   url,
                   imageBehavior,
-                });
+                };
               }}
               enableGenerativeAI
-              defaultImageUrl={backgroundImage?.url}
-              defaultImageBehavior={backgroundImage?.imageBehavior}
+              defaultImageUrl={backgroundImageRef.current?.url}
+              defaultImageBehavior={backgroundImageRef.current?.imageBehavior}
             />
           </CWFormSection>
           <CWFormSection
