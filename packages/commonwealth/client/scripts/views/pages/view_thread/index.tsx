@@ -95,8 +95,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadUpdatedCallback = (title: string, body: string) => {
     setThread(new Thread({
       ...thread,
-      title: title || thread.title,
-      body: body || thread.body
+      title: title,
+      body: body
     }))
     cancelEditing()
   } 
