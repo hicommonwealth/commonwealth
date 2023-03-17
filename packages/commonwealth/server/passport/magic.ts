@@ -64,7 +64,7 @@ export function useMagicAuth(models: DB) {
         if (
           !existingUser &&
           registrationChain?.base &&
-          !MAGIC_SUPPORTED_BASES.includes(registrationChain.base)
+          !MAGIC_SUPPORTED_BASES.includes(registrationChain?.base)
         ) {
           // unsupported chain -- client should send through old email flow
           return cb(new AppError('Unsupported magic chain.'));
