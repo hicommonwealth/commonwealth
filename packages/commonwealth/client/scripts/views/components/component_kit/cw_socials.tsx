@@ -15,7 +15,7 @@ type SocialsProps = {
 };
 
 export const CWSocials = (props: SocialsProps) => {
-  const [socials, setSocials] = useState(props.socials);
+  const [socials, setSocials] = useState(props.socials ?? []);
 
   const addInputRow = () => {
     setSocials([...socials, '']);
