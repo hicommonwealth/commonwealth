@@ -72,7 +72,7 @@ export function useMagicAuth(models: DB) {
 
         // if on root URL, no chain base, we allow users to sign up and generate an Ethereum Address
         if (!existingUser) {
-          const chainId = registrationChain.id || 'ethereum';
+          const chainId = registrationChain?.id ?? 'ethereum';
           const ethAddress = userMetadata.publicAddress;
           const result = await sequelize.transaction(async (t) => {
             // create new user and unverified address if doesn't exist
@@ -100,7 +100,6 @@ export function useMagicAuth(models: DB) {
               },
               { transaction: t }
             );
-
             await createRole(
               models,
               newAddress.id,
