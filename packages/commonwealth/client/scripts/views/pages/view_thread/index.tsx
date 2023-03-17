@@ -87,6 +87,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
+  const cancelEditing = () => {
+    setIsGloballyEditing(false)
+    setIsEditingBody(false)
+  }
+
+  const threadUpdatedCallback = (title: string, body: string) => {
+    setThread(new Thread({
+      ...thread,
+      title: title || thread.title,
+      body: body || thread.body
+    }))
+    cancelEditing()
+  } 
+    
   const updatedCommentsCallback = useCallback(() => {
     if (!thread) {
       return;
@@ -665,11 +679,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 {reactionsAndReplyButtons}
                 <EditBody
+                  title={title}
                   thread={thread}
                   savedEdits={savedEdits}
                   shouldRestoreEdits={shouldRestoreEdits}
-                  setIsEditing={setIsEditingBody}
-                  title={title}
+                  cancelEditing={cancelEditing}
+                  threadUpdatedCallback={threadUpdatedCallback}
                 />
               </>
             ) : (

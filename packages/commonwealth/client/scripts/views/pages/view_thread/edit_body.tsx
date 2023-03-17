@@ -7,24 +7,29 @@ import app from 'state';
 import { ContentType } from 'types';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { parseDeltaString } from '../../components/react_quill_editor/utils';
 
 type EditBodyProps = {
+  title: string;
   savedEdits: string;
-  setIsEditing: (status: boolean) => void;
   shouldRestoreEdits: boolean;
   thread: Thread;
-  title: string;
+  cancelEditing: () => void;
+  threadUpdatedCallback: (title: string, body: string) => void;
 };
 
 export const EditBody = (props: EditBodyProps) => {
 
-  const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } = props;
-
-  const navigate = useCommonNavigate();
+  const { 
+    title,
+    shouldRestoreEdits, 
+    savedEdits, 
+    thread, 
+    cancelEditing,
+    threadUpdatedCallback,
+  } = props;
 
   const threadBody = (shouldRestoreEdits && savedEdits) ? savedEdits : thread.body;
   const body = parseDeltaString(threadBody)
@@ -44,9 +49,8 @@ export const EditBody = (props: EditBodyProps) => {
     }
 
     if (cancelConfirmed) {
-      setIsEditing(false);
       clearEditingLocalStorage(thread.id, ContentType.Thread);
-      navigate(`/discussion/${thread.id}`);
+      cancelEditing();
     }
   }
 
@@ -56,11 +60,11 @@ export const EditBody = (props: EditBodyProps) => {
     setSaving(true);
 
     try {
-      await app.threads.edit(thread, JSON.stringify(contentDelta), title)
-      setIsEditing(false);
+      const newBody = JSON.stringify(contentDelta)
+      await app.threads.edit(thread, newBody, title)
       clearEditingLocalStorage(thread.id, ContentType.Thread);
-      navigate(`/discussion/${thread.id}`);
       notifySuccess('Thread successfully edited');
+      threadUpdatedCallback(title, newBody);
     } catch (err) {
       console.error(err)
     } finally {
