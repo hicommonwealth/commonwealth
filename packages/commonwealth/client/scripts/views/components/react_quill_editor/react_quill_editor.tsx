@@ -39,4 +39,4 @@ const ReactQuillEditor = ({
 
 }
 
-export default ReactQuillEditor
+export default ReactQuillEditor;

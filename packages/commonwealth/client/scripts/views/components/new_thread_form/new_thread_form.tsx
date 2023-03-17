@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactQuill from 'react-quill';
 import { capitalize } from 'lodash';
 
 import 'components/new_thread_form.scss';
@@ -9,11 +10,8 @@ import { ThreadKind, ThreadStage } from 'models';
 import app from 'state';
 import { detectURL } from 'helpers/threads';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { TopicSelector } from 'views/components/topic_selector';
 import { useCommonNavigate } from 'navigation/helpers';
 
@@ -23,12 +21,9 @@ import {
   checkNewThreadErrors,
   updateTopicList,
 } from './helpers';
-import { ReactQuillEditor } from '../react_quill_editor';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
-
-  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
   const chainId = app.chain.id;
   const hasTopics = !!app.topics.getByCommunity(chainId).length;
@@ -116,71 +111,52 @@ export const NewThreadForm = () => {
         </div>
         <div className="new-thread-body">
           <div className="new-thread-form-inputs">
-            {!authorName && (
-              <div className="set-display-name-callout">
-                <CWText>You haven't set a display name yet.</CWText>
-                <a onClick={() => setIsEditProfileModalOpen(true)}>
-                  Set a display name
-                </a>
-              </div>
-            )}
-
-            <>
-              <div className="topics-and-title-row">
-                {hasTopics && (
-                  <TopicSelector
-                    defaultTopic={threadTopic}
-                    topics={topicsForSelector}
-                    onChange={setThreadTopic}
-                  />
-                )}
-                <CWTextInput
-                  autoFocus
-                  placeholder="Title"
-                  value={threadTitle}
-                  tabIndex={2}
-                  onInput={(e) => setThreadTitle(e.target.value)}
-                />
-              </div>
-
-              {!isDiscussion && (
-                <CWTextInput
-                  placeholder="https://"
-                  value={threadUrl}
-                  tabIndex={3}
-                  onInput={(e) => setThreadUrl(e.target.value)}
+            <div className="topics-and-title-row">
+              {hasTopics && (
+                <TopicSelector
+                  defaultTopic={threadTopic}
+                  topics={topicsForSelector}
+                  onChange={setThreadTopic}
                 />
               )}
+              <CWTextInput
+                autoFocus
+                placeholder="Title"
+                value={threadTitle}
+                tabIndex={2}
+                onInput={(e) => setThreadTitle(e.target.value)}
+              />
+            </div>
 
-              <div>
-                <ReactQuillEditor
-                  contentDelta={threadContentDelta}
-                  setContentDelta={setThreadContentDelta}
-                />
-              </div>
+            {!isDiscussion && (
+              <CWTextInput
+                placeholder="https://"
+                value={threadUrl}
+                tabIndex={3}
+                onInput={(e) => setThreadUrl(e.target.value)}
+              />
+            )}
 
-              <div className="buttons-row">
-                <CWButton
-                  label="Create thread"
-                  disabled={isDisabled}
-                  onClick={handleNewThreadCreation}
-                  tabIndex={4}
-                />
-              </div>
-            </>
+            <div>
+              <ReactQuill
+                className="QuillEditor"
+                onChange={(value, delta, source, editor) =>
+                  setThreadContentDelta(editor.getContents())
+                }
+              />
+            </div>
+
+            <div className="buttons-row">
+              <CWButton
+                label="Create thread"
+                disabled={isDisabled}
+                onClick={handleNewThreadCreation}
+                tabIndex={4}
+              />
+            </div>
           </div>
         </div>
       </div>
-      <Modal
-        onClose={() => setIsEditProfileModalOpen(false)}
-        open={isEditProfileModalOpen}
-        content={
-          <EditProfileModal
-            onModalClose={() => setIsEditProfileModalOpen(false)}
-            account={app.user.activeAccount}
-          />
-        }
-      />
     </>
   );
 };

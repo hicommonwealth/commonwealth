@@ -7,8 +7,12 @@ import app from 'state';
 import { ContentType } from 'types';
 import { CWButton } from '../component_kit/cw_button';
 import { clearEditingLocalStorage } from './helpers';
-import { DeltaStatic } from 'quill';
-import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../react_quill_editor';
+import type { DeltaStatic } from 'quill';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  ReactQuillEditor,
+} from '../react_quill_editor';
 
 type EditCommentProps = {
   comment: Comment<any>;
@@ -29,7 +33,9 @@ export const EditComment = (props: EditCommentProps) => {
 
   const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
 
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(body));
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    createDeltaFromText(body)
+  );
   const [saving, setSaving] = React.useState<boolean>();
 
   const editorValue = getTextFromDelta(contentDelta);
