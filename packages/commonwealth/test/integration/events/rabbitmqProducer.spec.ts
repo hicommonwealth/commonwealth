@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { RabbitMqHandler } from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers';
+import { RabbitMqHandler } from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
 import type { CWEvent } from 'chain-events/src';
 import {
   RascalPublications,
