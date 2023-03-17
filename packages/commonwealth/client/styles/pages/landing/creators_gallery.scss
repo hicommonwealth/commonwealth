@@ -50,7 +50,6 @@
     flex-direction: column;
     gap: 16px;
     justify-content: center;
-    max-width: 768px;
   }
 
   .inner-container {
@@ -60,6 +59,29 @@
     height: 568px;
     padding: 32px;
     width: 1104px;
+
+    @include mediumSmall {
+      width: 100%;
+    }
+
+    @include smallInclusive {
+      flex-direction: column;
+      height: unset;
+      justify-content: space-between;
+      padding: 24px;
+      width: 100%;
+    }
+
+    .mobile-card {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px;
+
+      .mobile-card-text.Text {
+        color: $white;
+      }
+    }
 
     .cards-column {
       display: flex;

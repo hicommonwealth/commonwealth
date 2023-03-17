@@ -27,7 +27,7 @@ import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
-import { CWToggle } from '../component_kit/cw_toggle';
+import { CWToggle, toggleDarkMode } from '../component_kit/cw_toggle';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { UserBlock } from '../user/user_block';
@@ -210,28 +210,16 @@ export const LoginSelectorMenuRight = ({
           <CWToggle
             checked={isDarkModeOn}
             onChange={(e) => {
-              if (isDarkModeOn) {
-                localStorage.setItem('dark-mode-state', 'off');
-                localStorage.setItem('user-dark-mode-state', 'off');
-                document
-                  .getElementsByTagName('html')[0]
-                  .classList.toggle('invert');
-                setIsDarkModeOn(false);
-              } else {
-                document
-                  .getElementsByTagName('html')[0]
-                  .classList.toggle('invert');
-                localStorage.setItem('dark-mode-state', 'on');
-                localStorage.setItem('user-dark-mode-state', 'on');
-                setIsDarkModeOn(true);
-              }
+              isDarkModeOn
+                ? toggleDarkMode(false, setIsDarkModeOn)
+                : toggleDarkMode(true, setIsDarkModeOn);
               e.stopPropagation();
               redraw();
             }}
           />
-          <CWText type="caption">
-            {isDarkModeOn ? 'Light mode' : 'Dark mode'}
-          </CWText>
+          <div className="login-darkmode-label">
+            <CWText type="caption">Dark mode</CWText>
+          </div>
         </div>
         <CWDivider />
         <div className="login-menu-item" onClick={() => setIsModalOpen(true)}>
@@ -295,8 +283,9 @@ export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
-    useState(false);
+  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] = useState(
+    false
+  );
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const leftMenuProps = usePopover();
@@ -339,9 +328,8 @@ export const LoginSelector = () => {
 
   const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
-  const nAccountsWithoutRole = activeAccountsByRole.filter(
-    ([role]) => !role
-  ).length;
+  const nAccountsWithoutRole = activeAccountsByRole.filter(([role]) => !role)
+    .length;
 
   if (!profileLoadComplete && app.newProfiles.allLoaded()) {
     setProfileLoadComplete(true);

@@ -4,6 +4,7 @@ import React from 'react';
 import { renderMultilineText } from 'helpers';
 
 import 'pages/privacy_and_terms.scss';
+
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
 

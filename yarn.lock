@@ -3132,11 +3132,6 @@
   dependencies:
     "@floating-ui/core" "^1.2.2"
 
-"@glidejs/glide@^3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@glidejs/glide/-/glide-3.6.0.tgz#d13fd57de8473a2d86022ac601b5cbc98c9dcfe5"
-  integrity sha512-47Aa+JmYjY4xTFpTtYCwrqirmI1arnp1UZETwtWpbTPisXUAuxrdJxKJLH8KHFWMsSrLi9+AcfyfzDIuO75rEA==
-
 "@graphql-typed-document-node/core@^3.0.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.1.0.tgz#0eee6373e11418bfe0b5638f654df7a4ca6a3950"
@@ -4400,11 +4395,6 @@
   integrity sha1-yayFsqX9GENbjIXZ7LUObWyJP/g=
   dependencies:
     "@types/node" "*"
-
-"@types/glidejs__glide@^3.4.0":
-  version "3.4.0"
-  resolved "https://registry.npmjs.org/@types/glidejs__glide/-/glidejs__glide-3.4.0.tgz"
-  integrity sha512-LwOWY79RczNq18OZakHc3IXL1rfz27Rei83371Z45bDeI7UZfEiQPfqcHyxxuH51QwU+Rnww8y3rQzf9FBTSAw==
 
 "@types/glob@^7.1.1":
   version "7.1.1"
