@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React from 'react';
 
 import 'components/comments/edit_comment.scss';
 import type { Comment } from 'models';
@@ -8,7 +8,8 @@ import { ContentType } from 'types';
 import { CWButton } from '../component_kit/cw_button';
 import { clearEditingLocalStorage } from './helpers';
 import { DeltaStatic } from 'quill';
-import { createDeltaFromText, ReactQuillEditor } from '../react_quill_editor';
+import { ReactQuillEditor } from '../react_quill_editor';
+import { parseDeltaString } from '../react_quill_editor/utils';
 
 type EditCommentProps = {
   comment: Comment<any>;
@@ -27,7 +28,10 @@ export const EditComment = (props: EditCommentProps) => {
     updatedCommentsCallback,
   } = props;
 
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
+  const commentBody = (shouldRestoreEdits && savedEdits) ? savedEdits : comment.text;
+  const body = parseDeltaString(commentBody)
+
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>();
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -64,23 +68,6 @@ export const EditComment = (props: EditCommentProps) => {
     }
     
   }
-
-  // attempt to parse the comment text as JSON
-  // since it might be a quill delta object
-  const body = useMemo<DeltaStatic>(() => {
-    const commentText = (shouldRestoreEdits && savedEdits) ? savedEdits : comment.text;
-    try {
-      return JSON.parse(commentText)
-    } catch (e) {
-      console.warn('failed to parse comment as JSON, falling back on string', e)
-      return createDeltaFromText(commentText)
-    }
-  }, [shouldRestoreEdits, savedEdits, comment])
-
-  // once body is parsed, set initial content delta
-  useEffect(() => {
-    setContentDelta(body)
-  }, [body])
 
   return (
     <div className="EditComment">

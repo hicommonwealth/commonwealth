@@ -97,6 +97,11 @@ export const Comment = (props: CommentProps) => {
     !isLocked &&
     (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
+  const deleteComment = async () => {
+    await app.comments.delete(comment);
+    updatedCommentsCallback();
+  }
+
   return (
     <div className={`Comment comment-${comment.id}`}>
       {threadLevel > 0 && (
@@ -197,9 +202,7 @@ export const Comment = (props: CommentProps) => {
                         {
                           label: 'Delete',
                           iconLeft: 'trash',
-                          onClick: () => {
-                            app.comments.delete(comment);
-                          },
+                          onClick: deleteComment,
                         },
                       ]}
                     />

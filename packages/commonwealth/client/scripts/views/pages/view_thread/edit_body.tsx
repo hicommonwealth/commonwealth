@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React from 'react';
 
 import type { Thread } from 'models';
 import 'pages/view_thread/edit_body.scss';
@@ -9,7 +9,8 @@ import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
-import { createDeltaFromText, ReactQuillEditor } from '../../components/react_quill_editor';
+import { ReactQuillEditor } from '../../components/react_quill_editor';
+import { parseDeltaString } from '../../components/react_quill_editor/utils';
 
 type EditBodyProps = {
   savedEdits: string;
@@ -24,7 +25,11 @@ export const EditBody = (props: EditBodyProps) => {
   const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } = props;
 
   const navigate = useCommonNavigate();
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
+
+  const threadBody = (shouldRestoreEdits && savedEdits) ? savedEdits : thread.body;
+  const body = parseDeltaString(threadBody)
+
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>(false);
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -62,23 +67,6 @@ export const EditBody = (props: EditBodyProps) => {
       setSaving(false);
     }
   }
-
-  // attempt to parse the thread body as JSON
-  // since it might be a quill delta object
-  const body = useMemo<DeltaStatic>(() => {
-    const threadBody = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
-    try {
-      return JSON.parse(threadBody)
-    } catch (err) {
-      console.warn('failed to parse thread body as JSON, falling back on string', err)
-      return createDeltaFromText(threadBody)
-    }
-  }, [shouldRestoreEdits, savedEdits, thread])
-
-  // once body is parsed, set initial content delta
-  useEffect(() => {
-    setContentDelta(body)
-  }, [body])
 
   return (
     <div className="EditBody">
