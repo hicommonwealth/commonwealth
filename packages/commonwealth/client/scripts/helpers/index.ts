@@ -261,7 +261,7 @@ export function formatPercent(num: number, digits: number) {
 
 export function formatDuration(
   duration: moment.Duration,
-  includeSeconds = true
+  includeSeconds: boolean = true
 ) {
   const days = Math.floor(duration.asDays());
   return [
