@@ -1,7 +1,7 @@
 @import '../../shared';
 
 .Toggle {
-  background-color: $primary-300;
+  background-color: $neutral-300;
   border-radius: $border-radius-rounded-corners;
   display: inline-block;
   height: 24px;
@@ -25,7 +25,12 @@
   }
 
   &.checked {
-    background-color: $neutral-300;
+    background-color: $primary-300;
+    transition: all ease-in-out 0.2s;
+
+    .slider {
+      transform: translateX(24px);
+    }
 
     &.disabled {
       background-color: $primary-200;
