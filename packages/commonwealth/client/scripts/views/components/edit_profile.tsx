@@ -387,7 +387,7 @@ export default class EditProfileComponent extends ClassComponent {
                 addresses={this.addresses}
                 profile={this.profile}
                 refreshProfiles={(address: string) => {
-                  this.getProfile(vnode.attrs.profileId);
+                  this.getProfile();
                   // Remove from all address stores in the frontend state
                   const index = app.user.addresses.indexOf(
                     app.user.addresses.find((a) => a.address === address)
