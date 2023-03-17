@@ -29,7 +29,11 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
   let decodedTitle;
 
   try {
-    decodedTitle = decodeURIComponent(title);
+    if (isThread) {
+      decodedTitle = decodeURIComponent(title);
+    } else {
+      decodedTitle = decodeURIComponent(comment.thread?.title);
+    }
   } catch (err) {
     console.error(`Could not decode title: "${title}"`);
     decodedTitle = title;
