@@ -109,6 +109,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
   const cancel = (e) => {
     e.preventDefault();
     setContentDelta(createDeltaFromText(''))
+    if (handleIsReplying) {
+      handleIsReplying(false)
+    }
   }
 
   return (
