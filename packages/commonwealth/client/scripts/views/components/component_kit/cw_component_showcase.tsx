@@ -139,17 +139,15 @@ export const ComponentShowcase = () => {
   const [isToggled, setIsToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState<number>(1);
-  const [isRadioButtonChecked, setIsRadioButtonChecked] = useState<boolean>(
-    false
-  );
+  const [isRadioButtonChecked, setIsRadioButtonChecked] =
+    useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState<boolean>(
-    false
-  );
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
+    useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
@@ -157,6 +155,7 @@ export const ComponentShowcase = () => {
   return (
     <div className="ComponentShowcase">
       <AvatarUpload scope="community" />
+      <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
       <Modal
         content={<div>hi</div>}

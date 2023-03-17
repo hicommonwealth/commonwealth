@@ -96,8 +96,8 @@ export const AvatarUpload = ({
       })}
     >
       <div
-        className={getClasses<{ darkMode?: boolean }>(
-          { darkMode },
+        className={getClasses<{ darkMode?: boolean } & AvatarUploadStyleProps>(
+          { darkMode, size },
           'icon-button-container'
         )}
       >
