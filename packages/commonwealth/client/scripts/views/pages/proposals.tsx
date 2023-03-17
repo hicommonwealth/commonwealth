@@ -90,7 +90,6 @@ class ProposalsPage extends ClassComponent {
     }
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-    const onMoloch = app.chain && app.chain.network === ChainNetwork.Moloch;
     const onCompound = app.chain && app.chain.network === ChainNetwork.Compound;
     const onAave = app.chain && app.chain.network === ChainNetwork.Aave;
     const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;

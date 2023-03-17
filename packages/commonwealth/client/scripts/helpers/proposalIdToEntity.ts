@@ -1,7 +1,6 @@
 import {
   AaveTypes,
   CompoundTypes,
-  MolochTypes,
   SubstrateTypes,
 } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
@@ -38,9 +37,6 @@ export default function (app: IApp, chain: string, identifier: string) {
     }
     case ProposalType.SubstrateTreasuryTip: {
       return findEntity(SubstrateTypes.EntityKind.TipProposal.toString());
-    }
-    case ProposalType.MolochProposal: {
-      return findEntity(MolochTypes.EntityKind.Proposal.toString());
     }
     case ProposalType.CompoundProposal: {
       return findEntity(CompoundTypes.EntityKind.Proposal.toString());
