@@ -1,6 +1,6 @@
 import { DeltaStatic } from "quill"
 
-// parseDelta createds a new DeltaStatic object from a string JSON string
+// parseDelta creates a new DeltaStatic object from a string JSON string
 export const parseDeltaString = (str: string) : DeltaStatic => {
   try {
     return JSON.parse(str)
@@ -10,7 +10,7 @@ export const parseDeltaString = (str: string) : DeltaStatic => {
   }
 }
 
-// createDeltaFromText creates a new DeltaStatic object from a string
+// createDeltaFromText returns a new DeltaStatic object from a string
 export const createDeltaFromText = (str: string) : DeltaStatic => {
   return {
     ops: [
