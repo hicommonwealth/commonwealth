@@ -36,14 +36,16 @@ html.invert {
   -o-filter: invert(90%);
   -ms-filter: invert(90%);
 
+  .Profile,
+  .profile-image,
   img,
   .user-avatar:not(:has(.Avatar)),
   .Avatar {
-    filter: invert(90%);
-    -webkit-filter: invert(90%);
-    -moz-filter: invert(90%);
-    -o-filter: invert(90%);
-    -ms-filter: invert(90%);
+    filter: invert(120%);
+    -webkit-filter: invert(120%);
+    -moz-filter: invert(120%);
+    -o-filter: invert(120%);
+    -ms-filter: invert(120%);
   }
 }
 

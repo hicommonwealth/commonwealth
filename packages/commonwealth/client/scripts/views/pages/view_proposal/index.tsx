@@ -162,7 +162,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     if (this.prefetch[proposalIdAndType]['profilesStarted'] === undefined) {
       if (this.proposal.author instanceof Account) {
         // AnyProposal
-        app.profiles.getProfile(
+        app.newProfiles.getProfile(
           this.proposal.author.chain.id,
           this.proposal.author.address
         );
@@ -172,7 +172,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     }
 
     if (
-      !app.profiles.allLoaded() &&
+      !app.newProfiles.allLoaded() &&
       !this.prefetch[proposalIdAndType]['profilesFinished']
     ) {
       return (

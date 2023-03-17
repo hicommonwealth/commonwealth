@@ -8,6 +8,7 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { DB } from '../models';
 import { createRole, findOneRole } from '../util/roles';
 import { factory, formatFilename } from 'common-common/src/logging';
+import assertAddressOwnership from '../util/assertAddressOwnership';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -64,13 +65,6 @@ const linkExistingAddressToChain = async (
   if (!originalAddress) {
     return next(new AppError(Errors.NotVerifiedAddressOrUser));
   }
-
-  const originalProfile = await models.OffchainProfile.findOne({
-    where: { address_id: originalAddress.id },
-  });
-
-  const profileData =
-    originalProfile && originalProfile.data ? originalProfile.data : null;
 
   // check if the original address's token is expired. refer edge case 1)
   let verificationToken = originalAddress.verification_token;
@@ -154,27 +148,8 @@ const linkExistingAddressToChain = async (
       addressId = newObj.id;
     }
 
-    const existingProfile = await models.OffchainProfile.findOne({
-      where: { address_id: addressId },
-    });
-
-    if (existingProfile) {
-      await models.OffchainProfile.update(
-        {
-          data: profileData,
-        },
-        {
-          where: {
-            address_id: addressId,
-          },
-        }
-      );
-    } else {
-      await models.OffchainProfile.create({
-        address_id: addressId,
-        data: profileData,
-      });
-    }
+    // assertion check
+    await assertAddressOwnership(models, encodedAddress);
 
     const ownedAddresses = await models.Address.findAll({
       where: { user_id: originalAddress.user_id },

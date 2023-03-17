@@ -15,7 +15,6 @@ import { ContentType } from 'types';
 import type { QuillEditor } from 'views/components/quill/quill_editor';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import User from 'views/components/widgets/user';
-import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
@@ -135,100 +134,71 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
 
     return (
       <div class="CreateComment">
-        {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
-          <CWText type="h5" className="callout-text">
-            You haven't set a display name yet.
-            <a
-              href={`/${app.activeChainId()}/account/${
-                app.user.activeAccount.address
-              }?base=${app.user.activeAccount.chain.id}`}
+        <div class="attribution-row">
+          <div class="attribution-left-content">
+            <CWText type="caption">
+              {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
+            </CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="user-link-text"
+            >
+              {m(User, { user: author, hideAvatar: true, linkify: true })}
+            </CWText>
+          </div>
+          {error && <CWValidationText message={error} status="failure" />}
+        </div>
+        <QuillEditorComponent
+          contentsDoc=""
+          oncreateBind={(state: QuillEditor) => {
+            this.quillEditorState = state;
+          }}
+          editorNamespace={`${document.location.pathname}-commenting`}
+          imageUploader
+        />
+        {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
+          <CWText className="token-req-text">
+            Commenting in {activeTopicName} requires{' '}
+            {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
+            {app.chain.meta.default_symbol}.{' '}
+            {userBalance && app.user.activeAccount && (
+              <>
+                You have {weiToTokens(userBalance.toString(), decimals)}{' '}
+                {app.chain.meta.default_symbol}.
+              </>
+            )}
+          </CWText>
+        )}
+        <div
+          class="form-bottom"
+          onmouseover={() => {
+            // keeps Quill's isBlank up to date
+            return m.redraw();
+          }}
+        >
+          <div class="form-buttons">
+            <CWButton
+              disabled={
+                !handleIsReplying ? this.quillEditorState?.isBlank() : undefined
+              }
+              buttonType="secondary-blue"
               onclick={(e) => {
                 e.preventDefault();
-                app.modals.create({
-                  modal: EditProfileModal,
-                  data: {
-                    account: app.user.activeAccount,
-                    refreshCallback: () => m.redraw(),
-                  },
-                });
-              }}
-            >
-              Set a display name.
-            </a>
-          </CWText>
-        ) : (
-          <>
-            <div class="attribution-row">
-              <div class="attribution-left-content">
-                <CWText type="caption">
-                  {parentType === ContentType.Comment
-                    ? 'Reply as'
-                    : 'Comment as'}
-                </CWText>
-                <CWText
-                  type="caption"
-                  fontWeight="medium"
-                  className="user-link-text"
-                >
-                  {m(User, { user: author, hideAvatar: true, linkify: true })}
-                </CWText>
-              </div>
-              {error && <CWValidationText message={error} status="failure" />}
-            </div>
-            <QuillEditorComponent
-              contentsDoc=""
-              oncreateBind={(state: QuillEditor) => {
-                this.quillEditorState = state;
-              }}
-              editorNamespace={`${document.location.pathname}-commenting`}
-              imageUploader
-            />
-            {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-              <CWText className="token-req-text">
-                Commenting in {activeTopicName} requires{' '}
-                {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-                {app.chain.meta.default_symbol}.{' '}
-                {userBalance && app.user.activeAccount && (
-                  <>
-                    You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-                    {app.chain.meta.default_symbol}.
-                  </>
-                )}
-              </CWText>
-            )}
-            <div
-              class="form-bottom"
-              onmouseover={() => {
-                // keeps Quill's isBlank up to date
-                return m.redraw();
-              }}
-            >
-              <div class="form-buttons">
-                <CWButton
-                  disabled={
-                    !handleIsReplying
-                      ? this.quillEditorState?.isBlank()
-                      : undefined
-                  }
-                  buttonType="secondary-blue"
-                  onclick={(e) => {
-                    e.preventDefault();
 
-                    if (handleIsReplying) {
-                      handleIsReplying(false);
-                    }
-                  }}
-                  label="Cancel"
-                />
-                <CWButton
-                  disabled={disabled}
-                  onclick={handleSubmitComment}
-                  label={uploadsInProgress > 0 ? 'Uploading...' : 'Submit'}
-                />
-              </div>
-            </div>
-          </>
-        )}
+                if (handleIsReplying) {
+                  handleIsReplying(false);
+                }
+              }}
+              label="Cancel"
+            />
+            <CWButton
+              disabled={disabled}
+              onclick={handleSubmitComment}
+              label={uploadsInProgress > 0 ? 'Uploading...' : 'Submit'}
+            />
+          </div>
+        </div>
       </div>
     );
   }
