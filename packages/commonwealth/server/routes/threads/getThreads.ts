@@ -1,14 +1,14 @@
-import Sequelize from 'sequelize';
 import type {
   GetThreadsReq,
   GetThreadsResp,
 } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { success, failure } from '../../types';
+import Sequelize from 'sequelize';
 import type { DB } from '../../models';
-import { formatPagination } from '../../util/queries';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
+import { flattenIncludedAddresses, formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
@@ -45,21 +45,32 @@ export const getThreads = async (
 
   const pagination = formatPagination(req.query);
 
+  // if address is included, find which thread_ids they correspond to.
   const where = { chain: community_id };
-
-  const include = [];
   if (addresses) {
-    include.push({
-      model: models.Address,
+    const addressIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
-      as: 'Address',
+      attributes: ['id'],
     });
+
+    where['address_id'] = { [Op.in]: addressIds.map((p) => p.id) };
   }
 
-  let attributes;
+  const include: any = [
+    {
+      model: models.Address,
+      attributes: ['address'],
+      as: 'Address',
+      required: true,
+    },
+  ];
 
+  const attributes = { exclude: ['address_id'] };
   if (no_body)
-    attributes = { exclude: ['body', 'plaintext', 'version_history'] };
+    attributes.exclude = [
+      ...attributes.exclude,
+      ...['body', 'plaintext', 'version_history'],
+    ];
   if (topic_id) where['topic_id'] = topic_id;
   if (address_ids) where['address_id'] = { [Op.in]: address_ids };
   if (include_comments)
@@ -81,6 +92,8 @@ export const getThreads = async (
       ...pagination,
     });
   }
+
+  flattenIncludedAddresses(threads);
 
   return success(res, { threads, count });
 };
