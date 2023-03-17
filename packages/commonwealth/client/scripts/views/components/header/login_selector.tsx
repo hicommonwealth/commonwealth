@@ -197,7 +197,9 @@ export const LoginSelectorMenuRight = ({
               redraw();
             }}
           />
-          <CWText type="caption">Dark mode</CWText>
+          <div className="login-darkmode-label">
+            <CWText type="caption">Dark mode</CWText>
+          </div>
         </div>
         <CWDivider />
         <div className="login-menu-item" onClick={() => setIsModalOpen(true)}>
