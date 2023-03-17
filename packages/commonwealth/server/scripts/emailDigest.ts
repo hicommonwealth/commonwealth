@@ -52,7 +52,8 @@ export const getTopThreads = async (
         COUNT(DISTINCT c.id) AS comment_count,
         COUNT(DISTINCT r.id) AS view_count,
         a.address AS author_address,
-        t.id AS thread_id
+        t.id AS thread_id,
+        t.created_at AS created_at
       FROM 
         "Threads" t
         LEFT JOIN "Comments" c ON t.id = CAST(substring(c.root_id from '[0-9]+$') AS INTEGER)
