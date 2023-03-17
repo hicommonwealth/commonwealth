@@ -35,20 +35,17 @@ import { LinkedAddresses } from './linked_addresses';
 enum EditProfileError {
   None,
   NoProfileFound,
+  NotLoggedIn,
 }
 
 const NoProfileFoundError = 'No profile found';
-
-type EditNewProfileAttrs = {
-  profileId: string;
-};
 
 export type Image = {
   url: string;
   imageBehavior: ImageBehavior;
 };
 
-export default class EditProfileComponent extends ClassComponent<EditNewProfileAttrs> {
+export default class EditProfileComponent extends ClassComponent {
   private email: string;
   private error: EditProfileError;
   private loading: boolean;
@@ -59,15 +56,13 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
   private bio: QuillEditor;
   private avatarUrl: string;
   private addresses: AddressInfo[];
-  private isOwner: boolean;
   private backgroundImage: Image;
   private displayNameValid: boolean;
 
-  private getProfile = async (profileId: string) => {
+  private getProfile = async () => {
     this.loading = true;
     try {
       const { result } = await $.get(`${app.serverUrl()}/profile/v2`, {
-        profileId,
         jwt: app.user.jwt,
       });
 
@@ -88,7 +83,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
             a.ghost_address
           )
       );
-      this.isOwner = result.isOwner;
     } catch (err) {
       if (
         err.status === 500 &&
@@ -179,9 +173,9 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
     this.name = e.target.value;
   };
 
-  oninit(vnode) {
+  oninit() {
     this.error = EditProfileError.None;
-    this.getProfile(vnode.attrs.profileId);
+    this.getProfile();
     this.profileUpdate = {};
     this.displayNameValid = true;
   }
@@ -201,10 +195,6 @@ export default class EditProfileComponent extends ClassComponent<EditNewProfileA
       return <PageNotFound message="We cannot find this profile." />;
 
     if (this.error === EditProfileError.None) {
-      if (!this.isOwner) {
-        navigateToSubpage(`/profile/id/${vnode.attrs.profileId}`);
-      }
-
       // need to create an account to pass to AvatarUpload to see last upload
       // not the best solution because address is not always available
       // should refactor AvatarUpload to make it work with new profiles
