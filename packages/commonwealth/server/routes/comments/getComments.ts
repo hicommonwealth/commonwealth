@@ -1,14 +1,14 @@
-import Sequelize from 'sequelize';
 import type {
   GetCommentsReq,
   GetCommentsResp,
 } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { success, failure } from '../../types';
+import Sequelize from 'sequelize';
 import type { DB } from '../../models';
-import { formatPagination } from '../../util/queries';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
+import { flattenIncludedAddresses, formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
@@ -33,28 +33,42 @@ export const getComments = async (
 
   const where = { chain: community_id };
 
-  const include = [];
-  if (addresses)
-    include.push({
-      model: models.Address,
+  // if address is included, find which addressIds they correspond to.
+  if (addresses) {
+    const addressIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
-      required: true,
+      attributes: ['id'],
     });
+
+    where['address_id'] = { [Op.in]: addressIds.map((p) => p.id) };
+  }
+
+  const include = [
+    {
+      model: models.Address,
+      attributes: ['address'],
+      required: true,
+    },
+  ];
 
   let comments, count;
   if (!count_only) {
     ({ rows: comments, count } = await models.Comment.findAndCountAll({
       where,
       include,
+      attributes: { exclude: ['address_id'] },
       ...formatPagination(req.query),
     }));
   } else {
     count = await models.Comment.count({
       where,
       include,
+      attributes: { exclude: ['address_id'] },
       ...formatPagination(req.query),
     });
   }
+
+  flattenIncludedAddresses(comments);
 
   return success(res, { comments, count });
 };
