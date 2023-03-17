@@ -172,7 +172,7 @@ const User: m.Component<
           '.User',
           {
             key: profile?.address || '-',
-            class: linkify ? 'linkified' : '',
+            class: linkify && profile?.id ? 'linkified' : '',
           },
           [
             showAvatar &&
@@ -185,7 +185,7 @@ const User: m.Component<
               ),
             [
               // non-substrate name
-              linkify
+              linkify && profile?.id
                 ? link(
                     'a.user-display-name.username',
                     profile ? `/profile/id/${profile.id}` : 'javascript:',
@@ -205,8 +205,13 @@ const User: m.Component<
                     ]
                   )
                 : m('a.user-display-name.username', [
-                    !profile
-                      ? addrShort
+                    !profile || !profile?.id
+                      ? !profile?.id
+                        ? `${profile.address.slice(
+                            0,
+                            8
+                          )}...${profile.address.slice(-5)}`
+                        : addrShort
                       : !showAddressWithDisplayName
                       ? profile.name
                       : [
@@ -238,21 +243,27 @@ const User: m.Component<
       [
         m('.user-avatar', [!profile ? null : profileAvatarPopover]),
         m('.user-name', [
-          link(
-            'a.user-display-name',
-            profile ? `/profile/id/${profile.id}` : 'javascript:',
-            !profile
-              ? addrShort
-              : !showAddressWithDisplayName
-              ? profile.name
-              : [
-                  profile.name,
-                  m(
-                    '.id-short',
-                    formatAddressShort(profile.address, profile.chain)
-                  ),
-                ]
-          ),
+          profile &&
+            profile?.id &&
+            link(
+              'a.user-display-name',
+              `/profile/id/${profile.id}`,
+              !profile || !profile?.id
+                ? !profile?.id
+                  ? `${profile.address.slice(0, 8)}...${profile.address.slice(
+                      -5
+                    )}`
+                  : addrShort
+                : !showAddressWithDisplayName
+                ? profile.name
+                : [
+                    profile.name,
+                    m(
+                      '.id-short',
+                      formatAddressShort(profile.address, profile.chain)
+                    ),
+                  ]
+            ),
         ]),
         profile?.address &&
           m(
