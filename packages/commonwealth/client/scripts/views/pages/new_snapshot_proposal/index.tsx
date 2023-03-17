@@ -236,7 +236,6 @@ class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposa
               }}
             />
           </div>
-          {/* TODO: Replace QuillEditorComponent with ReactQuillEditor */}
           <QuillEditorComponent
             contentsDoc={this.form.body || ' '}
             oncreateBind={(state: QuillEditor) => {

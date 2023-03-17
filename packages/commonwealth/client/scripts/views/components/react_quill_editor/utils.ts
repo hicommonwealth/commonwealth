@@ -1,4 +1,4 @@
-import { DeltaStatic } from "quill"
+import type { DeltaStatic } from "quill";
 
 // parseDelta creates a new DeltaStatic object from a string JSON string
 export const parseDeltaString = (str: string) : DeltaStatic => {

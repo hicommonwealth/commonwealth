@@ -165,4 +165,15 @@ $width: 360px;
     gap: 8px;
     width: $width;
   }
+
+  .toggle-gallery {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+
+    .toggle-label {
+      display: grid;
+      align-items: center;
+    }
+  }
 }

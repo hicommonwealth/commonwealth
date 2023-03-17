@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Profile } from 'models';
+import type { MinimumProfile as Profile } from 'models';
 
 import 'components/component_kit/cw_avatar_group.scss';
 import { CWAvatar, CWJdenticon } from './cw_avatar';

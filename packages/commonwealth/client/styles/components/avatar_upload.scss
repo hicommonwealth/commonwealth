@@ -26,6 +26,16 @@
     right: 0;
     top: 0;
 
+    &.small {
+      height: 16px;
+      width: 16px;
+    }
+
+    &.large {
+      height: 24px;
+      width: 24px;
+    }
+
     &.darkMode {
       background-color: $neutral-800;
 

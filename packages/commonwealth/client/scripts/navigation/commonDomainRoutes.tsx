@@ -39,8 +39,6 @@ const FeedPage = lazy(() => import('views/pages/feed'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
 const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
 
-const SettingsPage = lazy(() => import('views/pages/settings'));
-
 const TreasuryPage = lazy(() => import('views/pages/treasury'));
 const TipsPage = lazy(() => import('views/pages/tips'));
 
@@ -61,7 +59,9 @@ const NewSnapshotProposalPage = lazy(
   () => import('views/pages/new_snapshot_proposal')
 );
 
-const ProfilePage = lazy(() => import('views/pages/profile'));
+const NewProfilePage = lazy(() => import('views/pages/new_profile'));
+const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
+const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const commonDomainsRoutes = () => [
   <Route
@@ -276,16 +276,6 @@ const commonDomainsRoutes = () => [
   />,
   // CONTRACTS END
 
-  // SETTINGS
-  <Route
-    path="/:scope/settings"
-    element={withLayout(SettingsPage, {
-      scoped: true,
-    })}
-  />,
-  <Route path="/settings" element={<Navigate to="/edgeware/settings" />} />,
-  // SETTINGS END
-
   // TREASURY
   <Route
     path="/:scope/treasury"
@@ -405,24 +395,36 @@ const commonDomainsRoutes = () => [
   // PROFILES
   <Route
     path="/:scope/account/:address"
-    element={withLayout(ProfilePage, {
+    element={withLayout(ProfilePageRedirect, {
       scoped: true,
       deferChain: true,
     })}
   />,
   <Route
     path="/:scope/account"
-    element={
-      <Navigate
-        to={({ scope }) =>
-          app.user.activeAccount
-            ? `/${scope}/account/${app.user.activeAccount.address}`
-            : `/${scope}`
-        }
-      />
-    }
+    element={withLayout(ProfilePageRedirect, {
+      scoped: true,
+      deferChain: true,
+    })}
   />,
   // PROFILES END
+
+  // NEW PROFILES
+  <Route
+    path="/profile/id/:profileId"
+    element={withLayout(NewProfilePage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
+    path="/profile/id/:profileId/edit"
+    element={withLayout(EditNewProfilePage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  // NEW PROFILES END
 
   // LEGACY REDIRECTS
   //here for compatibility only

@@ -1,0 +1,59 @@
+@import '../../shared';
+
+.Profile {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+
+  &.loading {
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ProfilePageContainer {
+    display: flex;
+    flex-direction: row;
+    margin: 64px 80px;
+    gap: 24px;
+
+    &.smaller-margins {
+      margin: 24px 80px;
+
+      @include mediumInclusive {
+        margin: 24px 72px;
+      }
+
+      @include mediumSmallInclusive {
+        margin: 24px 48px;
+      }
+
+      @include smallInclusive {
+        margin: 24px 32px;
+      }
+    }
+
+    @include mediumInclusive {
+      margin: 80px 72px;
+    }
+
+    @include mediumSmallInclusive {
+      margin: 40px 48px;
+    }
+
+    @include smallInclusive {
+      flex-direction: column;
+      margin: 40px 32px;
+    }
+  }
+
+  .ErrorPage {
+    padding: 56px 0;
+    text-align: center;
+
+    h3 {
+      margin-bottom: 36px;
+    }
+  }
+}
