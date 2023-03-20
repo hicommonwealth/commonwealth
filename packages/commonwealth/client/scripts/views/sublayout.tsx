@@ -47,7 +47,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
   }
 
   view(vnode: m.Vnode<SublayoutAttrs>) {
-    const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
+    const { hideFooter = true, hideSearch, onscroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
