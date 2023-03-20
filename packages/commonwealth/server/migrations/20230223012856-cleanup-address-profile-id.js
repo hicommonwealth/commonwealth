@@ -32,7 +32,7 @@ module.exports = {
             AND a.user_id = p.user_id
             AND a.id IN (${addresses.map((a) => a.id).join(',')});
         `,
-          {transaction}
+          { transaction }
         );
         console.log(`Update ${metadata.rowCount} Addresses to new profile_id.`);
       }
