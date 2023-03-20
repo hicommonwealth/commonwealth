@@ -195,145 +195,144 @@ const renderRoute = (
 
 const getCustomDomainRoutes = (importRoute) => ({
   // Custom domain routes
-  '/': importRoute(import('views/pages/discussions_redirect'), {
-    scoped: true,
-  }),
-  '/web3login': _DEPRECATED_redirectRoute(() => '/'),
-  '/search': importRoute(import('views/pages/search'), {
-    deferChain: true,
-  }),
-
+  // '/': importRoute(import('views/pages/discussions_redirect'), {
+  //   scoped: true,
+  // }),
+  // '/web3login': _DEPRECATED_redirectRoute(() => '/'),
+  // '/search': importRoute(import('views/pages/search'), {
+  //   deferChain: true,
+  // }),
+  //
   // Notifications
-  '/notification-settings': importRoute(
-    import('views/pages/notification_settings'),
-    {
-      scoped: true,
-      deferChain: true,
-    }
-  ),
-  '/notifications': importRoute(import('views/pages/notifications'), {
-    scoped: true,
-    deferChain: true,
-  }),
-
+  // '/notification-settings': importRoute(
+  //   import('views/pages/notification_settings'),
+  //   {
+  //     scoped: true,
+  //     deferChain: true,
+  //   }
+  // ),
+  // '/notifications': importRoute(import('views/pages/notifications'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  //
   // NEAR
-  '/finishNearLogin': importRoute(import('views/pages/finish_near_login'), {
-    scoped: true,
-  }),
-  '/finishaxielogin': importRoute(import('views/pages/finish_axie_login'), {
-    scoped: true,
-  }),
-
+  // '/finishNearLogin': importRoute(import('views/pages/finish_near_login'), {
+  //   scoped: true,
+  // }),
+  // '/finishaxielogin': importRoute(import('views/pages/finish_axie_login'), {
+  //   scoped: true,
+  // }),
+  //
   // General Contracts
-  '/new/contract': importRoute(import('views/pages/new_contract'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/contract/:contractAddress': importRoute(
-    import('views/pages/general_contract'),
-    {
-      scoped: true,
-    }
-  ),
-
+  // '/new/contract': importRoute(import('views/pages/new_contract'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  // '/contract/:contractAddress': importRoute(
+  //   import('views/pages/general_contract'),
+  //   {
+  //     scoped: true,
+  //   }
+  // ),
+  //
   // Discussions
-  '/home': _DEPRECATED_redirectRoute((attrs) => `/${attrs.scope}/`),
-  '/overview': importRoute(import('views/pages/overview'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/members': importRoute(import('views/pages/members'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/sputnik-daos': importRoute(import('views/pages/sputnikdaos'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/new/discussion': importRoute(import('views/pages/new_thread'), {
-    scoped: true,
-    deferChain: true,
-  }),
-
+  // '/home': _DEPRECATED_redirectRoute((attrs) => `/${attrs.scope}/`),
+  // '/overview': importRoute(import('views/pages/overview'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  // '/members': importRoute(import('views/pages/members'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  // '/sputnik-daos': importRoute(import('views/pages/sputnikdaos'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  // '/new/discussion': importRoute(import('views/pages/new_thread'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  //
   // Profiles
-  '/account/:address': importRoute(import('views/pages/profile'), {
-    scoped: true,
-    deferChain: true,
-  }),
-  '/account': _DEPRECATED_redirectRoute(() =>
-    app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
-  ),
-
+  // '/account/:address': importRoute(import('views/pages/profile_redirect'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  // '/account': _DEPRECATED_redirectRoute(() =>
+  //   app.user.activeAccount ? `/account/${app.user.activeAccount.address}` : '/'
+  // ),
+  //
   // Governance
-  '/referenda': importRoute(import('views/pages/referenda'), {
-    scoped: true,
-  }),
-  '/proposals': importRoute(import('views/pages/proposals'), {
-    scoped: true,
-  }),
-  '/proposal/:type/:identifier': importRoute(
-    import('views/pages/view_proposal/index'),
-    { scoped: true }
-  ),
-  '/:scope/proposal/discussion/:identifier': _DEPRECATED_redirectRoute(
-    (attrs) => `/discussion/${attrs.identifier}`
-  ),
-  '/proposal/:identifier': importRoute(
-    import('views/pages/view_proposal/index'),
-    {
-      scoped: true,
-    }
-  ),
-  '/discussion/:identifier': importRoute(
-    import('views/pages/view_thread/index'),
-    {
-      scoped: true,
-    }
-  ),
-  '/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), {
-    scoped: true,
-  }),
-  '/new/proposal': importRoute(import('views/pages/new_proposal/index'), {
-    scoped: true,
-  }),
-
+  // '/referenda': importRoute(import('views/pages/referenda'), {
+  //   scoped: true,
+  // }),
+  // '/proposals': importRoute(import('views/pages/proposals'), {
+  //   scoped: true,
+  // }),
+  // '/proposal/:type/:identifier': importRoute(
+  //   import('views/pages/view_proposal/index'),
+  //   { scoped: true }
+  // ),
+  // '/:scope/proposal/discussion/:identifier': _DEPRECATED_redirectRoute(
+  //   (attrs) => `/discussion/${attrs.identifier}`
+  // ),
+  // '/proposal/:identifier': importRoute(
+  //   import('views/pages/view_proposal/index'),
+  //   {
+  //     scoped: true,
+  //   }
+  // ),
+  // '/discussion/:identifier': importRoute(
+  //   import('views/pages/view_thread/index'),
+  //   {
+  //     scoped: true,
+  //   }
+  // ),
+  // '/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), {
+  //   scoped: true,
+  // }),
+  // '/new/proposal': importRoute(import('views/pages/new_proposal/index'), {
+  //   scoped: true,
+  // }),
+  //
   // Treasury
-  '/treasury': importRoute(import('views/pages/treasury'), { scoped: true }),
-  '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
-
+  // '/treasury': importRoute(import('views/pages/treasury'), { scoped: true }),
+  // '/tips': importRoute(import('views/pages/tips'), { scoped: true }),
+  //
   // Admin
-  '/manage': importRoute(
-    import('views/pages/manage_community/ManageCommunityPage'),
-    {
-      scoped: true,
-    }
-  ),
-  '/settings': importRoute(import('views/pages/settings'), { scoped: true }),
-  '/analytics': importRoute(import('views/pages/stats'), {
-    scoped: true,
-    deferChain: true,
-  }),
-
-  '/snapshot/:snapshotId': importRoute(
-    import('views/pages/snapshot_proposals'),
-    {
-      scoped: true,
-      deferChain: true,
-    }
-  ),
-  '/multiple-snapshots': importRoute(
-    import('views/pages/view_multiple_snapshot_spaces'),
-    { scoped: true, deferChain: true }
-  ),
-  '/snapshot/:snapshotId/:identifier': importRoute(
-    import('views/pages/view_snapshot_proposal'),
-    { scoped: true, deferChain: true }
-  ),
-  '/new/snapshot/:snapshotId': importRoute(
-    import('views/pages/new_snapshot_proposal'),
-    { scoped: true, deferChain: true }
-  ),
-
+  // '/manage': importRoute(
+  //   import('views/pages/manage_community/ManageCommunityPage'),
+  //   {
+  //     scoped: true,
+  //   }
+  // ),
+  // '/analytics': importRoute(import('views/pages/stats'), {
+  //   scoped: true,
+  //   deferChain: true,
+  // }),
+  //
+  // '/snapshot/:snapshotId': importRoute(
+  //   import('views/pages/snapshot_proposals'),
+  //   {
+  //     scoped: true,
+  //     deferChain: true,
+  //   }
+  // ),
+  // '/multiple-snapshots': importRoute(
+  //   import('views/pages/view_multiple_snapshot_spaces'),
+  //   { scoped: true, deferChain: true }
+  // ),
+  // '/snapshot/:snapshotId/:identifier': importRoute(
+  //   import('views/pages/view_snapshot_proposal'),
+  //   { scoped: true, deferChain: true }
+  // ),
+  // '/new/snapshot/:snapshotId': importRoute(
+  //   import('views/pages/new_snapshot_proposal'),
+  //   { scoped: true, deferChain: true }
+  // ),
+  //
   // Redirects
   '/:scope/dashboard': _DEPRECATED_redirectRoute(() => '/'),
   '/:scope/notifications': _DEPRECATED_redirectRoute(() => '/notifications'),

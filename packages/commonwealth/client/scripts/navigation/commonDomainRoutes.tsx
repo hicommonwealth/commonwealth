@@ -1,9 +1,9 @@
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { Navigate } from 'navigation/helpers';
-import app from 'state';
 import { withLayout } from 'views/layout';
 
+const LandingPage = lazy(() => import('views/pages/landing'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
@@ -64,6 +64,13 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const commonDomainsRoutes = () => [
+  <Route
+    path="/"
+    element={withLayout(LandingPage, {
+      scoped: false,
+      hideSidebar: false,
+    })}
+  />,
   <Route
     path="/whyCommonwealth"
     element={withLayout(WhyCommonwealthPage, { hideSidebar: true })}
@@ -146,6 +153,13 @@ const commonDomainsRoutes = () => [
     })}
   />,
   <Route
+    path="/notifications"
+    element={withLayout(NotificationsPage, {
+      scoped: true,
+      deferChain: true,
+    })}
+  />,
+  <Route
     path="/notification-settings"
     element={withLayout(NotificationSettingsPage, {
       deferChain: true,
@@ -154,10 +168,6 @@ const commonDomainsRoutes = () => [
   <Route
     path="/:scope/notification-settings"
     element={<Navigate to="/notification-settings" />}
-  />,
-  <Route
-    path="/notifications"
-    element={<Navigate to={'/edgeware/notifications'} />}
   />,
   // NOTIFICATIONS END
 
@@ -407,9 +417,6 @@ const commonDomainsRoutes = () => [
       deferChain: true,
     })}
   />,
-  // PROFILES END
-
-  // NEW PROFILES
   <Route
     path="/profile/id/:profileId"
     element={withLayout(NewProfilePage, {
@@ -424,7 +431,7 @@ const commonDomainsRoutes = () => [
       deferChain: true,
     })}
   />,
-  // NEW PROFILES END
+  // PROFILES END
 
   // LEGACY REDIRECTS
   //here for compatibility only
