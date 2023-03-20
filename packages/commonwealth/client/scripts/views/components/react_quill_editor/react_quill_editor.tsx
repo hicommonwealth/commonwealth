@@ -1,8 +1,13 @@
-import React from 'react';
-import ReactQuill from 'react-quill';
+import React, { useRef } from 'react';
+import ReactQuill, { Quill } from 'react-quill';
+
+import imageDropAndPaste from 'quill-image-drop-and-paste'
+
 import type { DeltaStatic } from 'quill';
 import type { QuillMode } from '../quill/types';
 import 'react-quill/dist/quill.snow.css';
+
+Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
 
 type ReactQuillEditorProps = {
   className?: string
@@ -26,6 +31,10 @@ const ReactQuillEditor = ({
     setContentDelta(editor.getContents())
   }
 
+  const handleImageDropAndPaste = (imageDataUrl, imageType) => {
+    console.log({ imageDataUrl, imageType })
+  }
+
   return (
     <ReactQuill
       className={`QuillEditor ${className}`}
@@ -34,6 +43,16 @@ const ReactQuillEditor = ({
       theme='snow'
       value={contentDelta}
       onChange={handleChange}
+      modules={{
+        toolbar: ([[{ header: 1 }, { header: 2 }]] as any).concat([
+          ['bold', 'italic', 'strike'],
+          ['link', 'code-block', 'blockquote'],
+          [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+        ]),
+        imageDropAndPaste: {
+          handler: handleImageDropAndPaste
+        }
+      }}
     />
   )
 
