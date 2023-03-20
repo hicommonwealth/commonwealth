@@ -19,6 +19,7 @@ import { AaveProposalForm } from './aave_proposal_form';
 import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 import { SputnikProposalForm } from './sputnik_proposal_form';
+import useForceRerender from 'hooks/useForceRerender';
 
 type NewProposalPageProps = {
   type: ProposalType;
@@ -26,27 +27,21 @@ type NewProposalPageProps = {
 
 const NewProposalPage = (props: NewProposalPageProps) => {
   const { type } = props;
+  const forceRerender = useForceRerender();
   const [internalType, setInternalType] = useState<ProposalType>(type);
   const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
-  // isLoggedIn is not referenced, but is used to trigger re-render
-  const [isLoggedIn, setIsLoggedIn] = useState(app.isLoggedIn());
 
   useEffect(() => {
     app.runWhenReady(() => {
-      console.log('app.chain.loaded', app.chain.loaded);
-
       setIsLoaded(app.chain.loaded);
     });
   }, [app.chain?.loaded]);
 
   useEffect(() => {
-    app.loginStateEmitter.on('redraw', () => {
-      console.log('app.isLoggedIn()', app.isLoggedIn());
-      setIsLoggedIn(app.isLoggedIn());
-    });
+    app.loginStateEmitter.on('redraw', forceRerender);
 
     return () => {
-      app.loginStateEmitter.removeAllListeners();
+      app.loginStateEmitter.off('redraw', forceRerender);
     };
   }, [app.loginState]);
 
