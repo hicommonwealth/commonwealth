@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-
+import app from 'state';
 import 'components/topic_selector.scss';
 import { Callout, Icons, ListItem, SelectList } from 'construct-ui';
 import { isNotUndefined } from 'helpers/typeGuards';
@@ -101,6 +101,7 @@ export class TopicSelector extends ClassComponent<TopicSelectorAttrs> {
               : 'Select a topic'
           }
           tabindex={tabindex}
+          disabled={!app.user.activeAccount}
         />
       ),
     });

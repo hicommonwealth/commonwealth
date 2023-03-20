@@ -111,7 +111,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         <div
           class="login-menu-item"
           onclick={() => {
-            m.route.set(`/profile/id/${this.profileId}/edit`);
+            m.route.set(`/profile/edit`);
           }}
         >
           <CWText type="caption">Edit profile</CWText>
