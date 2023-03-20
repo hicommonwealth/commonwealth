@@ -8,11 +8,8 @@ import { ContentType } from 'types';
 import { CWButton } from '../component_kit/cw_button';
 import { clearEditingLocalStorage } from './helpers';
 import type { DeltaStatic } from 'quill';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  ReactQuillEditor,
-} from '../react_quill_editor';
+import { ReactQuillEditor } from '../react_quill_editor';
+import { parseDeltaString } from '../react_quill_editor/utils';
 
 type EditCommentProps = {
   comment: Comment<any>;
@@ -31,14 +28,46 @@ export const EditComment = (props: EditCommentProps) => {
     updatedCommentsCallback,
   } = props;
 
-  const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+  const commentBody = (shouldRestoreEdits && savedEdits) ? savedEdits : comment.text;
+  const body = parseDeltaString(commentBody)
 
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    createDeltaFromText(body)
-  );
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>();
 
-  const editorValue = getTextFromDelta(contentDelta);
+  const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    let cancelConfirmed = true;
+
+    if (JSON.stringify(body) !== JSON.stringify(contentDelta)) {
+      cancelConfirmed = window.confirm(
+        'Cancel editing? Changes will not be saved.'
+      );
+    }
+
+    if (cancelConfirmed) {
+      setIsEditing(false);
+      clearEditingLocalStorage(comment.id, ContentType.Comment);
+    }
+  }
+
+  const save = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    setSaving(true);
+
+    try {
+      await app.comments.edit(comment, JSON.stringify(contentDelta))
+      setIsEditing(false);
+      clearEditingLocalStorage(comment.id, ContentType.Comment);
+      updatedCommentsCallback();
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setSaving(false);
+    }
+    
+  }
 
   return (
     <div className="EditComment">
@@ -51,38 +80,12 @@ export const EditComment = (props: EditCommentProps) => {
           label="Cancel"
           disabled={saving}
           buttonType="secondary-blue"
-          onClick={async (e) => {
-            e.preventDefault();
-
-            let confirmed = true;
-
-            if (editorValue !== body) {
-              confirmed = window.confirm(
-                'Cancel editing? Changes will not be saved.'
-              );
-            }
-
-            if (confirmed) {
-              setIsEditing(false);
-              clearEditingLocalStorage(comment.id, ContentType.Comment);
-            }
-          }}
+          onClick={cancel}
         />
         <CWButton
           label="Save"
           disabled={saving}
-          onClick={(e) => {
-            e.preventDefault();
-
-            setSaving(true);
-
-            app.comments.edit(comment, editorValue).then(() => {
-              setSaving(false);
-              clearEditingLocalStorage(comment.id, ContentType.Comment);
-              setIsEditing(false);
-              updatedCommentsCallback();
-            });
-          }}
+          onClick={save}
         />
       </div>
     </div>

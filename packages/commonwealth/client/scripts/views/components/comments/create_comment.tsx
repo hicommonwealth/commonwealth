@@ -106,6 +106,14 @@ export const CreateComment = (props: CreateCommmentProps) => {
 
   const decimals = getDecimals(app.chain);
 
+  const cancel = (e) => {
+    e.preventDefault();
+    setContentDelta(createDeltaFromText(''))
+    if (handleIsReplying) {
+      handleIsReplying(false)
+    }
+  }
+
   return (
     <div className="CreateComment">
       <div className="attribution-row">
@@ -139,18 +147,15 @@ export const CreateComment = (props: CreateCommmentProps) => {
       )}
       <div className="form-bottom">
         <div className="form-buttons">
-          <CWButton
-            disabled={!handleIsReplying ? editorValue.length > 0 : undefined}
-            buttonType="secondary-blue"
-            onClick={(e) => {
-              e.preventDefault();
-
-              if (handleIsReplying) {
-                handleIsReplying(false);
-              }
-            }}
-            label="Cancel"
-          />
+          {
+            editorValue.length > 0 && (
+              <CWButton
+                buttonType="secondary-blue"
+                onClick={cancel}
+                label="Cancel"
+              />
+            )
+          }
           <CWButton
             disabled={disabled}
             onClick={handleSubmitComment}
