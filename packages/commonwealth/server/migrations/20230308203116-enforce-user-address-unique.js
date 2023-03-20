@@ -152,21 +152,21 @@ module.exports = {
               SET profile_name = '${keptProfileName}'
               WHERE id = ${keptProfile}
             `,
-              {transaction}
+              { transaction }
             );
           }
         }
         console.log(`Updated ${profilesUpdated} profiles.`);
 
         // 7. Update address objects on merged users to have kept user
-        for (const {keptUser, keptProfile, mergedUsers} of userToKeepMap) {
+        for (const { keptUser, keptProfile, mergedUsers } of userToKeepMap) {
           await queryInterface.sequelize.query(
             `
             UPDATE "Addresses"
             SET user_id = ${keptUser}, profile_id = ${keptProfile}
             WHERE user_id IN (${mergedUsers.join(',')});
           `,
-            {transaction}
+            { transaction }
           );
         }
         console.log('Migration complete.');
