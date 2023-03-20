@@ -126,13 +126,6 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
-
-  _lastNavigatedBack: boolean;
-  _lastNavigatedFrom: string;
-
-  lastNavigatedBack(): boolean;
-
-  lastNavigatedFrom(): string;
 }
 
 // INJECT DEPENDENCIES
@@ -220,11 +213,6 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
-
-  _lastNavigatedFrom: null,
-  _lastNavigatedBack: false,
-  lastNavigatedBack: () => app._lastNavigatedBack,
-  lastNavigatedFrom: () => app._lastNavigatedFrom,
 };
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status

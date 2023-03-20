@@ -294,6 +294,132 @@ const customDomainRoutes = () => {
       })}
     />,
     // PROFILES END
+
+    // REDIRECTS //
+    <Route path="/:scope/home" element={<Navigate to="/overview" />} />,
+    <Route path="/:scope/search" element={<Navigate to="/search" />} />,
+    <Route path="/:scope/web3login" element={<Navigate to="/web3login" />} />,
+    <Route path="/:scope/overview" element={<Navigate to="/overview" />} />,
+    <Route path="/:scope/members" element={<Navigate to="/members" />} />,
+    <Route
+      path="/:scope/sputnik-daos"
+      element={<Navigate to="/sputnik-daos" />}
+    />,
+    <Route
+      path="/:scope/finishNearLogin"
+      element={<Navigate to="/finishNearLogin" />}
+    />,
+    <Route
+      path="/:scope/finishaxielogin"
+      element={<Navigate to="/finishaxielogin" />}
+    />,
+
+    // NOTIFICATIONS
+    <Route
+      path="/:scope/notifications"
+      element={<Navigate to="/notifications" />}
+    />,
+    <Route
+      path="/:scope/notification-settings"
+      element={<Navigate to="/notification-settings" />}
+    />,
+    // NOTIFICATIONS END
+
+    // GOVERNANCE
+    <Route path="/:scope/referenda" element={<Navigate to="/referenda" />} />,
+    <Route path="/:scope/proposals" element={<Navigate to="/proposals" />} />,
+    <Route
+      path="/:scope/proposal/:type/:identifier"
+      element={<Navigate to="/proposal/:type/:identifier" />}
+    />,
+    <Route
+      path="/:scope/proposal/:identifier"
+      element={<Navigate to="/proposal/:identifier" />}
+    />,
+    <Route
+      path="/:scope/new/proposal/:type"
+      element={<Navigate to="/new/proposal/:type" />}
+    />,
+    <Route
+      path="/:scope/new/proposal"
+      element={<Navigate to="/new/proposal" />}
+    />,
+    // GOVERNANCE END
+
+    // DISCUSSIONS
+    <Route
+      path="/:scope/discussions"
+      element={<Navigate to="/discussions" />}
+    />,
+    <Route
+      path="/:scope/discussions/:topicName"
+      element={<Navigate to="/discussions/:topicName" />}
+    />,
+    <Route
+      path="/:scope/discussion/:identifier"
+      element={<Navigate to="/discussion/:identifier" />}
+    />,
+    <Route
+      path="/:scope/new/discussion"
+      element={<Navigate to="/new/discussion" />}
+    />,
+    <Route
+      path="/:scope/proposal/discussion/:identifier"
+      element={<Navigate to="/proposal/discussion/:identifier" />}
+    />,
+    // DISCUSSIONS END
+
+    // CONTRACTS
+    <Route
+      path="/:scope/new/contract"
+      element={<Navigate to="/new/contract" />}
+    />,
+    <Route
+      path="/:scope/contract/:contractAddress"
+      element={<Navigate to="/contract/:contractAddress" />}
+    />,
+    // CONTRACTS END
+
+    // TREASURY
+    <Route path="/:scope/treasury" element={<Navigate to="/treasury" />} />,
+    <Route path="/:scope/tips" element={<Navigate to="/tips" />} />,
+    // TREASURY END
+
+    // ADMIN
+    <Route path="/:scope/manage" element={<Navigate to="/manage" />} />,
+    <Route path="/:scope/analytics" element={<Navigate to="/analytics" />} />,
+    <Route
+      path="/:scope/snapshot/:snapshotId"
+      element={<Navigate to="/snapshot/:snapshotId" />}
+    />,
+    <Route
+      path="/:scope/multiple-snapshots"
+      element={<Navigate to="/multiple-snapshots" />}
+    />,
+    <Route
+      path="/:scope/snapshot/:snapshotId/:identifier"
+      element={<Navigate to="/snapshot/:snapshotId/:identifier" />}
+    />,
+    <Route
+      path="/:scope/new/snapshot/:snapshotId"
+      element={<Navigate to="/new/snapshot/:snapshotId" />}
+    />,
+    // ADMIN END
+
+    // PROFILES
+    <Route
+      path="/:scope/account/:address"
+      element={<Navigate to="/account/:address" />}
+    />,
+    <Route path="/:scope/account" element={<Navigate to="/account" />} />,
+    <Route
+      path="/:scope/profile/id/:profileId"
+      element={<Navigate to="/profile/id/:profileId" />}
+    />,
+    <Route
+      path="/:scope/profile/id/:profileId/edit"
+      element={<Navigate to="/profile/id/:profileId/edit" />}
+    />,
   ];
 };
 
