@@ -545,7 +545,11 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                   tabindex={4}
                 />
                 <CWButton
-                  label="Create thread"
+                  label={
+                    app.user.activeAccount
+                      ? 'Create thread'
+                      : 'Join community to create'
+                  }
                   name="submit"
                   disabled={disableSubmission}
                   onclick={async (e) => {
