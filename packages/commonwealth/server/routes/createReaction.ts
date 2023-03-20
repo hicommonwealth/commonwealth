@@ -73,9 +73,8 @@ const createReaction = async (
     const threadId = (
       await models.Comment.findOne({ where: { id: comment_id } })
     ).thread_id;
-    const comment_thread_id = threadId.substring(threadId.indexOf('_') + 1);
     thread = await models.Thread.findOne({
-      where: { id: comment_thread_id },
+      where: { id: threadId },
     });
   }
 
