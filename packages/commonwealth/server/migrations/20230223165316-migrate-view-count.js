@@ -17,28 +17,30 @@ module.exports = {
       `SELECT * FROM "ViewCounts"`
     );
 
-    const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id, v]));
+    if (viewCounts[0].length > 0) {
+      const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id, v]));
 
-    const threads = await queryInterface.sequelize.query(
-      `SELECT id FROM "Threads"`
-    );
+      const threads = await queryInterface.sequelize.query(
+        `SELECT id FROM "Threads"`
+      );
 
-    const updateQueries = [];
-    threads[0].forEach((thread) => {
-      if (viewCountMap.has(thread.id.toString())) {
-        updateQueries.push(
-          queryInterface.sequelize.query(
-            `UPDATE "Threads"
+      const updateQueries = [];
+      threads[0].forEach((thread) => {
+        if (viewCountMap.has(thread.id.toString())) {
+          updateQueries.push(
+            queryInterface.sequelize.query(
+              `UPDATE "Threads"
                SET "view_count" = ${
                  viewCountMap.get(thread.id.toString()).view_count
                }
                WHERE "id" = ${thread.id}`
-          )
-        );
-      }
-    });
+            )
+          );
+        }
+      });
 
-    await Promise.all(updateQueries);
+      await Promise.all(updateQueries);
+    }
 
     await queryInterface.dropTable('ViewCounts');
   },
@@ -47,20 +49,20 @@ module.exports = {
     await queryInterface.createTable(
       'ViewCounts',
       {
-        id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-        chain: { type: Sequelize.STRING },
-        object_id: { type: Sequelize.STRING, allowNull: false },
-        view_count: { type: Sequelize.INTEGER, allowNull: false },
+        id: {type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true},
+        chain: {type: Sequelize.STRING},
+        object_id: {type: Sequelize.STRING, allowNull: false},
+        view_count: {type: Sequelize.INTEGER, allowNull: false},
       },
       {
         underscored: true,
         timestamps: false,
         indexes: [
-          { fields: ['id'] },
-          { fields: ['chain', 'object_id'] },
-          { fields: ['community', 'object_id'] },
-          { fields: ['chain', 'community', 'object_id'] },
-          { fields: ['view_count'] },
+          {fields: ['id']},
+          {fields: ['chain', 'object_id']},
+          {fields: ['community', 'object_id']},
+          {fields: ['chain', 'community', 'object_id']},
+          {fields: ['view_count']},
         ],
       }
     );
