@@ -144,6 +144,7 @@ module.exports = {
         transaction: t,
       });
     });
+
     // cant be part of the transaction, or it will cause db to deadlock
     await queryInterface.changeColumn('Comments', 'thread_id', {
       type: 'INTEGER USING CAST("thread_id" as INTEGER)',
@@ -156,17 +157,12 @@ module.exports = {
       allowNull: false,
     });
 
-    // remove discussion_ portion from object_id
-    await queryInterface.sequelize.query(
-      `UPDATE "ViewCounts" SET "object_id" = regexp_replace(object_id, '^discussion_(.*)', '\\1')`
-    );
-
     const viewCounts = await queryInterface.sequelize.query(
       `SELECT * FROM "ViewCounts"`
     );
 
     if (viewCounts[0].length > 0) {
-      const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id, v]));
+      const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id.split('_')[1], v]));
 
       const threads = await queryInterface.sequelize.query(
         `SELECT id FROM "Threads"`
