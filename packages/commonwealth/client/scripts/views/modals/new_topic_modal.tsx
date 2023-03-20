@@ -17,6 +17,9 @@ import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { DeltaStatic } from 'quill';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -24,6 +27,8 @@ type NewTopicModalProps = {
 
 export const NewTopicModal = (props: NewTopicModalProps) => {
   const { onModalClose } = props;
+
+  const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
@@ -176,8 +181,8 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
                 defaultOffchainTemplate as string
               );
 
-              setIsSaving(false);
-              redraw();
+              navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+
               onModalClose();
             } catch (err) {
               setErrorMsg('Error creating topic');

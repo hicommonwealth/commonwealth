@@ -6,6 +6,14 @@ import type { BaseStyleProps } from './types';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
+export const toggleDarkMode = (on: boolean, stateFn: Function) => {
+  const state: string = on ? 'on' : 'off';
+  localStorage.setItem('dark-mode-state', state);
+  localStorage.setItem('user-dark-mode-state', state);
+  document.getElementsByTagName('html')[0].classList.toggle('invert');
+  stateFn(on);
+};
+
 type ToggleStyleProps = {
   checked?: boolean;
 } & BaseStyleProps;

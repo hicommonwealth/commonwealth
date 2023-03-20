@@ -7,7 +7,7 @@ const useAuthorName = () => {
   );
 
   useEffect(() => {
-    app.profiles.isFetched.on('redraw', () => {
+    app.newProfiles.isFetched.on('redraw', () => {
       setAuthorName(app.user.activeAccount?.profile?.name);
     });
   }, []);

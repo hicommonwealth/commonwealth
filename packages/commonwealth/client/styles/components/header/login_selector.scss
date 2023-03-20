@@ -23,6 +23,15 @@
       justify-content: center;
       padding: 4px 8px;
     }
+
+    .User {
+      display: flex;
+      align-items: center;
+
+      .user-display-name {
+        font-weight: 700;
+      }
+    }
   }
 
   .button-container {
@@ -69,15 +78,51 @@
   background-color: $white;
   border-radius: $border-radius-corners;
   box-shadow: $elevation-3;
+  position: relative;
+
+  &.left {
+    right: 16px;
+
+    .UserBlock {
+      gap: 24px;
+    }
+  }
+
+  &.right {
+    right: -8px;
+  }
+
+  .title {
+    padding: 4px 16px;
+    color: $neutral-500;
+  }
 
   .login-menu-item {
     cursor: pointer;
     display: flex;
     gap: 8px;
     padding: 8px 16px;
+    width: 100%;
+
+    &:not(.selected) {
+      svg {
+        fill: transparent;
+      }
+
+      &:hover {
+        svg {
+          fill: $neutral-500;
+        }
+      }
+    }
 
     &:hover {
       background-color: $neutral-100;
     }
+  }
+
+  .login-darkmode-label {
+    display: grid;
+    align-items: center;
   }
 }

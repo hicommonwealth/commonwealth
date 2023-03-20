@@ -22,7 +22,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
 import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle } from './cw_toggle';
+import { CWToggle, toggleDarkMode } from './cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
@@ -148,10 +148,14 @@ export const ComponentShowcase = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
     useState<boolean>(false);
+  const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
+    localStorage.getItem('dark-mode-state') === 'on'
+  );
 
   return (
     <div className="ComponentShowcase">
       <AvatarUpload scope="community" />
+      <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
       <Modal
         content={<div>hi</div>}
@@ -655,6 +659,20 @@ export const ComponentShowcase = () => {
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Toggle</CWText>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isDarkModeOn}
+            onChange={(e) => {
+              isDarkModeOn
+                ? toggleDarkMode(false, setIsDarkModeOn)
+                : toggleDarkMode(true, setIsDarkModeOn);
+              e.stopPropagation();
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Dark mode</CWText>
+          </div>
+        </div>
         <CWToggle
           checked={isToggled}
           onChange={() => {
@@ -792,6 +810,7 @@ export const ComponentShowcase = () => {
           uploadCompleteCallback={(url: string) => {
             notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
           }}
+          enableGenerativeAI
         />
       </div>
       <div className="choice-gallery">

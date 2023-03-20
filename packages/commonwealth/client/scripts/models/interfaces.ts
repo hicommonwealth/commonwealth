@@ -123,18 +123,3 @@ export interface IUnavailableEndTime {
 export interface IQueuedEndTime {
   kind: 'queued';
 }
-
-export interface ICardListItem {
-  button: {
-    id: string;
-  };
-  texts: {
-    title: string;
-    text: string;
-  };
-  card: {
-    id: string;
-    imgSrc: string;
-    imgAlt: string;
-  };
-}

@@ -322,13 +322,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
     // load profiles
     if (!prefetch[threadIdAndType]['profilesStarted']) {
-      app.profiles.getProfile(thread.authorChain, thread.author);
+      app.newProfiles.getProfile(thread.authorChain, thread.author);
 
       comments.forEach((comment) => {
-        app.profiles.getProfile(comment.authorChain, comment.author);
+        app.newProfiles.getProfile(comment.authorChain, comment.author);
       });
 
-      app.profiles.isFetched.on('redraw', () => {
+      app.newProfiles.isFetched.on('redraw', () => {
         if (!prefetch[threadIdAndType]['profilesFinished']) {
           setPrefetch((prevState) => ({
             ...prevState,
@@ -401,7 +401,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   if (
-    !app.profiles.allLoaded() &&
+    !app.newProfiles.allLoaded() &&
     !prefetch[threadIdAndType]['profilesFinished']
   ) {
     return <PageLoading />;
@@ -739,13 +739,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             polls?.map((poll) => [poll.id, poll])
                           ).values(),
                         ].map((poll: Poll) => {
-                          return <ThreadPollCard poll={poll} />;
+                          return (
+                            <ThreadPollCard
+                              poll={poll}
+                              key={poll.id}
+                              onVote={() => setInitializedPolls(false)}
+                            />
+                          );
                         })}
                         {isAuthor &&
                           (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
                             <ThreadPollEditorCard
                               thread={thread}
                               threadAlreadyHasPolling={!polls?.length}
+                              onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
                       </div>
