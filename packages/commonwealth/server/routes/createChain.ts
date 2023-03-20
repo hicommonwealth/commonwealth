@@ -343,6 +343,12 @@ const createChain = async (
   await createDefaultCommunityRoles(models, chain.id);
 
   if (req.body.address) {
+    const erc20Abi = await models.ContractAbi.findOne({
+      where: {
+        nickname: 'erc20',
+      },
+    });
+
     const [contract] = await models.Contract.findOrCreate({
       where: {
         address: req.body.address,
@@ -355,6 +361,7 @@ const createChain = async (
         token_name: chain.token_name,
         symbol: chain.default_symbol,
         type: chain.network,
+        abi_id: chain.network === 'erc20' ? erc20Abi?.id : null,
       },
     });
 
