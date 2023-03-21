@@ -137,12 +137,10 @@ export const NewThreadForm = () => {
               />
             )}
 
-            <div>
-              <ReactQuillEditor
-                contentDelta={threadContentDelta}
-                setContentDelta={setThreadContentDelta}
-              />
-            </div>
+            <ReactQuillEditor
+              contentDelta={threadContentDelta}
+              setContentDelta={setThreadContentDelta}
+            />
 
             <div className="buttons-row">
               <CWButton
