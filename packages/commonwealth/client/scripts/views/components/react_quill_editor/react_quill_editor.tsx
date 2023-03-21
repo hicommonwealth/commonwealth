@@ -42,8 +42,6 @@ const ReactQuillEditor = ({
   // also cannot use contentDelta in dependencies array or else infinite loop
   const handleImageDropAndPaste = useCallback(async (imageDataUrl, imageType) => {
 
-    console.log({ imageDataUrl, imageType })
-
     if (!editorRef.current?.editor) {
       throw new Error('editor is not set')
     }
