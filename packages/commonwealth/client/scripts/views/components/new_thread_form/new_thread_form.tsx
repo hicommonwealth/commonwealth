@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
+import React from 'react';
 import { capitalize } from 'lodash';
 
 import 'components/new_thread_form.scss';
@@ -21,6 +20,7 @@ import {
   checkNewThreadErrors,
   updateTopicList,
 } from './helpers';
+import { ReactQuillEditor } from '../react_quill_editor';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -138,12 +138,10 @@ export const NewThreadForm = () => {
             )}
 
             <div>
-              <ReactQuill
-                className="QuillEditor"
-                onChange={(value, delta, source, editor) =>
-                  setThreadContentDelta(editor.getContents())
-                }
-              />
+            <ReactQuillEditor
+              contentDelta={threadContentDelta}
+              setContentDelta={setThreadContentDelta}
+            />
             </div>
 
             <div className="buttons-row">

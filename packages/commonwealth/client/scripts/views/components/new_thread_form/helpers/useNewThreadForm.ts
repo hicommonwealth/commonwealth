@@ -3,6 +3,7 @@ import type { DeltaStatic } from 'quill';
 
 import type { Topic } from 'models';
 import { ThreadKind } from 'models';
+import { getTextFromDelta } from '../../react_quill_editor';
 
 const useNewThreadForm = (authorName: string, hasTopics: boolean) => {
   const [threadKind, setThreadKind] = useState<ThreadKind>(
@@ -14,16 +15,14 @@ const useNewThreadForm = (authorName: string, hasTopics: boolean) => {
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>();
   const [isSaving, setIsSaving] = useState(false);
 
-  const hasOnlyNewLineCharacter = /^\s+$/.test(
-    threadContentDelta?.ops?.[0]?.insert
-  );
+  const editorText = getTextFromDelta(threadContentDelta)
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
   const disableSave = !authorName || isSaving;
   const topicMissing = hasTopics && !threadTopic;
   const titleMissing = !threadTitle;
   const linkContentMissing = !isDiscussion && !threadUrl;
-  const contentMissing = !threadContentDelta || hasOnlyNewLineCharacter;
+  const contentMissing = editorText.length === 0
 
   const isDisabled =
     disableSave ||
