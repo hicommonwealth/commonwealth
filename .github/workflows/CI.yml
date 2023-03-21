@@ -2,13 +2,13 @@ name: CI
 on: [push]
 
 jobs:
-  commonwealth:
-    name: Commonwealth Tests
+  # These tests run slowly, so run them in a separate job
+  e2e-tests:
+    strategy:
+      matrix:
+        node: [ 18 ]
+    name: Commonwealth E2E Test
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: packages/commonwealth
 
     services:
       postgres:
@@ -29,38 +29,42 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: ${{ matrix.node }}
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Typecheck
-        run: yarn check-types
+      - name: Init Db
+        run: cd packages/commonwealth && npx sequelize db:migrate
 
-      - name: Run unit tests
-        run: yarn unit-test
+      - name: Cache browsers
+        id: playwright-cache
+        uses: actions/cache@v3
+        with:
+          path: '~/.cache/ms-playwright/chromium-1045'
+          key: hashFiles('~/.cache/ms-playwright/chromium-1045') }}
 
-      - name: Run API tests
-        run: yarn test-api
+      - name: Install playwright browser drivers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Run e2e tests
+        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
         env:
-          NO_CLIENT: true
+          PORT: 8080
+          USES_DOCKER_PGSQL: true
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
@@ -68,124 +72,69 @@ jobs:
           name: code-coverage-report
           path: coverage
 
-  token-balance-cache:
-    name: Token Balance Cache Tests
+  # These tests run quickly, so run them in a separate job
+  commonwealth-unit-integration:
+    strategy:
+      matrix:
+        node: [ 18 ]
+    name: All Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/token-balance-cache
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: commonwealth
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 18.x
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Run unit tests
-        run: yarn test
-
-  chain-events:
-    name: Chain Events Tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/chain-events
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 18.x
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install dependencies
-        run: yarn --ignore-engines
-
-      - name: Typecheck
-        run: yarn check-types
-
-      - name: Run unit tests
-        run: yarn unit-test
-
-      # TODO: fix integration tests -- they currently fail
-      # - name: Run integration tests
-      #  run: yarn integration-test
-
-      # TODO: reintegrate code coverage once we get nyc working with hardhat
-
-      # TODO: fix linter and then reintegrate using current ts version
-      # - name: Run linter
-      #   run: yarn lint
-
-  code-quality-checks:
-    name: Code Quality Checks
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout master
         uses: actions/checkout@v3
-        with:
-          ref: master
-          fetch-depth: 0
-
-      - name: Checkout branch
-        run: git checkout ${{ github.ref_name }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: ${{ matrix.node }}
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - uses: actions/cache@v3
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Init Db
+        run: cd packages/commonwealth && npx sequelize db:migrate
+
       - name: Run linter
         run: yarn lint-branch
 
-      - name: Run formatter
-        run: yarn format-check
+      - name: Run Token Balance Cache Unit Tests
+        run: yarn --cwd packages/token-balance-cache test
 
+      - name: Run Chain Events Unit Tests
+        run: yarn --cwd packages/chain-events unit-test
+
+      - name: Run unit tests
+        run: yarn --cwd packages/commonwealth unit-test
+
+      - name: Run API tests
+        run: yarn --cwd packages/commonwealth test-api
+        env:
+          NO_CLIENT: true
+
+      - name: Typecheck
+        run: yarn --cwd packages/commonwealth check-types

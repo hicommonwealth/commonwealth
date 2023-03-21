@@ -247,12 +247,6 @@ export function constructFakeApi(callOverrides: {
         proposals: callOverrides['collectiveProposals'],
         proposalOf: callOverrides['collectiveProposalOf'],
       },
-      signaling: {
-        proposalOf: callOverrides['signalingProposalOf'],
-        inactiveProposals: callOverrides['inactiveProposals'],
-        activeProposals: callOverrides['activeProposals'],
-        completedProposals: callOverrides['completedProposals'],
-      },
       tips: {
         tips,
         reasons: callOverrides['tipReasons'],

@@ -12,16 +12,14 @@ export const Errors = {
 };
 
 type UpdateNewProfileReq = {
-  profileId: string;
-  email?: string;
-  slug?: string;
-  name?: string;
-  bio?: string;
-  website?: string;
-  avatarUrl?: string;
-  socials?: string;
-  coverImage?: string;
-  backgroundImage?: string;
+  email: string;
+  slug: string;
+  name: string;
+  bio: string;
+  website: string;
+  avatarUrl: string;
+  socials: string;
+  backgroundImage: string;
 };
 type UpdateNewProfileResp = {
   status: string;
@@ -33,25 +31,13 @@ const updateNewProfile = async (
   res: TypedResponse<UpdateNewProfileResp>,
   next: NextFunction
 ) => {
-  let profileId = req.body.profileId;
-  if (!profileId) {
-    const user = await models.User.findOne({
-      where: {
-        id: req.user.id,
-      },
-    });
+  const profile = await models.Profile.findOne({
+    where: {
+      user_id: req.user.id,
+    },
+  });
 
-    const userProfile = await models.Profile.findOne({
-      where: {
-        user_id: user.id,
-      },
-    });
-
-    if (!userProfile) {
-      return next(new Error(Errors.NoProfileFound));
-    }
-    profileId = userProfile.id.toString();
-  }
+  if (!profile) return next(new Error(Errors.NoProfileFound));
 
   if (
     !req.body.email &&
@@ -61,7 +47,6 @@ const updateNewProfile = async (
     !req.body.website &&
     !req.body.avatarUrl &&
     !req.body.socials &&
-    !req.body.coverImage &&
     !req.body.backgroundImage
   ) {
     return next(new Error(Errors.InvalidUpdate));
@@ -75,44 +60,23 @@ const updateNewProfile = async (
     website,
     avatarUrl,
     socials,
-    coverImage,
     backgroundImage,
   } = req.body;
 
-  const profile = await models.Profile.findOne({
-    where: {
-      id: profileId,
-    },
-  });
-  if (!profile) return next(new Error(Errors.NoProfileFound));
-
-  if (profile.user_id !== req.user.id) {
-    return next(new Error(Errors.NotAuthorized));
-  }
-
-  if (name) {
-    // eslint-disable-next-line no-useless-escape
-    const regex = /^([a-zA-Z0-9 \_\-]+)$/;
-    if (!regex.test(name)) {
-      return next(new Error(Errors.ProfileNameInvalid));
-    }
-  }
-
   const updateStatus = await models.Profile.update(
     {
-      // ...(email && { email }),
-      // ...(slug && { slug }),
+      ...(email && { email }),
+      ...(slug && { slug }),
       ...(name && { profile_name: name }),
-      // ...(bio && { bio }),
-      // ...(website && { website }),
-      // ...(avatarUrl && { avatar_url: avatarUrl }),
-      // ...(socials && { socials: JSON.parse(socials) }),
-      // ...(coverImage && { cover_image: JSON.parse(coverImage) }),
-      // ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
+      ...(bio && { bio }),
+      ...(website && { website }),
+      ...(avatarUrl && { avatar_url: avatarUrl }),
+      ...(socials && { socials: JSON.parse(socials) }),
+      ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
     },
     {
       where: {
-        id: profileId,
+        user_id: req.user.id,
       },
     }
   );

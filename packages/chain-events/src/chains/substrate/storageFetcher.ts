@@ -34,19 +34,9 @@ import type {
   IDemocracyPassed,
   IPreimageNoted,
   ITreasuryProposed,
-  ITreasuryBountyProposed,
-  ICollectiveProposed,
-  ICollectiveVoted,
-  ISignalingNewProposal,
-  ISignalingCommitStarted,
-  ISignalingVotingStarted,
-  ISignalingVotingCompleted,
   IEventData,
   IIdentitySet,
   IdentityJudgement,
-  ITreasuryBountyBecameActive,
-  ITreasuryBountyAwarded,
-  ITreasuryBountyEvents,
   INewTip,
   ITipVoted,
   ITipClosing,
@@ -131,18 +121,12 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }
     const blockNumber = +(await this._api.rpc.chain.getHeader()).number;
     switch (kind as EntityKind) {
-      case EntityKind.CollectiveProposal:
-        return this.fetchCollectiveProposals(moduleName, blockNumber, id);
       case EntityKind.DemocracyPreimage:
         return this.fetchDemocracyPreimages([id]);
       case EntityKind.DemocracyProposal:
         return this.fetchDemocracyProposals(blockNumber, id);
       case EntityKind.DemocracyReferendum:
         return this.fetchDemocracyReferenda(blockNumber, id);
-      case EntityKind.SignalingProposal:
-        return this.fetchSignalingProposals(blockNumber, id);
-      case EntityKind.TreasuryBounty:
-        return this.fetchBounties(blockNumber, id);
       case EntityKind.TreasuryProposal:
         return this.fetchTreasuryProposals(blockNumber, id);
       case EntityKind.TipProposal:
@@ -182,28 +166,9 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const treasuryProposalEvents = await this.fetchTreasuryProposals(
       blockNumber
     );
-    const bountyEvents = await this.fetchBounties(blockNumber);
-
-    /** collective proposals */
-    let technicalCommitteeProposalEvents = [];
-    if (this._api.query.technicalCommittee) {
-      technicalCommitteeProposalEvents = await this.fetchCollectiveProposals(
-        'technicalCommittee',
-        blockNumber
-      );
-    }
-    const councilProposalEvents = await this.fetchCollectiveProposals(
-      'council',
-      blockNumber
-    );
 
     /** tips */
     const tipsEvents = await this.fetchTips(blockNumber);
-
-    /** signaling proposals */
-    const signalingProposalEvents = await this.fetchSignalingProposals(
-      blockNumber
-    );
 
     this.log.info('Fetch complete.');
     return [
@@ -211,10 +176,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       ...democracyReferendaEvents,
       ...democracyPreimageEvents,
       ...treasuryProposalEvents,
-      ...bountyEvents,
-      ...technicalCommitteeProposalEvents,
-      ...councilProposalEvents,
-      ...signalingProposalEvents,
       ...tipsEvents,
     ];
   }
@@ -459,208 +420,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }));
   }
 
-  public async fetchBounties(
-    blockNumber: number,
-    id?: string
-  ): Promise<CWEvent<ITreasuryBountyEvents>[]> {
-    // TODO: List all relevant events explicitly?
-    if (
-      !this._api.query.treasury?.bountyCount &&
-      !this._api.query.bounties?.bountyCount
-    ) {
-      this.log.info('Bounties module not detected.');
-      return [];
-    }
-
-    this.log.info('Migrating treasury bounties...');
-    const bounties = await this._api.derive.bounties.bounties();
-    const events = [];
-    for (const b of bounties) {
-      events.push({
-        kind: EventKind.TreasuryBountyProposed,
-        bountyIndex: +b.index,
-        proposer: b.bounty.proposer.toString(),
-        value: b.bounty.value.toString(),
-        fee: b.bounty.fee.toString(),
-        curatorDeposit: b.bounty.curatorDeposit.toString(),
-        bond: b.bounty.bond.toString(),
-        description: b.description,
-      } as ITreasuryBountyProposed);
-
-      if (b.bounty.status.isActive) {
-        events.push({
-          kind: EventKind.TreasuryBountyBecameActive,
-          bountyIndex: +b.index,
-          curator: b.bounty.status.asActive.curator.toString(),
-          updateDue: +b.bounty.status.asActive.updateDue,
-        } as ITreasuryBountyBecameActive);
-      }
-
-      if (b.bounty.status.isPendingPayout) {
-        events.push({
-          kind: EventKind.TreasuryBountyBecameActive,
-          bountyIndex: +b.index,
-          curator: b.bounty.status.asPendingPayout.curator.toString(),
-          updateDue: blockNumber, // fake this unavailable field
-        } as ITreasuryBountyBecameActive);
-        events.push({
-          kind: EventKind.TreasuryBountyAwarded,
-          bountyIndex: +b.index,
-          value: b.bounty.value.toString(),
-          beneficiary: b.bounty.status.asPendingPayout.beneficiary.toString(),
-          curator: b.bounty.status.asPendingPayout.curator.toString(),
-          unlockAt: +b.bounty.status.asPendingPayout.unlockAt,
-        } as ITreasuryBountyAwarded);
-      }
-    }
-
-    // no easier way to only fetch one than to fetch em all
-    const results = events.map((data) => ({
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data,
-    }));
-    if (id !== undefined) {
-      const data = results.filter(
-        ({ data: { bountyIndex } }) => bountyIndex === +id
-      );
-      if (data.length === 0) {
-        this.log.error(`No bounty found with id ${id}!`);
-        return null;
-      }
-      return data;
-    }
-    this.log.info(`Found ${bounties.length} bounties!`);
-    return results;
-  }
-
-  public async fetchCollectiveProposals(
-    moduleName: 'council' | 'technicalCommittee',
-    blockNumber: number,
-    id?: string
-  ): Promise<CWEvent<ICollectiveProposed | ICollectiveVoted>[]> {
-    if (!this._api.query[moduleName]) {
-      this.log.info(`${moduleName} module not detected.`);
-      return [];
-    }
-
-    const constructEvent = (
-      hash: Hash,
-      proposalOpt: Option<Proposal>,
-      votesOpt: Option<Votes>
-    ) => {
-      if (
-        !hash ||
-        !proposalOpt ||
-        !votesOpt ||
-        !proposalOpt.isSome ||
-        !votesOpt.isSome
-      )
-        return null;
-      const proposal = proposalOpt.unwrap();
-      const votes = votesOpt.unwrap();
-      return [
-        {
-          kind: EventKind.CollectiveProposed,
-          collectiveName: moduleName,
-          proposalIndex: +votes.index,
-          proposalHash: hash.toString(),
-          threshold: +votes.threshold,
-          call: {
-            method: proposal.method,
-            section: proposal.section,
-            args: proposal.args.map((arg) => arg.toString()),
-          },
-
-          // unknown
-          proposer: '',
-        } as ICollectiveProposed,
-        ...votes.ayes.map(
-          (who) =>
-            ({
-              kind: EventKind.CollectiveVoted,
-              collectiveName: moduleName,
-              proposalHash: hash.toString(),
-              voter: who.toString(),
-              vote: true,
-            } as ICollectiveVoted)
-        ),
-        ...votes.nays.map(
-          (who) =>
-            ({
-              kind: EventKind.CollectiveVoted,
-              collectiveName: moduleName,
-              proposalHash: hash.toString(),
-              voter: who.toString(),
-              vote: false,
-            } as ICollectiveVoted)
-        ),
-      ];
-    };
-
-    this.log.info(`Migrating ${moduleName} proposals...`);
-    const proposalHashes = await this._api.query[moduleName].proposals();
-
-    // fetch one
-    if (id !== undefined) {
-      const hash = proposalHashes.find((h) => h.toString() === id);
-      if (!hash) {
-        this.log.error(`No collective proposal found with hash ${id}!`);
-        return null;
-      }
-      const proposalOpt = await this._api.query[moduleName].proposalOf(hash);
-      const votesOpt = await this._api.query[moduleName].voting(hash);
-      const events = constructEvent(hash, proposalOpt, votesOpt);
-      if (!events) {
-        this.log.error(`No collective proposal found with hash ${id}!`);
-        return null;
-      }
-      return events.map((data) => ({
-        blockNumber,
-        network: SupportedNetwork.Substrate,
-        data,
-      }));
-    }
-
-    // fetch all
-    const proposals: Array<Option<Proposal>> = await Promise.all(
-      proposalHashes.map(async (h) => {
-        try {
-          // awaiting inside the map here to force the individual call to throw, rather than the Promise.all
-          return await this._api.query[moduleName].proposalOf(h);
-        } catch (e) {
-          this.log.error(`Failed to fetch council motion hash ${h.toString()}`);
-          return Promise.resolve(null);
-        }
-      })
-    );
-    const proposalVotes = await this._api.query[moduleName].voting.multi<
-      Option<Votes>
-    >(proposalHashes);
-    const proposedEvents = _.flatten(
-      proposalHashes
-        .map((hash, index) => {
-          const proposalOpt = proposals[index];
-          const votesOpt = proposalVotes[index];
-          return constructEvent(hash, proposalOpt, votesOpt);
-        })
-        .filter((es) => !!es)
-    );
-    const nProposalEvents = proposedEvents.filter(
-      (e) => e.kind === EventKind.CollectiveProposed
-    ).length;
-    this.log.info(
-      `Found ${nProposalEvents} ${moduleName} proposals and ${
-        proposedEvents.length - nProposalEvents
-      } votes!`
-    );
-    return proposedEvents.map((data) => ({
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data,
-    }));
-  }
-
   public async fetchTips(
     blockNumber: number,
     hash?: string
@@ -745,142 +504,6 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
 
     const newTips = results.filter((v) => v.data.kind === EventKind.NewTip);
     this.log.info(`Found ${newTips.length} open tips!`);
-    return results;
-  }
-
-  public async fetchSignalingProposals(
-    blockNumber: number,
-    id?: string
-  ): Promise<
-    CWEvent<
-      | ISignalingNewProposal
-      | ISignalingCommitStarted
-      | ISignalingVotingStarted
-      | ISignalingVotingCompleted
-    >[]
-  > {
-    if (!this._api.query.signaling || !this._api.query.voting) {
-      this.log.info('Signaling module not detected.');
-      return [];
-    }
-
-    this.log.info('Migrating signaling proposals...');
-    if (!this._api.query.voting || !this._api.query.signaling) {
-      this.log.info('Found no signaling proposals (wrong chain)!');
-      return [];
-    }
-    // in "prevoting" phase
-    const inactiveProposals = await this._api.query.signaling.inactiveProposals<
-      Vec<[Hash, BlockNumber] & Codec>
-    >();
-    // in "commit" or "voting" phase
-    const activeProposals = await this._api.query.signaling.activeProposals<
-      Vec<[Hash, BlockNumber] & Codec>
-    >();
-    // in "completed" phase
-    const completedProposals =
-      await this._api.query.signaling.completedProposals<
-        Vec<[Hash, BlockNumber] & Codec>
-      >();
-    const proposalHashes = [
-      ...inactiveProposals,
-      ...activeProposals,
-      ...completedProposals,
-    ].map(([hash]) => hash);
-
-    // fetch records
-    const proposalRecordOpts = await this._api.queryMulti(
-      proposalHashes.map((hash) => [this._api.query.signaling.proposalOf, hash])
-    );
-    const proposalRecords = _.zip(proposalRecordOpts, proposalHashes)
-      .filter(([p]) => p.isSome)
-      .map(([p, hash]) => [p.unwrap(), hash]);
-    const voteRecordOpts = await this._api.queryMulti(
-      proposalRecords.map(([p]) => [
-        this._api.query.voting.voteRecords,
-        p.vote_id,
-      ])
-    );
-    const allRecords = _.zip(proposalRecords, voteRecordOpts)
-      .filter(([, voteOpt]) => voteOpt.isSome)
-      .map(([[record, hash], vote]) => [hash, record, vote.unwrap()]);
-
-    // generate events
-    const newProposalEvents = allRecords.map(([hash, proposal, voting]) => {
-      return {
-        kind: EventKind.SignalingNewProposal,
-        proposer: proposal.author.toString(),
-        proposalHash: hash.toString(),
-        voteId: voting.id.toString(),
-        title: proposal.title.toString(),
-        description: proposal.contents.toString(),
-        tallyType: voting.data.tally_type.toString(),
-        voteType: voting.data.vote_type.toString(),
-        choices: voting.outcomes.map((outcome) => outcome.toString()),
-      } as ISignalingNewProposal;
-    });
-
-    // we're not using commit in production, but check anyway
-    const commitStartedEvents = allRecords
-      .filter(([, proposal]) => proposal.stage.isCommit)
-      .map(([hash, proposal, voting]) => {
-        return {
-          kind: EventKind.SignalingCommitStarted,
-          proposalHash: hash.toString(),
-          voteId: voting.id.toString(),
-          endBlock: +proposal.transition_time,
-        } as ISignalingCommitStarted;
-      });
-
-    // assume all voting/completed proposals skipped straight there without commit
-    const votingStartedEvents = allRecords
-      .filter(
-        ([, proposal]) => proposal.stage.isVoting || proposal.stage.isCompleted
-      )
-      .map(([hash, proposal, voting]) => {
-        return {
-          kind: EventKind.SignalingVotingStarted,
-          proposalHash: hash.toString(),
-          voteId: voting.id.toString(),
-          endBlock: +proposal.transition_time,
-        } as ISignalingVotingStarted;
-      });
-
-    const completedEvents = allRecords
-      .filter(([, proposal]) => proposal.stage.isCompleted)
-      .map(([hash, , voting]) => {
-        return {
-          kind: EventKind.SignalingVotingCompleted,
-          proposalHash: hash.toString(),
-          voteId: voting.id.toString(),
-        } as ISignalingVotingCompleted;
-      });
-
-    const events = [
-      ...newProposalEvents,
-      ...commitStartedEvents,
-      ...votingStartedEvents,
-      ...completedEvents,
-    ];
-    // we could plausibly populate the completed events with block numbers, but not necessary
-    const results = events.map((data) => ({
-      blockNumber,
-      network: SupportedNetwork.Substrate,
-      data,
-    }));
-
-    // no easier way to only fetch one than to fetch em all
-    if (id !== undefined) {
-      const data = results.filter(
-        ({ data: { proposalHash } }) => proposalHash === id
-      );
-      if (data.length === 0) {
-        this.log.error(`No referendum found with id ${id}!`);
-        return null;
-      }
-      return data;
-    }
-    this.log.info(`Found ${newProposalEvents.length} signaling proposals!`);
     return results;
   }
 }
