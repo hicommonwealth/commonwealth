@@ -1,11 +1,16 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 
 import imageDropAndPaste from 'quill-image-drop-and-paste'
 
-import type { DeltaStatic } from 'quill';
+import type { DeltaOperation, DeltaStatic } from 'quill';
 import type { QuillMode } from '../quill/types';
 import 'react-quill/dist/quill.snow.css';
+import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
+
+import app from 'state';
+
+const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png']
 
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
 
@@ -27,16 +32,70 @@ const ReactQuillEditor = ({
     setContentDelta,
   } : ReactQuillEditorProps) => {
 
+  const editorRef = useRef<ReactQuill>()
+
   const handleChange = (value, delta, source, editor) => {
     setContentDelta(editor.getContents())
   }
 
-  const handleImageDropAndPaste = (imageDataUrl, imageType) => {
+  // must use memoized function or else it'll render in an infinite loop,
+  // also cannot use contentDelta in dependencies array or else infinite loop
+  const handleImageDropAndPaste = useCallback(async (imageDataUrl, imageType) => {
+
     console.log({ imageDataUrl, imageType })
-  }
+
+    if (!editorRef.current?.editor) {
+      throw new Error('editor is not set')
+    }
+    const editor = editorRef.current?.editor
+
+    try {
+
+      editor.disable()
+  
+      if (!imageType) {
+        imageType = 'image/png'
+      }
+  
+      const selectedIndex = editor.getSelection()?.index || editor.getLength() || 0
+  
+      // filter out ops that contain a base64 image
+      const opsWithoutBase64Images : DeltaOperation[] = (editor.getContents() || [])
+        .filter((op) => {
+          for (const imageType of VALID_IMAGE_TYPES) {
+            const base64Prefix = `data:image/${imageType};base64`
+            if (op.insert?.image?.startsWith(base64Prefix)) {
+              return false
+            }
+          }
+          return true
+        })
+  
+      console.log({ opsWithoutBase64Images })
+  
+      // update content
+      setContentDelta({ ops: opsWithoutBase64Images } as DeltaStatic)
+  
+      const file = base64ToFile(imageDataUrl, imageType)
+
+      const uploadedFileUrl = await uploadFileToS3(file, app.serverUrl(), app.user.jwt)
+
+      editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl)
+
+      setContentDelta(editor.getContents()) // sync state with editor data
+  
+    } catch (err) {
+      console.error(err)
+    } finally {
+      editor.enable()
+    }
+    
+
+  }, [editorRef])
 
   return (
     <ReactQuill
+      ref={editorRef}
       className={`QuillEditor ${className}`}
       placeholder={placeholder}
       tabIndex={tabIndex}
