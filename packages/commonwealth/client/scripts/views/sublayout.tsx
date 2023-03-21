@@ -37,7 +37,10 @@ const Sublayout = ({
   });
 
   useEffect(() => {
-    if (localStorage.getItem('dark-mode-state') === 'on') {
+    if (
+      localStorage.getItem('dark-mode-state') === 'on' &&
+      localStorage.getItem('user-dark-mode-state')
+    ) {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
 
