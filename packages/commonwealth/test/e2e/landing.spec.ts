@@ -1,49 +1,100 @@
 import { test, expect } from '@playwright/test';
 import { PORT } from '../../server/config';
 
-test('landing page works', async ({ page }) => {
-  await page.goto(`http://localhost:${PORT}`);
-
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Commonwealth/);
+test('Homepage works', async ({ page }) => {
+  await page.goto('http://localhost:8080/');
+  await page
+    .locator('div')
+    .filter({ hasText: 'Why Commonwealth? Login' })
+    .nth(2)
+    .click();
   await page.locator('#landing-page').click();
-  await page.locator('.flex').first().click();
-  await page.locator('.gradient-135').click();
-  await page.locator('.gradient-135 > img').first().click();
+  await page
+    .locator('#landing-page')
+    .getByRole('img', { name: 'Commonwealth' })
+    .click();
+  await page
+    .locator('section')
+    .filter({
+      hasText:
+        'A community for every token. Commonwealth is an all-in-one platform for on-chain',
+    })
+    .getByRole('heading', { name: 'A community for every token.' })
+    .click();
+  await page
+    .getByText(
+      'Commonwealth is an all-in-one platform for on-chain communities to discuss, vote'
+    )
+    .click();
+  await page
+    .getByText(
+      'A community for every token. Commonwealth is an all-in-one platform for on-chain'
+    )
+    .click();
+  await page.getByRole('heading', { name: 'We’re also here' }).click();
   await page.locator('img:nth-child(3)').click();
+  await page.locator('.gradient-135 > img').first().click();
   await page.locator('.gradient-135 > img:nth-child(2)').click();
+  await page.getByRole('heading', { name: 'Every token, every chain' }).click();
   await page
     .getByText(
-      'A community for every token.Commonwealth is an all-in-one platform for on-chain '
+      'Subscribe to chain activity like whale transfers or major votes. Discuss new ide'
+    )
+    .click();
+  await page
+    .getByRole('heading', { name: 'Token creators are empowered' })
+    .click();
+  await page
+    .getByText(
+      'Token creators are empowered Commonwealth lets you simplify your community and g'
     )
     .click();
   await page
     .getByText(
-      'Token creators are empoweredCommonwealth lets you simplify your community and go'
+      'Commonwealth lets you simplify your community and governance, bringing four tool'
     )
     .click();
-  await page.getByRole('button', { name: 'On-chain notifications' }).click();
-  await page.getByRole('button', { name: 'Crowdfunding' }).click();
-  await page.locator('#tab3-codepen img').click();
+  await page.locator('#tab-codepen').click();
+  await page
+    .getByRole('button', {
+      name: 'On-chain notifications Stay up-to-date on chain events like votes and large transfers.',
+    })
+    .click();
   await page
     .getByRole('button', { name: 'Off-chain polling & on-chain voting' })
     .click();
-  await page.locator('#tab2-codepen img').click();
+  await page.getByRole('button', { name: 'Crowdfunding' }).click();
   await page.getByRole('button', { name: 'A rich forum experience' }).click();
   await page.locator('#tab4-codepen img').click();
   await page
     .getByText(
-      'Your community is here.Stop bouncing between 10 tabs at once - everything you ne'
+      'Token holders come together Find your community and drive your token forward. Yo'
     )
     .click();
   await page
     .getByText(
-      'Claim your tokenWe generate pages for your favorite community and address from r'
+      'Token holders come together Find your community and drive your token forward. Yo'
+    )
+    .click();
+  await page
+    .getByRole('heading', { name: 'Token holders come together' })
+    .click();
+  await page
+    .getByText('Find your community and drive your token forward.')
+    .click();
+  await page
+    .getByText(
+      'Stop bouncing between 10 tabs at once - everything you need to know about your t'
     )
     .click();
   await page
     .getByText(
-      'Stay updatedBe the first to know when community events are happening with in-app'
+      'We generate pages for your favorite community and address from real-time chain a'
+    )
+    .click();
+  await page
+    .getByText(
+      'Be the first to know when community events are happening with in-app, email, and'
     )
     .click();
   await page
@@ -53,41 +104,39 @@ test('landing page works', async ({ page }) => {
     .click();
   await page
     .getByText(
-      'Leverage on-chain crowdfundingFund new projectsAnyone from within your community'
+      'Participate in events like upcoming votes, new projects and community initiative'
     )
     .click();
   await page
-    .locator('div')
-    .filter({
-      hasText:
-        'Fund new projectsAnyone from within your community can easily turn a conversatio',
-    })
-    .nth(3)
-    .click();
-  await page
-    .locator('div')
-    .filter({
-      hasText:
-        'Create Community EndowmentsPool funds with other like-minded folks, and fund int',
-    })
-    .nth(3)
-    .click();
-  await page
-    .locator('div')
-    .filter({
-      hasText:
-        'Launch New TokensUse a project to raise funds for a new DeFi token or NFT. Optio',
-    })
-    .nth(3)
+    .getByText(
+      'Leverage on-chain crowdfunding Fund new projectsAnyone from within your communit'
+    )
     .click();
   await page
     .locator('section')
-    .filter({ hasText: 'A community for every token.Join Commonwealth today.' })
+    .filter({
+      hasText: 'A community for every token. Join Commonwealth today.',
+    })
+    .getByRole('heading', { name: 'A community for every token.' })
+    .click();
+  await page.getByText('Join Commonwealth today.').click();
+  await page
+    .locator('section')
+    .filter({
+      hasText: 'A community for every token. Join Commonwealth today.',
+    })
+    .click();
+  await page
+    .locator('div')
+    .filter({
+      hasText: 'A community for every token. Join Commonwealth today.',
+    })
+    .nth(3)
     .click();
   await page
     .locator('div')
     .filter({ hasText: 'AboutBlogJobsTermsPrivacyDocsDiscordTelegram' })
-    .nth(3)
+    .nth(2)
     .click();
   await page.getByRole('img', { name: 'Commonwealth' }).nth(1).click();
 });
