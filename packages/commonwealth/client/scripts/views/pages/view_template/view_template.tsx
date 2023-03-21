@@ -388,7 +388,7 @@ class ViewTemplatePage extends ClassComponent {
                       type: 'secondary-black',
                       label: 'cancel',
                       onCancel: () => {
-                        console.log('closed');
+                        console.log('transaction cancelled');
                       },
                     },
                   });
