@@ -8,8 +8,8 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 
-import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
-import { ThreadStage as ThreadStageType } from 'models';
+import type { ChainEntity, Comment, Poll, Topic } from 'models';
+import { ThreadStage as ThreadStageType, Thread } from 'models';
 
 import 'pages/view_thread/index.scss';
 
@@ -31,7 +31,6 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
-import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -39,6 +38,12 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from '../../components/component_kit/cw_modal';
+import type { IThreadCollaborator } from 'models/Thread';
+import {
+  getCommentSubscription,
+  getReactionSubscription,
+  handleToggleSubscription,
+} from '../discussions/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -82,6 +87,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
+  const cancelEditing = () => {
+    setIsGloballyEditing(false)
+    setIsEditingBody(false)
+  }
+
+  const threadUpdatedCallback = (title: string, body: string) => {
+    setThread(new Thread({
+      ...thread,
+      title: title,
+      body: body
+    }))
+    cancelEditing()
+  } 
+    
   const updatedCommentsCallback = useCallback(() => {
     if (!thread) {
       return;
@@ -317,14 +336,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
     // load profiles
     if (!prefetch[threadIdAndType]['profilesStarted']) {
-      app.profiles.getProfile(thread.authorChain, thread.author);
+      app.newProfiles.getProfile(thread.authorChain, thread.author);
 
       comments.forEach((comment) => {
-        app.profiles.getProfile(comment.authorChain, comment.author);
+        app.newProfiles.getProfile(comment.authorChain, comment.author);
       });
 
-      app.profiles.isFetched.on('redraw', () => {
-        if (!prefetch[threadIdAndType]['profilesFinished']) {
+      app.newProfiles.isFetched.on('redraw', () => {
+        if (!prefetch[threadIdAndType]?.['profilesFinished']) {
           setPrefetch((prevState) => ({
             ...prevState,
             [threadIdAndType]: {
@@ -396,8 +415,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   if (
-    !app.profiles.allLoaded() &&
-    !prefetch[threadIdAndType]['profilesFinished']
+    !app.newProfiles.allLoaded() &&
+    !prefetch[threadIdAndType]?.['profilesFinished']
   ) {
     return <PageLoading />;
   }
@@ -437,6 +456,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       chain: app.activeChainId(),
     });
 
+  const isSubscribed =
+    getCommentSubscription(thread)?.isActive &&
+    getReactionSubscription(thread)?.isActive;
+
   const showLinkedProposalOptions =
     thread.snapshotProposal?.length > 0 ||
     thread.chainEntities?.length > 0 ||
@@ -461,6 +484,36 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const hasEditPerms = isAuthor || isEditor;
+
+  const handleLinkedThreadChange = (linkedThreads: Thread[]) => {
+    const linkedThreadsRelations = linkedThreads.map((t) => ({
+      id: '',
+      linkedThread: String(t.id),
+      linkingThread: String(thread.id),
+    }));
+
+    const updatedThread = new Thread({
+      ...thread,
+      linkedThreads: linkedThreadsRelations,
+    });
+
+    setThread(updatedThread);
+  };
+
+  const handleLinkedProposalChange = (
+    stage: ThreadStageType,
+    chainEntities: ChainEntity[] = [],
+    snapshotProposal: SnapshotProposal[] = []
+  ) => {
+    const newThread = {
+      ...thread,
+      stage,
+      chainEntities,
+      snapshotProposal: snapshotProposal[0]?.id,
+    } as Thread;
+
+    setThread(newThread);
+  };
 
   const getActionMenuItems = () => {
     return [
@@ -518,9 +571,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Delete',
               iconLeft: 'trash' as const,
-              onClick: async (e) => {
-                e.preventDefault();
-
+              onClick: async () => {
                 const confirmed = window.confirm('Delete this entire thread?');
 
                 if (!confirmed) return;
@@ -537,8 +588,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
               iconLeft: 'lock' as const,
-              onClick: (e) => {
-                e.preventDefault();
+              onClick: () => {
                 app.threads
                   .setPrivacy({
                     threadId: thread.id,
@@ -571,7 +621,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ]
         : []),
       { type: 'divider' as const },
-      getThreadSubScriptionMenuItem(thread),
+      {
+        onClick: () => {
+          handleToggleSubscription(
+            thread,
+            getCommentSubscription(thread),
+            getReactionSubscription(thread),
+            isSubscribed
+          ).then(() => {
+            setRecentlyEdited(true);
+          });
+        },
+        label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
+        iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
+      },
     ];
   };
 
@@ -616,11 +679,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 {reactionsAndReplyButtons}
                 <EditBody
+                  title={title}
                   thread={thread}
                   savedEdits={savedEdits}
                   shouldRestoreEdits={shouldRestoreEdits}
-                  setIsEditing={setIsEditingBody}
-                  title={title}
+                  cancelEditing={cancelEditing}
+                  threadUpdatedCallback={threadUpdatedCallback}
                 />
               </>
             ) : (
@@ -661,30 +725,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <div className="cards-column">
                         {showLinkedProposalOptions && (
                           <LinkedProposalsCard
-                            onChangeHandler={(
-                              stage: ThreadStageType,
-                              chainEntities: ChainEntity[],
-                              snapshotProposal: SnapshotProposal[]
-                            ) => {
-                              thread.stage = stage;
-                              thread.chainEntities = chainEntities;
-                              if (app.chain?.meta.snapshot.length) {
-                                thread.snapshotProposal =
-                                  snapshotProposal[0]?.id;
-                              }
-                              app.threads.fetchThreadsFromId([
-                                thread.identifier,
-                              ]);
-                              setThread(thread);
-                            }}
+                            onChangeHandler={handleLinkedProposalChange}
                             thread={thread}
                             showAddProposalButton={isAuthor || isAdminOrMod}
                           />
                         )}
                         {showLinkedThreadOptions && (
                           <LinkedThreadsCard
-                            threadId={thread.id}
+                            thread={thread}
                             allowLinking={isAuthor || isAdminOrMod}
+                            onChangeHandler={handleLinkedThreadChange}
                           />
                         )}
                       </div>
@@ -704,13 +754,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             polls?.map((poll) => [poll.id, poll])
                           ).values(),
                         ].map((poll: Poll) => {
-                          return <ThreadPollCard poll={poll} />;
+                          return (
+                            <ThreadPollCard
+                              poll={poll}
+                              key={poll.id}
+                              onVote={() => setInitializedPolls(false)}
+                            />
+                          );
                         })}
                         {isAuthor &&
                           (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
                             <ThreadPollEditorCard
                               thread={thread}
                               threadAlreadyHasPolling={!polls?.length}
+                              onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
                       </div>
@@ -725,8 +782,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         content={
           <ChangeTopicModal
             onChangeHandler={(topic: Topic) => {
-              thread.topic = topic;
-              setThread(thread);
+              const newThread = new Thread({ ...thread, topic });
+              setThread(newThread);
             }}
             thread={thread}
             onModalClose={() => setIsChangeTopicModalOpen(false)}
@@ -740,6 +797,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
             thread={thread}
+            onCollaboratorsUpdated={(collaborators: IThreadCollaborator[]) => {
+              const newThread = new Thread({ ...thread, collaborators });
+              setThread(newThread);
+            }}
           />
         }
         onClose={() => setIsEditCollaboratorsModalOpen(false)}

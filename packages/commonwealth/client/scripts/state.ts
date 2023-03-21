@@ -14,7 +14,7 @@ import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
 import PollsController from './controllers/server/polls';
-import ProfilesController from './controllers/server/profiles';
+import NewProfilesController from './controllers/server/newProfiles';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
 import { RolesController } from './controllers/server/roles';
@@ -83,7 +83,7 @@ export interface IApp {
   user: UserController;
   roles: RolesController;
   recentActivity: RecentActivityController;
-  profiles: ProfilesController;
+  newProfiles: NewProfilesController;
   sessions: SessionsController;
 
   // Web3
@@ -97,6 +97,8 @@ export interface IApp {
   sidebarToggled: boolean;
 
   loginState: LoginState;
+  loginStateEmitter: EventEmitter;
+
   // stored on server-side
   config: {
     chains: ChainStore;
@@ -185,9 +187,10 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  profiles: new ProfilesController(),
+  newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
+  loginStateEmitter: new EventEmitter(),
 
   // Global nav state
   mobileMenu: null,
@@ -284,12 +287,14 @@ export async function initAppState(
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => redraw());
+          app.loginStateEmitter.emit('redraw');
         } else if (
           app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected
         ) {
           // TODO: create global deinit function
           app.socket.disconnect();
+          app.loginStateEmitter.emit('redraw');
         }
 
         app.user.setStarredCommunities(

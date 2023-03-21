@@ -48,7 +48,7 @@ export const UserDashboardChainEventRow = (
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigate(`/${chain}`);
+              navigate(`/${chain?.id}`, {}, null);
             }}
           >
             <CWText type="caption" fontWeight="medium">

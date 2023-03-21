@@ -1,19 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import 'components/chain_entities_selector.scss';
-import type { ChainEntity, Thread } from 'models';
+import type { ChainEntity } from 'models';
 
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { ChainEntitiesSelectorItem } from 'views/components/chain_entities_selector/chain_entities_selector_item';
 import { chainEntityTypeToProposalName } from 'identifiers';
-
-type ChainEntitiesSelectorProps = {
-  chainEntitiesToSet: Array<ChainEntity>;
-  onSelect: (ce: ChainEntity) => void;
-  thread: Thread;
-};
 
 const sortChainEntities = (a: ChainEntity, b: ChainEntity) => {
   if (!a.threadId && b.threadId) {
@@ -39,6 +33,11 @@ const filterChainEntities = (ce: ChainEntity, searchTerm: string) => {
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
+};
+
+type ChainEntitiesSelectorProps = {
+  chainEntitiesToSet: Array<ChainEntity>;
+  onSelect: (ce: ChainEntity) => void;
 };
 
 export const ChainEntitiesSelector = ({
@@ -88,19 +87,7 @@ export const ChainEntitiesSelector = ({
         <ChainEntitiesSelectorItem
           chainEntity={chainEntity}
           isSelected={isSelected}
-          onClick={(ce) => {
-            console.log('click');
-            if (isSelected) {
-              // TODO FIX THIS
-              // const index = vnode.attrs.chainEntitiesToSet.findIndex(
-              //   (ce_) => ce_.id === ce.id
-              // );
-              // vnode.attrs.chainEntitiesToSet.splice(index, 1);
-            } else {
-              // vnode.attrs.chainEntitiesToSet.push(ce);
-            }
-            onSelect(ce);
-          }}
+          onClick={(ce) => onSelect(ce)}
         />
       );
     },

@@ -12,6 +12,7 @@ import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
+import getAddressProfile from '../routes/getAddressProfile';
 import selectChain from '../routes/selectChain';
 import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
@@ -57,7 +58,7 @@ import bulkMembers from '../routes/bulkMembers';
 import bulkAddresses from '../routes/bulkAddresses';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
-import getProfileOld from '../routes/getProfile';
+import getProfileNew from '../routes/getNewProfile';
 
 import createRole from '../routes/createRole';
 import deleteRole from '../routes/deleteRole';
@@ -93,8 +94,7 @@ import editDraft from '../routes/drafts/editDraft';
 import getDrafts from '../routes/drafts/getDrafts';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
-import bulkProfiles from '../routes/bulkProfiles';
-import updateProfile from '../routes/updateProfile';
+import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
@@ -225,6 +225,7 @@ function setupRouter(
     linkExistingAddressToChain.bind(this, models)
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
+  router.post('/getAddressProfile', getAddressProfile.bind(this, models));
   router.post(
     '/selectChain',
     passport.authenticate('jwt', { session: false }),
@@ -417,7 +418,7 @@ function setupRouter(
     searchComments.bind(this, models)
   );
 
-  router.get('/profile', getProfileOld.bind(this, models));
+  router.get('/profile/v2', getProfileNew.bind(this, models));
 
   // discussion drafts
   router.post(
@@ -643,14 +644,12 @@ function setupRouter(
     setDefaultRole.bind(this, models)
   );
 
-  // profiles
+  // new profile
   router.post(
-    '/updateProfile',
+    '/updateProfile/v2',
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateProfile.bind(this, models)
+    updateProfileNew.bind(this, models)
   );
-  router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
   // social accounts
   router.delete(

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { initAppState } from 'state';
@@ -21,14 +21,13 @@ import { AddressInfo, ITokenAdapter } from 'models';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
-import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
-import { CWToggle } from '../component_kit/cw_toggle';
+import { CWToggle, toggleDarkMode } from '../component_kit/cw_toggle';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { UserBlock } from '../user/user_block';
@@ -61,86 +60,111 @@ export const LoginSelectorMenuLeft = ({
   nAccountsWithoutRole,
 }: LoginSelectorMenuLeftAttrs) => {
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
 
-  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSelectAddressModalOpen, setIsSelectAddressModalOpen] =
     useState(false);
+  const [profileId, setProfileId] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
+  const changeSelectedAddress = () => {
+    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
+    setSelectedAddress(activeAccount.address);
+    forceRerender();
+  };
+
+  useEffect(() => {
+    // force rerender when new address is connected
+    app.user.isFetched.on('redraw', () => {
+      changeSelectedAddress();
+    });
+
+    return () => {
+      app.user.isFetched.off('redraw', () => {
+        changeSelectedAddress();
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
+    const chain =
+      typeof activeAccount.chain === 'string'
+        ? activeAccount.chain
+        : activeAccount.chain?.id;
+    const profile = app.newProfiles.getProfile(chain, activeAccount.address);
+    setProfileId(profile.id);
+    setSelectedAddress(activeAccount.address);
+  }, []);
+
+  const { activeAccounts } = app.user;
 
   return (
-    <>
-      <div className="LoginSelectorMenu">
-        {activeAddressesWithRole.map((account) => (
-          <div
-            key={account.address}
-            className="login-menu-item"
-            onClick={async () => {
-              await setActiveAccount(account);
-              redraw();
-            }}
-          >
-            <UserBlock
-              user={account}
-              selected={isSameAccount(account, app.user.activeAccount)}
-              showRole={false}
-              compact
-              avatarSize={16}
-            />
-          </div>
-        ))}
-        {activeAddressesWithRole.length > 0 && <CWDivider />}
-        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
-          <div
-            className="login-menu-item"
-            onClick={() => {
-              const pf = app.user.activeAccount.profile;
-              if (app.chain) {
-                navigate(`/account/${pf.address}`);
-              }
-            }}
-          >
-            <CWText type="caption">View profile</CWText>
-          </div>
-        )}
-        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
-          <div
-            className="login-menu-item"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsEditProfileModalOpen(true);
-            }}
-          >
-            <CWText type="caption">Edit profile</CWText>
-          </div>
-        )}
-        <div
-          className="login-menu-item"
-          onClick={() => {
-            if (nAccountsWithoutRole > 0) {
-              setIsSelectAddressModalOpen(true);
-            } else {
-              setIsLoginModalOpen(true);
-            }
-          }}
-        >
-          <CWText type="caption">
-            {nAccountsWithoutRole > 0
-              ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-              : 'Connect a new address'}
+    <div className="LoginSelectorMenu left">
+      {app.activeChainId() && (
+        <>
+          <CWText type="caption" className="title">
+            Select address to use
           </CWText>
-        </div>
+          {activeAccounts.map((account, i) => {
+            return (
+              <div
+                key={i}
+                className={`login-menu-item ${
+                  selectedAddress === account.address ? 'selected' : ''
+                }`}
+                onClick={async () => {
+                  await setActiveAccount(account);
+                  setSelectedAddress(account.address);
+                  redraw();
+                }}
+              >
+                <UserBlock
+                  user={account}
+                  selected={isSameAccount(account, app.user.activeAccount)}
+                  showRole={false}
+                  compact
+                  hideAvatar
+                />
+              </div>
+            );
+          })}
+        </>
+      )}
+      {activeAccounts.length > 0 && <CWDivider />}
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          navigate(`/profile/id/${profileId}`, {}, null);
+        }}
+      >
+        <CWText type="caption">View profile</CWText>
       </div>
-      <Modal
-        content={
-          <EditProfileModal
-            onModalClose={() => setIsEditProfileModalOpen(false)}
-            account={app.user.activeAccount}
-            refreshCallback={() => redraw()}
-          />
-        }
-        onClose={() => setIsEditProfileModalOpen(false)}
-        open={isEditProfileModalOpen}
-      />
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          navigate(`/profile/id/${profileId}/edit`, {}, null);
+        }}
+      >
+        <CWText type="caption">Edit profile</CWText>
+      </div>
+      <div
+        className="login-menu-item"
+        onClick={() => {
+          if (nAccountsWithoutRole > 0) {
+            setIsSelectAddressModalOpen(true);
+          } else {
+            setIsLoginModalOpen(true);
+          }
+        }}
+      >
+        <CWText type="caption">
+          {nAccountsWithoutRole > 0
+            ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+            : 'Connect a new address'}
+        </CWText>
+      </div>
       <Modal
         content={
           <SelectAddressModal
@@ -156,7 +180,7 @@ export const LoginSelectorMenuLeft = ({
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
       />
-    </>
+    </div>
   );
 };
 
@@ -169,42 +193,33 @@ export const LoginSelectorMenuRight = ({
 }: LoginSelectorMenuRightProps) => {
   const navigate = useCommonNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
+  const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
+    localStorage.getItem('dark-mode-state') === 'on'
+  );
 
   return (
     <>
-      <div className="LoginSelectorMenu">
+      <div className="LoginSelectorMenu right">
         <div
           className="login-menu-item"
           onClick={() => navigate('/notification-settings', {}, null)}
         >
           <CWText type="caption">Notification settings</CWText>
         </div>
-        <div className="login-menu-item" onClick={() => navigate('/settings')}>
-          <CWText type="caption">Account settings</CWText>
-        </div>
         <div className="login-menu-item">
           <CWToggle
             checked={isDarkModeOn}
             onChange={(e) => {
-              if (isDarkModeOn) {
-                localStorage.setItem('dark-mode-state', 'off');
-                localStorage.setItem('user-dark-mode-state', 'off');
-                document
-                  .getElementsByTagName('html')[0]
-                  .classList.remove('invert');
-              } else {
-                document
-                  .getElementsByTagName('html')[0]
-                  .classList.add('invert');
-                localStorage.setItem('dark-mode-state', 'on');
-                localStorage.setItem('user-dark-mode-state', 'on');
-              }
+              isDarkModeOn
+                ? toggleDarkMode(false, setIsDarkModeOn)
+                : toggleDarkMode(true, setIsDarkModeOn);
               e.stopPropagation();
               redraw();
             }}
           />
-          <CWText type="caption">Dark mode</CWText>
+          <div className="login-darkmode-label">
+            <CWText type="caption">Dark mode</CWText>
+          </div>
         </div>
         <CWDivider />
         <div className="login-menu-item" onClick={() => setIsModalOpen(true)}>
@@ -268,8 +283,9 @@ export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
-    useState(false);
+  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] = useState(
+    false
+  );
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const leftMenuProps = usePopover();
@@ -312,11 +328,10 @@ export const LoginSelector = () => {
 
   const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
-  const nAccountsWithoutRole = activeAccountsByRole.filter(
-    ([role]) => !role
-  ).length;
+  const nAccountsWithoutRole = activeAccountsByRole.filter(([role]) => !role)
+    .length;
 
-  if (!profileLoadComplete && app.profiles.allLoaded()) {
+  if (!profileLoadComplete && app.newProfiles.allLoaded()) {
     setProfileLoadComplete(true);
   }
 
@@ -501,35 +516,32 @@ export const LoginSelector = () => {
               />
             </div>
           )}
-        {app.chain &&
-          !app.chainPreloading &&
-          profileLoadComplete &&
-          app.user.activeAccount && (
-            <ClickAwayListener
-              onClickAway={() => {
-                leftMenuProps.setAnchorEl(null);
-              }}
-            >
-              <div className="button-container">
-                <div
-                  className="left-button"
-                  onClick={leftMenuProps.handleInteraction}
-                >
-                  <User user={app.user.activeAccount} />
-                </div>
-
-                <Popover
-                  content={
-                    <LoginSelectorMenuLeft
-                      activeAddressesWithRole={activeAddressesWithRole}
-                      nAccountsWithoutRole={nAccountsWithoutRole}
-                    />
-                  }
-                  {...leftMenuProps}
-                />
+        {profileLoadComplete && (
+          <ClickAwayListener
+            onClickAway={() => {
+              leftMenuProps.setAnchorEl(null);
+            }}
+          >
+            <div className="button-container">
+              <div
+                className="left-button"
+                onClick={leftMenuProps.handleInteraction}
+              >
+                <User user={app.user.addresses[0]} />
               </div>
-            </ClickAwayListener>
-          )}
+
+              <Popover
+                content={
+                  <LoginSelectorMenuLeft
+                    activeAddressesWithRole={activeAddressesWithRole}
+                    nAccountsWithoutRole={nAccountsWithoutRole}
+                  />
+                }
+                {...leftMenuProps}
+              />
+            </div>
+          </ClickAwayListener>
+        )}
         <ClickAwayListener
           onClickAway={() => {
             rightMenuProps.setAnchorEl(null);

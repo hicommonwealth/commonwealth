@@ -6,8 +6,8 @@
   display: inline-block;
   height: 24px;
   position: relative;
-  transition: all ease-in-out 0.2s;
   width: 48px;
+  cursor: pointer;
 
   .toggle-input {
     @include hideInput;
@@ -16,7 +16,6 @@
   .slider {
     background-color: $white;
     border-radius: $border-radius-round;
-    cursor: pointer;
     height: 20px;
     left: 2px;
     position: absolute;

@@ -100,7 +100,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Run linter
-        run: yarn lint-branch
+        run: yarn lint-all
 
       - name: Typecheck
         run: yarn --cwd packages/commonwealth check-types

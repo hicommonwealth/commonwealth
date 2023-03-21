@@ -1,77 +1,32 @@
 @import '../../shared';
 
-.Homepage {
-  .hero-unit {
-    margin: 0 auto;
-    background: $primary-400;
-    border-bottom: 1px solid $neutral-25;
-    margin-bottom: 48px;
+.LandingPage {
+  align-items: center;
+  background-color: $neutral-50;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
 
-    .layout-container {
-      padding: 28px 30px 30px;
-      max-width: 820px;
-      margin: 0 auto;
-      display: flex;
+  .join-section {
+    background-color: $neutral-800;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 224px;
+    padding: 0 268px;
+    width: 100%;
+
+    @include mediumSmallInclusive {
+      padding: 0 64px;
     }
 
-    .hero-unit-left {
-      padding-right: 40px;
-    }
-
-    .hero-unit-right {
-      padding-top: 4px;
-    }
-
-    .hero-image {
-    }
-
-    .hero-image-inner {
-      border-radius: $border-radius-round;
-      height: 160px;
-      width: 160px;
-      background: $neutral-50;
-      text-align: center;
-      padding-top: 29px;
-
-      img {
-        margin: 0 auto;
-        position: relative;
-        left: -1px;
-        width: 108px;
-        height: 108px;
-      }
-    }
-
-    h2 {
-      margin: 18px 0 13px 0;
-    }
-
-    p {
-      margin: 6px 0;
-    }
-
-    @include small {
-      .layout-container {
-        display: block;
-        text-align: center;
-      }
-
-      .hero-unit-left {
-        padding-right: 0;
-      }
-
-      .hero-unit-right {
-        padding-top: 12px;
-      }
-
-      .hero-image-inner {
-        margin: 0 auto;
-      }
+    .join-text.Text {
+      color: $white;
     }
   }
 
-  p.lead-copy {
-    font-size: 19px;
-    margin: 0 0 34px;
+  .Footer {
+    width: 100%;
   }
 }

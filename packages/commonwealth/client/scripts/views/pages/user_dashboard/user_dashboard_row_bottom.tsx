@@ -12,6 +12,8 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { subscribeToThread } from './helpers';
+import { NotificationSubscription } from 'client/scripts/models';
+import useForceRerender from 'hooks/useForceRerender';
 
 type UserDashboardRowBottomProps = {
   commentCount: number;
@@ -23,6 +25,22 @@ type UserDashboardRowBottomProps = {
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const { threadId, commentCount, commentId, chainId, commenters } = props;
+  const forceRerender = useForceRerender();
+
+  const setSubscription = async (
+    threadId: string,
+    bothActive: boolean,
+    commentSubscription: NotificationSubscription,
+    reactionSubscription: NotificationSubscription
+  ) => {
+    await subscribeToThread(
+      threadId,
+      bothActive,
+      commentSubscription,
+      reactionSubscription
+    );
+    forceRerender();
+  };
 
   const adjustedId = `discussion_${threadId}`;
 
@@ -61,7 +79,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           menuItems={[
             {
               onClick: () => {
-                subscribeToThread(
+                setSubscription(
                   threadId,
                   bothActive,
                   commentSubscription,

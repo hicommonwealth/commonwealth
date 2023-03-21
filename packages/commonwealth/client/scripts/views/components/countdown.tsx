@@ -21,7 +21,12 @@ export const Countdown = (props: CountdownProps) => {
   }, [startCountdown]);
 
   return (
-    <span>{formatDuration(moment.duration(moment(count).diff(moment())))}</span>
+    <span>
+      {formatDuration(
+        moment.duration(moment().add(duration, 'ms').diff(moment())),
+        false
+      )}
+    </span>
   );
 };
 

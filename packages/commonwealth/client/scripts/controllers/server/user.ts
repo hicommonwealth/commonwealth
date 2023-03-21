@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import $ from 'jquery';
+import { EventEmitter } from 'events';
 
 import type {
   Account,
@@ -21,6 +22,8 @@ export class UserController {
   public get activeAccount(): Account {
     return this._activeAccount;
   }
+
+  public isFetched = new EventEmitter();
 
   private _setActiveAccount(account: Account): void {
     this._activeAccount = account;
@@ -78,6 +81,7 @@ export class UserController {
 
   private _setActiveAccounts(activeAccounts: Account[]): void {
     this._activeAccounts = activeAccounts;
+    this.isFetched.emit('redraw');
   }
 
   private _socialAccounts: SocialAccount[] = [];

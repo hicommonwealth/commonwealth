@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ChainNetwork, ProposalType } from 'common-common/src/types';
 import {
@@ -19,6 +19,7 @@ import { AaveProposalForm } from './aave_proposal_form';
 import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 import { SputnikProposalForm } from './sputnik_proposal_form';
+import useForceRerender from 'hooks/useForceRerender';
 
 type NewProposalPageProps = {
   type: ProposalType;
@@ -26,7 +27,23 @@ type NewProposalPageProps = {
 
 const NewProposalPage = (props: NewProposalPageProps) => {
   const { type } = props;
-  const [internalType, setInternalType] = React.useState<ProposalType>(type);
+  const forceRerender = useForceRerender();
+  const [internalType, setInternalType] = useState<ProposalType>(type);
+  const [isLoaded, setIsLoaded] = useState(app.chain?.loaded);
+
+  useEffect(() => {
+    app.runWhenReady(() => {
+      setIsLoaded(app.chain.loaded);
+    });
+  }, [app.chain?.loaded]);
+
+  useEffect(() => {
+    app.loginStateEmitter.on('redraw', forceRerender);
+
+    return () => {
+      app.loginStateEmitter.off('redraw', forceRerender);
+    };
+  }, [app.loginState]);
 
   // wait for chain
   if (app.chain?.failed) {
@@ -38,7 +55,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     );
   }
 
-  if (!app.chain || !app.chain.loaded || !app.chain.meta) {
+  if (!app.chain || !isLoaded || !app.chain.meta) {
     return <PageLoading />;
   }
 
@@ -57,13 +74,13 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   }
 
   // check if module is still initializing
-  const c = proposalSlugToClass().get(internalType) as ProposalModule<
+  const c = proposalSlugToClass()?.get(internalType) as ProposalModule<
     any,
     any,
     any
   >;
 
-  if (!c.ready) {
+  if (!c || !c.ready) {
     app.chain.loadModules([c]);
     return <PageLoading />;
   }
