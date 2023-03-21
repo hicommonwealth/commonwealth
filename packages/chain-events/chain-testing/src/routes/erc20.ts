@@ -53,11 +53,11 @@ export const transfer = async (req: Request, res: Response) => {
           request.from,
           Web3.utils.toWei(request.amount)
         )
-        .send({ from: account, gasLimit: 100000 });
+        .send({ from: account, gasLimit: 400000 });
     } else {
       await contract.methods
         .transfer(request.to, Web3.utils.toWei(request.amount))
-        .send({ from: account, gasLimit: 100000 });
+        .send({ from: account, gasLimit: 400000 });
     }
     res.status(200).send();
   } catch (err) {
@@ -113,7 +113,7 @@ export const getTokens = async (req: Request, res: Response) => {
           account,
           Math.floor(Date.now() / 1000) + 60 * 200
         )
-        .send({ from: account, value: request.value[i], gasLimit: 200000 });
+        .send({ from: account, value: request.value[i], gasLimit: 500000 });
     });
     res.status(200).send();
   } catch (err) {
