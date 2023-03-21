@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect } from 'react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
@@ -43,23 +43,25 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
 
   const editorText = getTextFromDelta(contentDelta)
 
-  const formIsValid = useMemo(() => {
+  useEffect(() => {
     if (!name || !name.trim()) {
-      return false
+      setErrorMsg('Name must be specified.')
+      return
     }
     if (featuredInNewPost && editorText.length === 0) {
-      return false
+      setErrorMsg('Must add template.')
+      return
     }
-    return true
+    setErrorMsg(null)
   }, [name, featuredInNewPost, editorText])
 
   const decimals = app.chain?.meta?.decimals
     ? app.chain.meta.decimals
     : app.chain.network === ChainNetwork.ERC721
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
+      ? 0
+      : app.chain.base === ChainBase.CosmosSDK
+        ? 6
+        : 18;
 
   return (
     <div className="NewTopicModal">
@@ -91,7 +93,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
               const err = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
                 'char'
-              )} 
+              )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(err);
               return ['failure', err];
@@ -148,9 +150,9 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
         </div>
         {featuredInNewPost && (
           <ReactQuillEditor
-          contentDelta={contentDelta}
-          setContentDelta={setContentDelta}
-        />
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+          />
         )}
         <CWButton
           label="Create topic"
