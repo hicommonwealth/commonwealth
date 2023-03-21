@@ -544,7 +544,6 @@ const getCommonDomainRoutes = (importRoute) => ({
     import('views/pages/general_contract'),
     { scoped: true }
   ),
-  // TODO temporary route name
   '/:scope/:contract_address/:slug': importRoute(
     import('views/pages/view_template'),
     {
