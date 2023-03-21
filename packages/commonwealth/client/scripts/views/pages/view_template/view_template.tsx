@@ -24,6 +24,7 @@ import { callContractFunction } from 'controllers/chain/ethereum/callContractFun
 import { parseFunctionFromABI } from 'abi_utils';
 import validateType from 'helpers/validateTypes';
 import Web3 from 'web3';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 enum TemplateComponents {
   DIVIDER = 'divider',
@@ -367,11 +368,17 @@ class ViewTemplatePage extends ClassComponent {
                             this.formState
                           );
 
-                          await callContractFunction({
+                          const res = await callContractFunction({
                             contract: this.currentContract,
                             fn: functionAbi,
                             inputArgs: functionArgs,
                           });
+
+                          if (res.status) {
+                            notifySuccess('Transaction successful!');
+                          } else {
+                            notifyError('Transcation Failed. Try again.');
+                          }
                         } catch (e) {
                           console.log(e);
                         }
@@ -381,7 +388,7 @@ class ViewTemplatePage extends ClassComponent {
                       type: 'secondary-black',
                       label: 'cancel',
                       onCancel: () => {
-                        console.log('hi');
+                        console.log('closed');
                       },
                     },
                   });
