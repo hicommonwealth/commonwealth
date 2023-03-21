@@ -69,7 +69,7 @@ export async function callContractFunction({
   contract: Contract;
   fn: AbiItem;
   inputArgs: string[];
-}): Promise<Result> {
+}): Promise<TransactionReceipt> {
   const sender = app.user.activeAccount;
   // get querying wallet
   const signingWallet = await app.wallets.locateWallet(
@@ -101,7 +101,7 @@ export async function callContractFunction({
   const txReceipt: TransactionReceipt | any = await sendFunctionCall(
     functionConfig
   );
-  return ethersInterface.decodeFunctionResult(fn.name, txReceipt);
+  return txReceipt;
 }
 
 export function encodeParameters(types, values) {
