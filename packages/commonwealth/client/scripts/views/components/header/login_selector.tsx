@@ -194,7 +194,8 @@ export const LoginSelectorMenuRight = ({
   const navigate = useCommonNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on'
+    localStorage.getItem('dark-mode-state') === 'on' &&
+      !!localStorage.getItem('user-dark-mode-state')
   );
 
   return (
@@ -283,9 +284,8 @@ export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] = useState(
-    false
-  );
+  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
+    useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const leftMenuProps = usePopover();
@@ -328,8 +328,9 @@ export const LoginSelector = () => {
 
   const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
-  const nAccountsWithoutRole = activeAccountsByRole.filter(([role]) => !role)
-    .length;
+  const nAccountsWithoutRole = activeAccountsByRole.filter(
+    ([role]) => !role
+  ).length;
 
   if (!profileLoadComplete && app.newProfiles.allLoaded()) {
     setProfileLoadComplete(true);
