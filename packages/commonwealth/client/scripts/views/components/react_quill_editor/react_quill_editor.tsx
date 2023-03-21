@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 
 import imageDropAndPaste from 'quill-image-drop-and-paste'
@@ -6,7 +6,7 @@ import imageDropAndPaste from 'quill-image-drop-and-paste'
 import type { DeltaOperation, DeltaStatic } from 'quill';
 import type { QuillMode } from '../quill/types';
 import 'react-quill/dist/quill.snow.css';
-import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
+import { base64ToFile, uploadFileToS3 } from './utils';
 
 import app from 'state';
 
@@ -70,20 +70,16 @@ const ReactQuillEditor = ({
           }
           return true
         })
-  
-      console.log({ opsWithoutBase64Images })
-  
-      // update content
       setContentDelta({ ops: opsWithoutBase64Images } as DeltaStatic)
   
       const file = base64ToFile(imageDataUrl, imageType)
 
       const uploadedFileUrl = await uploadFileToS3(file, app.serverUrl(), app.user.jwt)
 
+      // insert image op at the selected index,
       editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl)
+      setContentDelta(editor.getContents()) // sync state with editor content
 
-      setContentDelta(editor.getContents()) // sync state with editor data
-  
     } catch (err) {
       console.error(err)
     } finally {
