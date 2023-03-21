@@ -1,5 +1,5 @@
+import axios from "axios";
 import type { DeltaStatic } from "quill";
-import $ from 'jquery';
 
 // parseDelta creates a new DeltaStatic object from a JSON string
 export const parseDeltaString = (str: string) : DeltaStatic => {
@@ -56,26 +56,24 @@ export const uploadFileToS3 = async (file: File, appServerUrl: string, jwtToken:
   try {
 
     // get a signed upload URL for s3
-    const sigResponse = await $.post(`${appServerUrl}/getUploadSignature`, {
-      name: file.name, // tokyo.png'
-      mimetype: file.type, // 'image/png'
-      auth: true,
+    const sigResponse = await axios.post(`${appServerUrl}/getUploadSignature`, new URLSearchParams({
+      mimetype: file.type,
+      name: file.name,
+      auth: 'true',
       jwt: jwtToken,
-    })
+    }))
 
-    if (sigResponse.status !== 'Success') {
-      throw new Error(`failed to get an S3 signed upload URL: ${sigResponse.error}`)
+    if (sigResponse.status != 200) {
+      throw new Error(`failed to get an S3 signed upload URL: ${sigResponse.data.error}`)
     }
 
-    const signedUploadUrl = sigResponse.result
+    const signedUploadUrl = sigResponse.data.result
 
     // upload the file via the signed URL
-    await $.ajax({
-      type: 'PUT',
-      url: signedUploadUrl,
-      contentType: file.type,
-      processData: false, // don't send as form
-      data: file,
+    await axios.put(signedUploadUrl, file, {
+      params: {
+        'Content-Type': file.type
+      }
     })
 
     const trimmedURL = signedUploadUrl.split('?')[0]
