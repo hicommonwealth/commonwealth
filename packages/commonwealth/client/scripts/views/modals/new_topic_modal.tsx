@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { redraw } from 'mithrilInterop';
+import React, { useMemo } from 'react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
@@ -9,17 +7,15 @@ import { pluralizeWithoutNumberPrefix } from 'helpers';
 import 'modals/new_topic_modal.scss';
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import type { QuillEditor } from 'views/components/quill/quill_editor';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -31,7 +27,9 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
   const [featuredInNewPost, setFeaturedInNewPost] =
@@ -43,15 +41,17 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [submitIsDisabled, setSubmitIsDisabled] =
     React.useState<boolean>(false);
 
-  React.useEffect(() => {
-    if (!name || !name.trim()) {
-      setSubmitIsDisabled(true);
-    }
+  const editorText = getTextFromDelta(contentDelta)
 
-    if (featuredInNewPost && quillEditorState && quillEditorState.isBlank()) {
-      setSubmitIsDisabled(true);
+  const formIsValid = useMemo(() => {
+    if (!name || !name.trim()) {
+      return false
     }
-  }, [name, featuredInNewPost, quillEditorState]);
+    if (featuredInNewPost && editorText.length === 0) {
+      return false
+    }
+    return true
+  }, [name, featuredInNewPost, editorText])
 
   const decimals = app.chain?.meta?.decimals
     ? app.chain.meta.decimals
@@ -82,7 +82,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             if (currentCommunityTopicNames.includes(text.toLowerCase())) {
               const err = 'Topic name already used within community.';
               setErrorMsg(err);
-              redraw();
               return ['failure', err];
             }
 
@@ -95,7 +94,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
               )} 
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(err);
-              redraw();
               return ['failure', err];
             }
 
@@ -149,13 +147,10 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
           />
         </div>
         {featuredInNewPost && (
-          <QuillEditorComponent
-            contentsDoc=""
-            oncreateBind={(state: QuillEditor) => {
-              setQuillEditorState(state);
-            }}
-            editorNamespace="new-discussion"
-          />
+          <ReactQuillEditor
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+        />
         )}
         <CWButton
           label="Create topic"
@@ -164,12 +159,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             e.preventDefault();
 
             try {
-              let defaultOffchainTemplate;
-
-              if (quillEditorState) {
-                quillEditorState.disable();
-                defaultOffchainTemplate = quillEditorState.textContentsAsString;
-              }
 
               await app.topics.add(
                 name,
@@ -178,7 +167,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
                 featuredInSidebar,
                 featuredInNewPost,
                 tokenThreshold || '0',
-                defaultOffchainTemplate as string
+                JSON.stringify(contentDelta)
               );
 
               navigate(`/discussions/${encodeURI(name.toString().trim())}`);
@@ -187,10 +176,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             } catch (err) {
               setErrorMsg('Error creating topic');
               setIsSaving(false);
-              if (quillEditorState) {
-                quillEditorState.enable();
-              }
-              redraw();
             }
           }}
         />

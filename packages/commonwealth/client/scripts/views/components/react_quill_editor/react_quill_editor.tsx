@@ -84,8 +84,7 @@ const ReactQuillEditor = ({
       editor.enable()
     }
     
-
-  }, [editorRef])
+  }, [editorRef, setContentDelta])
 
   return (
     <ReactQuill
