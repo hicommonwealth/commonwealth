@@ -321,7 +321,7 @@ class ViewTemplatePage extends ClassComponent {
           <CWBreadcrumbs
             breadcrumbs={[
               { label: 'Contracts', path: `/${scope}/contracts` },
-              { label: 'Create Proposal', path: '' },
+              { label: this.templateNickname, path: '' },
             ]}
           />
           <CWText type="h3" className="header">
