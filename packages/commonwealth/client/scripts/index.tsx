@@ -1,10 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
+import 'normalize.css'; // reset
+import 'shared.scss';
+import 'index.scss';
 import '../../static/fonts/fonts.css';
-import '../styles/normalize.css'; // reset
-import '../styles/shared.scss';
-import 'lity/dist/lity.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 import App from './app';
