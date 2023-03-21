@@ -19,6 +19,7 @@ import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
+import { ETH_RPC } from '../config';
 
 type ThreadCountQueryData = {
   concat: string;
@@ -53,6 +54,7 @@ type StatusResp = {
     unseenPosts: { [chain: string]: number };
     hasDisplayName: boolean;
   };
+  evmTestEnv?: string;
 };
 
 const status = async (
@@ -137,6 +139,7 @@ const status = async (
         chainCategories,
         chainCategoryTypes,
         recentThreads: threadCountQueryData,
+        evmTestEnv: ETH_RPC,
       });
     }
 
@@ -372,6 +375,7 @@ const status = async (
         unseenPosts,
         hasDisplayName,
       },
+      evmTestEnv: ETH_RPC,
     });
   } catch (error) {
     console.log(error);
