@@ -141,6 +141,9 @@ class ThreadsController {
       last_commented_on,
       linked_threads,
       numberOfComments,
+    } = thread;
+
+    let {
       reactionIds,
       reactionType,
       addressesReacted,
@@ -154,6 +157,9 @@ class ThreadsController {
       for (const reaction of reactions) {
         app.reactions.store.add(modelReactionFromServer(reaction));
       }
+      reactionIds = reactions.map(r => r.id);
+      reactionType = reactions.map(r => r.type);
+      addressesReacted = reactions.map(r => r.address);
     }
 
     let versionHistoryProcessed;

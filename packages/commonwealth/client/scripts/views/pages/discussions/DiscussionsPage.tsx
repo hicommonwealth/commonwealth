@@ -32,7 +32,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
       setInitializing(false);
     });
-  }, []);
+  }, [stageName, threads, topicName]);
 
   const loadMore = useCallback(async () => {
     const newThreads = await app.threads.loadNextPage({ topicName, stageName });

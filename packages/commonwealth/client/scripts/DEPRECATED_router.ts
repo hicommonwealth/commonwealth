@@ -285,7 +285,7 @@ const getCustomDomainRoutes = (importRoute) => ({
     }
   ),
   '/discussion/:identifier': importRoute(
-    import('views/pages/view_thread/index'),
+    import('./views/pages/view_thread/ViewThreadPage'),
     {
       scoped: true,
     }
