@@ -4,25 +4,20 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
 import Sublayout from 'views/sublayout';
 import EditProfileComponent from '../components/edit_profile';
+import { PageNotFound } from '../pages/404';
 
 export default class EditNewProfile extends ClassComponent {
-  private profileId: string;
-
-  oninit() {
-    this.profileId = m.route.param('profileId');
-
-    if (!app.isLoggedIn()) {
-      navigateToSubpage(`/profile/id/${this.profileId}`);
-    }
-  }
-
   view() {
+    if (!app.isLoggedIn())
+      return (
+        <PageNotFound message="You must be logged in to edit your profile." />
+      );
+
     return (
       <Sublayout hideFooter={true}>
-        <EditProfileComponent profileId={this.profileId} />
+        <EditProfileComponent />
       </Sublayout>
     );
   }
