@@ -6,6 +6,7 @@ import { Navigate } from 'navigation/helpers';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 
+const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(() => import('views/pages/members'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
@@ -62,7 +63,11 @@ const customDomainRoutes = () => {
   return [
     <Route
       path="/"
-      element={withLayout(DiscussionsRedirectPage, { hideSidebar: true })}
+      element={withLayout(DiscussionsRedirectPage, { scoped: true })}
+    />,
+    <Route
+      path="/createCommunity"
+      element={withLayout(CreateCommunityPage, { scoped: true })}
     />,
     <Route path="/home" element={<Navigate to="/overview" />} />,
     <Route
@@ -110,10 +115,12 @@ const customDomainRoutes = () => {
         deferChain: true,
       })}
     />,
+
     <Route
       path="/notification-settings"
       element={withLayout(NotificationSettingsPage, {
         deferChain: true,
+        scoped: true,
       })}
     />,
     // NOTIFICATIONS END

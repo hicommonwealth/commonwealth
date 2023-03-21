@@ -10,6 +10,7 @@ const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
+const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(() => import('views/pages/members'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
@@ -70,6 +71,10 @@ const commonDomainsRoutes = () => [
       scoped: false,
       hideSidebar: false,
     })}
+  />,
+  <Route
+    path="/createCommunity"
+    element={withLayout(CreateCommunityPage, {})}
   />,
   <Route
     path="/whyCommonwealth"

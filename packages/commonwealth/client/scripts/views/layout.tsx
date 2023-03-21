@@ -20,18 +20,18 @@ import { CWText } from './components/component_kit/cw_text';
 import withRouter from 'navigation/helpers';
 import { useParams } from 'react-router-dom';
 import { ChainType } from 'common-common/src/types';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorPage from 'views/pages/error';
 
-class LoadingLayout extends ClassComponent {
-  view() {
-    return (
-      <div className="Layout">
-        <div className="spinner-container">
-          <CWSpinner size="xl" />
-        </div>
+const LoadingLayout = () => {
+  return (
+    <div className="Layout">
+      <div className="spinner-container">
+        <CWSpinner size="xl" />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 interface ShouldDeferChainAttrs {
   deferChain: boolean;
@@ -49,6 +49,7 @@ type LayoutAttrs = {
   deferChain?: boolean;
   scope?: string;
   router?: ClassComponentRouter;
+  children: React.ReactNode;
 };
 
 class LayoutComponent extends ClassComponent<LayoutAttrs> {
@@ -118,11 +119,9 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
         selectChain(scopeMatchesChain, deferChain).then((response) => {
           if (!deferChain && response) {
             initChain().then(() => {
-              console.log('redraw1');
               this.redraw();
             });
           } else {
-            console.log('redraw2');
             this.redraw();
           }
         });
@@ -133,7 +132,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     if (scope && this.deferred && !deferChain) {
       this.deferred = false;
       initChain().then(() => {
-        console.log('redraw3');
         this.redraw();
       });
       return <LoadingLayout />;
@@ -147,7 +145,6 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       if (!app.isCustomDomain()) {
         deinitChainOrCommunity().then(() => {
           this.loadingScope = null;
-          console.log('redraw4');
           redraw();
         });
       }
@@ -182,8 +179,12 @@ export const LayoutWrapper = ({ Component, params }) => {
 
 export const withLayout = (Component, params) => {
   return (
-    <Suspense fallback={null}>
-      <LayoutWrapper Component={Component} params={params} />
-    </Suspense>
+    <ErrorBoundary
+      FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
+    >
+      <Suspense fallback={null}>
+        <LayoutWrapper Component={Component} params={params} />
+      </Suspense>
+    </ErrorBoundary>
   );
 };

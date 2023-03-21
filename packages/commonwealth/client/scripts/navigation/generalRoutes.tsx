@@ -4,16 +4,11 @@ import { withLayout } from 'views/layout';
 
 const TermsPage = lazy(() => import('views/pages/terms'));
 const PrivacyPage = lazy(() => import('views/pages/privacy'));
-const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const ComponentsPage = lazy(() => import('views/pages/components'));
 
 const generalRoutes = () => [
   <Route path="/terms" element={withLayout(TermsPage, {})} />,
   <Route path="/privacy" element={withLayout(PrivacyPage, {})} />,
-  <Route
-    path="/createCommunity"
-    element={withLayout(CreateCommunityPage, {})}
-  />,
   <Route
     path="/components"
     element={withLayout(ComponentsPage, { hideSidebar: true })}
