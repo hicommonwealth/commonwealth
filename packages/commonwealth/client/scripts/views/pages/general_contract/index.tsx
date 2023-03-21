@@ -23,6 +23,7 @@ import type { Result } from 'ethers/lib/utils';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
+import { ethers } from 'ethers';
 
 class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
   private loaded = false;
@@ -75,7 +76,11 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
           inputArgs: inputArgsArray,
         });
 
-        this.functionNameToFunctionOutput.set(fn.name, result);
+        const ethersInterface = new ethers.utils.Interface(contract.abi);
+        this.functionNameToFunctionOutput.set(
+          fn.name,
+          ethersInterface.decodeFunctionResult(fn.name, result)
+        );
         this.saving = false;
         this.loaded = true;
         this.loading = false;

@@ -7,7 +7,6 @@ import type { AbiItem } from 'web3-utils';
 import type Contract from 'client/scripts/models/Contract';
 import type { IWebWallet } from 'client/scripts/models';
 import { ethers } from 'ethers';
-import type { Result } from 'ethers/lib/utils';
 
 async function sendFunctionCall({
   fn,
@@ -69,7 +68,7 @@ export async function callContractFunction({
   contract: Contract;
   fn: AbiItem;
   inputArgs: string[];
-}): Promise<TransactionReceipt> {
+}): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
   // get querying wallet
   const signingWallet = await app.wallets.locateWallet(
