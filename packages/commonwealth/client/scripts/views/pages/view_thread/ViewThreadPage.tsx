@@ -82,6 +82,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
+  const cancelEditing = () => {
+    setIsGloballyEditing(false)
+    setIsEditingBody(false)
+  }
+
+  const threadUpdatedCallback = (title: string, body: string) => {
+    setThread(new Thread({
+      ...thread,
+      title: title,
+      body: body
+    }))
+    cancelEditing()
+  } 
+    
   const updatedCommentsCallback = useCallback(() => {
     if (!thread) {
       return;
@@ -310,7 +324,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       });
 
       app.newProfiles.isFetched.on('redraw', () => {
-        if (!prefetch[threadIdAndType]['profilesFinished']) {
+        if (!prefetch[threadIdAndType]?.['profilesFinished']) {
           setPrefetch((prevState) => ({
             ...prevState,
             [threadIdAndType]: {
@@ -383,7 +397,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   if (
     !app.newProfiles.allLoaded() &&
-    !prefetch[threadIdAndType]['profilesFinished']
+    !prefetch[threadIdAndType]?.['profilesFinished']
   ) {
     return <PageLoading/>;
   }
@@ -646,11 +660,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 {reactionsAndReplyButtons}
                 <EditBody
+                  title={title}
                   thread={thread}
                   savedEdits={savedEdits}
                   shouldRestoreEdits={shouldRestoreEdits}
-                  setIsEditing={setIsEditingBody}
-                  title={title}
+                  cancelEditing={cancelEditing}
+                  threadUpdatedCallback={threadUpdatedCallback}
                 />
               </>
             ) : (

@@ -7,81 +7,88 @@ import app from 'state';
 import { ContentType } from 'types';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
-import type { QuillEditor } from '../../components/quill/quill_editor';
-import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
-import { useCommonNavigate } from 'navigation/helpers';
+import { DeltaStatic } from 'quill';
+import { ReactQuillEditor } from '../../components/react_quill_editor';
+import { parseDeltaString } from '../../components/react_quill_editor/utils';
 
 type EditBodyProps = {
+  title: string;
   savedEdits: string;
-  setIsEditing: (status: boolean) => void;
   shouldRestoreEdits: boolean;
   thread: Thread;
-  title: string;
+  cancelEditing: () => void;
+  threadUpdatedCallback: (title: string, body: string) => void;
 };
 
 export const EditBody = (props: EditBodyProps) => {
-  const navigate = useCommonNavigate();
-  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
-  const [saving, setSaving] = React.useState<boolean>(false);
-  const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } = props;
 
-  const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
+  const { 
+    title,
+    shouldRestoreEdits, 
+    savedEdits, 
+    thread, 
+    cancelEditing,
+    threadUpdatedCallback,
+  } = props;
+
+  const threadBody = (shouldRestoreEdits && savedEdits) ? savedEdits : thread.body;
+  const body = parseDeltaString(threadBody)
+
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
+  const [saving, setSaving] = React.useState<boolean>(false);
+
+  const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    let cancelConfirmed = true;
+
+    if (JSON.stringify(body) !== JSON.stringify(contentDelta)) {
+      cancelConfirmed = window.confirm(
+        'Cancel editing? Changes will not be saved.'
+      );
+    }
+
+    if (cancelConfirmed) {
+      clearEditingLocalStorage(thread.id, ContentType.Thread);
+      cancelEditing();
+    }
+  }
+
+  const save = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    setSaving(true);
+
+    try {
+      const newBody = JSON.stringify(contentDelta)
+      await app.threads.edit(thread, newBody, title)
+      clearEditingLocalStorage(thread.id, ContentType.Thread);
+      notifySuccess('Thread successfully edited');
+      threadUpdatedCallback(title, newBody);
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="EditBody">
-      <QuillEditorComponent
-        contentsDoc={body}
-        oncreateBind={(state: QuillEditor) => {
-          setQuillEditorState(state);
-        }}
-        imageUploader
-        theme="snow"
-        editorNamespace={`edit-thread-${thread.id}`}
+      <ReactQuillEditor
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
       />
       <div className="buttons-row">
         <CWButton
           label="Cancel"
           disabled={saving}
           buttonType="secondary-blue"
-          onClick={async (e) => {
-            e.preventDefault();
-
-            let confirmed = true;
-
-            const threadText = quillEditorState.textContentsAsString;
-
-            if (threadText !== body) {
-              confirmed = window.confirm(
-                'Cancel editing? Changes will not be saved.'
-              );
-            }
-
-            if (confirmed) {
-              setIsEditing(false);
-              clearEditingLocalStorage(thread.id, ContentType.Thread);
-            }
-          }}
+          onClick={cancel}
         />
         <CWButton
           label="Save"
           disabled={saving}
-          onClick={(e) => {
-            e.preventDefault();
-
-            setSaving(true);
-
-            quillEditorState.disable();
-
-            const itemText = quillEditorState.textContentsAsString;
-
-            app.threads.edit(thread, itemText, title).then(() => {
-              navigate(`/discussion/${thread.id}`);
-              setSaving(false);
-              clearEditingLocalStorage(thread.id, ContentType.Thread);
-              setIsEditing(false);
-              notifySuccess('Thread successfully edited');
-            });
-          }}
+          onClick={save}
         />
       </div>
     </div>
