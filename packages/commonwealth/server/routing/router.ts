@@ -12,8 +12,6 @@ import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
 import getAddressProfile from '../routes/getAddressProfile';
-import selectChain from '../routes/selectChain';
-import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
 import finishOAuthLogin from '../routes/finishOAuthLogin';
 import createComment from '../routes/createComment';
