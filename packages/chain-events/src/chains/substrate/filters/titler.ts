@@ -217,49 +217,6 @@ export const Title: TitlerFilter = (
         description: 'A treasury spend is rejected.',
       };
     }
-    case EventKind.TreasuryBountyProposed: {
-      return {
-        title: 'Treasury Bounty Proposed',
-        description: 'A treasury bounty is proposed.',
-      };
-    }
-    case EventKind.TreasuryBountyAwarded: {
-      return {
-        title: 'Treasury Bounty Awarded',
-        description: 'A treasury bounty is awarded.',
-      };
-    }
-    case EventKind.TreasuryBountyRejected: {
-      return {
-        title: 'Treasury Bounty Rejected',
-        description: 'A treasury bounty is rejected.',
-      };
-    }
-    case EventKind.TreasuryBountyBecameActive: {
-      return {
-        title: 'Treasury Bounty Became Active',
-        description: 'A treasury bounty became active.',
-      };
-    }
-    case EventKind.TreasuryBountyClaimed: {
-      return {
-        title: 'Treasury Bounty Claimed',
-        description: 'A treasury bounty is claimed.',
-      };
-    }
-    case EventKind.TreasuryBountyCanceled: {
-      return {
-        title: 'Treasury Bounty Canceled',
-        description: 'A treasury bounty is canceled.',
-      };
-    }
-    case EventKind.TreasuryBountyExtended: {
-      return {
-        title: 'Treasury Bounty Expiry Extended',
-        description: "A treasury bounty's expiry is extended.",
-      };
-    }
-
     /**
      * Elections Events
      */
@@ -295,70 +252,13 @@ export const Title: TitlerFilter = (
     }
 
     /**
-     * Collective Events
+     * TreasuryReward events
      */
-    case EventKind.CollectiveProposed: {
+    case EventKind.TreasuryRewardMinting:
+    case EventKind.TreasuryRewardMintingV2: {
       return {
-        title: 'New Collective Proposal',
-        description: 'A new collective proposal is introduced.',
-      };
-    }
-    case EventKind.CollectiveVoted: {
-      return {
-        title: 'Collective Proposal Vote',
-        description: 'A collective proposal receives a vote.',
-      };
-    }
-    case EventKind.CollectiveApproved: {
-      return {
-        title: 'Collective Proposal Approved',
-        description: 'A collective proposal is approved.',
-      };
-    }
-    case EventKind.CollectiveDisapproved: {
-      return {
-        title: 'Collective Proposal Disapproved',
-        description: 'A collective proposal is disapproved.',
-      };
-    }
-    case EventKind.CollectiveExecuted: {
-      return {
-        title: 'Collective Proposal Executed',
-        description: 'A collective proposal is executed.',
-      };
-    }
-    case EventKind.CollectiveMemberExecuted: {
-      return {
-        title: 'Collective Member Execution',
-        description: 'A collective member directly executes a proposal.',
-      };
-    }
-
-    /**
-     * Signaling Events
-     */
-    case EventKind.SignalingNewProposal: {
-      return {
-        title: 'New Signaling Proposal',
-        description: 'A new signaling proposal is introduced.',
-      };
-    }
-    case EventKind.SignalingCommitStarted: {
-      return {
-        title: 'Signaling Proposal Commit Started',
-        description: "A signaling proposal's commit phase begins.",
-      };
-    }
-    case EventKind.SignalingVotingStarted: {
-      return {
-        title: 'Signaling Proposal Voting Started',
-        description: "A signaling proposal's voting phase begins.",
-      };
-    }
-    case EventKind.SignalingVotingCompleted: {
-      return {
-        title: 'Signaling Proposal Voting Completed',
-        description: 'A signaling proposal is completed.',
+        title: 'Treasury Reward Minted',
+        description: 'A reward is added to the treasury pot.',
       };
     }
 
@@ -403,29 +303,12 @@ export const Title: TitlerFilter = (
     }
 
     /**
-     * TreasuryReward events
-     */
-    case EventKind.TreasuryRewardMinting:
-    case EventKind.TreasuryRewardMintingV2: {
-      return {
-        title: 'Treasury Reward Minted',
-        description: 'A reward is added to the treasury pot.',
-      };
-    }
-
-    /**
      * Identity events
      */
     case EventKind.IdentitySet: {
       return {
         title: 'Identity Set',
         description: 'A user sets an identity.',
-      };
-    }
-    case EventKind.JudgementGiven: {
-      return {
-        title: 'Identity Judgement Given',
-        description: 'A registrar passes judgement on an identity.',
       };
     }
     case EventKind.IdentityCleared: {

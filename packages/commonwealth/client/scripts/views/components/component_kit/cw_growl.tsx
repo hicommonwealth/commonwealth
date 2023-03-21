@@ -3,13 +3,14 @@
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_growl.scss';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import m from 'mithril';
 
 import { CWCard } from './cw_card';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
-type GrowlPosition = 'bottom-left' | 'bottom-right';
+type GrowlPosition = 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right';
 
 type GrowlAttrs = {
   className?: string;

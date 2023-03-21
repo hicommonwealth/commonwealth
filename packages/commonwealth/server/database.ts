@@ -28,7 +28,6 @@ import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
 import NotificationsReadFactory from './models/notifications_read';
-import OffchainProfileFactory from './models/offchain_profile';
 import PollFactory from './models/poll';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
@@ -117,7 +116,6 @@ const models: Models = {
   Attachment: AttachmentFactory(sequelize, DataTypes),
   Comment: CommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),
-  OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   Reaction: ReactionFactory(sequelize, DataTypes),
   Thread: ThreadFactory(sequelize, DataTypes),
   Topic: TopicFactory(sequelize, DataTypes),
