@@ -76,7 +76,7 @@ const ReactQuillEditor = ({
 
       const uploadedFileUrl = await uploadFileToS3(file, app.serverUrl(), app.user.jwt)
 
-      // insert image op at the selected index,
+      // insert image op at the selected index
       editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl)
       setContentDelta(editor.getContents()) // sync state with editor content
 
