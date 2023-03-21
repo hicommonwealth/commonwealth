@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Commonwealth Tests
+    name: Commonwealth E2E Test
     runs-on: ubuntu-latest
 
     services:
@@ -73,12 +73,29 @@ jobs:
           path: coverage
 
   # These tests run quickly, so run them in a separate job
-  remaining-commonwealth-tests:
+  commonwealth-unit-integration:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Remaining commonwealth tests
+    name: All Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: commonwealth
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
 
     steps:
       - name: Checkout
@@ -99,11 +116,11 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Run linter
-        run: yarn lint-all
+      - name: Init Db
+        run: cd packages/commonwealth && npx sequelize db:migrate
 
-      - name: Typecheck
-        run: yarn --cwd packages/commonwealth check-types
+      - name: Run linter
+        run: yarn lint-branch
 
       - name: Run Token Balance Cache Unit Tests
         run: yarn --cwd packages/token-balance-cache test
@@ -118,3 +135,6 @@ jobs:
         run: yarn --cwd packages/commonwealth test-api
         env:
           NO_CLIENT: true
+
+      - name: Typecheck
+        run: yarn --cwd packages/commonwealth check-types
