@@ -43,7 +43,6 @@ import type { ThreadModelStatic } from './models/thread';
 import type { TokenModelStatic } from './models/token';
 import type { TopicModelStatic } from './models/topic';
 import type { UserModelStatic } from './models/user';
-import type { ViewCountModelStatic } from './models/viewcount';
 import type { VoteModelStatic } from './models/vote';
 import type { WebhookModelStatic } from './models/webhook';
 
@@ -78,7 +77,6 @@ export type Models = {
   Reaction: ReactionModelStatic;
   Thread: ThreadModelStatic;
   Topic: TopicModelStatic;
-  ViewCount: ViewCountModelStatic;
   Vote: VoteModelStatic;
   Profile: ProfileModelStatic;
   RoleAssignment: RoleAssignmentModelStatic;

@@ -101,12 +101,12 @@ describe('Token Forum tests', () => {
       address: userAddress,
       jwt: userJWT,
       text: markdownComment.text,
-      root_id: `discussion_${res.result.id}`,
+      thread_id: res.result.id,
     });
 
     expect(cRes.status).to.equal('Success');
     expect(cRes.result).to.not.be.null;
-    expect(cRes.result.root_id).to.equal(`discussion_${res.result.id}`);
+    expect(cRes.result.thread_id).to.equal(res.result.id);
     expect(cRes.result.text).to.equal(markdownComment.text);
     expect(cRes.result.Address).to.not.be.null;
     expect(cRes.result.Address.address).to.equal(userAddress);
@@ -181,12 +181,12 @@ describe('Token Forum tests', () => {
       address: adminAddress,
       jwt: adminJWT,
       text: markdownComment.text,
-      root_id: `discussion_${res.result.id}`,
+      thread_id: res.result.id,
     });
 
     expect(cRes.status).to.equal('Success');
     expect(cRes.result).to.not.be.null;
-    expect(cRes.result.root_id).to.equal(`discussion_${res.result.id}`);
+    expect(cRes.result.thread_id).to.equal(res.result.id);
     expect(cRes.result.text).to.equal(markdownComment.text);
     expect(cRes.result.Address).to.not.be.null;
     expect(cRes.result.Address.address).to.equal(adminAddress);
