@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
-import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
 
 import 'pages/search/search_bar.scss';
 
@@ -38,12 +37,15 @@ const goToSearchPage = (
   setRoute(`/search?${query.toUrlParams()}`);
 };
 
+// FIX comments problem with rendering
+// FIX hitting enter
+// FIX communities should be visible when no scope
+
 export const SearchBar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchResults, setSearchResults] =
     useState<Record<string, Array<any>>>();
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>();
-  const [searchTerm, setSearchTerm] = useState<Lowercase<string>>('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useCommonNavigate();
 
@@ -66,50 +68,53 @@ export const SearchBar = () => {
   //   </div>
   // ));
 
-  const handleGetSearchPreview = () => {
-    setSearchQuery(
-      new SearchQuery(searchTerm, {
-        isSearchPreview: true,
-        chainScope: app.activeChainId(),
-      })
-    );
+  const handleGetSearchPreview = async (value: string) => {
+    const searchQuery = new SearchQuery(value, {
+      isSearchPreview: true,
+      chainScope: app.activeChainId(),
+    });
 
-    async () => {
-      try {
-        await app.search.search(searchQuery);
-      } catch (err) {
-        setSearchResults({});
+    try {
+      await app.search.search(searchQuery);
+      const searchResponse = app.search.getByQuery(searchQuery)?.results;
 
-        notifyError(
-          err.responseJSON?.error || err.responseText || err.toString()
-        );
-      }
-
-      setSearchResults(
-        Object.fromEntries(
-          Object.entries(app.search.getByQuery(searchQuery).results).map(
-            ([k, v]) => [k, v.slice(0, 2)]
+      const results = searchResponse
+        ? Object.fromEntries(
+            Object.entries(searchResponse).map(([k, v]) => [k, v.slice(0, 2)])
           )
-        )
-      );
+        : {};
 
+      setSearchResults(results);
       app.search.addToHistory(searchQuery);
-    };
+    } catch (err) {
+      setSearchResults({});
+
+      notifyError(
+        err.responseJSON?.error || err.responseText || err.toString()
+      );
+    }
   };
 
   const handleGoToSearchPage = () => {
     if (searchTerm?.length < 3) {
       return;
-    } else {
-      setSearchQuery(
-        new SearchQuery(searchTerm, {
-          isSearchPreview: false,
-          chainScope: app.activeChainId(),
-        })
-      );
     }
 
+    const searchQuery = new SearchQuery(searchTerm, {
+      isSearchPreview: false,
+      chainScope: app.activeChainId(),
+    });
+
     goToSearchPage(searchQuery, navigate);
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value?.toLowerCase();
+    setSearchTerm(value);
+
+    if (value?.length > 3) {
+      handleGetSearchPreview(value);
+    }
   };
 
   return (
@@ -123,26 +128,15 @@ export const SearchBar = () => {
             isClearable: searchTerm?.length > 0,
           })}
           placeholder="Search Common"
-          defaultValue={_DEPRECATED_getSearchParams('q') || searchTerm}
-          // value={searchTerm}
+          value={searchTerm}
           autoComplete="off"
-          onFocus={() => {
-            setShowDropdown(true);
-          }}
+          onFocus={() => setShowDropdown(true)}
           onBlur={() => {
             setTimeout(() => {
               setShowDropdown(false);
             }, 500); // hack to prevent the dropdown closing too quickly on click
           }}
-          onInput={(e) => {
-            const lower =
-              e.currentTarget.value?.toLowerCase() as Lowercase<string>;
-            setSearchTerm(lower);
-
-            if (searchTerm?.length > 3) {
-              handleGetSearchPreview();
-            }
-          }}
+          onChange={handleInputChange}
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
               handleGoToSearchPage();
@@ -151,12 +145,7 @@ export const SearchBar = () => {
         />
         {searchTerm?.length > 0 && (
           <div className="clear-icon">
-            <CWIconButton
-              iconName="close"
-              onClick={() => {
-                setSearchTerm('');
-              }}
-            />
+            <CWIconButton iconName="close" onClick={() => setSearchTerm('')} />
           </div>
         )}
         {searchResults && showDropdown && (
@@ -179,7 +168,7 @@ export const SearchBar = () => {
                         {v.map((res) => (
                           <SearchBarThreadPreviewRow
                             searchResult={res}
-                            searchTerm={searchQuery.searchTerm}
+                            searchTerm={searchTerm}
                           />
                         ))}
                       </div>
@@ -199,7 +188,7 @@ export const SearchBar = () => {
                         {v.map((res) => (
                           <SearchBarCommentPreviewRow
                             searchResult={res}
-                            searchTerm={searchQuery.searchTerm}
+                            searchTerm={searchTerm}
                           />
                         ))}
                       </div>
