@@ -14,7 +14,7 @@ export const Errors = {
 };
 
 type GetNewProfileReq = {
-  profileId: string;
+  profileId?: string;
 };
 type GetNewProfileResp = {
   profile: ProfileInstance;
@@ -32,13 +32,21 @@ const getNewProfile = async (
   next: NextFunction
 ) => {
   const { profileId } = req.query;
-  if (!profileId) return next(new Error(Errors.NoIdentifierProvided));
+  let profile;
 
-  const profile = await models.Profile.findOne({
-    where: {
-      id: profileId,
-    },
-  });
+  if (profileId) {
+    profile = await models.Profile.findOne({
+      where: {
+        id: profileId,
+      },
+    });
+  } else {
+    profile = await models.Profile.findOne({
+      where: {
+        user_id: req.user.id,
+      },
+    });
+  }
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
@@ -67,9 +75,6 @@ const getNewProfile = async (
 
   const comments = await models.Comment.findAll({
     where: {
-      root_id: {
-        [Op.like]: 'discussion%',
-      },
       address_id: {
         [Op.in]: addressIds,
       },
@@ -82,7 +87,7 @@ const getNewProfile = async (
 
   const commentThreadIds = [
     ...new Set<number>(
-      comments.map((c) => parseInt(c.root_id.replace('discussion_', ''), 10))
+      comments.map((c) => parseInt(c.thread_id, 10))
     ),
   ];
   const commentThreads = await models.Thread.findAll({

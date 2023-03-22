@@ -8,7 +8,6 @@ import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { getDecimals, weiToTokens } from 'helpers';
 import m from 'mithril';
-import type { AnyProposal } from 'models';
 import { Thread } from 'models';
 
 import app from 'state';
@@ -24,7 +23,7 @@ import { jumpHighlightComment } from './helpers';
 type CreateCommmentAttrs = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
-  rootProposal: AnyProposal | Thread;
+  rootThread: Thread;
   updatedCommentsCallback: () => void;
 };
 
@@ -39,7 +38,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
     const {
       handleIsReplying,
       parentCommentId,
-      rootProposal,
+      rootThread,
       updatedCommentsCallback,
     } = vnode.attrs;
 
@@ -72,7 +71,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       try {
         const res = await app.comments.create(
           author.address,
-          rootProposal.uniqueIdentifier,
+          rootThread.id,
           chainId,
           commentText,
           parentCommentId
@@ -111,7 +110,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
     };
 
     const activeTopicName =
-      rootProposal instanceof Thread ? rootProposal?.topic?.name : null;
+      rootThread instanceof Thread ? rootThread?.topic?.name : null;
 
     const { error, sendingComment, uploadsInProgress } = this;
 
