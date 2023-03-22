@@ -17,9 +17,6 @@ export const networkUrls = {
   kulupu: 'ws://rpc.kulupu.corepaper.org/ws',
   stafi: 'wss://scan-rpc.stafi.io/ws',
 
-  moloch: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-  'moloch-local': 'ws://127.0.0.1:9545',
-
   marlin: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   'marlin-local': 'ws://127.0.0.1:9545',
   uniswap:
@@ -51,8 +48,6 @@ export const networkSpecs: { [chain: string]: RegisteredTypes } = {
 };
 
 export const contracts = {
-  moloch: '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
-  'moloch-local': '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
   marlin: '0x777992c2E4EDF704e49680468a9299C6679e37F6',
   aave: '0xEC568fffba86c094cf06b22134B23074DFE2252c',
   'aave-local': '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',

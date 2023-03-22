@@ -8,7 +8,6 @@ module.exports = {
         `UPDATE "Addresses" SET profile_id = NULL WHERE user_id IS NULL;`,
         { transaction }
       );
-
       // THEN, fix addresses by replacing their profile_id with the profile associated with their user_id
       // This is safe because we have a mandatory 1-to-1 User <> Profile mapping, (verify this beforehand:
       // `SELECT user_id, count(*) FROM "Profiles" GROUP BY user_id HAVING count(*) > 1;`) -- we expect
@@ -23,8 +22,9 @@ module.exports = {
         `,
         { transaction }
       );
-      const [, metadata] = await queryInterface.sequelize.query(
-        `
+      if (addresses.length > 0) {
+        const [, metadata] = await queryInterface.sequelize.query(
+          `
           UPDATE "Addresses" a
           SET profile_id = p.id
           FROM "Profiles" p
@@ -32,9 +32,10 @@ module.exports = {
             AND a.user_id = p.user_id
             AND a.id IN (${addresses.map((a) => a.id).join(',')});
         `,
-        { transaction }
-      );
-      console.log(`Update ${metadata.rowCount} Addresses to new profile_id.`);
+          { transaction }
+        );
+        console.log(`Update ${metadata.rowCount} Addresses to new profile_id.`);
+      }
     });
   },
 

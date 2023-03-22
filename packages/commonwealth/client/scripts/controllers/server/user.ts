@@ -199,12 +199,16 @@ export class UserController {
 
   public setEmailInterval(emailInterval: string): void {
     this._setEmailInterval(emailInterval);
+  }
+
+  public updateEmailInterval(emailInterval: string): void {
     try {
       $.post(`${app.serverUrl()}/writeUserSetting`, {
         jwt: app.user.jwt,
         key: 'updateEmailInterval',
         value: emailInterval,
       });
+      this._setEmailInterval(emailInterval);
     } catch (e) {
       console.log(e);
       notifyError('Unable to set email interval');
