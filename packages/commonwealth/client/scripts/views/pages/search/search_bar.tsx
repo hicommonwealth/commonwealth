@@ -131,11 +131,7 @@ export const SearchBar = () => {
           value={searchTerm}
           autoComplete="off"
           onFocus={() => setShowDropdown(true)}
-          onBlur={() => {
-            setTimeout(() => {
-              setShowDropdown(false);
-            }, 500); // hack to prevent the dropdown closing too quickly on click
-          }}
+          onBlur={() => setShowDropdown(false)}
           onChange={handleInputChange}
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
@@ -165,10 +161,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
+                        {v.map((res, i) => (
                           <SearchBarThreadPreviewRow
                             searchResult={res}
                             searchTerm={searchTerm}
+                            key={i}
                           />
                         ))}
                       </div>
@@ -185,8 +182,9 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
+                        {v.map((res, i) => (
                           <SearchBarCommentPreviewRow
+                            key={i}
                             searchResult={res}
                             searchTerm={searchTerm}
                           />
@@ -205,8 +203,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
-                          <SearchBarCommunityPreviewRow searchResult={res} />
+                        {v.map((res, i) => (
+                          <SearchBarCommunityPreviewRow
+                            searchResult={res}
+                            key={i}
+                          />
                         ))}
                       </div>
                     );
@@ -222,8 +223,11 @@ export const SearchBar = () => {
                           </CWText>
                           <CWDivider />
                         </div>
-                        {v.map((res) => (
-                          <SearchBarMemberPreviewRow searchResult={res} />
+                        {v.map((res, i) => (
+                          <SearchBarMemberPreviewRow
+                            searchResult={res}
+                            key={i}
+                          />
                         ))}
                       </div>
                     );
