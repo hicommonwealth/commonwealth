@@ -42,3 +42,10 @@ export const formatPaginationNoSort = (query: {
 
   return pagination;
 };
+
+export const flattenIncludedAddresses = (entities) => {
+  entities.forEach((e) => {
+    e.dataValues['address'] = e.dataValues.Address.address;
+    delete e.dataValues.Address;
+  });
+};

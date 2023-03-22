@@ -109,7 +109,7 @@ export async function putCommunities(
       );
     }
 
-    transaction.commit();
+    await transaction.commit();
   } catch (e) {
     error = e.message;
     await transaction.rollback();
