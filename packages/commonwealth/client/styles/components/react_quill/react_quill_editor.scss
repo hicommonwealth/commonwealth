@@ -2,7 +2,9 @@
 
 .QuillEditorWrapper {
 
-  // background-color: red;
+  .ql-editor {
+    min-height: 180px;
+  }
 
   .LoadingIndicator {
 
