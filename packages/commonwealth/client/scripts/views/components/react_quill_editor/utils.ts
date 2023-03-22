@@ -33,10 +33,17 @@ export const getTextFromDelta = (delta: DeltaStatic) : string => {
   }
   return delta.ops
     .filter((op) => {
-      return typeof op.insert === 'string' && op.insert.trim().length > 0
+      if (typeof op.insert === 'string') {
+        return op.insert.trim().length > 0
+      }
+      if (op.insert.image) {
+        return true
+      }
+      return false
     })
     .reduce((acc, op) => {
-      return acc + op.insert
+      const text = typeof op.insert === 'string' ? op.insert : '(image)\n'
+      return acc + text
     }, '')
 }
 
