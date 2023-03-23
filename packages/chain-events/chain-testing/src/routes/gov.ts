@@ -12,7 +12,7 @@ import { IGovernor } from '../utils/governance/IGovernor';
 export const createProposal = async (req: Request, res: Response) => {
   try {
     const request: govCompCreate = req.body;
-    let gov: IGovernor = req.originalUrl.includes('compound')
+    const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
     const id = await gov.createArbitraryProposal(request.accountIndex, 3);
@@ -31,7 +31,7 @@ export const createProposal = async (req: Request, res: Response) => {
 export const cancelProposal = async (req: Request, res: Response) => {
   try {
     const request: govCompProposalId = req.body;
-    let gov: IGovernor = req.originalUrl.includes('compound')
+    const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
     const id = await gov.cancelProposal(request.proposalId);
@@ -49,7 +49,7 @@ export const cancelProposal = async (req: Request, res: Response) => {
 export const getVotes = async (req: Request, res: Response) => {
   try {
     const request: govCompGetVotes = req.body;
-    let gov: IGovernor = req.originalUrl.includes('compound')
+    const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
     await gov.getVotes(request.accountIndex, request.numberOfVotes);
@@ -67,7 +67,7 @@ export const getVotes = async (req: Request, res: Response) => {
 export const castVote = async (req: Request, res: Response) => {
   try {
     const request: govCompVote = req.body;
-    let gov: IGovernor = req.originalUrl.includes('compound')
+    const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
     await gov.castVote(
@@ -90,7 +90,7 @@ export const castVote = async (req: Request, res: Response) => {
 export const queueProposal = async (req: Request, res: Response) => {
   try {
     const request: govCompProposalId = req.body;
-    let gov: IGovernor = req.originalUrl.includes('compound')
+    const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
     await gov.queueProposal(request.proposalId, true);
@@ -109,7 +109,7 @@ export const queueProposal = async (req: Request, res: Response) => {
 export const executeProposal = async (req: Request, res: Response) => {
   try {
     const request: govCompProposalId = req.body;
-    let gov: IGovernor = req.originalUrl.includes('compound')
+    const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
     await gov.executeProposal(request.proposalId, true);
@@ -127,7 +127,7 @@ export const executeProposal = async (req: Request, res: Response) => {
 
 export const runFullCycle = async (req: Request, res: Response) => {
   try {
-    let gov: IGovernor = req.originalUrl.includes('compound')
+    const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
     await gov.endToEndSim();
@@ -146,7 +146,7 @@ export const runFullCycle = async (req: Request, res: Response) => {
 export const getProposalDetails = async (req: Request, res: Response) => {
   try {
     const request: govCompProposalId = req.body;
-    let gov: IGovernor = req.originalUrl.includes('compound')
+    const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
     const details = await gov.getProposalDetails(request.proposalId);
