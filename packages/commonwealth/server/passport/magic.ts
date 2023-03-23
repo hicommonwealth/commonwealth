@@ -14,7 +14,7 @@ import type { ProfileAttributes } from '../models/profile';
 import '../types';
 import { createRole } from '../util/roles';
 
-export function useMagicAuth(models: DB) {
+export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
   if (MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
