@@ -1,7 +1,10 @@
 export interface IGovernor {
   readonly contractAddress: string;
 
-  createArbitraryProposal: (accountIndex: number) => Promise<string>;
+  createArbitraryProposal: (
+    accountIndex: number,
+    advanceDays?: number | string
+  ) => Promise<string>;
 
   queueProposal: (
     proposalId: string | number,
@@ -23,4 +26,6 @@ export interface IGovernor {
   ): Promise<void>;
 
   getVotes(accountIndex: number, numberOfVotes: string): Promise<void>;
+
+  endToEndSim(): Promise<void>;
 }

@@ -43,6 +43,15 @@ function setupRouter(): Router {
   router.post('/gov/compound/execute', executeProposal);
   router.get('/gov/compound/runFullCylce', runFullCycle);
 
+  router.post('/gov/aave/createProposal', createProposal);
+  router.post('/gov/aave/cancelProposal', cancelProposal);
+  router.post('/gov/aave/getVotes', getVotes);
+  router.post('/gov/aave/castVote', castVote);
+  router.post('/gov/aave/proposalDetails', getProposalDetails);
+  router.post('/gov/aave/queue', queueProposal);
+  router.post('/gov/aave/execute', executeProposal);
+  router.get('/gov/aave/runFullCylce', runFullCycle);
+
   return router;
 }
 
