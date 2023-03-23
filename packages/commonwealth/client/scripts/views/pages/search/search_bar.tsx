@@ -37,10 +37,6 @@ const goToSearchPage = (
   setRoute(`/search?${query.toUrlParams()}`);
 };
 
-// FIX comments problem with rendering
-// FIX hitting enter
-// FIX communities should be visible when no scope
-
 export const SearchBar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchResults, setSearchResults] =

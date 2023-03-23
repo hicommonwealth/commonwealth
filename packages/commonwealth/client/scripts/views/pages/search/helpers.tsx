@@ -18,14 +18,15 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const proposalId = thread.proposalid;
   const chain = thread.chain;
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) return;
+  if (app.isCustomDomain() && app.customDomainId() !== chain) {
+    return;
+  }
 
   return (
     <div
+      key={proposalId}
       className="search-result-row"
-      onClick={() => {
-        setRoute(`/discussion/${proposalId}`);
-      }}
+      onClick={() => setRoute(`/discussion/${proposalId}`)}
     >
       <CWIcon iconName="feedback" />
       <div className="inner-container">
@@ -67,10 +68,11 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
 
   return (
     <div
+      key={comment.id}
       className="search-result-row"
-      onClick={() => {
-        setRoute(`/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
-      }}
+      onClick={() =>
+        setRoute(`/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`)
+      }
     >
       <CWIcon iconName="feedback" />
       <div className="inner-container">
@@ -123,7 +125,11 @@ const getCommunityResult = (community, setRoute) => {
   };
 
   return (
-    <div className="community-result-row" onClick={onSelect}>
+    <div
+      key={community?.id}
+      className="community-result-row"
+      onClick={onSelect}
+    >
       <CommunityLabel {...params} />
     </div>
   );
@@ -138,7 +144,7 @@ const getMemberResult = (addr) => {
   if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
 
   return (
-    <div className="member-result-row">
+    <div key={profile.id} className="member-result-row">
       <User
         user={profile}
         showRole

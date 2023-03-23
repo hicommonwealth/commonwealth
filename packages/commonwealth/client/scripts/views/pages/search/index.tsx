@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { capitalize } from 'lodash';
 
 import 'pages/search/index.scss';
 
 import type { SearchScope } from 'models/SearchQuery';
+import { SearchSort } from 'models/SearchQuery';
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { SearchSort } from 'models/SearchQuery';
 import { SearchQuery } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
+import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { useCommonNavigate } from 'navigation/helpers';
 import { getListing } from './helpers';
@@ -24,35 +25,38 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 const SearchPage = () => {
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
-
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>(
-    SearchQuery.fromUrlParams(Object.fromEntries(searchParams.entries()))
+  const [searchResults, setSearchResults] = useState({});
+  const searchQuery = useMemo(
+    () => SearchQuery.fromUrlParams(Object.fromEntries(searchParams.entries())),
+    [searchParams]
   );
   const [activeTab, setActiveTab] = useState<SearchScope>(
     searchQuery.getSearchScope()[0]
   );
-  const [searchResults, setSearchResults] = useState({});
+
+  const handleSearch = useCallback(async () => {
+    try {
+      const response = await app.search.search(searchQuery);
+
+      setSearchResults(
+        Object.fromEntries(
+          Object.entries(response.results).map(([k, v]) => [
+            k,
+            v.slice(0, SEARCH_PAGE_SIZE),
+          ])
+        )
+      );
+    } catch (err) {
+      setSearchResults({});
+      notifyError(
+        err.responseJSON?.error || err.responseText || err.toString()
+      );
+    }
+  }, [searchQuery]);
 
   useEffect(() => {
-    const search = async () => {
-      try {
-        const response = await app.search.search(searchQuery);
-
-        setSearchResults(
-          Object.fromEntries(
-            Object.entries(response.results).map(([k, v]) => [k, v.slice(0, 2)])
-          )
-        );
-      } catch (err) {
-        setSearchResults({});
-        notifyError(
-          err.responseJSON?.error || err.responseText || err.toString()
-        );
-      }
-    };
-
-    search();
-  }, [searchQuery]);
+    handleSearch();
+  }, [handleSearch]);
 
   const tabScopedListing = getListing(
     searchResults,
@@ -80,6 +84,22 @@ const SearchPage = () => {
     }
   };
 
+  const handleSortChange = (option: DropdownItemType) => {
+    const newSearchQuery = SearchQuery.fromUrlParams(
+      Object.fromEntries(searchParams.entries())
+    );
+    newSearchQuery.sort = SearchSort[option.value];
+    navigate(`/search?${newSearchQuery.toUrlParams()}`);
+  };
+
+  const handleSearchAllCommunities = () => {
+    const newSearchQuery = SearchQuery.fromUrlParams(
+      Object.fromEntries(searchParams.entries())
+    );
+    newSearchQuery.chainScope = undefined;
+    navigate(`/search?${newSearchQuery.toUrlParams()}`);
+  };
+
   return !app.search.getByQuery(searchQuery)?.loaded ? (
     <PageLoading />
   ) : (
@@ -103,13 +123,7 @@ const SearchPage = () => {
               <a
                 href="#"
                 className="search-all-communities"
-                onClick={() => {
-                  setSearchQuery(
-                    (prevState) =>
-                      ({ ...prevState, chainScope: undefined } as SearchQuery)
-                  );
-                  navigate(`/search?${searchQuery.toUrlParams()}`);
-                }}
+                onClick={handleSearchAllCommunities}
               >
                 Search all communities?
               </a>
@@ -120,25 +134,15 @@ const SearchPage = () => {
               <CWText type="h5">Sort By:</CWText>
               <CWDropdown
                 label=""
+                onSelect={handleSortChange}
                 initialValue={{
                   label: searchQuery.sort,
                   value: searchQuery.sort,
                 }}
-                options={[
-                  { label: 'Best', value: 'Best' },
-                  { label: 'Newest', value: 'Newest' },
-                  { label: 'Oldest', value: 'Oldest' },
-                ]}
-                onSelect={(o) => {
-                  setSearchQuery(
-                    (prevState) =>
-                      ({
-                        ...prevState,
-                        sort: SearchSort[o.value],
-                      } as SearchQuery)
-                  );
-                  navigate(`/search?${searchQuery.toUrlParams()}`);
-                }}
+                options={Object.keys(SearchSort).map((k) => ({
+                  label: k,
+                  value: k,
+                }))}
               />
             </div>
           )}
