@@ -83,26 +83,13 @@ export const GovernanceSection = () => {
     (app.chain?.base === ChainBase.CosmosSDK &&
       app.chain.network !== ChainNetwork.Terra) ||
     app.chain?.network === ChainNetwork.Sputnik ||
-    app.chain?.network === ChainNetwork.Moloch ||
     app.chain?.network === ChainNetwork.Compound ||
     app.chain?.network === ChainNetwork.Aave;
 
-<<<<<<< HEAD
   const showTreasury =
     isNotOffchain &&
     app.chain?.base === ChainBase.Substrate &&
     app.chain.network !== ChainNetwork.Centrifuge;
-=======
-    const showProposals =
-      (isNotOffchain &&
-        app.chain?.base === ChainBase.Substrate &&
-        app.chain.network !== ChainNetwork.Darwinia) ||
-      (app.chain?.base === ChainBase.CosmosSDK &&
-        app.chain.network !== ChainNetwork.Terra) ||
-      app.chain?.network === ChainNetwork.Sputnik ||
-      app.chain?.network === ChainNetwork.Compound ||
-      app.chain?.network === ChainNetwork.Aave;
->>>>>>> 084c049fe (Remove chain-event Substrate code for related deprecated client code (#3043))
 
   const showTips =
     isNotOffchain &&
