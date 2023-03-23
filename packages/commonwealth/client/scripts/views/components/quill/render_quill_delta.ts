@@ -332,18 +332,18 @@ export const renderQuillDelta = (
             } else if (indent < temp.length - 1) {
               // outdent and unwind
               while (indent < temp.length - 1) {
-                let iii = 0
+                let iiii = 0
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   render(
                     getGroupTag(_group),
-                    { key: `outdent-${iii}` },
+                    { key: `outdent-${iiii}` },
                     temp.pop().map((data, index) => {
                       return render(data.tag, { key: index }, data.content);
                     })
                   )
                 );
-                iii++
+                iiii++
               }
               temp[temp.length - 1].push({ tag, content, indent, key: ii });
             }
