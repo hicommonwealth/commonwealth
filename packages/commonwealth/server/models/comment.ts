@@ -7,7 +7,7 @@ import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type CommentAttributes = {
-  root_id: string;
+  thread_id: string;
   address_id: number;
   text: string;
   plaintext: string;
@@ -43,7 +43,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       chain: { type: dataTypes.STRING, allowNull: false },
-      root_id: { type: dataTypes.STRING, allowNull: false },
+      thread_id: { type: dataTypes.INTEGER, allowNull: false },
       parent_id: { type: dataTypes.STRING, allowNull: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       text: { type: dataTypes.TEXT, allowNull: false },
@@ -72,11 +72,11 @@ export default (
       paranoid: true,
       indexes: [
         { fields: ['id'] },
-        { fields: ['chain', 'root_id'] },
+        { fields: ['chain', 'thread_id'] },
         { fields: ['address_id'] },
         { fields: ['chain', 'created_at'] },
         { fields: ['chain', 'updated_at'] },
-        { fields: ['root_id'] },
+        { fields: ['thread_id'] },
         { fields: ['canvas_hash'] },
       ],
     }

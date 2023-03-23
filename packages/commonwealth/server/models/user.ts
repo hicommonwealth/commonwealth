@@ -112,7 +112,6 @@ export default (
       defaultScope: {
         attributes: {
           exclude: [
-            'email',
             'emailVerified',
             'emailNotificationInterval',
             'isAdmin',
@@ -134,7 +133,9 @@ export default (
   ): Promise<UserInstance> => {
     const newUser = await User.create(attrs, options);
     const profile = await models.Profile.create(
-      { user_id: newUser.id },
+      {
+        user_id: newUser.id,
+      },
       options
     );
     newUser.Profiles = [profile];

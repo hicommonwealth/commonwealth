@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import {
-  getProposalUrl,
+  getThreadUrl,
   renderQuillDeltaToText,
   validURL,
 } from '../../shared/utils';
@@ -192,7 +192,7 @@ const editThread = async (
       '',
       {
         created_at: new Date(),
-        root_id: +finalThread.id,
+        thread_id: +finalThread.id,
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
@@ -258,7 +258,7 @@ const editThread = async (
           `user-${mentionedAddress.User.id}`,
           {
             created_at: new Date(),
-            root_id: +finalThread.id,
+            thread_id: +finalThread.id,
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
@@ -268,7 +268,7 @@ const editThread = async (
           },
           {
             user: finalThread.Address.address,
-            url: getProposalUrl('discussion', finalThread),
+            url: getThreadUrl('discussion', finalThread),
             title: req.body.title,
             bodyUrl: req.body.url,
             chain: finalThread.chain,
