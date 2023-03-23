@@ -27,7 +27,6 @@ type PreviewModalProps = {
 };
 
 export const PreviewModal = ({ doc, onModalClose, title }: PreviewModalProps) => {
-  console.log('modal doc: ', doc);
   const renderedContent = useMemo(() => {
     if (!doc) {
       return <EmptyState />;
@@ -38,8 +37,14 @@ export const PreviewModal = ({ doc, onModalClose, title }: PreviewModalProps) =>
         console.warn('markdown doc empty');
         return <EmptyState />;
       }
+      console.log('md doc: ', doc);
       return <MarkdownFormattedText doc={doc} />;
     }
+    if (!doc.ops?.length) {
+      console.warn('richtext doc empty');
+      return <EmptyState />;
+    }
+    console.log('rt doc: ', doc);
     return <QuillFormattedText doc={doc} />;
   }, [doc]);
 
