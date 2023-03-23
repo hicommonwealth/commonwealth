@@ -1,5 +1,4 @@
 import {
-  RabbitMQController,
   RabbitMQControllerError,
 } from './rabbitMQController';
 import type * as Rascal from 'rascal';
@@ -8,20 +7,29 @@ import type {
   RascalSubscriptions,
   TRmqMessages,
 } from './types';
+import {AbstractRabbitMQController, RmqMsgFormatError} from "./types";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 /**
  * This is a mock RabbitMQController whose functions simply log a 'success' message when called. Used mainly for
  * testing and scripts that need to use eventHandlers without a live RabbitMQ instance.
  */
-export class MockRabbitMQController extends RabbitMQController {
-  constructor(_rabbitMQConfig: Rascal.BrokerConfig) {
-    super(_rabbitMQConfig);
+export class MockRabbitMQController extends AbstractRabbitMQController {
+  private _queuedMessages = {}
+
+  constructor(private readonly _rabbitMQConfig: Rascal.BrokerConfig) {
+    super();
   }
 
   public async init(): Promise<void> {
     this._initialized = true;
+
+    const config = this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]]
+
+    // initialize the message queue arrays
+    for (const subName of Object.keys(config.subscriptions)) {
+      this._queuedMessages[subName] = [];
+    }
   }
 
   /**
@@ -41,6 +49,25 @@ export class MockRabbitMQController extends RabbitMQController {
         'RabbitMQController is not initialized!'
       );
     }
+
+    for (const message of this._queuedMessages[subscriptionName]) {
+      try {
+        await messageProcessor.call({ rmqController: this, ...msgProcessorContext }, message);
+      } catch (e) {
+        const errorMsg = `
+              Failed to process message: ${JSON.stringify(message)} 
+              with processor function ${messageProcessor.name}.
+            `;
+        // if the message processor throws because of a message formatting error then we immediately deadLetter the
+        // message to avoid re-queuing the message multiple times
+        if (e instanceof RmqMsgFormatError) {
+          throw new Error(`Negative Acknowledgement: Invalid Message Format Error - ${errorMsg}`)
+        } else {
+          throw new Error(`Negative Acknowledgement: Unknown Error - Message would be re-queued in production`)
+        }
+      }
+    }
+
     console.log('Subscription started');
     return;
   }
@@ -54,10 +81,43 @@ export class MockRabbitMQController extends RabbitMQController {
         'RabbitMQController is not initialized!'
       );
     }
+    const subscription = this.routeMessage(publisherName);
+    this._queuedMessages[subscription].push(data);
     console.log('Message published');
+  }
+
+  public async safePublish(
+    publishData: TRmqMessages,
+    objectId: number | string,
+    publication: RascalPublications,
+    DB?: any
+  ) {
+    await this.publish(publishData, publication);
   }
 
   public get initialized(): boolean {
     return this._initialized;
+  }
+
+  public async shutdown() {
+    this._initialized = false;
+    // clear the fake queues
+    this._queuedMessages = {};
+  }
+
+  private routeMessage(publication: RascalPublications): RascalSubscriptions {
+    const config = this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]]
+    const {exchange, routingKey} = config.publications[publication]
+    const queue = Object.values(config.bindings).find(binding => binding.source === exchange && binding.bindingKey === routingKey)
+
+    if (!queue) {
+      throw new Error('Routing Failed: Could not find a queue that matches the given publication')
+    }
+
+    for (const [subName, sub] of Object.entries(config.subscriptions)) {
+      if (sub.queue === queue) return subName as RascalSubscriptions;
+    }
+
+    throw new Error('Routing Failed: Could not find a subscription that matches the given publication');
   }
 }

@@ -1,23 +1,16 @@
 import * as Rascal from 'rascal';
 import type {
   RascalPublications,
-  RascalSubscriptions,
+  RascalSubscriptions, SafeRmqPublishSupported,
   TRmqMessages,
 } from './types';
-import { RmqMsgFormatError } from './types';
+import {AbstractRabbitMQController, RmqMsgFormatError} from './types';
 import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';
-import type { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
-import type { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
-import type { ChainEventTypeModelStatic } from 'chain-events/services/database/models/chain_event_type';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export type SafeRmqPublishSupported =
-  | ChainEntityModelStatic
-  | ChainEventModelStatic
-  | ChainEventTypeModelStatic;
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
@@ -38,18 +31,19 @@ class PublishError extends RabbitMQControllerError {
  * initialize the class you must have a Rascal configuration. Every publish and message processing should be done
  * through this class as it implements error handling that is crucial to avoid data loss.
  */
-export class RabbitMQController {
+export class RabbitMQController extends AbstractRabbitMQController {
   public broker: Rascal.BrokerAsPromised;
   public readonly subscribers: string[];
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
-  protected _initialized = false;
   protected rollbar: Rollbar;
 
   constructor(
     protected readonly _rabbitMQConfig: Rascal.BrokerConfig,
     rollbar?: Rollbar
   ) {
+    super();
+
     // sets the first vhost config to _rawVhost
     this._rawVhost =
       _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];

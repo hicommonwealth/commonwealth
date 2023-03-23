@@ -12,6 +12,10 @@ import type { RmqCWEvent } from './chainEvents';
 import type { RmqCENotification } from './chainEventNotification';
 import type { RmqSnapshotEvent } from './snapshotListener';
 import type { RmqSnapshotNotification } from './snapshotNotification';
+import {Sequelize} from "sequelize";
+import {ChainEntityModelStatic} from "chain-events/services/database/models/chain_entity";
+import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
+import {ChainEventTypeModelStatic} from "chain-events/services/database/models/chain_event_type";
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -101,4 +105,39 @@ export enum RascalRoutingKeys {
   SnapshotProposalNotifications = 'SnapshotProposalNotifications',
   SnapshotListener = 'SnapshotListener',
   DeadLetter = 'DeadLetter',
+}
+
+export type SafeRmqPublishSupported =
+  | ChainEntityModelStatic
+  | ChainEventModelStatic
+  | ChainEventTypeModelStatic;
+
+export abstract class AbstractRabbitMQController {
+  protected _initialized = false;
+
+  public abstract init(): Promise<void>;
+
+  public abstract startSubscription(
+    messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>,
+    subscriptionName: RascalSubscriptions,
+    msgProcessorContext?: { [key: string]: any }
+  ): Promise<any>;
+
+  public abstract publish(
+    data: TRmqMessages,
+    publisherName: RascalPublications
+  ): Promise<any>;
+
+  public abstract safePublish(
+    publishData: TRmqMessages,
+    objectId: number | string,
+    publication: RascalPublications,
+    DB: { sequelize: Sequelize, model: SafeRmqPublishSupported}
+  ): Promise<any>;
+
+  public abstract shutdown(): Promise<any>;
+
+  public get initialized(): boolean {
+    return this._initialized;
+  }
 }
