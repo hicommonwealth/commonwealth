@@ -15,7 +15,7 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
-import { isSameAccount, pluralize } from 'helpers';
+import { isSameAccount, pluralize, setDarkMode } from 'helpers';
 import type { Account } from 'models';
 import { AddressInfo, ITokenAdapter } from 'models';
 
@@ -234,6 +234,8 @@ export const LoginSelectorMenuRight = ({
                 await initAppState();
                 notifySuccess('Logged out');
                 onLogout();
+                localStorage.removeItem('dark-mode-state');
+                localStorage.removeItem('user-dark-mode-state');
               })
               .catch(() => {
                 // eslint-disable-next-line no-restricted-globals
