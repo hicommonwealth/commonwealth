@@ -21,11 +21,6 @@ const bulkComments = async (
   }
   const whereOptions: any = {};
   whereOptions.chain = chain.id;
-  if (req.query.offchain_threads_only) {
-    whereOptions.root_id = { [Op.like]: 'discussion%' };
-  } else if (req.query.proposals_only) {
-    whereOptions.root_id = { [Op.notLike]: 'discussion%' };
-  }
   const comments = await models.Comment.findAll({
     where: whereOptions,
     include: [models.Address, models.Attachment],
