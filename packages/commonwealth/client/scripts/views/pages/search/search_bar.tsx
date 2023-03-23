@@ -127,7 +127,7 @@ export const SearchBar = () => {
           value={searchTerm}
           autoComplete="off"
           onFocus={() => setShowDropdown(true)}
-          onBlur={() => setShowDropdown(true)}
+          onBlur={() => setShowDropdown(false)}
           onChange={handleInputChange}
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
