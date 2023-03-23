@@ -33,6 +33,19 @@ export const AaveProposalForm = () => {
   const author = app.user.activeAccount;
   const aave = app.chain as Aave;
 
+  type AaveProposalStateItem = typeof aaveProposalState[number];
+  type AaveProposalStateKeys = keyof AaveProposalStateItem;
+
+  const updateAaveProposalState = <K extends keyof AaveProposalStateItem>(
+    index: number,
+    key: K,
+    value: AaveProposalStateItem[K]
+  ) => {
+    const newAaveProposalState = [...aaveProposalState];
+    newAaveProposalState[index][key] = value;
+    setAaveProposalState(newAaveProposalState);
+  };
+
   return (
     <div className="AaveProposalForm">
       <div className="row-with-label">
@@ -130,7 +143,7 @@ export const AaveProposalForm = () => {
         placeholder="Add Target"
         value={aaveProposalState[activeTabIndex].target}
         onInput={(e) => {
-          aaveProposalState[activeTabIndex].target = e.target.value;
+          updateAaveProposalState(activeTabIndex, 'target', e.target.value);
         }}
       />
       <CWTextInput
@@ -138,7 +151,7 @@ export const AaveProposalForm = () => {
         placeholder="Enter amount in wei"
         value={aaveProposalState[activeTabIndex].value}
         onInput={(e) => {
-          aaveProposalState[activeTabIndex].value = e.target.value;
+          updateAaveProposalState(activeTabIndex, 'value', e.target.value);
         }}
       />
       <CWTextInput
@@ -146,7 +159,7 @@ export const AaveProposalForm = () => {
         placeholder="Add Calldata"
         value={aaveProposalState[activeTabIndex].calldata}
         onInput={(e) => {
-          aaveProposalState[activeTabIndex].calldata = e.target.value;
+          updateAaveProposalState(activeTabIndex, 'calldata', e.target.value);
         }}
       />
       <CWTextInput
@@ -154,14 +167,17 @@ export const AaveProposalForm = () => {
         placeholder="Add a signature"
         value={aaveProposalState[activeTabIndex].signature}
         onInput={(e) => {
-          aaveProposalState[activeTabIndex].signature = e.target.value;
+          updateAaveProposalState(activeTabIndex, 'signature', e.target.value);
         }}
       />
       <CWCheckbox
         checked={aaveProposalState[activeTabIndex].withDelegateCall}
-        onChange={() => {
-          aaveProposalState[activeTabIndex].withDelegateCall =
-            !aaveProposalState[activeTabIndex].withDelegateCall;
+        onChange={(e) => {
+          updateAaveProposalState(
+            activeTabIndex,
+            'withDelegateCall',
+            e.target.checked
+          );
         }}
         label="Delegate Call"
         value=""
