@@ -14,7 +14,7 @@ import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { Modal } from '../component_kit/cw_modal';
 import { LoginModal } from '../../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
-import { useThreadReactionButton } from './ThreadPreviewReactionButtonSmall';
+import { ReactionButtonLogic } from './ReactionButtonLogic';
 
 type ThreadPreviewReactionButtonProps = {
   thread: Thread;
@@ -32,7 +32,7 @@ export const ThreadPreviewReactionButtonBig = ({
     isLoading,
     isUserForbidden,
     like,
-  } = useThreadReactionButton(thread, setReactors);
+  } = ReactionButtonLogic(thread, setReactors);
 
   return (
     <>

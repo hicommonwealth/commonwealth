@@ -87,15 +87,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsEditingBody(false)
   }
 
-  const threadUpdatedCallback = (title: string, body: string) => {
+  const threadUpdatedCallback = (newTitle: string, body: string) => {
     setThread(new Thread({
       ...thread,
-      title: title,
+      title: newTitle,
       body: body
     }))
     cancelEditing()
-  } 
-    
+  }
+
   const updatedCommentsCallback = useCallback(() => {
     if (!thread) {
       return;

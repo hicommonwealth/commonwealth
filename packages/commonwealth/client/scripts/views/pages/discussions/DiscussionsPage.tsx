@@ -25,14 +25,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useEffect(() => {
     app.threads.loadNextPage({ topicName, stageName, includePinnedThreads: true }).then((t) => {
       // Fetch first 20 + unpinned threads
-      setThreads([
-        ...threads,
-        ...t,
-      ]);
+      setThreads(t);
 
       setInitializing(false);
     });
-  }, [stageName, threads, topicName]);
+  }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
     const newThreads = await app.threads.loadNextPage({ topicName, stageName });
@@ -53,7 +50,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         <RecentThreadsHeader
           topic={topicName}
           stage={stageName}
-          totalThreadCount={threads.length}
+          totalThreadCount={threads?.length || 0}
         />
         <Virtuoso
           style={{ height: '100%', width: '100%' }}

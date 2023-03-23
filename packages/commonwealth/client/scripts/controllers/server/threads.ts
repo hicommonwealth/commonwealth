@@ -681,7 +681,7 @@ class ThreadsController {
     if (topicId) params['topic_id'] = topicId;
     if (stageName) params['stage'] = stageName;
     if (includePinnedThreads)
-      params['includePinnedThreads'] = includePinnedThreads;
+      params['includePinnedThreads'] = true;
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
@@ -709,9 +709,10 @@ class ThreadsController {
     });
 
     // Update listing cutoff date (date up to which threads have been fetched)
+    const unPinnedThreads = modeledThreads.filter(t => !t.pinned);
     if (modeledThreads?.length) {
-      const lastThread = [...modeledThreads].sort(orderDiscussionsbyLastComment)[
-        modeledThreads.length - 1
+      const lastThread = unPinnedThreads.sort(orderDiscussionsbyLastComment)[
+        unPinnedThreads.length - 1
       ];
       const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
       this.listingStore.setCutoffDate(options, cutoffDate);
@@ -728,7 +729,7 @@ class ThreadsController {
     if (!this.listingStore.isInitialized(options)) {
       this.listingStore.initializeListing(options);
     }
-    if (threads.length < DEFAULT_PAGE_SIZE) {
+    if ((includePinnedThreads ? threads.length : unPinnedThreads.length) < DEFAULT_PAGE_SIZE) {
       this.listingStore.depleteListing(options);
     }
 
