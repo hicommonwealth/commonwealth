@@ -17,12 +17,14 @@ const SnapshotProposalSelectorItem = ({
   return (
     <div className="proposal-item" onClick={() => onClick(snapshot)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
-        <CWText fontWeight="medium" title={snapshot.title}>
+      <div>
+        <CWText fontWeight="medium" noWrap title={snapshot.title}>
           {snapshot.title}
         </CWText>
         <CWText type="caption" title={snapshot.id}>
-          Hash: {smartTruncate(snapshot.id, 8, {position: 5})}
+          Hash: {smartTruncate(snapshot.id, 12, {position: 4})}
         </CWText>
+      </div>
     </div>
   );
 };

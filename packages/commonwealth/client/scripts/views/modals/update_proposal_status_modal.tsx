@@ -129,16 +129,16 @@ export const UpdateProposalStatusModal = ({
       <div className="compact-modal-body">
         {/* To fix the issue of the select list not being able to be clicked on*/}
         <SelectList
-          items={stages.map((stage) => ({
+          defaultValue={tempStage ? { value: tempStage, label: threadStageToLabel(tempStage) } : null}
+          placeholder="Select the stage"
+          isSearchable={false}
+          options={stages.map((stage) => ({
             value: stage,
             label: threadStageToLabel(stage),
           }))}
-          selectedItem={tempStage}
-          onSelectItem={setTempStage}
-          listItemProps={{
-              buttonType: 'text',
-          }}
-      />
+          className="StageSelector"
+          onChange={(option) => setTempStage(option.value)}
+        />
         {showSnapshot && (
           <SnapshotProposalSelector
             onSelect={handleSelectProposal}
