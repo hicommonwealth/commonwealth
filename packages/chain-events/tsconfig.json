@@ -9,6 +9,11 @@
     "common-common": ["../../packages/common-common"],
     "common-common/*": ["../../packages/common-common/*"]
   },
-  "include": ["src", "services", "test", "scripts"],
-  "exclude": ["./dist", "./node_modules", "./build"]
+  "include": ["src", "services", "test", "scripts", "chain-testing"],
+  "exclude": [
+    "./dist",
+    "./node_modules",
+    "./build",
+    "./chain-testing/node_modules"
+  ]
 }
