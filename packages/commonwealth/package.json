@@ -62,7 +62,8 @@
     "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
     "gen-e2e": "npx playwright codegen",
     "test-e2e": "npx playwright test ./test/e2e/*",
-    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
+    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
+    "reset-frack-db": "heroku pg:copy commonwealth-beta::HEROKU_POSTGRESQL_RED_URL DATABASE_URL --app commonwealth-staging2 --confirm commonwealth-staging2"
   },
   "engines": {
     "node": "18.x"
