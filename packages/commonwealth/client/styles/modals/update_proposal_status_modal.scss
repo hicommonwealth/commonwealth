@@ -1,6 +1,12 @@
 @import '../shared';
 
 .UpdateProposalStatusModal {
+  width: 504px;
+
+  @include smallInclusive {
+    width: 100%;
+  }
+
   .compact-modal-body {
     display: flex;
     flex-direction: column;

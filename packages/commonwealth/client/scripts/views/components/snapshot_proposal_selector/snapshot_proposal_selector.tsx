@@ -79,7 +79,7 @@ export const SnapshotProposalSelector = ({
   return (
     <div className="SnapshotProposalSelector">
       <CWTextInput
-        placeholder="Search for an existing snapshot proposal..."
+        placeholder="Search for snapshot proposals"
         iconRightonClick={handleClearButtonClick}
         value={searchTerm}
         iconRight="close"
