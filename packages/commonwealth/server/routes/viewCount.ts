@@ -31,10 +31,10 @@ const viewCount = async (
   }
 
   // verify count exists before querying
-  let count = await models.ViewCount.findOne({
+  let count = await models.Thread.findOne({
     where: {
       chain: req.body.chain,
-      object_id: req.body.object_id,
+      id: req.body.object_id,
     },
   });
   if (!count) {

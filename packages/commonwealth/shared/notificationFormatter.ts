@@ -2,7 +2,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import type { IPostNotificationData } from './types';
 import {
   formatAddressShort,
-  getProposalUrl,
+  getThreadUrl,
   renderQuillDeltaToText,
   smartTrim,
 } from './utils';
@@ -17,7 +17,7 @@ export const getForumNotificationCopy = async (
 ) => {
   // unpack notification_data
   const {
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -43,7 +43,7 @@ export const getForumNotificationCopy = async (
       : 'New activity on Commonwealth';
 
   // author
-  const authorProfile = await models.OffchainProfile.findOne({
+  const authorProfile = await models.Profile.findOne({
     include: [
       {
         model: models.Address,
@@ -106,14 +106,14 @@ export const getForumNotificationCopy = async (
 
   // link to proposal
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
     chain: chain_id,
   };
   const proposalUrlArgs = comment_id
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
-  const proposalPath = (getProposalUrl as any)(...proposalUrlArgs);
+  const proposalPath = (getThreadUrl as any)(...proposalUrlArgs);
   return [
     emailSubjectLine,
     authorName,

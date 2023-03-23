@@ -28,7 +28,6 @@ import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
 import NotificationsReadFactory from './models/notifications_read';
-import OffchainProfileFactory from './models/offchain_profile';
 import PollFactory from './models/poll';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
@@ -46,7 +45,6 @@ import ThreadFactory from './models/thread';
 import TokenFactory from './models/token';
 import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
-import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -105,11 +103,9 @@ const models: Models = {
   Attachment: AttachmentFactory(sequelize, DataTypes),
   Comment: CommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),
-  OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   Reaction: ReactionFactory(sequelize, DataTypes),
   Thread: ThreadFactory(sequelize, DataTypes),
   Topic: TopicFactory(sequelize, DataTypes),
-  ViewCount: ViewCountFactory(sequelize, DataTypes),
   Vote: VoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),

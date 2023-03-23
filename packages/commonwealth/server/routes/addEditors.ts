@@ -2,7 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { getProposalUrl } from '../../shared/utils';
+import { getThreadUrl } from '../../shared/utils';
 import type { DB } from '../models';
 import emitNotifications from '../util/emitNotifications';
 import { findOneRole } from '../util/roles';
@@ -95,7 +95,7 @@ const addEditors = async (
           where: {
             subscriber_id: collaborator.User.id,
             category_id: NotificationCategories.NewComment,
-            object_id: `discussion_${thread.id}`,
+            object_id: thread.id,
             offchain_thread_id: thread.id,
             chain_id: thread.chain,
             is_active: true,
@@ -105,7 +105,7 @@ const addEditors = async (
           where: {
             subscriber_id: collaborator.User.id,
             category_id: NotificationCategories.NewReaction,
-            object_id: `discussion_${thread.id}`,
+            object_id: thread.id,
             offchain_thread_id: thread.id,
             chain_id: thread.chain,
             is_active: true,
@@ -131,7 +131,7 @@ const addEditors = async (
         `user-${collaborator.User.id}`,
         {
           created_at: new Date(),
-          root_id: +thread.id,
+          thread_id: +thread.id,
           root_type: ProposalType.Thread,
           root_title: thread.title,
           comment_text: thread.body,
@@ -141,7 +141,7 @@ const addEditors = async (
         },
         {
           user: author.address,
-          url: getProposalUrl('discussion', thread),
+          url: getThreadUrl('discussion', thread),
           title: req.body.title,
           bodyUrl: req.body.url,
           chain: thread.chain,

@@ -26,7 +26,6 @@ import type { LoginTokenModelStatic } from './models/login_token';
 import type { NotificationModelStatic } from './models/notification';
 import type { NotificationCategoryModelStatic } from './models/notification_category';
 import type { NotificationsReadModelStatic } from './models/notifications_read';
-import type { OffchainProfileModelStatic } from './models/offchain_profile';
 import type { PollModelStatic } from './models/poll';
 import type { ProfileModelStatic } from './models/profile';
 import type { ReactionModelStatic } from './models/reaction';
@@ -44,7 +43,6 @@ import type { ThreadModelStatic } from './models/thread';
 import type { TokenModelStatic } from './models/token';
 import type { TopicModelStatic } from './models/topic';
 import type { UserModelStatic } from './models/user';
-import type { ViewCountModelStatic } from './models/viewcount';
 import type { VoteModelStatic } from './models/vote';
 import type { WebhookModelStatic } from './models/webhook';
 
@@ -76,11 +74,9 @@ export type Models = {
   Attachment: AttachmentModelStatic;
   Comment: CommentModelStatic;
   Poll: PollModelStatic;
-  OffchainProfile: OffchainProfileModelStatic;
   Reaction: ReactionModelStatic;
   Thread: ThreadModelStatic;
   Topic: TopicModelStatic;
-  ViewCount: ViewCountModelStatic;
   Vote: VoteModelStatic;
   Profile: ProfileModelStatic;
   RoleAssignment: RoleAssignmentModelStatic;
