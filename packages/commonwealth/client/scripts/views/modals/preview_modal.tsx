@@ -27,18 +27,18 @@ type PreviewModalProps = {
 };
 
 export const PreviewModal = ({ doc, onModalClose, title }: PreviewModalProps) => {
+  console.log('modal doc: ', doc);
   const renderedContent = useMemo(() => {
     if (!doc) {
       return <EmptyState />;
     }
     // render as markdown
     if (typeof doc === 'string') {
-      const docAsText = getTextFromDelta(doc);
-      if (docAsText.length === 0) {
+      if (doc.length === 0) {
         console.warn('markdown doc empty');
         return <EmptyState />;
       }
-      return <MarkdownFormattedText doc={docAsText} />;
+      return <MarkdownFormattedText doc={doc} />;
     }
     return <QuillFormattedText doc={doc} />;
   }, [doc]);

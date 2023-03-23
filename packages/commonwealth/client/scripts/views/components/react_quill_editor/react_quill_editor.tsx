@@ -115,7 +115,7 @@ const ReactQuillEditor = ({
       <Modal
         content={
           <PreviewModal
-            doc={isMarkdownEnabled ? contentDelta : getTextFromDelta(contentDelta)}
+            doc={isMarkdownEnabled ? getTextFromDelta(contentDelta) : contentDelta}
             onModalClose={handlePreviewModalClose}
             title={isMarkdownEnabled ? 'As Markdown' : 'As Rich Text'}
           />
