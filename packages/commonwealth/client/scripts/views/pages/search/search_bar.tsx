@@ -96,7 +96,7 @@ export const SearchBar = () => {
   };
 
   const handleGoToSearchPage = () => {
-    if (searchTerm?.length < 3) {
+    if (searchTerm?.length < 4) {
       return;
     }
 
@@ -131,7 +131,7 @@ export const SearchBar = () => {
           value={searchTerm}
           autoComplete="off"
           onFocus={() => setShowDropdown(true)}
-          onBlur={() => setShowDropdown(false)}
+          onBlur={() => setShowDropdown(true)}
           onChange={handleInputChange}
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
