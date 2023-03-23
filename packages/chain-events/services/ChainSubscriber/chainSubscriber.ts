@@ -11,7 +11,7 @@ import Rollbar from 'rollbar';
 import fetch from 'node-fetch';
 import { StatsDController } from 'common-common/src/statsd';
 
-import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
+import {IRabbitMqHandler, RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers';
 import {
   CHAIN_EVENT_SERVICE_SECRET,
   CW_DATABASE_URI,
@@ -46,7 +46,7 @@ let cachedChainsAndTokens;
  * This function creates, updates, and deletes chain-event listeners based on the provided list of chainsAndTokens.
  */
 export async function processChains(
-  producer: RabbitMqHandler,
+  producer: IRabbitMqHandler,
   chainsAndTokens: ChainAttributes[],
   rollbar?: Rollbar
 ) {
@@ -259,7 +259,7 @@ export async function getSubscriberChainData(pool?: Pool, rollbar?: Rollbar, cha
  * Retrieves and processes the chains we need to be listening to. This function is especially useful for testing since
  * we can pass a fully populated chain object that may not exist in the database.
  */
-export async function runSubscriberAsFunction(producer: RabbitMqHandler, pool?: Pool, rollbar?: Rollbar, chain?: ChainAttributes) {
+export async function runSubscriberAsFunction(producer: IRabbitMqHandler, pool?: Pool, rollbar?: Rollbar, chain?: ChainAttributes) {
   const chains = await getSubscriberChainData(pool, rollbar, chain);
   await processChains(producer, chains, rollbar);
 }

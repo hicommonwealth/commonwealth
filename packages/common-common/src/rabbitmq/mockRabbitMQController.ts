@@ -16,6 +16,7 @@ import {AbstractRabbitMQController, RmqMsgFormatError} from "./types";
  */
 export class MockRabbitMQController extends AbstractRabbitMQController {
   private _queuedMessages = {}
+  private subscribedIntervals: Partial<Record<RascalSubscriptions, NodeJS.Timeout>>[] = []
 
   constructor(private readonly _rabbitMQConfig: Rascal.BrokerConfig) {
     super();
@@ -49,24 +50,22 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
         'RabbitMQController is not initialized!'
       );
     }
+    // process existing messages
+    await this.runMessageProcessor(messageProcessor, this._queuedMessages[subscriptionName], msgProcessorContext);
 
-    for (const message of this._queuedMessages[subscriptionName]) {
-      try {
-        await messageProcessor.call({ rmqController: this, ...msgProcessorContext }, message);
-      } catch (e) {
-        const errorMsg = `
-              Failed to process message: ${JSON.stringify(message)} 
-              with processor function ${messageProcessor.name}.
-            `;
-        // if the message processor throws because of a message formatting error then we immediately deadLetter the
-        // message to avoid re-queuing the message multiple times
-        if (e instanceof RmqMsgFormatError) {
-          throw new Error(`Negative Acknowledgement: Invalid Message Format Error - ${errorMsg}`)
-        } else {
-          throw new Error(`Negative Acknowledgement: Unknown Error - Message would be re-queued in production`)
-        }
+    const checkQueues = async () => {
+      if (this._queuedMessages[subscriptionName].length > 0) {
+        await this.runMessageProcessor(messageProcessor, this._queuedMessages[subscriptionName], msgProcessorContext);
       }
     }
+
+    // setup func which checks every second whether a new message has been added to the fake queue (array)
+    // we could set up a proxy trigger when a message is published but then error handling would fall to the publisher
+    // rather than the subscriber which is not the case in production.
+    const interval = setInterval(checkQueues.bind(this), 1000);
+    this.subscribedIntervals.push({
+      [subscriptionName]: interval
+    });
 
     console.log('Subscription started');
     return;
@@ -103,6 +102,11 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     this._initialized = false;
     // clear the fake queues
     this._queuedMessages = {};
+    // reset intervals
+    for (const interval of this.subscribedIntervals) {
+      clearInterval(Object.values(interval)[0])
+    }
+    this.subscribedIntervals = [];
   }
 
   private routeMessage(publication: RascalPublications): RascalSubscriptions {
@@ -119,5 +123,33 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     }
 
     throw new Error('Routing Failed: Could not find a subscription that matches the given publication');
+  }
+
+  private async runMessageProcessor(
+    messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>,
+    messages: any[],
+    msgProcessorContext?: { [key: string]: any },
+  ) {
+    for (const message of messages) {
+      try {
+        await messageProcessor.call({ rmqController: this, ...msgProcessorContext }, message);
+      } catch (e) {
+        const errorMsg = `
+              Failed to process message: ${JSON.stringify(message)} 
+              with processor function ${messageProcessor.name}.
+            `;
+        // if the message processor throws because of a message formatting error then we immediately deadLetter the
+        // message to avoid re-queuing the message multiple times
+        if (e instanceof RmqMsgFormatError) {
+          throw new Error(`Negative Acknowledgement: Invalid Message Format Error - ${errorMsg}`)
+        } else {
+          throw new Error(`Negative Acknowledgement: Unknown Error - Message would be re-queued in production`)
+        }
+      }
+    }
+  }
+
+  public get queuedMessages() {
+    return this._queuedMessages;
   }
 }

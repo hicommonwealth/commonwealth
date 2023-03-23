@@ -3,7 +3,6 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type Rollbar from 'rollbar';
 
-import type { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import type { SubstrateEvents } from '../../src';
 import {
   createListener,
@@ -16,6 +15,7 @@ import type { DB } from '../database/database';
 import models from '../database/database';
 
 import type { ChainAttributes, IListenerInstances } from './types';
+import {IRabbitMqHandler} from "../ChainEventsConsumer/ChainEventHandlers";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -34,7 +34,7 @@ export async function manageErcListeners(
   network: ChainNetwork,
   groupedTokens: { [url: string]: ChainAttributes[] },
   listenerInstances: IListenerInstances,
-  producer: RabbitMqHandler,
+  producer: IRabbitMqHandler,
   rollbar?: Rollbar
 ): Promise<void> {
   // delete any listeners that have no more tokens to listen to
@@ -170,7 +170,7 @@ export async function manageErcListeners(
 export async function manageRegularListeners(
   chains: ChainAttributes[],
   listenerInstances: IListenerInstances,
-  producer: RabbitMqHandler,
+  producer: IRabbitMqHandler,
   rollbar?: Rollbar
 ): Promise<void> {
   // for ease of use create a new object containing all listener instances that are not ERC20 or ERC721
@@ -221,7 +221,7 @@ export async function manageRegularListeners(
 async function setupNewListeners(
   newChains: ChainAttributes[],
   listenerInstances: IListenerInstances,
-  producer: RabbitMqHandler,
+  producer: IRabbitMqHandler,
   rollbar?: Rollbar
 ) {
   for (const chain of newChains) {
