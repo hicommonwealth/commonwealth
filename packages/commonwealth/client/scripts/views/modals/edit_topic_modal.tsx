@@ -6,16 +6,15 @@ import 'modals/edit_topic_modal.scss';
 import { Topic } from 'models';
 
 import app from 'state';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import type { QuillEditor } from '../components/quill/quill_editor';
-import type { QuillTextContents } from '../components/quill/types';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
+import { DeltaStatic } from 'quill';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -38,9 +37,11 @@ export const EditTopicModal = ({
   const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [quillEditorState, setQuillEditorState] = useState<QuillEditor>();
+
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [contentsDoc, setContentsDoc] = useState<QuillTextContents>();
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
 
   const [description, setDescription] = useState<string>(descriptionProp);
   const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
@@ -51,12 +52,14 @@ export const EditTopicModal = ({
   );
   const [name, setName] = useState<string>(nameProp);
 
+  const editorText = getTextFromDelta(contentDelta)
+
   useEffect(() => {
     if (defaultOffchainTemplate) {
       try {
-        setContentsDoc(JSON.parse(defaultOffchainTemplate));
+        setContentDelta(JSON.parse(defaultOffchainTemplate));
       } catch (e) {
-        setContentsDoc(defaultOffchainTemplate);
+        setContentDelta(createDeltaFromText(defaultOffchainTemplate));
       }
     }
   }, [defaultOffchainTemplate]);
@@ -64,12 +67,9 @@ export const EditTopicModal = ({
   const handleSaveChanges = async () => {
     setIsSaving(true);
 
-    if (featuredInNewPost) {
-      if (!quillEditorState || quillEditorState?.isBlank()) {
-        setErrorMsg('Must provide template.');
-      } else {
-        quillEditorState?.disable();
-      }
+    if (featuredInNewPost && editorText.length === 0) {
+      setErrorMsg('Must provide template.');
+      return;
     }
 
     const topicInfo = {
@@ -81,7 +81,7 @@ export const EditTopicModal = ({
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
       default_offchain_template: featuredInNewPost
-        ? quillEditorState.textContentsAsString
+        ? JSON.stringify(contentDelta)
         : null,
     };
 
@@ -173,12 +173,9 @@ export const EditTopicModal = ({
           value=""
         />
         {featuredInNewPost && (
-          <QuillEditorComponent
-            contentsDoc={contentsDoc}
-            oncreateBind={(state: QuillEditor) => {
-              setQuillEditorState(state);
-            }}
-            editorNamespace="new-discussion"
+          <ReactQuillEditor
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
             tabIndex={3}
           />
         )}

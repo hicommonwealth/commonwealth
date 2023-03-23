@@ -19,7 +19,7 @@ type SublayoutProps = {
 
 const Sublayout = ({
   children,
-  hideFooter = false,
+  hideFooter = true,
   hideSearch,
   onScroll,
 }: SublayoutProps) => {
