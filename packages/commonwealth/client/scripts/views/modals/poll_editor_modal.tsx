@@ -172,6 +172,7 @@ export const PollEditorModal = ({
                 options={customDurationOptions}
                 defaultValue={customDurationOptions[0]}
                 onChange={({ value }) => setCustomDuration(value)}
+                menuMaxHeight="75px"
               />
             )}
           </div>
