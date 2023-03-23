@@ -19,6 +19,7 @@ export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
     'textProposal' | 'communitySpend'
   >('textProposal');
+  const [deposit, setDeposit] = useState<number>(0);
   const [description, setDescription] = useState<string>('');
   const [payoutAmount, setPayoutAmount] = useState<number>(0);
   const [recipient, setRecipient] = useState<string>('');
@@ -29,7 +30,6 @@ export const CosmosProposalForm = () => {
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
 
-  const [deposit, setDeposit] = useState<number>(+cosmos.governance.minDeposit);
 
   return !cosmos.governance.initialized ? (
     <CWSpinner />

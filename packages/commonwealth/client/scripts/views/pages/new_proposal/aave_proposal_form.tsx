@@ -33,13 +33,10 @@ export const AaveProposalForm = () => {
   const author = app.user.activeAccount;
   const aave = app.chain as Aave;
 
-  type AaveProposalStateItem = typeof aaveProposalState[number];
-  type AaveProposalStateKeys = keyof AaveProposalStateItem;
-
-  const updateAaveProposalState = <K extends keyof AaveProposalStateItem>(
+  const updateAaveProposalState = <K extends keyof AaveProposalState>(
     index: number,
     key: K,
-    value: AaveProposalStateItem[K]
+    value: AaveProposalState[K]
   ) => {
     const newAaveProposalState = [...aaveProposalState];
     newAaveProposalState[index][key] = value;
