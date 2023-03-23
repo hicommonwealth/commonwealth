@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import 'pages/user_dashboard/index.scss';
 
@@ -33,11 +33,13 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
-  if (!type) {
-    navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
-  } else if (type === 'for-you' && !loggedIn) {
-    navigate('/dashboard/global');
-  }
+  useEffect(() => {
+    if (!type) {
+      navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+    } else if (type === 'for-you' && !loggedIn) {
+      navigate('/dashboard/global');
+    }
+  }, [loggedIn, navigate, type]);
 
   const subpage: DashboardViews =
     type === 'chain-events'

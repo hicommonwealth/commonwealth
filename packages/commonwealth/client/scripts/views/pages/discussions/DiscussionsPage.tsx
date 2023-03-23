@@ -9,7 +9,6 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
-import { Footer } from '../../footer';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -45,7 +44,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return <PageLoading />;
   }
   return (
-    <Sublayout hideFooter>
+    <Sublayout>
       <div className="DiscussionsPage">
         <RecentThreadsHeader
           topic={topicName}
@@ -60,11 +59,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           }}
           endReached={loadMore}
           overscan={200}
-          components={{
-            Footer: () => {
-              return <Footer />;
-            },
-          }}
         />
       </div>
     </Sublayout>
