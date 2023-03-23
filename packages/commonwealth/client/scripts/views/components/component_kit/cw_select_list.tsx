@@ -32,7 +32,7 @@ export const SelectList = <
         }),
         menu: (baseStyles) => ({
           ...baseStyles,
-          maxHeight: props.menuMaxHeight || '100px', // Set the desired maximum height for the scrollable menu
+          maxHeight: props.menuMaxHeight || '150px', // Set the desired maximum height for the scrollable menu
           overflowY: 'auto', // Enable vertical scrolling
         }),
       }}
