@@ -19,13 +19,13 @@ const ChainEntitiesSelectorItem = ({
     <div className="chain-entity" onClick={() => onClick(chainEntity)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
-        <CWText fontWeight="medium" noWrap>
+        <CWText fontWeight="medium" truncate noWrap>
           {chainEntityTypeToProposalName(chainEntity.type) +
             (chainEntity.typeId.startsWith('0x')
               ? ` ${chainEntity.typeId.slice(0, 6)}...`
               : ` #${chainEntity.typeId}`)}
         </CWText>
-        <CWText type="caption">
+        <CWText type="caption" truncate>
           {chainEntity.threadTitle !== 'undefined'
             ? decodeURIComponent(chainEntity.threadTitle)
             : 'No thread title'}

@@ -17,6 +17,13 @@
     font-size: 14px;
     cursor: pointer;
 
+    .text {
+      width: calc(100% - 15%);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
     &:hover {
       background-color: $neutral-100;
     }
@@ -30,30 +37,6 @@
       svg {
         fill: $black;
         width: 18px;
-      }
-    }
-
-    .truncate-text {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
-
-    .text {
-      width: calc(100% - 50px);
-
-      .proposal-item-text {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .proposal-item-subtext {
-        color: $neutral-500;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
     }
   }

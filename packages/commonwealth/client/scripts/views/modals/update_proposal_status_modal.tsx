@@ -127,7 +127,6 @@ export const UpdateProposalStatusModal = ({
         <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
-        {/* To fix the issue of the select list not being able to be clicked on*/}
         <SelectList
           defaultValue={tempStage ? { value: tempStage, label: threadStageToLabel(tempStage) } : null}
           placeholder="Select the stage"
