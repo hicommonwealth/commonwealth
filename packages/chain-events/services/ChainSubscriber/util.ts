@@ -16,9 +16,17 @@ import type { DB } from '../database/database';
 import models from '../database/database';
 
 import type { ChainAttributes, IListenerInstances } from './types';
-import { handleFatalListenerError } from './chainSubscriber';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+export function handleFatalListenerError(
+  chain_id: string,
+  error: Error,
+  rollbar?: Rollbar
+): void {
+  log.error(`Listener for ${chain_id} threw an error`, error);
+  rollbar?.critical(`Listener for ${chain_id} threw an error`, error);
+}
 
 const generalLogger = new LoggingHandler();
 
