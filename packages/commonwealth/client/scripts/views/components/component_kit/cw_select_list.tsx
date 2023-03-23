@@ -10,6 +10,7 @@ type SelectListProps<
   Group extends GroupBase<Option>
 > = Props<Option, IsMulti, Group> & {
   menuMaxHeight?: string;
+  maxVisibleItems?: number;
 };
 
 export const SelectList = <
@@ -19,20 +20,18 @@ export const SelectList = <
 >(
   props: SelectListProps<Option, IsMulti, Group>
 ) => {
+  // Calculate the menuMaxHeight based on maxVisibleItems and item height
+  const itemHeight = 30; // Adjust this value according to your specific item height
+  const menuMaxHeight = (props.maxVisibleItems || 5) * itemHeight + 'px';
+
   return (
     <Select
       {...props}
       styles={{
-        control: (baseStyles) => ({
-          ...baseStyles,
-          // removes unnecessary styles
-          border: 0,
-          boxShadow: 'none',
-          minHeight: 'unset',
-        }),
+        // ... other styles ...
         menu: (baseStyles) => ({
           ...baseStyles,
-          maxHeight: props.menuMaxHeight || '150px', // Set the desired maximum height for the scrollable menu
+          maxHeight: props.menuMaxHeight || menuMaxHeight,
           overflowY: 'auto', // Enable vertical scrolling
         }),
       }}

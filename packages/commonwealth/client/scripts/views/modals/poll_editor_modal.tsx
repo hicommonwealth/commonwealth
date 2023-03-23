@@ -168,7 +168,7 @@ export const PollEditorModal = ({
             />
             {customDurationEnabled && (
               <SelectList
-                isSearchable={false}
+                isSearchable={true}
                 options={customDurationOptions}
                 defaultValue={customDurationOptions[0]}
                 onChange={({ value }) => setCustomDuration(value)}

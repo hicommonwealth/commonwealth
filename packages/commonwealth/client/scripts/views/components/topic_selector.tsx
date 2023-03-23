@@ -37,6 +37,7 @@ export const TopicSelector = ({
       placeholder="Select the topic"
       isSearchable={false}
       options={options}
+      maxVisibleItems={10}
       className="TopicSelector"
       onChange={handleOnChange}
     />
