@@ -150,7 +150,7 @@ const NotificationSettingsPage = () => {
                 ) : (
                   <>
                     <CWText type="h5">Email Request</CWText>
-                    <CWText fontType="b1">
+                    <CWText type="b1">
                       Mmm...seems like we don't have your email on file? Enter
                       your email below so we can send you scheduled email
                       digests.

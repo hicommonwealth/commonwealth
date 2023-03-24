@@ -62,15 +62,23 @@ const deletePoll = async (
       throw new AppError(Errors.NotAuthor);
     }
 
-    const poll = await models.Poll.findOne({
+    const polls = await models.Poll.findAll({
       where: {
         thread_id,
-        id: poll_id,
       },
     });
-    if (!poll) throw new AppError(Errors.NoPoll);
+    if (!polls) throw new AppError(Errors.NoPoll);
 
+    const poll = polls.find((p) => p.id === poll_id);
+    if (!poll) {
+      throw new AppError(Errors.NoPoll);
+    }
     await poll.destroy();
+
+    if (polls.length === 1) {
+      thread.has_poll = false;
+      await thread.save();
+    }
   } catch (e) {
     throw new ServerError(e);
   }

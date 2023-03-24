@@ -17,7 +17,9 @@ import {
 } from '../../components/poll_card';
 
 export type SnapshotPollCardProps = Omit<
-  PollCardProps,
+  PollCardProps & {
+    onSnapshotVoteCast: (option: string, callback: () => void) => void;
+  },
   'multiSelect' | 'onResultsClick'
 >;
 
@@ -28,6 +30,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
     incrementalVoteCast,
     isPreview,
     onVoteCast,
+    onSnapshotVoteCast,
     pollEnded,
     proposalTitle,
     timeRemaining,
@@ -54,7 +57,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
   const resultString = 'Results';
 
   const castVote = async () => {
-    await onVoteCast(selectedOptions[0], () => {
+    await onSnapshotVoteCast(selectedOptions[0], () => {
       if (!votedFor) {
         setInternalTotalVoteCount(internalTotalVoteCount + incrementalVoteCast);
       }

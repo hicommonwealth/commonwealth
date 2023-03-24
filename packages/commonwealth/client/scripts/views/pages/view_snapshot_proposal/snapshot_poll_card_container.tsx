@@ -113,7 +113,7 @@ export const SnapshotPollCardContainer = (
         tokenSymbol={space.symbol}
         totalVoteCount={totals.sumOfResultsBalance}
         voteInformation={buildVoteInformation(proposal?.choices, votes)}
-        onVoteCast={(_choice, _callback) => {
+        onSnapshotVoteCast={(_choice, _callback) => {
           setChoice(_choice);
           setCallback(_callback);
 
@@ -122,6 +122,9 @@ export const SnapshotPollCardContainer = (
           }
 
           redraw();
+        }}
+        onVoteCast={() => {
+          setIsModalOpen(false);
         }}
         incrementalVoteCast={totalScore}
         tooltipErrorMessage={voteErrorText}

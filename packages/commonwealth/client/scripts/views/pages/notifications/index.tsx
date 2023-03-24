@@ -17,12 +17,6 @@ const NotificationsPage = () => {
     return <PageError message="This page requires you to be logged in." />;
   }
 
-  const activeEntity = app.chain;
-
-  if (!activeEntity) {
-    return <PageLoading />;
-  }
-
   const discussionNotifications =
     app.user.notifications.discussionNotifications;
   const chainEventNotifications =
