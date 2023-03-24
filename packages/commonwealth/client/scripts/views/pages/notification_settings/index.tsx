@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
 import { AddressInfo, NotificationSubscription } from 'models';
@@ -11,6 +11,11 @@ import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
@@ -21,14 +26,30 @@ import {
 import { bundleSubs } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { redraw } from 'mithrilInterop';
+
+const emailIntervalFrequencyMap = {
+  never: 'Never',
+  weekly: 'Once a week',
+  daily: 'Everyday',
+  twoweeks: 'Every two weeks',
+  monthly: 'Once a month',
+};
 
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
+  const [email, setEmail] = useState('');
+  const [emailValidated, setEmailValidated] = useState(false);
+  const [sentEmail, setSentEmail] = useState(false);
+
+  const [currentFrequency, setCurrentFrequency] = useState(
+    app.user.emailInterval
+  );
 
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
-  }, [app?.user.notifications]);
+  }, [app?.user.notifications, app.user.emailInterval]);
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
@@ -78,6 +99,104 @@ const NotificationSettingsPage = () => {
           Notification settings for all new threads, comments, mentions, likes,
           and chain events in the following communities.
         </CWText>
+        <div className="email-management-section">
+          <div className="text-description">
+            <CWText type="h5">Scheduled Email Digest</CWText>
+            <CWText type="b2" className="subtitle-text">
+              Bundle top posts from all your communities via email as often as
+              you need it.
+            </CWText>
+          </div>
+          <PopoverMenu
+            renderTrigger={(onclick) => (
+              <CWButton
+                buttonType="mini-white"
+                label={emailIntervalFrequencyMap[currentFrequency]}
+                iconRight="chevronDown"
+                onClick={onclick}
+              />
+            )}
+            menuItems={[
+              {
+                label: 'Once a week',
+                onClick: () => {
+                  app.user.updateEmailInterval('weekly');
+                  setCurrentFrequency('weekly');
+                  redraw();
+                },
+              },
+              {
+                label: 'Never',
+                onClick: () => {
+                  app.user.updateEmailInterval('never');
+                  setCurrentFrequency('never');
+                  redraw();
+                },
+              },
+            ]}
+          />
+        </div>
+        {(!app.user.email || !app.user.emailVerified) &&
+          currentFrequency !== 'never' && (
+            <div className="email-input-section">
+              <CWCard fullWidth className="email-card">
+                {sentEmail ? (
+                  <div className="loading-state">
+                    <CWText>
+                      Check your email to verify the your account. Refresh this
+                      page when finished connecting.
+                    </CWText>
+                  </div>
+                ) : (
+                  <>
+                    <CWText type="h5">Email Request</CWText>
+                    <CWText fontType="b1">
+                      Mmm...seems like we don't have your email on file? Enter
+                      your email below so we can send you scheduled email
+                      digests.
+                    </CWText>
+                    <div className="email-input-row">
+                      <CWTextInput
+                        placeholder="Enter Email"
+                        containerClassName="email-input"
+                        inputValidationFn={(value) => {
+                          const validEmailRegex = /\S+@\S+\.\S+/;
+
+                          if (!validEmailRegex.test(value)) {
+                            setEmailValidated(false);
+                            return [
+                              'failure',
+                              'Please enter a valid email address',
+                            ];
+                          } else {
+                            setEmailValidated(true);
+                            return [];
+                          }
+                        }}
+                        onInput={(e) => {
+                          setEmail(e.target.value);
+                        }}
+                      />
+                      <CWButton
+                        label="Save"
+                        buttonType="primary-black"
+                        disabled={!emailValidated}
+                        onClick={() => {
+                          try {
+                            app.user.updateEmail(email);
+                            setSentEmail(true);
+                            // redraw();
+                          } catch (e) {
+                            console.log(e);
+                          }
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+              </CWCard>
+            </div>
+          )}
         <div className="column-header-row">
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
