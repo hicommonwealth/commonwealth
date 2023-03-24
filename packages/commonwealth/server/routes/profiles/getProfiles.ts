@@ -6,11 +6,10 @@ import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
 import Sequelize from 'sequelize';
 import type { DB } from '../../models';
-import profile from '../../models/profile';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
-import { flattenIncludedAddresses, formatPagination } from '../../util/queries';
+import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
@@ -62,6 +61,10 @@ const getProfiles = async (
     {
       model: models.Address,
       required: true,
+      include: [
+        { model: models.Thread, as: 'Address' },
+        { model: models.Comment, include: [{ model: models.Thread, as: 'commentThreads' }] },
+      ],
     },
   ];
   let profiles, count;
