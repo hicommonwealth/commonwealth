@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import 'pages/user_dashboard/index.scss';
 
 import app, { LoginState } from 'state';
 import { notifyInfo } from 'controllers/app/notifications';
 import { DashboardActivityNotification } from 'models';
+import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 import Sublayout from 'views/sublayout';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
@@ -30,6 +31,8 @@ const UserDashboard = (props: UserDashboardProps) => {
   );
 
   const navigate = useCommonNavigate();
+
+  const [scrollElement, setScrollElement] = React.useState(null);
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
@@ -57,8 +60,8 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [activePage]);
 
   return (
-    <Sublayout>
-      <div className="UserDashboard">
+    <Sublayout >
+      <div ref={setScrollElement} className="UserDashboard">
         <div className="dashboard-column">
           <div className="dashboard-header">
             <CWTabBar>
@@ -144,6 +147,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                 fetchData={() => fetchActivity(activePage)}
                 noFeedMessage="Join some communities to see Activity!"
                 onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                customScrollParent={scrollElement}
               />
             )}
             {activePage === DashboardViews.Global && (
@@ -151,6 +155,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                 fetchData={() => fetchActivity(activePage)}
                 noFeedMessage="No Activity"
                 onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                customScrollParent={scrollElement}
               />
             )}
             {activePage === DashboardViews.Chain && (
@@ -158,6 +163,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                 fetchData={() => fetchActivity(activePage)}
                 noFeedMessage="Join some communities that have governance to see Chain Events!"
                 onFetchedDataCallback={DashboardActivityNotification.fromJSON}
+                customScrollParent={scrollElement}
               />
             )}
           </>
