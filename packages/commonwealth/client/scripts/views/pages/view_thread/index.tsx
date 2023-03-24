@@ -88,19 +88,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
   const cancelEditing = () => {
-    setIsGloballyEditing(false)
-    setIsEditingBody(false)
-  }
+    setIsGloballyEditing(false);
+    setIsEditingBody(false);
+  };
 
   const threadUpdatedCallback = (title: string, body: string) => {
-    setThread(new Thread({
-      ...thread,
-      title: title,
-      body: body
-    }))
-    cancelEditing()
-  } 
-    
+    setThread(
+      new Thread({
+        ...thread,
+        title: title,
+        body: body,
+      })
+    );
+    cancelEditing();
+  };
+
   const updatedCommentsCallback = useCallback(() => {
     if (!thread) {
       return;
@@ -759,6 +761,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              showDeleteButton={isAuthor || isAdminOrMod}
+                              onDelete={() => setInitializedPolls(false)}
                             />
                           );
                         })}

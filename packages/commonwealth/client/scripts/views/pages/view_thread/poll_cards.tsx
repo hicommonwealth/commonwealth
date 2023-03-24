@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
 import type { Poll, Thread } from 'models';
-
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
 
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { PollCard } from '../../components/poll_card';
@@ -66,9 +66,16 @@ export const ThreadPollEditorCard = ({
 type ThreadPollCardProps = {
   poll: Poll;
   onVote: () => void;
+  showDeleteButton: boolean;
+  onDelete: () => void;
 };
 
-export const ThreadPollCard = ({ poll, onVote }: ThreadPollCardProps) => {
+export const ThreadPollCard = ({
+  poll,
+  onVote,
+  showDeleteButton,
+  onDelete,
+}: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -117,6 +124,19 @@ export const ThreadPollCard = ({ poll, onVote }: ThreadPollCardProps) => {
           e.preventDefault();
           if (poll.votes.length > 0) {
             setIsModalOpen(true);
+          }
+        }}
+        showDeleteButton={showDeleteButton}
+        onDeleteClick={async () => {
+          try {
+            await app.polls.deletePoll({
+              threadId: poll.threadId,
+              pollId: poll.id,
+            });
+            onDelete();
+          } catch (e) {
+            console.error(e);
+            notifyError('Failed to delete poll');
           }
         }}
       />

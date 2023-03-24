@@ -11,6 +11,7 @@ import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
+import { Modal } from './component_kit/cw_modal';
 
 const LIVE_PREVIEW_MAX = 3;
 const ENDED_PREVIEW_MAX = 1;
@@ -278,17 +279,43 @@ export const ResultsSection = ({
   );
 };
 
+const DeletePollModal = ({ onClickDelete }) => {
+  const handleDeleteClick = async (e) => {
+    e.preventDefault();
+    await onClickDelete();
+    // Assuming you are using a library like 'react-modal', you can trigger the modal exit using that library's methods.
+  };
+
+  return (
+    <div className="DeleteThreadModal">
+      <div className="compact-modal-title">
+        <CWText className="modal-text">Delete this poll?</CWText>
+      </div>
+      <div className="compact-modal-body">
+        <div className="modal-body">
+          <CWText>This action cannot be reversed.</CWText>
+          <CWButton label="confirm" onClick={handleDeleteClick} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export type PollCardProps = PollOptionProps &
   CastVoteProps &
   ResultsSectionProps & {
     hasVoted?: boolean;
     incrementalVoteCast?: number;
     proposalTitle?: string;
+    showDeleteButton?: boolean;
+    onDeleteClick?: () => void;
   };
 
 export const PollCard = ({
   disableVoteButton = false,
   isPreview = false,
+  showDeleteButton = false,
+  onDeleteClick,
   multiSelect,
   onResultsClick,
   onVoteCast,
@@ -303,6 +330,7 @@ export const PollCard = ({
   totalVoteCount,
 }: PollCardProps) => {
   const [selectedOptions, setSelectedOptions] = useState<Array<string>>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const resultString = 'Results';
 
@@ -321,9 +349,35 @@ export const PollCard = ({
 
   return (
     <CWCard className="PollCard">
-      <CWText type="b2" className="poll-title-text">
-        {proposalTitle}
-      </CWText>
+      <div className="poll-title-section">
+        <CWText type="b2" className="poll-title-text">
+          {proposalTitle}
+        </CWText>
+        <Modal
+          content={
+            <DeletePollModal
+              onClickDelete={async () => {
+                if (onDeleteClick) onDeleteClick();
+                setDeleteModalOpen(false);
+              }}
+            />
+          }
+          onClose={() => setDeleteModalOpen(false)}
+          open={deleteModalOpen}
+        />
+        {showDeleteButton && (
+          <CWIcon
+            iconName="close"
+            iconSize="small"
+            className="poll-delete-button"
+            onClick={(e) => {
+              console.log('eyo');
+              setDeleteModalOpen(true);
+            }}
+          />
+        )}
+      </div>
+
       <div className="poll-voting-section">
         {!hasVoted && !pollEnded && !isPreview && (
           <>
