@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import type { DeltaOperation, DeltaStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import ReactQuill, { Quill } from 'react-quill';
@@ -28,6 +28,7 @@ const LoadingIndicator = () => {
   );
 };
 
+const Delta = Quill.import('delta');
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
 
 type ReactQuillEditorProps = {
@@ -106,9 +107,31 @@ const ReactQuillEditor = ({
     [editorRef, setContentDelta]
   );
 
+  const handleToggleMarkdown = () => {
+    setIsMarkdownEnabled(!isMarkdownEnabled);
+  };
+
   const handlePreviewModalClose = () => {
     setIsPreviewVisible(false);
   };
+
+  const clipboardMatchers = useMemo(() => {
+    return [
+      [
+        Node.ELEMENT_NODE,
+        (node, delta) => {
+          return delta.compose(
+            new Delta().retain(delta.length(), {
+              header: false,
+              align: false,
+              color: false,
+              background: false
+            })
+          );
+        }
+      ]
+    ];
+  }, []);
 
   return (
     <div className="QuillEditorWrapper">
@@ -131,9 +154,7 @@ const ReactQuillEditor = ({
             fontWeight="semiBold"
             className="custom-button"
             title="Switch to RichText mode"
-            onClick={(e) => {
-              setIsMarkdownEnabled(false);
-            }}
+            onClick={handleToggleMarkdown}
           >
             R
           </CWText>
@@ -144,9 +165,7 @@ const ReactQuillEditor = ({
             fontWeight="semiBold"
             className="custom-button"
             title="Switch to Markdown mode"
-            onClick={async () => {
-              setIsMarkdownEnabled(true);
-            }}
+            onClick={handleToggleMarkdown}
           >
             M
           </CWText>
@@ -178,6 +197,9 @@ const ReactQuillEditor = ({
           ]),
           imageDropAndPaste: {
             handler: handleImageDropAndPaste
+          },
+          clipboard: {
+            matchers: clipboardMatchers
           }
         }}
       />
