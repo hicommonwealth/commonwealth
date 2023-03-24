@@ -134,6 +134,7 @@ module.exports = {
     fallback: {
       fs: false,
       net: false,
+      zlib: require.resolve('browserify-zlib'),
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),
       https: require.resolve('https-browserify'),
