@@ -144,7 +144,7 @@ export const LoginSelectorMenuLeft = ({
       <div
         className="login-menu-item"
         onClick={() => {
-          navigate(`/profile/id/${profileId}/edit`, {}, null);
+          navigate(`/profile/edit`, {}, null);
         }}
       >
         <CWText type="caption">Edit profile</CWText>

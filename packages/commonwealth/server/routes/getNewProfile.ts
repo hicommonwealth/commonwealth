@@ -14,7 +14,7 @@ export const Errors = {
 };
 
 type GetNewProfileReq = {
-  profileId: string;
+  profileId?: string;
 };
 type GetNewProfileResp = {
   profile: ProfileInstance;
@@ -32,13 +32,21 @@ const getNewProfile = async (
   next: NextFunction
 ) => {
   const { profileId } = req.query;
-  if (!profileId) return next(new Error(Errors.NoIdentifierProvided));
+  let profile: ProfileInstance;
 
-  const profile = await models.Profile.findOne({
-    where: {
-      id: profileId,
-    },
-  });
+  if (profileId) {
+    profile = await models.Profile.findOne({
+      where: {
+        id: profileId,
+      },
+    });
+  } else {
+    profile = await models.Profile.findOne({
+      where: {
+        user_id: req.user.id,
+      },
+    });
+  }
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
