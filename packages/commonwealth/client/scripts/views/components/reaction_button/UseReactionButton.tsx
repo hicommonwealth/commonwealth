@@ -3,7 +3,7 @@ import TopicGateCheck from '../../../controllers/chain/ethereum/gatedTopic';
 import type { ChainInfo, Thread } from '../../../models/index';
 import app from '../../../state';
 
-export const ReactionButtonLogic = (thread: Thread, setReactors) => {
+export const useReactionButton = (thread: Thread, setReactors) => {
   const activeAddress = app.user.activeAccount?.address;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ export const ReactionButtonLogic = (thread: Thread, setReactors) => {
     };
 
     fetch();
-  }, []);
+  }, [activeAddress, setReactors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // token balance check if needed
   const isAdmin =
@@ -51,6 +51,9 @@ export const ReactionButtonLogic = (thread: Thread, setReactors) => {
       setReactedId(-1);
       setHasReacted(false);
       setIsLoading(false);
+    }).catch(e => {
+      console.log(e);
+      setIsLoading(false);
     });
   };
 
@@ -67,7 +70,10 @@ export const ReactionButtonLogic = (thread: Thread, setReactors) => {
         setReactors(oldReactors => [...oldReactors, activeAddress]);
         setHasReacted(true);
         setIsLoading(false);
-      });
+      }).catch(e => {
+        console.log(e);
+        setIsLoading(false);
+    });
   };
 
   return {

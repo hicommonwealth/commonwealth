@@ -1,8 +1,6 @@
 import axios from 'axios';
-import type { AssociatedReaction } from '../../../models/Thread';
-import type Thread from '../../../models/Thread';
+import Thread, { AssociatedReaction } from '../../../models/Thread';
 import app from '../../../state';
-import { notifyError } from '../../app/notifications';
 
 class ThreadReactionsController {
   private _threadIdToReactions: Map<number, AssociatedReaction[]> = new Map<
@@ -34,47 +32,38 @@ class ThreadReactionsController {
       jwt: app.user.jwt
     };
 
-    try {
-      const response = (
-        await axios.post(`${app.serverUrl()}/createReaction`, options)
-      ).data;
+    const response = (
+      await axios.post(`${app.serverUrl()}/createReaction`, options)
+    ).data;
 
-      const existingReactions = this._threadIdToReactions.get(thread.id);
-      if (!existingReactions) {
-        this._threadIdToReactions.set(thread.id, [response.result]);
-      } else {
-        this._threadIdToReactions.set(thread.id, [
-          ...existingReactions,
-          {
-            id: response.result.id,
-            type: response.result.reaction,
-            address: response.result.address,
-          },
-        ]);
-      }
-      return response.result;
-    } catch (err) {
-      notifyError('Failed to save reaction');
+    const existingReactions = this._threadIdToReactions.get(thread.id);
+    if (!existingReactions) {
+      this._threadIdToReactions.set(thread.id, [response.result]);
+    } else {
+      this._threadIdToReactions.set(thread.id, [
+        ...existingReactions,
+        {
+          id: response.result.id,
+          type: response.result.reaction,
+          address: response.result.address,
+        },
+      ]);
     }
+    return response.result;
   }
 
   public async deleteOnThread(thread: Thread, reaction_id: number) {
-    try {
-      await axios.post(`${app.serverUrl()}/deleteReaction`, {
-        jwt: app.user.jwt,
-        reaction_id
-      });
+    await axios.post(`${app.serverUrl()}/deleteReaction`, {
+      jwt: app.user.jwt,
+      reaction_id
+    });
 
-      this._threadIdToReactions.set(
-        thread.id,
-        this._threadIdToReactions
-          .get(thread.id)
-          ?.filter((r) => r.id !== reaction_id)
-      );
-    } catch (e) {
-      console.error(e);
-      notifyError('Failed to update reaction count');
-    }
+    this._threadIdToReactions.set(
+      thread.id,
+      this._threadIdToReactions
+        .get(thread.id)
+        ?.filter((r) => r.id !== reaction_id)
+    );
   }
 }
 

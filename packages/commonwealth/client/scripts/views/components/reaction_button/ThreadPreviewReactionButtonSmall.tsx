@@ -11,7 +11,7 @@ import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
 import { getClasses, isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
-import { ReactionButtonLogic } from './ReactionButtonLogic';
+import { useReactionButton } from './UseReactionButton';
 
 type ThreadReactionButtonProps = {
   thread: Thread;
@@ -27,7 +27,7 @@ export const ThreadReactionPreviewButtonSmall = ({ thread }: ThreadReactionButto
     isLoading,
     isUserForbidden,
     like
-  } = ReactionButtonLogic(thread, setReactors);
+  } = useReactionButton(thread, setReactors);
 
   return (
     <>
