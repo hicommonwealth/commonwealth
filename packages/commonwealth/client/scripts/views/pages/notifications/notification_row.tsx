@@ -6,6 +6,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import {
   ChainEventNotificationRow,
   DefaultNotificationRow,
+  SnapshotNotificationRow,
 } from './notification_row_components';
 
 export type NotificationRowProps = {
@@ -29,6 +30,14 @@ export const NotificationRow = (props: NotificationRowProps) => {
       <ChainEventNotificationRow
         notification={notification}
         onListPage={onListPage}
+      />
+    );
+  } else if (category === NotificationCategories.SnapshotProposal) {
+    return (
+      <SnapshotNotificationRow
+        notification={notification}
+        handleSetMarkingRead={handleSetMarkingRead}
+        markingRead={markingRead}
       />
     );
   } else {

@@ -43,6 +43,13 @@ export interface SnapshotNotification {
   expire?: string;
 }
 
+export const enum SnapshotEventType {
+  Created = 'proposal/created',
+  Deleted = 'proposal/deleted',
+  Ended = 'proposal/end',
+  Started = 'proposal/start',
+}
+
 export interface INotification {
   kind: ChainEventNotification | SnapshotNotification;
 }

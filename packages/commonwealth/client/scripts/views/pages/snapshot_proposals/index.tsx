@@ -12,6 +12,9 @@ import { SnapshotProposalCard } from './snapshot_proposal_card';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { NotificationCategories } from '../../../../../../common-common/src/types';
+import { redraw } from 'mithrilInterop';
 
 type SnapshotProposalsPageProps = {
   topic?: string;
@@ -28,6 +31,14 @@ const SnapshotProposalsPage = (props: SnapshotProposalsPageProps) => {
   const [endedProposals, setEndedProposals] = React.useState<
     Array<SnapshotProposal>
   >([]);
+
+  const spaceSubscription = app.user.notifications.subscriptions.find((sub) => {
+    return sub.category === 'snapshot-proposal' && sub.objectId === snapshotId;
+  });
+
+  const [hasSubscription, setHasSubscription] = React.useState<boolean>(
+    spaceSubscription !== undefined
+  );
 
   React.useEffect(() => {
     const fetch = async () => {
@@ -55,22 +66,53 @@ const SnapshotProposalsPage = (props: SnapshotProposalsPageProps) => {
   return (
     <Sublayout>
       <div className="SnapshotProposalsPage">
-        <CWTabBar>
-          <CWTab
-            label="Active"
-            isSelected={currentTab === 1}
-            onClick={() => {
-              setCurrentTab(1);
-            }}
-          />
-          <CWTab
-            label="Ended"
-            isSelected={currentTab === 2}
-            onClick={() => {
-              setCurrentTab(2);
-            }}
-          />
-        </CWTabBar>
+        <div class="top-bar">
+          <CWTabBar>
+            <CWTab
+              label="Active"
+              isSelected={currentTab === 1}
+              onClick={() => {
+                setCurrentTab(1);
+              }}
+            />
+            <CWTab
+              label="Ended"
+              isSelected={currentTab === 2}
+              onClick={() => {
+                setCurrentTab(2);
+              }}
+            />
+          </CWTabBar>
+          <div>
+            <CWButton
+              label={
+                hasSubscription
+                  ? 'Remove Subscription'
+                  : 'Subscribe to Notifications'
+              }
+              iconLeft={hasSubscription ? 'mute' : 'bell'}
+              onClick={() => {
+                if (hasSubscription) {
+                  app.user.notifications
+                    .deleteSubscription(spaceSubscription)
+                    .then(() => {
+                      setHasSubscription(false);
+                    });
+                } else {
+                  app.user.notifications
+                    .subscribe(
+                      NotificationCategories.SnapshotProposal,
+                      snapshotId
+                    )
+                    .then(() => {
+                      setHasSubscription(true);
+                    });
+                }
+              }}
+              buttonType="mini-black"
+            />
+          </div>
+        </div>
         {currentTab === 1 ? (
           activeProposals.length > 0 ? (
             <CardsCollection

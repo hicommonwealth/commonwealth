@@ -6,6 +6,8 @@ import type {
   IChatNotification,
   ICommunityNotificationData,
   IPostNotificationData,
+  SnapshotEventType,
+  SnapshotNotification,
 } from '../../shared/types';
 import { SERVER_URL } from '../config';
 import type { DB } from '../models';
@@ -30,7 +32,8 @@ export default async function emitNotifications(
     | IPostNotificationData
     | ICommunityNotificationData
     | IChainEventNotificationData
-    | IChatNotification,
+    | IChatNotification
+    | (SnapshotNotification & { eventType: SnapshotEventType }),
   webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
   includeAddresses?: string[]
@@ -139,11 +142,13 @@ export default async function emitNotifications(
 
   let msg;
   try {
-    msg = await createImmediateNotificationEmailObject(
-      notification_data,
-      category_id,
-      models
-    );
+    if (category_id !== 'snapshot-proposal') {
+      msg = await createImmediateNotificationEmailObject(
+        notification_data,
+        category_id,
+        models
+      );
+    }
   } catch (e) {
     console.log('Error generating immediate notification email!');
     console.trace(e);

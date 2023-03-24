@@ -42,13 +42,13 @@ export default async (
       break;
     }
     case 'snapshot-proposal': {
-      const proposal = await models.SnapshotProposal.findOne({
+      const space = await models.SnapshotSpace.findOne({
         where: {
-          id: +p_id,
+          snapshot_space: p_entity,
         },
       });
-      if (proposal) {
-        obj = { proposal_id: proposal.id };
+      if (space) {
+        obj = { snapshot_id: space.snapshot_space };
       }
       break;
     }

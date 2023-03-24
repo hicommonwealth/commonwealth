@@ -190,3 +190,69 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
     </div>
   );
 };
+
+export const SnapshotNotificationRow = (
+  props: ExtendedNotificationRowProps
+) => {
+  const { handleSetMarkingRead, markingRead, notification } = props;
+  const navigate = useNavigate();
+
+  const notificationData = JSON.parse(notification.data);
+  const header = `Update in Snapshot Space: ${notificationData.space}`;
+  let body = '';
+
+  switch (notificationData.eventType) {
+    case 'proposal/created':
+      body = `New proposal created: ${notificationData.title}`;
+      break;
+    case 'proposal/end':
+      body = `Proposal ended: ${notificationData.title}`;
+      break;
+    case 'proposal/deleted':
+      body = `Proposal deleted: ${notificationData.title}`;
+      break;
+    case 'proposal/start':
+      body = `Proposal started: ${notificationData.title}`;
+      break;
+    default:
+      break;
+  }
+
+  return (
+    <div
+      className="NotificationRow"
+      onClick={() =>
+        navigate(`/snapshot/${notificationData.space}/${notificationData.id}`)
+      }
+    >
+      <div className="comment-body">
+        <div className="comment-body-title">{header}</div>
+        <div className="comment-body-excerpt">{body}</div>
+        <div className="comment-body-bottom-wrap">
+          {!notification.isRead && (
+            <div
+              className="comment-body-mark-as-read"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                handleSetMarkingRead(true);
+
+                app.user.notifications
+                  .markAsRead([notification])
+                  ?.then(() => {
+                    handleSetMarkingRead(false);
+                  })
+                  .catch(() => {
+                    handleSetMarkingRead(false);
+                  });
+              }}
+            >
+              {markingRead ? <CWSpinner size="small" /> : 'Mark as read'}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
