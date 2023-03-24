@@ -36,7 +36,7 @@ export const getTextFromDelta = (delta: DeltaStatic) : string => {
       if (typeof op.insert === 'string') {
         return op.insert.trim().length > 0
       }
-      if (op.insert.image) {
+      if (op.insert?.image) {
         return true
       }
       return false

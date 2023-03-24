@@ -58,7 +58,7 @@ const ReactQuillEditor = ({
     setContentDelta(editor.getContents());
   };
 
-  // must use memoized function or else it'll render in an infinite loop
+  // must be memoized or else infinite loop
   const handleImageDropAndPaste = useCallback(
     async (imageDataUrl, imageType) => {
       const editor = editorRef.current?.editor;
@@ -108,13 +108,32 @@ const ReactQuillEditor = ({
   );
 
   const handleToggleMarkdown = () => {
-    setIsMarkdownEnabled(!isMarkdownEnabled);
+    const editor = editorRef.current?.getEditor();
+    if (!editor) {
+      throw new Error('editor not set');
+    }
+    // if enabling markdown, confirm and remove formatting
+    const newMarkdownEnabled = !isMarkdownEnabled;
+    if (newMarkdownEnabled) {
+      let confirmed = true;
+      if (getTextFromDelta(editor.getContents()).length > 0) {
+        confirmed = window.confirm('All formatting and images will be lost. Continue?');
+      }
+      if (confirmed) {
+        editor.removeFormat(0, editor.getLength());
+        setContentDelta(editor.getContents());
+        setIsMarkdownEnabled(newMarkdownEnabled);
+      }
+    } else {
+      setIsMarkdownEnabled(newMarkdownEnabled);
+    }
   };
 
   const handlePreviewModalClose = () => {
     setIsPreviewVisible(false);
   };
 
+  // must be memoized or else infinite loop
   const clipboardMatchers = useMemo(() => {
     return [
       [
