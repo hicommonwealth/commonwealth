@@ -119,38 +119,6 @@ export function ParseType(
         default:
           return null;
       }
-    case 'collective':
-    case 'council':
-    case 'technicalCollective':
-      switch (method) {
-        case 'Proposed':
-          return EventKind.CollectiveProposed;
-        case 'Voted':
-          return EventKind.CollectiveVoted;
-        case 'Approved':
-          return EventKind.CollectiveApproved;
-        case 'Disapproved':
-          return EventKind.CollectiveDisapproved;
-        case 'Executed':
-          return EventKind.CollectiveExecuted;
-        case 'MemberExecuted':
-          return EventKind.CollectiveMemberExecuted;
-        default:
-          return null;
-      }
-    case 'signaling':
-      switch (method) {
-        case 'NewProposal':
-          return EventKind.SignalingNewProposal;
-        case 'CommitStarted':
-          return EventKind.SignalingCommitStarted;
-        case 'VotingStarted':
-          return EventKind.SignalingVotingStarted;
-        case 'VotingCompleted':
-          return EventKind.SignalingVotingCompleted;
-        default:
-          return null;
-      }
     case 'tips':
       switch (method) {
         case 'NewTip': {
@@ -191,8 +159,6 @@ export function ParseType(
       switch (method) {
         case 'IdentitySet':
           return EventKind.IdentitySet;
-        case 'JudgementGiven':
-          return EventKind.JudgementGiven;
         case 'IdentityCleared':
           return EventKind.IdentityCleared;
         case 'IdentityKilled':
@@ -205,26 +171,6 @@ export function ParseType(
       switch (method) {
         case 'Offence':
           return EventKind.Offence;
-        default:
-          return null;
-      }
-    }
-    case 'bounties': {
-      switch (method) {
-        case 'BountyProposed':
-          return EventKind.TreasuryBountyProposed;
-        case 'BountyRejected':
-          return EventKind.TreasuryBountyRejected;
-        case 'BountyBecameActive':
-          return EventKind.TreasuryBountyBecameActive;
-        case 'BountyAwarded':
-          return EventKind.TreasuryBountyAwarded;
-        case 'BountyClaimed':
-          return EventKind.TreasuryBountyClaimed;
-        case 'BountyCanceled':
-          return EventKind.TreasuryBountyCanceled;
-        case 'extendBountyExpiry':
-          return EventKind.TreasuryBountyExtended;
         default:
           return null;
       }

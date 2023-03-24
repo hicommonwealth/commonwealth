@@ -2,6 +2,8 @@ import { render } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
+import app from 'state';
+import { Browser } from '@capacitor/browser';
 
 export const renderQuillDelta = (
   delta,
@@ -110,7 +112,10 @@ export const renderQuillDelta = (
                       target: openLinksInNewTab ? '_blank' : '',
                       noreferrer: 'noreferrer',
                       noopener: 'noopener',
-                      onClick: (e) => {
+                      onclick: async (e) => {
+                        if (app.isNative(window)) {
+                          await Browser.open({ url: child.attributes.link });
+                        }
                         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
                           return;
                         if (
@@ -327,18 +332,18 @@ export const renderQuillDelta = (
             } else if (indent < temp.length - 1) {
               // outdent and unwind
               while (indent < temp.length - 1) {
-                let iii = 0
+                let iiii = 0
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   render(
                     getGroupTag(_group),
-                    { key: `outdent-${iii}` },
+                    { key: `outdent-${iiii}` },
                     temp.pop().map((data, index) => {
                       return render(data.tag, { key: index }, data.content);
                     })
                   )
                 );
-                iii++
+                iiii++
               }
               temp[temp.length - 1].push({ tag, content, indent, key: ii });
             }

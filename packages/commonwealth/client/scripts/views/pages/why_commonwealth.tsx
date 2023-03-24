@@ -54,7 +54,7 @@ const WhyCommonwealthPage = () => {
             No matter what protocol you build on, give easy access to your
             project's most important on-chain actions like staking and voting.
             Commonwealth has a growing list of integrations--including Ethereum,
-            NEAR, Cosmos, Substrate, and popular DAO frameworks like Moloch or
+            NEAR, Cosmos, Substrate, and popular DAO frameworks like
             Aragon.
           </CWText>
           <CWText>

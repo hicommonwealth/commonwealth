@@ -130,6 +130,7 @@ export const DynamicTemplate = {
   SignUp: 'd-2b00abbf123e4b5981784d17151e86be',
   UpdateEmail: 'd-a0c28546fecc49fb80a3ba9e535bff48',
   VerifyAddress: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
+  EmailDigest: 'd-a4f27421ce5a41d29dca7625d2136cc3',
 };
 
 export type TokenResponse = {

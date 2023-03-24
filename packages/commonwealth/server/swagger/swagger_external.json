@@ -101,7 +101,7 @@
           },
           {
             "in": "query",
-            "name": "address_ids",
+            "name": "addresses",
             "type": "array",
             "items": {
               "type": "string"

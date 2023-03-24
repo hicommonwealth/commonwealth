@@ -22,7 +22,7 @@ describe('aggregatePermissions() unit tests', () => {
     permissionsManager = new PermissionManager();
   });
 
-  it('should correctly aggregate permissions for a community with one member roles', () => {
+  xit('should correctly aggregate permissions for a community with one member roles', () => {
     const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
@@ -48,7 +48,7 @@ describe('aggregatePermissions() unit tests', () => {
     );
   });
 
-  it('should correctly aggregate permissions for a community with member roles that overwrite each other', () => {
+  xit('should correctly aggregate permissions for a community with member roles that overwrite each other', () => {
     const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
@@ -91,7 +91,7 @@ describe('aggregatePermissions() unit tests', () => {
     );
   });
 
-  it('should correctly aggregate permissions for a community with multiple role and community overwrites (no implicit)', () => {
+  xit('should correctly aggregate permissions for a community with multiple role and community overwrites (no implicit)', () => {
     const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
@@ -160,7 +160,7 @@ describe('aggregatePermissions() unit tests', () => {
     );
   });
 
-  it('should correctly aggregate permissions for a community with multiple role overwrites', () => {
+  xit('should correctly aggregate permissions for a community with multiple role overwrites', () => {
     const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD

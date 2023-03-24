@@ -27,7 +27,6 @@ export enum ProposalType {
   SubstrateTreasuryProposal = 'treasuryproposal',
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
-  MolochProposal = 'molochproposal',
   CompoundProposal = 'compoundproposal',
   AaveProposal = 'onchainproposal',
   SputnikProposal = 'sputnikproposal',
@@ -50,8 +49,6 @@ export enum ContractType {
   ERC721 = 'erc721',
   MARLINTESTNET = 'marlin-testnet',
   SPL = 'spl',
-  MOLOCH1 = 'moloch1', // unused
-  MOLOCH2 = 'moloch2', // unused
   COMMONPROTOCOL = 'common-protocol',
 }
 
@@ -103,7 +100,6 @@ export enum ChainNetwork {
   Ethereum = 'ethereum',
   NEAR = 'near',
   NEARTestnet = 'near-testnet',
-  Moloch = 'moloch',
   Compound = 'compound',
   Aave = 'aave',
   AaveLocal = 'aave-local',
@@ -112,6 +108,7 @@ export enum ChainNetwork {
   ALEX = 'alex',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',

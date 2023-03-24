@@ -14,7 +14,7 @@ import type { ProfileAttributes } from '../models/profile';
 import '../types';
 import { createRole } from '../util/roles';
 
-export function useMagicAuth(models: DB) {
+export function initMagicAuth(models: DB) {
   // allow magic login if configured with key
   if (MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
@@ -64,7 +64,7 @@ export function useMagicAuth(models: DB) {
         if (
           !existingUser &&
           registrationChain?.base &&
-          !MAGIC_SUPPORTED_BASES.includes(registrationChain.base)
+          !MAGIC_SUPPORTED_BASES.includes(registrationChain?.base)
         ) {
           // unsupported chain -- client should send through old email flow
           return cb(new AppError('Unsupported magic chain.'));
@@ -72,7 +72,7 @@ export function useMagicAuth(models: DB) {
 
         // if on root URL, no chain base, we allow users to sign up and generate an Ethereum Address
         if (!existingUser) {
-          const chainId = registrationChain.id || 'ethereum';
+          const chainId = registrationChain?.id ?? 'ethereum';
           const ethAddress = userMetadata.publicAddress;
           const result = await sequelize.transaction(async (t) => {
             // create new user and unverified address if doesn't exist
@@ -100,7 +100,6 @@ export function useMagicAuth(models: DB) {
               },
               { transaction: t }
             );
-
             await createRole(
               models,
               newAddress.id,

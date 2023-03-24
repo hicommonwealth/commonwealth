@@ -42,7 +42,15 @@ const getNewProfile = async (
 
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const addresses = await profile.getAddresses();
+  const addresses = await profile.getAddresses({
+    include: [
+      {
+        model: models.Chain,
+        required: true,
+        where: { active: true },
+      },
+    ],
+  });
 
   const addressIds = [...new Set<number>(addresses.map((a) => a.id))];
   const threads = await models.Thread.findAll({
@@ -51,7 +59,10 @@ const getNewProfile = async (
         [Op.in]: addressIds,
       },
     },
-    include: [{ model: models.Address, as: 'Address' }],
+    include: [
+      { model: models.Address, as: 'Address' },
+      { model: models.Chain, required: true, where: { active: true } },
+    ],
   });
 
   const comments = await models.Comment.findAll({
@@ -63,7 +74,10 @@ const getNewProfile = async (
         [Op.in]: addressIds,
       },
     },
-    include: [{ model: models.Address, as: 'Address' }],
+    include: [
+      { model: models.Address, as: 'Address' },
+      { model: models.Chain, required: true, where: { active: true } },
+    ],
   });
 
   const commentThreadIds = [
@@ -77,6 +91,13 @@ const getNewProfile = async (
         [Op.in]: commentThreadIds,
       },
     },
+    include: [
+      {
+        model: models.Chain,
+        required: true,
+        where: { active: true },
+      },
+    ],
   });
 
   return success(res, {

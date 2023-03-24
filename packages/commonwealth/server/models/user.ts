@@ -113,7 +113,6 @@ export default (
       defaultScope: {
         attributes: {
           exclude: [
-            'email',
             'emailVerified',
             'emailNotificationInterval',
             'isAdmin',
