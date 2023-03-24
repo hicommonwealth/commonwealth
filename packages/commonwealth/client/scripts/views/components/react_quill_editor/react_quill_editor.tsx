@@ -1,12 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
-import 'components/react_quill/react_quill_editor.scss';
-
-import imageDropAndPaste from 'quill-image-drop-and-paste';
-
 import type { DeltaOperation, DeltaStatic } from 'quill';
-import type { QuillMode } from '../quill/types';
-import 'react-quill/dist/quill.snow.css';
+import imageDropAndPaste from 'quill-image-drop-and-paste';
+import ReactQuill, { Quill } from 'react-quill';
+
 import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
 
 import app from 'state';
@@ -14,6 +10,11 @@ import { CWText } from '../component_kit/cw_text';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { PreviewModal } from '../../modals/preview_modal';
 import { Modal } from '../component_kit/cw_modal';
+
+import 'components/react_quill/react_quill_editor.scss';
+import 'react-quill/dist/quill.snow.css';
+
+export type QuillMode = 'markdown' | 'richText' | 'hybrid';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 

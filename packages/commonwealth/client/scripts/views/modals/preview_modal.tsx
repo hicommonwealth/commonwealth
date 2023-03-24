@@ -2,13 +2,11 @@ import React, { useMemo } from 'react';
 
 import 'modals/preview_modal.scss';
 
-import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import type { DeltaStatic } from 'quill';
-import { renderQuillDeltaToText } from 'shared/utils';
-import { getTextFromDelta } from '../components/react_quill_editor';
+import { MarkdownFormattedText } from '../components/react_quill_editor/markdown_formatted_text';
 
 const EmptyState = () => {
   return (
@@ -34,17 +32,13 @@ export const PreviewModal = ({ doc, onModalClose, title }: PreviewModalProps) =>
     // render as markdown
     if (typeof doc === 'string') {
       if (doc.length === 0) {
-        console.warn('markdown doc empty');
         return <EmptyState />;
       }
-      console.log('md doc: ', doc);
       return <MarkdownFormattedText doc={doc} />;
     }
     if (!doc.ops?.length) {
-      console.warn('richtext doc empty');
       return <EmptyState />;
     }
-    console.log('rt doc: ', doc);
     return <QuillFormattedText doc={doc} />;
   }, [doc]);
 

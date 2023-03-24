@@ -93,3 +93,8 @@ export const uploadFileToS3 = async (file: File, appServerUrl: string, jwtToken:
     throw err
   }
 }
+
+// countLinesMarkdown returns the number of lines for the text
+export const countLinesMarkdown = (text: string) : number => {
+  return text.split('\n').length - 1;
+};
