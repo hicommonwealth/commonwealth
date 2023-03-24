@@ -86,7 +86,7 @@ export default (
     models.Comment.belongsTo(models.Thread, {
       foreignKey: 'thread_id',
       targetKey: 'id',
-      as: 'commentThreads'
+      as: 'commentThread'
     })
     models.Comment.belongsTo(models.Chain, {
       foreignKey: 'chain',

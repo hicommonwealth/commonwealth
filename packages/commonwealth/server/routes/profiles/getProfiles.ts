@@ -62,8 +62,8 @@ const getProfiles = async (
       model: models.Address,
       required: true,
       include: [
-        { model: models.Thread, as: 'Address' },
-        { model: models.Comment, include: [{ model: models.Thread, as: 'commentThreads' }] },
+        { model: models.Thread, as: 'threadsCreated' },
+        { model: models.Comment, include: [{ model: models.Thread, as: 'commentThread' }] },
       ],
     },
   ];
