@@ -69,7 +69,7 @@ class ThreadReactionsController {
         thread.id,
         this._threadIdToReactions
           .get(thread.id)
-          .filter((r) => r.id !== reaction_id)
+          ?.filter((r) => r.id !== reaction_id)
       );
     } catch (e) {
       console.error(e);

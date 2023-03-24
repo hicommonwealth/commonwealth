@@ -14,7 +14,7 @@ export const ReactionButtonLogic = (thread: Thread, setReactors) => {
 
   useEffect(() => {
     const fetch = () => {
-      if (app.user.activeAccount && thread.associatedReactions.filter((r) => r.address === activeAddress).length > 0) {
+      if (activeAddress && thread.associatedReactions.filter((r) => r.address === activeAddress).length > 0) {
         setHasReacted(true);
       } else {
         setHasReacted(false);

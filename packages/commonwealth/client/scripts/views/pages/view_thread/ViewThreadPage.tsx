@@ -67,7 +67,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [thread, setThread] = useState<Thread>(null);
-  const [threadFetched, setThreadFetched] = useState(false);
   const [threadFetchFailed, setThreadFetchFailed] = useState(false);
   const [title, setTitle] = useState('');
   const [viewCount, setViewCount] = useState(null);
@@ -83,18 +82,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
   const cancelEditing = () => {
-    setIsGloballyEditing(false)
-    setIsEditingBody(false)
-  }
+    setIsGloballyEditing(false);
+    setIsEditingBody(false);
+  };
 
   const threadUpdatedCallback = (newTitle: string, body: string) => {
     setThread(new Thread({
       ...thread,
       title: newTitle,
       body: body
-    }))
-    cancelEditing()
-  }
+    }));
+    cancelEditing();
+  };
 
   const updatedCommentsCallback = useCallback(() => {
     if (!thread) {
@@ -132,14 +131,23 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     app.threads
       .fetchThreadsFromId([+threadId])
       .then((res) => {
-        setThread(res[0]);
+        const t = res[0];
+        if (t) {
+          const reactions = app.reactions.getByPost(t);
+          t.associatedReactions = reactions.filter(r => r.reaction === 'like').map(r => {
+            return {
+              id: r.id, type: 'like', address: r.author
+            };
+          });
+
+          setThread(t);
+        }
       })
       .catch(() => {
         notifyError('Thread not found');
         setThreadFetchFailed(true);
       });
-    setThreadFetched(true);
-  }, [threadId]);
+  }, [thread, threadId]);
 
   useEffect(() => {
     if (!thread) {
@@ -356,7 +364,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (threadDoesNotMatch) {
       setThread(undefined);
       setRecentlyEdited(false);
-      setThreadFetched(false);
     }
   }, [threadDoesNotMatch]);
 

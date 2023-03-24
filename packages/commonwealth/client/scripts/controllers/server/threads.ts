@@ -642,6 +642,7 @@ class ThreadsController {
         active_address: app.user.activeAccount?.address,
       }),
     });
+
     for (const rc of reactionCounts) {
       const id = app.reactionCounts.store.getIdentifier({
         threadId: rc.thread_id,
