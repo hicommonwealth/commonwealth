@@ -18,6 +18,7 @@
     "test-query": "ts-node ./scripts/testSequelizeQuery.ts",
     "unit-test": "ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
     "integration-test": "cd eth && hardhat test ../test/integration/*.spec.ts",
+    "test": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/chainSubscriber.test.ts --timeout 20000",
     "test-services": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/*.test.ts --timeout 20000",
     "test-app": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/chainEventsApp.test.ts",
     "lint-all": "eslint './**/*.ts'",
