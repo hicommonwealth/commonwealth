@@ -99,9 +99,7 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
         class="SearchBarCommentPreviewRow"
         onclick={() => {
           m.route.set(
-            `/${searchResult.chain}/proposal/${
-              searchResult.proposalid.split('_')[0]
-            }/${searchResult.proposalid.split('_')[1]}`
+            `/${searchResult.chain}/discussion/${searchResult.proposalid}`
           );
         }}
       >
@@ -154,7 +152,7 @@ export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRo
     return (
       <div class="SearchBarMemberPreviewRow">
         {m(User, {
-          user: app.profiles.getProfile(
+          user: app.newProfiles.getProfile(
             searchResult.chain,
             searchResult.address
           ),

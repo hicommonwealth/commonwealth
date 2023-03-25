@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export const DEFAULT_PORT = '8080';
+export const PORT = process.env.PORT || '8080';
 
 export const NODE_URL =
   process.env.NODE_URL ||
@@ -65,10 +65,11 @@ export const DISCORD_OAUTH_CALLBACK =
 export const DISCORD_OAUTH_SCOPES =
   process.env.DISCORD_OAUTH_SCOPES?.split(' ');
 
-export const DATABASE_URI =
-  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    : process.env.DATABASE_URL;
+export const DATABASE_URI = process.env.USES_DOCKER_DB
+  ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
+  : !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+  ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+  : process.env.DATABASE_URL;
 
 export const VULTR_IP = process.env.VULTR_IP;
 

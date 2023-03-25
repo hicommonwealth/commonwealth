@@ -1,0 +1,31 @@
+@import '../../shared';
+
+.Socials {
+  .input-row {
+    display: flex;
+    align-items: center;
+
+    .text-input-right-icon.Icon {
+      color: $neutral-800;
+    }
+  }
+
+  .add-social-link {
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      color: $neutral-600;
+      cursor: pointer;
+    }
+
+    .caption.medium {
+      color: $neutral-800;
+      margin: 0 0 0 4px;
+
+      &:hover {
+        color: $neutral-600;
+      }
+    }
+  }
+}

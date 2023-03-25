@@ -15,7 +15,7 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithAccount } from 'controllers/server/sessions';
-import { Account, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
 import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import {
@@ -352,7 +352,10 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       };
       try {
         if (this.username || this.avatarUrl) {
-          await app.profiles.updateProfileForAccount(this.primaryAccount, data);
+          await app.newProfiles.updateProfileForAccount(
+            this.primaryAccount.profile.address,
+            data
+          );
         }
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
           $('.LoginMobile').trigger('modalexit');

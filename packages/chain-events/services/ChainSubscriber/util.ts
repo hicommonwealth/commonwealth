@@ -234,8 +234,6 @@ async function setupNewListeners(
       network = SupportedNetwork.Compound;
     else if (chain.network === ChainNetwork.Aave)
       network = SupportedNetwork.Aave;
-    else if (chain.network === ChainNetwork.Moloch)
-      network = SupportedNetwork.Moloch;
 
     try {
       log.info(`Starting listener for: ${chain.id}`);
@@ -268,6 +266,20 @@ async function setupNewListeners(
         SubstrateTypes.EventKind.TreasuryRewardMinting,
         SubstrateTypes.EventKind.TreasuryRewardMintingV2,
         SubstrateTypes.EventKind.HeartbeatReceived,
+        'treasury-bounty-proposed',
+        'treasury-bounty-awarded',
+        'treasury-bounty-rejected',
+        'treasury-bounty-became-active',
+        'treasury-bounty-claimed',
+        'treasury-bounty-canceled',
+        'treasury-bounty-extended',
+        'collective-proposed',
+        'collective-voted',
+        'collective-approved',
+        'collective-disapproved',
+        'collective-executed',
+        'collective-member-executed',
+        'identity-judgement-given',
       ];
 
     // add the rabbitmq handler and the events it should ignore

@@ -40,10 +40,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
-    // post.rootProposal has typescript typedef number but in practice seems to be a string
-    const parentThread = app.threads.getById(
-      parseInt(comment.rootProposal.toString().split('_')[1], 10)
-    );
+    const parentThread = app.threads.getById(comment.threadId);
 
     const topicName = parentThread?.topic?.name;
 
@@ -57,10 +54,9 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
         return r.Address.address === activeAddress;
       });
 
-      const { session, action, hash } =
-        await app.sessions.signDeleteCommentReaction({
-          comment_id: reaction.canvasId,
-        });
+      await app.sessions.signDeleteCommentReaction({
+        comment_id: reaction.canvasId,
+      });
 
       this.loading = true;
       app.reactionCounts
@@ -83,7 +79,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
       chainId: string,
       userAddress: string
     ) => {
-      const { session, action, hash } = await app.sessions.signCommentReaction({
+      await app.sessions.signCommentReaction({
         comment_id: comment.id,
         like: true,
       });
