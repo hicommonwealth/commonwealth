@@ -238,13 +238,13 @@ class NotificationSettingsPage extends ClassComponent {
                 {
                   label: 'Once a week',
                   onclick: () => {
-                    app.user.setEmailInterval('weekly');
+                    app.user.updateEmailInterval('weekly');
                   },
                 },
                 {
                   label: 'Never',
                   onclick: () => {
-                    app.user.setEmailInterval('never');
+                    app.user.updateEmailInterval('never');
                   },
                 },
               ]}

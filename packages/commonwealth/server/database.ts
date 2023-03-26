@@ -44,7 +44,6 @@ import ThreadFactory from './models/thread';
 import TokenFactory from './models/token';
 import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
-import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -105,7 +104,6 @@ const models: Models = {
   Reaction: ReactionFactory(sequelize, DataTypes),
   Thread: ThreadFactory(sequelize, DataTypes),
   Topic: TopicFactory(sequelize, DataTypes),
-  ViewCount: ViewCountFactory(sequelize, DataTypes),
   Vote: VoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
