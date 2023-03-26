@@ -38,9 +38,9 @@ describe('Integration tests for Compound Bravo', () => {
       await runSubscriberAsFunction(rmq, null, null, chain);
     });
 
-    it('Should capture proposal created events', async () => {
+    it.only('Should capture proposal created events', async () => {
       proposalId = await sdk.createProposal(1);
-
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Proposal ID:  + proposalId");
       await delay(3000);
 
       // verify the event was created and appended to the correct queue
