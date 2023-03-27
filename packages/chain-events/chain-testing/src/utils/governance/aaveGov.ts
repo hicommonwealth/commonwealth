@@ -176,7 +176,7 @@ export class aaveGovernor implements IGovernor {
       await this.getVotes(idx, '100000');
     }
     console.log('creating Prop');
-    const proposalId = await this.createArbitraryProposal(0);
+    const proposalId = (await this.createArbitraryProposal(0))["proposalId"];
     for (const idx of accts) {
       await this.castVote(proposalId, idx, true);
     }

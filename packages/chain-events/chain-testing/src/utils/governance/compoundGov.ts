@@ -185,7 +185,7 @@ export class compoundGovernor implements IGovernor {
     for (const idx of accts) {
       await this.getVotes(idx, '120000');
     }
-    const proposalId = await this.createArbitraryProposal(0, 3);
+    const proposalId = (await this.createArbitraryProposal(0, 3))["proposalId"];
     for (const idx of accts) {
       await this.castVote(proposalId, idx, true);
     }
