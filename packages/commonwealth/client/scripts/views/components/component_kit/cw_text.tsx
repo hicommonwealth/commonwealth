@@ -39,6 +39,7 @@ type TextStyleProps = {
   isCentered?: boolean;
   noWrap?: boolean; // parent must be flex container and have definite width for this to work
   type?: FontType;
+  truncate?: boolean;
 };
 
 type TextProps = TextStyleProps &
@@ -66,6 +67,7 @@ export const CWText = (props: TextProps) => {
     title,
     type = 'b1',
     fontWeight = getFontWeight(type),
+    truncate = false,
     ...otherProps
   } = props;
 
@@ -81,6 +83,7 @@ export const CWText = (props: TextProps) => {
           onClick: !!onClick,
           isCentered,
           className,
+          truncate,
         },
         ComponentType.Text
       )}

@@ -412,6 +412,7 @@ class ThreadsController {
       },
       error: (err) => {
         console.log('Failed to update stage');
+        notifyError(`Failed to update stage: ${err.responseJSON.error}`);
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
@@ -485,7 +486,8 @@ class ThreadsController {
         return thread;
       },
       error: (err) => {
-        console.log('Failed to update linked snapshot proposal');
+        notifyError(`Could not update Snapshot Linked Proposal: ${err.responseJSON.error}`);
+        console.error('Failed to update linked snapshot proposal');
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
@@ -525,6 +527,7 @@ class ThreadsController {
       },
       error: (err) => {
         console.log('Failed to update linked proposals');
+        notifyError(`Failed to update linked proposals: ${err.responseJSON.error}`);
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
