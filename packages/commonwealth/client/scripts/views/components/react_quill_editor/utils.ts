@@ -98,3 +98,13 @@ export const uploadFileToS3 = async (file: File, appServerUrl: string, jwtToken:
 export const countLinesMarkdown = (text: string) : number => {
   return text.split('\n').length - 1;
 };
+
+export type SerializableDeltaStatic = DeltaStatic & {
+  ___isMarkdown?: boolean
+}
+export const serializeDelta = (delta: DeltaStatic) : string => {
+  if ((delta as SerializableDeltaStatic).___isMarkdown) {
+    return getTextFromDelta(delta)
+  }
+  return JSON.stringify(delta)
+}

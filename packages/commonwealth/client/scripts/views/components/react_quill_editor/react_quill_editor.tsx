@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DeltaOperation, DeltaStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import ReactQuill, { Quill } from 'react-quill';
 
+import type { SerializableDeltaStatic } from './utils';
 import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
 
 import app from 'state';
@@ -36,8 +37,8 @@ type ReactQuillEditorProps = {
   placeholder?: string;
   tabIndex?: number;
   mode?: QuillMode; // Use in order to limit editor to only MD or RT support
-  contentDelta: DeltaStatic;
-  setContentDelta: (d: DeltaStatic) => void;
+  contentDelta: SerializableDeltaStatic;
+  setContentDelta: (d: SerializableDeltaStatic) => void;
 };
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
@@ -55,7 +56,10 @@ const ReactQuillEditor = ({
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
 
   const handleChange = (value, delta, source, editor) => {
-    setContentDelta(editor.getContents());
+    setContentDelta({
+      ...editor.getContents(),
+      ___isMarkdown: isMarkdownEnabled
+    } as SerializableDeltaStatic);
   };
 
   // must be memoized or else infinite loop
@@ -121,8 +125,11 @@ const ReactQuillEditor = ({
       }
       if (confirmed) {
         editor.removeFormat(0, editor.getLength());
-        setContentDelta(editor.getContents());
         setIsMarkdownEnabled(newMarkdownEnabled);
+        setContentDelta({
+          ...editor.getContents(),
+          ___isMarkdown: newMarkdownEnabled
+        });
       }
     } else {
       setIsMarkdownEnabled(newMarkdownEnabled);
@@ -151,6 +158,16 @@ const ReactQuillEditor = ({
       ]
     ];
   }, []);
+
+  useEffect(() => {
+    const editor = editorRef.current?.getEditor();
+    if (editor) {
+      setContentDelta({
+        ...editor.getContents(),
+        ___isMarkdown: isMarkdownEnabled
+      } as SerializableDeltaStatic);
+    }
+  }, [isMarkdownEnabled, setContentDelta]);
 
   return (
     <div className="QuillEditorWrapper">
