@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 const router = setupRouter();
 
-app.use(cors())
+app.use(cors());
 app.use(json());
 app.use('/', router);
 const port = process.env.CHAIN_PORT;

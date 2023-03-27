@@ -18,7 +18,7 @@ export const createProposal = async (req: Request, res: Response) => {
     const id = await gov.createArbitraryProposal(request.accountIndex, 3);
     res.status(200).json(id).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -38,7 +38,7 @@ export const cancelProposal = async (req: Request, res: Response) => {
     const id = await gov.cancelProposal(request.proposalId);
     res.status(200).json(id).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -57,7 +57,7 @@ export const getVotes = async (req: Request, res: Response) => {
     await gov.getVotes(request.accountIndex, request.numberOfVotes);
     res.status(200).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -80,7 +80,7 @@ export const castVote = async (req: Request, res: Response) => {
     );
     res.status(200).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -100,7 +100,7 @@ export const queueProposal = async (req: Request, res: Response) => {
     await gov.queueProposal(request.proposalId, true);
     res.status(200).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -120,7 +120,7 @@ export const executeProposal = async (req: Request, res: Response) => {
     await gov.executeProposal(request.proposalId, true);
     res.status(200).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -139,7 +139,7 @@ export const runFullCycle = async (req: Request, res: Response) => {
     await gov.endToEndSim();
     res.status(200).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -159,7 +159,7 @@ export const getProposalDetails = async (req: Request, res: Response) => {
     const details = await gov.getProposalDetails(request.proposalId);
     res.status(200).json(details).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({

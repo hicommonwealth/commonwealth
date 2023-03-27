@@ -27,7 +27,7 @@ export const getBalance = async (req: Request, res: Response) => {
       })
       .send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -62,7 +62,7 @@ export const transfer = async (req: Request, res: Response) => {
     }
     res.status(200).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -84,7 +84,7 @@ export const approve = async (req: Request, res: Response) => {
       .send({ from: accounts[request.accountIndex ?? 0] });
     res.status(200).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({
@@ -119,7 +119,7 @@ export const getTokens = async (req: Request, res: Response) => {
     });
     res.status(200).send();
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res
       .status(500)
       .json({

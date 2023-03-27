@@ -5,6 +5,7 @@ import erc20_abi from './abi/erc20';
 import dex_abi from './abi/dex';
 import comp_gov_abi from './abi/compGov';
 import aave_gov_abi from './abi/aaveGov';
+import erc_721_abi from './abi/erc721';
 
 export const erc20 = (address: string, provider: Web3): Contract => {
   return new provider.eth.Contract(erc20_abi as AbiItem[], address);
@@ -20,4 +21,8 @@ export const comp_gov = (address: string, provider: Web3): Contract => {
 
 export const aave_gov = (address: string, provider: Web3): Contract => {
   return new provider.eth.Contract(aave_gov_abi as AbiItem[], address);
+};
+
+export const erc_721 = (address: string, provider: Web3): Contract => {
+  return new provider.eth.Contract(erc_721_abi as AbiItem[], address);
 };
