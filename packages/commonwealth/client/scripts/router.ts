@@ -552,12 +552,6 @@ const getCommonDomainRoutes = (importRoute) => ({
     import('views/pages/general_contract'),
     { scoped: true }
   ),
-  '/:scope/:contract_address/:slug': importRoute(
-    import('views/pages/view_template'),
-    {
-      scoped: true,
-    }
-  ),
   '/:scope/discussions/:topic': importRoute(import('views/pages/discussions'), {
     scoped: true,
     deferChain: true,
@@ -717,6 +711,13 @@ const getCommonDomainRoutes = (importRoute) => ({
   ),
   '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
     (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
+  ),
+
+  '/:scope/:contract_address/:slug': importRoute(
+    import('views/pages/view_template'),
+    {
+      scoped: true,
+    }
   ),
 });
 
