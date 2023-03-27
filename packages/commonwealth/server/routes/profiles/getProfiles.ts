@@ -1,7 +1,4 @@
-import type {
-  GetProfilesReq,
-  GetProfilesResp,
-} from 'common-common/src/api/extApiTypes';
+import type { GetProfilesReq, GetProfilesResp, } from 'common-common/src/api/extApiTypes';
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
 import Sequelize from 'sequelize';
@@ -62,11 +59,13 @@ const getProfiles = async (
       model: models.Address,
       required: true,
       include: [
+        { model: models.Chain, required: true, where: { active: true } },
         { model: models.Thread, as: 'threadsCreated' },
         { model: models.Comment, include: [{ model: models.Thread, as: 'commentThread' }] },
       ],
     },
   ];
+
   let profiles, count;
   if (!count_only) {
     ({ rows: profiles, count } = await models.Profile.findAndCountAll({
