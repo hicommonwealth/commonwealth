@@ -30,7 +30,7 @@ const ProfileActivity = (props: ProfileActivityProps) => {
   const [selectedActivity, setSelectedActivity] = useState(
     ProfileActivityType.Comments
   );
-  const { comments, threads } = props;
+  const { addresses, comments, threads } = props;
 
   return (
     <div className="ProfileActivity">
@@ -63,14 +63,19 @@ const ProfileActivity = (props: ProfileActivityProps) => {
               this.selectedActivity = ProfileActivity.Communities;
             }}
             isSelected={this.selectedActivity === ProfileActivity.Communities}
-          />
-          <CWTab
-            label="Addresses"
-            onclick={() => {
-              this.selectedActivity = ProfileActivity.Addresses;
-            }}
-            isSelected={this.selectedActivity === ProfileActivity.Addresses}
           /> */}
+          <CWTab
+            label={
+              <div className="tab-header">
+                Addresses
+                <div className="count">{addresses.length}</div>
+              </div>
+            }
+            onClick={() => {
+              setSelectedActivity(ProfileActivityType.Addresses);
+            }}
+            isSelected={selectedActivity === ProfileActivityType.Addresses}
+          />
         </CWTabBar>
       </div>
       <div className="activity-content">
@@ -78,6 +83,7 @@ const ProfileActivity = (props: ProfileActivityProps) => {
           option={selectedActivity}
           threads={threads}
           comments={comments}
+          addresses={addresses}
         />
       </div>
     </div>

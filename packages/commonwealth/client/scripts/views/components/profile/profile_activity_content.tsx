@@ -1,9 +1,13 @@
 import React from 'react';
 
+import 'components/linked_addresses.scss';
+
 import { CWText } from '../component_kit/cw_text';
 import type Thread from 'client/scripts/models/Thread';
 import NewProfileActivityRow from './profile_activity_row';
 import type { CommentWithAssociatedThread } from './profile_activity';
+import { CWAddressTooltip } from '../component_kit/cw_popover/cw_address_tooltip';
+import { CWTruncatedAddress } from '../component_kit/cw_truncated_address';
 
 enum ProfileActivityType {
   Addresses,
@@ -16,10 +20,37 @@ type ProfileActivityContentProps = {
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
+  addresses: any[]; // TODO change type
 };
 
 const ProfileActivityContent = (props: ProfileActivityContentProps) => {
-  const { option, comments, threads } = props;
+  const { option, comments, threads, addresses } = props;
+
+  if (option === ProfileActivityType.Addresses) {
+    if (addresses.length === 0) {
+      return (
+        <div className="empty-state">
+          <CWText className="empty-state-text">
+            You currently have no addresses connected.
+          </CWText>
+        </div>
+      );
+    }
+    return (
+      <div className="LinkedAddresses">
+        {addresses.map(({ address, chain }, i) => (
+          <div key={i}>
+            <CWAddressTooltip
+              address={address}
+              renderTrigger={() => (
+                <CWTruncatedAddress address={address} communityInfo={chain} />
+              )}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
