@@ -3,7 +3,6 @@
 import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
@@ -14,7 +13,7 @@ import {
   proposalSlugToClass,
 } from 'identifiers';
 import m from 'mithril';
-import type { AnyProposal, Comment, ProposalModule } from 'models';
+import type { AnyProposal, ProposalModule } from 'models';
 import { Account } from 'models';
 
 import app from 'state';
@@ -23,7 +22,6 @@ import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-import { CommentsTree } from '../../components/comments/comments_tree';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
@@ -37,7 +35,6 @@ import { ProposalSubheader } from './proposal_components';
 
 type ProposalPrefetch = {
   [identifier: string]: {
-    commentsStarted: boolean;
     profilesFinished: boolean;
     profilesStarted: boolean;
   };
@@ -49,7 +46,6 @@ type ViewProposalPageAttrs = {
 };
 
 class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
-  private comments: Comment<AnyProposal>[];
   private prefetch: ProposalPrefetch;
   private proposal: AnyProposal;
   private tipAmount: number;
@@ -81,12 +77,11 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     const proposalType = type;
     const proposalIdAndType = `${proposalId}-${proposalType}`;
 
-    // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
+    // we will want to prefetch profiles, and viewCount on the page before rendering anything
     if (!this.prefetch || !this.prefetch[proposalIdAndType]) {
       this.prefetch = {};
 
       this.prefetch[proposalIdAndType] = {
-        commentsStarted: false,
         profilesFinished: false,
         profilesStarted: false,
       };
@@ -163,70 +158,21 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       );
     }
 
-    // load comments
-    if (!this.prefetch[proposalIdAndType]['commentsStarted']) {
-      app.comments
-        .refresh(this.proposal, app.activeChainId())
-        .then(async () => {
-          this.comments = app.comments
-            .getByProposal(this.proposal)
-            .filter((c) => c.parentComment === null);
-
-          m.redraw();
-        })
-        .catch(() => {
-          notifyError('Failed to load comments');
-          this.comments = [];
-          m.redraw();
-        });
-
-      this.prefetch[proposalIdAndType]['commentsStarted'] = true;
-    }
-
-    if (this.comments?.length) {
-      const mismatchedComments = this.comments.filter((c) => {
-        return c.rootProposal !== `${type}_${proposalId}`;
-      });
-
-      if (mismatchedComments.length) {
-        this.prefetch[proposalIdAndType]['commentsStarted'] = false;
-      }
-    }
-
-    const updatedCommentsCallback = () => {
-      this.comments = app.comments
-        .getByProposal(this.proposal)
-        .filter((c) => c.parentComment === null);
-      m.redraw();
-    };
-
-    if (this.comments === undefined) {
-      return (
-        <PageLoading
-        //  title={headerTitle}
-        />
-      );
-    }
-
     // load profiles
     if (this.prefetch[proposalIdAndType]['profilesStarted'] === undefined) {
       if (this.proposal.author instanceof Account) {
         // AnyProposal
-        app.profiles.getProfile(
+        app.newProfiles.getProfile(
           this.proposal.author.chain.id,
           this.proposal.author.address
         );
       }
 
-      this.comments.forEach((comment) => {
-        app.profiles.getProfile(comment.authorChain, comment.author);
-      });
-
       this.prefetch[proposalIdAndType]['profilesStarted'] = true;
     }
 
     if (
-      !app.profiles.allLoaded() &&
+      !app.newProfiles.allLoaded() &&
       !this.prefetch[proposalIdAndType]['profilesFinished']
     ) {
       return (
@@ -305,13 +251,6 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
                 votingModalOpen={this.votingModalOpen}
               />
             </>
-          }
-          comments={
-            <CommentsTree
-              comments={this.comments}
-              proposal={this.proposal}
-              updatedCommentsCallback={updatedCommentsCallback}
-            />
           }
         />
       </Sublayout>

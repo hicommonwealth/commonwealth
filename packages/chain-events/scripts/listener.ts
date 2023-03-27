@@ -9,7 +9,6 @@ import {
   IEventHandler,
   SubstrateEvents,
   CompoundEvents,
-  MolochEvents,
   AaveEvents,
   Erc20Events,
   SupportedNetwork,
@@ -150,35 +149,6 @@ if (network === SupportedNetwork.Substrate) {
       startBlock,
       verbose: true,
       enricherConfig: { balanceTransferThresholdPermill: 1_000 }, // 0.1% of total issuance
-    });
-  });
-} else if (network === SupportedNetwork.Moloch) {
-  const contractVersion = 1;
-  MolochEvents.createApi(url, contractVersion, contract).then(async (api) => {
-    const dater = new EthDater(api.provider);
-    const fetcher = new MolochEvents.StorageFetcher(
-      api,
-      contractVersion,
-      dater
-    );
-    try {
-      const fetched = await fetcher.fetch(
-        { startBlock: 11000000, maxResults: 3 },
-        true
-      );
-      // const fetched = await fetcher.fetchOne('132');
-      console.log(fetched.map((f) => f.data));
-    } catch (err) {
-      console.log(err);
-      console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
-    }
-    MolochEvents.subscribeEvents({
-      chain,
-      api,
-      contractVersion,
-      handlers: [new StandaloneEventHandler()],
-      skipCatchup,
-      verbose: true,
     });
   });
 } else if (network === SupportedNetwork.Compound) {

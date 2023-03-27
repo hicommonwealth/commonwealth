@@ -10,14 +10,7 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 import m from 'mithril';
-import type {
-  Account,
-  ChainEntity,
-  Comment,
-  Poll,
-  Thread,
-  Topic,
-} from 'models';
+import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
 import { ThreadStage as ThreadStageType } from 'models';
 
 import 'pages/view_thread/index.scss';
@@ -116,12 +109,11 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       );
 
     const threadId = identifier.split('-')[0];
-    const threadIdAndType = `${threadId}-${ProposalType.Thread}`;
 
     // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
-    if (!this.prefetch || !this.prefetch[threadIdAndType]) {
+    if (!this.prefetch || !this.prefetch[threadId]) {
       this.prefetch = {};
-      this.prefetch[threadIdAndType] = {
+      this.prefetch[threadId] = {
         commentsStarted: false,
         pollsStarted: false,
         viewCountStarted: false,
@@ -208,18 +200,18 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     }
 
     // load proposal
-    if (!this.prefetch[threadIdAndType]['threadReactionsStarted']) {
+    if (!this.prefetch[threadId]['threadReactionsStarted']) {
       app.threads.fetchReactionsCount([thread]).then(() => m.redraw);
-      this.prefetch[threadIdAndType]['threadReactionsStarted'] = true;
+      this.prefetch[threadId]['threadReactionsStarted'] = true;
     }
 
     // load comments
-    if (!this.prefetch[threadIdAndType]['commentsStarted']) {
+    if (!this.prefetch[threadId]['commentsStarted']) {
       app.comments
         .refresh(thread, app.activeChainId())
         .then(async () => {
           this.comments = app.comments
-            .getByProposal(thread)
+            .getByThread(thread)
             .filter((c) => c.parentComment === null);
 
           // fetch reactions
@@ -232,7 +224,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
             data: JSON.stringify({
               proposal_ids: [threadId],
               comment_ids: app.comments
-                .getByProposal(thread)
+                .getByThread(thread)
                 .map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
@@ -258,41 +250,41 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           m.redraw();
         });
 
-      this.prefetch[threadIdAndType]['commentsStarted'] = true;
+      this.prefetch[threadId]['commentsStarted'] = true;
     }
 
     if (this.comments?.length) {
       const mismatchedComments = this.comments.filter((c) => {
-        return c.rootProposal !== `${ProposalType.Thread}_${threadId}`;
+        return c.threadId !== thread.id;
       });
 
       if (mismatchedComments.length) {
-        this.prefetch[threadIdAndType]['commentsStarted'] = false;
+        this.prefetch[threadId]['commentsStarted'] = false;
       }
     }
 
     const updatedCommentsCallback = () => {
       this.comments = app.comments
-        .getByProposal(thread)
+        .getByThread(thread)
         .filter((c) => c.parentComment === null);
       m.redraw();
     };
 
     // load polls
-    if (!this.prefetch[threadIdAndType]['pollsStarted']) {
+    if (!this.prefetch[threadId]['pollsStarted']) {
       app.polls.fetchPolls(app.activeChainId(), thread.id).catch(() => {
         notifyError('Failed to load comments');
         this.comments = [];
         m.redraw();
       });
 
-      this.prefetch[threadIdAndType]['pollsStarted'] = true;
+      this.prefetch[threadId]['pollsStarted'] = true;
     } else {
       this.polls = app.polls.getByThreadId(thread.id);
     }
 
     // load view count
-    if (!this.prefetch[threadIdAndType]['viewCountStarted']) {
+    if (!this.prefetch[threadId]['viewCountStarted']) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
         object_id: thread.id,
@@ -311,7 +303,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           throw new Error('could not load view count');
         });
 
-      this.prefetch[threadIdAndType]['viewCountStarted'] = true;
+      this.prefetch[threadId]['viewCountStarted'] = true;
     }
 
     if (this.comments === undefined || this.viewCount === undefined) {
@@ -323,19 +315,19 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     }
 
     // load profiles
-    if (this.prefetch[threadIdAndType]['profilesStarted'] === undefined) {
-      app.profiles.getProfile(thread.authorChain, thread.author);
+    if (this.prefetch[threadId]['profilesStarted'] === undefined) {
+      app.newProfiles.getProfile(thread.authorChain, thread.author);
 
       this.comments.forEach((comment) => {
-        app.profiles.getProfile(comment.authorChain, comment.author);
+        app.newProfiles.getProfile(comment.authorChain, comment.author);
       });
 
-      this.prefetch[threadIdAndType]['profilesStarted'] = true;
+      this.prefetch[threadId]['profilesStarted'] = true;
     }
 
     if (
-      !app.profiles.allLoaded() &&
-      !this.prefetch[threadIdAndType]['profilesFinished']
+      !app.newProfiles.allLoaded() &&
+      !this.prefetch[threadId]['profilesFinished']
     ) {
       return (
         <PageLoading
@@ -344,7 +336,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       );
     }
 
-    this.prefetch[threadIdAndType]['profilesFinished'] = true;
+    this.prefetch[threadId]['profilesFinished'] = true;
 
     const commentCount = app.comments.nComments(thread);
 
@@ -622,7 +614,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                         setIsGloballyEditing={setIsGloballyEditing}
                         isGloballyEditing={this.isGloballyEditing}
                         parentComment={null}
-                        rootProposal={thread}
+                        rootThread={thread}
                       />
                     </>
                   ) : null}
@@ -633,7 +625,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           comments={
             <CommentsTree
               comments={this.comments}
-              proposal={thread}
+              thread={thread}
               setIsGloballyEditing={setIsGloballyEditing}
               updatedCommentsCallback={updatedCommentsCallback}
             />

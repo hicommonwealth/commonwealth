@@ -72,6 +72,8 @@ class OverviewPage extends ClassComponent {
       return { monthlyThreads, pinnedThreads, topic };
     });
 
+    const activeAccount = app.user.activeAccount;
+
     return !topicSummaryRows.length && !app.threads.initialized ? (
       <PageLoading />
     ) : (
@@ -99,6 +101,7 @@ class OverviewPage extends ClassComponent {
                 onclick={() => {
                   navigateToSubpage('/new/discussion');
                 }}
+                disabled={!activeAccount}
               />
             ) : (
               <CWButton
@@ -108,6 +111,7 @@ class OverviewPage extends ClassComponent {
                 onclick={() => {
                   navigateToSubpage('/new/discussion');
                 }}
+                disabled={!activeAccount}
               />
             )}
           </div>
