@@ -101,10 +101,7 @@ const bulkThreads = async (
       return next(new ServerError('Could not fetch threads'));
     }
 
-    const thread_ids = [];
     threads = preprocessedThreads.map((t) => {
-      const thread_id = `discussion_${t.thread_id}`;
-      thread_ids.push(thread_id);
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
