@@ -72,11 +72,12 @@ export class ChainTesting {
       amount,
       accountIndex,
     };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/erc20/transfer`,
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
 
   /**
@@ -88,11 +89,12 @@ export class ChainTesting {
   public async getErc20(tokenAddress: string, to: string, amount: string) {
     const fromBank = true;
     const request: erc20Transfer = { tokenAddress, to, amount, fromBank };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/erc20/transfer`,
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
 
   // Proposal
@@ -107,11 +109,12 @@ export class ChainTesting {
     govType: string = 'compound'
   ) {
     const request: govCompGetVotes = { accountIndex, numberOfVotes };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/gov/${govType}/getVotes`,
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
 
   /**
@@ -123,7 +126,7 @@ export class ChainTesting {
   public async createProposal(
     accountIndex: number,
     govType: string = 'compound'
-  ): Promise<string> {
+  ): Promise<any> {
     const request: govCompCreate = { accountIndex };
     const response = await axios.post(
       `${this.host}/gov/${govType}/createProposal`,
@@ -142,7 +145,7 @@ export class ChainTesting {
   public async cancelProposal(
     proposalId: string,
     govType: string = 'compound'
-  ): Promise<string> {
+  ): Promise<any> {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
       `${this.host}/gov/${govType}/cancelProposal`,
@@ -171,6 +174,7 @@ export class ChainTesting {
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
 
   /**
@@ -180,11 +184,12 @@ export class ChainTesting {
    */
   public async queueProposal(proposalId: string, govType: string = 'compound') {
     const request: govCompProposalId = { proposalId };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/gov/${govType}/queueProposal`,
       JSON.stringify(request),
       this.header
     );
+    response.data;
   }
 
   /**
@@ -197,11 +202,12 @@ export class ChainTesting {
     govType: string = 'compound'
   ) {
     const request: govCompProposalId = { proposalId };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/gov/${govType}/executeProposal`,
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
 
   /**
@@ -302,11 +308,12 @@ export class ChainTesting {
       from,
       accountIndex,
     };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/erc721/transfer`,
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
 
   /**
@@ -332,11 +339,12 @@ export class ChainTesting {
       accountIndex,
       all: false,
     };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/erc721/approve`,
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
   /**
    * Approve all holdings for use
@@ -361,11 +369,12 @@ export class ChainTesting {
       accountIndex,
       all: true,
     };
-    await axios.post(
+    const response = await axios.post(
       `${this.host}/erc721/approve`,
       JSON.stringify(request),
       this.header
     );
+    return response.data;
   }
 
   //RPC

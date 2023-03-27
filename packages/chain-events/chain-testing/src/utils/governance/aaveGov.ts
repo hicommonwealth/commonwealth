@@ -11,7 +11,7 @@ export class aaveGovernor implements IGovernor {
   public async createArbitraryProposal(
     accountIndex: number,
     advanceDays?: number | string
-  ): Promise<string> {
+  ): Promise<any> {
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
     const accounts = (await provider.eth.getAccounts())[accountIndex];
@@ -49,13 +49,18 @@ export class aaveGovernor implements IGovernor {
     const secs = 86400;
     const blocks = secs / 12 + 500;
     await advanceEvmTime(secs, blocks);
-    return String(proposalId['events']['ProposalCreated']['returnValues'][0]);
+    return {
+      proposalId: String(
+        proposalId['events']['ProposalCreated']['returnValues'][0]
+      ),
+      block: proposalId['blockNumber'],
+    };
   }
 
   public async queueProposal(
     proposalId: string | number,
     advanceTime?: boolean | undefined
-  ): Promise<void> {
+  ): Promise<any> {
     const secs = 3 * 86400;
     const blocks = secs / 12 + 500;
     await advanceEvmTime(secs, blocks);
@@ -67,9 +72,10 @@ export class aaveGovernor implements IGovernor {
       .queue(proposalId)
       .send({ from: accounts, gasLimit: 500000 });
     console.log(queued);
+    return { block: queued['blockNumber'] };
   }
 
-  public async cancelProposal(proposalId: string | number): Promise<void> {
+  public async cancelProposal(proposalId: string | number): Promise<any> {
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
     const aaveToken = erc20(this.aaveToken, provider);
@@ -81,13 +87,14 @@ export class aaveGovernor implements IGovernor {
       .cancel(proposalId)
       .send({ from: accounts[0], gasLimit: 200000 });
     console.log(cancel);
+    return { block: cancel['blockNumber'] };
   }
 
   public async castVote(
     proposalId: string | number,
     accountIndex: number,
     forAgainst: boolean
-  ): Promise<void> {
+  ): Promise<any> {
     const provider = getProvider();
     const contract = aave_gov(this.contractAddress, provider);
     const accounts = (await provider.eth.getAccounts())[accountIndex];
@@ -95,6 +102,7 @@ export class aaveGovernor implements IGovernor {
       .submitVote(proposalId, Number(forAgainst))
       .send({ from: accounts, gasLimit: 1000000 });
     console.log(vote);
+    return { block: vote['blockNumber'] };
   }
 
   public async getProposalDetails(proposalId: string | number): Promise<any> {
@@ -107,7 +115,7 @@ export class aaveGovernor implements IGovernor {
   public async executeProposal(
     proposalId: string | number,
     advanceTime?: boolean | undefined
-  ): Promise<void> {
+  ): Promise<any> {
     const secs = 86400;
     const blocks = secs / 12 + 500;
     await advanceEvmTime(secs, blocks);
@@ -118,12 +126,13 @@ export class aaveGovernor implements IGovernor {
       .execute(proposalId)
       .send({ from: accounts, value: 0, gasLimit: 1000000 });
     console.log(executed);
+    return { block: executed['blockNumber'] };
   }
 
   public async getVotes(
     accountIndex: number,
     numberOfVotes: string
-  ): Promise<void> {
+  ): Promise<any> {
     const provider = getProvider();
     const aaveToken = erc20(this.aaveToken, provider);
     const accounts = (await provider.eth.getAccounts())[accountIndex];
@@ -133,26 +142,32 @@ export class aaveGovernor implements IGovernor {
     const tokensNeeded = provider.utils.toBN(
       provider.utils.toWei(numberOfVotes)
     );
+    let txReceipt;
     if (currBalance.lt(tokensNeeded)) {
       try {
-        await aaveToken.methods.transfer(accounts, tokensNeeded).send({
-          from: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
-          gasLimit: 500000,
-        });
+        txReceipt = await aaveToken.methods
+          .transfer(accounts, tokensNeeded)
+          .send({
+            from: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
+            gasLimit: 500000,
+          });
       } catch {
-        await aaveToken.methods.transfer(accounts, tokensNeeded).send({
-          from: '0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8', // Binance 7
-          gasLimit: 500000,
-        });
+        txReceipt = await aaveToken.methods
+          .transfer(accounts, tokensNeeded)
+          .send({
+            from: '0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8', // Binance 7
+            gasLimit: 500000,
+          });
       }
     }
     try {
-      await aaveToken.methods
+      txReceipt = await aaveToken.methods
         .delegate(accounts)
         .send({ from: accounts, gasLimit: 150000 });
     } catch {
       console.log('already Delegated');
     }
+    return { block: txReceipt['blockNumber'] };
   }
 
   public async endToEndSim(): Promise<void> {

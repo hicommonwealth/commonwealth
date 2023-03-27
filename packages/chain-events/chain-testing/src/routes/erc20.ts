@@ -47,8 +47,9 @@ export const transfer = async (req: Request, res: Response) => {
     const account = request.fromBank
       ? '0xF977814e90dA44bFA03b6295A0616a897441aceC'
       : (await provider.eth.getAccounts())[request.accountIndex ?? 0];
+    let txReceipt;
     if (!request.fromBank && request.from) {
-      await contract.methods
+      txReceipt = await contract.methods
         .transferFrom(
           request.to,
           request.from,
@@ -56,11 +57,11 @@ export const transfer = async (req: Request, res: Response) => {
         )
         .send({ from: account, gasLimit: 400000 });
     } else {
-      await contract.methods
+      txReceipt = await contract.methods
         .transfer(request.to, Web3.utils.toWei(request.amount))
         .send({ from: account, gasLimit: 400000 });
     }
-    res.status(200).send();
+    res.status(200).json({ block: txReceipt['blockNumber'] }).send();
   } catch (err) {
     console.error(err);
     res
@@ -79,10 +80,10 @@ export const approve = async (req: Request, res: Response) => {
     const provider = getProvider();
     const accounts = await provider.eth.getAccounts();
     const contract = erc20(request.tokenAddress, provider);
-    await contract.methods
+    const txReceipt = await contract.methods
       .approve(request.spender, request.amount)
       .send({ from: accounts[request.accountIndex ?? 0] });
-    res.status(200).send();
+    res.status(200).json({ block: txReceipt['blockNumber'] }).send();
   } catch (err) {
     console.error(err);
     res

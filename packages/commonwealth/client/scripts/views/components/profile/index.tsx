@@ -51,8 +51,7 @@ export default class ProfileComponent extends ClassComponent<NewProfileAttrs> {
       const comments = result.comments.map((c) => modelCommentFromServer(c));
       const commentsWithAssociatedThread = comments.map((c) => {
         const thread = result.commentThreads.find(
-          (t) =>
-            t.id === parseInt(c.threadId, 10)
+          (t) => t.id === parseInt(c.threadId, 10)
         );
         return { ...c, thread };
       });

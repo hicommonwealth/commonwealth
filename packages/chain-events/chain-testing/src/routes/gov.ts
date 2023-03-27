@@ -54,8 +54,11 @@ export const getVotes = async (req: Request, res: Response) => {
     const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
-    await gov.getVotes(request.accountIndex, request.numberOfVotes);
-    res.status(200).send();
+    const block = await gov.getVotes(
+      request.accountIndex,
+      request.numberOfVotes
+    );
+    res.status(200).json(block).send();
   } catch (err) {
     console.error(err);
     res
@@ -73,12 +76,12 @@ export const castVote = async (req: Request, res: Response) => {
     const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
-    await gov.castVote(
+    const block = await gov.castVote(
       request.proposalId,
       request.accountIndex,
       request.forAgainst
     );
-    res.status(200).send();
+    res.status(200).json(block).send();
   } catch (err) {
     console.error(err);
     res
@@ -97,8 +100,8 @@ export const queueProposal = async (req: Request, res: Response) => {
     const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
-    await gov.queueProposal(request.proposalId, true);
-    res.status(200).send();
+    const block = await gov.queueProposal(request.proposalId, true);
+    res.status(200).json(block).send();
   } catch (err) {
     console.error(err);
     res
@@ -117,8 +120,8 @@ export const executeProposal = async (req: Request, res: Response) => {
     const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
-    await gov.executeProposal(request.proposalId, true);
-    res.status(200).send();
+    const block = await gov.executeProposal(request.proposalId, true);
+    res.status(200).json(block).send();
   } catch (err) {
     console.error(err);
     res

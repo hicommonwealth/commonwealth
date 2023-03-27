@@ -4,28 +4,29 @@ export interface IGovernor {
   createArbitraryProposal: (
     accountIndex: number,
     advanceDays?: number | string
-  ) => Promise<string>;
+  ) => Promise<any>;
 
   queueProposal: (
     proposalId: string | number,
     advanceTime?: boolean
-  ) => Promise<void>;
-  cancelProposal(proposalId: string | number): Promise<void>;
+  ) => Promise<any>;
+
+  cancelProposal(proposalId: string | number): Promise<any>;
 
   castVote(
     proposalId: string | number,
     accountIndex: number,
     forAgainst: boolean
-  ): Promise<void>;
+  ): Promise<any>;
 
   getProposalDetails(proposalId: number | string): Promise<any>;
 
   executeProposal(
     proposalId: string | number,
     advanceTime?: boolean
-  ): Promise<void>;
+  ): Promise<any>;
 
-  getVotes(accountIndex: number, numberOfVotes: string): Promise<void>;
+  getVotes(accountIndex: number, numberOfVotes: string): Promise<any>;
 
   endToEndSim(): Promise<void>;
 }

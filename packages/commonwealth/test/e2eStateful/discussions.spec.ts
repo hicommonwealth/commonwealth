@@ -6,14 +6,16 @@ test.describe('test discussion page', () => {
     await page.goto('http://localhost:8080/dydx/discussions');
   });
   test('assert elements show up on page load', async ({ page }) => {
-
-    await page.getByText('All Discussions24 ThreadsCreate ThreadThis section is for the community to discu').click();
+    await page
+      .getByText(
+        'All Discussions24 ThreadsCreate ThreadThis section is for the community to discu'
+      )
+      .click();
     await page.getByText('DiscussionGovernance').click();
     await page.locator('.SidebarQuickSwitcher').click();
   });
 
   test('assert default threads loaded', async ({ page }) => {
-
     // Get the count of non-pinned.
     const nonPinnedThreads = await page.$$('.ThreadPreview:not(.isPinned)');
 
@@ -35,6 +37,8 @@ test.describe('test discussion page', () => {
     const updatedReactionCount = await reactionCountElement.textContent();
 
     // Assert that the reaction count has incremented by one
-    expect(parseInt(updatedReactionCount)).toBe(parseInt(initialReactionCount) + 1);
+    expect(parseInt(updatedReactionCount)).toBe(
+      parseInt(initialReactionCount) + 1
+    );
   });
 });

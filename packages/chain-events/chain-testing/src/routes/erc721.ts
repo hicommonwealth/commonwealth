@@ -11,14 +11,14 @@ export const approve721 = async (req: Request, res: Response) => {
     const account = request.accountIndex
       ? (await provider.eth.getAccounts())[request.accountIndex]
       : request.from;
-    request.all
+    const txReceipt = request.all
       ? await contract.methods
           .approve(request.to, request.tokenId)
           .send({ from: account, gasLimit: 500000 })
       : await contract.methods
           .setApprovalForAll(request.to)
           .send({ from: account, gasLimit: 500000 });
-    res.status(200).send();
+    res.status(200).json({ block: txReceipt['blockNumber'] }).send();
   } catch (err) {
     console.error(err);
     res
@@ -39,10 +39,10 @@ export const transfer721 = async (req: Request, res: Response) => {
     const account = request.accountIndex
       ? (await provider.eth.getAccounts())[request.accountIndex]
       : request.from;
-    await contract.methods
+    const txReceipt = await contract.methods
       .transferFrom(account, request.to, request.tokenId)
       .send({ from: account, gasLimit: 500000 });
-    res.status(200).send();
+    res.status(200).json({ block: txReceipt['blockNumber'] }).send();
   } catch (err) {
     console.error(err);
     res
