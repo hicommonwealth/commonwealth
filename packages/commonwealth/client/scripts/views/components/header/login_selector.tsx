@@ -194,8 +194,7 @@ export const LoginSelectorMenuRight = ({
   const navigate = useCommonNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on' &&
-      !!localStorage.getItem('user-dark-mode-state')
+    localStorage.getItem('dark-mode-state') === 'on'
   );
 
   return (
@@ -234,8 +233,7 @@ export const LoginSelectorMenuRight = ({
                 await initAppState();
                 notifySuccess('Logged out');
                 onLogout();
-                localStorage.removeItem('dark-mode-state');
-                localStorage.removeItem('user-dark-mode-state');
+                setDarkMode(false);
               })
               .catch(() => {
                 // eslint-disable-next-line no-restricted-globals

@@ -64,8 +64,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     //   return false;
     // }
 
-    if (this.meta.id === '1inch' && !localStorage.getItem('user-dark-mode-state')) {
-      setDarkMode(true);
+    const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
+    if (this.meta.id === '1inch') {
+      darkModePreferenceSet ?
+        setDarkMode(darkModePreferenceSet === 'on') :
+        setDarkMode(true);
     }
 
     const {
