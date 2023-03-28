@@ -14,6 +14,7 @@ import { Modal } from '../component_kit/cw_modal';
 
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
+import { nextTick } from 'process';
 
 export type QuillMode = 'markdown' | 'richText' | 'hybrid';
 
@@ -51,9 +52,21 @@ const ReactQuillEditor = ({
 }: ReactQuillEditorProps) => {
   const editorRef = useRef<ReactQuill>();
 
+  const [isVisible, setIsVisible] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isMarkdownEnabled, setIsMarkdownEnabled] = useState<boolean>(false);
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
+
+  // refreshQuillComponent unmounts and remounts the
+  // React Quill component, as this is the only way
+  // to refresh the component if the 'modules'
+  // prop is changed
+  const refreshQuillComponent = () => {
+    setIsVisible(false);
+    nextTick(() => {
+      setIsVisible(true);
+    });
+  };
 
   const handleChange = (value, delta, source, editor) => {
     setContentDelta({
@@ -99,7 +112,11 @@ const ReactQuillEditor = ({
         const uploadedFileUrl = await uploadFileToS3(file, app.serverUrl(), app.user.jwt);
 
         // insert image op at the selected index
-        editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
+        if (isMarkdownEnabled) {
+          editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
+        } else {
+          editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
+        }
         setContentDelta(editor.getContents()); // sync state with editor content
       } catch (err) {
         console.error(err);
@@ -108,7 +125,7 @@ const ReactQuillEditor = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta]
+    [editorRef, isMarkdownEnabled, setContentDelta]
   );
 
   const handleToggleMarkdown = () => {
@@ -134,6 +151,7 @@ const ReactQuillEditor = ({
     } else {
       setIsMarkdownEnabled(newMarkdownEnabled);
     }
+    refreshQuillComponent();
   };
 
   const handlePreviewModalClose = () => {
@@ -159,7 +177,7 @@ const ReactQuillEditor = ({
     ];
   }, []);
 
-  // when markdown is toggled, add markdown metadata to ops
+  // when markdown state is changed, add markdown metadata to delta ops
   useEffect(() => {
     const editor = editorRef.current?.getEditor();
     if (editor) {
@@ -170,11 +188,10 @@ const ReactQuillEditor = ({
     }
   }, [isMarkdownEnabled, setContentDelta]);
 
-  // when initialized, update markdown state to match content type
+  // when delta markdown is changed, update markdown state to match
   useEffect(() => {
     setIsMarkdownEnabled(!!contentDelta?.___isMarkdown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [contentDelta]);
 
   return (
     <div className="QuillEditorWrapper">
@@ -224,28 +241,30 @@ const ReactQuillEditor = ({
           }}
         />
       </div>
-      <ReactQuill
-        ref={editorRef}
-        className={`QuillEditor ${className}`}
-        placeholder={placeholder}
-        tabIndex={tabIndex}
-        theme="snow"
-        value={contentDelta}
-        onChange={handleChange}
-        modules={{
-          toolbar: ([[{ header: 1 }, { header: 2 }]] as any).concat([
-            ['bold', 'italic', 'strike'],
-            ['link', 'code-block', 'blockquote'],
-            [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }]
-          ]),
-          imageDropAndPaste: {
-            handler: handleImageDropAndPaste
-          },
-          clipboard: {
-            matchers: clipboardMatchers
-          }
-        }}
-      />
+      {isVisible && (
+        <ReactQuill
+          ref={editorRef}
+          className={`QuillEditor ${className}`}
+          placeholder={placeholder}
+          tabIndex={tabIndex}
+          theme="snow"
+          value={contentDelta}
+          onChange={handleChange}
+          modules={{
+            toolbar: ([[{ header: 1 }, { header: 2 }]] as any).concat([
+              ['bold', 'italic', 'strike'],
+              ['link', 'code-block', 'blockquote'],
+              [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }]
+            ]),
+            imageDropAndPaste: {
+              handler: handleImageDropAndPaste
+            },
+            clipboard: {
+              matchers: clipboardMatchers
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
