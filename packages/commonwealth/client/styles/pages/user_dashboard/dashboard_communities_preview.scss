@@ -38,6 +38,9 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  position: absolute;
+  right: 0;
+  z-index: 1;
 
   @include mediumSmallInclusive {
     display: none;

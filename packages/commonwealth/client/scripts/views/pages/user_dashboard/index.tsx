@@ -61,7 +61,7 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   return (
     <Sublayout >
-      <div ref={setScrollElement} className="UserDashboard">
+      <div ref={setScrollElement} className="UserDashboard" >
         <div className="dashboard-column">
           <div className="dashboard-header">
             <CWTabBar>
