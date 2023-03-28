@@ -1,17 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
+import { useSearchParams } from 'react-router-dom';
+
+import 'pages/discussions/index.scss';
+
 import app from '../../../state';
-import { Footer } from '../../footer';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
 
-import 'pages/discussions/index.scss';
+type DiscussionsPageProps = {
+  topicName?: string;
+};
 
-function DiscussionsPage({ topicName, stageName }) {
+const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
   const [initializing, setInitializing] = useState(true);
+  const [searchParams, _] = useSearchParams();
+  const stageName: string = searchParams.get('stage');
 
   // setup initial threads
   useEffect(() => {
@@ -36,7 +43,7 @@ function DiscussionsPage({ topicName, stageName }) {
 
       setInitializing(false);
     });
-  }, []);
+  }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
     const newThreads = await app.threads.loadNextPage({ topicName, stageName });
@@ -46,7 +53,7 @@ function DiscussionsPage({ topicName, stageName }) {
     }
 
     return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
-  }, [threads]);
+  }, [stageName, topicName]);
 
   if (initializing) {
     return <PageLoading />;
@@ -69,9 +76,6 @@ function DiscussionsPage({ topicName, stageName }) {
               totalThreadCount={threads.length}
             />
           </div>;
-        },
-        Footer: () => {
-          return <Footer/>;
         }
       }}
     />
