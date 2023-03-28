@@ -159,6 +159,7 @@ const ReactQuillEditor = ({
     ];
   }, []);
 
+  // when markdown is toggled, add markdown metadata to ops
   useEffect(() => {
     const editor = editorRef.current?.getEditor();
     if (editor) {
@@ -168,6 +169,12 @@ const ReactQuillEditor = ({
       } as SerializableDeltaStatic);
     }
   }, [isMarkdownEnabled, setContentDelta]);
+
+  // when initialized, update markdown state to match content type
+  useEffect(() => {
+    setIsMarkdownEnabled(!!contentDelta?.___isMarkdown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="QuillEditorWrapper">

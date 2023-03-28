@@ -1,25 +1,16 @@
 import axios from "axios";
 import type { DeltaStatic } from "quill";
 
-// parseDelta creates a new DeltaStatic object from a JSON string
-export const parseDeltaString = (str: string) : DeltaStatic => {
-  try {
-    return JSON.parse(str)
-  } catch (err) {
-    console.warn('failed to parse string JSON', err)
-    return createDeltaFromText(str)
-  }
-}
-
 // createDeltaFromText returns a new DeltaStatic object from a string
-export const createDeltaFromText = (str: string) : DeltaStatic => {
+export const createDeltaFromText = (str: string, isMarkdown?: boolean) : SerializableDeltaStatic => {
   return {
     ops: [
       {
         insert: str
       }
-    ]
-  } as DeltaStatic
+    ],
+    ___isMarkdown: !!isMarkdown
+  } as SerializableDeltaStatic
 }
 
 // getTextFromDelta returns the text from a DeltaStatic
@@ -99,12 +90,27 @@ export const countLinesMarkdown = (text: string) : number => {
   return text.split('\n').length - 1;
 };
 
+// -----
+
 export type SerializableDeltaStatic = DeltaStatic & {
   ___isMarkdown?: boolean
 }
+// serializeDelta converts a delta object to a string for persistence
 export const serializeDelta = (delta: DeltaStatic) : string => {
   if ((delta as SerializableDeltaStatic).___isMarkdown) {
     return getTextFromDelta(delta)
   }
   return JSON.stringify(delta)
+}
+
+// parseDelta converts a string to a delta object for state
+export const deserializeDelta = (str: string) : DeltaStatic => {
+  try {
+    // is richtext delta object
+    return JSON.parse(str)
+  } catch (err) {
+    // otherwise, it's plain text markdown
+    console.warn('failed to parse string JSON, treating as plain text', err)
+    return createDeltaFromText(str, true)
+  }
 }
