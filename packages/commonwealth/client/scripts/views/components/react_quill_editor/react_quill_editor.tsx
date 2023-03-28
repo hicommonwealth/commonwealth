@@ -105,7 +105,10 @@ const ReactQuillEditor = ({
           }
           return true;
         });
-        setContentDelta({ ops: opsWithoutBase64Images } as DeltaStatic);
+        setContentDelta({
+          ops: opsWithoutBase64Images,
+          ___isMarkdown: isMarkdownEnabled
+        } as SerializableDeltaStatic);
 
         const file = base64ToFile(imageDataUrl, imageType);
 
@@ -117,7 +120,10 @@ const ReactQuillEditor = ({
         } else {
           editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
         }
-        setContentDelta(editor.getContents()); // sync state with editor content
+        setContentDelta({
+          ...editor.getContents(),
+          ___isMarkdown: isMarkdownEnabled
+        } as SerializableDeltaStatic); // sync state with editor content
       } catch (err) {
         console.error(err);
       } finally {
