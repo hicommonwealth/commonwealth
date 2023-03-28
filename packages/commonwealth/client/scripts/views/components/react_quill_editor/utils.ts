@@ -107,10 +107,13 @@ export const serializeDelta = (delta: DeltaStatic) : string => {
 export const deserializeDelta = (str: string) : DeltaStatic => {
   try {
     // is richtext delta object
-    return JSON.parse(str)
+    const delta: DeltaStatic = JSON.parse(str)
+    if (!delta.ops) {
+      throw new Error('object is not a delta static')
+    }
+    return delta
   } catch (err) {
     // otherwise, it's plain text markdown
-    console.warn('failed to parse string JSON, treating as plain text', err)
     return createDeltaFromText(str, true)
   }
 }

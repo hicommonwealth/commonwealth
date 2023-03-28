@@ -16,8 +16,6 @@ import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
 import { nextTick } from 'process';
 
-export type QuillMode = 'markdown' | 'richText' | 'hybrid';
-
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
 const LoadingIndicator = () => {
@@ -37,7 +35,6 @@ type ReactQuillEditorProps = {
   className?: string;
   placeholder?: string;
   tabIndex?: number;
-  mode?: QuillMode; // Use in order to limit editor to only MD or RT support
   contentDelta: SerializableDeltaStatic;
   setContentDelta: (d: SerializableDeltaStatic) => void;
 };
@@ -157,7 +154,6 @@ const ReactQuillEditor = ({
     } else {
       setIsMarkdownEnabled(newMarkdownEnabled);
     }
-    refreshQuillComponent();
   };
 
   const handlePreviewModalClose = () => {
@@ -184,6 +180,7 @@ const ReactQuillEditor = ({
   }, []);
 
   // when markdown state is changed, add markdown metadata to delta ops
+  // and refresh quill component
   useEffect(() => {
     const editor = editorRef.current?.getEditor();
     if (editor) {
@@ -192,12 +189,14 @@ const ReactQuillEditor = ({
         ___isMarkdown: isMarkdownEnabled
       } as SerializableDeltaStatic);
     }
+    refreshQuillComponent();
   }, [isMarkdownEnabled, setContentDelta]);
 
-  // when delta markdown is changed, update markdown state to match
+  // when initialized, update markdown state to match content type
   useEffect(() => {
     setIsMarkdownEnabled(!!contentDelta?.___isMarkdown);
-  }, [contentDelta]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="QuillEditorWrapper">
