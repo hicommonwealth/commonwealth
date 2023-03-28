@@ -1,16 +1,16 @@
 import * as Rascal from 'rascal';
 import type {
   RascalPublications,
-  RascalSubscriptions, SafeRmqPublishSupported,
+  RascalSubscriptions,
+  SafeRmqPublishSupported,
   TRmqMessages,
 } from './types';
-import {AbstractRabbitMQController, RmqMsgFormatError} from './types';
+import { AbstractRabbitMQController, RmqMsgFormatError } from './types';
 import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {

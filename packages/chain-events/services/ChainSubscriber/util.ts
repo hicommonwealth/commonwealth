@@ -15,7 +15,7 @@ import type { DB } from '../database/database';
 import models from '../database/database';
 
 import type { ChainAttributes, IListenerInstances } from './types';
-import {IRabbitMqHandler} from "../ChainEventsConsumer/ChainEventHandlers";
+import { IRabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 
 const log = factory.getLogger(formatFilename(__filename));
 

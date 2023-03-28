@@ -39,8 +39,8 @@ function setupRouter(): Router {
   router.post('/gov/compound/castVote', castVote);
   router.post('/gov/compound/proposalDetails', getProposalDetails);
   router.post('/gov/compound/getVotes', getVotes);
-  router.post('/gov/compound/queue', queueProposal);
-  router.post('/gov/compound/execute', executeProposal);
+  router.post('/gov/compound/queueProposal', queueProposal);
+  router.post('/gov/compound/executeProposal', executeProposal);
   router.get('/gov/compound/runFullCylce', runFullCycle);
 
   return router;

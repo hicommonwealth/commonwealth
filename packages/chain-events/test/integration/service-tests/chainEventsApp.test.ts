@@ -1,14 +1,20 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
-import { app } from '../../../services/app/Server';
 import { Errors as EntityErrors } from '../../../services/app/routes/entities';
 import { Errors as EventErrors } from '../../../services/app/routes/eventActivity';
+import {createChainEventsApp} from "../../../services/app/Server";
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
+let app;
+
 describe('Tests for the App service', () => {
+  before(async () => {
+    app = (await createChainEventsApp()).listen();
+  });
+
   describe('Tests for /entities', () => {
     it('Should return entities for a specific chain', async () => {
       const result = await chai

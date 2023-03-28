@@ -2,11 +2,11 @@
  * Generic handler that stores the event in the database.
  */
 import { addPrefix, factory } from 'common-common/src/logging';
-import type {
-  RabbitMQController,
-  RmqCETypeCUD,
+import type { RmqCETypeCUD } from 'common-common/src/rabbitmq';
+import {
+  AbstractRabbitMQController,
+  RascalPublications,
 } from 'common-common/src/rabbitmq';
-import { RascalPublications } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
 import { StatsDController } from 'common-common/src/statsd';
@@ -31,7 +31,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models: DB,
-    private readonly _rmqController: RabbitMQController,
+    private readonly _rmqController: AbstractRabbitMQController,
     private readonly _chain?: string,
     private readonly _filterConfig: StorageFilterConfig = {}
   ) {

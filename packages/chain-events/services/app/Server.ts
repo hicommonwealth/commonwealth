@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Express } from 'express';
 import bodyParser from 'body-parser';
 import passport from 'passport';
 import logger from 'morgan';
@@ -21,14 +21,13 @@ log.info(
 
 const port = process.env.PORT || DEFAULT_PORT;
 
-export const app = express();
-
-setupPassport();
-
 /**
  * Entry point for the ChainEvents App
  */
-async function main() {
+export async function createChainEventsApp(): Promise<Express> {
+  const app = express();
+  setupPassport();
+
   app.use(logger('dev'));
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json({ limit: '1mb' }));
@@ -62,9 +61,14 @@ async function main() {
   };
 
   app.on('error', onError);
-  app.listen(port, () => {
-    log.info(`Chain events server listening on port ${port}`);
-  });
+
+  return app;
 }
 
-main();
+if (process.argv[2] === 'run-as-script') {
+  createChainEventsApp().then((app) => {
+    app.listen(port, () => {
+      log.info(`Chain events server listening on port ${port}`);
+    });
+  });
+}

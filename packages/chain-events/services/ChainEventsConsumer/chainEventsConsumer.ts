@@ -6,6 +6,7 @@ import {
   RabbitMQController,
   getRabbitMQConfig,
   RascalSubscriptions,
+  AbstractRabbitMQController,
 } from 'common-common/src/rabbitmq';
 import Rollbar from 'rollbar';
 import { SubstrateTypes } from 'chain-events/src/types';
@@ -34,31 +35,9 @@ log.info(
  * subscriptions. The function also runs RepublishMessages which periodically republishes data stored in the database
  * that was previously unsuccessfully published.
  */
-export async function setupChainEventConsumer(): Promise<ServiceConsumer> {
-  let rollbar;
-  if (ROLLBAR_SERVER_TOKEN) {
-    rollbar = new Rollbar({
-      accessToken: ROLLBAR_SERVER_TOKEN,
-      environment: process.env.NODE_ENV,
-      captureUncaught: true,
-      captureUnhandledRejections: true,
-    });
-  }
-
-  let rmqController: RabbitMQController;
-  try {
-    rmqController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
-      rollbar
-    );
-    await rmqController.init();
-  } catch (e) {
-    log.error(
-      'Rascal consumer setup failed. Please check the Rascal configuration'
-    );
-    throw e;
-  }
-
+export async function setupChainEventConsumer(
+  rmqController: AbstractRabbitMQController
+): Promise<ServiceConsumer> {
   // writes events into the db as ChainEvents rows
   const storageHandler = new EventStorageHandler(models, rmqController);
 
@@ -116,9 +95,33 @@ export async function setupChainEventConsumer(): Promise<ServiceConsumer> {
  * Entry point for the ChainEventsConsumer server
  */
 async function main() {
+  let rollbar;
+  if (ROLLBAR_SERVER_TOKEN) {
+    rollbar = new Rollbar({
+      accessToken: ROLLBAR_SERVER_TOKEN,
+      environment: process.env.NODE_ENV,
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+    });
+  }
+
+  let rmqController: RabbitMQController;
+  try {
+    rmqController = new RabbitMQController(
+      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
+      rollbar
+    );
+    await rmqController.init();
+  } catch (e) {
+    log.error(
+      'Rascal consumer setup failed. Please check the Rascal configuration'
+    );
+    throw e;
+  }
+
   try {
     log.info('Starting consumer...');
-    await setupChainEventConsumer();
+    await setupChainEventConsumer(rmqController);
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }

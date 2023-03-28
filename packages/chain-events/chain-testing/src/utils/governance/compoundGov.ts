@@ -42,7 +42,7 @@ export class compoundGovernor implements IGovernor {
         [
           '0xecb9a875000000000000000000000000c3d688b66703497daa19211eedff47f25384cdc3000000000000000000000000c00e94cb662c3520282e6f5717214004a7f268880000000000000000000000000000000000000000000000000b84c09a3b930000',
         ],
-        'Liquidation ratio propoasl'
+        'Liquidation ratio proposal'
       )
       .send({ from: accounts, gasLimit: 1000000 });
 

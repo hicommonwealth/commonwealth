@@ -1,5 +1,5 @@
 export { getRabbitMQConfig } from './rabbitMQConfig';
-export * from './rabbitMQController';
-export * from './mockRabbitMQController';
 export * from './types';
+export { RabbitMQControllerError, RabbitMQController } from './rabbitMQController';
+export { MockRabbitMQController } from './mockRabbitMQController';
 export { RepublishFailedMessages } from './republishFailedMessages';

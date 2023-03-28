@@ -11,7 +11,10 @@ import Rollbar from 'rollbar';
 import fetch from 'node-fetch';
 import { StatsDController } from 'common-common/src/statsd';
 
-import {IRabbitMqHandler, RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers';
+import {
+  IRabbitMqHandler,
+  RabbitMqHandler,
+} from '../ChainEventsConsumer/ChainEventHandlers';
 import {
   CHAIN_EVENT_SERVICE_SECRET,
   CW_DATABASE_URI,
@@ -191,7 +194,11 @@ export async function initSubscriberTools(): Promise<{
  * @param rollbar
  * @param chain
  */
-export async function getSubscriberChainData(pool?: Pool, rollbar?: Rollbar, chain?: ChainAttributes): Promise<ChainAttributes[]> {
+export async function getSubscriberChainData(
+  pool?: Pool,
+  rollbar?: Rollbar,
+  chain?: ChainAttributes
+): Promise<ChainAttributes[]> {
   if (chain) {
     cachedChainsAndTokens = [chain];
     return cachedChainsAndTokens;
@@ -244,9 +251,12 @@ export async function getSubscriberChainData(pool?: Pool, rollbar?: Rollbar, cha
     } catch (e) {
       log.error('Could not fetch chain-event service data', e);
       rollbar?.critical('Could not fetch chain-event service data', e);
-      if (Array.isArray(cachedChainsAndTokens) && cachedChainsAndTokens.length > 0) {
+      if (
+        Array.isArray(cachedChainsAndTokens) &&
+        cachedChainsAndTokens.length > 0
+      ) {
         log.info(`Using cached chains: ${cachedChainsAndTokens}`);
-        return cachedChainsAndTokens
+        return cachedChainsAndTokens;
       } else {
         log.info(`No cached chains. Retrying in ${REPEAT_TIME} minute(s)`);
         return;
@@ -259,7 +269,12 @@ export async function getSubscriberChainData(pool?: Pool, rollbar?: Rollbar, cha
  * Retrieves and processes the chains we need to be listening to. This function is especially useful for testing since
  * we can pass a fully populated chain object that may not exist in the database.
  */
-export async function runSubscriberAsFunction(producer: IRabbitMqHandler, pool?: Pool, rollbar?: Rollbar, chain?: ChainAttributes) {
+export async function runSubscriberAsFunction(
+  producer: IRabbitMqHandler,
+  pool?: Pool,
+  rollbar?: Rollbar,
+  chain?: ChainAttributes
+) {
   const chains = await getSubscriberChainData(pool, rollbar, chain);
   await processChains(producer, chains, rollbar);
 }
@@ -279,7 +294,7 @@ export async function runSubscriberAsServer() {
       producer,
       pool,
       rollbar
-    )
+    );
   } catch (e) {
     log.error('Fatal error occurred', e);
     rollbar.critical('Fatal error occurred', e);

@@ -1,6 +1,10 @@
 import type Rascal from 'rascal';
 import type { RascalPublications } from 'common-common/src/rabbitmq';
-import {AbstractRabbitMQController, MockRabbitMQController, RabbitMQController} from 'common-common/src/rabbitmq';
+import {
+  AbstractRabbitMQController,
+  MockRabbitMQController,
+  RabbitMQController,
+} from 'common-common/src/rabbitmq';
 
 import type { CWEvent, IEventHandler } from 'chain-events/src';
 
@@ -8,9 +12,7 @@ export abstract class IRabbitMqHandler
   extends AbstractRabbitMQController
   implements IEventHandler
 {
-  public abstract handle(
-    event: CWEvent,
-  ): Promise<any>
+  public abstract handle(event: CWEvent): Promise<any>;
 }
 
 export class RabbitMqHandler

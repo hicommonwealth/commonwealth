@@ -2,6 +2,7 @@ import type events from 'events';
 
 import type { CWEvent, IChainEventData, IEventHandler } from '../src';
 import { ChainEventKinds } from '../src';
+import { expect } from 'chai';
 
 export class TestHandler implements IEventHandler {
   private counter = 0;
@@ -22,4 +23,10 @@ export class TestHandler implements IEventHandler {
     }
     return event.data;
   }
+}
+
+export function eventMatch(event, kind, proposalId, chain_id) {
+  expect(event.data.kind).to.equal(kind);
+  expect(parseInt(event.data.id)).to.equal(Number(proposalId));
+  expect(event.chain).to.equal(chain_id);
 }

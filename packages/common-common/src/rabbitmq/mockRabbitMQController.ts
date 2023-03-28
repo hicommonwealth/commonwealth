@@ -1,31 +1,37 @@
-import {
-  RabbitMQControllerError,
-} from './rabbitMQController';
+import { RabbitMQControllerError } from './rabbitMQController';
 import type * as Rascal from 'rascal';
 import type {
   RascalPublications,
   RascalSubscriptions,
   TRmqMessages,
 } from './types';
-import {AbstractRabbitMQController, RmqMsgFormatError} from "./types";
-
+import { AbstractRabbitMQController, RmqMsgFormatError } from './types';
 
 /**
  * This is a mock RabbitMQController whose functions simply log a 'success' message when called. Used mainly for
  * testing and scripts that need to use eventHandlers without a live RabbitMQ instance.
  */
 export class MockRabbitMQController extends AbstractRabbitMQController {
-  private _queuedMessages = {}
-  private subscribedIntervals: Partial<Record<RascalSubscriptions, NodeJS.Timeout>>[] = []
+  private _queuedMessages = {};
+  private subscribedIntervals: Partial<
+    Record<RascalSubscriptions, NodeJS.Timeout>
+  >[] = [];
 
   constructor(private readonly _rabbitMQConfig: Rascal.BrokerConfig) {
     super();
   }
 
   public async init(): Promise<void> {
+    if (this._initialized === true) {
+      throw new RabbitMQControllerError(
+        'RabbitMQController is already initialized!'
+      );
+    }
+
     this._initialized = true;
 
-    const config = this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]]
+    const config =
+      this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]];
 
     // initialize the message queue arrays
     for (const subName of Object.keys(config.subscriptions)) {
@@ -50,21 +56,30 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
         'RabbitMQController is not initialized!'
       );
     }
+
     // process existing messages
-    await this.runMessageProcessor(messageProcessor, this._queuedMessages[subscriptionName], msgProcessorContext);
+    await this.runMessageProcessor(
+      messageProcessor,
+      this._queuedMessages[subscriptionName],
+      msgProcessorContext
+    );
 
     const checkQueues = async () => {
       if (this._queuedMessages[subscriptionName].length > 0) {
-        await this.runMessageProcessor(messageProcessor, this._queuedMessages[subscriptionName], msgProcessorContext);
+        await this.runMessageProcessor(
+          messageProcessor,
+          this._queuedMessages[subscriptionName],
+          msgProcessorContext
+        );
       }
-    }
+    };
 
     // setup func which checks every second whether a new message has been added to the fake queue (array)
     // we could set up a proxy trigger when a message is published but then error handling would fall to the publisher
     // rather than the subscriber which is not the case in production.
     const interval = setInterval(checkQueues.bind(this), 1000);
     this.subscribedIntervals.push({
-      [subscriptionName]: interval
+      [subscriptionName]: interval,
     });
 
     console.log('Subscription started');
@@ -104,35 +119,46 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     this._queuedMessages = {};
     // reset intervals
     for (const interval of this.subscribedIntervals) {
-      clearInterval(Object.values(interval)[0])
+      clearInterval(Object.values(interval)[0]);
     }
     this.subscribedIntervals = [];
   }
 
   private routeMessage(publication: RascalPublications): RascalSubscriptions {
-    const config = this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]]
-    const {exchange, routingKey} = config.publications[publication]
-    const queue = Object.values(config.bindings).find(binding => binding.source === exchange && binding.bindingKey === routingKey)
+    const config =
+      this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]];
+    const { exchange, routingKey } = config.publications[publication];
+    const queue = Object.values(config.bindings).find(
+      (binding) =>
+        binding.source === exchange && binding.bindingKey === routingKey
+    ).destination;
 
     if (!queue) {
-      throw new Error('Routing Failed: Could not find a queue that matches the given publication')
+      throw new Error(
+        'Routing Failed: Could not find a queue that matches the given publication'
+      );
     }
 
     for (const [subName, sub] of Object.entries(config.subscriptions)) {
       if (sub.queue === queue) return subName as RascalSubscriptions;
     }
 
-    throw new Error('Routing Failed: Could not find a subscription that matches the given publication');
+    throw new Error(
+      'Routing Failed: Could not find a subscription that matches the given publication'
+    );
   }
 
   private async runMessageProcessor(
     messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>,
     messages: any[],
-    msgProcessorContext?: { [key: string]: any },
+    msgProcessorContext?: { [key: string]: any }
   ) {
     for (const message of messages) {
       try {
-        await messageProcessor.call({ rmqController: this, ...msgProcessorContext }, message);
+        await messageProcessor.call(
+          { rmqController: this, ...msgProcessorContext },
+          message
+        );
       } catch (e) {
         const errorMsg = `
               Failed to process message: ${JSON.stringify(message)} 
@@ -141,9 +167,13 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
         // if the message processor throws because of a message formatting error then we immediately deadLetter the
         // message to avoid re-queuing the message multiple times
         if (e instanceof RmqMsgFormatError) {
-          throw new Error(`Negative Acknowledgement: Invalid Message Format Error - ${errorMsg}`)
+          throw new Error(
+            `Negative Acknowledgement: Invalid Message Format Error - ${errorMsg}`
+          );
         } else {
-          throw new Error(`Negative Acknowledgement: Unknown Error - Message would be re-queued in production`)
+          throw new Error(
+            `Negative Acknowledgement: Unknown Error - Message would be re-queued in production`
+          );
         }
       }
     }
