@@ -198,6 +198,18 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // if markdown is disabled, hide toolbar buttons
+  const toolbar = useMemo(() => {
+    if (isMarkdownEnabled) {
+      return [];
+    }
+    return ([[{ header: 1 }, { header: 2 }]] as any).concat([
+      ['bold', 'italic', 'strike'],
+      ['link', 'code-block', 'blockquote'],
+      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }]
+    ]);
+  }, [isMarkdownEnabled]);
+
   return (
     <div className="QuillEditorWrapper">
       {isUploading && <LoadingIndicator />}
@@ -256,11 +268,7 @@ const ReactQuillEditor = ({
           value={contentDelta}
           onChange={handleChange}
           modules={{
-            toolbar: ([[{ header: 1 }, { header: 2 }]] as any).concat([
-              ['bold', 'italic', 'strike'],
-              ['link', 'code-block', 'blockquote'],
-              [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }]
-            ]),
+            toolbar,
             imageDropAndPaste: {
               handler: handleImageDropAndPaste
             },
