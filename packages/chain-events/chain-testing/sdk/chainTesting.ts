@@ -185,7 +185,7 @@ export class ChainTesting {
   public async queueProposal(proposalId: string, govType: string = 'compound') {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
-      `${this.host}/gov/${govType}/queueProposal`,
+      `${this.host}/gov/${govType}/queue`,
       JSON.stringify(request),
       this.header
     );
@@ -203,7 +203,7 @@ export class ChainTesting {
   ) {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
-      `${this.host}/gov/${govType}/executeProposal`,
+      `${this.host}/gov/${govType}/execute`,
       JSON.stringify(request),
       this.header
     );
