@@ -10,6 +10,14 @@ function tupleToKey(list) {
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
+
+      await queryInterface.addColumn('Threads', 'view_count', {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+        transaction: t
+      });
+
       const updateQueries = [];
       const deleteCommentIds = [];
 
@@ -143,93 +151,94 @@ module.exports = {
       await queryInterface.renameColumn('Comments', 'root_id', 'thread_id', {
         transaction: t,
       });
+
+      const viewCounts = await queryInterface.sequelize.query(
+        `SELECT * FROM "ViewCounts"`
+      );
+
+      if (viewCounts[0].length > 0) {
+        const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id.split('_')[1], v]));
+
+        const threads = await queryInterface.sequelize.query(
+          `SELECT id FROM "Threads"`
+        );
+
+        const viewCountUpdates = [];
+        threads[0].forEach((thread) => {
+          if (viewCountMap.has(thread.id.toString())) {
+            viewCountUpdates.push(
+              queryInterface.sequelize.query(
+                `UPDATE "Threads"
+               SET "view_count" = ${
+                viewCountMap.get(thread.id.toString()).view_count
+              }
+               WHERE "id" = ${thread.id}`,
+                {transaction: t}
+              )
+            );
+          }
+        });
+
+        await Promise.all(viewCountUpdates);
+      }
+
+      await queryInterface.dropTable('ViewCounts', {
+        transaction: t
+      });
     });
 
     // cant be part of the transaction, or it will cause db to deadlock
     await queryInterface.changeColumn('Comments', 'thread_id', {
       type: 'INTEGER USING CAST("thread_id" as INTEGER)',
-      allowNull: false,
+      allowNull: false
     });
-
-    await queryInterface.addColumn('Threads', 'view_count', {
-      type: Sequelize.INTEGER,
-      defaultValue: 0,
-      allowNull: false,
-    });
-
-    const viewCounts = await queryInterface.sequelize.query(
-      `SELECT * FROM "ViewCounts"`
-    );
-
-    if (viewCounts[0].length > 0) {
-      const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id.split('_')[1], v]));
-
-      const threads = await queryInterface.sequelize.query(
-        `SELECT id FROM "Threads"`
-      );
-
-      const viewCountUpdates = [];
-      threads[0].forEach((thread) => {
-        if (viewCountMap.has(thread.id.toString())) {
-          viewCountUpdates.push(
-            queryInterface.sequelize.query(
-              `UPDATE "Threads"
-               SET "view_count" = ${
-                viewCountMap.get(thread.id.toString()).view_count
-              }
-               WHERE "id" = ${thread.id}`
-            )
-          );
-        }
-      });
-
-      await Promise.all(viewCountUpdates);
-    }
-
-    await queryInterface.dropTable('ViewCounts');
   },
 
   down: async (queryInterface, Sequelize) => {
-    // IRREVERSABLE data loss, but schema will update fine.
-    await queryInterface.renameColumn('Comments', 'thread_id', 'root_id');
+    await queryInterface.sequelize.transaction(async (t) => {
+      // IRREVERSABLE data loss, but schema will update fine.
+      await queryInterface.renameColumn('Comments', 'thread_id', 'root_id', {transaction: t});
 
-    await queryInterface.createTable(
-      'ViewCounts',
-      {
-        id: {type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true},
-        chain: {type: Sequelize.STRING},
-        object_id: {type: Sequelize.STRING, allowNull: false},
-        view_count: {type: Sequelize.INTEGER, allowNull: false},
-      },
-      {
-        underscored: true,
-        timestamps: false,
-        indexes: [
-          {fields: ['id']},
-          {fields: ['chain', 'object_id']},
-          {fields: ['community', 'object_id']},
-          {fields: ['chain', 'community', 'object_id']},
-          {fields: ['view_count']},
-        ],
-      }
-    );
-
-    const threads = await queryInterface.sequelize.query(
-      `SELECT id, chain, view_count FROM "Threads"`
-    );
-
-    const updateQueries = [];
-    threads[0].forEach((t) => {
-      updateQueries.push(
-        queryInterface.sequelize.query(
-          `INSERT INTO "ViewCounts" (chain, object_id, view_count)
-         VALUES ('${t.chain}', 'discussion_${t.id}', ${t.view_count})`
-        )
+      await queryInterface.createTable(
+        'ViewCounts',
+        {
+          id: {type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true},
+          chain: {type: Sequelize.STRING},
+          object_id: {type: Sequelize.STRING, allowNull: false},
+          view_count: {type: Sequelize.INTEGER, allowNull: false},
+        },
+        {
+          underscored: true,
+          timestamps: false,
+          indexes: [
+            {fields: ['id']},
+            {fields: ['chain', 'object_id']},
+            {fields: ['community', 'object_id']},
+            {fields: ['chain', 'community', 'object_id']},
+            {fields: ['view_count']},
+          ],
+        },
+        {transaction: t}
       );
+
+      const threads = await queryInterface.sequelize.query(
+        `SELECT id, chain, view_count FROM "Threads"`
+      );
+
+      const updateQueries = [];
+      threads[0].forEach((th) => {
+        updateQueries.push(
+          queryInterface.sequelize.query(
+            `INSERT INTO "ViewCounts" (chain, object_id, view_count)
+         VALUES ('${th.chain}', 'discussion_${th.id}', ${th.view_count})`,
+            {transaction: t}
+          )
+        );
+      });
+
+      await Promise.all(updateQueries);
+
+      return queryInterface.removeColumn('Threads', 'view_count', {transaction: t});
     });
-
-    await Promise.all(updateQueries);
-
-    return queryInterface.removeColumn('Threads', 'view_count');
   },
 };
