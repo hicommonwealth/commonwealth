@@ -3,10 +3,10 @@ import type { AnyProposal } from '../models';
 import { AbridgedThread, Comment, Proposal, Reaction, Thread } from '../models';
 import IdStore from './IdStore';
 
-class ReactionStore extends IdStore<Reaction<any>> {
-  private _storePost: { [identifier: string]: Array<Reaction<any>> } = {};
+class ReactionStore extends IdStore<Reaction> {
+  private _storePost: { [identifier: string]: Array<Reaction> } = {};
 
-  public add(reaction: Reaction<any>) {
+  public add(reaction: Reaction) {
     // TODO: Remove this once we start enforcing an ordering in stores
     const identifier = this.getPostIdentifier(reaction);
     const reactionAlreadyInStore =
@@ -26,7 +26,7 @@ class ReactionStore extends IdStore<Reaction<any>> {
     return this;
   }
 
-  public remove(reaction: Reaction<any>) {
+  public remove(reaction: Reaction) {
     super.remove(reaction);
     const identifier = this.getPostIdentifier(reaction);
     const proposalIndex = this._storePost[identifier].indexOf(reaction);
@@ -56,14 +56,14 @@ class ReactionStore extends IdStore<Reaction<any>> {
 
   public getByPost(
     post: Thread | AbridgedThread | AnyProposal | Comment<any>
-  ): Array<Reaction<any>> {
+  ): Array<Reaction> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
   public getPostIdentifier(
     rxnOrPost:
-      | Reaction<any>
+      | Reaction
       | Thread
       | AbridgedThread
       | AnyProposal

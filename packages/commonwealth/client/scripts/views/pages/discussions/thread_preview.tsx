@@ -20,8 +20,8 @@ import {
   getClasses,
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
-import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { ThreadPreviewReactionButtonBig } from '../../components/reaction_button/ThreadPreviewReactionButtonBig';
+import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import {
@@ -117,7 +117,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
         }}
         key={thread.id}
       >
-        {!windowIsSmall && <ThreadPreviewReactionButton thread={thread} />}
+        {!windowIsSmall && <ThreadPreviewReactionButtonBig thread={thread} />}
         <div className="main-content">
           <div className="top-row">
             <div className="user-and-date">
@@ -191,7 +191,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           )}
           <div className="row-bottom">
             <div className="comments-count">
-              {windowIsSmall && <ThreadReactionButton thread={thread} />}
+              {windowIsSmall && <ThreadReactionPreviewButtonSmall thread={thread} />}
               <CWIcon iconName="feedback" iconSize="small" />
               <CWText type="caption">
                 {pluralize(thread.numberOfComments, 'comment')}

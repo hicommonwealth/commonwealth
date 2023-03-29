@@ -48,7 +48,7 @@ export const RecentThreadsHeader = ({
     };
   }, []);
 
-  const { stagesEnabled, customStages } = app.chain.meta;
+  const { stagesEnabled, customStages } = app.chain?.meta || {};
 
   const topics = app.topics.getByCommunity(app.activeChainId());
 
