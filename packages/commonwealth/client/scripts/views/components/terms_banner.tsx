@@ -16,7 +16,11 @@ export const TermsBanner = (props: TermsBannerProps) => {
       className="TermsBanner"
       bannerContent={
         <CWText type="b2" className="terms-text">
-          Please check out our <a href={terms}>terms of service</a>.
+          Please check out our{' '}
+          <a href={terms} target="_blank">
+            terms of service
+          </a>
+          .
         </CWText>
       }
       onClose={() => localStorage.setItem(`${app.activeChainId()}-tos`, 'off')}
