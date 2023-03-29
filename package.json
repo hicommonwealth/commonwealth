@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "start": "yarn --cwd packages/commonwealth start",
+    "start:debug": "yarn --cwd packages/commonwealth start:debug",
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "psql": "yarn --cwd packages/commonwealth psql",

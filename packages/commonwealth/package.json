@@ -34,6 +34,7 @@
     "test-consumer": "ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000",
     "test-scripts": "ts-mocha --project tsconfig.json test/integration/enforceDataConsistency.spec.ts",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts",
+    "start:debug": "ts-node-dev --inspect-brk --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts",
     "start-consumer": "ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script",
     "start-prerender": "ts-node --project tsconfig.json server/scripts/runPrerenderService.ts",
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
