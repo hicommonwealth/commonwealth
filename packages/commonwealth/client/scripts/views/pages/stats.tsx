@@ -159,7 +159,7 @@ const StatsPage = () => {
   return (
     <Sublayout>
       <div className="StatsPage">
-        <div className="stat-row">
+        <div className="stat-row dark top">
           <CWText fontWeight="medium">Duration</CWText>
           <CWText fontWeight="medium">New Addresses</CWText>
           <CWText fontWeight="medium">New Comments</CWText>
@@ -194,7 +194,7 @@ const StatsPage = () => {
           <CWText>{batchedThreads['month']}</CWText>
           <CWText>{batchedActiveAccounts['month']}</CWText>
         </div>
-        <div className="stat-row">
+        <div className="stat-row dark bottom">
           <CWText fontWeight="medium">{'Total (all time)'}</CWText>
           <CWText fontWeight="medium">{totalData.totalRoles}</CWText>
           <CWText fontWeight="medium">{totalData.totalComments}</CWText>

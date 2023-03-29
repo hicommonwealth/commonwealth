@@ -1,15 +1,11 @@
 import axios from 'axios';
 import { StatsDController } from 'common-common/src/statsd';
 import type { Logger } from 'typescript-logging';
+import emitNotifications from '../../util/emitNotifications';
 import type { SnapshotNotification } from '../../../shared/types';
+import { SnapshotEventType } from '../../../shared/types';
+import { NotificationCategories } from 'common-common/src/types';
 import type { DB } from '../../models';
-
-const enum SnapshotEventType {
-  Created = 'proposal/created',
-  Deleted = 'proposal/deleted',
-  Ended = 'proposal/end',
-  Started = 'proposal/start',
-}
 
 export async function processSnapshotMessage(
   this: { models: DB; log: Logger },
@@ -17,7 +13,7 @@ export async function processSnapshotMessage(
 ) {
   const { space, id, title, body, choices, start, expire } = data;
 
-  const eventType = data.event;
+  const eventType = data.event as SnapshotEventType;
 
   // Sometimes snapshot-listener will receive a webhook event from a
   // proposal that no longer exists. In that event, we will receive null data
@@ -76,6 +72,19 @@ export async function processSnapshotMessage(
       space,
     });
   }
+
+  // Notifications
+  emitNotifications(
+    this.models,
+    NotificationCategories.SnapshotProposal,
+    snapshotNotificationData.space,
+    { eventType, ...snapshotNotificationData },
+    {
+      notificationCategory: eventType,
+      body: snapshotNotificationData.body,
+      title: snapshotNotificationData.title, // TODO: Decide on what we want for the webhook we emit
+    }
+  );
 
   try {
     if (space || proposal.space) {

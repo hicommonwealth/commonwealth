@@ -1,5 +1,4 @@
 import React from 'react';
-
 import type { Topic } from 'models';
 
 import { SelectList } from 'views/components/component_kit/cw_select_list';
