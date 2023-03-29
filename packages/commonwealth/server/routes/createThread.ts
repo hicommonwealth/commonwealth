@@ -186,14 +186,7 @@ const dispatchHooks = async (
           author_address: finalThread.Address.address,
           author_chain: finalThread.Address.chain,
         },
-        {
-          user: finalThread.Address.address,
-          url: getThreadUrl('discussion', finalThread),
-          title: req.body.title,
-          bodyUrl: req.body.url,
-          chain: finalThread.chain,
-          body: finalThread.body,
-        },
+        null,
         [finalThread.Address.address]
       );
     });
