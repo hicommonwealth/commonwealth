@@ -116,7 +116,6 @@ export const NewSnapshotProposalPageComponent = ({ snapshotId }: NewSnapshotProp
       setForm(initialForm);
 
       const snapshotSpace = app.snapshot.space;
-      console.log('snapshotSpace: ', snapshotSpace);
       const scoreResponse = await getScore(snapshotSpace, app.user.activeAccount.address);
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
