@@ -29,12 +29,12 @@ export default class extends IEventHandler {
     );
 
     if (!dbEvent) {
-      log.trace(`No db event received! Ignoring.`);
+      log.warn(`No db event received! Ignoring.`);
       return;
     }
 
     if (this._excludedEvents.includes(event.data.kind)) {
-      log.trace(`Skipping event!`);
+      log.warn(`Skipping event!`);
       return dbEvent;
     }
 
@@ -43,7 +43,7 @@ export default class extends IEventHandler {
       dbEventType = await dbEvent.getChainEventType();
       if (!dbEventType) {
         log.error(`Failed to fetch event type! Ignoring.`);
-        return;
+        return dbEvent;
       }
     } catch (e) {
       log.error(

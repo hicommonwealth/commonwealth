@@ -1,21 +1,21 @@
-import { runSubscriberAsFunction } from '../../../services/ChainSubscriber/chainSubscriber';
-import { MockRabbitMqHandler } from '../../../services/ChainEventsConsumer/ChainEventHandlers';
+import { runSubscriberAsFunction } from '../../../../services/ChainSubscriber/chainSubscriber';
+import { MockRabbitMqHandler } from '../../../../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   getRabbitMQConfig,
   RascalPublications,
   RascalSubscriptions,
 } from 'common-common/src/rabbitmq';
-import { RABBITMQ_URI } from '../../../services/config';
+import { RABBITMQ_URI } from '../../../../services/config';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { compoundGovernor } from '../../../chain-testing/src/utils/governance/compoundGov';
-import { ChainTesting } from '../../../chain-testing/sdk/chainTesting';
+import { compoundGovernor } from '../../../../chain-testing/src/utils/governance/compoundGov';
+import { ChainTesting } from '../../../../chain-testing/sdk/chainTesting';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import models from '../../../services/database/database';
-import { setupChainEventConsumer } from '../../../services/ChainEventsConsumer/chainEventsConsumer';
+import models from '../../../../services/database/database';
+import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
-import { eventMatch } from '../../util';
-import { createChainEventsApp } from '../../../services/app/Server';
+import { eventMatch } from '../../../util';
+import { createChainEventsApp } from '../../../../services/app/Server';
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -39,7 +39,7 @@ describe('Integration tests for Compound Bravo', () => {
   let relatedEntity;
 
   const contract = new compoundGovernor();
-  const chain_id = 'ganache-fork';
+  const chain_id = 'ganache-fork-bravo';
   const chain = {
     id: chain_id,
     base: ChainBase.Ethereum,
@@ -83,8 +83,8 @@ describe('Integration tests for Compound Bravo', () => {
       eventMatch(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][0],
         'proposal-created',
-        proposalId,
-        chain_id
+        chain_id,
+        proposalId
       );
     });
 
@@ -103,8 +103,8 @@ describe('Integration tests for Compound Bravo', () => {
       eventMatch(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][1],
         'vote-cast',
-        proposalId,
-        chain_id
+        chain_id,
+        proposalId
       );
     });
 
@@ -123,8 +123,8 @@ describe('Integration tests for Compound Bravo', () => {
       eventMatch(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][2],
         'proposal-queued',
-        proposalId,
-        chain_id
+        chain_id,
+        proposalId
       );
     });
 
@@ -143,8 +143,8 @@ describe('Integration tests for Compound Bravo', () => {
       eventMatch(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][3],
         'proposal-executed',
-        proposalId,
-        chain_id
+        chain_id,
+        proposalId
       );
     });
 
@@ -170,7 +170,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal created events', async () => {
       const propCreatedEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: 'ganache-fork-proposal-created',
+          chain_event_type_id: `${chain_id}-proposal-created`,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'proposal-created'`),
@@ -192,8 +192,8 @@ describe('Integration tests for Compound Bravo', () => {
           RascalSubscriptions.ChainEventNotificationsCUDMain
         ][0].event,
         'proposal-created',
-        proposalId,
-        chain_id
+        chain_id,
+        proposalId
       );
 
       relatedEntity = await models.ChainEntity.findOne({
@@ -213,7 +213,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process vote cast events', async () => {
       const voteCastEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: 'ganache-fork-vote-cast',
+          chain_event_type_id: `${chain_id}-vote-cast`,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'vote-cast'`),
@@ -231,7 +231,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal queued events', async () => {
       const propQueuedEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: 'ganache-fork-proposal-queued',
+          chain_event_type_id: `${chain_id}-proposal-queued`,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'proposal-queued'`),
@@ -249,7 +249,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal executed events', async () => {
       const propExecutedEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: 'ganache-fork-proposal-executed',
+          chain_event_type_id: `${chain_id}-proposal-executed`,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'proposal-executed'`),
@@ -268,8 +268,8 @@ describe('Integration tests for Compound Bravo', () => {
           RascalSubscriptions.ChainEventNotificationsCUDMain
         ][3].event,
         'proposal-executed',
-        proposalId,
-        chain_id
+        chain_id,
+        proposalId
       );
     });
   });
@@ -356,7 +356,7 @@ describe('Integration tests for Compound Bravo', () => {
 
   after(async () => {
     await rmq.shutdown();
-    await models.ChainEvent.destroy({ where: { chain_event_type_id: {[Op.like]: 'ganache-fork%'} }, logging: console.log });
+    await models.ChainEvent.destroy({ where: { chain_event_type_id: {[Op.like]: `${chain_id}%`} }, logging: console.log });
     await models.ChainEventType.destroy({ where: { chain: chain_id }, logging: console.log });
     await models.ChainEntity.destroy({ where: { chain: chain_id }, logging: console.log });
     await models.sequelize.close();

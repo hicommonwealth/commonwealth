@@ -78,7 +78,7 @@ export default class extends IEventHandler {
     event = this.truncateEvent(event);
     const shouldSkip = await this._shouldSkip(event);
     if (shouldSkip) {
-      log.trace(`Skipping event!`);
+      log.warn(`Skipping event!`);
       return;
     }
 
@@ -149,6 +149,7 @@ export default class extends IEventHandler {
 
       return dbEvent;
     } else {
+      log.warn(`Duplicate event: ${eventKey}: ${JSON.stringify(eventData)}`);
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
 

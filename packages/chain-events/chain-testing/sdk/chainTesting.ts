@@ -2,7 +2,7 @@ import axios from 'axios';
 import Web3 from 'web3';
 import {
   chainAdvanceTime,
-  chainGetEth,
+  chainGetEth, erc20Approve,
   erc20BalanceReq,
   erc20Transfer,
   govCompCreate,
@@ -73,6 +73,32 @@ export class ChainTesting {
     };
     await axios.post(
       `${this.host}/erc20/transfer`,
+      JSON.stringify(request),
+      this.header
+    );
+  }
+
+  /**
+   * Approve a spender to spend an ERC20 token
+   * @param tokenAddress ERC20 token address
+   * @param spender address to approve
+   * @param amount amount to approve
+   * @param accountIndex account index to create approve tx from(erc20.approve)
+   */
+  public async approveErc20(
+    tokenAddress: string,
+    spender: string,
+    amount: string,
+    accountIndex?: number
+  ) {
+    const request: erc20Approve = {
+      tokenAddress,
+      spender,
+      amount,
+      accountIndex,
+    };
+    await axios.post(
+      `${this.host}/erc20/approve`,
       JSON.stringify(request),
       this.header
     );

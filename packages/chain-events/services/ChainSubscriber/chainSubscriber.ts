@@ -301,6 +301,13 @@ export async function runSubscriberAsServer() {
   }
 }
 
+export async function shutdownSubscriber() {
+  log.info('Shutting down subscriber');
+  Object.values(listenerInstances).forEach((listener) => {
+    listener.unsubscribe();
+  });
+}
+
 // Used in the Heroku Procfile + `yarn` commands -> only tests should bypass this
 if (require.main === module) {
   runSubscriberAsServer();

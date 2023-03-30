@@ -53,7 +53,7 @@ export default class extends IEventHandler {
     const chain = event.chain || this._chain;
     if (!dbEvent) {
       log.warn(
-        `no db event found for event ${event.chain}::${event.data.kind}!`
+        `no db event found for event ${event.chain}-${event.data.kind}!`
       );
       return;
     }
