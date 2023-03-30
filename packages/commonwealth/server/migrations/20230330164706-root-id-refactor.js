@@ -187,20 +187,24 @@ module.exports = {
       });
     });
 
-    throw new Error('Fail');
-
-    // cant be part of the transaction, or it will cause db to deadlock
-    // eslint-disable-next-line no-unreachable
-    await queryInterface.changeColumn('Comments', 'thread_id', {
-      type: 'INTEGER USING CAST("thread_id" as INTEGER)',
-      allowNull: false
-    });
+    // Just don't run this part, so that sequlize thinks this ran fine so that we can run the revert script.
+    // // cant be part of the transaction, or it will cause db to deadlock
+    // await queryInterface.changeColumn('Comments', 'thread_id', {
+    //   type: 'INTEGER USING CAST("thread_id" as INTEGER)',
+    //   allowNull: false
+    // });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
       // IRREVERSABLE data loss, but schema will update fine.
       await queryInterface.renameColumn('Comments', 'thread_id', 'root_id', {transaction: t});
+
+      await queryInterface.sequelize.query(
+        `UPDATE "Comments" SET "root_id" = 
+         regexp_replace(root_id, '(.*)', 'discussion_\\1')`,
+         {transaction: t}
+      );
 
       await queryInterface.createTable(
         'ViewCounts',
