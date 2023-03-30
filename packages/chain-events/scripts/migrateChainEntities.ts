@@ -206,6 +206,6 @@ export async function runEntityMigrations(chainId?: string): Promise<void> {
   }
 }
 
-if (process.argv[2] === 'run-as-script') {
-  runEntityMigrations(process.argv[3]);
+if (require.main === module) {
+  runEntityMigrations(process.argv[2]);
 }

@@ -302,6 +302,6 @@ export async function runSubscriberAsServer() {
 }
 
 // Used in the Heroku Procfile + `yarn` commands -> only tests should bypass this
-if (process.argv[2] === 'run-as-script') {
+if (require.main === module) {
   runSubscriberAsServer();
 }

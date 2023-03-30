@@ -65,7 +65,7 @@ export async function createChainEventsApp(): Promise<Express> {
   return app;
 }
 
-if (process.argv[2] === 'run-as-script') {
+if (require.main === module) {
   createChainEventsApp().then((app) => {
     app.listen(port, () => {
       log.info(`Chain events server listening on port ${port}`);
