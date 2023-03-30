@@ -53,13 +53,13 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
 
-    // Put the profile growl on a timer so it doesn't immediately appear
+    // Put the email growl on a timer so it doesn't immediately appear
     if (!this.emailGrowlDelayTriggered && !this.emailGrowlReadyForDisplay) {
       this.emailGrowlDelayTriggered = true;
       setTimeout(() => {
         this.emailGrowlReadyForDisplay = true;
         m.redraw();
-      }, 40);
+      }, 4000);
     }
 
     if (app.loadingError) {

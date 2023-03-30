@@ -12,7 +12,7 @@ import { CWGrowl } from './component_kit/cw_growl';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWText } from './component_kit/cw_text';
 
-const GROWL_DISPLAY_INTERVAL = 1000; // 1 Hour wait
+const GROWL_DISPLAY_INTERVAL = 1000 * 60 * 60; // 1 Hour wait
 
 type EmailDigestGrowlViewAttrs = {
   disabled: boolean;
@@ -36,7 +36,7 @@ class EmailDigestView extends ClassComponent<EmailDigestGrowlViewAttrs> {
           </CWText>
           <CWText type="b1" className="body-text">
             Bundle top posts from all your communities via email as often as you
-            need it
+            need it.
           </CWText>
           <div class="button-wrapper">
             <CWButton
@@ -59,7 +59,7 @@ class EmailDigestView extends ClassComponent<EmailDigestGrowlViewAttrs> {
 }
 
 function surveyDisplayTimeElapsed() {
-  const lastSurvey = localStorage.getItem('profile-growl-last-displayed');
+  const lastSurvey = localStorage.getItem('email-growl-last-displayed');
   if (!lastSurvey) {
     // They have never seen the survey growl before
     return true;
@@ -81,11 +81,11 @@ export class EmailDigestPopup extends ClassComponent<NewProfilesPopupAttrs> {
 
   oninit() {
     this.hideForeverChecked = false;
-    const profileGrowlCurrentlyLocked =
+    const emailGrowlCurrentlyLocked =
       localStorage.getItem('email-growl-locked');
     const delayTimeElapsed = surveyDisplayTimeElapsed();
 
-    if (profileGrowlCurrentlyLocked) {
+    if (emailGrowlCurrentlyLocked) {
       this.growlLocked = true;
     } else {
       this.growlLocked = !delayTimeElapsed;
@@ -100,10 +100,7 @@ export class EmailDigestPopup extends ClassComponent<NewProfilesPopupAttrs> {
         localStorage.setItem('email-growl-locked', 'true');
       }
       this.growlLocked = true;
-      localStorage.setItem(
-        'profile-growl-last-displayed',
-        Date.now().toString()
-      );
+      localStorage.setItem('email-growl-last-displayed', Date.now().toString());
       console.log('setting new email-growl-last-displayed');
       m.redraw();
     };
@@ -113,13 +110,8 @@ export class EmailDigestPopup extends ClassComponent<NewProfilesPopupAttrs> {
       this.growlLocked = true;
       localStorage.setItem('email-growl-locked', 'true');
 
-      const { address, chain } = app.user.addresses[0];
-      const pf = app.newProfiles.getProfile(chain.id, address);
-
-      // Redirect to the view profile page
-      if (pf) {
-        m.route.set(`/profile/id/${pf.id}`);
-      }
+      // Redirect to the notification page
+      m.route.set(`/notification-settings`);
     };
 
     if (this.growlLocked) return;
