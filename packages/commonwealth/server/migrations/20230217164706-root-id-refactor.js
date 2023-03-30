@@ -199,6 +199,12 @@ module.exports = {
       // IRREVERSABLE data loss, but schema will update fine.
       await queryInterface.renameColumn('Comments', 'thread_id', 'root_id', {transaction: t});
 
+      await queryInterface.sequelize.query(
+        `UPDATE "Comments" SET "root_id" = 
+         regexp_replace(root_id, '(.*)', 'discussion_\\1')`,
+        {transaction: t}
+      );
+
       await queryInterface.createTable(
         'ViewCounts',
         {
