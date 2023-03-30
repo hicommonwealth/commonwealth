@@ -19,6 +19,7 @@ import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import { NewProfilesPopup } from './components/new_profiles_popup';
+import { EmailDigestPopup } from './components/email_digest_popup';
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -43,8 +44,8 @@ type LayoutAttrs = {
 export class Layout extends ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
-  private growlDelayTriggered = false;
-  private profileGrowlReadyForDisplay = false;
+  private emailGrowlDelayTriggered = false;
+  private emailGrowlReadyForDisplay = false;
 
   view(vnode: m.Vnode<LayoutAttrs>) {
     const { scope, deferChain } = vnode.attrs;
@@ -53,12 +54,12 @@ export class Layout extends ClassComponent<LayoutAttrs> {
     const scopeMatchesChain = app.config.chains.getById(scope);
 
     // Put the profile growl on a timer so it doesn't immediately appear
-    if (!this.growlDelayTriggered && !this.profileGrowlReadyForDisplay) {
-      this.growlDelayTriggered = true;
+    if (!this.emailGrowlDelayTriggered && !this.emailGrowlReadyForDisplay) {
+      this.emailGrowlDelayTriggered = true;
       setTimeout(() => {
-        this.profileGrowlReadyForDisplay = true;
+        this.emailGrowlReadyForDisplay = true;
         m.redraw();
-      }, 4000);
+      }, 40);
     }
 
     if (app.loadingError) {
@@ -135,9 +136,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
         <AppModals />
         <AppToasts />
         {app.isLoggedIn() && (
-          <NewProfilesPopup
-            readyForDisplay={this.profileGrowlReadyForDisplay}
-          />
+          <EmailDigestPopup readyForDisplay={this.emailGrowlReadyForDisplay} />
         )}
       </div>
     );
