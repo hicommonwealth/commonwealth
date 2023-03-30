@@ -68,7 +68,7 @@ describe('Integration tests for Compound Bravo', () => {
 
     it('Should capture proposal created events', async () => {
       // get votes before creating the proposal, so we can test voting further down
-      await sdk.getVotingPower(1, '400000');
+      await sdk.getVotingPower(1, '456000');
 
       proposalId = await sdk.createProposal(1);
       await delay(10000);
@@ -202,7 +202,6 @@ describe('Integration tests for Compound Bravo', () => {
           type_id: '0x' + parseInt(proposalId).toString(16),
           type: 'proposal',
         },
-        logging: console.log,
       });
 
       expect(relatedEntity, 'Entity created not found').to.exist;
@@ -276,39 +275,38 @@ describe('Integration tests for Compound Bravo', () => {
   });
 
   describe('Tests for retrieving Bravo events with the app', async () => {
-    let server;
-    let agent;
+    let agent, hexProposalId;
+
 
     before(async () => {
       // set up the app
       const app = await createChainEventsApp();
-      server = app.listen();
-      agent = chai.request(server);
+      agent = chai.request(app).keepOpen();
+      hexProposalId = '0x' + parseInt(proposalId).toString(16);
     });
 
     after(async () => {
-      server.close();
+      agent.close();
     });
 
     it('Should retrieve the proposal created event and entity', async () => {
       let res = await agent.get(`/api/events?limit=10`);
-      console.log('res.body', res.body);
       expect(res.status).to.equal(200);
-      expect(res.body.result).to.exist;
+      expect(res.body.result, 'The request body should contain an array of events').to.exist;
+
       const proposalCreatedEvent = res.body.result.find(
         (e) =>
           e.event_data.kind === 'proposal-created' &&
-          e.event_data.id === proposalId &&
+          e.event_data.id === hexProposalId &&
           e.chain === chain_id
       );
-      expect(proposalCreatedEvent).to.exist;
+      expect(proposalCreatedEvent, 'Should be set to the proposal creation event DB record').to.exist;
 
       res = await agent.get(
-        `/api/entities?type=proposal&type_id=0x${parseInt(proposalId).toString(16)}&chain=${chain_id}`
+        `/api/entities?type=proposal&type_id=${hexProposalId}&chain=${chain_id}`
       );
-      console.log('res.body', res.body);
       expect(res.status).to.equal(200);
-      expect(res.body.result).to.exist;
+      expect(res.body.result, 'The request body should contain an array with a single element').to.exist;
       expect(res.body.result.length).to.equal(1);
       expect(res.body.result[0].id).to.equal(proposalCreatedEvent.entity_id);
     });
@@ -320,12 +318,11 @@ describe('Integration tests for Compound Bravo', () => {
       const event = res.body.result.find(
         (e) =>
           e.event_data.kind === 'vote-cast' &&
-          e.event_data.id === proposalId &&
+          e.event_data.id === hexProposalId &&
           e.chain === chain_id
       );
       expect(event).to.exist;
       expect(event.entity_id).to.equal(relatedEntity.id);
-
     });
 
     it('Should retrieve proposal queued events', async () => {
@@ -335,7 +332,7 @@ describe('Integration tests for Compound Bravo', () => {
       const event = res.body.result.find(
         (e) =>
           e.event_data.kind === 'proposal-queued' &&
-          e.event_data.id === proposalId &&
+          e.event_data.id === hexProposalId &&
           e.chain === chain_id
       );
       expect(event).to.exist;
@@ -349,7 +346,7 @@ describe('Integration tests for Compound Bravo', () => {
       const event = res.body.result.find(
         (e) =>
           e.event_data.kind === 'proposal-executed' &&
-          e.event_data.id === proposalId &&
+          e.event_data.id === hexProposalId &&
           e.chain === chain_id
       );
       expect(event).to.exist;
