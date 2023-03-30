@@ -153,8 +153,8 @@ async function migrateChainEntity(
     for (const event of events) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        // const dbEvent = await migrationHandler.handle(event);
-        // await entityArchivalHandler.handle(event, dbEvent);
+        const dbEvent = await migrationHandler.handle(event);
+        await entityArchivalHandler.handle(event, dbEvent);
       } catch (e) {
         log.error(`Event handle failure: ${e.message}`);
       }
