@@ -20,6 +20,7 @@ import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEve
 import ceModels from 'chain-events/services/database/database';
 
 import {
+  AbstractRabbitMQController,
   getRabbitMQConfig,
   RabbitMQController,
 } from 'common-common/src/rabbitmq';
@@ -59,7 +60,7 @@ async function fetchData(url: string, data: any) {
 
 async function migrateChainEntity(
   chain: string,
-  rmqController: RabbitMQController
+  rmqController: AbstractRabbitMQController
 ): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info(`Fetching node info for ${chain}...`);
@@ -152,8 +153,8 @@ async function migrateChainEntity(
     for (const event of events) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        const dbEvent = await migrationHandler.handle(event);
-        await entityArchivalHandler.handle(event, dbEvent);
+        // const dbEvent = await migrationHandler.handle(event);
+        // await entityArchivalHandler.handle(event, dbEvent);
       } catch (e) {
         log.error(`Event handle failure: ${e.message}`);
       }
@@ -164,7 +165,7 @@ async function migrateChainEntity(
 }
 
 async function migrateChainEntities(
-  rmqController: RabbitMQController
+  rmqController: AbstractRabbitMQController
 ): Promise<void> {
   const chains = await fetchData(
     `${CW_SERVER_URL}/api/getSubscribedChains`,
