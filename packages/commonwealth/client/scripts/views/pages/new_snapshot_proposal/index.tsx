@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { FormEvent, SyntheticEvent, useEffect, useMemo, useState } from 'react';
 
-import { ClassComponent, redraw, parsePathname } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
+import { parsePathname } from 'mithrilInterop';
 import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
@@ -11,53 +10,74 @@ import { capitalize } from 'lodash';
 import 'pages/new_snapshot_proposal.scss';
 
 import app from 'state';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import type { QuillEditor } from '../../components/quill/quill_editor';
+
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
-import { newLink } from './helpers';
 import type { ThreadForm } from './types';
-import withRouter from 'navigation/helpers';
+import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useLocation } from 'react-router';
+import { createDeltaFromText, ReactQuillEditor } from '../../components/react_quill_editor';
+import { DeltaStatic } from 'quill';
+import { createNewProposal } from './helpers';
 
-type NewSnapshotProposalPageAttrs = {
+type NewSnapshotProposalPageProps = {
   snapshotId: string;
 };
 
-class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposalPageAttrs> {
-  private form: ThreadForm;
-  private initialized: boolean;
-  private isFromExistingProposal: boolean;
-  private members: Array<string>;
-  private quillEditorState: QuillEditor;
-  private saving: boolean;
-  private snapshotScoresFetched: boolean;
-  private space: SnapshotSpace;
-  private userScore: number;
+export const NewSnapshotProposalPageComponent = ({ snapshotId }: NewSnapshotProposalPageProps) => {
+  const navigate = useCommonNavigate();
 
-  view(vnode: ResultNode<NewSnapshotProposalPageAttrs>) {
-    if (!app.chain) {
-      return <PageLoading />;
+  const [form, setForm] = useState<ThreadForm | null>(null);
+  const [isFromExistingProposal, setIsFromExistingProposal] = useState<boolean>();
+  const [members, setMembers] = useState<string[]>([]);
+  const [contentDelta, setContentDelta] = useState<DeltaStatic>(createDeltaFromText(''));
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [snapshotScoresFetched, setSnapshotScoresFetched] = useState<boolean>(false);
+  const [space, setSpace] = useState<SnapshotSpace | null>(null);
+  const [userScore, setUserScore] = useState<number>(0);
+
+  const location = useLocation();
+  const pathVars = useMemo(() => {
+    return parsePathname(window.location.href);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
+
+  const clearLocalStorage = () => {
+    localStorage.removeItem(`${app.activeChainId()}-new-snapshot-proposal-name`);
+  };
+
+  const handlePublish = async () => {
+    try {
+      setIsSaving(true);
+
+      const content = JSON.stringify(contentDelta);
+      await createNewProposal(form, content, author, space);
+
+      clearLocalStorage();
+      notifySuccess('Snapshot Created!');
+      navigate(`/snapshot/${space.id}`);
+    } catch (err) {
+      notifyError(capitalize(err.message));
+    } finally {
+      setIsSaving(false);
     }
+  };
 
-    const pathVars = parsePathname(window.location.href);
+  useEffect(() => {
+    const init = async () => {
+      await app.snapshot.init(snapshotId);
 
-    if (!app.snapshot.initialized) {
-      app.snapshot.init(vnode.attrs.snapshotId).then(() => this.redraw());
-      return <PageLoading />;
-    }
+      if (!app.snapshot.initialized) {
+        return;
+      }
 
-    if (!this.initialized) {
-      this.initialized = true;
-      this.members = [];
-      this.userScore = null;
-
-      this.form = {
+      const initialForm: ThreadForm = {
         name: '',
         body: '',
         choices: ['Yes', 'No'],
@@ -66,7 +86,7 @@ class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposa
         end: moment().add(5, 'days').toDate().getTime(),
         snapshot: 0,
         metadata: {},
-        type: 'single-choice',
+        type: 'single-choice'
       };
 
       if (pathVars.params.fromProposalType && pathVars.params.fromProposalId) {
@@ -79,205 +99,142 @@ class NewSnapshotProposalPageComponent extends ClassComponent<NewSnapshotProposa
 
         const fromProposal = idToProposal(fromProposalType, fromProposalId);
 
-        this.form.name = fromProposal.title;
+        initialForm.name = fromProposal.title;
 
-        this.isFromExistingProposal = true;
+        setIsFromExistingProposal(true);
 
         if (fromProposal.body) {
           try {
             const parsedBody = JSON.parse(fromProposal.body);
-            this.form.body = parsedBody.ops[0].insert;
+            initialForm.body = parsedBody.ops[0].insert;
           } catch (e) {
             console.error(e);
           }
         }
       }
 
-      const space = app.snapshot.space;
+      setForm(initialForm);
 
-      getScore(space, app.user.activeAccount.address).then((response) => {
-        const scores = response
-          .map((score) =>
-            Object.values(score).reduce(
-              (a, b) => (a as number) + (b as number),
-              0
-            )
-          )
-          .reduce((a, b) => (a as number) + (b as number), 0);
-
-        this.userScore = scores as number;
-
-        this.space = space;
-
-        this.members = space.members;
-
-        this.snapshotScoresFetched = true;
-        this.redraw();
-      });
-    }
-
-    if (!this.snapshotScoresFetched) return <PageLoading />;
-
-    const author = app.user.activeAccount;
-
-    const clearLocalStorage = () => {
-      localStorage.removeItem(
-        `${app.activeChainId()}-new-snapshot-proposal-name`
-      );
+      const snapshotSpace = app.snapshot.space;
+      console.log('snapshotSpace: ', snapshotSpace);
+      const scoreResponse = await getScore(snapshotSpace, app.user.activeAccount.address);
+      setUserScore(scoreResponse);
+      setSpace(snapshotSpace);
+      setMembers(snapshotSpace.members);
+      setSnapshotScoresFetched(true);
     };
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const isMember =
-      author &&
-      author.address &&
-      !!this.members.find(
-        (member) => member.toLowerCase() === author.address.toLowerCase()
-      );
+  if (!form || !snapshotScoresFetched) return <PageLoading />;
 
-    const hasMinScore = this.userScore >= this.space.filters?.minScore;
+  const author = app.user.activeAccount;
 
-    const showScoreWarning =
-      this.space.filters?.minScore > 0 &&
-      !hasMinScore &&
-      !isMember &&
-      this.userScore !== null;
+  const isMember =
+    author && author.address && !!members.find((member) => member.toLowerCase() === author.address.toLowerCase());
 
-    const isValid =
-      this.space !== undefined &&
-      (!this.space.filters?.onlyMembers ||
-        (this.space.filters?.onlyMembers && isMember)) &&
-      (this.space.filters?.minScore === 0 ||
-        (this.space.filters?.minScore > 0 &&
-          this.userScore > this.space.filters?.minScore) ||
-        isMember);
+  const hasMinScore = userScore >= space.filters?.minScore;
 
-    return (
-      <Sublayout>
-        <div className="NewSnapshotProposalPage">
-          <CWText type="h3" fontWeight="medium">
-            New Snapshot Proposal
+  const showScoreWarning = space.filters?.minScore > 0 && !hasMinScore && !isMember && userScore !== null;
+
+  const isValid =
+    !!space &&
+    (!space.filters?.onlyMembers || (space.filters?.onlyMembers && isMember)) &&
+    (space.filters?.minScore === 0 || (space.filters?.minScore > 0 && userScore > space.filters?.minScore) || isMember);
+
+  return (
+    <Sublayout>
+      <div className="NewSnapshotProposalPage">
+        <CWText type="h3" fontWeight="medium">
+          New Snapshot Proposal
+        </CWText>
+        {space.filters?.onlyMembers && !isMember && (
+          <CWText>You need to be a member of the space in order to submit a proposal.</CWText>
+        )}
+        {showScoreWarning ? (
+          <CWText>
+            You need to have a minimum of {space.filters.minScore} {space.symbol} in order to submit a proposal.
           </CWText>
-          {this.space.filters?.onlyMembers && !isMember && (
-            <CWText>
-              You need to be a member of the space in order to submit a
-              proposal.
-            </CWText>
-          )}
-          {showScoreWarning ? (
-            <CWText>
-              You need to have a minimum of {this.space.filters.minScore}{' '}
-              {this.space.symbol} in order to submit a proposal.
-            </CWText>
-          ) : (
-            <CWSpinner />
-          )}
-          <CWTextInput
-            label="Question/Proposal"
-            placeholder="Should 0xMaki be our new Mayor?"
-            onInput={(e) => {
-              e.redraw = false; // do not redraw on input
-
-              this.form.name = e.target.value as any;
-
-              localStorage.setItem(
-                `${app.activeChainId()}-new-snapshot-proposal-name`,
-                this.form.name
-              );
-            }}
-            defaultValue={this.form.name}
-          />
-          {this.form.choices.map((_, idx) => {
-            return (
-              <CWTextInput
-                label={`Choice ${idx + 1}`}
-                placeholder={
-                  idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
-                }
-                onInput={(e) => {
-                  this.form.choices[idx] = (e.target as any).value;
-                  this.redraw();
-                }}
-                iconRight={
-                  idx > 1 && idx === this.form.choices.length - 1
-                    ? 'trash'
-                    : undefined
-                }
-                iconRightonClick={() => {
-                  this.form.choices.pop();
-                  this.redraw();
-                }}
-              />
-            );
-          })}
-          <CWButton
-            iconLeft="plus"
-            label="Add voting choice"
-            onClick={() => {
-              this.form.choices.push(`Option ${this.form.choices.length + 1}`);
-              this.redraw();
-            }}
-          />
-          <div className="date-range">
-            <CWLabel label="Date Range" />
-            <CWRadioGroup
-              name="period"
-              options={[{ value: '4d', label: '4-day' }]}
-              toggledOption="4d"
-              onChange={(e: Event) => {
-                this.form.range = (e.target as any).value;
-                this.form.start = new Date().getTime();
-
-                switch (this.form.range) {
-                  case '4d':
-                    this.form.end = moment().add(4, 'days').toDate().getTime();
-                    break;
-                  default:
-                    break;
-                }
+        ) : (
+          <CWSpinner />
+        )}
+        <CWTextInput
+          label="Question/Proposal"
+          placeholder="Should 0xMaki be our new Mayor?"
+          onInput={(e) => {
+            setForm({
+              ...form,
+              name: e.target.value
+            });
+            localStorage.setItem(`${app.activeChainId()}-new-snapshot-proposal-name`, form.name);
+          }}
+          defaultValue={form.name}
+        />
+        {form.choices.map((_, idx) => {
+          return (
+            <CWTextInput
+              label={`Choice ${idx + 1}`}
+              placeholder={idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`}
+              onInput={(e) => {
+                setForm({
+                  ...form,
+                  choices: form.choices.map((choice, i) => (i === idx ? e.target.value : choice))
+                });
+              }}
+              iconRight={idx > 1 && idx === form.choices.length - 1 ? 'trash' : undefined}
+              iconRightonClick={() => {
+                setForm({
+                  ...form,
+                  choices: form.choices.slice(0, -1)
+                });
               }}
             />
-          </div>
-          <QuillEditorComponent
-            contentsDoc={this.form.body || ' '}
-            oncreateBind={(state: QuillEditor) => {
-              this.quillEditorState = state;
-            }}
-            placeholder="What is your proposal?"
-            editorNamespace="new-proposal"
-            mode="markdown"
-          />
-          <CWButton
-            label="Publish"
-            disabled={!author || this.saving || !isValid}
-            onClick={async () => {
-              this.saving = true;
+          );
+        })}
+        <CWButton
+          iconLeft="plus"
+          label="Add voting choice"
+          onClick={() => {
+            setForm({
+              ...form,
+              choices: form.choices.concat(`Option ${form.choices.length + 1}`)
+            });
+          }}
+        />
+        <div className="date-range">
+          <CWLabel label="Date Range" />
+          <CWRadioGroup
+            name="period"
+            options={[{ value: '4d', label: '4-day' }]}
+            toggledOption="4d"
+            onChange={(e: FormEvent<HTMLInputElement>) => {
+              const values: Partial<ThreadForm> = {
+                range: e.currentTarget.value,
+                start: new Date().getTime()
+              };
 
-              try {
-                await newLink(
-                  this.form,
-                  this.quillEditorState,
-                  author,
-                  this.space
-                );
-
-                this.saving = false;
-
-                clearLocalStorage();
-
-                notifySuccess('Snapshot Created!');
-
-                this.setRoute(`/snapshot/${this.space.id}`);
-              } catch (err) {
-                this.saving = false;
-
-                notifyError(capitalize(err.message));
+              if (form.range === '4d') {
+                form.end = moment().add(4, 'days').toDate().getTime();
               }
+
+              setForm({
+                ...form,
+                ...values
+              });
             }}
           />
         </div>
-      </Sublayout>
-    );
-  }
-}
+        <ReactQuillEditor
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+          placeholder={'What is your proposal?'}
+        />
+        <CWButton label="Publish" disabled={!author || isSaving || !isValid} onClick={handlePublish} />
+      </div>
+    </Sublayout>
+  );
+};
 
 const NewSnapshotProposalPage = withRouter(NewSnapshotProposalPageComponent);
 
