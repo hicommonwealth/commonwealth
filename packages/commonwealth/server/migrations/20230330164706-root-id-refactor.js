@@ -22,7 +22,8 @@ module.exports = {
       const deleteCommentIds = [];
 
       const threadComments = await queryInterface.sequelize.query(
-        `SELECT * FROM "Comments" WHERE "root_id" ILIKE '%discussion%'`
+        `SELECT * FROM "Comments" WHERE "root_id" ILIKE '%discussion%'`,
+        { transaction: t }
       );
       if (threadComments[0].length > 0) {
         // for each comment that is part of a discussion, replace its root_id with the thread_id
@@ -40,7 +41,8 @@ module.exports = {
         // we will now perform the same operation with proposal comments, but in order to do so we must create threads
         // to backlink to proposals
         const proposalComments = await queryInterface.sequelize.query(
-          `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`
+          `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`,
+          { transaction: t }
         );
 
         if (proposalComments[0].length > 0) {
@@ -153,14 +155,16 @@ module.exports = {
       });
 
       const viewCounts = await queryInterface.sequelize.query(
-        `SELECT * FROM "ViewCounts"`
+        `SELECT * FROM "ViewCounts"`,
+        { transaction: t }
       );
 
       if (viewCounts[0].length > 0) {
         const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id.split('_')[1], v]));
 
         const threads = await queryInterface.sequelize.query(
-          `SELECT id FROM "Threads"`
+          `SELECT id FROM "Threads"`,
+          { transaction: t }
         );
 
         const viewCountUpdates = [];
@@ -187,23 +191,28 @@ module.exports = {
       });
     });
 
-    // Just don't run this part, so that sequlize thinks this ran fine so that we can run the revert script.
-    // // cant be part of the transaction, or it will cause db to deadlock
-    // await queryInterface.changeColumn('Comments', 'thread_id', {
-    //   type: 'INTEGER USING CAST("thread_id" as INTEGER)',
-    //   allowNull: false
-    // });
+    // cant be part of the transaction, or it will cause db to deadlock
+    await queryInterface.changeColumn('Comments', 'thread_id', {
+      type: 'INTEGER USING CAST("thread_id" as INTEGER)',
+      allowNull: false
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
+    // IRREVERSABLE data loss (loses proposal comments), but schema will update fine.
+    await queryInterface.changeColumn('Comments', 'thread_id', {
+      type: 'varchar',
+      allowNull: false
+    });
+
     await queryInterface.sequelize.transaction(async (t) => {
-      // IRREVERSABLE data loss, but schema will update fine.
+
       await queryInterface.renameColumn('Comments', 'thread_id', 'root_id', {transaction: t});
 
       await queryInterface.sequelize.query(
         `UPDATE "Comments" SET "root_id" = 
          regexp_replace(root_id, '(.*)', 'discussion_\\1')`,
-         {transaction: t}
+        {transaction: t}
       );
 
       await queryInterface.createTable(
@@ -229,7 +238,8 @@ module.exports = {
       );
 
       const threads = await queryInterface.sequelize.query(
-        `SELECT id, chain, view_count FROM "Threads"`
+        `SELECT id, chain, view_count FROM "Threads"`,
+        { transaction: t }
       );
 
       const updateQueries = [];
