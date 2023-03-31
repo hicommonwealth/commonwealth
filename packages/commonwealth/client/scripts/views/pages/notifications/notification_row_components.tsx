@@ -93,10 +93,11 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
 type ExtendedNotificationRowProps = NotificationRowProps & {
   handleSetMarkingRead: (isMarkingRead: boolean) => void;
   markingRead: boolean;
+  allRead: boolean;
 };
 
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
-  const { handleSetMarkingRead, markingRead, notification } = props;
+  const { handleSetMarkingRead, markingRead, notification, allRead } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
 
   const { category } = notification.subscription;
@@ -131,7 +132,9 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
 
   return (
     <div
-      className={!isRead ? 'NotificationRow unread' : 'NotificationRow'}
+      className={
+        !isRead && !allRead ? 'NotificationRow unread' : 'NotificationRow'
+      }
       onClick={() => navigate(path.replace(/ /g, '%20'))}
     >
       {authorInfo.length === 1 ? (
@@ -166,7 +169,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
           <div className="comment-body-created">
             {moment(createdAt).fromNow()}
           </div>
-          {!isRead && (
+          {!isRead && !allRead && (
             <div
               className="comment-body-mark-as-read"
               onClick={(e) => {
@@ -198,7 +201,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
 export const SnapshotNotificationRow = (
   props: ExtendedNotificationRowProps
 ) => {
-  const { handleSetMarkingRead, markingRead, notification } = props;
+  const { handleSetMarkingRead, markingRead, notification, allRead } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
   const navigate = useNavigate();
 
@@ -225,7 +228,9 @@ export const SnapshotNotificationRow = (
 
   return (
     <div
-      className={!isRead ? 'NotificationRow unread' : 'NotificationRow'}
+      className={
+        !isRead && !allRead ? 'NotificationRow unread' : 'NotificationRow'
+      }
       onClick={() =>
         navigate(`/snapshot/${notificationData.space}/${notificationData.id}`)
       }
