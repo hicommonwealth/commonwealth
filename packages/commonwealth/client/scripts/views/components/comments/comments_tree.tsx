@@ -3,8 +3,8 @@
 import ClassComponent from 'class_component';
 
 import 'components/comments/comments_tree.scss';
-import m from 'mithril';
-import type { AnyProposal, Comment as CommentType } from 'models';
+import m from 'mithril'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+import type { Comment as CommentType } from 'models';
 import { Thread } from 'models';
 
 import app from 'state';
@@ -17,7 +17,7 @@ const MAX_THREAD_LEVEL = 2;
 
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
-  proposal: Thread | AnyProposal;
+  thread: Thread;
   setIsGloballyEditing?: (status: boolean) => void;
   updatedCommentsCallback: () => void;
 };
@@ -34,12 +34,8 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
   }
 
   view(vnode: m.Vnode<CommentsTreeAttrs>) {
-    const {
-      comments,
-      proposal,
-      setIsGloballyEditing,
-      updatedCommentsCallback,
-    } = vnode.attrs;
+    const { comments, thread, setIsGloballyEditing, updatedCommentsCallback } =
+      vnode.attrs;
 
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
@@ -82,7 +78,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
           }
 
           const grandchildren = app.comments
-            .getByProposal(proposal)
+            .getByThread(thread)
             .filter((c) => c.parentComment === child.id);
 
           for (let j = 0; j < grandchildren.length; j++) {
@@ -110,7 +106,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
 
       return comments_.map((comment: CommentType<any>) => {
         const children = app.comments
-          .getByProposal(proposal)
+          .getByThread(thread)
           .filter((c) => c.parentComment === comment.id);
 
         if (isLivingCommentTree(comment, children)) {
@@ -120,7 +116,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
                 comment={comment}
                 handleIsReplying={handleIsReplying}
                 isLast={threadLevel === 2}
-                isLocked={proposal instanceof Thread && proposal.readOnly}
+                isLocked={thread instanceof Thread && thread.readOnly}
                 setIsGloballyEditing={setIsGloballyEditing}
                 threadLevel={threadLevel}
                 updatedCommentsCallback={updatedCommentsCallback}
@@ -132,7 +128,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
                 <CreateComment
                   handleIsReplying={handleIsReplying}
                   parentCommentId={this.parentCommentId}
-                  rootProposal={proposal}
+                  rootThread={thread}
                   updatedCommentsCallback={updatedCommentsCallback}
                 />
               )}

@@ -288,12 +288,12 @@ const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime());
       // append the SELECT query
-      query += `SELECT root_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`;
+      query += `SELECT thread_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`;
       if (i === commsAndChains.length - 1) query += ';';
     }
 
     // populate query and execute
-    const commentNum: { root_id: string; chain: string }[] = <any>(
+    const commentNum: { thread_id: string; chain: string }[] = <any>(
       await sequelize.query(query, {
         raw: true,
         type: QueryTypes.SELECT,
@@ -304,8 +304,7 @@ const status = async (
     // iterates through the retrieved comments and adds each thread id to the activePosts set
     for (const comment of commentNum) {
       if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {};
-      // extract the thread id from the comments root id
-      const id = comment.root_id.split('_')[1];
+      const id = comment.thread_id;
       unseenPosts[comment.chain].activePosts
         ? unseenPosts[comment.chain].activePosts.add(id)
         : (unseenPosts[comment.chain].activePosts = new Set(id));

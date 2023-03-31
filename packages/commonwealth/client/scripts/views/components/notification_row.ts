@@ -14,7 +14,7 @@ import app from 'state';
 import type { IPostNotificationData } from 'types';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { getCommunityUrl, getProposalUrl } from '../../../../shared/utils';
+import { getCommunityUrl, getThreadUrl } from 'utils';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWSpinner } from './component_kit/cw_spinner';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
@@ -84,7 +84,7 @@ const getCommentPreview = (comment_text) => {
 const getNotificationFields = (category, data: IPostNotificationData) => {
   const {
     created_at,
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -158,14 +158,14 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
         ]);
   }
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
     chain: chain_id,
   };
   const args = comment_id
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
-  const path = (getProposalUrl as any)(...args);
+  const path = (getThreadUrl as any)(...args);
   const pageJump = comment_id
     ? () => jumpHighlightNotification(comment_id)
     : () => jumpHighlightNotification('parent');
@@ -190,7 +190,7 @@ const getBatchNotificationFields = (
 
   const {
     created_at,
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -275,7 +275,7 @@ const getBatchNotificationFields = (
         ]);
   }
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
     chain: chain_id,
   };
@@ -285,7 +285,7 @@ const getBatchNotificationFields = (
   const path =
     category === NotificationCategories.NewThread
       ? (getCommunityUrl as any)(chain_id)
-      : (getProposalUrl as any)(...args);
+      : (getThreadUrl as any)(...args);
   const pageJump = comment_id
     ? () => jumpHighlightNotification(comment_id)
     : () => jumpHighlightNotification('parent');

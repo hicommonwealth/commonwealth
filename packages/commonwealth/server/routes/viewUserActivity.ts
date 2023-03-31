@@ -19,7 +19,7 @@ export default async (
 
   const query = `
     SELECT nt.thread_id, nts.created_at as last_activity, nts.notification_data, nts.category_id,
-      MAX(ovc.view_count) as view_count,
+      MAX(thr.view_count) as view_count,
       COUNT(DISTINCT oc.id) AS comment_count,
       COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
     FROM
@@ -27,8 +27,8 @@ export default async (
           ROW_NUMBER() OVER (ORDER BY mx_not_id DESC) as thread_rank
         FROM
         (SELECT DISTINCT nn.thread_id, nn.mx_not_id
-          FROM (SELECT (n.notification_data::jsonb->>'root_id') AS thread_id,
-                  MAX(n.id) OVER (PARTITION BY (n.notification_data::jsonb->>'root_id')) AS mx_not_id
+          FROM (SELECT (n.notification_data::jsonb->>'thread_id') AS thread_id,
+                  MAX(n.id) OVER (PARTITION BY (n.notification_data::jsonb->>'thread_id')) AS mx_not_id
                 FROM "Notifications" n
                 WHERE n.category_id IN('new-thread-creation','new-comment-creation')
                   AND n.chain_id IN(SELECT a."chain" FROM "Addresses" a WHERE a.user_id = ?)
@@ -38,8 +38,7 @@ export default async (
           ) nnn
       ) nt
     INNER JOIN "Notifications" nts ON nt.mx_not_id = nts.id
-    LEFT JOIN "ViewCounts" ovc ON nt.thread_id = CAST(ovc.object_id AS VARCHAR)
-    LEFT JOIN "Comments" oc ON 'discussion_'||CAST(nt.thread_id AS VARCHAR) = oc.root_id
+    LEFT JOIN "Comments" oc ON nt.thread_id = CAST(oc.thread_id AS VARCHAR)
       --TODO: eval execution path with alternate aggregations
     LEFT JOIN "Reactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
     LEFT JOIN "Reactions" cr ON oc.id = cr.comment_id

@@ -75,9 +75,6 @@ const getNewProfile = async (
 
   const comments = await models.Comment.findAll({
     where: {
-      root_id: {
-        [Op.like]: 'discussion%',
-      },
       address_id: {
         [Op.in]: addressIds,
       },
@@ -89,9 +86,7 @@ const getNewProfile = async (
   });
 
   const commentThreadIds = [
-    ...new Set<number>(
-      comments.map((c) => parseInt(c.root_id.replace('discussion_', ''), 10))
-    ),
+    ...new Set<number>(comments.map((c) => parseInt(c.thread_id, 10))),
   ];
   const commentThreads = await models.Thread.findAll({
     where: {

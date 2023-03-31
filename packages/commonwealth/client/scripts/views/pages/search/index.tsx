@@ -84,11 +84,7 @@ const getCommentResult = (comment, searchTerm) => {
     <div
       class="search-result-row"
       onclick={() => {
-        m.route.set(
-          `/${chain}/discussion/${proposalId.split('_')[0]}/${
-            proposalId.split('_')[1]
-          }`
-        );
+        m.route.set(`/${chain}/discussion/${proposalId}`);
       }}
     >
       <CWIcon iconName="feedback" />
