@@ -18,6 +18,7 @@ export const getAccounts = async (req: Request, res: Response) => {
     const accounts = await provider.eth.getAccounts();
     res.status(200).json(accounts).send();
   } catch (err) {
+    console.error(err);
     res
       .status(500)
       .json({
@@ -33,6 +34,7 @@ export const getBlock = async (req: Request, res: Response) => {
     const block = await getBlockInfo();
     res.status(200).json(block).send();
   } catch (err) {
+    console.error(err);
     res
       .status(500)
       .json({
@@ -89,6 +91,7 @@ export const advanceTimestamp = async (req: Request, res: Response) => {
     results.postTime = (await getBlockInfo()).timestamp.toString();
     res.status(200).json(results).send();
   } catch (err) {
+    console.error(err);
     res
       .status(500)
       .json({
@@ -111,6 +114,7 @@ export const getETH = async (req: Request, res: Response) => {
     });
     res.status(200).send();
   } catch (err) {
+    console.error(err);
     res
       .status(500)
       .json({
