@@ -14,35 +14,22 @@ module.exports = {
       await queryInterface.addColumn('Threads', 'view_count', {
         type: Sequelize.INTEGER,
         defaultValue: 0,
-        allowNull: false,
-        transaction: t
-      });
+        allowNull: false
+      }, {transaction: t});
 
       const updateQueries = [];
       const deleteCommentIds = [];
 
       const threadComments = await queryInterface.sequelize.query(
         `SELECT * FROM "Comments" WHERE "root_id" ILIKE '%discussion%'`,
-        { transaction: t }
+        {transaction: t}
       );
       if (threadComments[0].length > 0) {
-        // for each comment that is part of a discussion, replace its root_id with the thread_id
-        threadComments[0].forEach((c) => {
-          updateQueries.push(
-            queryInterface.sequelize.query(
-              `UPDATE "Comments" SET "root_id" = ${
-              c.root_id.split('_')[1]
-            } WHERE "id"=${c.id}`,
-              {transaction: t}
-            )
-          );
-        });
-
         // we will now perform the same operation with proposal comments, but in order to do so we must create threads
         // to backlink to proposals
         const proposalComments = await queryInterface.sequelize.query(
           `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`,
-          { transaction: t }
+          {transaction: t}
         );
 
         if (proposalComments[0].length > 0) {
@@ -53,35 +40,36 @@ module.exports = {
           // these are the chain bases that correspond to the rootPart of the root_id
           const cosmos = ['cosmosproposal'];
           const ethereum = ['compoundproposal', 'onchainproposal'];
-          const near = ['sputnikproposal']
+          const near = ['sputnikproposal'];
 
           // these are the special addresses we made to link the newly created threads
           const cosmosAdminAddress = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE "address" = 'osmo10njyk4vx50cd7jynhwy48x4vwwyyugehdeaqxk'`,
-            { transaction: t }
+            {transaction: t}
           );
 
           const ethereumAdminAddress = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE "address" = '0xe92586e3E2FD9Aa7F0cc14898f0EB33BeE5a45D6'`,
-            { transaction: t }
+            {transaction: t}
           );
 
           const nearAdminAddress = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE "address" = 'commonwealth-archive.near'`,
-            { transaction: t }
+            {transaction: t}
           );
 
           const substrateAdminAddress = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE "address" = 'nMJeTQQc9uqWgizwWv7pUcpmpk43k4AwdxmJxijNFSY5amS'`,
-            { transaction: t }
+            {transaction: t}
           );
 
           proposalComments[0].forEach((c) => {
-            if (newThreads.get(tupleToKey([c.chain, c.root_id]))) {
+            if (c.root_id.includes('councilmotion') || newThreads.get(tupleToKey([c.chain, c.root_id]))) {
               return; // if we already had created thread to backlink proposal comments, don't create another one
             }
 
             let rootParts = c.root_id.split('_');
+            const rootBase = rootParts[0];
             let key = tupleToKey([c.chain, c.root_id]);
             // handle cosmosproposals and onchainproposal differently
             if (
@@ -97,14 +85,14 @@ module.exports = {
             const url = `https://commonwealth.im/${c.chain}/${rootParts[0]}/${rootParts[1]}`;
 
             let addressId;
-            if (ethereum.includes(rootParts[0])) {
-              addressId = ethereumAdminAddress[0].id;
-            } else if (cosmos.includes(rootParts[0])) {
-              addressId = cosmosAdminAddress[0].id;
-            } else if (near.includes(rootParts[0])) {
-              addressId = nearAdminAddress[0].id;
+            if (ethereum.includes(rootBase)) {
+              addressId = ethereumAdminAddress[0][0].id;
+            } else if (cosmos.includes(rootBase)) {
+              addressId = cosmosAdminAddress[0][0].id;
+            } else if (near.includes(rootBase)) {
+              addressId = nearAdminAddress[0][0].id;
             } else {
-              addressId = substrateAdminAddress[0].id;
+              addressId = substrateAdminAddress[0][0].id;
             }
 
             // otherwise map the root_id to a new thread to backlink proposal comments
@@ -191,23 +179,34 @@ module.exports = {
               type: Sequelize.INTEGER,
               allowNull: true,
             },
-            { transaction: t}
-          );
-
-          updateQueries.push(
-            queryInterface.sequelize.query(`
-             UPDATE "Comments"
-             SET "thread_id" = CAST("root_id" as INTEGER)`,
-             {transaction: t})
+            {transaction: t}
           );
 
           await Promise.all([...deleteQueries, ...updateQueries]);
         }
+
+        // for each comment that is part of a discussion, replace its root_id with the thread_id
+        threadComments[0].forEach((c) => {
+          updateQueries.push(
+            queryInterface.sequelize.query(
+              `UPDATE "Comments" SET "root_id" = ${
+                c.root_id.split('_')[1]
+              } WHERE "id"=${c.id}`,
+              {transaction: t}
+            )
+          );
+        });
+
+        await queryInterface.sequelize.query(`
+          UPDATE "Comments"
+          SET "thread_id" = CAST("root_id" as INTEGER)`,
+          {transaction: t}
+        );
       }
 
       const viewCounts = await queryInterface.sequelize.query(
         `SELECT * FROM "ViewCounts"`,
-        { transaction: t }
+        {transaction: t}
       );
 
       if (viewCounts[0].length > 0) {
@@ -215,7 +214,7 @@ module.exports = {
 
         const threads = await queryInterface.sequelize.query(
           `SELECT id FROM "Threads"`,
-          { transaction: t }
+          {transaction: t}
         );
 
         const viewCountUpdates = [];
@@ -284,7 +283,7 @@ module.exports = {
 
       const threads = await queryInterface.sequelize.query(
         `SELECT id, chain, view_count FROM "Threads"`,
-        { transaction: t }
+        {transaction: t}
       );
 
       const updateQueries = [];
