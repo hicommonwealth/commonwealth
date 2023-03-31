@@ -191,7 +191,12 @@ module.exports = {
       });
     });
 
+    // simulate failure
+
+    throw new Error('simulated failure');
+
     // cant be part of the transaction, or it will cause db to deadlock
+    // eslint-disable-next-line no-unreachable
     await queryInterface.changeColumn('Comments', 'thread_id', {
       type: 'INTEGER USING CAST("thread_id" as INTEGER)',
       allowNull: false
