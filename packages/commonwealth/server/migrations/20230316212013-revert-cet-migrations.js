@@ -22,13 +22,18 @@ module.exports = {
         { transaction: t }
       );
 
-      await queryInterface.addColumn('Subscriptions', 'chain_entity_id', {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: { model: 'ChainEntityMeta', key: 'id' },
-      }, { transaction: t });
+      await queryInterface.addColumn(
+        'Subscriptions',
+        'chain_entity_id',
+        {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+          references: { model: 'ChainEntityMeta', key: 'id' },
+        },
+        { transaction: t }
+      );
     });
   },
 
-  down: async (queryInterface, Sequelize) => {}
+  down: async (queryInterface, Sequelize) => {},
 };

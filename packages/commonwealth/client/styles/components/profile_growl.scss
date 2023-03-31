@@ -6,10 +6,10 @@
   width: fit-content;
 
   .survey-svg-header {
-    background-image: url('/static/img/profile_growl.svg');
+    background-image: url('/static/img/email_growl.png');
     background-repeat: no-repeat;
     background-size: contain;
-    height: 187px;
+    height: 177px;
   }
 
   .header-text {
@@ -28,6 +28,7 @@
     gap: 8px;
     justify-content: center;
     margin-top: 16px;
+    margin-bottom: 8px;
   }
 
   .checkbox.Checkbox {
@@ -46,7 +47,7 @@
   .close-icon {
     position: fixed;
     right: 34px; // not on grid system due to fixed positioning
-    color: $primary-300;
+    color: $neutral-800;
   }
 
   .learn-more {
