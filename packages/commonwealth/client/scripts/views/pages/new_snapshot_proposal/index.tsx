@@ -1,4 +1,4 @@
-import React, { FormEvent, SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import React, { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { parsePathname } from 'mithrilInterop';
 import moment from 'moment';
@@ -34,7 +34,6 @@ export const NewSnapshotProposalPageComponent = ({ snapshotId }: NewSnapshotProp
   const navigate = useCommonNavigate();
 
   const [form, setForm] = useState<ThreadForm | null>(null);
-  const [isFromExistingProposal, setIsFromExistingProposal] = useState<boolean>();
   const [members, setMembers] = useState<string[]>([]);
   const [contentDelta, setContentDelta] = useState<DeltaStatic>(createDeltaFromText(''));
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -44,8 +43,12 @@ export const NewSnapshotProposalPageComponent = ({ snapshotId }: NewSnapshotProp
 
   const location = useLocation();
   const pathVars = useMemo(() => {
-    return parsePathname(window.location.href);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const search = new URLSearchParams(location.search);
+    const params: Record<string, any> = {};
+    for (const [key, value] of search) {
+      params[key] = value;
+    }
+    return params;
   }, [location]);
 
   const clearLocalStorage = () => {
@@ -89,19 +92,15 @@ export const NewSnapshotProposalPageComponent = ({ snapshotId }: NewSnapshotProp
         type: 'single-choice'
       };
 
-      if (pathVars.params.fromProposalType && pathVars.params.fromProposalId) {
+      if (pathVars.fromProposalType && pathVars.fromProposalId) {
         const fromProposalId =
-          typeof pathVars.params.fromProposalId === 'number'
-            ? pathVars.params.fromProposalId
-            : pathVars.params.fromProposalId.toString();
+          typeof pathVars.fromProposalId === 'number' ? pathVars.fromProposalId : pathVars.fromProposalId.toString();
 
-        const fromProposalType = pathVars.params.fromProposalType.toString();
+        const fromProposalType = pathVars.fromProposalType.toString();
 
         const fromProposal = idToProposal(fromProposalType, fromProposalId);
 
         initialForm.name = fromProposal.title;
-
-        setIsFromExistingProposal(true);
 
         if (fromProposal.body) {
           try {
@@ -173,6 +172,7 @@ export const NewSnapshotProposalPageComponent = ({ snapshotId }: NewSnapshotProp
         {form.choices.map((_, idx) => {
           return (
             <CWTextInput
+              key={`choice-${idx}`}
               label={`Choice ${idx + 1}`}
               placeholder={idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`}
               onInput={(e) => {
@@ -235,6 +235,6 @@ export const NewSnapshotProposalPageComponent = ({ snapshotId }: NewSnapshotProp
   );
 };
 
-const NewSnapshotProposalPage = withRouter(NewSnapshotProposalPageComponent);
+const NewSnapshotProposalPage = NewSnapshotProposalPageComponent;
 
 export default NewSnapshotProposalPage;
