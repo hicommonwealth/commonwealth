@@ -199,8 +199,14 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
+    // IRREVERSABLE data loss (loses proposal comments), but schema will update fine.
+    await queryInterface.changeColumn('Comments', 'thread_id', {
+      type: 'varchar',
+      allowNull: false
+    });
+
     await queryInterface.sequelize.transaction(async (t) => {
-      // IRREVERSABLE data loss, but schema will update fine.
+
       await queryInterface.renameColumn('Comments', 'thread_id', 'root_id', {transaction: t});
 
       await queryInterface.sequelize.query(
