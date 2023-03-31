@@ -49,6 +49,33 @@ module.exports = {
           // maps [chain, root_id] -> newThread it creates
           const newThreads = new Map();
           const urlToRootId = new Map();
+
+          // these are the chain bases that correspond to the rootPart of the root_id
+          const cosmos = ['cosmosproposal'];
+          const ethereum = ['compoundproposal', 'onchainproposal'];
+          const near = ['sputnikproposal']
+
+          // these are the special addresses we made to link the newly created threads
+          const cosmosAdminAddress = await queryInterface.sequelize.query(
+            `SELECT * FROM "Addresses" WHERE "address" = 'osmo10njyk4vx50cd7jynhwy48x4vwwyyugehdeaqxk'`,
+            { transaction: t }
+          );
+
+          const ethereumAdminAddress = await queryInterface.sequelize.query(
+            `SELECT * FROM "Addresses" WHERE "address" = '0xe92586e3E2FD9Aa7F0cc14898f0EB33BeE5a45D6'`,
+            { transaction: t }
+          );
+
+          const nearAdminAddress = await queryInterface.sequelize.query(
+            `SELECT * FROM "Addresses" WHERE "address" = 'commonwealth-archive.near'`,
+            { transaction: t }
+          );
+
+          const substrateAdminAddress = await queryInterface.sequelize.query(
+            `SELECT * FROM "Addresses" WHERE "address" = 'nMJeTQQc9uqWgizwWv7pUcpmpk43k4AwdxmJxijNFSY5amS'`,
+            { transaction: t }
+          );
+
           proposalComments[0].forEach((c) => {
             if (newThreads.get(tupleToKey([c.chain, c.root_id]))) {
               return; // if we already had created thread to backlink proposal comments, don't create another one
@@ -68,9 +95,21 @@ module.exports = {
             }
 
             const url = `https://commonwealth.im/${c.chain}/${rootParts[0]}/${rootParts[1]}`;
+
+            let addressId;
+            if (ethereum.includes(rootParts[0])) {
+              addressId = ethereumAdminAddress[0].id;
+            } else if (cosmos.includes(rootParts[0])) {
+              addressId = cosmosAdminAddress[0].id;
+            } else if (near.includes(rootParts[0])) {
+              addressId = nearAdminAddress[0].id;
+            } else {
+              addressId = substrateAdminAddress[0].id;
+            }
+
             // otherwise map the root_id to a new thread to backlink proposal comments
             newThreads.set(key, {
-              address_id: 1,
+              address_id: addressId,
               title: `Thread for ${c.chain}'s ${rootParts[0]} ${rootParts[1]}`,
               kind: 'link',
               body: '',
@@ -145,14 +184,26 @@ module.exports = {
             );
           });
 
-          await Promise.all([...deleteQueries, ...updateQueries]);
+          await queryInterface.addColumn(
+            'Comments',
+            'thread_id',
+            {
+              type: Sequelize.INTEGER,
+              allowNull: true,
+            },
+            { transaction: t}
+          );
 
+          updateQueries.push(
+            queryInterface.sequelize.query(`
+             UPDATE "Comments"
+             SET "thread_id" = CAST("root_id" as INTEGER)`,
+             {transaction: t})
+          );
+
+          await Promise.all([...deleteQueries, ...updateQueries]);
         }
       }
-
-      await queryInterface.renameColumn('Comments', 'root_id', 'thread_id', {
-        transaction: t,
-      });
 
       const viewCounts = await queryInterface.sequelize.query(
         `SELECT * FROM "ViewCounts"`,
@@ -189,12 +240,6 @@ module.exports = {
       await queryInterface.dropTable('ViewCounts', {
         transaction: t
       });
-    });
-
-    // cant be part of the transaction, or it will cause db to deadlock
-    await queryInterface.changeColumn('Comments', 'thread_id', {
-      type: 'INTEGER USING CAST("thread_id" as INTEGER)',
-      allowNull: false
     });
   },
 
