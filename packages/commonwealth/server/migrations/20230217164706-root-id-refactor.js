@@ -22,9 +22,9 @@ module.exports = {
           updateQueries.push(
             queryInterface.sequelize.query(
               `UPDATE "Comments" SET "root_id" = ${
-              c.root_id.split('_')[1]
-            } WHERE "id"=${c.id}`,
-              {transaction: t}
+                c.root_id.split('_')[1]
+              } WHERE "id"=${c.id}`,
+              { transaction: t }
             )
           );
         });
@@ -86,7 +86,7 @@ module.exports = {
           const inserted = await queryInterface.bulkInsert(
             'Threads',
             [...newThreads.values()],
-            {returning: true, transaction: t}
+            { returning: true, transaction: t }
           );
 
           // create map of rootId -> thread_id
@@ -111,9 +111,9 @@ module.exports = {
             updateQueries.push(
               queryInterface.sequelize.query(
                 `UPDATE "Comments" SET "root_id" = ${rootToThreadMap.get(
-              tupleToKey([c.chain, c.root_id])
-            )} WHERE "id"=${c.id}`,
-                {transaction: t}
+                  tupleToKey([c.chain, c.root_id])
+                )} WHERE "id"=${c.id}`,
+                { transaction: t }
               )
             );
           });
@@ -123,20 +123,23 @@ module.exports = {
             deleteQueries.push(
               queryInterface.bulkDelete(
                 'Reactions',
-                {comment_id: id},
-                {transaction: t}
+                { comment_id: id },
+                { transaction: t }
               )
             );
           });
 
           deleteCommentIds.forEach((id) => {
             deleteQueries.push(
-              queryInterface.bulkDelete('Comments', {id: id}, {transaction: t})
+              queryInterface.bulkDelete(
+                'Comments',
+                { id: id },
+                { transaction: t }
+              )
             );
           });
 
           await Promise.all([...deleteQueries, ...updateQueries]);
-
         }
       }
 
@@ -162,7 +165,9 @@ module.exports = {
     );
 
     if (viewCounts[0].length > 0) {
-      const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id.split('_')[1], v]));
+      const viewCountMap = new Map(
+        viewCounts[0].map((v) => [v.object_id.split('_')[1], v])
+      );
 
       const threads = await queryInterface.sequelize.query(
         `SELECT id FROM "Threads"`
@@ -175,8 +180,8 @@ module.exports = {
             queryInterface.sequelize.query(
               `UPDATE "Threads"
                SET "view_count" = ${
-                viewCountMap.get(thread.id.toString()).view_count
-              }
+                 viewCountMap.get(thread.id.toString()).view_count
+               }
                WHERE "id" = ${thread.id}`
             )
           );
@@ -196,20 +201,20 @@ module.exports = {
     await queryInterface.createTable(
       'ViewCounts',
       {
-        id: {type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true},
-        chain: {type: Sequelize.STRING},
-        object_id: {type: Sequelize.STRING, allowNull: false},
-        view_count: {type: Sequelize.INTEGER, allowNull: false},
+        id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+        chain: { type: Sequelize.STRING },
+        object_id: { type: Sequelize.STRING, allowNull: false },
+        view_count: { type: Sequelize.INTEGER, allowNull: false },
       },
       {
         underscored: true,
         timestamps: false,
         indexes: [
-          {fields: ['id']},
-          {fields: ['chain', 'object_id']},
-          {fields: ['community', 'object_id']},
-          {fields: ['chain', 'community', 'object_id']},
-          {fields: ['view_count']},
+          { fields: ['id'] },
+          { fields: ['chain', 'object_id'] },
+          { fields: ['community', 'object_id'] },
+          { fields: ['chain', 'community', 'object_id'] },
+          { fields: ['view_count'] },
         ],
       }
     );
