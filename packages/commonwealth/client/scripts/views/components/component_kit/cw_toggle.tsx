@@ -5,12 +5,11 @@ import 'components/component_kit/cw_toggle.scss';
 import type { BaseStyleProps } from './types';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
+import { setDarkMode } from '../../../helpers';
 
-export const toggleDarkMode = (on: boolean, stateFn: Function) => {
-  const state: string = on ? 'on' : 'off';
-  localStorage.setItem('dark-mode-state', state);
-  localStorage.setItem('user-dark-mode-state', state);
-  document.getElementsByTagName('html')[0].classList.toggle('invert');
+export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
+  setDarkMode(on);
+  localStorage.setItem('user-dark-mode-state', on ? 'on' : 'off');
   stateFn(on);
 };
 
