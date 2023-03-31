@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
 
 import 'pages/notifications/notification_row.scss';
@@ -63,7 +63,11 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
 
   return (
     <div
-      className="NotificationRow"
+      className={
+        !notification.isRead
+          ? 'NotificationRow NewNotificationRow'
+          : 'NotificationRow'
+      }
       onClick={() => navigate(`/notifications?id=${notification.id}`)}
     >
       <div className="comment-body">
@@ -95,6 +99,7 @@ type ExtendedNotificationRowProps = NotificationRowProps & {
 
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const { handleSetMarkingRead, markingRead, notification } = props;
+  const [isRead, setIsRead] = useState<boolean>(notification.isRead);
 
   const { category } = notification.subscription;
 
@@ -128,7 +133,9 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
 
   return (
     <div
-      className="NotificationRow"
+      className={
+        !isRead ? 'NotificationRow NewNotificationRow' : 'NotificationRow'
+      }
       onClick={() => navigate(path.replace(/ /g, '%20'))}
     >
       {authorInfo.length === 1 ? (
@@ -163,7 +170,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
           <div className="comment-body-created">
             {moment(createdAt).fromNow()}
           </div>
-          {!notification.isRead && (
+          {!isRead && (
             <div
               className="comment-body-mark-as-read"
               onClick={(e) => {
@@ -175,6 +182,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
                 app.user.notifications
                   .markAsRead([notification])
                   ?.then(() => {
+                    setIsRead(true);
                     handleSetMarkingRead(false);
                   })
                   .catch(() => {
@@ -195,6 +203,7 @@ export const SnapshotNotificationRow = (
   props: ExtendedNotificationRowProps
 ) => {
   const { handleSetMarkingRead, markingRead, notification } = props;
+  const [isRead, setIsRead] = useState<boolean>(notification.isRead);
   const navigate = useNavigate();
 
   const notificationData = JSON.parse(notification.data);
@@ -220,7 +229,9 @@ export const SnapshotNotificationRow = (
 
   return (
     <div
-      className="NotificationRow"
+      className={
+        !isRead ? 'NotificationRow NewNotificationRow' : 'NotificationRow'
+      }
       onClick={() =>
         navigate(`/snapshot/${notificationData.space}/${notificationData.id}`)
       }
@@ -229,7 +240,7 @@ export const SnapshotNotificationRow = (
         <div className="comment-body-title">{header}</div>
         <div className="comment-body-excerpt">{body}</div>
         <div className="comment-body-bottom-wrap">
-          {!notification.isRead && (
+          {!isRead && (
             <div
               className="comment-body-mark-as-read"
               onClick={(e) => {
@@ -241,6 +252,7 @@ export const SnapshotNotificationRow = (
                 app.user.notifications
                   .markAsRead([notification])
                   ?.then(() => {
+                    setIsRead(true);
                     handleSetMarkingRead(false);
                   })
                   .catch(() => {

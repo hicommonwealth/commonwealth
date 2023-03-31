@@ -1,7 +1,6 @@
 @import '../../shared';
 
 .NotificationRow {
-  border-bottom: 1px solid $neutral-100;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -13,7 +12,7 @@
   color: $black !important;
 
   &:hover {
-    background: $neutral-50;
+    background: $neutral-200;
   }
 
   &.unread {
@@ -81,11 +80,16 @@
 
   .comment-body-mark-as-read {
     display: inline;
-    color: $neutral-500;
+    color: $primary-300;
     margin-left: 8px;
   }
 
   .comment-body-mark-as-read:hover {
     color: $primary-600;
   }
+}
+
+.NewNotificationRow {
+  background: $neutral-50;
+  border-bottom: 1px solid $neutral-300;
 }

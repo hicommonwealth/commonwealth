@@ -6,7 +6,6 @@ import 'pages/notifications/index.scss';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
-import { PageLoading } from 'views/pages/loading';
 import { NotificationRow } from './notification_row';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
