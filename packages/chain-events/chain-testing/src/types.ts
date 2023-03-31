@@ -54,4 +54,11 @@ export interface chainGetEth {
   amount: string;
 }
 
-//TODO: Add for unconvered endpoints
+export interface erc721Approve {
+  nftAddress: string;
+  tokenId: string;
+  to: string;
+  all?: boolean;
+  accountIndex?: number;
+  from?: string;
+}
