@@ -76,35 +76,29 @@ class NotificationSettingsPage extends ClassComponent {
                 you need it.
               </CWText>
             </div>
-            {app.user.emailVerified ? (
-              <CWPopoverMenu
-                trigger={
-                  <CWButton
-                    buttonType="mini-white"
-                    label={emailIntervalFrequencyMap[currentFrequency]}
-                    iconRight="chevronDown"
-                  />
-                }
-                menuItems={[
-                  {
-                    label: 'Once a week',
-                    onclick: () => {
-                      app.user.updateEmailInterval('weekly');
-                    },
+            <CWPopoverMenu
+              trigger={
+                <CWButton
+                  buttonType="mini-white"
+                  label={emailIntervalFrequencyMap[currentFrequency]}
+                  iconRight="chevronDown"
+                />
+              }
+              menuItems={[
+                {
+                  label: 'Once a week',
+                  onclick: () => {
+                    app.user.updateEmailInterval('weekly');
                   },
-                  {
-                    label: 'Never',
-                    onclick: () => {
-                      app.user.updateEmailInterval('never');
-                    },
+                },
+                {
+                  label: 'Never',
+                  onclick: () => {
+                    app.user.updateEmailInterval('never');
                   },
-                ]}
-              />
-            ) : (
-              <CWText className="subtitle-text">
-                Verify Email to set Digest Interval
-              </CWText>
-            )}
+                },
+              ]}
+            />
           </div>
           {(!app.user.email || !app.user.emailVerified) &&
             currentFrequency !== 'never' && (
