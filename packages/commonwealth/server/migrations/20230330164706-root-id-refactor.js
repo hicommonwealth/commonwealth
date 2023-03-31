@@ -11,6 +11,16 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
 
+      await queryInterface.addColumn(
+        'Comments',
+        'thread_id',
+        {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+        },
+        {transaction: t}
+      );
+
       await queryInterface.addColumn('Threads', 'view_count', {
         type: Sequelize.INTEGER,
         defaultValue: 0,
@@ -171,16 +181,6 @@ module.exports = {
               queryInterface.bulkDelete('Comments', {id: id}, {transaction: t})
             );
           });
-
-          await queryInterface.addColumn(
-            'Comments',
-            'thread_id',
-            {
-              type: Sequelize.INTEGER,
-              allowNull: true,
-            },
-            {transaction: t}
-          );
 
           await Promise.all([...deleteQueries, ...updateQueries]);
         }
