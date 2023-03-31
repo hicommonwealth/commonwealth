@@ -7,14 +7,12 @@ COPY package*.json ./
 
 RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
 
-RUN npm install
+RUN npm install --no-optional
 
 COPY . .
 
 ENV RPC_HOST=ganache
 ENV CHAIN_PORT=3000
-
-RUN npm run build
 
 EXPOSE 3000
 
