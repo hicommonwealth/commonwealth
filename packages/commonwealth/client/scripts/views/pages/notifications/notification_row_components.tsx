@@ -64,9 +64,7 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
   return (
     <div
       className={
-        !notification.isRead
-          ? 'NotificationRow NewNotificationRow'
-          : 'NotificationRow'
+        !notification.isRead ? 'NotificationRow unread' : 'NotificationRow'
       }
       onClick={() => navigate(`/notifications?id=${notification.id}`)}
     >
@@ -133,9 +131,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
 
   return (
     <div
-      className={
-        !isRead ? 'NotificationRow NewNotificationRow' : 'NotificationRow'
-      }
+      className={!isRead ? 'NotificationRow unread' : 'NotificationRow'}
       onClick={() => navigate(path.replace(/ /g, '%20'))}
     >
       {authorInfo.length === 1 ? (
@@ -229,9 +225,7 @@ export const SnapshotNotificationRow = (
 
   return (
     <div
-      className={
-        !isRead ? 'NotificationRow NewNotificationRow' : 'NotificationRow'
-      }
+      className={!isRead ? 'NotificationRow unread' : 'NotificationRow'}
       onClick={() =>
         navigate(`/snapshot/${notificationData.space}/${notificationData.id}`)
       }

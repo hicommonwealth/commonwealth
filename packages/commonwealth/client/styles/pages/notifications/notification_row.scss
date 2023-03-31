@@ -11,12 +11,13 @@
   text-decoration: none !important;
   color: $black !important;
 
-  &:hover {
-    background: $neutral-200;
-  }
-
   &.unread {
     background: $yellow-100;
+    border-bottom: 1px solid $neutral-300;
+  }
+
+  &:hover {
+    background: $neutral-50;
   }
 
   > .User {
@@ -87,9 +88,4 @@
   .comment-body-mark-as-read:hover {
     color: $primary-600;
   }
-}
-
-.NewNotificationRow {
-  background: $neutral-50;
-  border-bottom: 1px solid $neutral-300;
 }
