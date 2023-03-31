@@ -96,18 +96,18 @@ module.exports = {
 
             let addressId;
             if (ethereum.includes(rootBase)) {
-              addressId = ethereumAdminAddress[0][0].id;
+              addressId = ethereumAdminAddress[0][0]?.id;
             } else if (cosmos.includes(rootBase)) {
-              addressId = cosmosAdminAddress[0][0].id;
+              addressId = cosmosAdminAddress[0][0]?.id;
             } else if (near.includes(rootBase)) {
-              addressId = nearAdminAddress[0][0].id;
+              addressId = nearAdminAddress[0][0]?.id;
             } else {
-              addressId = substrateAdminAddress[0][0].id;
+              addressId = substrateAdminAddress[0][0]?.id;
             }
 
             // otherwise map the root_id to a new thread to backlink proposal comments
             newThreads.set(key, {
-              address_id: addressId,
+              address_id: addressId || 1,
               title: `Thread for ${c.chain}'s ${rootParts[0]} ${rootParts[1]}`,
               kind: 'link',
               body: '',
