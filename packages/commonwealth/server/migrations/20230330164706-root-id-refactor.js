@@ -22,7 +22,8 @@ module.exports = {
       const deleteCommentIds = [];
 
       const threadComments = await queryInterface.sequelize.query(
-        `SELECT * FROM "Comments" WHERE "root_id" ILIKE '%discussion%'`
+        `SELECT * FROM "Comments" WHERE "root_id" ILIKE '%discussion%'`,
+        { transaction: t }
       );
       if (threadComments[0].length > 0) {
         // for each comment that is part of a discussion, replace its root_id with the thread_id
@@ -40,7 +41,8 @@ module.exports = {
         // we will now perform the same operation with proposal comments, but in order to do so we must create threads
         // to backlink to proposals
         const proposalComments = await queryInterface.sequelize.query(
-          `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`
+          `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`,
+          { transaction: t }
         );
 
         if (proposalComments[0].length > 0) {
@@ -153,14 +155,16 @@ module.exports = {
       });
 
       const viewCounts = await queryInterface.sequelize.query(
-        `SELECT * FROM "ViewCounts"`
+        `SELECT * FROM "ViewCounts"`,
+        { transaction: t }
       );
 
       if (viewCounts[0].length > 0) {
         const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id.split('_')[1], v]));
 
         const threads = await queryInterface.sequelize.query(
-          `SELECT id FROM "Threads"`
+          `SELECT id FROM "Threads"`,
+          { transaction: t }
         );
 
         const viewCountUpdates = [];
@@ -228,7 +232,8 @@ module.exports = {
       );
 
       const threads = await queryInterface.sequelize.query(
-        `SELECT id, chain, view_count FROM "Threads"`
+        `SELECT id, chain, view_count FROM "Threads"`,
+        { transaction: t }
       );
 
       const updateQueries = [];
