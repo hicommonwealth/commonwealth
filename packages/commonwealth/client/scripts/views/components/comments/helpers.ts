@@ -3,7 +3,7 @@ import type { ContentType } from 'types';
 
 // highlight the header/body of a parent thread, or the body of a comment
 export const jumpHighlightComment = (commentId: number) => {
-  const commentEle = document.getElementsByClassName(`comment-${commentId}`)[1];
+  const commentEle = document.getElementsByClassName(`comment-${commentId}`)[0];
 
   if (commentEle) {
     // clear any previous animation
