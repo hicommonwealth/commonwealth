@@ -37,7 +37,6 @@ module.exports = {
         {
           transaction: t,
           raw: true,
-          type: queryInterface.sequelize.QueryTypes.DELETE,
         }
       );
       console.log('NR deleted');
