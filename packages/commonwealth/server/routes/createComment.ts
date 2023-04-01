@@ -365,14 +365,7 @@ const createComment = async (
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
-      {
-        user: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
-        url: cwUrl,
-        title: thread.title || '',
-        chain: finalComment.chain,
-        body: finalComment.text,
-      },
+      null,
       excludedAddrs
     );
   }
@@ -399,14 +392,7 @@ const createComment = async (
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.chain,
           },
-          {
-            user: finalComment.Address.address,
-            author_chain: finalComment.Address.chain,
-            url: cwUrl,
-            title: thread.title || '',
-            chain: finalComment.chain,
-            body: finalComment.text,
-          }, // TODO: add webhook data for mentions
+          null,
           [finalComment.Address.address]
         );
     });
