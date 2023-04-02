@@ -9,7 +9,6 @@ import ChainFactory from './models/chain';
 import ChainCategoryFactory from './models/chain_category';
 import ChainCategoryTypeFactory from './models/chain_category_type';
 import ChainEntityMetaFactory from './models/chain_entity_meta';
-import ChainEventTypeFactory from './models/chain_event_type';
 import ChainNodeFactory from './models/chain_node';
 import ChatChannelFactory from './models/chat_channel';
 import ChatMessageFactory from './models/chat_message';
@@ -85,7 +84,6 @@ const models: Models = {
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
