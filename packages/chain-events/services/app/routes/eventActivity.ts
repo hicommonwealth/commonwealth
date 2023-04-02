@@ -17,13 +17,13 @@ const eventActivity: any = async (
     return next(new AppError(Errors.NeedLimit));
   }
 
-  console.log("Starting /eventActivity");
   try {
+    // we can order by id since the resulting order is almost exactly the same as when ordered by created_at
+    // but ordering by id is much faster due to primary key index
     const events = await models.ChainEvent.findAll({
-      order: [['created_at', 'DESC']],
+      order: [['id', 'DESC']],
       limit: req.query.limit,
     });
-    console.log("events fetched from db", events);
     return res.json({ status: 'Success', result: events.map((e) => e.toJSON()) });
   } catch (e) {
     console.error(e);
