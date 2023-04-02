@@ -44,10 +44,8 @@ const entities: any = async (
     entityFindOptions.where.completed = true;
   }
 
-  console.log("Fetching entities from DB");
   try {
     const fetchedEntities = await models.ChainEntity.findAll(entityFindOptions);
-    console.log("Done fetching entities from DB");
     return res.json({
       status: 'Success',
       result: fetchedEntities.map((e) => e.toJSON()),

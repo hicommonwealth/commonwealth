@@ -6,7 +6,6 @@ import { CE_URL } from '../config';
 
 async function ceProxy(ceEndpoint: 'entities' | 'events', req, res) {
   try {
-    console.log("Proxying to CE");
     const search = url.parse(req.url).search;
     const ceUrl = `${CE_URL}/${ceEndpoint}${search}`;
     const response = await axios.get(ceUrl, {
@@ -14,7 +13,6 @@ async function ceProxy(ceEndpoint: 'entities' | 'events', req, res) {
         origin: 'https://commonwealth.im',
       },
     });
-    console.log("Done proxying to CE", response.data);
     return res.send(response.data);
   } catch (err) {
     res.status(500).json({ message: err.message });
