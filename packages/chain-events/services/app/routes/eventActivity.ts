@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import {AppError, ServerError} from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 import type { DB } from '../../database/database';
 
@@ -24,13 +24,14 @@ const eventActivity: any = async (
       order: [['id', 'DESC']],
       limit: req.query.limit,
     });
-    return res.json({ status: 'Success', result: events.map((e) => e.toJSON()) });
+    return res.json({
+      status: 'Success',
+      result: events.map((e) => e.toJSON()),
+    });
   } catch (e) {
     console.error(e);
     return next(new ServerError(`Failed to fetch events from DB`, e));
   }
-
-
 };
 
 export default eventActivity;

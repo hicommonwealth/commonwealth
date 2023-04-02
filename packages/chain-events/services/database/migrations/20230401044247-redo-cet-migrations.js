@@ -36,5 +36,5 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn('ChainEvents', 'chain');
-  }
+  },
 };

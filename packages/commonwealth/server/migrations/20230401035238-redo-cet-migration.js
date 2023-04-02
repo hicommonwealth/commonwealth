@@ -3,9 +3,13 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn('Subscriptions', 'chain_event_type_id', {
-        transaction: t,
-      });
+      await queryInterface.removeColumn(
+        'Subscriptions',
+        'chain_event_type_id',
+        {
+          transaction: t,
+        }
+      );
       await queryInterface.removeColumn('Subscriptions', 'chain_entity_id', {
         transaction: t,
       });
@@ -44,5 +48,5 @@ module.exports = {
         { transaction: t }
       );
     });
-  }
+  },
 };

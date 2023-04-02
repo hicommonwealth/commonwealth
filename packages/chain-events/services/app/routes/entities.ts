@@ -1,5 +1,5 @@
 import type { Response, NextFunction, Request } from 'express';
-import {AppError, ServerError} from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 import type { DB } from '../../database/database';
 
@@ -16,8 +16,6 @@ const entities: any = async (
   if (!req.query.chain) {
     return next(new AppError(Errors.NeedChain));
   }
-
-  console.log("Starting /entities");
 
   const entityFindOptions: any = {
     include: [
@@ -54,8 +52,6 @@ const entities: any = async (
     console.error(err);
     return next(new ServerError(`Failed to fetch entities from DB`, err));
   }
-
-
 };
 
 export default entities;
