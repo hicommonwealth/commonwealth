@@ -17,12 +17,14 @@ const eventActivity: any = async (
     return next(new AppError(Errors.NeedLimit));
   }
 
+  console.log("Starting /eventActivity");
   try {
     const events = await models.ChainEvent.findAll({
       order: [['created_at', 'DESC']],
       limit: req.query.limit,
     });
-    return res.json({ status: 'Success', result: events });
+    console.log("events fetched from db", events);
+    return res.json({ status: 'Success', result: events.map((e) => e.toJSON()) });
   } catch (e) {
     console.error(e);
     return next(new ServerError(`Failed to fetch events from DB`, e));
