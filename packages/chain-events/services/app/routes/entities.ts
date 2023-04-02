@@ -1,5 +1,5 @@
 import type { Response, NextFunction, Request } from 'express';
-import { AppError } from 'common-common/src/errors';
+import {AppError, ServerError} from 'common-common/src/errors';
 
 import type { DB } from '../../database/database';
 
@@ -16,6 +16,8 @@ const entities: any = async (
   if (!req.query.chain) {
     return next(new AppError(Errors.NeedChain));
   }
+
+  console.log("Starting /entities");
 
   const entityFindOptions: any = {
     include: [
@@ -41,11 +43,21 @@ const entities: any = async (
   if (req.query.completed) {
     entityFindOptions.where.completed = true;
   }
-  const entities = await models.ChainEntity.findAll(entityFindOptions);
-  return res.json({
-    status: 'Success',
-    result: entities.map((e) => e.toJSON()),
-  });
+
+  console.log("Fetching entities from DB");
+  try {
+    const fetchedEntities = await models.ChainEntity.findAll(entityFindOptions);
+    console.log("Done fetching entities from DB");
+    return res.json({
+      status: 'Success',
+      result: fetchedEntities.map((e) => e.toJSON()),
+    });
+  } catch (err) {
+    console.error(err);
+    return next(new ServerError(`Failed to fetch entities from DB`, err));
+  }
+
+
 };
 
 export default entities;
