@@ -12,7 +12,6 @@ import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
 import models from '../database';
 import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
-import { processChainEventTypeCUD } from './messageProcessors/chainEventTypeCUDQueue';
 import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
 import v8 from 'v8';
 
@@ -66,12 +65,6 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
     msgProcessorContext: context,
   };
 
-  const ceTypeCUDProcessorRmqSub: RabbitMQSubscription = {
-    messageProcessor: processChainEventTypeCUD,
-    subscriptionName: RascalSubscriptions.ChainEventTypeCUDMain,
-    msgProcessorContext: context,
-  };
-
   const snapshotEventProcessorRmqSub: RabbitMQSubscription = {
     messageProcessor: processSnapshotMessage,
     subscriptionName: RascalSubscriptions.SnapshotListener,
@@ -81,7 +74,6 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
   const subscriptions: RabbitMQSubscription[] = [
     chainEntityCUDProcessorRmqSub,
     ceNotifsCUDProcessorRmqSub,
-    ceTypeCUDProcessorRmqSub,
     snapshotEventProcessorRmqSub,
   ];
 

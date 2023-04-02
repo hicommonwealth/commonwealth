@@ -10,7 +10,6 @@ function tupleToKey(list) {
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-
       await queryInterface.addColumn(
         'Comments',
         'thread_id',
@@ -18,28 +17,33 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        {transaction: t}
+        { transaction: t }
       );
 
-      await queryInterface.addColumn('Threads', 'view_count', {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-        allowNull: false
-      }, {transaction: t});
+      await queryInterface.addColumn(
+        'Threads',
+        'view_count',
+        {
+          type: Sequelize.INTEGER,
+          defaultValue: 0,
+          allowNull: false,
+        },
+        { transaction: t }
+      );
 
       const updateQueries = [];
       const deleteCommentIds = [];
 
       const threadComments = await queryInterface.sequelize.query(
         `SELECT * FROM "Comments" WHERE "root_id" ILIKE '%discussion%'`,
-        {transaction: t}
+        { transaction: t }
       );
       if (threadComments[0].length > 0) {
         // we will now perform the same operation with proposal comments, but in order to do so we must create threads
         // to backlink to proposals
         const proposalComments = await queryInterface.sequelize.query(
           `SELECT * FROM "Comments" WHERE "root_id" NOT ILIKE '%discussion%'`,
-          {transaction: t}
+          { transaction: t }
         );
 
         if (proposalComments[0].length > 0) {
@@ -55,26 +59,29 @@ module.exports = {
           // these are the special addresses we made to link the newly created threads
           const cosmosAdminAddress = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE "address" = 'osmo10njyk4vx50cd7jynhwy48x4vwwyyugehdeaqxk'`,
-            {transaction: t}
+            { transaction: t }
           );
 
           const ethereumAdminAddress = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE "address" = '0xe92586e3E2FD9Aa7F0cc14898f0EB33BeE5a45D6'`,
-            {transaction: t}
+            { transaction: t }
           );
 
           const nearAdminAddress = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE "address" = 'commonwealth-archive.near'`,
-            {transaction: t}
+            { transaction: t }
           );
 
           const substrateAdminAddress = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE "address" = 'nMJeTQQc9uqWgizwWv7pUcpmpk43k4AwdxmJxijNFSY5amS'`,
-            {transaction: t}
+            { transaction: t }
           );
 
           proposalComments[0].forEach((c) => {
-            if (c.root_id.includes('councilmotion') || newThreads.get(tupleToKey([c.chain, c.root_id]))) {
+            if (
+              c.root_id.includes('councilmotion') ||
+              newThreads.get(tupleToKey([c.chain, c.root_id]))
+            ) {
               return; // if we already had created thread to backlink proposal comments, don't create another one
             }
 
@@ -133,7 +140,7 @@ module.exports = {
           const inserted = await queryInterface.bulkInsert(
             'Threads',
             [...newThreads.values()],
-            {returning: true, transaction: t}
+            { returning: true, transaction: t }
           );
 
           // create map of rootId -> thread_id
@@ -158,9 +165,9 @@ module.exports = {
             updateQueries.push(
               queryInterface.sequelize.query(
                 `UPDATE "Comments" SET "root_id" = ${rootToThreadMap.get(
-              tupleToKey([c.chain, c.root_id])
-            )} WHERE "id"=${c.id}`,
-                {transaction: t}
+                  tupleToKey([c.chain, c.root_id])
+                )} WHERE "id"=${c.id}`,
+                { transaction: t }
               )
             );
           });
@@ -170,15 +177,19 @@ module.exports = {
             deleteQueries.push(
               queryInterface.bulkDelete(
                 'Reactions',
-                {comment_id: id},
-                {transaction: t}
+                { comment_id: id },
+                { transaction: t }
               )
             );
           });
 
           deleteCommentIds.forEach((id) => {
             deleteQueries.push(
-              queryInterface.bulkDelete('Comments', {id: id}, {transaction: t})
+              queryInterface.bulkDelete(
+                'Comments',
+                { id: id },
+                { transaction: t }
+              )
             );
           });
 
@@ -192,29 +203,32 @@ module.exports = {
               `UPDATE "Comments" SET "root_id" = ${
                 c.root_id.split('_')[1]
               } WHERE "id"=${c.id}`,
-              {transaction: t}
+              { transaction: t }
             )
           );
         });
 
-        await queryInterface.sequelize.query(`
+        await queryInterface.sequelize.query(
+          `
           UPDATE "Comments"
           SET "thread_id" = CAST("root_id" as INTEGER)`,
-          {transaction: t}
+          { transaction: t }
         );
       }
 
       const viewCounts = await queryInterface.sequelize.query(
         `SELECT * FROM "ViewCounts"`,
-        {transaction: t}
+        { transaction: t }
       );
 
       if (viewCounts[0].length > 0) {
-        const viewCountMap = new Map(viewCounts[0].map((v) => [v.object_id.split('_')[1], v]));
+        const viewCountMap = new Map(
+          viewCounts[0].map((v) => [v.object_id.split('_')[1], v])
+        );
 
         const threads = await queryInterface.sequelize.query(
           `SELECT id FROM "Threads"`,
-          {transaction: t}
+          { transaction: t }
         );
 
         const viewCountUpdates = [];
@@ -224,10 +238,10 @@ module.exports = {
               queryInterface.sequelize.query(
                 `UPDATE "Threads"
                SET "view_count" = ${
-                viewCountMap.get(thread.id.toString()).view_count
-              }
+                 viewCountMap.get(thread.id.toString()).view_count
+               }
                WHERE "id" = ${thread.id}`,
-                {transaction: t}
+                { transaction: t }
               )
             );
           }
@@ -237,7 +251,7 @@ module.exports = {
       }
 
       await queryInterface.dropTable('ViewCounts', {
-        transaction: t
+        transaction: t,
       });
     });
   },
@@ -246,44 +260,49 @@ module.exports = {
     // IRREVERSABLE data loss (loses proposal comments), but schema will update fine.
     await queryInterface.changeColumn('Comments', 'thread_id', {
       type: 'varchar',
-      allowNull: false
+      allowNull: false,
     });
 
     await queryInterface.sequelize.transaction(async (t) => {
-
-      await queryInterface.renameColumn('Comments', 'thread_id', 'root_id', {transaction: t});
+      await queryInterface.renameColumn('Comments', 'thread_id', 'root_id', {
+        transaction: t,
+      });
 
       await queryInterface.sequelize.query(
         `UPDATE "Comments" SET "root_id" = 
          regexp_replace(root_id, '(.*)', 'discussion_\\1')`,
-        {transaction: t}
+        { transaction: t }
       );
 
       await queryInterface.createTable(
         'ViewCounts',
         {
-          id: {type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true},
-          chain: {type: Sequelize.STRING},
-          object_id: {type: Sequelize.STRING, allowNull: false},
-          view_count: {type: Sequelize.INTEGER, allowNull: false},
+          id: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+          },
+          chain: { type: Sequelize.STRING },
+          object_id: { type: Sequelize.STRING, allowNull: false },
+          view_count: { type: Sequelize.INTEGER, allowNull: false },
         },
         {
           underscored: true,
           timestamps: false,
           indexes: [
-            {fields: ['id']},
-            {fields: ['chain', 'object_id']},
-            {fields: ['community', 'object_id']},
-            {fields: ['chain', 'community', 'object_id']},
-            {fields: ['view_count']},
+            { fields: ['id'] },
+            { fields: ['chain', 'object_id'] },
+            { fields: ['community', 'object_id'] },
+            { fields: ['chain', 'community', 'object_id'] },
+            { fields: ['view_count'] },
           ],
         },
-        {transaction: t}
+        { transaction: t }
       );
 
       const threads = await queryInterface.sequelize.query(
         `SELECT id, chain, view_count FROM "Threads"`,
-        {transaction: t}
+        { transaction: t }
       );
 
       const updateQueries = [];
@@ -292,14 +311,16 @@ module.exports = {
           queryInterface.sequelize.query(
             `INSERT INTO "ViewCounts" (chain, object_id, view_count)
          VALUES ('${th.chain}', 'discussion_${th.id}', ${th.view_count})`,
-            {transaction: t}
+            { transaction: t }
           )
         );
       });
 
       await Promise.all(updateQueries);
 
-      return queryInterface.removeColumn('Threads', 'view_count', {transaction: t});
+      return queryInterface.removeColumn('Threads', 'view_count', {
+        transaction: t,
+      });
     });
   },
 };
