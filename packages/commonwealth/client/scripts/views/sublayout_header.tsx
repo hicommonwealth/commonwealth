@@ -13,6 +13,7 @@ import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
 import { useCommonNavigate } from 'navigation/helpers';
 import { HelpMenuPopover } from 'views/menus/help_menu';
+import { useUser } from 'context/userContext';
 
 type SublayoutHeaderProps = {
   hideSearch?: boolean;
@@ -24,6 +25,7 @@ export const SublayoutHeader = ({
   onMobile,
 }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUser();
 
   return (
     <div className="SublayoutHeader">
@@ -71,7 +73,7 @@ export const SublayoutHeader = ({
         <div className="DesktopMenuContainer">
           <CreateContentPopover />
           <HelpMenuPopover />
-          {app.isLoggedIn() && !onMobile && <NotificationsMenuPopover />}
+          {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
         </div>
         <LoginSelector />
       </div>

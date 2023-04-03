@@ -39,6 +39,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
+import { useUser } from "context/userContext";
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -57,6 +58,7 @@ type ViewThreadPageProps = {
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUser();
 
   const [comments, setComments] = useState<Array<Comment<Thread>>>([]);
   const [isEditingBody, setIsEditingBody] = useState(false);
@@ -682,7 +684,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   <CWText type="h5" className="callout-text">
                     Commenting is disabled because this post has been locked.
                   </CWText>
-                ) : !isGloballyEditing && canComment && app.isLoggedIn() ? (
+                ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {reactionsAndReplyButtons}
                     <CreateComment

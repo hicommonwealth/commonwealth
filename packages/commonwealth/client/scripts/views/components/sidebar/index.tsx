@@ -15,6 +15,7 @@ import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { useCommonNavigate } from '../../../navigation/helpers';
+import { useUser } from "context/userContext";
 
 export type SidebarMenuName =
   | 'default'
@@ -24,6 +25,7 @@ export type SidebarMenuName =
 export const Sidebar = () => {
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
+  const { isLoggedIn } = useUser();
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
@@ -61,7 +63,7 @@ export const Sidebar = () => {
               <GovernanceSection />
               <ExternalLinksModule />
               <div className="buttons-container">
-                {app.isLoggedIn() && app.chain && (
+                {isLoggedIn && app.chain && (
                   <div className="subscription-button">
                     <SubscriptionButton />
                   </div>
