@@ -14,24 +14,22 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
-import { DeltaStatic } from 'quill';
+import type { DeltaStatic } from 'quill';
+import { deserializeDelta, serializeDelta } from '../components/react_quill_editor/utils';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
   topic: Topic;
 };
 
-export const EditTopicModal = ({
-  topic,
-  onModalClose,
-}: EditTopicModalProps) => {
+export const EditTopicModal = ({ topic, onModalClose }: EditTopicModalProps) => {
   const {
     defaultOffchainTemplate,
     description: descriptionProp,
     featuredInNewPost: featuredInNewPostProp,
     featuredInSidebar: featuredInSidebarProp,
     id,
-    name: nameProp,
+    name: nameProp
   } = topic;
 
   const navigate = useCommonNavigate();
@@ -39,30 +37,14 @@ export const EditTopicModal = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    createDeltaFromText('')
-  );
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(deserializeDelta(defaultOffchainTemplate));
 
   const [description, setDescription] = useState<string>(descriptionProp);
-  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
-    featuredInNewPostProp
-  );
-  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
-    featuredInSidebarProp
-  );
+  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(featuredInNewPostProp);
+  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(featuredInSidebarProp);
   const [name, setName] = useState<string>(nameProp);
 
-  const editorText = getTextFromDelta(contentDelta)
-
-  useEffect(() => {
-    if (defaultOffchainTemplate) {
-      try {
-        setContentDelta(JSON.parse(defaultOffchainTemplate));
-      } catch (e) {
-        setContentDelta(createDeltaFromText(defaultOffchainTemplate));
-      }
-    }
-  }, [defaultOffchainTemplate]);
+  const editorText = getTextFromDelta(contentDelta);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
@@ -80,9 +62,7 @@ export const EditTopicModal = ({
       telegram: null,
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
-      default_offchain_template: featuredInNewPost
-        ? JSON.stringify(contentDelta)
-        : null,
+      default_offchain_template: featuredInNewPost ? serializeDelta(contentDelta) : null
     };
 
     try {
@@ -105,7 +85,7 @@ export const EditTopicModal = ({
     const topicInfo = {
       id,
       name: name,
-      chainId: app.activeChainId(),
+      chainId: app.activeChainId()
     };
 
     await app.topics.remove(topicInfo);
@@ -131,10 +111,7 @@ export const EditTopicModal = ({
 
             const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
             if (disallowedCharMatches) {
-              newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
-                disallowedCharMatches.length,
-                'char'
-              )} 
+              newErrorMsg = `The ${pluralizeWithoutNumberPrefix(disallowedCharMatches.length, 'char')}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
               return ['failure', newErrorMsg];
@@ -173,20 +150,11 @@ export const EditTopicModal = ({
           value=""
         />
         {featuredInNewPost && (
-          <ReactQuillEditor
-            contentDelta={contentDelta}
-            setContentDelta={setContentDelta}
-            tabIndex={3}
-          />
+          <ReactQuillEditor contentDelta={contentDelta} setContentDelta={setContentDelta} tabIndex={3} />
         )}
         <div className="buttons-row">
           <CWButton onClick={handleSaveChanges} label="Save changes" />
-          <CWButton
-            buttonType="primary-red"
-            disabled={isSaving}
-            onClick={handleDeleteTopic}
-            label="Delete topic"
-          />
+          <CWButton buttonType="primary-red" disabled={isSaving} onClick={handleDeleteTopic} label="Delete topic" />
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>

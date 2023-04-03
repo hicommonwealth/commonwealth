@@ -7,13 +7,6 @@ import { SnapshotEventType } from '../../../shared/types';
 import { NotificationCategories } from 'common-common/src/types';
 import type { DB } from '../../models';
 
-const enum SnapshotEventType {
-  Created = 'proposal/created',
-  Deleted = 'proposal/deleted',
-  Ended = 'proposal/end',
-  Started = 'proposal/start',
-}
-
 export async function processSnapshotMessage(
   this: { models: DB; log: Logger },
   data: SnapshotNotification

@@ -2,6 +2,7 @@ import React from 'react';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { chainEntityTypeToProposalName } from 'identifiers';
 import type { ChainEntity } from 'models';
+import { CWText } from '../component_kit/cw_text';
 
 interface ChainEntitiesSelectorItemProps {
   chainEntity: ChainEntity;
@@ -18,17 +19,17 @@ const ChainEntitiesSelectorItem = ({
     <div className="chain-entity" onClick={() => onClick(chainEntity)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
-        <div className="chain-entity-text">
+        <CWText fontWeight="medium" truncate noWrap>
           {chainEntityTypeToProposalName(chainEntity.type) +
             (chainEntity.typeId.startsWith('0x')
               ? ` ${chainEntity.typeId.slice(0, 6)}...`
               : ` #${chainEntity.typeId}`)}
-        </div>
-        <div className="chain-entity-subtext">
+        </CWText>
+        <CWText type="caption" truncate>
           {chainEntity.threadTitle !== 'undefined'
             ? decodeURIComponent(chainEntity.threadTitle)
             : 'No thread title'}
-        </div>
+        </CWText>
       </div>
     </div>
   );

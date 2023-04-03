@@ -315,10 +315,22 @@ export const renderQuillDelta = (
             const content = parent.children.map(renderChild);
             if (tag === 'li.checked') {
               content.unshift(
-                render(`input[type='checkbox'][disabled][checked]`, { key: iii })
+                render(`input`, {
+                  key: `input-${iii}`,
+                  type: 'checkbox',
+                  disabled: true,
+                  checked: true
+                }, null)
               );
             } else if (tag === 'li.unchecked') {
-              content.unshift(render(`input[type='checkbox'][disabled]`, { key: iii }));
+              content.unshift(
+                render(`input`, {
+                  key: `input-${iii}`,
+                  type: 'checkbox',
+                  disabled: true,
+                  checked: false
+                }, null)
+              );
             }
             const indent = parent.attributes.indent || 0;
 

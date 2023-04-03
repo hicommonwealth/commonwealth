@@ -10,6 +10,7 @@ import { countLinesQuill } from './helpers';
 // import { loadScript } from 'helpers';
 import { renderQuillDelta } from './render_quill_delta';
 import { useCommonNavigate } from 'navigation/helpers';
+import { rootRender } from 'mithrilInterop';
 
 export type QuillTextParams = {
   hideFormatting?: boolean;

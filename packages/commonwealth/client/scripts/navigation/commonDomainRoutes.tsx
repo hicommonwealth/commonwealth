@@ -30,7 +30,7 @@ const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 const DiscussionsPage = lazy(
   () => import('views/pages/discussions/DiscussionsPage')
 );
-const ViewThreadPage = lazy(() => import('views/pages/view_thread/index'));
+const ViewThreadPage = lazy(() => import('../views/pages/view_thread/ViewThreadPage'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect')

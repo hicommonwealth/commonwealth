@@ -10,6 +10,7 @@ import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { SublayoutHeader } from './sublayout_header';
 import useForceRerender from 'hooks/useForceRerender';
+import { setDarkMode } from '../helpers';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -37,7 +38,10 @@ const Sublayout = ({
   });
 
   useEffect(() => {
-    if (localStorage.getItem('dark-mode-state') === 'on') {
+    if (
+      localStorage.getItem('dark-mode-state') === 'on' &&
+      localStorage.getItem('user-dark-mode-state') === 'on'
+    ) {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
 

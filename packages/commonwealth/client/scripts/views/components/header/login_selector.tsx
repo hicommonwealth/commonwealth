@@ -15,7 +15,7 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
-import { isSameAccount, pluralize } from 'helpers';
+import { isSameAccount, pluralize, setDarkMode } from 'helpers';
 import type { Account } from 'models';
 import { AddressInfo, ITokenAdapter } from 'models';
 
@@ -233,6 +233,7 @@ export const LoginSelectorMenuRight = ({
                 await initAppState();
                 notifySuccess('Logged out');
                 onLogout();
+                setDarkMode(false);
               })
               .catch(() => {
                 // eslint-disable-next-line no-restricted-globals
@@ -283,9 +284,8 @@ export const LoginSelector = () => {
   const forceRerender = useForceRerender();
   const [profileLoadComplete, setProfileLoadComplete] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] = useState(
-    false
-  );
+  const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
+    useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
 
   const leftMenuProps = usePopover();
@@ -328,8 +328,9 @@ export const LoginSelector = () => {
 
   const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
-  const nAccountsWithoutRole = activeAccountsByRole.filter(([role]) => !role)
-    .length;
+  const nAccountsWithoutRole = activeAccountsByRole.filter(
+    ([role]) => !role
+  ).length;
 
   if (!profileLoadComplete && app.newProfiles.allLoaded()) {
     setProfileLoadComplete(true);

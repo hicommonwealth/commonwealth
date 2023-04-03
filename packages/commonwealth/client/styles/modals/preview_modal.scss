@@ -1,6 +1,16 @@
 @import '../shared';
 
 .PreviewModal {
+
+  max-height: 95vh;
+  overflow-y: scroll;
+
+  .compact-modal-title {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
   .compact-modal-body {
     .QuillFormattedText {
       margin: 25px 0;

@@ -128,7 +128,6 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
             content={
               <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
-                  likes,
                   reactors: reactors,
                 })}
               </div>
