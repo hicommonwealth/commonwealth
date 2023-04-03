@@ -170,11 +170,10 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal created events', async () => {
       const propCreatedEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: `${chain_id}-proposal-created`,
+          chain: chain_id,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'proposal-created'`),
-              // Sequelize.literal(`event_data->>'chain' = '${chain_id}'`),
             ],
           },
           block_number: events['proposal-created'].blockNumber,
@@ -213,11 +212,10 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process vote cast events', async () => {
       const voteCastEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: `${chain_id}-vote-cast`,
+          chain: chain_id,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'vote-cast'`),
-              // Sequelize.literal(`event_data->>'chain' = '${chain_id}'`),
             ],
           },
           block_number: events['vote-cast'].blockNumber,
@@ -231,11 +229,10 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal queued events', async () => {
       const propQueuedEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: `${chain_id}-proposal-queued`,
+          chain: chain_id,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'proposal-queued'`),
-              // Sequelize.literal(`event_data->>'chain' = '${chain_id}'`),
             ],
           },
           block_number: events['proposal-queued'].blockNumber,
@@ -249,11 +246,10 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process proposal executed events', async () => {
       const propExecutedEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: `${chain_id}-proposal-executed`,
+          chain: chain_id,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'proposal-executed'`),
-              // Sequelize.literal(`event_data->>'chain' = '${chain_id}'`),
             ],
           },
           block_number: events['proposal-executed'].blockNumber,
@@ -356,8 +352,7 @@ describe('Integration tests for Compound Bravo', () => {
 
   after(async () => {
     await rmq.shutdown();
-    await models.ChainEvent.destroy({ where: { chain_event_type_id: {[Op.like]: `${chain_id}%`} }, logging: console.log });
-    await models.ChainEventType.destroy({ where: { chain: chain_id }, logging: console.log });
+    await models.ChainEvent.destroy({ where: { chain: chain_id }, logging: console.log });
     await models.ChainEntity.destroy({ where: { chain: chain_id }, logging: console.log });
     await models.sequelize.close();
   });

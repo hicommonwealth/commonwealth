@@ -93,7 +93,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process transfer events', async () => {
       const transferEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: `${chain_id}-transfer`,
+          chain: chain_id,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'transfer'`),
@@ -109,7 +109,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should process approval events', async () => {
       const approvalEvent = await models.ChainEvent.findOne({
         where: {
-          chain_event_type_id: `${chain_id}-approval`,
+          chain: chain_id,
           event_data: {
             [Op.and]: [
               Sequelize.literal(`event_data->>'kind' = 'approval'`),
@@ -156,8 +156,7 @@ describe('Integration tests for Compound Bravo', () => {
 
   after(async () => {
     await rmq.shutdown();
-    await models.ChainEvent.destroy({ where: { chain_event_type_id: {[Op.like]: `${chain_id}%`} }, logging: console.log });
-    await models.ChainEventType.destroy({ where: { chain: chain_id }, logging: console.log });
+    await models.ChainEvent.destroy({ where: { chain: chain_id }, logging: console.log });
     await models.ChainEntity.destroy({ where: { chain: chain_id }, logging: console.log });
     await models.sequelize.close();
   });

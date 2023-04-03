@@ -13,7 +13,6 @@ import type { RmqSnapshotNotification } from './snapshotNotification';
 import { Sequelize } from 'sequelize';
 import { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
 import { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
-import { ChainEventTypeModelStatic } from 'chain-events/services/database/models/chain_event_type';
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -101,8 +100,7 @@ export enum RascalRoutingKeys {
 
 export type SafeRmqPublishSupported =
   | ChainEntityModelStatic
-  | ChainEventModelStatic
-  | ChainEventTypeModelStatic;
+  | ChainEventModelStatic;
 
 export abstract class AbstractRabbitMQController {
   protected _initialized = false;
