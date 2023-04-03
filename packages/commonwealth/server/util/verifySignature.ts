@@ -1,45 +1,39 @@
-import { configure as configureStableStringify } from 'safe-stable-stringify';
-import type { KeyringOptions } from '@polkadot/keyring/types';
-import { hexToU8a, stringToHex } from '@polkadot/util';
-import type { KeypairType } from '@polkadot/util-crypto/types';
 import {
   recoverTypedSignature,
   SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
+import type { KeyringOptions } from '@polkadot/keyring/types';
+import { hexToU8a, stringToHex } from '@polkadot/util';
+import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-import Web3 from 'web3';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, WalletId } from 'common-common/src/types';
-
-import { addressSwapper } from '../../shared/utils';
+import {
+  ChainBase,
+  NotificationCategories,
+  WalletId,
+} from 'common-common/src/types';
+import * as ethUtil from 'ethereumjs-util';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import {
-  chainBaseToCanvasChain,
-  chainBaseToCanvasChainId,
+  chainBasetoCanvasChain,
   constructCanvasMessage,
 } from '../../shared/adapters/shared';
+import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { ChainInstance } from '../models/chain';
+import type { ProfileAttributes } from '../models/profile';
 
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-// can't import from canvas es module, so we reimplement stringify here
-const sortedStringify = configureStableStringify({
-  bigint: false,
-  circularValue: Error,
-  strict: true,
-  deterministic: true,
-});
-
 const verifySignature = async (
-  chain: Readonly<ChainInstance>,
-  chain_id: string | number,
-  addressInstance: Readonly<AddressInstance>,
+  models: DB,
+  chain: ChainInstance,
+  addressModel: AddressInstance,
+  user_id: number,
   signatureString: string,
-  sessionAddress: string | null, // used when signing a block to login
-  sessionIssued: string | null, // used when signing a block to login
+  sessionPublicAddress: string | null, // used when signing a block to login
   sessionBlockInfo: string | null // used when signing a block to login
 ): Promise<boolean> => {
   if (!chain) {
@@ -47,25 +41,15 @@ const verifySignature = async (
     return false;
   }
 
-  // Reconstruct the expected canvas message.
-  const canvasChain = chainBaseToCanvasChain(chain.base);
-  const canvasChainId = chainBaseToCanvasChainId(chain.base, chain_id);
+  // Reconstruct the expected canvas message
   const canvasMessage = constructCanvasMessage(
-    canvasChain,
-    canvasChainId,
-    chain.base === ChainBase.Substrate
-      ? addressSwapper({
-          address: addressInstance.address,
-          currentPrefix: 42,
-        })
-      : addressInstance.address,
-    sessionAddress,
-    parseInt(sessionIssued, 10),
-    sessionBlockInfo
-      ? addressInstance.block_info
-        ? JSON.parse(addressInstance.block_info).hash
-        : null
-      : null
+    chainBasetoCanvasChain(chain.base),
+    // TODO: Figure out how to retrieve the right chain ID
+    // this is not currently being checked
+    'unknown',
+    addressModel.address,
+    sessionPublicAddress,
+    addressModel.block_info
   );
 
   let isValid: boolean;
@@ -74,21 +58,21 @@ const verifySignature = async (
     // substrate address handling
     //
     const polkadot = await import('@polkadot/keyring');
-    const address = polkadot.decodeAddress(addressInstance.address);
+    const address = polkadot.decodeAddress(addressModel.address);
     const keyringOptions: KeyringOptions = { type: 'sr25519' };
     if (
-      !addressInstance.keytype ||
-      addressInstance.keytype === 'sr25519' ||
-      addressInstance.keytype === 'ed25519'
+      !addressModel.keytype ||
+      addressModel.keytype === 'sr25519' ||
+      addressModel.keytype === 'ed25519'
     ) {
-      if (addressInstance.keytype) {
-        keyringOptions.type = addressInstance.keytype as KeypairType;
+      if (addressModel.keytype) {
+        keyringOptions.type = addressModel.keytype as KeypairType;
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
       const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(
         address
       );
-      const message = stringToHex(sortedStringify(canvasMessage));
+      const message = stringToHex(JSON.stringify(canvasMessage));
 
       const signatureU8a =
         signatureString.slice(0, 2) === '0x'
@@ -101,24 +85,37 @@ const verifySignature = async (
     }
   } else if (
     chain.base === ChainBase.CosmosSDK &&
-    (addressInstance.wallet_id === WalletId.CosmosEvmMetamask ||
-      addressInstance.wallet_id === WalletId.KeplrEthereum)
+    (addressModel.wallet_id === WalletId.CosmosEvmMetamask ||
+      addressModel.wallet_id === WalletId.KeplrEthereum)
   ) {
     //
     // ethereum address handling on cosmos chains via metamask
     //
-    const web3 = new Web3();
-    const address = web3.eth.accounts.recover(
-      sortedStringify(canvasMessage),
-      signatureString.trim()
+
+    const msgBuffer = Buffer.from(JSON.stringify(canvasMessage));
+
+    // toBuffer() doesn't work if there is a newline
+    const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
+    const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
+    const publicKey = ethUtil.ecrecover(
+      msgHash,
+      ethSignatureParams.v,
+      ethSignatureParams.r,
+      ethSignatureParams.s
     );
 
+    const addressBuffer = ethUtil.publicToAddress(publicKey);
+    const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
     try {
+      // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
+      const b32AddrBuf = ethUtil.Address.fromString(
+        lowercaseAddress.toString()
+      ).toBuffer();
       const b32Address = bech32.encode(
         chain.bech32_prefix,
-        bech32.toWords(Buffer.from(address.slice(2), 'hex'))
+        bech32.toWords(b32AddrBuf)
       );
-      if (addressInstance.address === b32Address) isValid = true;
+      if (addressModel.address === b32Address) isValid = true;
     } catch (e) {
       isValid = false;
     }
@@ -131,7 +128,7 @@ const verifySignature = async (
     //
 
     // provided string should be serialized AminoSignResponse object
-    const stdSignature = JSON.parse(signatureString);
+    const { signature: stdSignature } = JSON.parse(signatureString);
 
     // we generate an address from the actual public key and verify that it matches,
     // this prevents people from using a different key to sign the message than
@@ -150,14 +147,14 @@ const verifySignature = async (
         bech32Prefix
       );
 
-      if (generatedAddress === addressInstance.address) {
+      if (generatedAddress === addressModel.address) {
         try {
           // directly verify the generated signature, generated via SignBytes
           const { pubkey, signature } = cosm.decodeSignature(stdSignature);
           const secpSignature =
             cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new cosmCrypto.Sha256(
-            Buffer.from(sortedStringify(canvasMessage))
+            Buffer.from(JSON.stringify(canvasMessage))
           ).digest();
 
           isValid = await cosmCrypto.Secp256k1.verifySignature(
@@ -174,7 +171,8 @@ const verifySignature = async (
     //
     // cosmos-sdk address handling
     //
-    const stdSignature = JSON.parse(signatureString);
+
+    const { signature: stdSignature } = JSON.parse(signatureString);
 
     const bech32Prefix = chain.bech32_prefix;
     if (!bech32Prefix) {
@@ -192,13 +190,13 @@ const verifySignature = async (
       );
 
       if (
-        generatedAddress === addressInstance.address ||
-        generatedAddressWithCosmosPrefix === addressInstance.address
+        generatedAddress === addressModel.address ||
+        generatedAddressWithCosmosPrefix === addressModel.address
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
           const generatedSignDoc = await validationTokenToSignDoc(
-            Buffer.from(sortedStringify(canvasMessage)),
+            Buffer.from(JSON.stringify(canvasMessage)),
             generatedAddress
           );
 
@@ -223,7 +221,7 @@ const verifySignature = async (
         }
       } else {
         log.error(
-          `Address not matched. Generated ${generatedAddress}, found ${addressInstance.address}.`
+          `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`
         );
         isValid = false;
       }
@@ -235,9 +233,9 @@ const verifySignature = async (
     try {
       const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
 
-      if (addressInstance.block_info !== sessionBlockInfo) {
+      if (addressModel.block_info !== sessionBlockInfo) {
         throw new Error(
-          `Eth verification failed for ${addressInstance.address}: signed a different block than expected`
+          `Eth verification failed for ${addressModel.address}: signed a different block than expected`
         );
       }
       const address = recoverTypedSignature({
@@ -245,15 +243,15 @@ const verifySignature = async (
         signature: signatureString.trim(),
         version: SignTypedDataVersion.V4,
       });
-      isValid = addressInstance.address.toLowerCase() === address.toLowerCase();
+      isValid = addressModel.address.toLowerCase() === address.toLowerCase();
       if (!isValid) {
         log.info(
-          `Eth verification failed for ${addressInstance.address}: does not match recovered address ${address}`
+          `Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`
         );
       }
     } catch (e) {
       log.info(
-        `Eth verification failed for ${addressInstance.address}: ${e.stack}`
+        `Eth verification failed for ${addressModel.address}: ${e.message}`
       );
       isValid = false;
     }
@@ -265,9 +263,8 @@ const verifySignature = async (
     // both in base64 encoding
     const nacl = await import('tweetnacl');
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
-
     isValid = nacl.sign.detached.verify(
-      Buffer.from(sortedStringify(canvasMessage)),
+      Buffer.from(JSON.stringify(canvasMessage)),
       Buffer.from(sigObj, 'base64'),
       Buffer.from(publicKey, 'base64')
     );
@@ -278,12 +275,12 @@ const verifySignature = async (
 
     // ensure address is base58 string length 32, cf @solana/web3 impl
     try {
-      const decodedAddress = bs58.decode(addressInstance.address);
+      const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
         const nacl = await import('tweetnacl');
         isValid = nacl.sign.detached.verify(
-          Buffer.from(sortedStringify(canvasMessage)),
-          bs58.decode(signatureString),
+          Buffer.from(`${JSON.stringify(canvasMessage)}`),
+          Buffer.from(signatureString, 'base64'),
           decodedAddress
         );
       } else {
@@ -298,6 +295,45 @@ const verifySignature = async (
     isValid = false;
   }
 
+  addressModel.last_active = new Date();
+
+  if (isValid && user_id === null) {
+    // mark the address as verified, and if it doesn't have an associated user, create a new user
+    addressModel.verification_token_expires = null;
+    addressModel.verified = new Date();
+    if (!addressModel.user_id) {
+      const user = await models.User.createWithProfile(models, { email: null });
+      addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
+      await models.Subscription.create({
+        subscriber_id: user.id,
+        category_id: NotificationCategories.NewMention,
+        object_id: `user-${user.id}`,
+        is_active: true,
+      });
+      await models.Subscription.create({
+        subscriber_id: user.id,
+        category_id: NotificationCategories.NewCollaboration,
+        object_id: `user-${user.id}`,
+        is_active: true,
+      });
+      // Automatically create subscription to chat mentions
+      await models.Subscription.create({
+        subscriber_id: user.id,
+        category_id: NotificationCategories.NewChatMention,
+        object_id: `user-${user.id}`,
+        is_active: true,
+      });
+      addressModel.user_id = user.id;
+    }
+  } else if (isValid) {
+    // mark the address as verified
+    addressModel.verification_token_expires = null;
+    addressModel.verified = new Date();
+    addressModel.user_id = user_id;
+    const profile = await models.Profile.findOne({ where: { user_id } });
+    addressModel.profile_id = profile.id;
+  }
+  await addressModel.save();
   return isValid;
 };
 
