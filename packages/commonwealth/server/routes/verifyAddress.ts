@@ -47,8 +47,7 @@ const processAddress = async (
   wallet_id: WalletId,
   signature: string,
   user: Express.User,
-  sessionAddress: string | null,
-  sessionIssued: string | null,
+  sessionPublicAddress: string | null,
   sessionBlockInfo: string | null
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
@@ -74,12 +73,12 @@ const processAddress = async (
   // verify the signature matches the session information = verify ownership
   try {
     const valid = await verifySignature(
+      models,
       chain,
-      chain_id,
       addressInstance,
+      user ? user.id : null,
       signature,
-      sessionAddress,
-      sessionIssued,
+      sessionPublicAddress,
       sessionBlockInfo
     );
     if (!valid) {
@@ -227,8 +226,7 @@ const verifyAddress = async (
     req.body.signature,
     req.user,
     req.body.session_public_address,
-    req.body.session_timestamp || null, // disallow empty strings
-    req.body.session_block_data || null // disallow empty strings
+    req.body.session_block_data
   );
 
   // assertion check
