@@ -430,7 +430,7 @@ const commonDomainsRoutes = () => [
     })}
   />,
   <Route
-    path="/profile/id/:profileId/edit"
+    path="/profile/edit"
     element={withLayout(EditNewProfilePage, {
       scoped: true,
       deferChain: true,

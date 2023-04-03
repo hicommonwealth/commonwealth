@@ -173,7 +173,7 @@ export const User = (props: UserAttrs) => {
     </div>
   ) : (
     <div
-      className={`User${linkify ? ' linkified' : ''}`}
+      className={`User${linkify && profile?.id ? ' linkified' : ''}`}
       key={profile?.address || '-'}
     >
       {showAvatar && (
@@ -187,7 +187,7 @@ export const User = (props: UserAttrs) => {
       {
         <>
           {/* non-substrate name */}
-          {linkify ? (
+          {linkify && profile?.id ? (
             link(
               'a.user-display-name.username',
               profile ? `/profile/id/${profile.id}` : 'javascript:',
@@ -210,8 +210,13 @@ export const User = (props: UserAttrs) => {
             )
           ) : (
             <a className="user-display-name username">
-              {!profile ? (
-                addrShort
+              {!profile || !profile?.id ? (
+                !profile?.id ?
+                  `${profile.address.slice(
+                    0,
+                    8
+                  )}...${profile.address.slice(-5)}` :
+                  addrShort
               ) : !showAddressWithDisplayName ? (
                 profile.name
               ) : (
@@ -261,9 +266,13 @@ export const User = (props: UserAttrs) => {
             app.chain.base === ChainBase.Substrate &&
             link(
               'a.user-display-name',
-              profile ? `/profile/id/${profile.id}` : 'javascript:',
-              !profile ? (
-                addrShort
+              profile?.id ? `/profile/id/${profile.id}` : 'javascript:',
+              !profile || !profile?.id ? (
+                !profile?.id
+                  ? `${profile.address.slice(0, 8)}...${profile.address.slice(
+                    -5
+                  )}`
+                  : addrShort
               ) : !showAddressWithDisplayName ? (
                 profile.name
               ) : (

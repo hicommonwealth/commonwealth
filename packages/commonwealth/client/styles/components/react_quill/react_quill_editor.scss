@@ -6,6 +6,43 @@
     min-height: 180px;
   }
 
+  .custom-buttons {
+    position: relative;
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: row;
+
+    .custom-button {
+      color: #333;
+      text-align: center;
+      font-size: 1.2em;
+      width: 1.2em;
+      height: 1.2em;
+      align-items: center;
+      justify-content: center;
+      margin-left: 5px;
+
+      -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+          -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently
+                                      supported by Chrome, Edge, Opera and Firefox */
+
+      &.preview {
+        padding: 3px;
+      }
+
+      &:hover {
+        color: #888;
+      }
+    }
+
+  }
+
   .LoadingIndicator {
 
     position: relative;

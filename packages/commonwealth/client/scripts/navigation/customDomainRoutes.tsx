@@ -294,7 +294,7 @@ const customDomainRoutes = () => {
       })}
     />,
     <Route
-      path="/profile/id/:profileId/edit"
+      path="/profile/edit"
       element={withLayout(EditNewProfilePage, {
         scoped: true,
         deferChain: true,
@@ -424,8 +424,8 @@ const customDomainRoutes = () => {
       element={<Navigate to="/profile/id/:profileId" />}
     />,
     <Route
-      path="/:scope/profile/id/:profileId/edit"
-      element={<Navigate to="/profile/id/:profileId/edit" />}
+      path="/:scope/profile/edit"
+      element={<Navigate to="/profile/edit" />}
     />,
   ];
 };
