@@ -36,7 +36,10 @@ import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
 import updateBanner from '../routes/updateBanner';
 import communityStats from '../routes/communityStats';
-import fetchEtherscanContract from '../routes/etherscanAPI';
+import {
+  fetchEtherscanContract,
+  fetchEtherscanContractAbi,
+} from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
