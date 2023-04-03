@@ -340,7 +340,7 @@ export async function getResults(
     return { votes, results };
   } catch (e) {
     console.error(e);
-    return e;
+    throw e
   }
 }
 
