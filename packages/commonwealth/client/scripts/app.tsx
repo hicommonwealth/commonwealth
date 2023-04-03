@@ -6,7 +6,7 @@ import useInitApp from 'hooks/useInitApp';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 
 import router from 'navigation/router';
-import { UserProvider } from 'context/userContext';
+import { UserProvider } from 'atoms/userAtom';
 
 const App = () => {
   const { customDomain, loading } = useInitApp();

@@ -38,7 +38,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { useUser } from "context/userContext";
+import { useUser } from "atoms/userAtom";
 
 type ThreadPreviewProps = {
   thread: Thread;

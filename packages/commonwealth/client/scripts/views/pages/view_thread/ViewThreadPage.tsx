@@ -39,7 +39,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
-import { useUser } from "context/userContext";
+import { useUser } from "atoms/userAtom";
 
 export type ThreadPrefetch = {
   [identifier: string]: {

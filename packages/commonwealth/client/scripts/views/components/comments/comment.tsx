@@ -18,7 +18,7 @@ import { User } from '../user/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
-import { useUser } from 'context/userContext';
+import { useUser } from 'atoms/userAtom';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 
 type CommentAuthorProps = {

@@ -10,7 +10,7 @@ import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useUser } from 'context/userContext';
+import { useUser } from 'atoms/userAtom';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();

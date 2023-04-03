@@ -13,7 +13,7 @@ import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
 import { useCommonNavigate } from 'navigation/helpers';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import { useUser } from 'context/userContext';
+import { useUser } from 'atoms/userAtom';
 
 type SublayoutHeaderProps = {
   hideSearch?: boolean;

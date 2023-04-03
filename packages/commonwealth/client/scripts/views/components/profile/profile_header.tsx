@@ -9,7 +9,7 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
 import { SocialAccounts } from '../social_accounts';
-import { useUser } from 'context/userContext';
+import { useUser } from 'atoms/userAtom';
 
 type ProfileHeaderProps = {
   profile: Profile;

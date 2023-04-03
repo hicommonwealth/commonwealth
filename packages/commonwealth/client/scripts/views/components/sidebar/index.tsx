@@ -15,7 +15,7 @@ import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { useCommonNavigate } from '../../../navigation/helpers';
-import { useUser } from "context/userContext";
+import { useUser } from "atoms/userAtom";
 
 export type SidebarMenuName =
   | 'default'
