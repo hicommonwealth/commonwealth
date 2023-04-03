@@ -24,3 +24,10 @@ services:
       - ./mq-init.sh:/mq-init.sh
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     entrypoint: ["sh", "-c", "sh /mq-init.sh"]
+  loacl-redis:
+    container_name: local-redis
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis-data:/data
