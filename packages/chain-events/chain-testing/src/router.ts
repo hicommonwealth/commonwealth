@@ -6,6 +6,7 @@ import {
   getETH,
 } from './routes/chain';
 import { approve, getBalance, getTokens, transfer } from './routes/erc20';
+import { approve721, transfer721 } from './routes/erc721';
 import {
   cancelProposal,
   castVote,
@@ -42,6 +43,18 @@ function setupRouter(): Router {
   router.post('/gov/compound/queueProposal', queueProposal);
   router.post('/gov/compound/executeProposal', executeProposal);
   router.get('/gov/compound/runFullCylce', runFullCycle);
+
+  router.post('/gov/aave/createProposal', createProposal);
+  router.post('/gov/aave/cancelProposal', cancelProposal);
+  router.post('/gov/aave/getVotes', getVotes);
+  router.post('/gov/aave/castVote', castVote);
+  router.post('/gov/aave/proposalDetails', getProposalDetails);
+  router.post('/gov/aave/queue', queueProposal);
+  router.post('/gov/aave/execute', executeProposal);
+  router.get('/gov/aave/runFullCylce', runFullCycle);
+
+  router.post('/erc721/approve', approve721);
+  router.post('/erc721/transfer', transfer721);
 
   return router;
 }

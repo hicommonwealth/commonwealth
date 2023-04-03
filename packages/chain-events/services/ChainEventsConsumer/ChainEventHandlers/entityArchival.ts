@@ -11,6 +11,7 @@ import {
 
 import type { DB } from '../../database/database';
 
+import type { ChainEventInstance } from 'chain-events/services/database/models/chain_event';
 import type {
   CWEvent,
   IChainEntityKind,
@@ -42,7 +43,10 @@ export default class extends IEventHandler {
    * `dbEvent` is the database entry corresponding to the `event`.
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public async handle(event: CWEvent<IChainEventData>, dbEvent) {
+  public async handle(
+    event: CWEvent<IChainEventData>,
+    dbEvent: ChainEventInstance
+  ) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const log = factory.getLogger(
       addPrefix(__filename, [event.network, event.chain])
@@ -175,5 +179,7 @@ export default class extends IEventHandler {
         break;
       }
     }
+
+    return dbEvent;
   }
 }

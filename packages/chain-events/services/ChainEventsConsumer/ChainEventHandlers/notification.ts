@@ -5,11 +5,15 @@ import {
 } from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
-import type { ChainEventAttributes } from '../../database/models/chain_event';
+import type { ChainEventInstance } from '../../database/models/chain_event';
 import type { DB } from '../../database/database';
 
 import type { CWEvent, IChainEventKind } from 'chain-events/src';
-import { IEventHandler } from 'chain-events/src';
+import {
+  EntityEventKind,
+  eventToEntity,
+  IEventHandler,
+} from 'chain-events/src';
 
 export default class extends IEventHandler {
   public readonly name = 'Notification Producer';
@@ -23,7 +27,7 @@ export default class extends IEventHandler {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public async handle(event: CWEvent, dbEvent) {
+  public async handle(event: CWEvent, dbEvent: ChainEventInstance) {
     const log = factory.getLogger(
       addPrefix(__filename, [event.network, event.chain])
     );
@@ -38,25 +42,24 @@ export default class extends IEventHandler {
       return dbEvent;
     }
 
-    let dbEventType;
-    try {
-      dbEventType = await dbEvent.getChainEventType();
-      if (!dbEventType) {
-        log.error(`Failed to fetch event type! Ignoring.`);
-        return dbEvent;
-      }
-    } catch (e) {
-      log.error(
-        `Failed to get chain-event type for event: ${JSON.stringify(event)}`
+    if (!dbEvent.entity_id) {
+      log.info(`No related entity, skipping!`);
+      return dbEvent;
+    }
+
+    const [, eventEntityKind] = eventToEntity(event.network, event.data.kind);
+    if (
+      eventEntityKind != EntityEventKind.Create &&
+      eventEntityKind != EntityEventKind.Complete
+    ) {
+      log.trace(
+        `Event does not mark the creation or completion of an entity. Skipping event!`
       );
       return dbEvent;
     }
 
-    const formattedEvent: ChainEventAttributes = dbEvent.toJSON();
-    formattedEvent.ChainEventType = dbEventType.toJSON();
-
     const publishData: RmqCENotificationCUD.RmqMsgType = {
-      ChainEvent: formattedEvent,
+      ChainEvent: dbEvent.toJSON(),
       event,
       cud: 'create',
     };

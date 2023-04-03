@@ -12,7 +12,7 @@ export class compoundGovernor implements IGovernor {
   public async createArbitraryProposal(
     accountIndex: number,
     advanceDays?: string | number
-  ): Promise<string> {
+  ): Promise<any> {
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
     const accounts = (await provider.eth.getAccounts())[accountIndex];
@@ -54,18 +54,21 @@ export class compoundGovernor implements IGovernor {
     }
     console.log(proposalId);
 
-    return String(
-      provider.eth.abi.decodeParameter(
-        'uint256',
-        String(proposalId['events']['ProposalCreated']['raw']['data']).slice(
-          0,
-          66
+    return {
+      proposalId: String(
+        provider.eth.abi.decodeParameter(
+          'uint256',
+          String(proposalId['events']['ProposalCreated']['raw']['data']).slice(
+            0,
+            66
+          )
         )
-      )
-    );
+      ),
+      block: proposalId['blockNumber'],
+    };
   }
 
-  public async cancelProposal(proposalId: string | number): Promise<void> {
+  public async cancelProposal(proposalId: string | number): Promise<any> {
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
     const accounts = await provider.eth.getAccounts();
@@ -73,13 +76,14 @@ export class compoundGovernor implements IGovernor {
       .cancel(proposalId)
       .send({ from: accounts[0], gasLimit: 150000 });
     console.log(cancel);
+    return { block: cancel['blockNumber'] };
   }
 
   public async castVote(
     proposalId: string | number,
     accountIndex: number,
     forAgainst: boolean
-  ): Promise<void> {
+  ): Promise<any> {
     const provider = getProvider();
     const contract = comp_gov(this.contractAddress, provider);
     const accounts = (await provider.eth.getAccounts())[accountIndex];
@@ -87,6 +91,7 @@ export class compoundGovernor implements IGovernor {
       .castVote(proposalId, Number(forAgainst))
       .send({ from: accounts, gasLimit: 1000000 });
     console.log(vote);
+    return { block: vote['blockNumber'] };
   }
 
   public async getProposalDetails(proposalId: number | string): Promise<any> {
@@ -99,7 +104,7 @@ export class compoundGovernor implements IGovernor {
   public async queueProposal(
     proposalId: string | number,
     advanceTime?: boolean
-  ): Promise<void> {
+  ): Promise<any> {
     if (advanceTime) {
       const secs = Number(3) * 86400;
       const blocks = secs / 12 + 500;
@@ -112,12 +117,13 @@ export class compoundGovernor implements IGovernor {
       .queue(proposalId)
       .send({ from: accounts, gasLimit: 500000 });
     console.log(queued);
+    return { block: queued['blockNumber'] };
   }
 
   public async executeProposal(
     proposalId: string | number,
     advanceTime?: boolean
-  ): Promise<void> {
+  ): Promise<any> {
     if (advanceTime) {
       const secs = Number(5) * 86400;
       const blocks = secs / 12 + 500;
@@ -130,12 +136,13 @@ export class compoundGovernor implements IGovernor {
       .execute(proposalId)
       .send({ from: accounts, value: 0, gasLimit: 1000000 });
     console.log(executed);
+    return { block: executed['blockNumber'] };
   }
 
   public async getVotes(
     accountIndex: number,
     numberOfVotes: string
-  ): Promise<void> {
+  ): Promise<any> {
     const provider = getProvider();
     const compToken = erc20(this.compToken, provider);
     const accounts = (await provider.eth.getAccounts())[accountIndex];
@@ -145,31 +152,37 @@ export class compoundGovernor implements IGovernor {
     const tokensNeeded = provider.utils.toBN(
       provider.utils.toWei(numberOfVotes)
     );
+    let txReceipt;
     if (currBalance.lt(tokensNeeded)) {
       const compoundReservoir = '0x2775b1c75658Be0F640272CCb8c72ac986009e38';
       const binanceWallet = '0xF977814e90dA44bFA03b6295A0616a897441aceC';
       const someFund = '0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7';
 
       try {
-        await compToken.methods.transfer(accounts, tokensNeeded).send({
-          from: binanceWallet,
-          gasLimit: 100000,
-        });
+        txReceipt = await compToken.methods
+          .transfer(accounts, tokensNeeded)
+          .send({
+            from: binanceWallet,
+            gasLimit: 100000,
+          });
       } catch (e) {
         console.error(e);
-        await compToken.methods.transfer(accounts, tokensNeeded).send({
-          from: someFund,
-          gasLimit: 100000,
-        });
+        txReceipt = await compToken.methods
+          .transfer(accounts, tokensNeeded)
+          .send({
+            from: someFund,
+            gasLimit: 100000,
+          });
       }
     }
     try {
-      await compToken.methods
+      txReceipt = await compToken.methods
         .delegate(accounts)
         .send({ from: accounts, gasLimit: 150000 });
     } catch {
       console.log('already Delegated');
     }
+    return { block: txReceipt['blockNumber'] };
   }
 
   public async endToEndSim(): Promise<void> {
@@ -177,7 +190,7 @@ export class compoundGovernor implements IGovernor {
     for (const idx of accts) {
       await this.getVotes(idx, '120000');
     }
-    const proposalId = await this.createArbitraryProposal(0, 3);
+    const proposalId = (await this.createArbitraryProposal(0, 3))['proposalId'];
     for (const idx of accts) {
       await this.castVote(proposalId, idx, true);
     }

@@ -6,7 +6,6 @@ import {
   RascalQueues,
   RascalRoutingKeys,
   RmqCENotificationCUD,
-  RmqCETypeCUD,
   RmqEntityCUD,
 } from 'common-common/src/rabbitmq';
 import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
@@ -191,21 +190,6 @@ describe('Tests for the ChainEventsConsumer service', () => {
 
     expect(dbResult).to.not.be.null;
 
-    // check whether the new chain-event-type was pushed to the appropriate queue
-    const message = await getRmqMessage(
-      RABBITMQ_API_URI,
-      RascalQueues.ChainEventTypeCUDMain,
-      false
-    );
-    expect(message).to.have.property('length');
-    expect(message.length).to.equal(1);
-    expect(JSON.parse(message[0].payload)).to.deep.equal({
-      chainEventTypeId: 'random-chain-transfer',
-      cud: 'create',
-    });
-    expect(RmqCETypeCUD.isValidMsgFormat(JSON.parse(message[0].payload))).to.be
-      .true;
-
     await models.ChainEvent.destroy({
       where: {
         block_number: chainEvent.blockNumber,
@@ -217,10 +201,6 @@ describe('Tests for the ChainEventsConsumer service', () => {
           amount: ceData.amount,
         },
       },
-    });
-
-    await models.ChainEventType.destroy({
-      where: { id: `${chain}-${ceData.kind}` },
     });
   });
 
