@@ -7,7 +7,7 @@ rabbitmq-server &
 rabbitmq_pid=$!
 
 # Wait for RabbitMQ server to start
-while ! nc -z local-rabbitmq 5672; do
+while ! nc -z compose-rabbitmq 5672; do
   sleep 0.1
 done
 

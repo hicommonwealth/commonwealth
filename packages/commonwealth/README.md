@@ -44,7 +44,12 @@ https://github.com/hicommonwealth/ce-rabbitmq-plugin
 Optionally, use docker compose to start both local copy of postgres & rabbitmq. Make sure docker is running.
 
 ```
+# docker-compose without postgres
 docker-compose up -d #to start
+# docker-compose with postgres
+docker-compose up --scale compose-db=1 -d
+
+
 docker-compose down #to stop
 ```
 
