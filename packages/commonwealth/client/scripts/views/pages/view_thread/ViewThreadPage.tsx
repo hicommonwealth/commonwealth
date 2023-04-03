@@ -147,7 +147,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         notifyError('Thread not found');
         setThreadFetchFailed(true);
       });
-  }, [thread, threadId]);
+  }, [threadId]);
 
   useEffect(() => {
     if (!thread) {
