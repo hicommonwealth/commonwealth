@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import type { SnapshotProposal, SnapshotProposalVote, SnapshotSpace } from 'helpers/snapshot_utils';
+import {
+  Power,
+  SnapshotProposal,
+  SnapshotProposalVote,
+  SnapshotSpace,
+  VoteResults,
+  VoteResultsData
+} from 'helpers/snapshot_utils';
 import { getPower, getResults } from 'helpers/snapshot_utils';
 import { AddressInfo } from 'models';
 
@@ -15,6 +22,7 @@ import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
+import { LoadingIndicator } from '../../components/loading_indicator';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -23,41 +31,49 @@ type ViewProposalPageProps = {
 };
 
 export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposalPageProps) => {
-  const [fetchedPower, setFetchedPower] = useState<boolean>(false);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
-  const [scores, setScores] = useState<Array<number>>([]);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
-  const [symbol, setSymbol] = useState<string>('');
+  const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
+  const [power, setPower] = useState<Power | null>(null);
   const [threads, setThreads] = useState<Array<{ id: string; title: string }> | null>(null);
-  const [totals, setTotals] = useState<any>(null);
-  const [totalScore, setTotalScore] = useState<number>(0);
-  const [validatedAgainstStrategies, setValidatedAgainstStrategies] = useState<boolean>(true);
-  const [votes, setVotes] = useState<Array<SnapshotProposalVote>>([]);
 
-  const loadVotes = async () => {
-    setFetchedPower(false);
+  const symbol: string = space?.symbol || '';
+  const validatedAgainstStrategies: boolean = !power ? true : power.totalScore > 0;
+  const totalScore: number = power?.totalScore || 0;
+  const votes: SnapshotProposalVote[] = voteResults?.votes || [];
+  const totals: VoteResultsData = voteResults?.results || {
+    resultsByVoteBalance: [],
+    resultsByStrategyScore: [],
+    sumOfResultsBalance: 0
+  };
 
-    console.log('all proposals:', app.snapshot.proposals);
-    const currentProposal = app.snapshot.proposals.find((p) => p.id === identifier);
-    setProposal(currentProposal);
-
-    if (!currentProposal) {
-      throw new Error(`could not get proposal: ${currentProposal.id}`);
+  const activeChainId = app.activeChainId();
+  const proposalAuthor = useMemo(() => {
+    if (!proposal || !activeChainId) {
+      return null;
     }
+    return new AddressInfo(null, proposal.author, activeChainId, null);
+  }, [proposal, activeChainId]);
+
+  const loadVotes = async (snapId: string, proposalId: string) => {
+    await app.snapshot.init(snapId);
+    if (!app.snapshot.initialized) {
+      return;
+    }
+
+    const currentProposal = app.snapshot.proposals.find((p) => p.id === proposalId);
+    setProposal(currentProposal);
 
     const currentSpace = app.snapshot.space;
     setSpace(currentSpace);
-    setSymbol(currentSpace.symbol); // TODO: remove this since it's a derived value?
 
-    const results = await getResults(space, currentProposal);
-    setVotes(results.votes);
-    setTotals(results.results);
+    const results = await getResults(currentSpace, currentProposal);
+    console.log('voteResults', results);
+    setVoteResults(results);
 
-    const power = await getPower(currentSpace, currentProposal, app.user?.activeAccount?.address);
-    setValidatedAgainstStrategies(power.totalScore > 0);
-    setTotalScore(power.totalScore);
-
-    setFetchedPower(true);
+    const address = app.user?.activeAccount?.address || app.user?.addresses?.[0]?.address;
+    const powerRes = await getPower(currentSpace, currentProposal, address);
+    setPower(powerRes);
 
     try {
       if (app.activeChainId()) {
@@ -70,18 +86,8 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
   };
 
   useEffect(() => {
-    const init = async () => {
-      if (!app.snapshot.initialized) {
-        await app.snapshot.init(snapshotId);
-        return;
-      }
-      await loadVotes();
-    };
-    init().catch(console.error);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  console.log('proposal: ', proposal);
+    loadVotes(snapshotId, identifier).catch(console.error);
+  }, [identifier, snapshotId]);
 
   if (!proposal) {
     return <PageLoading />;
@@ -96,14 +102,7 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
         title={proposal.title}
         author={
           <CWText>
-            {!!app.activeChainId() && (
-              <User
-                user={new AddressInfo(null, proposal.author, app.activeChainId(), null)}
-                showAddressWithDisplayName
-                linkify
-                popover
-              />
-            )}
+            {!!proposalAuthor && <User user={proposalAuthor} showAddressWithDisplayName linkify popover />}
           </CWText>
         }
         createdAt={proposal.created}
@@ -126,10 +125,10 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
             label: 'Poll',
             item: (
               <SnapshotPollCardContainer
-                fetchedPower={fetchedPower}
+                fetchedPower={!!power}
                 identifier={identifier}
                 proposal={proposal}
-                scores={scores}
+                scores={[]} // unused?
                 space={space}
                 symbol={symbol}
                 totals={totals}
