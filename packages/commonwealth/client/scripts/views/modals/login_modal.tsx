@@ -136,7 +136,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
 
   view(vnode: ResultNode<LoginModalAttrs>) {
     const { onSuccess } = vnode.attrs;
-    const wcEnabled = _.any(
+    const wcEnabled = _.some(
       this.wallets,
       (w) =>
         (w instanceof WalletConnectWebWalletController ||

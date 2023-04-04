@@ -18,7 +18,8 @@ import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/key
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { addressSwapper } from '../../shared/utils';
 import {
-  chainBasetoCanvasChain,
+  chainBaseToCanvasChain,
+  chainBaseToCanvasChainId,
   constructCanvasMessage,
 } from '../../shared/adapters/shared';
 import type { DB } from '../models';

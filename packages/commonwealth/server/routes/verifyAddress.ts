@@ -105,6 +105,7 @@ const processAddress = async (
     const valid = await verifySignature(
       models,
       chain,
+      chain_id,
       addressInstance,
       user ? user.id : null,
       signature,

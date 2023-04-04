@@ -147,7 +147,6 @@ type WalletsListProps = {
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   linking?: boolean;
   useSessionKeyLoginFlow?: boolean;
-  hideConnectAnotherWayLink?: boolean;
 };
 
 export const CWWalletsList = (props: WalletsListProps) => {
@@ -161,7 +160,6 @@ export const CWWalletsList = (props: WalletsListProps) => {
     accountVerifiedCallback,
     linking,
     useSessionKeyLoginFlow,
-    hideConnectAnotherWayLink,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -455,17 +453,6 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 </CWText>
               )}
             />
-          )}
-          {!hideConnectAnotherWayLink && (
-            <CWText
-              type="b2"
-              className={getClasses<{ darkMode?: boolean }>(
-                { darkMode },
-                'connect-another-way-link'
-              )}
-            >
-              <a onClick={connectAnotherWayOnclick}>Connect Another Way</a>
-            </CWText>
           )}
         </div>
       </div>
