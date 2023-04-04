@@ -1,6 +1,6 @@
 import { Keyring } from '@polkadot/api';
 import { IKeyringPair } from '@polkadot/types/types';
-import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
 import { addressSwapper } from '../../../../../shared/utils';
 import type {
   Action,
@@ -49,7 +49,7 @@ export class SubstrateSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      // throw new Error("Invalid signature");
+      throw new Error("Invalid signature");
     }
     if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
@@ -165,7 +165,7 @@ export class SubstrateSessionController implements ISessionController {
     const action: Action = {
       type: 'action',
       payload: actionPayload,
-      session: sessionPayload.from,
+      session: sessionPayload.sessionAddress,
       signature,
     };
 

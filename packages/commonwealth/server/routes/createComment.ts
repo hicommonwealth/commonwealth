@@ -27,6 +27,7 @@ import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
+import { verifyComment } from '../../shared/canvas/serverVerify';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -189,6 +190,8 @@ const createComment = async (
   } catch (e) {
     // check always passes if the comment text isn't a Quill document
   }
+
+  await verifyComment(canvas_action, canvas_session, canvas_hash, { thread_id, text, address: author.address, chain: chain.id });
 
   // New comments get an empty version history initialized, which is passed
   // the comment's first version, formatted on the backend with timestamps

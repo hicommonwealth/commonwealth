@@ -19,6 +19,7 @@ import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
+import { verifyReaction } from '../../shared/canvas/serverVerify';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -63,6 +64,8 @@ const createReaction = async (
   if (!reaction) {
     return next(new AppError(Errors.NoReaction));
   }
+
+  await verifyReaction(canvas_action, canvas_session, canvas_hash, { thread_id, comment_id, proposal_id, address: author.address, chain: chain.id, value: reaction });
 
   let thread;
   if (thread_id) {

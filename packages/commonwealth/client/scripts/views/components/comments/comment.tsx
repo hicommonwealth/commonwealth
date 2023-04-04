@@ -22,7 +22,7 @@ import User, { AnonymousUser } from '../widgets/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 import { showCanvasVerifyDataModal } from '../../modals/canvas_verify_data_modal';
-import { verify } from '../../../helpers/canvas';
+import { verify } from 'canvas';
 
 type CommentAuthorAttrs = {
   comment: CommentType<any>;
@@ -114,31 +114,31 @@ export class Comment extends ClassComponent<CommentAttrs> {
       !isLocked &&
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
-    // if (!this.verificationChecked) {
-    //   this.verificationChecked = true;
-    //   try {
-    //     const session = JSON.parse(comment.canvasSession);
-    //     const action = JSON.parse(comment.canvasAction);
-    //     const actionSignerAddress = session?.payload?.sessionAddress;
-    //     if (
-    //       !comment.canvasSession ||
-    //       !comment.canvasAction ||
-    //       !actionSignerAddress
-    //     )
-    //       return;
-    //     verify({ session })
-    //       .then((result) => (this.verifiedSession = true))
-    //       .catch((err) => console.log('Could not verify session'))
-    //       .finally(() => m.redraw());
-    //     verify({ action, actionSignerAddress })
-    //       .then((result) => (this.verifiedAction = true))
-    //       .catch((err) => console.log('Could not verify action'))
-    //       .finally(() => m.redraw());
-    //   } catch (err) {
-    //     console.log('Unexpected error while verifying action/session');
-    //     return;
-    //   }
-    // }
+    if (!this.verificationChecked) {
+      this.verificationChecked = true;
+      try {
+        const session = JSON.parse(comment.canvasSession);
+        const action = JSON.parse(comment.canvasAction);
+        const actionSignerAddress = session?.payload?.sessionAddress;
+        if (
+          !comment.canvasSession ||
+          !comment.canvasAction ||
+          !actionSignerAddress
+        )
+          return;
+        verify({ session })
+          .then((result) => (this.verifiedSession = true))
+          .catch((err) => console.log('Could not verify session'))
+          .finally(() => m.redraw());
+        verify({ action, actionSignerAddress })
+          .then((result) => (this.verifiedAction = true))
+          .catch((err) => console.log('Could not verify action'))
+          .finally(() => m.redraw());
+      } catch (err) {
+        console.log('Unexpected error while verifying action/session');
+        return;
+      }
+    }
 
     return (
       <div class={`Comment comment-${comment.id}`}>
@@ -165,7 +165,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
             >
               {moment(comment.createdAt).format('l')}
             </CWText>
-            {/* this.verifiedAction && this.verifiedSession && (
+            {this.verifiedAction && this.verifiedSession && (
               <CWText
                 type="caption"
                 fontWeight="medium"
@@ -174,7 +174,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
               >
                 <CWIcon iconName="checkCircle" iconSize="xs" />
               </CWText>
-            ) */}
+            )}
           </div>
           {this.isEditingComment ? (
             <EditComment
