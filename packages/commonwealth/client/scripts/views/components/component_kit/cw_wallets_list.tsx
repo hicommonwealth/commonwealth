@@ -418,7 +418,10 @@ export const CWWalletsList = (props: WalletsListProps) => {
             >
               <a
                 href="#"
-                onClick={resetWalletConnectOnclick.bind(this, wallets)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  resetWalletConnectOnclick(wallets);
+                }}
               >
                 Reset WalletConnect
               </a>
