@@ -39,7 +39,7 @@ export const PollOptions = ({
   multiSelect,
   selectedOptions,
   voteInformation,
-  setSelectedOptions,
+  setSelectedOptions
 }: PollOptionProps) => {
   return (
     <div className="PollOptions">
@@ -60,10 +60,7 @@ export const PollOptions = ({
         : voteInformation.map((option) => (
             <CWRadioButton
               key={option.value}
-              checked={
-                selectedOptions.length > 0 &&
-                option.value === selectedOptions[0]
-              }
+              checked={selectedOptions.length > 0 && option.value === selectedOptions[0]}
               groupName="votes"
               onChange={() => setSelectedOptions([option.value])}
               label={option.label}
@@ -86,7 +83,7 @@ export const CastVoteSection = ({
   disableVoteButton,
   onVoteCast,
   timeRemaining,
-  tooltipErrorMessage,
+  tooltipErrorMessage
 }: CastVoteProps) => {
   return (
     <div className="CastVoteSection">
@@ -105,12 +102,7 @@ export const CastVoteSection = ({
           )}
         />
       ) : (
-        <CWButton
-          label="Vote"
-          buttonType="mini-black"
-          disabled={disableVoteButton}
-          onClick={() => onVoteCast()}
-        />
+        <CWButton label="Vote" buttonType="mini-black" disabled={disableVoteButton} onClick={() => onVoteCast()} />
       )}
       <CWText className="time-remaining-text" type="caption">
         {timeRemaining}
@@ -126,26 +118,15 @@ export type VoteDisplayProps = {
   voteInformation: Array<VoteInformation>;
 };
 
-export const VoteDisplay = ({
-  pollEnded,
-  timeRemaining,
-  voteDirectionString,
-  voteInformation,
-}: VoteDisplayProps) => {
-  const topResponse = voteInformation.sort(
-    (option1, option2) => option2.voteCount - option1.voteCount
-  )[0].label;
+export const VoteDisplay = ({ pollEnded, timeRemaining, voteDirectionString, voteInformation }: VoteDisplayProps) => {
+  const topResponse = voteInformation.sort((option1, option2) => option2.voteCount - option1.voteCount)[0].label;
 
   return (
     <div className="VoteDisplay">
       {!pollEnded ? (
         <>
           <div className="vote-direction">
-            <CWIcon
-              iconName="check"
-              iconSize="small"
-              className="vote-check-icon"
-            />
+            <CWIcon iconName="check" iconSize="small" className="vote-check-icon" />
             <CWText type="caption">{voteDirectionString}</CWText>
           </div>
           <CWText className="time-remaining-text" type="caption">
@@ -157,11 +138,7 @@ export const VoteDisplay = ({
           <CWText type="caption">This Poll is Complete</CWText>
           <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
           {voteDirectionString !== '' && (
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className="direction-text"
-            >
+            <CWText type="caption" fontWeight="medium" className="direction-text">
               {voteDirectionString}
             </CWText>
           )}
@@ -190,7 +167,7 @@ export const ResultsSection = ({
   tokenSymbol,
   totalVoteCount,
   votedFor,
-  voteInformation,
+  voteInformation
 }: ResultsSectionProps) => {
   const calculateProgressStatus = (option: VoteInformation, index: number) => {
     if (!pollEnded) {
@@ -204,14 +181,15 @@ export const ResultsSection = ({
     }
   };
 
-  const hasVotes =
-    voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
+  const hasVotes = voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
   let numOptionsBeyondPreview;
   if (!pollEnded) {
     numOptionsBeyondPreview = voteInformation.length - LIVE_PREVIEW_MAX;
   } else {
     numOptionsBeyondPreview = voteInformation.length - ENDED_PREVIEW_MAX;
   }
+
+  console.log('VI2', voteInformation);
 
   return (
     <div className="ResultsSection">
@@ -223,15 +201,11 @@ export const ResultsSection = ({
           <CWText
             type="caption"
             className={getClasses<{ clickable?: boolean }>({
-              clickable: onResultsClick && hasVotes,
+              clickable: onResultsClick && hasVotes
             })}
-            onClick={
-              onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
-            }
+            onClick={onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined}
           >
-            {`${Math.floor(totalVoteCount * 100) / 100} ${
-              tokenSymbol ?? 'votes'
-            }`}
+            {`${Math.floor(totalVoteCount * 100) / 100} ${tokenSymbol ?? 'votes'}`}
           </CWText>
         </div>
       )}
@@ -245,21 +219,12 @@ export const ResultsSection = ({
             }
           })
           .map((option, index) => {
-            if (
-              isPreview &&
-              (pollEnded
-                ? index >= ENDED_PREVIEW_MAX
-                : index >= LIVE_PREVIEW_MAX)
-            ) {
+            if (isPreview && (pollEnded ? index >= ENDED_PREVIEW_MAX : index >= LIVE_PREVIEW_MAX)) {
               return;
             }
             return (
               <CWProgressBar
-                progress={
-                  option.voteCount
-                    ? (option.voteCount / totalVoteCount) * 100
-                    : 0
-                }
+                progress={option.voteCount ? (option.voteCount / totalVoteCount) * 100 : 0}
                 key={option.value}
                 progressStatus={calculateProgressStatus(option, index)}
                 label={option.label}
@@ -270,9 +235,7 @@ export const ResultsSection = ({
       </div>
       {isPreview && numOptionsBeyondPreview > 0 && (
         <CWText type="caption" className="more-options">
-          {`+ ${numOptionsBeyondPreview} more option${
-            numOptionsBeyondPreview === 1 ? '' : 's'
-          }`}
+          {`+ ${numOptionsBeyondPreview} more option${numOptionsBeyondPreview === 1 ? '' : 's'}`}
         </CWText>
       )}
     </div>
@@ -327,7 +290,7 @@ export const PollCard = ({
   votedFor,
   voteInformation,
   hasVoted,
-  totalVoteCount,
+  totalVoteCount
 }: PollCardProps) => {
   const [selectedOptions, setSelectedOptions] = useState<Array<string>>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -335,11 +298,7 @@ export const PollCard = ({
   const resultString = 'Results';
 
   const castVote = async () => {
-    if (
-      multiSelect ||
-      selectedOptions[0] === votedFor ||
-      selectedOptions.length === 0
-    ) {
+    if (multiSelect || selectedOptions[0] === votedFor || selectedOptions.length === 0) {
       // TODO: Build this out when multiple vote options are introduced.
       return;
     }
@@ -389,9 +348,7 @@ export const PollCard = ({
               disableVoteOptions={disableVoteButton}
             />
             <CastVoteSection
-              disableVoteButton={
-                disableVoteButton || selectedOptions.length === 0
-              }
+              disableVoteButton={disableVoteButton || selectedOptions.length === 0}
               timeRemaining={timeRemaining}
               tooltipErrorMessage={tooltipErrorMessage}
               onVoteCast={castVote}
@@ -402,9 +359,7 @@ export const PollCard = ({
           <VoteDisplay
             timeRemaining={timeRemaining}
             voteDirectionString={
-              votedFor
-                ? buildVoteDirectionString(votedFor)
-                : buildVoteDirectionString(selectedOptions[0])
+              votedFor ? buildVoteDirectionString(votedFor) : buildVoteDirectionString(selectedOptions[0])
             }
             pollEnded={pollEnded}
             voteInformation={voteInformation}

@@ -22,7 +22,6 @@ import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
-import { LoadingIndicator } from '../../components/loading_indicator';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -47,6 +46,7 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
     sumOfResultsBalance: 0
   };
 
+  const activeUserAddress = app.user?.activeAccount?.address || app.user?.addresses?.[0]?.address;
   const activeChainId = app.activeChainId();
   const proposalAuthor = useMemo(() => {
     if (!proposal || !activeChainId) {
@@ -70,8 +70,7 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
     const results = await getResults(currentSpace, currentProposal);
     setVoteResults(results);
 
-    const address = app.user?.activeAccount?.address || app.user?.addresses?.[0]?.address;
-    const powerRes = await getPower(currentSpace, currentProposal, address);
+    const powerRes = await getPower(currentSpace, currentProposal, activeUserAddress);
     setPower(powerRes);
 
     try {
@@ -91,6 +90,17 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
   if (!proposal) {
     return <PageLoading />;
   }
+
+  console.log({
+    power,
+    proposal,
+    space,
+    symbol,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    votes
+  });
 
   return (
     <Sublayout
@@ -124,6 +134,7 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
             label: 'Poll',
             item: (
               <SnapshotPollCardContainer
+                activeUserAddress={activeUserAddress}
                 fetchedPower={!!power}
                 identifier={identifier}
                 proposal={proposal}
