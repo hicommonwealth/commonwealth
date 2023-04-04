@@ -13,13 +13,13 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, WalletId } from 'common-common/src/types';
 
 import { addressSwapper } from '../../shared/utils';
-import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+import { getCosmosSessionSignatureData } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import {
   chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
   constructCanvasMessage,
-} from '../../shared/adapters/shared';
+} from '../../shared/canvas';
 import type { AddressInstance } from '../models/address';
 import type { ChainInstance } from '../models/chain';
 
@@ -33,7 +33,7 @@ const sortedStringify = configureStableStringify({
   deterministic: true,
 });
 
-const verifySignature = async (
+const verifySessionSignature = async (
   chain: Readonly<ChainInstance>,
   chain_id: string | number,
   addressInstance: Readonly<AddressInstance>,
@@ -197,7 +197,7 @@ const verifySignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const generatedSignDoc = await validationTokenToSignDoc(
+          const generatedSignDoc = await getCosmosSessionSignatureData(
             Buffer.from(sortedStringify(canvasMessage)),
             generatedAddress
           );
@@ -301,4 +301,4 @@ const verifySignature = async (
   return isValid;
 };
 
-export default verifySignature;
+export default verifySessionSignature;

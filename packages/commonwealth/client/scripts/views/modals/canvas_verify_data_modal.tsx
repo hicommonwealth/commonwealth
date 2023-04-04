@@ -6,7 +6,7 @@ import type { Action, Session } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
-import { verify } from '../../helpers/canvas';
+import { verify } from 'canvas';
 
 import 'modals/canvas_verify_data_modal.scss';
 

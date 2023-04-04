@@ -6,7 +6,7 @@ import {
   constructCanvasMessage,
   chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
-} from 'adapters/shared';
+} from 'canvas';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
@@ -130,17 +130,11 @@ class SessionsController {
       chainId
     );
 
-    // TODO: Turn on the session sign-in modal
     if (!hasAuthenticatedSession) {
-      return {
-        session: JSON.stringify({}),
-        action: JSON.stringify({}),
-        hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-      };
-      // await sessionSigninModal().catch((err) => {
-      //   console.log('Login failed');
-      //   throw err;
-      // });
+      await sessionSigninModal().catch((err) => {
+        console.log('Login failed');
+        throw err;
+      });
     }
 
     const { session, action, hash } = await controller.sign(

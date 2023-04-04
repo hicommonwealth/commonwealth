@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import { constructCanvasMessage } from 'shared/adapters/shared';
+import { constructCanvasMessage } from 'canvas';
 import app, { resetDatabase } from '../../../server-test';
 import {
   constructTypedCanvasMessage,

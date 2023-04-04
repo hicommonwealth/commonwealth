@@ -26,6 +26,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
+import { verifyThread } from '../../shared/canvas/serverVerify';
 
 export const Errors = {
   DiscussionMissingTitle: 'Discussion posts must include a title',
@@ -228,6 +229,8 @@ const createThread = async (
     canvas_hash,
   } = req.body;
   let { topic_id } = req.body;
+
+  await verifyThread(canvas_action, canvas_session, canvas_hash, { title, body, address: author.address, community: chain.id, topic: topic_id });
 
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
