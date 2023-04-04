@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import type { Notification } from 'models';
 import { NotificationCategories } from 'common-common/src/types';
@@ -12,16 +12,19 @@ import {
 export type NotificationRowProps = {
   notification: Notification;
   onListPage?: boolean;
+  allRead: boolean;
 };
 
 export const NotificationRow = (props: NotificationRowProps) => {
-  const { notification, onListPage } = props;
+  const { notification, onListPage, allRead } = props;
 
   const [markingRead, setMarkingRead] = React.useState<boolean>(false);
 
   const handleSetMarkingRead = (isMarkingRead: boolean) => {
     setMarkingRead(isMarkingRead);
   };
+
+  useEffect(() => setMarkingRead(allRead), [allRead]);
 
   const { category } = notification.subscription;
 
@@ -38,6 +41,7 @@ export const NotificationRow = (props: NotificationRowProps) => {
         notification={notification}
         handleSetMarkingRead={handleSetMarkingRead}
         markingRead={markingRead}
+        allRead={allRead}
       />
     );
   } else {
@@ -46,6 +50,7 @@ export const NotificationRow = (props: NotificationRowProps) => {
         notification={notification}
         handleSetMarkingRead={handleSetMarkingRead}
         markingRead={markingRead}
+        allRead={allRead}
       />
     );
   }

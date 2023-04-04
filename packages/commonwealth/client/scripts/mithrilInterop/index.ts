@@ -246,16 +246,3 @@ export function _DEPRECATED_dangerouslySetRoute(route: string) {
   const body = document.getElementsByTagName('body')[0];
   if (body) body.scrollTo(0, 0);
 }
-
-type Params = { [key: string]: string };
-
-// m.route.parsePathname() shim
-export function parsePathname(url: string): { path: string; params: Params } {
-  const path = window.location.pathname;
-  const search = new URLSearchParams(window.location.search);
-  const params: Params = {};
-  for (const [key, value] of search) {
-    params[key] = value;
-  }
-  return { path, params };
-}

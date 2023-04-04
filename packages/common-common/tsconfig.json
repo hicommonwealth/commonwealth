@@ -11,11 +11,5 @@
     }
   },
   "include": ["src", "test"],
-  "exclude": [
-    "./node_modules",
-    "node_modules",
-    "./test",
-    "build",
-    "dist",
-  ]
+  "exclude": ["./node_modules", "node_modules", "./test", "build", "dist"]
 }
