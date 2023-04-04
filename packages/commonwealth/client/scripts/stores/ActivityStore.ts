@@ -105,22 +105,6 @@ export class ActiveAddressesStore {
       : [];
   }
 
-  public addAddress(address: any, parentEntity: string) {
-    const { id, chain } = address;
-    if (!this._addressesByCommunity[parentEntity]) {
-      this._addressesByCommunity[parentEntity] = {};
-    }
-    const communityStore = this._addressesByCommunity[parentEntity];
-    if (!communityStore[id]) {
-      const addressInfo = new AddressInfo(id, address.address, chain, null);
-      const postCount = 1;
-      communityStore[id] = { addressInfo, postCount };
-    } else {
-      communityStore[id]['postCount'] += 1;
-    }
-    return this;
-  }
-
   public removeAddressActivity(
     addressId: number | string,
     parentEntity: string

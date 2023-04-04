@@ -52,15 +52,12 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export const sequelize = new Sequelize(DATABASE_URI, {
+export const sequelize = process.env.NODE_ENV === 'test' ?
+  new Sequelize('sqlite::memory:') :
+  new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   // operatorsAliases: false,
-  logging:
-    process.env.NODE_ENV === 'test'
-      ? false
-      : (msg) => {
-          log.trace(msg);
-        },
+  logging: (msg) => { log.trace(msg) },
   dialectOptions:
     process.env.NODE_ENV !== 'production'
       ? { requestTimeout: 40000 }

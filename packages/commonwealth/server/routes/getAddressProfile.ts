@@ -1,8 +1,11 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
+import { query, validationResult } from 'express-validator';
 import _ from 'lodash';
+import { failure } from '../types';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import type { DB } from '../models';
+import { paginationValidation } from '../util/helperValidations';
 
 export const Errors = {
   NeedAddress: 'Must provide address',
@@ -11,14 +14,16 @@ export const Errors = {
   InvalidAddress: 'Invalid address',
 };
 
-type GetAddressProfileReq = {
-  address: string;
-  chain: string;
-};
+export const getCommentsValidation = [
+  query('community_id').isString().trim(),
+  query('addresses').optional().toArray(),
+  query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
+];
 
-type GetAddressProfilesReq = {
-  'address[]': string;
-  'chain[]': string;
+export type GetAddressProfileReq = {
+  addresses: string[];
+  chain: string;
 };
 
 type GetAddressProfileResp = {
@@ -31,24 +36,22 @@ type GetAddressProfileResp = {
 
 const getAddressProfile = async (
   models: DB,
-  req: TypedRequestBody<GetAddressProfileReq | GetAddressProfilesReq>,
-  res: TypedResponse<GetAddressProfileResp | GetAddressProfileResp[]>,
+  req: TypedRequestBody<GetAddressProfileReq>,
+  res: TypedResponse<GetAddressProfileResp>,
   next: NextFunction
 ) => {
-  if (!(req.body as GetAddressProfileReq).address && !req.body['address[]']) {
-    return next(new AppError(Errors.NeedAddress));
-  }
-  if (!(req.body as GetAddressProfileReq).chain && !req.body['chain[]']) {
-    return next(new AppError(Errors.NeedChain));
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return failure(res.status(400), errors);
   }
 
   // single profile
   if (
-    (req.body as GetAddressProfileReq).address &&
+    (req.body as GetAddressProfileReq).addresses &&
     (req.body as GetAddressProfileReq).chain
   ) {
     const reqChain = (req.body as GetAddressProfileReq).chain;
-    const reqAddr = (req.body as GetAddressProfileReq).address;
+    const reqAddr = (req.body as GetAddressProfileReq).addresses;
 
     const chain = await models.Chain.findOne({
       where: { id: reqChain },
