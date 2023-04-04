@@ -40,10 +40,7 @@ export const CommentReactionButton = (props: CommentReactionButtonProps) => {
     app.user.isSiteAdmin ||
     app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
-  // post.rootProposal has typescript typedef number but in practice seems to be a string
-  const parentThread = app.threads.getById(
-    parseInt(comment.rootProposal.toString().split('_')[1], 10)
-  );
+  const parentThread = app.threads.getById(comment.threadId);
 
   const topicName = parentThread?.topic?.name;
 

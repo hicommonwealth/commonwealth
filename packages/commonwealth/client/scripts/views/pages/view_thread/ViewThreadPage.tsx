@@ -77,7 +77,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     useState(false);
 
   const threadId = identifier.split('-')[0];
-  const threadIdAndType = `${threadId}-${ProposalType.Thread}`;
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
@@ -102,16 +101,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
     const _comments =
       app.comments
-        .getByProposal(thread)
+        .getByThread(thread)
         .filter((c) => c.parentComment === null) || [];
     setComments(_comments);
   }, [thread]);
 
   // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
-  if (!prefetch[threadIdAndType]) {
+  if (!prefetch[threadId]) {
     setPrefetch((prevState) => ({
       ...prevState,
-      [threadIdAndType]: {
+      [threadId]: {
         commentsStarted: false,
         pollsStarted: false,
         viewCountStarted: false,
@@ -155,19 +154,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
 
     // load proposal
-    if (!prefetch[threadIdAndType]['threadReactionsStarted']) {
+    if (!prefetch[threadId]['threadReactionsStarted']) {
       app.threads.fetchReactionsCount([thread]).then(() => {
         setThread(thread);
       });
       setPrefetch((prevState) => ({
         ...prevState,
-        [threadIdAndType]: {
-          ...prevState[threadIdAndType],
+        [threadId]: {
+          ...prevState[threadId],
           threadReactionsStarted: true,
         },
       }));
     }
-  }, [prefetch, thread, threadIdAndType]);
+  }, [prefetch, thread, threadId]);
 
   useEffect(() => {
     if (!thread) {
@@ -189,13 +188,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       return;
     }
 
-    if (!prefetch[threadIdAndType]['commentsStarted']) {
+    if (!prefetch[threadId]['commentsStarted']) {
       app.comments
         .refresh(thread, app.activeChainId())
         .then(async () => {
           // fetch comments
           const _comments = app.comments
-            .getByProposal(thread)
+            .getByThread(thread)
             .filter((c) => c.parentComment === null);
           setComments(_comments);
 
@@ -209,7 +208,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             data: JSON.stringify({
               proposal_ids: [threadId],
               comment_ids: app.comments
-                .getByProposal(thread)
+                .getByThread(thread)
                 .map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
@@ -235,13 +234,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
       setPrefetch((prevState) => ({
         ...prevState,
-        [threadIdAndType]: {
-          ...prevState[threadIdAndType],
+        [threadId]: {
+          ...prevState[threadId],
           commentsStarted: true,
         },
       }));
     }
-  }, [prefetch, thread, threadId, threadIdAndType]);
+  }, [prefetch, thread, threadId, threadId]);
 
   useEffect(() => {
     if (!initializedComments) {
@@ -263,7 +262,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
 
     // load polls
-    if (!prefetch[threadIdAndType]['pollsStarted']) {
+    if (!prefetch[threadId]['pollsStarted']) {
       app.polls
         .fetchPolls(app.activeChainId(), thread?.id)
         .then(() => {
@@ -276,13 +275,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
       setPrefetch((prevState) => ({
         ...prevState,
-        [threadIdAndType]: {
-          ...prevState[threadIdAndType],
+        [threadId]: {
+          ...prevState[threadId],
           pollsStarted: true,
         },
       }));
     }
-  }, [prefetch, thread, thread?.id, threadIdAndType]);
+  }, [prefetch, thread, thread?.id, threadId]);
 
   useEffect(() => {
     if (!thread) {
@@ -290,7 +289,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
 
     // load view count
-    if (!prefetch[threadIdAndType]['viewCountStarted']) {
+    if (!prefetch[threadId]['viewCountStarted']) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
         object_id: thread.id,
@@ -310,13 +309,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
       setPrefetch((prevState) => ({
         ...prevState,
-        [threadIdAndType]: {
-          ...prevState[threadIdAndType],
+        [threadId]: {
+          ...prevState[threadId],
           viewCountStarted: true,
         },
       }));
     }
-  }, [prefetch, thread, thread?.id, threadIdAndType]);
+  }, [prefetch, thread, thread?.id, threadId]);
 
   useEffect(() => {
     if (!thread) {
@@ -324,7 +323,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
 
     // load profiles
-    if (!prefetch[threadIdAndType]['profilesStarted']) {
+    if (!prefetch[threadId]['profilesStarted']) {
       app.newProfiles.getProfile(thread.authorChain, thread.author);
 
       comments.forEach((comment) => {
@@ -332,11 +331,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       });
 
       app.newProfiles.isFetched.on('redraw', () => {
-        if (!prefetch[threadIdAndType]?.['profilesFinished']) {
+        if (!prefetch[threadId]?.['profilesFinished']) {
           setPrefetch((prevState) => ({
             ...prevState,
-            [threadIdAndType]: {
-              ...prevState[threadIdAndType],
+            [threadId]: {
+              ...prevState[threadId],
               profilesFinished: true,
             },
           }));
@@ -345,8 +344,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
       setPrefetch((prevState) => ({
         ...prevState,
-        [threadIdAndType]: {
-          ...prevState[threadIdAndType],
+        [threadId]: {
+          ...prevState[threadId],
           profilesStarted: true,
         },
       }));
@@ -357,7 +356,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     thread,
     thread?.author,
     thread?.authorChain,
-    threadIdAndType,
+    threadId,
   ]);
 
   useEffect(() => {
@@ -370,20 +369,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   useEffect(() => {
     if (comments?.length > 0) {
       const mismatchedComments = comments.filter((c) => {
-        return c.rootProposal !== `${ProposalType.Thread}_${threadId}`;
+        return c.threadId !== thread.id;
       });
 
       if (mismatchedComments.length) {
         setPrefetch((prevState) => ({
           ...prevState,
-          [threadIdAndType]: {
-            ...prevState[threadIdAndType],
+          [threadId]: {
+            ...prevState[threadId],
             commentsStarted: false,
           },
         }));
       }
     }
-  }, [comments, threadId, threadIdAndType]);
+  }, [comments, threadId, threadId]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound/>;
@@ -404,7 +403,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   if (
     !app.newProfiles.allLoaded() &&
-    !prefetch[threadIdAndType]?.['profilesFinished']
+    !prefetch[threadId]?.['profilesFinished']
   ) {
     return <PageLoading/>;
   }
@@ -687,7 +686,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     {reactionsAndReplyButtons}
                     <CreateComment
                       updatedCommentsCallback={updatedCommentsCallback}
-                      rootProposal={thread}
+                      rootThread={thread}
                     />
                   </>
                 ) : null}
@@ -698,7 +697,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         comments={
           <CommentsTree
             comments={comments}
-            proposal={thread}
+            thread={thread}
             setIsGloballyEditing={setIsGloballyEditing}
             updatedCommentsCallback={updatedCommentsCallback}
           />

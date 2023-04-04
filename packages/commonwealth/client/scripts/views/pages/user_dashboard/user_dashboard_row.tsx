@@ -51,11 +51,11 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     );
   }
 
-  const { chain_id, root_id, root_type, comment_id } = JSON.parse(
+  const { chain_id, thread_id, root_type, comment_id } = JSON.parse(
     notification.notificationData
   );
 
-  const path = getProposalUrlPath(root_type, root_id, false, chain_id);
+  const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
 
   return (
     <div

@@ -6,7 +6,6 @@ import 'components/comments/create_comment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { weiToTokens, getDecimals } from 'helpers';
-import type { AnyProposal } from 'models';
 import type { DeltaStatic } from 'quill';
 import { Thread } from 'models';
 
@@ -23,7 +22,7 @@ import { serializeDelta } from '../react_quill_editor/utils';
 type CreateCommmentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
-  rootProposal: AnyProposal | Thread;
+  rootThread: Thread;
   updatedCommentsCallback: () => void;
 };
 
@@ -34,7 +33,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
 
   const editorValue = getTextFromDelta(contentDelta);
 
-  const { handleIsReplying, parentCommentId, rootProposal, updatedCommentsCallback } = props;
+  const { handleIsReplying, parentCommentId, rootThread, updatedCommentsCallback } = props;
 
   const author = app.user.activeAccount;
 
@@ -49,7 +48,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
     try {
       const res = await app.comments.create(
         author.address,
-        rootProposal.uniqueIdentifier,
+        rootThread.id,
         chainId,
         serializeDelta(contentDelta),
         parentCommentId
@@ -78,7 +77,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
     }
   };
 
-  const activeTopicName = rootProposal instanceof Thread ? rootProposal?.topic?.name : null;
+  const activeTopicName = rootThread instanceof Thread ? rootThread?.topic?.name : null;
 
   // token balance check if needed
   const tokenPostingThreshold: BN = TopicGateCheck.getTopicThreshold(activeTopicName);
