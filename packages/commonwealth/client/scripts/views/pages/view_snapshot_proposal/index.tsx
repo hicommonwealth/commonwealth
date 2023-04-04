@@ -68,7 +68,6 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
     setSpace(currentSpace);
 
     const results = await getResults(currentSpace, currentProposal);
-    console.log('voteResults', results);
     setVoteResults(results);
 
     const address = app.user?.activeAccount?.address || app.user?.addresses?.[0]?.address;
