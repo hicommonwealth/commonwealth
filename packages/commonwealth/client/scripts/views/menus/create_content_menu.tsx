@@ -13,7 +13,7 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useUser } from 'context/userContext';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
@@ -260,7 +260,7 @@ export const CreateContentMenu = () => {
 
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserLoggedIn();
 
   if (
     !isLoggedIn ||

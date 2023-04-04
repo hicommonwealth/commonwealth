@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import 'components/sidebar/index.scss';
@@ -15,7 +15,7 @@ import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { useCommonNavigate } from '../../../navigation/helpers';
-import { useUser } from "context/userContext";
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export type SidebarMenuName =
   | 'default'
@@ -25,7 +25,7 @@ export type SidebarMenuName =
 export const Sidebar = () => {
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 

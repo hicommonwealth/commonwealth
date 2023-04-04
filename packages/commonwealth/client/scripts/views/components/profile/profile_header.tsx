@@ -9,7 +9,7 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
 import { SocialAccounts } from '../social_accounts';
-import { useUser } from 'context/userContext';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 type ProfileHeaderProps = {
   profile: Profile;
@@ -18,7 +18,7 @@ type ProfileHeaderProps = {
 
 const ProfileHeader = (props: ProfileHeaderProps) => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const { profile, isOwner } = props;
 

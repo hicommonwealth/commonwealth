@@ -38,7 +38,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { useUser } from "context/userContext";
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -54,7 +54,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   );
 
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserLoggedIn();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {

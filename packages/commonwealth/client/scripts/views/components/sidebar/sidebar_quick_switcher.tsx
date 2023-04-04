@@ -10,11 +10,11 @@ import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useUser } from 'context/userContext';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const allCommunities = app.config.chains
     .getAll()

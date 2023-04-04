@@ -6,7 +6,6 @@ import useInitApp from 'hooks/useInitApp';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 
 import router from 'navigation/router';
-import { UserProvider } from 'context/userContext';
 
 const App = () => {
   const { customDomain, loading } = useInitApp();
@@ -21,9 +20,7 @@ const App = () => {
 
   return (
     <StrictMode>
-      <UserProvider>
-        <RouterProvider router={router(customDomain)} />
-      </UserProvider>
+      <RouterProvider router={router(customDomain)} />
       <ToastContainer />
     </StrictMode>
   );

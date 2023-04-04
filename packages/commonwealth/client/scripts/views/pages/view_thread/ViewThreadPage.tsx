@@ -39,7 +39,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
-import { useUser } from "context/userContext";
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -58,7 +58,7 @@ type ViewThreadPageProps = {
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const [comments, setComments] = useState<Array<Comment<Thread>>>([]);
   const [isEditingBody, setIsEditingBody] = useState(false);

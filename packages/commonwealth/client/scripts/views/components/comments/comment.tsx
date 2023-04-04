@@ -18,7 +18,7 @@ import { User } from '../user/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
-import { useUser } from 'context/userContext';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 
 type CommentAuthorProps = {
@@ -60,7 +60,7 @@ export const Comment = (props: CommentProps) => {
   const [shouldRestoreEdits, setShouldRestoreEdits] = React.useState<boolean>(false);
   const [savedEdits, setSavedEdits] = React.useState<string>('');
 
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const handleSetIsEditingComment = (status: boolean) => {
     setIsGloballyEditing(status);
