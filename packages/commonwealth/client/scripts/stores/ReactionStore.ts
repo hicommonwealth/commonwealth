@@ -62,12 +62,7 @@ class ReactionStore extends IdStore<Reaction> {
   }
 
   public getPostIdentifier(
-    rxnOrPost:
-      | Reaction
-      | Thread
-      | AbridgedThread
-      | AnyProposal
-      | Comment<any>
+    rxnOrPost: Reaction | Thread | AbridgedThread | AnyProposal | Comment<any>
   ) {
     if (rxnOrPost instanceof Reaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;

@@ -211,12 +211,13 @@ export const User = (props: UserAttrs) => {
           ) : (
             <a className="user-display-name username">
               {!profile || !profile?.id ? (
-                !profile?.id ?
-                  `${profile.address.slice(
-                    0,
-                    8
-                  )}...${profile.address.slice(-5)}` :
+                !profile?.id ? (
+                  `${profile.address.slice(0, 8)}...${profile.address.slice(
+                    -5
+                  )}`
+                ) : (
                   addrShort
+                )
               ) : !showAddressWithDisplayName ? (
                 profile.name
               ) : (
@@ -268,11 +269,13 @@ export const User = (props: UserAttrs) => {
               'a.user-display-name',
               profile?.id ? `/profile/id/${profile.id}` : 'javascript:',
               !profile || !profile?.id ? (
-                !profile?.id
-                  ? `${profile.address.slice(0, 8)}...${profile.address.slice(
+                !profile?.id ? (
+                  `${profile.address.slice(0, 8)}...${profile.address.slice(
                     -5
                   )}`
-                  : addrShort
+                ) : (
+                  addrShort
+                )
               ) : !showAddressWithDisplayName ? (
                 profile.name
               ) : (

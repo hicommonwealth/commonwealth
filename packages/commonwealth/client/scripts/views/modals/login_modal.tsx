@@ -4,7 +4,8 @@ import {
   chainBasetoCanvasChain,
   constructCanvasMessage,
 } from 'adapters/shared';
-import { initAppState } from 'state';
+import _ from 'lodash';
+import app, { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';

@@ -13,8 +13,10 @@ import {
   WalletId,
 } from 'common-common/src/types';
 import * as ethUtil from 'ethereumjs-util';
+import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
+import { addressSwapper } from '../../shared/utils';
 import {
   chainBasetoCanvasChain,
   constructCanvasMessage,
@@ -26,6 +28,13 @@ import type { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
+
+const sortedStringify = configureStableStringify({
+  bigint: false,
+  circularValue: Error,
+  strict: true,
+  deterministic: true,
+});
 
 const verifySignature = async (
   models: DB,
@@ -347,3 +356,5 @@ const verifySignature = async (
   await addressModel.save();
   return isValid;
 };
+
+export default verifySignature;

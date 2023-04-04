@@ -13,9 +13,6 @@ import type {
 } from 'web3-core';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
-
 declare let window: any;
 
 function encodeEthAddress(bech32Prefix: string, address: string): string {

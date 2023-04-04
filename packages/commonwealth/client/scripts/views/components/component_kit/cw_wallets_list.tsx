@@ -160,55 +160,57 @@ export const CWWalletsList = (props: WalletsListProps) => {
     setSelectedWallet,
     accountVerifiedCallback,
     linking,
-      useSessionKeyLoginFlow,
-      hideConnectAnotherWayLink,
+    useSessionKeyLoginFlow,
+    hideConnectAnotherWayLink,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
+  // We call handleNormalWalletLogin if we're using connecting a new wallet, and
+  // handleSessionKeyRevalidation if we're regenerating a session key.
+  async function handleSessionKeyRevalidation(
+    wallet: IWebWallet<any>,
+    address: string
+  ) {
+    const timestamp = +new Date();
+    const sessionAddress = await app.sessions.getOrCreateAddress(
+      wallet.chain,
+      wallet.getChainId().toString()
+    );
+    const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
+    const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
 
-    // We call handleNormalWalletLogin if we're using connecting a new wallet, and
-    // handleSessionKeyRevalidation if we're regenerating a session key.
-    async function handleSessionKeyRevalidation(
-      wallet: IWebWallet<any>,
-      address: string
-    ) {
-      const timestamp = +new Date();
-      const sessionAddress = await app.sessions.getOrCreateAddress(
-        wallet.chain,
-        wallet.getChainId().toString()
-      );
-      const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-      const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+    // Start the create-user flow, so validationBlockInfo gets saved to the backend
+    // This creates a new `Account` object with fields set up to be validated by verifyAddress.
+    const { account } = await createUserWithAddress(
+      address,
+      wallet.name,
+      chainIdentifier,
+      sessionAddress,
+      validationBlockInfo
+    );
+    account.setValidationBlockInfo(
+      validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
+    );
 
-      // Start the create-user flow, so validationBlockInfo gets saved to the backend
-      // This creates a new `Account` object with fields set up to be validated by verifyAddress.
-      const { account } = await createUserWithAddress(
-        address,
-        wallet.name,
-        chainIdentifier,
-        sessionAddress,
-        validationBlockInfo
-      );
-      account.setValidationBlockInfo(
-        validationBlockInfo ? JSON.stringify(validationBlockInfo) : null
-      );
+    const { chainId, sessionPayload, signature } = await signSessionWithAccount(
+      wallet,
+      account,
+      timestamp
+    );
+    await account.validate(signature, timestamp, chainId);
+    await app.sessions.authSession(
+      wallet.chain,
+      chainId,
+      sessionPayload,
+      signature
+    );
+    console.log('Started new session for', wallet.chain, chainId);
 
-      const { chainId, sessionPayload, signature } =
-        await signSessionWithAccount(wallet, account, timestamp);
-      await account.validate(signature, timestamp, chainId);
-      await app.sessions.authSession(
-        wallet.chain,
-        chainId,
-        sessionPayload,
-        signature
-      );
-      console.log('Started new session for', wallet.chain, chainId);
-
-      const newlyCreated = false;
-      const linking = false;
-      accountVerifiedCallback(account, newlyCreated, linking);
-    }
+    const newlyCreated = false;
+    const linking = false;
+    accountVerifiedCallback(account, newlyCreated, linking);
+  }
 
   async function handleNormalWalletLogin(
     wallet: IWebWallet<any>,
@@ -388,11 +390,11 @@ export const CWWalletsList = (props: WalletsListProps) => {
                       } else {
                         address = wallet.accounts[accountIndex].address;
                       }
-                          if (useSessionKeyLoginFlow) {
-                            await handleSessionKeyRevalidation(wallet, address);
-                          } else {
-                            await handleNormalWalletLogin(wallet, address);
-                          }
+                      if (useSessionKeyLoginFlow) {
+                        await handleSessionKeyRevalidation(wallet, address);
+                      } else {
+                        await handleNormalWalletLogin(wallet, address);
+                      }
                       setIsModalOpen(false);
                     }}
                     onModalClose={() => setIsModalOpen(false)}
@@ -454,17 +456,17 @@ export const CWWalletsList = (props: WalletsListProps) => {
               )}
             />
           )}
-        {!hideConnectAnotherWayLink && (
-          <CWText
-            type="b2"
-            className={getClasses<{ darkMode?: boolean }>(
-              { darkMode },
-              'connect-another-way-link'
-            )}
-          >
-            <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
-          </CWText>
-        )}
+          {!hideConnectAnotherWayLink && (
+            <CWText
+              type="b2"
+              className={getClasses<{ darkMode?: boolean }>(
+                { darkMode },
+                'connect-another-way-link'
+              )}
+            >
+              <a onClick={connectAnotherWayOnclick}>Connect Another Way</a>
+            </CWText>
+          )}
         </div>
       </div>
       <CWText

@@ -129,8 +129,6 @@ const FinishNearLogin = () => {
         .getSessionController(ChainBase.NEAR)
         .authSession(chainId, canvasMessage, signature);
 
-      await acct.validate(signature, chainId);
-
       if (!app.isLoggedIn()) {
         await initAppState();
         await updateActiveAddresses(chain);

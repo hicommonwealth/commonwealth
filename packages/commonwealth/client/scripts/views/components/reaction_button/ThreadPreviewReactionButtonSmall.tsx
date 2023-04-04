@@ -9,7 +9,10 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { Modal } from '../component_kit/cw_modal';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
-import { getClasses, isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import {
+  getClasses,
+  isWindowMediumSmallInclusive,
+} from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
 import { useReactionButton } from './UseReactionButton';
 
@@ -17,17 +20,14 @@ type ThreadReactionButtonProps = {
   thread: Thread;
 };
 
-export const ThreadReactionPreviewButtonSmall = ({ thread }: ThreadReactionButtonProps) => {
+export const ThreadReactionPreviewButtonSmall = ({
+  thread,
+}: ThreadReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactors, setReactors] = useState([]);
 
-  const {
-    dislike,
-    hasReacted,
-    isLoading,
-    isUserForbidden,
-    like
-  } = useReactionButton(thread, setReactors);
+  const { dislike, hasReacted, isLoading, isUserForbidden, like } =
+    useReactionButton(thread, setReactors);
 
   return (
     <>
@@ -87,7 +87,7 @@ export const ThreadReactionPreviewButtonSmall = ({ thread }: ThreadReactionButto
         )}
       </div>
       <Modal
-        content={<LoginModal onModalClose={() => setIsModalOpen(false)}/>}
+        content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}

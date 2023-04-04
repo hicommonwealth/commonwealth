@@ -32,14 +32,21 @@ const CommentAuthor = (props: CommentAuthorProps) => {
   // Check for accounts on forums that originally signed up on a different base chain,
   // Render them as anonymous as the forum is unable to support them.
   if (app.chain.meta.type === ChainType.Offchain) {
-    if (comment.authorChain !== app.chain.id && comment.authorChain !== app.chain.base) {
+    if (
+      comment.authorChain !== app.chain.id &&
+      comment.authorChain !== app.chain.base
+    ) {
       return <AnonymousUser distinguishingKey={comment.author} />;
     }
   }
 
   const author: Account = app.chain.accounts.get(comment.author);
 
-  return comment.deleted ? <span>[deleted]</span> : <User avatarSize={24} user={author} popover linkify />;
+  return comment.deleted ? (
+    <span>[deleted]</span>
+  ) : (
+    <User avatarSize={24} user={author} popover linkify />
+  );
 };
 
 type CommentProps = {
@@ -54,11 +61,20 @@ type CommentProps = {
 };
 
 export const Comment = (props: CommentProps) => {
-  const { comment, handleIsReplying, isLast, isLocked, setIsGloballyEditing, threadLevel, updatedCommentsCallback } =
-    props;
+  const {
+    comment,
+    handleIsReplying,
+    isLast,
+    isLocked,
+    setIsGloballyEditing,
+    threadLevel,
+    updatedCommentsCallback,
+  } = props;
 
-  const [isEditingComment, setIsEditingComment] = React.useState<boolean>(false);
-  const [shouldRestoreEdits, setShouldRestoreEdits] = React.useState<boolean>(false);
+  const [isEditingComment, setIsEditingComment] =
+    React.useState<boolean>(false);
+  const [shouldRestoreEdits, setShouldRestoreEdits] =
+    React.useState<boolean>(false);
   const [savedEdits, setSavedEdits] = React.useState<string>('');
 
   const handleSetIsEditingComment = (status: boolean) => {
@@ -70,47 +86,50 @@ export const Comment = (props: CommentProps) => {
     app.user.isSiteAdmin ||
     app.roles.isRoleOfCommunity({
       role: 'admin',
-      chain: app.activeChainId()
+      chain: app.activeChainId(),
     }) ||
     app.roles.isRoleOfCommunity({
       role: 'moderator',
-      chain: app.activeChainId()
+      chain: app.activeChainId(),
     });
 
-  const canReply = !isLast && !isLocked && app.isLoggedIn() && app.user.activeAccount;
+  const canReply =
+    !isLast && !isLocked && app.isLoggedIn() && app.user.activeAccount;
 
-  const canEditAndDelete = !isLocked && (comment.author === app.user.activeAccount?.address || isAdminOrMod);
+  const canEditAndDelete =
+    !isLocked &&
+    (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
   const deleteComment = async () => {
     await app.comments.delete(comment);
     updatedCommentsCallback();
   };
 
-    // if (!this.verificationChecked) {
-    //   this.verificationChecked = true;
-    //   try {
-    //     const session = JSON.parse(comment.canvasSession);
-    //     const action = JSON.parse(comment.canvasAction);
-    //     const actionSignerAddress = session?.payload?.sessionAddress;
-    //     if (
-    //       !comment.canvasSession ||
-    //       !comment.canvasAction ||
-    //       !actionSignerAddress
-    //     )
-    //       return;
-    //     verify({ session })
-    //       .then((result) => (this.verifiedSession = true))
-    //       .catch((err) => console.log('Could not verify session'))
-    //       .finally(() => m.redraw());
-    //     verify({ action, actionSignerAddress })
-    //       .then((result) => (this.verifiedAction = true))
-    //       .catch((err) => console.log('Could not verify action'))
-    //       .finally(() => m.redraw());
-    //   } catch (err) {
-    //     console.log('Unexpected error while verifying action/session');
-    //     return;
-    //   }
-    // }
+  // if (!this.verificationChecked) {
+  //   this.verificationChecked = true;
+  //   try {
+  //     const session = JSON.parse(comment.canvasSession);
+  //     const action = JSON.parse(comment.canvasAction);
+  //     const actionSignerAddress = session?.payload?.sessionAddress;
+  //     if (
+  //       !comment.canvasSession ||
+  //       !comment.canvasAction ||
+  //       !actionSignerAddress
+  //     )
+  //       return;
+  //     verify({ session })
+  //       .then((result) => (this.verifiedSession = true))
+  //       .catch((err) => console.log('Could not verify session'))
+  //       .finally(() => m.redraw());
+  //     verify({ action, actionSignerAddress })
+  //       .then((result) => (this.verifiedAction = true))
+  //       .catch((err) => console.log('Could not verify action'))
+  //       .finally(() => m.redraw());
+  //   } catch (err) {
+  //     console.log('Unexpected error while verifying action/session');
+  //     return;
+  //   }
+  // }
 
   return (
     <div className={`Comment comment-${comment.id}`}>
@@ -130,7 +149,12 @@ export const Comment = (props: CommentProps) => {
           {/* <CWText type="caption" className="published-text">
               published on
             </CWText> */}
-          <CWText key={comment.id} type="caption" fontWeight="medium" className="published-text">
+          <CWText
+            key={comment.id}
+            type="caption"
+            fontWeight="medium"
+            className="published-text"
+          >
             {moment(comment.createdAt).format('l')}
           </CWText>
         </div>
@@ -164,7 +188,7 @@ export const Comment = (props: CommentProps) => {
                       </CWText>
                     </div>
                   )}
-            {/* this.verifiedAction && this.verifiedSession && (
+                  {/* this.verifiedAction && this.verifiedSession && (
               <CWText
                 type="caption"
                 fontWeight="medium"
@@ -180,7 +204,11 @@ export const Comment = (props: CommentProps) => {
                   {canEditAndDelete && (
                     <PopoverMenu
                       renderTrigger={(onclick) => (
-                        <CWIconButton iconName="dotsVertical" iconSize="small" onClick={onclick} />
+                        <CWIconButton
+                          iconName="dotsVertical"
+                          iconSize="small"
+                          onClick={onclick}
+                        />
                       )}
                       menuItems={[
                         {
@@ -189,23 +217,32 @@ export const Comment = (props: CommentProps) => {
                           onClick: async (e) => {
                             e.preventDefault();
                             setSavedEdits(
-                              localStorage.getItem(`${app.activeChainId()}-edit-comment-${comment.id}-storedText`)
+                              localStorage.getItem(
+                                `${app.activeChainId()}-edit-comment-${
+                                  comment.id
+                                }-storedText`
+                              )
                             );
                             if (savedEdits) {
-                              clearEditingLocalStorage(comment.id, ContentType.Comment);
+                              clearEditingLocalStorage(
+                                comment.id,
+                                ContentType.Comment
+                              );
 
-                              const confirmationResult = window.confirm('Previous changes found. Restore edits?');
+                              const confirmationResult = window.confirm(
+                                'Previous changes found. Restore edits?'
+                              );
 
                               setShouldRestoreEdits(confirmationResult);
                             }
                             handleSetIsEditingComment(true);
-                          }
+                          },
                         },
                         {
                           label: 'Delete',
                           iconLeft: 'trash',
-                          onClick: deleteComment
-                        }
+                          onClick: deleteComment,
+                        },
                       ]}
                     />
                   )}
