@@ -12,8 +12,8 @@ import { createRole, findOneRole } from 'server/util/roles';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
-import { constructCanvasMessage } from 'shared/adapters/shared';
 import { PermissionManager } from 'shared/permissions';
+import { constructCanvasMessage } from 'canvas';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 import type { Chain } from '@canvas-js/interfaces';
-import { constructCanvasMessage } from 'adapters/shared';
+import { constructCanvasMessage } from 'canvas';
 import { initAppState } from 'state';
 import BN from 'bn.js';
 import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';

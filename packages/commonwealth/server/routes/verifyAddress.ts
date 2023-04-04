@@ -33,14 +33,7 @@ import type { ProfileAttributes } from '../models/profile';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import verifySignature from '../util/verifySignature';
-import {
-  chainBaseToCanvasChain,
-  chainBaseToCanvasChainId,
-  constructCanvasMessage,
-} from '../../shared/adapters/shared';
-
-import type { SessionPayload } from '@canvas-js/interfaces';
+import verifySessionSignature from '../util/verifySessionSignature';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -102,7 +95,7 @@ const processAddress = async (
 
   // verify the signature matches the session information = verify ownership
   try {
-    const valid = await verifySignature(
+    const valid = await verifySessionSignature(
       models,
       chain,
       chain_id,

@@ -1,4 +1,4 @@
-import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
 import type {
   AminoMsg,
   StdSignDoc,
@@ -83,7 +83,7 @@ export class CosmosSDKSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      // throw new Error("Invalid signature");
+      throw new Error("Invalid signature");
     }
     if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
@@ -213,7 +213,7 @@ export class CosmosSDKSessionController implements ISessionController {
     const action: Action = {
       type: 'action',
       payload: actionPayload,
-      session: sessionPayload.from,
+      session: sessionPayload.sessionAddress,
       signature,
     };
 

@@ -5,7 +5,7 @@ import type { Action, Session } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
-import { verify } from '../../helpers/canvas';
+import { verify } from 'canvas';
 
 import 'modals/canvas_verify_data_modal.scss';
 
@@ -13,7 +13,7 @@ type CanvasVerifyDataModalProps = {
   obj: any;
 };
 
-const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
+export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
   const { obj } = props;
   const [actionPayload, setActionPayload] = useState<string | null>();
   const [sessionPayload, setSessionPayload] = useState<string | null>();

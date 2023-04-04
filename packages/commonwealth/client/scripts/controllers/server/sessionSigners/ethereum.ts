@@ -6,7 +6,7 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
 import { ISessionController } from '.';
 
 export class EthereumSessionController implements ISessionController {
@@ -40,7 +40,7 @@ export class EthereumSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      // throw new Error("Invalid signature");
+      throw new Error("Invalid signature");
     }
     if (
       payload.sessionAddress.toLowerCase() !==
@@ -154,7 +154,7 @@ export class EthereumSessionController implements ISessionController {
     const action: Action = {
       type: 'action',
       payload: actionPayload,
-      session: sessionPayload.from,
+      session: sessionPayload.sessionAddress,
       signature,
     };
 

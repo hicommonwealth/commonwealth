@@ -7,6 +7,7 @@ import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
+
 import {
   ChainBase,
   NotificationCategories,
@@ -15,13 +16,15 @@ import {
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+
+import { getCosmosSessionSignatureData } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { addressSwapper } from '../../shared/utils';
 import {
   chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
   constructCanvasMessage,
-} from '../../shared/adapters/shared';
+} from '../../shared/canvas';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { ChainInstance } from '../models/chain';
@@ -37,9 +40,9 @@ const sortedStringify = configureStableStringify({
   deterministic: true,
 });
 
-const verifySignature = async (
+const verifySessionSignature = async (
   models: DB,
-  chain: ChainInstance,
+  chain: Readonly<ChainInstance>,
   chain_id: string | number,
   addressModel: AddressInstance,
   user_id: number,
@@ -215,7 +218,7 @@ const verifySignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const generatedSignDoc = await validationTokenToSignDoc(
+          const generatedSignDoc = await getCosmosSessionSignatureData(
             Buffer.from(sortedStringify(canvasMessage)),
             generatedAddress
           );
@@ -358,4 +361,4 @@ const verifySignature = async (
   return isValid;
 };
 
-export default verifySignature;
+export default verifySessionSignature;

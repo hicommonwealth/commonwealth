@@ -1,6 +1,6 @@
 import type * as solw3 from '@solana/web3.js';
 import bs58 from 'bs58';
-import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
+import { verify as verifyCanvasSessionSignature } from 'canvas';
 
 import type {
   Action,
@@ -42,7 +42,7 @@ export class SolanaSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      // throw new Error("Invalid signature");
+      throw new Error("Invalid signature");
     }
     if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
@@ -154,7 +154,7 @@ export class SolanaSessionController implements ISessionController {
     const action: Action = {
       type: 'action',
       payload: actionPayload,
-      session: sessionPayload.from,
+      session: sessionPayload.sessionAddress,
       signature,
     };
 
