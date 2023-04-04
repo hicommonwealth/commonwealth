@@ -91,17 +91,6 @@ export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposal
     return <PageLoading />;
   }
 
-  console.log({
-    power,
-    proposal,
-    space,
-    symbol,
-    totals,
-    totalScore,
-    validatedAgainstStrategies,
-    votes
-  });
-
   return (
     <Sublayout
     // title="Snapshot Proposal"

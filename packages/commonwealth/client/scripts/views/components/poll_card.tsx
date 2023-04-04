@@ -189,8 +189,6 @@ export const ResultsSection = ({
     numOptionsBeyondPreview = voteInformation.length - ENDED_PREVIEW_MAX;
   }
 
-  console.log('VI2', voteInformation);
-
   return (
     <div className="ResultsSection">
       {!isPreview && (
