@@ -28,7 +28,7 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
     throw new Error('chain event notification does not have expected data');
   }
 
-  const chainId = notification.chainEvent.type.chain;
+  const chainId = notification.chainEvent.chain;
 
   if (app.isCustomDomain() && chainId !== app.customDomainId()) {
     return;
@@ -36,7 +36,7 @@ export const ChainEventNotificationRow = (props: NotificationRowProps) => {
 
   const chainEvent: CWEvent = {
     blockNumber: notification.chainEvent.blockNumber,
-    network: notification.chainEvent.type.eventNetwork,
+    network: notification.chainEvent.network,
     data: notification.chainEvent.data,
   };
 

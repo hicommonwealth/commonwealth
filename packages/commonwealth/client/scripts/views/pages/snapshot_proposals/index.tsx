@@ -66,7 +66,7 @@ const SnapshotProposalsPage = (props: SnapshotProposalsPageProps) => {
   return (
     <Sublayout>
       <div className="SnapshotProposalsPage">
-        <div class="top-bar">
+        <div className="top-bar">
           <CWTabBar>
             <CWTab
               label="Active"

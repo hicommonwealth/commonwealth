@@ -128,7 +128,7 @@ const NotificationSettingsPage = () => {
           >
             Chain Events
           </CWText>
-          <div class="column-header-row">
+          <div className="column-header-row">
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
@@ -153,10 +153,10 @@ const NotificationSettingsPage = () => {
           </div>
           {relevantSubscribedChains.map((chain) => {
             return (
-              <div class="notification-row chain-events-subscriptions-padding">
-                <div class="notification-row-header">
-                  <div class="left-content-container">
-                    <div class="avatar-and-name">
+              <div className="notification-row chain-events-subscriptions-padding">
+                <div className="notification-row-header">
+                  <div className="left-content-container">
+                    <div className="avatar-and-name">
                       <CWCommunityAvatar size="medium" community={chain} />
                       <CWText type="h5" fontWeight="medium">
                         {chain.name}
@@ -167,21 +167,21 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     disabled={true}
                     checked={false}
-                    onchange={() => {
+                    onChange={() => {
                       app.user.notifications
                         .enableImmediateEmails([])
                         .then(() => {
-                          m.redraw();
+                          redraw();
                         });
                     }}
                   />
                   <CWToggle
                     checked={false}
-                    onchange={() => {
+                    onChange={() => {
                       app.user.notifications
                         .subscribe(NotificationCategories.ChainEvent, chain.id)
                         .then(() => {
-                          m.redraw();
+                          redraw();
                         });
                     }}
                   />
@@ -194,10 +194,10 @@ const NotificationSettingsPage = () => {
             const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
             const hasSomeInAppSubs = subs.some((s) => s.isActive);
             return (
-              <div class="notification-row chain-events-subscriptions-padding">
-                <div class="notification-row-header">
+              <div className="notification-row chain-events-subscriptions-padding">
+                <div className="notification-row-header">
                   <div className="left-content-container">
-                    <div class="avatar-and-name">
+                    <div className="avatar-and-name">
                       <CWCommunityAvatar size="medium" community={chainInfo} />
                       <CWText type="h5" fontWeight="medium">
                         {chainInfo?.name}
@@ -207,33 +207,33 @@ const NotificationSettingsPage = () => {
                   <CWCheckbox
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
-                    onchange={() => {
+                    onChange={() => {
                       hasSomeEmailSubs
                         ? app.user.notifications
                             .disableImmediateEmails(subs)
                             .then(() => {
-                              m.redraw();
+                              redraw();
                             })
                         : app.user.notifications
                             .enableImmediateEmails(subs)
                             .then(() => {
-                              m.redraw();
+                              redraw();
                             });
                     }}
                   />
                   <CWToggle
                     checked={subs.some((s) => s.isActive)}
-                    onchange={() => {
+                    onChange={() => {
                       hasSomeInAppSubs
                         ? app.user.notifications
                             .disableSubscriptions(subs)
                             .then(() => {
-                              m.redraw();
+                              redraw();
                             })
                         : app.user.notifications
                             .enableSubscriptions(subs)
                             .then(() => {
-                              m.redraw();
+                              redraw();
                             });
                     }}
                   />

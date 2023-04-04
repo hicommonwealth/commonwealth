@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-syntax */
-import app from 'state';
 import type {
   CWEvent,
   IChainEntityKind,
