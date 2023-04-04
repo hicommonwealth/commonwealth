@@ -91,8 +91,6 @@ export const SnapshotPollCardContainer = (props: SnapshotProposalCardsProps) => 
     return voteInfo;
   }, [proposal, votes]);
 
-  console.log({ voteInformation });
-
   return (
     <>
       <SnapshotPollCard
