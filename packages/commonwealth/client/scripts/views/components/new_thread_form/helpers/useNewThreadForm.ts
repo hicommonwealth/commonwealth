@@ -15,14 +15,14 @@ const useNewThreadForm = (authorName: string, hasTopics: boolean) => {
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>();
   const [isSaving, setIsSaving] = useState(false);
 
-  const editorText = getTextFromDelta(threadContentDelta)
+  const editorText = getTextFromDelta(threadContentDelta);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
   const disableSave = !authorName || isSaving;
   const topicMissing = hasTopics && !threadTopic;
   const titleMissing = !threadTitle;
   const linkContentMissing = !isDiscussion && !threadUrl;
-  const contentMissing = editorText.length === 0
+  const contentMissing = editorText.length === 0;
 
   const isDisabled =
     disableSave ||

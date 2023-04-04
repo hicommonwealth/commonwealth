@@ -28,7 +28,7 @@ export const createNewProposal = async (
     throw new Error(NewThreadErrors.NoChoices);
   }
 
-  const bodyText = getTextFromDelta(JSON.parse(content))
+  const bodyText = getTextFromDelta(JSON.parse(content));
   if (bodyText.length === 0) {
     throw new Error(NewThreadErrors.NoBody);
   }

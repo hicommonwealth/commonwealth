@@ -22,7 +22,7 @@ const SnapshotProposalSelectorItem = ({
           {snapshot.title}
         </CWText>
         <CWText type="caption" title={snapshot.id}>
-          Hash: {smartTruncate(snapshot.id, 12, {position: 4})}
+          Hash: {smartTruncate(snapshot.id, 12, { position: 4 })}
         </CWText>
       </div>
     </div>

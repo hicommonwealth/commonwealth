@@ -23,18 +23,27 @@ type QuillFormattedTextAttrs = {
   doc;
 } & QuillTextParams;
 
-export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hideFormatting, cutoffLines, openLinksInNewTab, searchTerm }) => {
+export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({
+  doc,
+  hideFormatting,
+  cutoffLines,
+  openLinksInNewTab,
+  searchTerm,
+}) => {
   const navigate = useCommonNavigate();
   const [cachedDocWithHighlights, setCachedDocWithHighlights] = useState();
-  const [cachedResultWithHighlights, setCachedResultWithHighlights] = useState();;
+  const [cachedResultWithHighlights, setCachedResultWithHighlights] =
+    useState();
   const [isTruncated, setIsTruncated] = useState<boolean>();
   const [truncatedDoc, setTruncatedDoc] = useState();
 
   useEffect(() => {
     const isTruncated = cutoffLines && cutoffLines < countLinesQuill(doc.ops);
-    const truncatedDoc = isTruncated ? {
-      ops: [...doc.ops.slice(0, cutoffLines)],
-    } : doc;
+    const truncatedDoc = isTruncated
+      ? {
+          ops: [...doc.ops.slice(0, cutoffLines)],
+        }
+      : doc;
     setTruncatedDoc(truncatedDoc);
     setIsTruncated(isTruncated);
   }, [doc, cutoffLines]);
@@ -50,7 +59,10 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hid
 
   // if we're showing highlighted search terms, render the doc once, and cache the result
   if (searchTerm) {
-    if (truncatedDoc && JSON.stringify(truncatedDoc) !== cachedDocWithHighlights) {
+    if (
+      truncatedDoc &&
+      JSON.stringify(truncatedDoc) !== cachedDocWithHighlights
+    ) {
       const vnodes = truncatedDoc
         ? renderQuillDelta(truncatedDoc, hideFormatting, true, false, navigate)
         : []; // collapse = true, to inline blocks
@@ -70,8 +82,8 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hid
 
       setCachedDocWithHighlights(JSON.stringify(truncatedDoc));
 
-      setCachedResultWithHighlights(chunks.map(
-        ({ end, highlight, start }, index) => {
+      setCachedResultWithHighlights(
+        chunks.map(({ end, highlight, start }, index) => {
           const middle = 15;
 
           const subString = textToHighlight.substr(start, end - start);
@@ -97,31 +109,31 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hid
           }
 
           return highlight ? <mark>{text}</mark> : <span>{text}</span>;
-        }
-      ));
+        })
+      );
     }
 
     return (
       <div
-      className={getClasses<{ collapsed?: boolean }>(
-        { collapsed: isTruncated },
-        'QuillFormattedText'
-      )}
-        >
+        className={getClasses<{ collapsed?: boolean }>(
+          { collapsed: isTruncated },
+          'QuillFormattedText'
+        )}
+      >
         {cachedResultWithHighlights}
       </div>
     );
   } else {
     return (
       <div
-        className='QuillFormattedText'
-      // oncreate={() => {
-      // if (!(<any>window).twttr) {
-      //   loadScript('//platform.twitter.com/widgets.js').then(() => {
-      //     console.log('Twitter Widgets loaded');
-      //   })
-      // }}
-        >
+        className="QuillFormattedText"
+        // oncreate={() => {
+        // if (!(<any>window).twttr) {
+        //   loadScript('//platform.twitter.com/widgets.js').then(() => {
+        //     console.log('Twitter Widgets loaded');
+        //   })
+        // }}
+      >
         {truncatedDoc &&
           renderQuillDelta(
             truncatedDoc,
@@ -130,14 +142,14 @@ export const QuillFormattedText: React.FC<QuillFormattedTextAttrs> = ({ doc, hid
             openLinksInNewTab,
             navigate
           )}
-      {isTruncated && (
-        <div className="show-more-button-wrapper">
-          <div className="show-more-button" onClick={toggleDisplay}>
-          <CWIcon iconName="plus" iconSize="small" />
-          <div className="show-more-text">Show More</div>
+        {isTruncated && (
+          <div className="show-more-button-wrapper">
+            <div className="show-more-button" onClick={toggleDisplay}>
+              <CWIcon iconName="plus" iconSize="small" />
+              <div className="show-more-text">Show More</div>
+            </div>
           </div>
-          </div>
-      )}
+        )}
       </div>
     );
   }
