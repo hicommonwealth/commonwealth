@@ -134,10 +134,11 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
         (member) => member.toLowerCase() === author.address.toLowerCase()
       );
 
-    const hasMinScore = this.userScore >= this.space.filters?.minScore;
+    const hasMinScore =
+      this.userScore >= this.space.validation?.params.minScore;
 
     const showScoreWarning =
-      this.space.filters?.minScore > 0 &&
+      this.space.validation?.params.minScore > 0 &&
       !hasMinScore &&
       !isMember &&
       this.userScore !== null;
@@ -146,9 +147,9 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
       this.space !== undefined &&
       (!this.space.filters?.onlyMembers ||
         (this.space.filters?.onlyMembers && isMember)) &&
-      (this.space.filters?.minScore === 0 ||
-        (this.space.filters?.minScore > 0 &&
-          this.userScore > this.space.filters?.minScore) ||
+      (this.space.validation?.params.minScore === 0 ||
+        (this.space.validation?.params.minScore > 0 &&
+          this.userScore > this.space.validation?.params.minScore) ||
         isMember);
 
     return (
