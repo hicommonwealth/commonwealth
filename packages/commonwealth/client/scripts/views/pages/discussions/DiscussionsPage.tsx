@@ -22,12 +22,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
-    app.threads.loadNextPage({ topicName, stageName, includePinnedThreads: true }).then((t) => {
-      // Fetch first 20 + unpinned threads
-      setThreads(t);
+    app.threads
+      .loadNextPage({ topicName, stageName, includePinnedThreads: true })
+      .then((t) => {
+        // Fetch first 20 + unpinned threads
+        setThreads(t);
 
-      setInitializing(false);
-    });
+        setInitializing(false);
+      });
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {

@@ -30,7 +30,6 @@ export const CosmosProposalForm = () => {
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
 
-
   return !cosmos.governance.initialized ? (
     <CWSpinner />
   ) : (

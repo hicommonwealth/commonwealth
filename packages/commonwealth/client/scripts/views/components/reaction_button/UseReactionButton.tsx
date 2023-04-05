@@ -8,19 +8,27 @@ export const useReactionButton = (thread: Thread, setReactors) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const thisUserReaction = thread.associatedReactions.filter(r => r.address === activeAddress);
+  const thisUserReaction = thread.associatedReactions.filter(
+    (r) => r.address === activeAddress
+  );
   const [hasReacted, setHasReacted] = useState(thisUserReaction.length !== 0);
-  const [reactedId, setReactedId] = useState(thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id);
+  const [reactedId, setReactedId] = useState(
+    thisUserReaction.length === 0 ? -1 : thisUserReaction[0].id
+  );
 
   useEffect(() => {
     const fetch = () => {
-      if (activeAddress && thread.associatedReactions.filter((r) => r.address === activeAddress).length > 0) {
+      if (
+        activeAddress &&
+        thread.associatedReactions.filter((r) => r.address === activeAddress)
+          .length > 0
+      ) {
         setHasReacted(true);
       } else {
         setHasReacted(false);
       }
 
-      setReactors(thread.associatedReactions.map(t => t.address));
+      setReactors(thread.associatedReactions.map((t) => t.address));
     };
 
     fetch();
@@ -46,15 +54,20 @@ export const useReactionButton = (thread: Thread, setReactors) => {
 
     setIsLoading(true);
 
-    app.threadReactions.deleteOnThread(thread, reactedId).then(() => {
-      setReactors(oldReactors => oldReactors.filter((r) => r !== activeAddress));
-      setReactedId(-1);
-      setHasReacted(false);
-      setIsLoading(false);
-    }).catch(e => {
-      console.log(e);
-      setIsLoading(false);
-    });
+    app.threadReactions
+      .deleteOnThread(thread, reactedId)
+      .then(() => {
+        setReactors((oldReactors) =>
+          oldReactors.filter((r) => r !== activeAddress)
+        );
+        setReactedId(-1);
+        setHasReacted(false);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsLoading(false);
+      });
   };
 
   const like = async (
@@ -67,13 +80,14 @@ export const useReactionButton = (thread: Thread, setReactors) => {
       .createOnThread(userAddress, thread, 'like')
       .then((reaction) => {
         setReactedId(reaction.id);
-        setReactors(oldReactors => [...oldReactors, activeAddress]);
+        setReactors((oldReactors) => [...oldReactors, activeAddress]);
         setHasReacted(true);
         setIsLoading(false);
-      }).catch(e => {
+      })
+      .catch((e) => {
         console.log(e);
         setIsLoading(false);
-    });
+      });
   };
 
   return {

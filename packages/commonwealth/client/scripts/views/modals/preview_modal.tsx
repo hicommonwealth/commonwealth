@@ -24,7 +24,11 @@ type PreviewModalProps = {
   title: string;
 };
 
-export const PreviewModal = ({ doc, onModalClose, title }: PreviewModalProps) => {
+export const PreviewModal = ({
+  doc,
+  onModalClose,
+  title,
+}: PreviewModalProps) => {
   const renderedContent = useMemo(() => {
     if (!doc) {
       return <EmptyState />;

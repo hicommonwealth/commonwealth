@@ -26,10 +26,8 @@ const crowdfundingGalleryText = [
 
 export const CrowdfundingGallery = () => {
   const [selectedCard, setSelectedCard] = useState(1);
-  const [
-    windowIsMediumSmallInclusive,
-    setWindowIsMediumSmallInclusive,
-  ] = useState(isWindowMediumSmallInclusive(window.innerWidth));
+  const [windowIsMediumSmallInclusive, setWindowIsMediumSmallInclusive] =
+    useState(isWindowMediumSmallInclusive(window.innerWidth));
 
   useEffect(() => {
     const onResize = () => {
