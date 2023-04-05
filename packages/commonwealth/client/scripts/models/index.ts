@@ -31,7 +31,6 @@ export { default as SearchQuery } from './SearchQuery';
 export { default as SearchResult } from './SearchResult';
 export { default as SocialAccount } from './SocialAccount';
 export { default as StorageModule } from './StorageModule';
-export { default as ChainEventType } from './ChainEventType';
 export { default as ChainEvent } from './ChainEvent';
 export { default as ChainEntity } from './ChainEntity';
 export { default as StarredCommunity } from './StarredCommunity';
