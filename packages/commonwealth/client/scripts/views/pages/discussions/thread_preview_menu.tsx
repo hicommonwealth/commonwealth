@@ -21,16 +21,17 @@ export const ThreadPreviewMenu = ({
 }: ThreadPreviewMenuProps) => {
   const navigate = useCommonNavigate();
 
-  const hasAdminPermissions =
-    app.user.activeAccount &&
-    (app.roles.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-    }) ||
-      app.roles.isRoleOfCommunity({
-        role: 'moderator',
-        chain: app.activeChainId(),
-      }));
+  const hasAdminPermissions = true;
+  // const hasAdminPermissions =
+  //   app.user.activeAccount &&
+  //   (app.roles.isRoleOfCommunity({
+  //     role: 'admin',
+  //     chain: app.activeChainId(),
+  //   }) ||
+  //     app.roles.isRoleOfCommunity({
+  //       role: 'moderator',
+  //       chain: app.activeChainId(),
+  //     }));
 
   const isAuthor =
     app.user.activeAccount && thread.author === app.user.activeAccount.address;
@@ -52,6 +53,7 @@ export const ThreadPreviewMenu = ({
                   {
                     onClick: () => {
                       app.threads.pin({ proposal: thread }).then(() => {
+                        app.threadUpdateEmmiter.emit('threadUpdated');
                         navigate('/discussions');
                         redraw();
                       });
@@ -70,7 +72,10 @@ export const ThreadPreviewMenu = ({
                           threadId: thread.id,
                           readOnly: !thread.readOnly,
                         })
-                        .then(() => redraw());
+                        .then(() => {
+                          app.threadUpdateEmmiter.emit('threadUpdated');
+                          redraw();
+                        });
                     },
                     label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                     iconLeft: 'lock' as const,
@@ -108,6 +113,7 @@ export const ThreadPreviewMenu = ({
                       if (!confirmed) return;
 
                       app.threads.delete(thread).then(() => {
+                        app.threadUpdateEmmiter.emit('threadUpdated');
                         navigate('/discussions');
                       });
                     },

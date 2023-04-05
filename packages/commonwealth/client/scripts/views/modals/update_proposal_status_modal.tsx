@@ -61,6 +61,7 @@ export const UpdateProposalStatusModal = ({
         threadId: thread.id,
         stage: tempStage,
       });
+      app.threadUpdateEmmiter.emit('threadUpdated');
     } catch (err) {
       console.log('Failed to update stage');
       throw new Error(
@@ -128,7 +129,11 @@ export const UpdateProposalStatusModal = ({
       </div>
       <div className="compact-modal-body">
         <SelectList
-          defaultValue={tempStage ? { value: tempStage, label: threadStageToLabel(tempStage) } : null}
+          defaultValue={
+            tempStage
+              ? { value: tempStage, label: threadStageToLabel(tempStage) }
+              : null
+          }
           placeholder="Select the stage"
           isSearchable={false}
           options={stages.map((stage) => ({

@@ -54,6 +54,7 @@ export const TopicsMenu = ({
                   _DEPRECATED_getRoute() === `/${app.activeChainId()}` || !topic
                 }
                 onClick={() => {
+                  app.threadUpdateEmmiter.emit('threadUpdated');
                   navigate('/discussions');
                 }}
               />
@@ -73,6 +74,7 @@ export const TopicsMenu = ({
                     isSelected={active}
                     onClick={(e) => {
                       e.preventDefault();
+                      app.threadUpdateEmmiter.emit('threadUpdated');
                       navigate(`/discussions/${t.name}`);
                     }}
                     iconRight={

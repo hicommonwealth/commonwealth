@@ -20,14 +20,51 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams, _] = useSearchParams();
   const stageName: string = searchParams.get('stage');
 
+  const handleThreadUpdate = () => {
+    console.log('event was triggered and catched');
+
+    console.log('app.threads.listingStore:', app.threads.listingStore);
+
+    // Refresh the threads here
+    const pinnedThreads = app.threads.listingStore.getThreads({
+      topicName,
+      stageName,
+      pinned: true,
+    });
+
+    const unpinnedThreads = app.threads.listingStore.getThreads({
+      topicName,
+      stageName,
+      pinned: false,
+    });
+
+    console.log('pinned and unpinned:', [...pinnedThreads, ...unpinnedThreads]);
+
+    setThreads([...pinnedThreads, ...unpinnedThreads]);
+  };
+
+  useEffect(() => {
+    console.log('listing has changed');
+  }, [threads]);
+
+  useEffect(() => {
+    app.threadUpdateEmmiter.on('threadUpdated', handleThreadUpdate);
+
+    return () => {
+      app.threadUpdateEmmiter.off('threadUpdated', handleThreadUpdate);
+    };
+  }, []);
+
   // setup initial threads
   useEffect(() => {
-    app.threads.loadNextPage({ topicName, stageName, includePinnedThreads: true }).then((t) => {
-      // Fetch first 20 + unpinned threads
-      setThreads(t);
+    app.threads
+      .loadNextPage({ topicName, stageName, includePinnedThreads: true })
+      .then((t) => {
+        // Fetch first 20 + unpinned threads
+        setThreads(t);
 
-      setInitializing(false);
-    });
+        setInitializing(false);
+      });
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
@@ -43,6 +80,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   if (initializing) {
     return <PageLoading />;
   }
+
   return (
     <Sublayout>
       <div className="DiscussionsPage">

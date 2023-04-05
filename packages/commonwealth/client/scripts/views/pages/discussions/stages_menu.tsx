@@ -76,6 +76,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                 isSelected={!stage}
                 onClick={(e) => {
                   e.preventDefault();
+                  app.threadUpdateEmmiter.emit('threadUpdated');
                   navigate('/discussions');
                 }}
               />
@@ -86,6 +87,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                   isSelected={stage === targetStage}
                   onClick={(e) => {
                     e.preventDefault();
+                    app.threadUpdateEmmiter.emit('threadUpdated');
                     navigate(`/discussions?stage=${targetStage}`);
                   }}
                   label={`

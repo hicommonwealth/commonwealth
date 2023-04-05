@@ -21,9 +21,17 @@ type EditBodyProps = {
 };
 
 export const EditBody = (props: EditBodyProps) => {
-  const { title, shouldRestoreEdits, savedEdits, thread, cancelEditing, threadUpdatedCallback } = props;
+  const {
+    title,
+    shouldRestoreEdits,
+    savedEdits,
+    thread,
+    cancelEditing,
+    threadUpdatedCallback,
+  } = props;
 
-  const threadBody = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
+  const threadBody =
+    shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
   const body = deserializeDelta(threadBody);
 
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
@@ -35,7 +43,9 @@ export const EditBody = (props: EditBodyProps) => {
     let cancelConfirmed = true;
 
     if (JSON.stringify(body) !== JSON.stringify(contentDelta)) {
-      cancelConfirmed = window.confirm('Cancel editing? Changes will not be saved.');
+      cancelConfirmed = window.confirm(
+        'Cancel editing? Changes will not be saved.'
+      );
     }
 
     if (cancelConfirmed) {
@@ -54,6 +64,7 @@ export const EditBody = (props: EditBodyProps) => {
       await app.threads.edit(thread, newBody, title);
       clearEditingLocalStorage(thread.id, ContentType.Thread);
       notifySuccess('Thread successfully edited');
+      app.threadUpdateEmmiter.emit('threadUpdated');
       threadUpdatedCallback(title, newBody);
     } catch (err) {
       console.error(err);
@@ -64,9 +75,17 @@ export const EditBody = (props: EditBodyProps) => {
 
   return (
     <div className="EditBody">
-      <ReactQuillEditor contentDelta={contentDelta} setContentDelta={setContentDelta} />
+      <ReactQuillEditor
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
+      />
       <div className="buttons-row">
-        <CWButton label="Cancel" disabled={saving} buttonType="secondary-blue" onClick={cancel} />
+        <CWButton
+          label="Cancel"
+          disabled={saving}
+          buttonType="secondary-blue"
+          onClick={cancel}
+        />
         <CWButton label="Save" disabled={saving} onClick={save} />
       </div>
     </div>

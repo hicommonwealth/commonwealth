@@ -391,6 +391,7 @@ class ThreadsController {
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
+          app.threadUpdateEmmiter.emit('threadUpdated');
           redraw();
           resolve(result);
         })
@@ -420,6 +421,7 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
+        app.threadUpdateEmmiter.emit('threadUpdated');
         return result;
       },
       error: (err) => {
@@ -448,6 +450,7 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._listingStore.add(result);
         this._overviewStore.update(result);
+        app.threadUpdateEmmiter.emit('threadUpdated');
         return result;
       },
       error: (err) => {
@@ -469,6 +472,7 @@ class ThreadsController {
         const result = this.modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._listingStore.add(result);
+        app.threadUpdateEmmiter.emit('threadUpdated');
         return result;
       },
       error: (err) => {
@@ -688,6 +692,8 @@ class ThreadsController {
     if (stageName) params['stage'] = stageName;
     if (includePinnedThreads)
       params['includePinnedThreads'] = true;
+    
+    console.log('params:', params);
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
@@ -698,6 +704,7 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads } = response.result;
+    console.log('threads:', threads);
     // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);

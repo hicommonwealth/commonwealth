@@ -30,6 +30,7 @@ export const ChangeTopicModal = ({
         activeTopic.id
       );
 
+      app.threadUpdateEmmiter.emit('threadUpdated');
       onChangeHandler(topic);
       onModalClose();
     } catch (err) {
