@@ -193,7 +193,9 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
           )}
           <div className="row-bottom">
             <div className="comments-count">
-              {windowIsSmall && <ThreadReactionPreviewButtonSmall thread={thread} />}
+              {windowIsSmall && (
+                <ThreadReactionPreviewButtonSmall thread={thread} />
+              )}
               <CWIcon iconName="feedback" iconSize="small" />
               <CWText type="caption">
                 {pluralize(thread.numberOfComments, 'comment')}

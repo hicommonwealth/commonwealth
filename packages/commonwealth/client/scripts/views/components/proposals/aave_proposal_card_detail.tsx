@@ -41,8 +41,10 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
   const [author, setAuthor] = useState<string>(proposal.ipfsData?.author);
   useEffect(() => {
     // TODO: we need to load titles / description async too
-    proposal.ipfsDataReady.once('ready', () => setAuthor(proposal.ipfsData?.author));
-  })
+    proposal.ipfsDataReady.once('ready', () =>
+      setAuthor(proposal.ipfsData?.author)
+    );
+  });
   // TODO: move executor display to entire page
   // TODO: display stats about voting turnout/etc
   // const executor = proposal.Executor;

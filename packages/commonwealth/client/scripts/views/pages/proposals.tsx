@@ -42,7 +42,7 @@ function getModules(): ProposalModule<any, any, any>[] {
 }
 
 const ProposalsPage = () => {
-  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded)
+  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded);
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
 
   useEffect(() => {

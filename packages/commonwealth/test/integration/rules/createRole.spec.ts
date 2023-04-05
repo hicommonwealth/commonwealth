@@ -1,10 +1,7 @@
 import { assert } from 'chai';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import models from 'server/database';
-import {
-  createDefaultCommunityRoles,
-  createRole,
-} from 'server/util/roles';
+import { createDefaultCommunityRoles, createRole } from 'server/util/roles';
 import * as modelUtils from 'test/util/modelUtils';
 
 describe('createRole tests', () => {

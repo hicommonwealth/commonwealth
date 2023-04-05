@@ -20,10 +20,7 @@ import getProfiles, {
 import getReactions, {
   getReactionsValidation,
 } from '../routes/reactions/getReactions';
-import {
-  getThreads,
-  getThreadsValidation,
-} from '../routes/threads/getThreads';
+import { getThreads, getThreadsValidation } from '../routes/threads/getThreads';
 import type { Express } from 'express';
 import type Router from 'express/lib/router/index';
 import passport from 'passport';

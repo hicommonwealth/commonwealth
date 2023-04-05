@@ -6,10 +6,7 @@ import type { Thread } from 'models';
 
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import {
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from './helpers';
+import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { Modal } from '../component_kit/cw_modal';
 import { LoginModal } from '../../modals/login_modal';
@@ -26,20 +23,15 @@ export const ThreadPreviewReactionButtonBig = ({
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [reactors, setReactors] = useState<Array<any>>([]);
 
-  const {
-    dislike,
-    hasReacted,
-    isLoading,
-    isUserForbidden,
-    like,
-  } = useReactionButton(thread, setReactors);
+  const { dislike, hasReacted, isLoading, isUserForbidden, like } =
+    useReactionButton(thread, setReactors);
 
   return (
     <>
       <div
         onMouseEnter={async () => {
           if (reactors.length === 0) {
-            setReactors(thread.associatedReactions.map(a => a.address));
+            setReactors(thread.associatedReactions.map((a) => a.address));
           }
         }}
         onClick={async (e) => {

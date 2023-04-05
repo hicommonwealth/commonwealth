@@ -72,7 +72,7 @@ function getModules() {
 }
 
 const TipsPage = () => {
-  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded)
+  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded);
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
 
   useEffect(() => {
@@ -102,13 +102,13 @@ const TipsPage = () => {
 
   if (isSubstrateLoading) return modLoading;
 
-  const activeTips = onSubstrate && (app.chain as Substrate).tips.store
-    .getAll()
-    .filter((p) => !p.completed);
+  const activeTips =
+    onSubstrate &&
+    (app.chain as Substrate).tips.store.getAll().filter((p) => !p.completed);
 
-  const inactiveTips = onSubstrate && (app.chain as Substrate).tips.store
-    .getAll()
-    .filter((p) => p.completed);
+  const inactiveTips =
+    onSubstrate &&
+    (app.chain as Substrate).tips.store.getAll().filter((p) => p.completed);
 
   const activeTipContent = activeTips.length ? (
     activeTips.map((tip) => (
