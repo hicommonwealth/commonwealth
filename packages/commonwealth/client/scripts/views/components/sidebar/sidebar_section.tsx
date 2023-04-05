@@ -173,7 +173,7 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
 
     setToggled(!toggled);
 
-    localStorage.setItem(`${sectionName}-toggled`, (!!toggled).toString());
+    localStorage.setItem(`${sectionName}-toggled`, (!toggled).toString());
 
     if (toggled) {
       setHoverColor('none');
