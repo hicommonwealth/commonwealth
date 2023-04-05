@@ -153,7 +153,7 @@ const NotificationSettingsPage = () => {
           </div>
           {relevantSubscribedChains.map((chain) => {
             return (
-              <div className="notification-row chain-events-subscriptions-padding">
+              <div className="notification-row chain-events-subscriptions-padding" key={chain.id}>
                 <div className="notification-row-header">
                   <div className="left-content-container">
                     <div className="avatar-and-name">
@@ -194,7 +194,7 @@ const NotificationSettingsPage = () => {
             const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
             const hasSomeInAppSubs = subs.some((s) => s.isActive);
             return (
-              <div className="notification-row chain-events-subscriptions-padding">
+              <div className="notification-row chain-events-subscriptions-padding" key={chainName}>
                 <div className="notification-row-header">
                   <div className="left-content-container">
                     <div className="avatar-and-name">
