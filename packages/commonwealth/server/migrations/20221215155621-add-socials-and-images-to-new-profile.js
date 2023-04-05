@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const tableDefinition =  await queryInterface.describeTable('Profiles');
+    const tableDefinition = await queryInterface.describeTable('Profiles');
     return queryInterface.sequelize.transaction(async (t) => {
       if (!tableDefinition.socials) {
         await queryInterface.addColumn(

@@ -1,9 +1,5 @@
 import { assert } from 'chai';
-import {
-  PermissionManager,
-  Action,
-  ToCheck,
-} from 'shared/permissions';
+import { PermissionManager, Action, ToCheck } from 'shared/permissions';
 
 describe('computePermissions() unit tests', () => {
   let base_permission;

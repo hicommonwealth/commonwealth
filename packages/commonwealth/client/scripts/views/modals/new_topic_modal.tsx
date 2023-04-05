@@ -15,7 +15,11 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import type { DeltaStatic } from 'quill';
-import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  ReactQuillEditor,
+} from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
 
 type NewTopicModalProps = {
@@ -28,14 +32,19 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const navigate = useCommonNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [description, setDescription] = React.useState<string>('');
-  const [featuredInNewPost, setFeaturedInNewPost] = React.useState<boolean>(false);
-  const [featuredInSidebar, setFeaturedInSidebar] = React.useState<boolean>(false);
+  const [featuredInNewPost, setFeaturedInNewPost] =
+    React.useState<boolean>(false);
+  const [featuredInSidebar, setFeaturedInSidebar] =
+    React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
   const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
-  const [submitIsDisabled, setSubmitIsDisabled] = React.useState<boolean>(false);
+  const [submitIsDisabled, setSubmitIsDisabled] =
+    React.useState<boolean>(false);
 
   const editorText = getTextFromDelta(contentDelta);
 
@@ -86,7 +95,10 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
 
             if (disallowedCharMatches) {
-              const err = `The ${pluralizeWithoutNumberPrefix(disallowedCharMatches.length, 'char')}
+              const err = `The ${pluralizeWithoutNumberPrefix(
+                disallowedCharMatches.length,
+                'char'
+              )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(err);
               return ['failure', err];
@@ -111,7 +123,9 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
         />
         {app.activeChainId() && (
           <React.Fragment>
-            <CWLabel label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`} />
+            <CWLabel
+              label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
+            />
             <TokenDecimalInput
               decimals={decimals}
               defaultValueInWei="0"
@@ -139,7 +153,12 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             value=""
           />
         </div>
-        {featuredInNewPost && <ReactQuillEditor contentDelta={contentDelta} setContentDelta={setContentDelta} />}
+        {featuredInNewPost && (
+          <ReactQuillEditor
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+          />
+        )}
         <CWButton
           label="Create topic"
           disabled={isSaving || !!errorMsg || submitIsDisabled}
