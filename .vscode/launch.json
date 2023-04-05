@@ -12,6 +12,14 @@
               "<node_internals>/**"
             ],
             "type": "pwa-node"
-          }
+          },
+          {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch localhost app",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}/packages/commonwealth/client",
+            "userDataDir": false
+          }  
     ]
 }
