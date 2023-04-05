@@ -18,21 +18,22 @@ export default async (
   const { id } = req.user;
 
   /**
-   * The inner select in the CTE gets the thread id and latest notification id for all threads and comments in
-   * chains (communities) that the user has joined. The outer select assigns a rank to the returned records based on
-   * the notification id. More recent notifications will have a higher (1, 2) rank than old notifications (50..) e.g.:
+   * The CTE gets the thread id and latest/max notification id for all threads and comments in
+   * chains (communities) that the user has joined. It also assigns a rank (row number) based on descending order of
+   * the max notification ids. More recent notifications will have a higher rank than old notifications:
    * thread_id  max_notification_id    thread_rank
    *  10681,         5645365,               1
    *  10680,         5645362,               2
    */
   const query = `
-      WITH ranked_thread_notifs as (SELECT *, ROW_NUMBER() OVER (ORDER BY mx_not_id DESC) as thread_rank
-                                    FROM (SELECT n.thread_id AS thread_id, MAX(n.id) as mx_not_id
-                                          FROM "Notifications" n
-                                          WHERE n.category_id IN ('new-thread-creation', 'new-comment-creation')
-                                            AND n.chain_id IN (SELECT a."chain" FROM "Addresses" a WHERE a.user_id = ?)
-                                            AND n.thread_id IS NOT NULL
-                                          GROUP BY n.thread_id) as notif)
+      WITH ranked_thread_notifs as (SELECT n.thread_id                                 AS thread_id,
+                                           MAX(n.id)                                   as mx_not_id,
+                                           ROW_NUMBER() OVER (ORDER BY MAX(n.id) DESC) as thread_rank
+                                    FROM "Notifications" n
+                                    WHERE n.category_id IN ('new-thread-creation', 'new-comment-creation')
+                                      AND n.chain_id IN (SELECT a."chain" FROM "Addresses" a WHERE a.user_id = ?)
+                                      AND n.thread_id IS NOT NULL
+                                    GROUP BY n.thread_id)
       -- this section combines the ranked thread ids from above with comments and reactions in order to
       -- count the number of reactions and comments associated with each thread. It also joins the ranked thread ids
       -- with notifications and threads in order to retrieve notification data and thread view counts respectively
