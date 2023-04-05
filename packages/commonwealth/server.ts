@@ -267,7 +267,7 @@ async function main() {
   const globalActivityCache = new GlobalActivityCache(models);
 
   // TODO: should we await this? it will block server startup -- but not a big deal locally
-  if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
+  if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
 
   // Declare Validation Middleware Service
   // middleware to use for all requests
