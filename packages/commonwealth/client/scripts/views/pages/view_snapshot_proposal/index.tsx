@@ -1,26 +1,21 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { MixpanelSnapshotEvents } from 'analytics/types';
-import type {
+import {
+  Power,
   SnapshotProposal,
   SnapshotProposalVote,
   SnapshotSpace,
+  VoteResults,
+  VoteResultsData
 } from 'helpers/snapshot_utils';
 import { getPower, getResults } from 'helpers/snapshot_utils';
 import { AddressInfo } from 'models';
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
 
-// import 'pages/snapshot/index.scss';
 import app from 'state';
 import Sublayout from 'views/sublayout';
-// import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  ActiveProposalPill,
-  ClosedProposalPill,
-} from '../../components/proposal_pills';
+import { ActiveProposalPill, ClosedProposalPill } from '../../components/proposal_pills';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
@@ -28,176 +23,124 @@ import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 
-type ViewProposalPageAttrs = {
+type ViewProposalPageProps = {
   identifier: string;
   scope: string;
   snapshotId: string;
 };
 
-class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
-  private fetchedPower: boolean;
-  private proposal: SnapshotProposal;
-  private scores: Array<number>;
-  private space: SnapshotSpace;
-  private symbol: string;
-  private threads: Array<{ id: string; title: string }> | null;
-  private totals: any;
-  private totalScore: number;
-  private validatedAgainstStrategies: boolean;
-  private votes: Array<SnapshotProposalVote>;
+export const ViewProposalPage = ({ identifier, scope, snapshotId }: ViewProposalPageProps) => {
+  const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
+  const [space, setSpace] = useState<SnapshotSpace | null>(null);
+  const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
+  const [power, setPower] = useState<Power | null>(null);
+  const [threads, setThreads] = useState<Array<{ id: string; title: string }> | null>(null);
 
-  oninit(vnode: ResultNode<ViewProposalPageAttrs>) {
-    this.fetchedPower = false;
-    this.proposal = null;
-    this.scores = [];
-    this.threads = null;
-    this.validatedAgainstStrategies = true;
-    this.votes = [];
+  const symbol: string = space?.symbol || '';
+  const validatedAgainstStrategies: boolean = !power ? true : power.totalScore > 0;
+  const totalScore: number = power?.totalScore || 0;
+  const votes: SnapshotProposalVote[] = voteResults?.votes || [];
+  const totals: VoteResultsData = voteResults?.results || {
+    resultsByVoteBalance: [],
+    resultsByStrategyScore: [],
+    sumOfResultsBalance: 0
+  };
 
-    const loadVotes = async () => {
-      this.proposal = app.snapshot.proposals.find(
-        (proposal) => proposal.id === vnode.attrs.identifier
-      );
-
-      const space = app.snapshot.space;
-      this.space = space;
-      this.symbol = space.symbol;
-
-      await getResults(space, this.proposal).then((res) => {
-        this.votes = res.votes;
-        this.totals = res.results;
-      });
-
-      redraw();
-
-      getPower(
-        this.space,
-        this.proposal,
-        app.user?.activeAccount?.address
-      ).then((vals) => {
-        this.validatedAgainstStrategies = vals.totalScore > 0;
-        this.totalScore = vals.totalScore;
-        this.fetchedPower = true;
-        redraw();
-      });
-
-      try {
-        if (app.activeChainId()) {
-          app.threads
-            .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
-            .then((res) => {
-              this.threads = res;
-              redraw();
-            });
-        }
-      } catch (e) {
-        console.error(`Failed to fetch threads: ${e}`);
-      }
-    };
-
-    // const mixpanelTrack = () => {
-    //   mixpanelBrowserTrack({
-    //     event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
-    //     isCustomDomain: app.isCustomDomain(),
-    //     space: app.snapshot.space.id,
-    //   });
-    // };
-
-    const snapshotId = vnode.attrs.snapshotId;
-
-    if (!app.snapshot.initialized) {
-      app.snapshot.init(snapshotId).then(() => {
-        // mixpanelTrack();
-        loadVotes();
-      });
-    } else {
-      // mixpanelTrack();
-      loadVotes();
+  const activeUserAddress = app.user?.activeAccount?.address || app.user?.addresses?.[0]?.address;
+  const activeChainId = app.activeChainId();
+  const proposalAuthor = useMemo(() => {
+    if (!proposal || !activeChainId) {
+      return null;
     }
+    return new AddressInfo(null, proposal.author, activeChainId, null);
+  }, [proposal, activeChainId]);
+
+  const loadVotes = async (snapId: string, proposalId: string) => {
+    await app.snapshot.init(snapId);
+    if (!app.snapshot.initialized) {
+      return;
+    }
+
+    const currentProposal = app.snapshot.proposals.find((p) => p.id === proposalId);
+    setProposal(currentProposal);
+
+    const currentSpace = app.snapshot.space;
+    setSpace(currentSpace);
+
+    const results = await getResults(currentSpace, currentProposal);
+    setVoteResults(results);
+
+    const powerRes = await getPower(currentSpace, currentProposal, activeUserAddress);
+    setPower(powerRes);
+
+    try {
+      if (app.activeChainId()) {
+        const threadsForSnapshot = await app.threads.fetchThreadIdsForSnapshot({ snapshot: currentProposal.id });
+        setThreads(threadsForSnapshot);
+      }
+    } catch (e) {
+      console.error(`Failed to fetch threads: ${e}`);
+    }
+  };
+
+  useEffect(() => {
+    loadVotes(snapshotId, identifier).catch(console.error);
+  }, [identifier, snapshotId]);
+
+  if (!proposal) {
+    return <PageLoading />;
   }
 
-  view(vnode: ResultNode<ViewProposalPageAttrs>) {
-    const { identifier } = vnode.attrs;
-
-    return !this.votes || !this.totals || !this.proposal ? (
-      <PageLoading />
-    ) : (
-      <Sublayout
-      // title="Snapshot Proposal"
-      >
-        <CWContentPage
-          showSidebar
-          title={this.proposal.title}
-          author={
-            <CWText>
-              {!!app.activeChainId() && (
-                <User
-                  user={
-                    new AddressInfo(
-                      null,
-                      this.proposal.author,
-                      app.activeChainId(),
-                      null
-                    )
-                  }
-                  showAddressWithDisplayName
-                  linkify
-                  popover
-                />
-              )}
-            </CWText>
-          }
-          createdAt={this.proposal.created}
-          contentBodyLabel="Snapshot"
-          subHeader={
-            this.proposal.state === 'active' ? (
-              <ActiveProposalPill proposalEnd={this.proposal.end} />
-            ) : (
-              <ClosedProposalPill proposalState={this.proposal.state} />
-            )
-          }
-          body={renderQuillTextBody(this.proposal.body)}
-          subBody={
-            this.votes.length > 0 && (
-              <SnapshotVotesTable
-                choices={this.proposal.choices}
-                symbol={this.symbol}
-                voters={this.votes}
+  return (
+    <Sublayout
+    // title="Snapshot Proposal"
+    >
+      <CWContentPage
+        showSidebar
+        title={proposal.title}
+        author={
+          <CWText>
+            {!!proposalAuthor && <User user={proposalAuthor} showAddressWithDisplayName linkify popover />}
+          </CWText>
+        }
+        createdAt={proposal.created}
+        contentBodyLabel="Snapshot"
+        subHeader={
+          proposal.state === 'active' ? (
+            <ActiveProposalPill proposalEnd={proposal.end} />
+          ) : (
+            <ClosedProposalPill proposalState={proposal.state} />
+          )
+        }
+        body={renderQuillTextBody(proposal.body)}
+        subBody={votes.length > 0 && <SnapshotVotesTable choices={proposal.choices} symbol={symbol} voters={votes} />}
+        sidebarComponents={[
+          {
+            label: 'Info',
+            item: <SnapshotInformationCard proposal={proposal} threads={threads} />
+          },
+          {
+            label: 'Poll',
+            item: (
+              <SnapshotPollCardContainer
+                activeUserAddress={activeUserAddress}
+                fetchedPower={!!power}
+                identifier={identifier}
+                proposal={proposal}
+                scores={[]} // unused?
+                space={space}
+                symbol={symbol}
+                totals={totals}
+                totalScore={totalScore}
+                validatedAgainstStrategies={validatedAgainstStrategies}
+                votes={votes}
               />
             )
           }
-          sidebarComponents={[
-            {
-              label: 'Info',
-              item: (
-                <SnapshotInformationCard
-                  proposal={this.proposal}
-                  threads={this.threads}
-                />
-              ),
-            },
-            {
-              label: 'Poll',
-              item: (
-                <SnapshotPollCardContainer
-                  fetchedPower={this.fetchedPower}
-                  identifier={identifier}
-                  proposal={this.proposal}
-                  scores={this.scores}
-                  space={this.space}
-                  symbol={this.symbol}
-                  totals={this.totals}
-                  totalScore={this.totalScore}
-                  validatedAgainstStrategies={this.validatedAgainstStrategies}
-                  votes={this.votes}
-                />
-              ),
-            },
-          ]}
-        />
-      </Sublayout>
-    );
-  }
-}
+        ]}
+      />
+    </Sublayout>
+  );
+};
 
 export default ViewProposalPage;

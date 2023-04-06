@@ -18,6 +18,8 @@ type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
 };
 
+const PROD_URL = 'https://commonwealth.im';
+
 const ProfileActivityRow = (props: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
   const { activity } = props;
@@ -43,6 +45,20 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
     <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
   );
 
+  const handleClickLink = (path) => {
+    const isExternalLink = chain !== app.customDomainId();
+
+    if (!app.isCustomDomain()) {
+      navigate(path, {}, chain);
+    } else {
+      if (isExternalLink) {
+        window.open(`${PROD_URL}/${chain}${path}`);
+      } else {
+        navigate(path);
+      }
+    }
+  };
+
   return (
     <div className="ProfileActivityRow">
       <div className="chain-info">
@@ -52,7 +68,7 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigate(`/${chain}/discussions`);
+              handleClickLink(`/discussions`);
             }}
           >
             {chain}
@@ -78,7 +94,7 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                navigate(`/${chain}/discussion/${id}`);
+                handleClickLink(`/discussion/${id}`);
               }}
             >
               {title}
@@ -88,8 +104,8 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                navigate(
-                  `/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`
+                handleClickLink(
+                  `/discussion/${comment.thread?.id}?comment=${comment.id}`
                 );
               }}
             >

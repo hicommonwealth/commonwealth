@@ -18,6 +18,7 @@ import { User } from '../user/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { showCanvasVerifyDataModal } from '../../modals/canvas_verify_data_modal';
 import { verify } from '../../../helpers/canvas';
@@ -77,6 +78,8 @@ export const Comment = (props: CommentProps) => {
     React.useState<boolean>(false);
   const [savedEdits, setSavedEdits] = React.useState<string>('');
 
+  const { isLoggedIn } = useUserLoggedIn();
+
   const handleSetIsEditingComment = (status: boolean) => {
     setIsGloballyEditing(status);
     setIsEditingComment(status);
@@ -94,7 +97,7 @@ export const Comment = (props: CommentProps) => {
     });
 
   const canReply =
-    !isLast && !isLocked && app.isLoggedIn() && app.user.activeAccount;
+    !isLast && !isLocked && isLoggedIn && app.user.activeAccount;
 
   const canEditAndDelete =
     !isLocked &&
