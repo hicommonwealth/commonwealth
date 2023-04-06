@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import type { Chain } from '@canvas-js/interfaces';
-import { constructCanvasMessage } from 'canvas';
+import { createCanvasSessionPayload } from 'canvas';
 import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
 import BN from 'bn.js';
@@ -109,7 +109,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         null
       );
 
-      const canvasMessage = constructCanvasMessage(
+      const canvasSessionPayload = createCanvasSessionPayload(
         'near' as Chain,
         chainId,
         acct.address,
@@ -128,14 +128,14 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
-        canvas.serializeSessionPayload(canvasMessage)
+        canvas.serializeSessionPayload(canvasSessionPayload)
       );
 
-      await acct.validate(signature, canvasMessage.sessionIssued, chainId);
+      await acct.validate(signature, canvasSessionPayload.sessionIssued, chainId);
 
       app.sessions
         .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, canvasMessage, signature);
+        .authSession(chainId, canvasSessionPayload, signature);
 
       if (!app.isLoggedIn()) {
         await initAppState();

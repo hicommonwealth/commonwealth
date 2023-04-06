@@ -3,7 +3,7 @@ import { sessionSigninModal } from 'views/modals/session_signin_modal';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import {
-  constructCanvasMessage,
+  createCanvasSessionPayload,
   chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
 } from 'canvas';
@@ -41,7 +41,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
     canvasChainId
   );
 
-  const canvasMessage = constructCanvasMessage(
+  const canvasSessionPayload = createCanvasSessionPayload(
     canvasChain,
     canvasChainId,
     wallet.chain === ChainBase.Substrate
@@ -57,8 +57,8 @@ export async function signSessionWithAccount<T extends { address: string }>(
       : null
   );
 
-  const signature = await wallet.signCanvasMessage(account, canvasMessage);
-  return { signature, chainId: canvasChainId, sessionPayload: canvasMessage };
+  const signature = await wallet.signCanvasMessage(account, canvasSessionPayload);
+  return { signature, chainId: canvasChainId, sessionPayload: canvasSessionPayload };
 }
 
 class SessionsController {

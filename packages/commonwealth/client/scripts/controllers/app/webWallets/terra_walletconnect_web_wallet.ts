@@ -69,12 +69,12 @@ class TerraWalletConnectWebWalletController
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
     try {
       const result = await this._wallet.signBytes(
-        Buffer.from(canvas.serializeSessionPayload(canvasMessage))
+        Buffer.from(canvas.serializeSessionPayload(canvasSessionPayload))
       );
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');

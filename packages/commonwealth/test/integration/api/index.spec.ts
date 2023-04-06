@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import { constructCanvasMessage } from 'canvas';
+import { createCanvasSessionPayload } from 'canvas';
 import app, { resetDatabase } from '../../../server-test';
 import {
   constructTypedCanvasMessage,
@@ -72,7 +72,7 @@ describe('API Tests', () => {
       const chain_id = '1'; // use ETH mainnet for testing
       const sessionWallet = ethers.Wallet.createRandom();
       const timestamp = 1665083987891;
-      const message = constructCanvasMessage(
+      const message = createCanvasSessionPayload(
         'ethereum',
         chain_id,
         address,

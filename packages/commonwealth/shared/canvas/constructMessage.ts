@@ -3,7 +3,7 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 
-export const constructCanvasMessage = (
+export const createCanvasSessionPayload = (
   canvasChain: CanvasChain, // Canvas chain network, e.g. "ethereum"
   canvasChainId: string, // Canvas chain id, e.g. "1" or "osmo-1" (CW chainId is 1 or "osmo-1")
   from: string,

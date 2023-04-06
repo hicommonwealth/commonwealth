@@ -12,7 +12,7 @@ import { createRole, findOneRole } from 'server/util/roles';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
-import { constructCanvasMessage } from 'canvas';
+import { createCanvasSessionPayload } from 'canvas';
 import { PermissionManager } from 'commonwealth/shared/permissions';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
@@ -90,7 +90,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
-    const message = constructCanvasMessage(
+    const message = createCanvasSessionPayload(
       'ethereum',
       chain_id,
       address,
@@ -145,7 +145,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     );
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
-    const message = constructCanvasMessage(
+    const message = createCanvasSessionPayload(
       'ethereum',
       chain_id,
       address,
