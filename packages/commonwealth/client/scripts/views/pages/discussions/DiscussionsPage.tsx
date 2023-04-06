@@ -26,7 +26,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     // Since topic changes do not update the listingStore,
     // the state change relies on the list without the updated thread
     if (topicId && topicName) {
-      setThreads(threads.filter((t) => t.id !== threadId));
+      const updatedThreadList = threads.filter((t) => t.id !== threadId);
+
+      setThreads(updatedThreadList);
     } else {
       const pinnedThreads = app.threads.listingStore.getThreads({
         topicName,
