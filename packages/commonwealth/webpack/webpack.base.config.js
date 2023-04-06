@@ -37,6 +37,9 @@ module.exports = {
         process.env.DISCORD_UI_URL || 'http://localhost:3000'
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.COSMOS_GOV_V1': JSON.stringify(process.env.COSMOS_GOV_V1),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {
