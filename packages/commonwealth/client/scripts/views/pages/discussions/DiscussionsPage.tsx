@@ -20,6 +20,41 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams, _] = useSearchParams();
   const stageName: string = searchParams.get('stage');
 
+  const handleThreadUpdate = (data: { threadId: number; topicId: number }) => {
+    const { threadId, topicId } = data;
+
+    // Since topic changes do not update the listingStore,
+    // the state change relies on the list without the updated thread
+    if (topicId && topicName) {
+      setThreads(threads.filter((t) => t.id !== threadId));
+    } else {
+      const pinnedThreads = app.threads.listingStore.getThreads({
+        topicName,
+        stageName,
+        pinned: true,
+      });
+
+      const unpinnedThreads = app.threads.listingStore.getThreads({
+        topicName,
+        stageName,
+        pinned: false,
+      });
+
+      setThreads([...pinnedThreads, ...unpinnedThreads]);
+    }
+  };
+
+  // Event binding for actions that trigger a thread update (e.g. topic or stage change)
+  useEffect(() => {
+    app.threadUpdateEmitter.on('threadUpdated', (data) =>
+      handleThreadUpdate(data)
+    );
+
+    return () => {
+      app.threadUpdateEmitter.off('threadUpdated', handleThreadUpdate);
+    };
+  }, [threads]);
+
   // setup initial threads
   useEffect(() => {
     app.threads
@@ -27,7 +62,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       .then((t) => {
         // Fetch first 20 + unpinned threads
         setThreads(t);
-
         setInitializing(false);
       });
   }, [stageName, topicName]);
