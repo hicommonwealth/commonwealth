@@ -8,7 +8,9 @@ import 'chai/register-should';
 import { BalanceType, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
+import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from 'server/util/roles';
+import { getActionHash } from '@canvas-js/interfaces';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
@@ -29,6 +31,13 @@ import {
 } from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+const sortedStringify = configureStableStringify({
+  bigint: false,
+  circularValue: Error,
+  strict: true,
+  deterministic: true,
+});
 
 export const generateEthAddress = () => {
   const keypair = wallet.generate();
@@ -91,7 +100,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
-    const message = createCanvasSessionPayload(
+    const sessionPayload = createCanvasSessionPayload(
       'ethereum',
       chain_id,
       address,
@@ -99,13 +108,16 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       timestamp,
       TEST_BLOCK_INFO_BLOCKHASH
     );
-    const data = constructTypedCanvasMessage(message);
-    const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
-      privateKey,
-      data,
+      privateKey: keypair.getPrivateKey(),
+      data: constructTypedCanvasMessage(sessionPayload),
       version: SignTypedDataVersion.V4,
     });
+    const session: Session = {
+      type: 'session',
+      payload: sessionPayload,
+      signature: signature,
+    };
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
@@ -122,7 +134,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
-    return { address_id, address, user_id, email };
+    return { address_id, address, user_id, email, canvas_session: sortedStringify(session) };
   }
   if (chain === 'edgeware') {
     const wallet_id = 'polkadot';
@@ -146,7 +158,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     );
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
-    const message = createCanvasSessionPayload(
+    const sessionPayload: SessionPayload = createCanvasSessionPayload(
       'ethereum',
       chain_id,
       address,
@@ -154,8 +166,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       timestamp,
       TEST_BLOCK_INFO_BLOCKHASH
     );
+    const session: Session = {
+      type: 'session',
+      payload: sessionPayload,
+      signature: signature,
+    };
 
-    const signature = keyPair.sign(stringToU8a(JSON.stringify(message)));
+    const signature = keyPair.sign(stringToU8a(sortedStringify(sessionPayload)));
 
     const address_id = res.body.result.id;
     res = await chai.request
@@ -165,7 +182,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
-    return { address_id, address, user_id, email };
+    return { address_id, address, user_id, email, canvas_session: sortedStringify(session) };
   }
   throw new Error('invalid chain');
 };
