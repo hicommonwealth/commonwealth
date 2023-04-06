@@ -45,8 +45,11 @@ const newThread = async (
 
   // Format form for proper validation
   delete form.range;
-  form.start = Math.floor(form.start / 1000);
-  form.end = Math.floor(form.end / 1000);
+  const delay = space.voting.delay ?? 0;
+  const period = space.voting.period ?? 432000; // 5 day default
+  const timestamp = Math.floor(Date.now() / 1e3);
+  form.start = timestamp + delay;
+  form.end = form.start + period;
 
   const proposalPayload = {
     space: space.id,
@@ -58,7 +61,7 @@ const newThread = async (
     end: form.end,
     snapshot: form.snapshot,
     network: '1', // TODO: unclear if this is always 1
-    timestamp: Math.floor(Date.now() / 1e3),
+    timestamp: timestamp,
     strategies: JSON.stringify({}),
     plugins: JSON.stringify({}),
     metadata: JSON.stringify({}),

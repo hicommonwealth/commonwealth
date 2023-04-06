@@ -218,27 +218,6 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
               m.redraw();
             }}
           />
-          <div class="date-range">
-            <CWLabel label="Date Range" />
-            <CWRadioGroup
-              name="period"
-              options={[{ value: '4d', label: '4-day' }]}
-              value={this.form.range}
-              toggledOption="4d"
-              onchange={(e: Event) => {
-                this.form.range = (e.target as any).value;
-                this.form.start = new Date().getTime();
-
-                switch (this.form.range) {
-                  case '4d':
-                    this.form.end = moment().add(4, 'days').toDate().getTime();
-                    break;
-                  default:
-                    break;
-                }
-              }}
-            />
-          </div>
           <QuillEditorComponent
             contentsDoc={this.form.body || ' '}
             oncreateBind={(state: QuillEditor) => {

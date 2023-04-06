@@ -49,6 +49,10 @@ class GqlLazyLoader {
       validation {
         params
       }
+      voting {
+        period
+        delay
+      }
       filters {
         minScore
         onlyMembers
@@ -169,6 +173,10 @@ export interface SnapshotSpace {
     params: {
       minScore: number;
     };
+  };
+  voting: {
+    period: number;
+    delay: number;
   };
   filters: {
     minScore: number;
