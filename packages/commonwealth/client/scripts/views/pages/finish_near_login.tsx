@@ -1,7 +1,7 @@
 import React from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 import type { Chain } from '@canvas-js/interfaces';
-import { constructCanvasMessage } from 'canvas';
+import { createCanvasSessionPayload } from 'canvas';
 import { initAppState } from 'state';
 import BN from 'bn.js';
 import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
@@ -101,7 +101,7 @@ const FinishNearLogin = () => {
         null
       );
 
-      const canvasMessage = constructCanvasMessage(
+      const canvasSessionPayload = createCanvasSessionPayload(
         'near' as Chain,
         chainId,
         acct.address,
@@ -120,14 +120,14 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
-        canvas.serializeSessionPayload(canvasMessage)
+        canvas.serializeSessionPayload(canvasSessionPayload)
       );
 
-      await acct.validate(signature, canvasMessage.sessionIssued, chainId);
+      await acct.validate(signature, canvasSessionPayload.sessionIssued, chainId);
 
       app.sessions
         .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, canvasMessage, signature);
+        .authSession(chainId, canvasSessionPayload, signature);
 
       if (!app.isLoggedIn()) {
         await initAppState();

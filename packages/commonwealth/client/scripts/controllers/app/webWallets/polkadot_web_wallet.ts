@@ -71,10 +71,10 @@ class PolkadotWebWalletController
   // ACTIONS
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
-    const message = stringToHex(canvas.serializeSessionPayload(canvasMessage));
+    const message = stringToHex(canvas.serializeSessionPayload(canvasSessionPayload));
 
     const signer = await this.getSigner(account.address);
     const payload: SignerPayloadRaw = {

@@ -44,11 +44,11 @@ class PhantomWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
     const encodedMessage = new TextEncoder().encode(
-      canvas.serializeSessionPayload(canvasMessage)
+      canvas.serializeSessionPayload(canvasSessionPayload)
     );
     const { signature } = await window.solana.signMessage(
       encodedMessage,

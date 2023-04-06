@@ -22,7 +22,7 @@ import { addressSwapper } from '../../shared/utils';
 import {
   chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
-  constructCanvasMessage,
+  createCanvasSessionPayload,
 } from '../../shared/canvas';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
@@ -58,7 +58,7 @@ const verifySessionSignature = async (
   // Reconstruct the expected canvas message.
   const canvasChain = chainBaseToCanvasChain(chain.base);
   const canvasChainId = chainBaseToCanvasChainId(chain.base, chain_id);
-  const canvasMessage = constructCanvasMessage(
+  const canvasSessionPayload = createCanvasSessionPayload(
     canvasChain,
     canvasChainId,
     chain.base === ChainBase.Substrate
@@ -96,7 +96,7 @@ const verifySessionSignature = async (
       const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(
         address
       );
-      const message = stringToHex(sortedStringify(canvasMessage));
+      const message = stringToHex(sortedStringify(canvasSessionPayload));
 
       const signatureU8a =
         signatureString.slice(0, 2) === '0x'
@@ -177,7 +177,7 @@ const verifySessionSignature = async (
           const secpSignature =
             cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new cosmCrypto.Sha256(
-            Buffer.from(sortedStringify(canvasMessage))
+            Buffer.from(sortedStringify(canvasSessionPayload))
           ).digest();
 
           isValid = await cosmCrypto.Secp256k1.verifySignature(
@@ -218,7 +218,7 @@ const verifySessionSignature = async (
         try {
           // Generate sign doc from token and verify it against the signature
           const generatedSignDoc = await getCosmosSessionSignatureData(
-            Buffer.from(sortedStringify(canvasMessage)),
+            Buffer.from(sortedStringify(canvasSessionPayload)),
             generatedAddress
           );
 
@@ -253,7 +253,7 @@ const verifySessionSignature = async (
     // ethereum address handling
     //
     try {
-      const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
+      const typedCanvasMessage = constructTypedCanvasMessage(canvasSessionPayload);
 
       if (addressModel.block_info !== sessionBlockInfo) {
         throw new Error(
@@ -287,7 +287,7 @@ const verifySessionSignature = async (
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
 
     isValid = nacl.sign.detached.verify(
-      Buffer.from(sortedStringify(canvasMessage)),
+      Buffer.from(sortedStringify(canvasSessionPayload)),
       Buffer.from(sigObj, 'base64'),
       Buffer.from(publicKey, 'base64')
     );
@@ -302,7 +302,7 @@ const verifySessionSignature = async (
       if (decodedAddress.length === 32) {
         const nacl = await import('tweetnacl');
         isValid = nacl.sign.detached.verify(
-          Buffer.from(sortedStringify(canvasMessage)),
+          Buffer.from(sortedStringify(canvasSessionPayload)),
           bs58.decode(signatureString),
           decodedAddress
         );

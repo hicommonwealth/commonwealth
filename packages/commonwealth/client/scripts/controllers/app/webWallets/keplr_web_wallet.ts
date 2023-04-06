@@ -70,14 +70,14 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
     const chainId = this.getChainId();
     const stdSignature = await window.keplr.signArbitrary(
       chainId,
       account.address,
-      canvas.serializeSessionPayload(canvasMessage)
+      canvas.serializeSessionPayload(canvasSessionPayload)
     );
     return JSON.stringify(stdSignature);
   }
