@@ -29,7 +29,7 @@ class ThreadReactionsController {
       thread_id: thread.id,
       address,
       reaction,
-      jwt: app.user.jwt
+      jwt: app.user.jwt,
     };
 
     const response = (
@@ -55,7 +55,7 @@ class ThreadReactionsController {
   public async deleteOnThread(thread: Thread, reaction_id: number) {
     await axios.post(`${app.serverUrl()}/deleteReaction`, {
       jwt: app.user.jwt,
-      reaction_id
+      reaction_id,
     });
 
     this._threadIdToReactions.set(

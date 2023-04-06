@@ -16,8 +16,8 @@ export const Errors = {
 };
 
 export interface AddEditorsBody {
-  thread_id: string
-  editors: IThreadCollaborator[]
+  thread_id: string;
+  editors: IThreadCollaborator[];
 }
 
 const addEditors = async (
@@ -176,7 +176,7 @@ const addEditors = async (
     result: {
       collaborators: finalCollaborations
         .map((c) => c.toJSON())
-        .map((c) => c.Address)
+        .map((c) => c.Address),
     },
   });
 };

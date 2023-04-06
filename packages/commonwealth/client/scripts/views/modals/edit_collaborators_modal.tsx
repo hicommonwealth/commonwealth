@@ -20,13 +20,13 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
   thread: Thread;
-  onCollaboratorsUpdated: (newEditors: IThreadCollaborator[]) => void
+  onCollaboratorsUpdated: (newEditors: IThreadCollaborator[]) => void;
 };
 
 export const EditCollaboratorsModal = ({
   onModalClose,
   thread,
-  onCollaboratorsUpdated
+  onCollaboratorsUpdated,
 }: EditCollaboratorsModalProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<
@@ -224,7 +224,6 @@ export const EditCollaboratorsModal = ({
               }
 
               onModalClose();
-
             }}
           />
         </div>

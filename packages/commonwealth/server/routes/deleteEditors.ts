@@ -13,8 +13,8 @@ export const Errors = {
 };
 
 interface DeleteEditorsBody {
-  thread_id: string
-  editors: IThreadCollaborator[]
+  thread_id: string;
+  editors: IThreadCollaborator[];
 }
 
 const deleteEditors = async (
@@ -80,7 +80,7 @@ const deleteEditors = async (
     result: {
       collaborators: finalCollaborations
         .map((c) => c.toJSON())
-        .map((c) => c.Address)
+        .map((c) => c.Address),
     },
   });
 };

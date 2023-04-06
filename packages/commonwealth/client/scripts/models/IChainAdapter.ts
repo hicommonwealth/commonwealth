@@ -66,9 +66,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
     const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
-      darkModePreferenceSet ?
-        setDarkMode(darkModePreferenceSet === 'on') :
-        setDarkMode(true);
+      darkModePreferenceSet
+        ? setDarkMode(darkModePreferenceSet === 'on')
+        : setDarkMode(true);
     }
 
     const {
@@ -141,7 +141,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this._loaded = false;
     console.log(`Stopping ${this.meta.id}...`);
 
-    if (this.meta.id === '1inch' && !localStorage.getItem('user-dark-mode-state')) {
+    if (
+      this.meta.id === '1inch' &&
+      !localStorage.getItem('user-dark-mode-state')
+    ) {
       setDarkMode(false);
     }
   }

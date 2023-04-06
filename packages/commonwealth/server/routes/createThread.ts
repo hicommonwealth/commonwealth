@@ -7,11 +7,8 @@ import {
   ProposalType,
 } from 'common-common/src/types';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { Action, PermissionError } from 'commonwealth/shared/permissions';
-import {
-  findAllRoles,
-  isAddressPermitted,
-} from 'commonwealth/server/util/roles';
+import { Action, PermissionError } from '../../shared/permissions';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
