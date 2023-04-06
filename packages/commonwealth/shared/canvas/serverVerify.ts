@@ -29,6 +29,7 @@ const verifyUnpack = async (canvas_action, canvas_session, address) => {
 }
 
 export const verifyComment = async (canvas_action, canvas_session, canvas_hash, fields) => {
+  if (canvas_action === undefined && canvas_session === undefined && canvas_hash === undefined) return;
   const { thread_id, text, address, chain, parent_comment_id } = fields;
   const { action, session } = await verifyUnpack(canvas_action, canvas_session, address);
   assert(action.payload.call === "comment" &&
@@ -40,6 +41,7 @@ export const verifyComment = async (canvas_action, canvas_session, canvas_hash, 
 }
 
 export const verifyThread = async (canvas_action, canvas_session, canvas_hash, fields) => {
+  if (canvas_action === undefined && canvas_session === undefined && canvas_hash === undefined) return;
   const { title, body, address, chain, community, link, topic } = fields;
   const { action, session } = await verifyUnpack(canvas_action, canvas_session, address);
   assert(action.payload.call === "thread" &&
@@ -53,6 +55,7 @@ export const verifyThread = async (canvas_action, canvas_session, canvas_hash, f
 }
 
 export const verifyReaction = async (canvas_action, canvas_session, canvas_hash, fields) => {
+  if (canvas_action === undefined && canvas_session === undefined && canvas_hash === undefined) return;
   const { thread_id, comment_id, proposal_id, address, chain, value } = fields;
   const { action, session } = await verifyUnpack(canvas_action, canvas_session, address);
   assert(value === action.payload.callArgs.value)
