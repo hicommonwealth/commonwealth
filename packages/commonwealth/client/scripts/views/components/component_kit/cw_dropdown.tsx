@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import 'components/component_kit/cw_dropdown.scss';
 import { CWText } from './cw_text';
@@ -15,19 +15,25 @@ type DropdownProps = {
   label: string;
   onSelect?: (item: DropdownItemType) => void;
   options: Array<DropdownItemType>;
+  containerClassName?: string;
 };
 
-export const CWDropdown = (props: DropdownProps) => {
-  const [showDropdown, setShowDropdown] = React.useState<boolean>(false);
-  const [selectedValue, setSelectedValue] = React.useState<DropdownItemType>(
-    props.initialValue ?? props.options[0]
+export const CWDropdown = ({
+  label,
+  options,
+  onSelect,
+  containerClassName,
+  initialValue,
+}: DropdownProps) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedValue, setSelectedValue] = useState<DropdownItemType>(
+    initialValue ?? options[0]
   );
-
-  const { label, options, onSelect } = props;
 
   return (
     <div className="dropdown-wrapper">
       <CWTextInput
+        containerClassName={containerClassName}
         iconRight="chevronDown"
         placeholder={selectedValue.label}
         displayOnly
