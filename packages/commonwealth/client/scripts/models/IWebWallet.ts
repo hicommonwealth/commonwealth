@@ -25,7 +25,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
 
   signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string>;
 
   chain: ChainBase;
