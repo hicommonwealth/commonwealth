@@ -1,8 +1,6 @@
 import React, { useState, useMemo } from 'react';
 
 import 'components/quill/quill_formatted_text.scss';
-import { findAll } from 'highlight-words-core';
-import smartTruncate from 'smart-truncate';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 import { countLinesQuill } from './helpers';
@@ -11,6 +9,7 @@ import { renderQuillDelta } from './render_quill_delta';
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
 import { getTextFromDelta } from '../react_quill_editor';
+import { renderTruncatedHighlights } from '../react_quill_editor/highlighter';
 
 export type QuillTextParams = {
   hideFormatting?: boolean;
@@ -48,7 +47,7 @@ export const QuillFormattedText = ({
 
   const toggleDisplay = () => setUserTruncated(!userTruncated);
 
-  // finalDoc is the quill content which may include search term highlights
+  // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {
     // if no search term, just render the doc normally
     if (!searchTerm) {
@@ -58,44 +57,7 @@ export const QuillFormattedText = ({
     // get text from doc and replace new lines with spaces
     const docText = getTextFromDelta(truncatedDoc).replace(/\n/g, ' ').replace(/\+/g, ' ');
 
-    // extract highlighted text
-    const chunks = findAll({
-      searchWords: [searchTerm.trim()],
-      textToHighlight: docText
-    });
-
-    // convert chunks to rendered components
-    const textWithHighlights = chunks.map(({ end, highlight, start }, index) => {
-      const middle = 15;
-
-      const subString = docText.substr(start, end - start);
-
-      const hasSingleChunk = chunks.length <= 1;
-      const truncateLength = hasSingleChunk ? 150 : 40 + searchTerm.trim().length;
-      const truncateOptions = hasSingleChunk
-        ? {}
-        : index === 0
-        ? { position: 0 }
-        : index === chunks.length - 1
-        ? {}
-        : { position: middle };
-
-      let text = smartTruncate(subString, truncateLength, truncateOptions);
-
-      // restore leading and trailing space
-      if (subString.startsWith(' ')) {
-        text = ` ${text}`;
-      }
-      if (subString.endsWith(' ')) {
-        text = `${text} `;
-      }
-
-      const key = `chunk-${index}`;
-      if (highlight) {
-        return <mark key={key}>{text}</mark>;
-      }
-      return <span key={key}>{text}</span>;
-    });
+    const textWithHighlights = renderTruncatedHighlights(searchTerm, docText);
 
     // wrap all elements in span to avoid container-based positioning
     return <span>{textWithHighlights}</span>;

@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 import { countLinesMarkdown } from './utils';
+import { renderTruncatedHighlights } from './highlighter';
+import removeMarkdown from 'markdown-to-text';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -41,15 +43,16 @@ export const MarkdownFormattedText = ({
 
   const truncatedDoc = useMemo(() => {
     if (isTruncated) {
-      return doc.slice(0, doc.split('\n', cutoffLines).join('\n').length);
+      const numChars = doc.split('\n', cutoffLines).join('\n').length;
+      return doc.slice(0, numChars);
     }
     return doc;
   }, [cutoffLines, doc, isTruncated]);
 
-  const unsanitizedHTML = marked.parse(truncatedDoc.toString());
+  const unsanitizedHTML = marked.parse(truncatedDoc);
 
   const sanitizedHTML: string = useMemo(() => {
-    return hideFormatting
+    return hideFormatting || searchTerm
       ? DOMPurify.sanitize(unsanitizedHTML, {
           ALLOWED_TAGS: ['a'],
           ADD_ATTR: ['target']
@@ -58,7 +61,23 @@ export const MarkdownFormattedText = ({
           USE_PROFILES: { html: true },
           ADD_ATTR: ['target']
         });
-  }, [hideFormatting, unsanitizedHTML]);
+  }, [hideFormatting, searchTerm, unsanitizedHTML]);
+
+  // finalDoc is the rendered content which may include search term highlights
+  const finalDoc = useMemo(() => {
+    // if no search term, just render the doc normally
+    if (!searchTerm) {
+      return <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></div>;
+    }
+
+    // get text from doc and replace new lines with spaces
+    const docText = removeMarkdown(doc).replace(/\n/g, ' ').replace(/\+/g, ' ');
+
+    const textWithHighlights = renderTruncatedHighlights(searchTerm, docText);
+
+    // wrap all elements in span to avoid container-based positioning
+    return <span>{textWithHighlights}</span>;
+  }, [doc, sanitizedHTML, searchTerm]);
 
   const toggleDisplay = () => {
     console.log('toggleDisplay');
@@ -67,7 +86,7 @@ export const MarkdownFormattedText = ({
   return (
     <>
       <div className={getClasses<{ collapsed?: boolean }>({ collapsed: !!collapse }, 'MarkdownFormattedText')}>
-        <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></div>
+        {finalDoc}
       </div>
       {isTruncated && (
         <div className="show-more-button-wrapper">
