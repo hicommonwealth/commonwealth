@@ -37,13 +37,19 @@ export async function createApi(
       const tendermint = await import('@cosmjs/tendermint-rpc');
       const tm = await tendermint.Tendermint34Client.connect(url);
       const cosm = await import('@cosmjs/stargate');
-      const lcd = cosm.QueryClient.withExtensions(
+      const rpc = cosm.QueryClient.withExtensions(
         tm,
         cosm.setupGovExtension,
         cosm.setupStakingExtension,
         cosm.setupBankExtension
       );
-      return { tm, lcd };
+      const { createLCDClient } = await import(
+        'common-common/src/cosmos-ts/src/codegen/cosmos/lcd'
+      );
+      const lcd = await createLCDClient({
+        restEndpoint: url,
+      });
+      return { tm, rpc, lcd };
     } catch (err) {
       log.error(`Cosmos chain at url: ${url} failure: ${err.message}`);
       await sleep(retryTimeMs);
