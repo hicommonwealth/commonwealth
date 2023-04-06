@@ -26,7 +26,9 @@ const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 const DiscussionsPage = lazy(
   () => import('views/pages/discussions/DiscussionsPage')
 );
-const ViewThreadPage = lazy(() => import('views/pages/view_thread/index'));
+const ViewThreadPage = lazy(
+  () => import('views/pages/view_thread/ViewThreadPage')
+);
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect')
@@ -294,7 +296,7 @@ const customDomainRoutes = () => {
       })}
     />,
     <Route
-      path="/profile/id/:profileId/edit"
+      path="/profile/edit"
       element={withLayout(EditNewProfilePage, {
         scoped: true,
         deferChain: true,
@@ -424,8 +426,8 @@ const customDomainRoutes = () => {
       element={<Navigate to="/profile/id/:profileId" />}
     />,
     <Route
-      path="/:scope/profile/id/:profileId/edit"
-      element={<Navigate to="/profile/id/:profileId/edit" />}
+      path="/:scope/profile/edit"
+      element={<Navigate to="/profile/edit" />}
     />,
   ];
 };

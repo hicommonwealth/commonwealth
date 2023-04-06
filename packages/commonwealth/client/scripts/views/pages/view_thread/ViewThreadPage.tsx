@@ -1,17 +1,18 @@
-import React, { useCallback, useEffect, useState } from 'react';
-
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-import { getProposalUrlPath, idToProposal } from 'identifiers';
+import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
 
 import type { ChainEntity, Comment, Poll, Topic } from 'models';
-import { ThreadStage as ThreadStageType, Thread } from 'models';
+import { Thread, ThreadStage as ThreadStageType } from 'models';
+import type { IThreadCollaborator } from 'models/Thread';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import app from 'state';
 import { ContentType } from 'types';
@@ -26,24 +27,23 @@ import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { Modal } from '../../components/component_kit/cw_modal';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
-import { EditBody } from './edit_body';
-import { LinkedProposalsCard } from './linked_proposals_card';
-import { LinkedThreadsCard } from './linked_threads_card';
-import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
-import { useCommonNavigate } from 'navigation/helpers';
-import { Modal } from '../../components/component_kit/cw_modal';
-import type { IThreadCollaborator } from 'models/Thread';
 import {
   getCommentSubscription,
   getReactionSubscription,
   handleToggleSubscription,
 } from '../discussions/helpers';
+import { EditBody } from './edit_body';
+import { LinkedProposalsCard } from './linked_proposals_card';
+import { LinkedThreadsCard } from './linked_threads_card';
+import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
+import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -62,6 +62,7 @@ type ViewThreadPageProps = {
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const [comments, setComments] = useState<Array<Comment<Thread>>>([]);
   const [isEditingBody, setIsEditingBody] = useState(false);
@@ -72,7 +73,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [thread, setThread] = useState<Thread>(null);
-  const [threadFetched, setThreadFetched] = useState(false);
   const [threadFetchFailed, setThreadFetchFailed] = useState(false);
   const [title, setTitle] = useState('');
   const [viewCount, setViewCount] = useState(null);
@@ -92,11 +92,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setIsEditingBody(false);
   };
 
-  const threadUpdatedCallback = (title: string, body: string) => {
+  const threadUpdatedCallback = (newTitle: string, body: string) => {
     setThread(
       new Thread({
         ...thread,
-        title: title,
+        title: newTitle,
         body: body,
       })
     );
@@ -136,31 +136,30 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [recentlyEdited]);
 
   useEffect(() => {
-    // load thread, and return PageLoading
-    if (!thread || recentlyEdited) {
-      try {
-        const _thread = idToProposal(ProposalType.Thread, threadId);
-        if (_thread === undefined) {
-          throw new Error();
-        }
-        setThread(_thread);
-      } catch (e) {
-        // proposal might be loading, if it's not an thread
-        if (!threadFetched) {
-          app.threads
-            .fetchThreadsFromId([+threadId])
-            .then((res) => {
-              setThread(res[0]);
-            })
-            .catch(() => {
-              notifyError('Thread not found');
-              setThreadFetchFailed(true);
+    app.threads
+      .fetchThreadsFromId([+threadId])
+      .then((res) => {
+        const t = res[0];
+        if (t) {
+          const reactions = app.reactions.getByPost(t);
+          t.associatedReactions = reactions
+            .filter((r) => r.reaction === 'like')
+            .map((r) => {
+              return {
+                id: r.id,
+                type: 'like',
+                address: r.author,
+              };
             });
-          setThreadFetched(true);
+
+          setThread(t);
         }
-      }
-    }
-  }, [recentlyEdited, thread, threadFetched, threadId]);
+      })
+      .catch(() => {
+        notifyError('Thread not found');
+        setThreadFetchFailed(true);
+      });
+  }, [thread, threadId]);
 
   useEffect(() => {
     if (!thread) {
@@ -377,7 +376,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (threadDoesNotMatch) {
       setThread(undefined);
       setRecentlyEdited(false);
-      setThreadFetched(false);
     }
   }, [threadDoesNotMatch]);
 
@@ -477,7 +475,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const reactionsAndReplyButtons = (
     <div className="thread-footer-row">
-      <ThreadReactionButton thread={thread} />
+      <ThreadReactionPreviewButtonSmall thread={thread} />
       <div className="comments-count">
         <CWIcon iconName="feedback" iconSize="small" />
         <CWText type="caption">{commentCount} Comments</CWText>
@@ -696,7 +694,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   <CWText type="h5" className="callout-text">
                     Commenting is disabled because this post has been locked.
                   </CWText>
-                ) : !isGloballyEditing && canComment && app.isLoggedIn() ? (
+                ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {reactionsAndReplyButtons}
                     <CreateComment
@@ -761,8 +759,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
-                              showDeleteButton={isAuthor || isAdminOrMod}
-                              onDelete={() => setInitializedPolls(false)}
                             />
                           );
                         })}

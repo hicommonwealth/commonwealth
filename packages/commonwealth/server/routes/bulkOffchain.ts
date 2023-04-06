@@ -15,7 +15,6 @@ import type { ContractInstance } from '../models/contract';
 import type { RuleInstance } from '../models/rule';
 import type { ThreadInstance } from '../models/thread';
 import type { TopicInstance } from '../models/topic';
-import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 
@@ -31,7 +30,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   // parallelized queries
   const [
     topics,
-    pinnedThreads,
     admins,
     mostActiveUsers,
     threadsInVoting,
@@ -44,7 +42,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     Promise<
       [
         TopicInstance[],
-        unknown,
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
@@ -60,66 +57,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     models.Topic.findAll({
       where: { chain_id: chain.id },
     }),
-    // threads, comments, reactions
-    new Promise(async (resolve, reject) => {
-      try {
-        const threadParams = Object.assign(replacements, { pinned: true });
-        const rawPinnedThreads = await models.Thread.findAll({
-          where: threadParams,
-          include: [
-            {
-              model: models.Address,
-              as: 'Address',
-            },
-            {
-              model: models.Address,
-              as: 'collaborators',
-            },
-            {
-              model: models.Topic,
-              as: 'topic',
-            },
-            {
-              model: models.ChainEntityMeta,
-              as: 'chain_entity_meta',
-            },
-            {
-              model: models.LinkedThread,
-              as: 'linked_threads',
-            },
-            {
-              model: models.Reaction,
-              as: 'reactions',
-              include: [
-                {
-                  model: models.Address,
-                  as: 'Address',
-                  required: true,
-                },
-              ],
-            },
-          ],
-          attributes: { exclude: ['version_history'] },
-        });
 
-        const threads = rawPinnedThreads.map((t) => {
-          return t.toJSON();
-        });
-
-        const threadsWithCommentsCount = await getThreadsWithCommentCount({
-          threads,
-          models,
-          chainId: chain.id,
-        });
-
-        resolve(threadsWithCommentsCount);
-      } catch (e) {
-        console.log(e);
-        reject(
-          new ServerError('Could not fetch threads, comments, or reactions')
-        );
-      }
-    }),
     // admins
     findAllRoles(
       models,
@@ -225,7 +163,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     result: {
       topics: topics.map((t) => t.toJSON()),
       numVotingThreads,
-      pinnedThreads, // already converted to JSON earlier
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
       chatChannels: JSON.stringify(chatChannels),

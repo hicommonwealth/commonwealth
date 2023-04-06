@@ -36,7 +36,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     }
   }
 
-  currentTree[split[split.length - 1]] = toggle;
+  currentTree[split[split.length - 1]] = !toggle;
 
   const newTree = currentTree;
 

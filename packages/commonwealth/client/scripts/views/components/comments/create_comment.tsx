@@ -22,6 +22,7 @@ import {
   getTextFromDelta,
   ReactQuillEditor,
 } from '../react_quill_editor';
+import { serializeDelta } from '../react_quill_editor/utils';
 
 type CreateCommmentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -61,7 +62,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
         author.address,
         rootProposal.uniqueIdentifier,
         chainId,
-        JSON.stringify(contentDelta),
+        serializeDelta(contentDelta),
         parentCommentId
       );
 
@@ -108,11 +109,11 @@ export const CreateComment = (props: CreateCommmentProps) => {
 
   const cancel = (e) => {
     e.preventDefault();
-    setContentDelta(createDeltaFromText(''))
+    setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
-      handleIsReplying(false)
+      handleIsReplying(false);
     }
-  }
+  };
 
   return (
     <div className="CreateComment">
@@ -147,15 +148,13 @@ export const CreateComment = (props: CreateCommmentProps) => {
       )}
       <div className="form-bottom">
         <div className="form-buttons">
-          {
-            editorValue.length > 0 && (
-              <CWButton
-                buttonType="secondary-blue"
-                onClick={cancel}
-                label="Cancel"
-              />
-            )
-          }
+          {editorValue.length > 0 && (
+            <CWButton
+              buttonType="secondary-blue"
+              onClick={cancel}
+              label="Cancel"
+            />
+          )}
           <CWButton
             disabled={disabled}
             onClick={handleSubmitComment}

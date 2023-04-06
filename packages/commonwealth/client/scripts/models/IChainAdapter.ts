@@ -8,6 +8,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import type { Account, ProposalModule } from '.';
+import { setDarkMode } from '../helpers';
 import type ChainInfo from './ChainInfo';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
@@ -63,15 +64,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     //   return false;
     // }
 
+    const darkModePreferenceSet = localStorage.getItem('user-dark-mode-state');
     if (this.meta.id === '1inch') {
-      if (localStorage.getItem('user-dark-mode-state') !== 'off') {
-        localStorage.setItem('dark-mode-state', 'on');
-        document.getElementsByTagName('html')[0].classList.add('invert');
-      }
-    } else {
-      if (localStorage.getItem('user-dark-mode-state') !== 'on') {
-        document.getElementsByTagName('html')[0].classList.remove('invert');
-      }
+      darkModePreferenceSet
+        ? setDarkMode(darkModePreferenceSet === 'on')
+        : setDarkMode(true);
     }
 
     const {
@@ -143,6 +140,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     if (this.app.snapshot) this.app.snapshot.deinit();
     this._loaded = false;
     console.log(`Stopping ${this.meta.id}...`);
+
+    if (
+      this.meta.id === '1inch' &&
+      !localStorage.getItem('user-dark-mode-state')
+    ) {
+      setDarkMode(false);
+    }
   }
 
   public async loadModules(modules: ProposalModule<any, any, any>[]) {

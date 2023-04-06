@@ -14,8 +14,13 @@ import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
-import { DeltaStatic } from 'quill';
-import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
+import type { DeltaStatic } from 'quill';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  ReactQuillEditor,
+} from '../components/react_quill_editor';
+import { serializeDelta } from '../components/react_quill_editor/utils';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -41,27 +46,27 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [submitIsDisabled, setSubmitIsDisabled] =
     React.useState<boolean>(false);
 
-  const editorText = getTextFromDelta(contentDelta)
+  const editorText = getTextFromDelta(contentDelta);
 
   useEffect(() => {
     if (!name || !name.trim()) {
-      setErrorMsg('Name must be specified.')
-      return
+      setErrorMsg('Name must be specified.');
+      return;
     }
     if (featuredInNewPost && editorText.length === 0) {
-      setErrorMsg('Must add template.')
-      return
+      setErrorMsg('Must add template.');
+      return;
     }
-    setErrorMsg(null)
-  }, [name, featuredInNewPost, editorText])
+    setErrorMsg(null);
+  }, [name, featuredInNewPost, editorText]);
 
   const decimals = app.chain?.meta?.decimals
     ? app.chain.meta.decimals
     : app.chain.network === ChainNetwork.ERC721
-      ? 0
-      : app.chain.base === ChainBase.CosmosSDK
-        ? 6
-        : 18;
+    ? 0
+    : app.chain.base === ChainBase.CosmosSDK
+    ? 6
+    : 18;
 
   return (
     <div className="NewTopicModal">
@@ -161,7 +166,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             e.preventDefault();
 
             try {
-
               await app.topics.add(
                 name,
                 description,
@@ -169,7 +173,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
                 featuredInSidebar,
                 featuredInNewPost,
                 tokenThreshold || '0',
-                JSON.stringify(contentDelta)
+                serializeDelta(contentDelta)
               );
 
               navigate(`/discussions/${encodeURI(name.toString().trim())}`);

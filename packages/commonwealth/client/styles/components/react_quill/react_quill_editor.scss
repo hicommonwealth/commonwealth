@@ -1,13 +1,45 @@
-
-
 .QuillEditorWrapper {
-
   .ql-editor {
     min-height: 180px;
   }
 
-  .LoadingIndicator {
+  .custom-buttons {
+    position: relative;
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: row;
 
+    .custom-button {
+      color: #333;
+      text-align: center;
+      font-size: 1.2em;
+      width: 1.2em;
+      height: 1.2em;
+      align-items: center;
+      justify-content: center;
+      margin-left: 5px;
+
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+      -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+      user-select: none; /* Non-prefixed version, currently
+                                      supported by Chrome, Edge, Opera and Firefox */
+
+      &.preview {
+        padding: 3px;
+      }
+
+      &:hover {
+        color: #888;
+      }
+    }
+  }
+
+  .LoadingIndicator {
     position: relative;
     left: 50%;
     top: calc(50% + 15px);
@@ -26,7 +58,11 @@
 
     .inner-circle {
       border-radius: inherit;
-      background-image: conic-gradient(#fff, rgba(80,200,120,0.3), rgb(80,200,120));
+      background-image: conic-gradient(
+        #fff,
+        rgba(80, 200, 120, 0.3),
+        rgb(80, 200, 120)
+      );
       position: absolute;
       z-index: -1;
       margin: auto;
@@ -38,14 +74,12 @@
     }
 
     @keyframes circle-anim {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
-
   }
-
 }

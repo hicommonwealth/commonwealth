@@ -7,7 +7,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 export const Errors = {
   NotSent: 'Please enter the feedback message.',
-  SlackWebhookError: 'SLACK_FEEDBACK_WEBHOOK missing.'
+  SlackWebhookError: 'SLACK_FEEDBACK_WEBHOOK missing.',
 };
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -23,7 +23,7 @@ const sendFeedback = async (
   }
 
   if (!SLACK_FEEDBACK_WEBHOOK) {
-    log.error("No slack webhook found");
+    log.error('No slack webhook found');
     return next(new ServerError(Errors.SlackWebhookError));
   }
 

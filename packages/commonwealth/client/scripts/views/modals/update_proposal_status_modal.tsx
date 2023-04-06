@@ -128,7 +128,11 @@ export const UpdateProposalStatusModal = ({
       </div>
       <div className="compact-modal-body">
         <SelectList
-          defaultValue={tempStage ? { value: tempStage, label: threadStageToLabel(tempStage) } : null}
+          defaultValue={
+            tempStage
+              ? { value: tempStage, label: threadStageToLabel(tempStage) }
+              : null
+          }
           placeholder="Select the stage"
           isSearchable={false}
           options={stages.map((stage) => ({

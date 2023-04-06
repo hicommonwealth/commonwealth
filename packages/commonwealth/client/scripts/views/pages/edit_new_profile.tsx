@@ -1,24 +1,20 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import EditProfileComponent from '../components/edit_profile';
+import { PageNotFound } from '../pages/404';
 
-type EditNewProfileProps = { profileId: string };
-
-const EditNewProfile = (props: EditNewProfileProps) => {
-  const navigate = useNavigate();
-
-  React.useEffect(() => {
-    if (!app.isLoggedIn()) {
-      navigate(`/profile/id/${props.profileId}`);
-    }
-  }, []);
+const EditNewProfile = () => {
+  if (!app.isLoggedIn()) {
+    return (
+      <PageNotFound message="You must be logged in to edit your profile." />
+    );
+  }
 
   return (
     <Sublayout>
-      <EditProfileComponent profileId={props.profileId} />
+      <EditProfileComponent />
     </Sublayout>
   );
 };

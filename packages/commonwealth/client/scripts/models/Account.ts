@@ -121,6 +121,7 @@ class Account {
     const params = {
       address: this.address,
       chain: this.chain.id,
+      chain_id: chainId,
       isToken: this.chain.type === ChainType.Token,
       jwt: app.user.jwt,
       signature,
