@@ -4,9 +4,11 @@ import { MarkdownFormattedText } from './markdown_formatted_text';
 
 type QuillRendererProps = {
   doc: string;
+  searchTerm?: string;
+  hideFormatting?: boolean;
 };
 
-export const QuillRenderer = ({ doc }: QuillRendererProps) => {
+export const QuillRenderer = ({ doc, searchTerm, hideFormatting }: QuillRendererProps) => {
   let decodedTextbody: string;
   try {
     decodedTextbody = decodeURIComponent(doc);
@@ -19,8 +21,8 @@ export const QuillRenderer = ({ doc }: QuillRendererProps) => {
     if (!parsedDoc.ops) {
       throw new Error('failed to parse doc as JSON');
     }
-    return <QuillFormattedText doc={parsedDoc} />;
+    return <QuillFormattedText hideFormatting={hideFormatting} doc={parsedDoc} searchTerm={searchTerm} />;
   } catch (e) {
-    return <MarkdownFormattedText doc={decodedTextbody} />;
+    return <MarkdownFormattedText hideFormatting={hideFormatting} doc={decodedTextbody} searchTerm={searchTerm} />;
   }
 };

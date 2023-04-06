@@ -9,9 +9,7 @@ const OPEN_LINKS_IN_NEW_TAB = true;
 
 const markdownRenderer = new marked.Renderer();
 markdownRenderer.link = (href, title, text) => {
-  return `<a ${
-    href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
-  } ${
+  return `<a ${href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'} ${
     OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
   } href="${href}">${text}</a>`;
 };
@@ -20,7 +18,7 @@ marked.setOptions({
   gfm: true, // use github flavored markdown
   smartypants: true,
   smartLists: true,
-  xhtml: true,
+  xhtml: true
 });
 
 type MarkdownFormattedTextProps = {
@@ -37,7 +35,7 @@ export const MarkdownFormattedText = ({
   doc,
   hideFormatting,
   searchTerm,
-  cutoffLines,
+  cutoffLines
 }: MarkdownFormattedTextProps) => {
   const isTruncated = cutoffLines > 0 && cutoffLines < countLinesMarkdown(doc);
 
@@ -54,11 +52,11 @@ export const MarkdownFormattedText = ({
     return hideFormatting
       ? DOMPurify.sanitize(unsanitizedHTML, {
           ALLOWED_TAGS: ['a'],
-          ADD_ATTR: ['target'],
+          ADD_ATTR: ['target']
         })
       : DOMPurify.sanitize(unsanitizedHTML, {
           USE_PROFILES: { html: true },
-          ADD_ATTR: ['target'],
+          ADD_ATTR: ['target']
         });
   }, [hideFormatting, unsanitizedHTML]);
 
@@ -68,12 +66,7 @@ export const MarkdownFormattedText = ({
 
   return (
     <>
-      <div
-        className={getClasses<{ collapsed?: boolean }>(
-          { collapsed: !!collapse },
-          'MarkdownFormattedText'
-        )}
-      >
+      <div className={getClasses<{ collapsed?: boolean }>({ collapsed: !!collapse }, 'MarkdownFormattedText')}>
         <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></div>
       </div>
       {isTruncated && (

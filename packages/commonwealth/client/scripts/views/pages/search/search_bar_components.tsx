@@ -12,6 +12,7 @@ import { getClasses } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
 import { useCommonNavigate } from 'navigation/helpers';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 type SearchChipProps = {
   isActive: boolean;
@@ -28,7 +29,7 @@ export const SearchChip = (props: SearchChipProps) => {
       fontWeight="medium"
       className={getClasses<{ isActive: boolean }>(
         {
-          isActive,
+          isActive
         },
         'SearchChip'
       )}
@@ -40,7 +41,16 @@ export const SearchChip = (props: SearchChipProps) => {
 };
 
 type SearchBarPreviewRowProps = {
-  searchResult: any;
+  searchResult: {
+    address_id: number;
+    address: string;
+    address_chain: string;
+    proposalid: string;
+    title: string;
+    body?: string;
+    text?: string;
+    created_at: string;
+  };
   searchTerm?: string;
 };
 
@@ -48,22 +58,16 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
 
+  const content = decodeURIComponent(searchResult.body);
+
+  const handleClick = () => {
+    navigate(`/discussion/${searchResult.proposalid}`);
+  };
+
   return (
-    <div
-      className="SearchBarThreadPreviewRow"
-      onClick={() => navigate(`/discussion/${searchResult.proposalid}`)}
-    >
+    <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
-        <User
-          user={
-            new AddressInfo(
-              searchResult.address_id,
-              searchResult.address,
-              searchResult.address_chain,
-              null
-            )
-          }
-        />
+        <User user={new AddressInfo(searchResult.address_id, searchResult.address, searchResult.address_chain, null)} />
         <CWText className="last-updated-text">•</CWText>
         <CWText type="caption" className="last-updated-text">
           {moment(searchResult.created_at).format('l')}
@@ -74,10 +78,7 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
         {decodeURIComponent(searchResult.title)}
       </CWText>
       <CWText type="caption" className="excerpt-text" fontWeight="medium">
-        {renderQuillTextBody(searchResult.body, {
-          hideFormatting: true,
-          searchTerm,
-        })}
+        <QuillRenderer hideFormatting={true} doc={content} searchTerm={searchTerm} />
       </CWText>
     </div>
   );
@@ -91,11 +92,7 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
     <div
       className="SearchBarCommentPreviewRow"
       onClick={() => {
-        navigate(
-          `/${searchResult.proposalid.split('_')[0]}/${
-            searchResult.proposalid.split('_')[1]
-          }`
-        );
+        navigate(`/${searchResult.proposalid.split('_')[0]}/${searchResult.proposalid.split('_')[1]}`);
       }}
     >
       <CWText type="caption" className="last-updated-text">
@@ -106,18 +103,13 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
           {decodeURIComponent(searchResult.title)}
         </CWText> */}
       <CWText type="caption" className="excerpt-text">
-        {renderQuillTextBody(searchResult.text, {
-          hideFormatting: true,
-          searchTerm,
-        })}
+        <QuillRenderer hideFormatting={true} doc={searchResult.text} searchTerm={searchTerm} />;
       </CWText>
     </div>
   );
 };
 
-export const SearchBarCommunityPreviewRow = (
-  props: SearchBarPreviewRowProps
-) => {
+export const SearchBarCommunityPreviewRow = (props: SearchBarPreviewRowProps) => {
   const { searchResult } = props;
   const navigate = useCommonNavigate();
 
@@ -125,13 +117,7 @@ export const SearchBarCommunityPreviewRow = (
     <div
       className="SearchBarCommunityPreviewRow"
       onClick={() => {
-        navigate(
-          searchResult.address
-            ? `/${searchResult.address}`
-            : searchResult.id
-            ? `/${searchResult.id}`
-            : '/'
-        );
+        navigate(searchResult.address ? `/${searchResult.address}` : searchResult.id ? `/${searchResult.id}` : '/');
       }}
     >
       <CommunityLabel community={searchResult} />
@@ -144,13 +130,7 @@ export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
 
   return (
     <div className="SearchBarMemberPreviewRow">
-      <User
-        user={app.newProfiles.getProfile(
-          searchResult.chain,
-          searchResult.address
-        )}
-        linkify
-      />
+      <User user={app.newProfiles.getProfile(searchResult.chain, searchResult.address)} linkify />
     </div>
   );
 };
