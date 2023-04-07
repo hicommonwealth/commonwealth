@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import 'pages/new_contract_template/create_contract_template_form.scss';
+import 'new_contract_template/create_contract_template_form.scss';
 
 import { notifyError } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';

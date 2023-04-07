@@ -7,10 +7,11 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import {
   displayOptions,
-  showManageContractTemplateModal,
+  ManageContractTemplateModalProps,
 } from 'views/modals/manage_contract_template_modal';
 
 import 'pages/contracts/contract_template_card.scss';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type ContractTemplateCardProps = {
   contractId: number;
@@ -21,6 +22,10 @@ type ContractTemplateCardProps = {
   slug: string;
   display: string;
   cctmd_id: number;
+  handleShowModal: (
+    templateId: number,
+    template: Omit<ManageContractTemplateModalProps['template'], 'id' | 'title'>
+  ) => void;
 };
 
 interface InfoOrder {
@@ -44,20 +49,11 @@ export const ContractTemplateCard = ({
   contractId,
   cctmd_id,
   id: templateId,
+  handleShowModal,
   ...templateInfo
 }: ContractTemplateCardProps) => {
   const handleEditTemplate = async () => {
-    try {
-      const templates = await app.contracts.getTemplatesForContract(contractId);
-      showManageContractTemplateModal({
-        contractId,
-        templateId,
-        template: templateInfo,
-        templates,
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    handleShowModal(contractId, templateInfo);
   };
 
   const handleDeleteTemplate = () => {
@@ -72,19 +68,18 @@ export const ContractTemplateCard = ({
       buttons: [
         {
           label: 'Delete',
-          type: 'mini-red',
+          buttonType: 'mini-red',
           onClick: async () => {
             await app.contracts.deleteCommunityContractTemplate({
               contract_id: contractId,
               template_id: templateId,
               cctmd_id,
             });
-            // TODO rerender
           },
         },
         {
           label: 'Cancel',
-          type: 'mini-black',
+          buttonType: 'mini-black',
         },
       ],
     });
