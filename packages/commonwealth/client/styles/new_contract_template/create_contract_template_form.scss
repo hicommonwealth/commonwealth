@@ -1,13 +1,19 @@
-@import '../../shared';
+@import '../../../shared';
 
-.AddContractAndAbiForm {
+.CreateContractTemplateForm {
   .form {
     display: flex;
     flex-direction: column;
 
     .TextInput,
     .TextArea {
-      margin: 20px 0;
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      color: $neutral-600;
+      margin-bottom: 4px;
+      margin-top: 20px;
     }
   }
 
@@ -19,9 +25,5 @@
     display: flex;
     justify-content: flex-end;
     gap: 16px;
-  }
-
-  .Label {
-    color: $neutral-600 !important;
   }
 }

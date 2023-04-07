@@ -27,7 +27,8 @@ type ButtonType =
   | 'primary-blue-dark'
   | 'secondary-blue-dark'
   | 'mini-black'
-  | 'mini-white';
+  | 'mini-white'
+  | 'mini-red';
 
 type ButtonStyleProps = {
   buttonType?: ButtonType;

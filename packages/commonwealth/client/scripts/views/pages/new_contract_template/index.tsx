@@ -1,10 +1,8 @@
-import React from 'react';
-
-import 'pages/new_contract/new_contract_page.scss';
-
+import 'pages/new_contract_template/new_contract_template_page.scss';
 import app from 'state';
+
 import { ChainBase } from 'common-common/src/types';
-import AddContractAndAbiForm from './add_contract_and_abi_form';
+import CreateContractTemplateForm from './create_contract_template_form';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -12,38 +10,37 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 
-const NewContractPage = () => {
-  // Payable functions are not supported in this implementation
+const NewContractTemplatePage = () => {
   if (!app.contracts || !app.chain) {
-    return <PageLoading message="General Contract" />;
+    return <PageLoading message="Contract Template" />;
   }
 
   if (app.chain.base !== ChainBase.Ethereum) {
     return (
-      <PageNotFound message="Contract ABI UI Generator Only Available for Ethereum based Chains" />
+      <PageNotFound message="Contract Template Creation Only Available for Ethereum based Chains" />
     );
   }
 
   return (
     <Sublayout>
-      <div className="NewContractPage">
+      <div className="NewContractTemplatePage">
         <CWBreadcrumbs
           breadcrumbs={[
             { label: 'Contracts', path: `/contracts` },
-            { label: 'Add Contract and ABI', path: '' },
+            { label: 'Create a New Template', path: '' },
           ]}
         />
         <CWText type="h3" className="header">
-          Add Contract and ABI
+          Create a New Template
         </CWText>
         <CWText className="subheader" type="b1">
-          Add contracts and their corresponding ABI files to your community.
+          Create a new template for your community to use.
         </CWText>
         <CWDivider className="divider" />
-        <AddContractAndAbiForm />
+        <CreateContractTemplateForm />
       </div>
     </Sublayout>
   );
 };
 
-export default NewContractPage;
+export default NewContractTemplatePage;
