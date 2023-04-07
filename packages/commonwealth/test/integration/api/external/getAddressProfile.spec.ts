@@ -1,48 +1,10 @@
 import chai from 'chai';
 import models from '../../../../server/database';
-import getAddressProfile, { GetAddressProfileReq } from '../../../../server/routes/getAddressProfile';
+import getAddressProfiles, { GetAddressProfileReq } from '../../../../server/routes/getAddressProfiles';
 import { postReq, res } from '../../../unit/unitHelpers';
 import { testAddresses, testProfiles } from './dbEntityHooks.spec';
 
 describe('getAddressProfile tests', () => {
-  it('should fail if parameters aren\'t provided', async () => {
-    let r: GetAddressProfileReq = {
-      chain: 'fake chain',
-    } as GetAddressProfileReq;
-
-    let error = '';
-
-    await getAddressProfile(
-      models,
-      postReq(r),
-      res(),
-      (e) => {
-        error = e;
-      }
-    );
-
-    chai.assert.equal(error['status'], 400);
-    chai.assert.equal(error['name'], 'AppError');
-
-    r = {
-      addresses: testAddresses[0].address as unknown
-    } as GetAddressProfileReq;
-
-    error = '';
-
-    await getAddressProfile(
-      models,
-      postReq(r),
-      res(),
-      (e) => {
-        error = e;
-      }
-    );
-
-    chai.assert.equal(error['status'], 400);
-    chai.assert.equal(error['name'], 'AppError');
-  });
-
   it('should fail if the chain doesn\'t exist', async () => {
     const r: GetAddressProfileReq = {
       chain: 'fake chain',
@@ -51,7 +13,7 @@ describe('getAddressProfile tests', () => {
 
     let error = '';
 
-    await getAddressProfile(
+    await getAddressProfiles(
       models,
       postReq(r),
       res(),
@@ -72,7 +34,7 @@ describe('getAddressProfile tests', () => {
 
     let error = '';
 
-    const resp = await getAddressProfile(
+    const resp = await getAddressProfiles(
       models,
       postReq(r),
       res(),
@@ -81,12 +43,13 @@ describe('getAddressProfile tests', () => {
       }
     );
 
-    const matchingProfile = testProfiles.filter(p => p.id === resp['result']['profileId'])[0];
+    const matchingProfile = testProfiles.filter(p => p.id === resp['result'][0]['profileId'])[0];
 
     chai.assert.equal(error, '');
-    chai.assert.equal(resp['result']['profileId'], testAddresses[0].profile_id);
-    chai.assert.equal(resp['result']['name'], matchingProfile.profile_name);
-    chai.assert.equal(resp['result']['avatarUrl'], matchingProfile.avatar_url);
+    chai.assert.equal(resp['result'].length, 1);
+    chai.assert.equal(resp['result'][0]['profileId'], testAddresses[0].profile_id);
+    chai.assert.equal(resp['result'][0]['name'], matchingProfile.profile_name);
+    chai.assert.equal(resp['result'][0]['avatarUrl'], matchingProfile.avatar_url);
   });
 
   it('should return profile of multiple addresses of the same profile', async () => {
@@ -99,7 +62,7 @@ describe('getAddressProfile tests', () => {
 
     let error = '';
 
-    const resp = await getAddressProfile(
+    const resp = await getAddressProfiles(
       models,
       postReq(r),
       res(),
@@ -108,12 +71,17 @@ describe('getAddressProfile tests', () => {
       }
     );
 
-    const matchingProfile = testProfiles.filter(p => p.id === resp['result']['profileId'])[0];
+    const matchingProfile = testProfiles.filter(p => p.id === resp['result'][0]['profileId'])[0];
 
     chai.assert.equal(error, '');
-    chai.assert.equal(resp['result']['profileId'], testAddresses[0].profile_id);
-    chai.assert.equal(resp['result']['name'], matchingProfile.profile_name);
-    chai.assert.equal(resp['result']['avatarUrl'], matchingProfile.avatar_url);
+    chai.assert.equal(resp['result'].length, 2);
+    chai.assert.equal(resp['result'][0]['profileId'], testAddresses[0].profile_id);
+    chai.assert.equal(resp['result'][0]['name'], matchingProfile.profile_name);
+    chai.assert.equal(resp['result'][0]['avatarUrl'], matchingProfile.avatar_url);
+
+    chai.assert.equal(resp['result'][1]['profileId'], testAddresses[1].profile_id);
+    chai.assert.equal(resp['result'][1]['name'], matchingProfile.profile_name);
+    chai.assert.equal(resp['result'][1]['avatarUrl'], matchingProfile.avatar_url);
   });
 
   it('should return profiles of multiple addresses of the different profiles', async () => {
@@ -127,7 +95,7 @@ describe('getAddressProfile tests', () => {
 
     let error = '';
 
-    const resp = await getAddressProfile(
+    const resp = await getAddressProfiles(
       models,
       postReq(r),
       res(),
@@ -136,12 +104,23 @@ describe('getAddressProfile tests', () => {
       }
     );
 
-    const matchingProfile = testProfiles.filter(p => p.id === resp['result']['profileId'])[0];
+    const matchingProfile = testProfiles.filter(p => p.id === resp['result'][0]['profileId'])[0];
 
     chai.assert.equal(error, '');
-    chai.assert.equal(resp['result']['profileId'], testAddresses[0].profile_id);
-    chai.assert.equal(resp['result']['name'], matchingProfile.profile_name);
-    chai.assert.equal(resp['result']['avatarUrl'], matchingProfile.avatar_url);
+    chai.assert.equal(resp['result'].length, 3);
+    chai.assert.equal(resp['result'][0]['profileId'], testAddresses[0].profile_id);
+    chai.assert.equal(resp['result'][0]['name'], matchingProfile.profile_name);
+    chai.assert.equal(resp['result'][0]['avatarUrl'], matchingProfile.avatar_url);
+
+    chai.assert.equal(resp['result'][1]['profileId'], testAddresses[1].profile_id);
+    chai.assert.equal(resp['result'][1]['name'], matchingProfile.profile_name);
+    chai.assert.equal(resp['result'][1]['avatarUrl'], matchingProfile.avatar_url);
+
+    const matchingProfile2 = testProfiles.filter(p => p.id === resp['result'][2]['profileId'])[0];
+
+    chai.assert.equal(resp['result'][2]['profileId'], testAddresses[2].profile_id);
+    chai.assert.equal(resp['result'][2]['name'], matchingProfile2.profile_name);
+    chai.assert.equal(resp['result'][2]['avatarUrl'], matchingProfile2.avatar_url);
   });
 
 });

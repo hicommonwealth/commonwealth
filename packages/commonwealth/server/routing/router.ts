@@ -12,7 +12,7 @@ import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
-import getAddressProfile, { getCommentsValidation } from '../routes/getAddressProfile';
+import getAddressProfiles, { getAddressProfileValidation } from '../routes/getAddressProfiles';
 import selectChain from '../routes/selectChain';
 import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
@@ -226,7 +226,7 @@ function setupRouter(
     linkExistingAddressToChain.bind(this, models)
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
-  router.post('/getAddressProfile', getCommentsValidation, getAddressProfile.bind(this, models));
+  router.post('/getAddressProfile', getAddressProfileValidation, getAddressProfiles.bind(this, models));
   router.post(
     '/selectChain',
     passport.authenticate('jwt', { session: false }),
