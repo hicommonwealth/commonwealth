@@ -8,6 +8,7 @@ import type CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
+import CosmosGovernanceV1 from './governance-v1';
 import type { CosmosToken } from './types';
 
 class Cosmos
@@ -16,7 +17,7 @@ class Cosmos
 {
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
-  public governance: CosmosGovernance;
+  public governance: CosmosGovernance | CosmosGovernanceV1;
 
   public readonly base = ChainBase.CosmosSDK;
 
@@ -24,7 +25,10 @@ class Cosmos
     super(meta, app);
     this.chain = new CosmosChain(this.app);
     this.accounts = new CosmosAccounts(this.app);
-    this.governance = new CosmosGovernance(this.app);
+    this.governance =
+      meta.cosmosGovernanceVersion === 'v1'
+        ? new CosmosGovernanceV1(this.app)
+        : new CosmosGovernance(this.app);
   }
 
   public async initApi() {

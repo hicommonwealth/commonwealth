@@ -136,3 +136,5 @@ export const ETHERSCAN_JS_API_KEY = process.env.ETHERSCAN_JS_API_KEY;
 export const CHAIN_EVENT_SERVICE_SECRET =
   process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
 export const ETH_RPC = process.env.ETH_RPC || 'prod';
+
+export const COSMOS_GOV_V1 = process.env.COSMOS_GOV_V1;
