@@ -20,6 +20,7 @@ type ContractCardProps = {
   id: number;
   address: string;
   templates: Contract['ccts'];
+  onDeleteSuccess: () => void;
 };
 
 type ManageContractTemplateModalData = Omit<
@@ -27,16 +28,19 @@ type ManageContractTemplateModalData = Omit<
   'onModalClose'
 >;
 
-export const ContractCard = ({ address, templates, id }: ContractCardProps) => {
+export const ContractCard = ({
+  address,
+  templates,
+  id,
+  onDeleteSuccess,
+}: ContractCardProps) => {
   const navigate = useCommonNavigate();
 
-  const [
-    manageContractTemplateModalData,
-    setManageContractTemplateModalData,
-  ] = useState<ManageContractTemplateModalData>(null);
+  const [manageContractTemplateModalData, setManageContractTemplateModalData] =
+    useState<ManageContractTemplateModalData>(null);
 
-  const globalTemplatesExist = app.contracts.store.getContractByAddress(address)
-    ?.hasGlobalTemplate;
+  const globalTemplatesExist =
+    app.contracts.store.getContractByAddress(address)?.hasGlobalTemplate;
 
   const handleDeleteContract = () => {
     openConfirmation({
@@ -52,9 +56,14 @@ export const ContractCard = ({ address, templates, id }: ContractCardProps) => {
           label: 'Delete',
           buttonType: 'mini-red',
           onClick: async () => {
-            await app.contracts.deleteCommunityContract({
-              contract_id: id,
-            });
+            try {
+              await app.contracts.deleteCommunityContract({
+                contract_id: id,
+              });
+              onDeleteSuccess();
+            } catch (err) {
+              console.log(err);
+            }
           },
         },
         {
