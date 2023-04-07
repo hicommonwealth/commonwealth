@@ -12,7 +12,6 @@ import {
 } from 'views/components/component_kit/cw_text_input';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { showConfirmationModal } from '../../modals/confirmation_modal';
 import type Contract from 'client/scripts/models/Contract';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
@@ -22,6 +21,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useCallback, useEffect, useState } from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useParams } from 'react-router-dom';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 enum TemplateComponents {
   DIVIDER = 'divider',
@@ -302,6 +302,50 @@ const ViewTemplatePage = () => {
     return val !== null && val !== '';
   });
 
+  const handleCreate = () => {
+    openConfirmation({
+      title: 'Attempt this transaction?',
+      description: constructTxPreview(), // TODO: Replace with some preview we like
+      buttons: [
+        {
+          buttonType: 'primary-black',
+          label: 'confirm',
+          onClick: async () => {
+            try {
+              const functionAbi = parseFunctionFromABI(
+                currentContract.abi,
+                json.tx_template?.method as string
+              );
+
+              const functionArgs = formatFunctionArgs();
+
+              const res = await callContractFunction({
+                contract: currentContract,
+                fn: functionAbi,
+                inputArgs: functionArgs,
+              });
+
+              if (res.status) {
+                notifySuccess('Transaction successful!');
+              } else {
+                notifyError('Transcation Failed. Try again.');
+              }
+            } catch (e) {
+              console.log(e);
+            }
+          },
+        },
+        {
+          buttonType: 'secondary-black',
+          label: 'cancel',
+          onClick: () => {
+            console.log('transaction cancelled');
+          },
+        },
+      ],
+    });
+  };
+
   return (
     <Sublayout>
       <div className="ViewTemplatePage">
@@ -335,47 +379,7 @@ const ViewTemplatePage = () => {
               label="Create"
               buttonType="primary-black"
               disabled={!txReady}
-              onClick={() => {
-                showConfirmationModal({
-                  title: 'Attempt this transaction?',
-                  description: constructTxPreview(), // TODO: Replace with some preview we like
-                  confirmButton: {
-                    type: 'primary-black',
-                    label: 'confirm',
-                    onConfirm: async () => {
-                      try {
-                        const functionAbi = parseFunctionFromABI(
-                          currentContract.abi,
-                          json.tx_template?.method as string
-                        );
-
-                        const functionArgs = formatFunctionArgs();
-
-                        const res = await callContractFunction({
-                          contract: currentContract,
-                          fn: functionAbi,
-                          inputArgs: functionArgs,
-                        });
-
-                        if (res.status) {
-                          notifySuccess('Transaction successful!');
-                        } else {
-                          notifyError('Transcation Failed. Try again.');
-                        }
-                      } catch (e) {
-                        console.log(e);
-                      }
-                    },
-                  },
-                  cancelButton: {
-                    type: 'secondary-black',
-                    label: 'cancel',
-                    onCancel: () => {
-                      console.log('transaction cancelled');
-                    },
-                  },
-                });
-              }}
+              onClick={handleCreate}
             />
           </div>
         </div>

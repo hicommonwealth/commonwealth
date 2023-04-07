@@ -21,7 +21,7 @@ export const displayOptions = [
   { value: '0', label: 'Hidden' },
 ];
 
-interface ManageContractTemplateModalProps {
+export interface ManageContractTemplateModalProps {
   contractId: number;
   templateId?: number;
   template: {
@@ -96,10 +96,9 @@ const ManageContractTemplateModal = ({
     };
 
     try {
-      // TODO add addCommunityContractTemplate to contracts controller
-      // await app.contracts.addCommunityContractTemplate(
-      //   communityContractTemplateAndMetadata
-      // );
+      await app.contracts.addCommunityContractTemplate(
+        communityContractTemplateAndMetadata
+      );
 
       onModalClose();
     } catch (err) {
@@ -128,10 +127,9 @@ const ManageContractTemplateModal = ({
     };
 
     try {
-      // TODO add editCommunityContractTemplate to contracts controller
-      // await app.contracts.editCommunityContractTemplate(
-      //   editedCommunityContractTemplate
-      // );
+      await app.contracts.editCommunityContractTemplate(
+        editedCommunityContractTemplate
+      );
 
       onModalClose();
     } catch (err) {
