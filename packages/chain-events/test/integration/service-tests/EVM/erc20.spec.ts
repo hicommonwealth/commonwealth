@@ -18,7 +18,7 @@ import Web3 from "web3";
 const { expect } = chai;
 chai.use(chaiHttp);
 
-describe('Integration tests for Compound Bravo', () => {
+describe('Integration tests for ERC20', () => {
   const rmq = new MockRabbitMqHandler(
     getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
@@ -137,21 +137,21 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should retrieve approve events', async () => {
-      const res = await agent.get(`/api/events?limit=1}`);
+      const res = await agent.get(`/api/events?limit=1`);
       expect(res.status).to.equal(200);
       expect(res.body.result, 'The request body should contain an array of events').to.exist;
-      expect(res.body.result[0].chain_event_type_id).to.equal(`${chain_id}-approval`);
+      expect(res.body.result[0].chain).to.equal(chain_id);
       expect(res.body.result[0].event_data.kind).to.equal('approval');
-      expect(res.body.result[0].event_data.amount).to.equal(transferAmount);
+      expect(res.body.result[0].event_data.value).to.equal(Web3.utils.toWei(transferAmount));
     });
 
     it('Should retrieve transfer events', async () => {
-      const res = await agent.get(`/api/events?limit=2}`);
+      const res = await agent.get(`/api/events?limit=2`);
       expect(res.status).to.equal(200);
       expect(res.body.result, 'The request body should contain an array of events').to.exist;
-      expect(res.body.result[1].chain_event_type_id).to.equal(`${chain_id}-transfer`);
+      expect(res.body.result[1].chain).to.equal(chain_id);
       expect(res.body.result[1].event_data.kind).to.equal('transfer');
-      expect(res.body.result[1].event_data.amount).to.equal(transferAmount);
+      expect(res.body.result[1].event_data.value).to.equal(Web3.utils.toWei(transferAmount));
     });
   });
 

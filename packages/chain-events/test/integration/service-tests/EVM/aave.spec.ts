@@ -9,7 +9,7 @@ import {
 } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { compoundGovernor } from '../../../../chain-testing/src/utils/governance/compoundGov';
+import { aaveGovernor } from '../../../../chain-testing/src/utils/governance/aaveGov';
 import { ChainTesting } from '../../../../chain-testing/sdk/chainTesting';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -40,12 +40,12 @@ describe('Integration tests for Compound Bravo', () => {
   // holds the relevant entity instance - used to ensure foreign keys are applied properly
   let relatedEntity;
 
-  const contract = new compoundGovernor();
-  const chain_id = 'ganache-fork-bravo';
+  const contract = new aaveGovernor();
+  const chain_id = 'ganache-fork-aave';
   const chain = {
     id: chain_id,
     base: ChainBase.Ethereum,
-    network: ChainNetwork.Compound,
+    network: ChainNetwork.Aave,
     substrate_spec: null,
     contract_address: contract.contractAddress,
     verbose_logging: false,
@@ -72,8 +72,7 @@ describe('Integration tests for Compound Bravo', () => {
       // get votes before creating the proposal, so we can test voting further down
       await sdk.getVotingPower(1, '456000');
 
-      const result = await sdk.createProposal(1);
-      proposalId = result.proposalId;
+      proposalId = await sdk.createProposal(1, 'aave');
       await delay(10000);
 
       events['proposal-created'] =
@@ -92,7 +91,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture votes on the created proposal', async () => {
-      await sdk.castVote(proposalId, 1, true);
+      await sdk.castVote(proposalId, 1, true, 'aave');
 
       await delay(10000);
 
@@ -112,7 +111,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture proposal queued events', async () => {
-      await sdk.queueProposal(proposalId);
+      await sdk.queueProposal(proposalId, 'aave');
 
       await delay(10000);
 
@@ -132,7 +131,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture proposal executed events', async () => {
-      await sdk.executeProposal(proposalId);
+      await sdk.executeProposal(proposalId, 'aave');
 
       await delay(10000);
 
@@ -152,8 +151,8 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     xit('Should capture proposal cancelled events', async () => {
-      const proposalIdToCancel = await sdk.createProposal(1);
-      await sdk.cancelProposal(proposalIdToCancel);
+      const proposalIdToCancel = await sdk.createProposal(1, 'aave');
+      await sdk.cancelProposal(proposalIdToCancel, 'aave');
 
       await delay(10000);
 
@@ -192,7 +191,7 @@ describe('Integration tests for Compound Bravo', () => {
       eventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][0].event,
+          ][0].event,
         'proposal-created',
         chain_id,
         proposalId
@@ -265,7 +264,7 @@ describe('Integration tests for Compound Bravo', () => {
       eventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][3].event,
+          ][3].event,
         'proposal-executed',
         chain_id,
         proposalId

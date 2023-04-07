@@ -33,11 +33,11 @@ export function eventMatch(
   proposalId?: string,
   transferAmount?: string
 ) {
-  if (proposalId) expect(parseInt(event.data.id)).to.equal(Number(proposalId));
+  if (proposalId) expect(parseInt(event.data.id), 'proposal id does not match').to.equal(Number(proposalId));
 
   if (transferAmount)
-    expect(event.data.value).to.equal(Web3.utils.toWei(transferAmount));
+    expect(event.data.value, 'transfer amount does not match').to.equal(Web3.utils.toWei(transferAmount));
 
-  expect(event.data.kind).to.equal(kind);
-  expect(event.chain).to.equal(chain_id);
+  expect(event.data.kind, 'event kind does not match').to.equal(kind);
+  expect(event.chain, 'event chain does not match').to.equal(chain_id);
 }

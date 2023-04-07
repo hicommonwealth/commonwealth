@@ -153,7 +153,9 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     messages: any[],
     msgProcessorContext?: { [key: string]: any }
   ) {
-    for (const message of messages) {
+    const numMessages = messages.length;
+    for (let i = 0; i < numMessages; i++) {
+      const message = messages.shift();
       try {
         await messageProcessor.call(
           { rmqController: this, ...msgProcessorContext },
