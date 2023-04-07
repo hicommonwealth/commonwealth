@@ -3,6 +3,8 @@
 .ManageContractTemplateModal {
   width: 720px;
   padding: 24px;
+  height: 95vh;
+  overflow-y: scroll;
 
   @include smallInclusive {
     width: auto;
