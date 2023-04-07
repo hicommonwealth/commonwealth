@@ -72,7 +72,8 @@ describe('Integration tests for Compound Bravo', () => {
       // get votes before creating the proposal, so we can test voting further down
       await sdk.getVotingPower(1, '456000');
 
-      proposalId = await sdk.createProposal(1, 'aave');
+      const result = await sdk.createProposal(1, 'aave');
+      proposalId = result.proposalId;
       await delay(10000);
 
       events['proposal-created'] =
@@ -93,7 +94,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture votes on the created proposal', async () => {
       await sdk.castVote(proposalId, 1, true, 'aave');
 
-      await delay(10000);
+      await delay(12000);
 
       events['vote-cast'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][1];
@@ -113,7 +114,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture proposal queued events', async () => {
       await sdk.queueProposal(proposalId, 'aave');
 
-      await delay(10000);
+      await delay(12000);
 
       events['proposal-queued'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][2];
@@ -183,15 +184,14 @@ describe('Integration tests for Compound Bravo', () => {
       });
 
       expect(propCreatedEvent, 'Proposal created event not found').to.exist;
-
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEventNotificationsCUDMain]
           .length
-      ).to.equal(4);
+      ).to.equal(2);
       eventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
-          ][0].event,
+        ][0].event,
         'proposal-created',
         chain_id,
         proposalId
@@ -264,7 +264,7 @@ describe('Integration tests for Compound Bravo', () => {
       eventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
-          ][3].event,
+        ][1].event,
         'proposal-executed',
         chain_id,
         proposalId

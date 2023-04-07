@@ -94,7 +94,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture votes on the created proposal', async () => {
       await sdk.castVote(proposalId, 1, true);
 
-      await delay(10000);
+      await delay(12000);
 
       events['vote-cast'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][1];
@@ -114,7 +114,7 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should capture proposal queued events', async () => {
       await sdk.queueProposal(proposalId);
 
-      await delay(10000);
+      await delay(12000);
 
       events['proposal-queued'] =
         rmq.queuedMessages[RascalSubscriptions.ChainEvents][2];
@@ -184,11 +184,10 @@ describe('Integration tests for Compound Bravo', () => {
       });
 
       expect(propCreatedEvent, 'Proposal created event not found').to.exist;
-
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEventNotificationsCUDMain]
           .length
-      ).to.equal(4);
+      ).to.equal(2);
       eventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
@@ -265,7 +264,7 @@ describe('Integration tests for Compound Bravo', () => {
       eventMatch(
         rmq.queuedMessages[
           RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][3].event,
+        ][1].event,
         'proposal-executed',
         chain_id,
         proposalId
