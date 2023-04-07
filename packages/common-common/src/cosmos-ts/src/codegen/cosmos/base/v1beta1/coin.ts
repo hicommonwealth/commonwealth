@@ -1,8 +1,8 @@
-import * as _m0 from "protobufjs/minimal";
-import { isSet } from "../../../helpers";
+import * as _m0 from 'protobufjs/minimal';
+import { isSet } from '../../../helpers';
 /**
  * Coin defines a token with a denomination and an amount.
- * 
+ *
  * NOTE: The amount field is an Int which implements the custom method
  * signatures required by gogoproto.
  */
@@ -13,7 +13,7 @@ export interface Coin {
 }
 /**
  * Coin defines a token with a denomination and an amount.
- * 
+ *
  * NOTE: The amount field is an Int which implements the custom method
  * signatures required by gogoproto.
  */
@@ -24,7 +24,7 @@ export interface CoinSDKType {
 }
 /**
  * DecCoin defines a token with a denomination and a decimal amount.
- * 
+ *
  * NOTE: The amount field is an Dec which implements the custom method
  * signatures required by gogoproto.
  */
@@ -35,7 +35,7 @@ export interface DecCoin {
 }
 /**
  * DecCoin defines a token with a denomination and a decimal amount.
- * 
+ *
  * NOTE: The amount field is an Dec which implements the custom method
  * signatures required by gogoproto.
  */
@@ -67,18 +67,18 @@ export interface DecProtoSDKType {
 
 function createBaseCoin(): Coin {
   return {
-    denom: "",
-    amount: ""
+    denom: '',
+    amount: '',
   };
 }
 
 export const Coin = {
   encode(message: Coin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.denom !== "") {
+    if (message.denom !== '') {
       writer.uint32(10).string(message.denom);
     }
 
-    if (message.amount !== "") {
+    if (message.amount !== '') {
       writer.uint32(18).string(message.amount);
     }
 
@@ -113,8 +113,8 @@ export const Coin = {
 
   fromJSON(object: any): Coin {
     return {
-      denom: isSet(object.denom) ? String(object.denom) : "",
-      amount: isSet(object.amount) ? String(object.amount) : ""
+      denom: isSet(object.denom) ? String(object.denom) : '',
+      amount: isSet(object.amount) ? String(object.amount) : '',
     };
   },
 
@@ -127,34 +127,36 @@ export const Coin = {
 
   fromPartial(object: Partial<Coin>): Coin {
     const message = createBaseCoin();
-    message.denom = object.denom ?? "";
-    message.amount = object.amount ?? "";
+    message.denom = object.denom ?? '';
+    message.amount = object.amount ?? '';
     return message;
   },
 
   fromSDK(object: CoinSDKType): Coin {
     return {
       denom: isSet(object.denom) ? object.denom : undefined,
-      amount: isSet(object.amount) ? object.amount : undefined
+      amount: isSet(object.amount) ? object.amount : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseDecCoin(): DecCoin {
   return {
-    denom: "",
-    amount: ""
+    denom: '',
+    amount: '',
   };
 }
 
 export const DecCoin = {
-  encode(message: DecCoin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.denom !== "") {
+  encode(
+    message: DecCoin,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.denom !== '') {
       writer.uint32(10).string(message.denom);
     }
 
-    if (message.amount !== "") {
+    if (message.amount !== '') {
       writer.uint32(18).string(message.amount);
     }
 
@@ -189,8 +191,8 @@ export const DecCoin = {
 
   fromJSON(object: any): DecCoin {
     return {
-      denom: isSet(object.denom) ? String(object.denom) : "",
-      amount: isSet(object.amount) ? String(object.amount) : ""
+      denom: isSet(object.denom) ? String(object.denom) : '',
+      amount: isSet(object.amount) ? String(object.amount) : '',
     };
   },
 
@@ -203,29 +205,31 @@ export const DecCoin = {
 
   fromPartial(object: Partial<DecCoin>): DecCoin {
     const message = createBaseDecCoin();
-    message.denom = object.denom ?? "";
-    message.amount = object.amount ?? "";
+    message.denom = object.denom ?? '';
+    message.amount = object.amount ?? '';
     return message;
   },
 
   fromSDK(object: DecCoinSDKType): DecCoin {
     return {
       denom: isSet(object.denom) ? object.denom : undefined,
-      amount: isSet(object.amount) ? object.amount : undefined
+      amount: isSet(object.amount) ? object.amount : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseIntProto(): IntProto {
   return {
-    int: ""
+    int: '',
   };
 }
 
 export const IntProto = {
-  encode(message: IntProto, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.int !== "") {
+  encode(
+    message: IntProto,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.int !== '') {
       writer.uint32(10).string(message.int);
     }
 
@@ -256,7 +260,7 @@ export const IntProto = {
 
   fromJSON(object: any): IntProto {
     return {
-      int: isSet(object.int) ? String(object.int) : ""
+      int: isSet(object.int) ? String(object.int) : '',
     };
   },
 
@@ -268,27 +272,29 @@ export const IntProto = {
 
   fromPartial(object: Partial<IntProto>): IntProto {
     const message = createBaseIntProto();
-    message.int = object.int ?? "";
+    message.int = object.int ?? '';
     return message;
   },
 
   fromSDK(object: IntProtoSDKType): IntProto {
     return {
-      int: isSet(object.int) ? object.int : undefined
+      int: isSet(object.int) ? object.int : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseDecProto(): DecProto {
   return {
-    dec: ""
+    dec: '',
   };
 }
 
 export const DecProto = {
-  encode(message: DecProto, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.dec !== "") {
+  encode(
+    message: DecProto,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.dec !== '') {
       writer.uint32(10).string(message.dec);
     }
 
@@ -319,7 +325,7 @@ export const DecProto = {
 
   fromJSON(object: any): DecProto {
     return {
-      dec: isSet(object.dec) ? String(object.dec) : ""
+      dec: isSet(object.dec) ? String(object.dec) : '',
     };
   },
 
@@ -331,14 +337,13 @@ export const DecProto = {
 
   fromPartial(object: Partial<DecProto>): DecProto {
     const message = createBaseDecProto();
-    message.dec = object.dec ?? "";
+    message.dec = object.dec ?? '';
     return message;
   },
 
   fromSDK(object: DecProtoSDKType): DecProto {
     return {
-      dec: isSet(object.dec) ? object.dec : undefined
+      dec: isSet(object.dec) ? object.dec : undefined,
     };
-  }
-
+  },
 };

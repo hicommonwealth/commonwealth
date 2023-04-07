@@ -3,10 +3,8 @@ import { Pool } from 'pg';
 import _ from 'underscore';
 import type { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import {
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import {  RascalPublications } from 'common-common/src/rabbitmq/types';
+import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import Rollbar from 'rollbar';
 import fetch from 'node-fetch';
 import { StatsDController } from 'common-common/src/statsd';

@@ -8,7 +8,7 @@ import {
   RascalQueues,
   RascalRoutingKeys,
   RmqCENotificationCUD,
-  RmqEntityCUD
+  RmqEntityCUD,
 } from 'common-common/src/rabbitmq/types';
 import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import {

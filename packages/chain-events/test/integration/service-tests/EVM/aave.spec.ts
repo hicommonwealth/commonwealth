@@ -1,11 +1,9 @@
 import { runSubscriberAsFunction } from '../../../../services/ChainSubscriber/chainSubscriber';
 import { MockRabbitMqHandler } from '../../../../services/ChainEventsConsumer/ChainEventHandlers';
-import {
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
+import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import {
   RascalPublications,
-  RascalSubscriptions
+  RascalSubscriptions,
 } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -16,7 +14,7 @@ import chaiHttp from 'chai-http';
 import models from '../../../../services/database/database';
 import { setupChainEventConsumer } from '../../../../services/ChainEventsConsumer/chainEventsConsumer';
 import { Op, Sequelize } from 'sequelize';
-import { eventMatch } from '../../../util';
+import {eventMatch, findEvent} from '../../../util';
 import { createChainEventsApp } from '../../../../services/app/Server';
 
 const { expect } = chai;
@@ -53,6 +51,7 @@ describe('Integration tests for Compound Bravo', () => {
   };
   const sdk = new ChainTesting('http://127.0.0.1:3000');
   let proposalId: string;
+  let proposalCreatedBlockNum: number;
 
   // This function delays the execution of the test for the specified number of milliseconds
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -70,21 +69,30 @@ describe('Integration tests for Compound Bravo', () => {
 
     it('Should capture proposal created events', async () => {
       // get votes before creating the proposal, so we can test voting further down
-      await sdk.getVotingPower(1, '456000');
+      await sdk.getVotingPower(1, '456000', 'aave');
 
       const result = await sdk.createProposal(1, 'aave');
       proposalId = result.proposalId;
-      await delay(10000);
+      proposalCreatedBlockNum = result.blockNumber;
+      await delay(17000);
 
-      events['proposal-created'] =
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][0];
+      events['proposal-created'] = findEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+   'proposal-created',
+        chain_id,
+        proposalCreatedBlockNum
+      );
 
       // verify the event was created and appended to the correct queue
+      console.log(rmq.queuedMessages[RascalSubscriptions.ChainEvents]);
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
-      ).to.equal(1, 'Event not captured');
+      ).to.equal(
+        10,
+        'Actual number of captured events does not match expected number of events'
+      );
       eventMatch(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][0],
+        events['proposal-created'],
         'proposal-created',
         chain_id,
         proposalId
@@ -92,19 +100,23 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture votes on the created proposal', async () => {
-      await sdk.castVote(proposalId, 1, true, 'aave');
+      const { block } = await sdk.castVote(proposalId, 1, true, 'aave');
 
       await delay(12000);
 
-      events['vote-cast'] =
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][1];
+      events['vote-cast'] = findEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        'vote-cast',
+        chain_id,
+        proposalCreatedBlockNum
+      );
 
       // verify the event was created and appended to the correct queue
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
-      ).to.equal(2);
+      ).to.equal(11);
       eventMatch(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][1],
+        events['vote-cast'],
         'vote-cast',
         chain_id,
         proposalId
@@ -116,15 +128,19 @@ describe('Integration tests for Compound Bravo', () => {
 
       await delay(12000);
 
-      events['proposal-queued'] =
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][2];
+      events['proposal-queued'] = findEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        'proposal-queued',
+        chain_id,
+        proposalCreatedBlockNum
+      );
 
       // verify the event was created and appended to the correct queue
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
-      ).to.equal(3);
+      ).to.equal(12);
       eventMatch(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][2],
+        events['proposal-queued'],
         'proposal-queued',
         chain_id,
         proposalId
@@ -136,15 +152,19 @@ describe('Integration tests for Compound Bravo', () => {
 
       await delay(10000);
 
-      events['proposal-executed'] =
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][3];
+      events['proposal-executed'] = findEvent(
+        rmq.queuedMessages[RascalSubscriptions.ChainEvents],
+        'proposal-executed',
+        chain_id,
+        proposalCreatedBlockNum
+      );
 
       // verify the event was created and appended to the correct queue
       expect(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents].length
-      ).to.equal(4);
+      ).to.equal(13);
       eventMatch(
-        rmq.queuedMessages[RascalSubscriptions.ChainEvents][3],
+        events['proposal-executed'],
         'proposal-executed',
         chain_id,
         proposalId
@@ -216,9 +236,7 @@ describe('Integration tests for Compound Bravo', () => {
         where: {
           chain: chain_id,
           event_data: {
-            [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = 'vote-cast'`),
-            ],
+            [Op.and]: [Sequelize.literal(`event_data->>'kind' = 'vote-cast'`)],
           },
           block_number: events['vote-cast'].blockNumber,
         },
@@ -275,7 +293,6 @@ describe('Integration tests for Compound Bravo', () => {
   describe('Tests for retrieving Bravo events with the app', async () => {
     let agent, hexProposalId;
 
-
     before(async () => {
       // set up the app
       const app = await createChainEventsApp();
@@ -290,7 +307,10 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should retrieve the proposal created event and entity', async () => {
       let res = await agent.get(`/api/events?limit=10`);
       expect(res.status).to.equal(200);
-      expect(res.body.result, 'The request body should contain an array of events').to.exist;
+      expect(
+        res.body.result,
+        'The request body should contain an array of events'
+      ).to.exist;
 
       const proposalCreatedEvent = res.body.result.find(
         (e) =>
@@ -298,13 +318,19 @@ describe('Integration tests for Compound Bravo', () => {
           e.event_data.id === hexProposalId &&
           e.chain === chain_id
       );
-      expect(proposalCreatedEvent, 'Should be set to the proposal creation event DB record').to.exist;
+      expect(
+        proposalCreatedEvent,
+        'Should be set to the proposal creation event DB record'
+      ).to.exist;
 
       res = await agent.get(
         `/api/entities?type=proposal&type_id=${hexProposalId}&chain=${chain_id}`
       );
       expect(res.status).to.equal(200);
-      expect(res.body.result, 'The request body should contain an array with a single element').to.exist;
+      expect(
+        res.body.result,
+        'The request body should contain an array with a single element'
+      ).to.exist;
       expect(res.body.result.length).to.equal(1);
       expect(res.body.result[0].id).to.equal(proposalCreatedEvent.entity_id);
     });
@@ -354,8 +380,14 @@ describe('Integration tests for Compound Bravo', () => {
 
   after(async () => {
     await rmq.shutdown();
-    await models.ChainEvent.destroy({ where: { chain: chain_id }, logging: console.log });
-    await models.ChainEntity.destroy({ where: { chain: chain_id }, logging: console.log });
+    await models.ChainEvent.destroy({
+      where: { chain: chain_id },
+      logging: console.log,
+    });
+    await models.ChainEntity.destroy({
+      where: { chain: chain_id },
+      logging: console.log,
+    });
     await models.sequelize.close();
   });
 });

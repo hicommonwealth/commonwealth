@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http';
 
 import { Errors as EntityErrors } from '../../../services/app/routes/entities';
 import { Errors as EventErrors } from '../../../services/app/routes/eventActivity';
-import {createChainEventsApp} from "../../../services/app/Server";
+import { createChainEventsApp } from '../../../services/app/Server';
 
 chai.use(chaiHttp);
 const { expect } = chai;

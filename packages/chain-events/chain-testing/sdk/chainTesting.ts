@@ -2,7 +2,8 @@ import axios from 'axios';
 import Web3 from 'web3';
 import {
   chainAdvanceTime,
-  chainGetEth, erc20Approve,
+  chainGetEth,
+  erc20Approve,
   erc20BalanceReq,
   erc20Transfer,
   erc721Approve,

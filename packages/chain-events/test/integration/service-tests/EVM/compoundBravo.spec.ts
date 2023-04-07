@@ -1,11 +1,9 @@
 import { runSubscriberAsFunction } from '../../../../services/ChainSubscriber/chainSubscriber';
 import { MockRabbitMqHandler } from '../../../../services/ChainEventsConsumer/ChainEventHandlers';
-import {
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
+import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import {
   RascalPublications,
-  RascalSubscriptions
+  RascalSubscriptions,
 } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -216,9 +214,7 @@ describe('Integration tests for Compound Bravo', () => {
         where: {
           chain: chain_id,
           event_data: {
-            [Op.and]: [
-              Sequelize.literal(`event_data->>'kind' = 'vote-cast'`),
-            ],
+            [Op.and]: [Sequelize.literal(`event_data->>'kind' = 'vote-cast'`)],
           },
           block_number: events['vote-cast'].blockNumber,
         },
@@ -275,7 +271,6 @@ describe('Integration tests for Compound Bravo', () => {
   describe('Tests for retrieving Bravo events with the app', async () => {
     let agent, hexProposalId;
 
-
     before(async () => {
       // set up the app
       const app = await createChainEventsApp();
@@ -290,7 +285,10 @@ describe('Integration tests for Compound Bravo', () => {
     it('Should retrieve the proposal created event and entity', async () => {
       let res = await agent.get(`/api/events?limit=10`);
       expect(res.status).to.equal(200);
-      expect(res.body.result, 'The request body should contain an array of events').to.exist;
+      expect(
+        res.body.result,
+        'The request body should contain an array of events'
+      ).to.exist;
 
       const proposalCreatedEvent = res.body.result.find(
         (e) =>
@@ -298,13 +296,19 @@ describe('Integration tests for Compound Bravo', () => {
           e.event_data.id === hexProposalId &&
           e.chain === chain_id
       );
-      expect(proposalCreatedEvent, 'Should be set to the proposal creation event DB record').to.exist;
+      expect(
+        proposalCreatedEvent,
+        'Should be set to the proposal creation event DB record'
+      ).to.exist;
 
       res = await agent.get(
         `/api/entities?type=proposal&type_id=${hexProposalId}&chain=${chain_id}`
       );
       expect(res.status).to.equal(200);
-      expect(res.body.result, 'The request body should contain an array with a single element').to.exist;
+      expect(
+        res.body.result,
+        'The request body should contain an array with a single element'
+      ).to.exist;
       expect(res.body.result.length).to.equal(1);
       expect(res.body.result[0].id).to.equal(proposalCreatedEvent.entity_id);
     });
@@ -354,8 +358,14 @@ describe('Integration tests for Compound Bravo', () => {
 
   after(async () => {
     await rmq.shutdown();
-    await models.ChainEvent.destroy({ where: { chain: chain_id }, logging: console.log });
-    await models.ChainEntity.destroy({ where: { chain: chain_id }, logging: console.log });
+    await models.ChainEvent.destroy({
+      where: { chain: chain_id },
+      logging: console.log,
+    });
+    await models.ChainEntity.destroy({
+      where: { chain: chain_id },
+      logging: console.log,
+    });
     await models.sequelize.close();
   });
 });
