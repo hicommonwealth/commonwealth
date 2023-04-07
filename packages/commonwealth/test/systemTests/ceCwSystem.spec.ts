@@ -12,7 +12,7 @@ const { expect } = chai;
 xdescribe('Tests for the whole chain-event and commonwealth system', () => {
   xit('Should take a message from the CE subscriber all the way to the CW Consumer', async () => {
     await setupCommonwealthConsumer();
-    await setupChainEventConsumer();
+    // await setupChainEventConsumer();
     await initSubscriberTools();
   });
 });
