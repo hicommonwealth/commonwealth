@@ -80,6 +80,7 @@ export const ContractCard = ({
 
   const handleOpenManageContractTemplateModal = async (
     templateId?: number,
+    cctId?: number,
     template?: any
   ) => {
     const contractTemplates = await app.contracts.getTemplatesForContract(id);
@@ -87,7 +88,7 @@ export const ContractCard = ({
     setManageContractTemplateModalData({
       contractId: id,
       templateId: templateId,
-      template: template,
+      template: { ...template, id: cctId },
       contractTemplates,
     });
   };
@@ -125,6 +126,7 @@ export const ContractCard = ({
                     slug={template.cctmd.slug}
                     display={template.cctmd.display_options}
                     cctmd_id={template.cctmd.id}
+                    cct_id={template.id}
                     handleShowModal={handleOpenManageContractTemplateModal}
                   />
                 ))}
