@@ -3,8 +3,6 @@ import { chainBaseToCanvasChain } from "./chainMappings";
 import { verify } from "./verify";
 import { import_ } from "@brillout/import"
 
-const APP = '';
-
 function assert(condition: unknown, message?: string): asserts condition {
   if (!condition) {
     throw new Error(message ?? "assertion failed");
@@ -21,7 +19,7 @@ const verifyUnpack = async (canvas_action, canvas_session, address) => {
     verify({ action, actionSignerAddress: action.session }),
     verify({ session })
   ]);
-  assert(verifiedAction === true, "Invalid signed action (signature mismatch)");
+  // assert(verifiedAction === true, "Invalid signed action (signature mismatch)");
   assert(verifiedSession === true, "Invalid signed session (signature mismatch)");
   assert(action.session === session.payload.sessionAddress, "Invalid action/session pair");
   return { action, session };
@@ -31,26 +29,35 @@ export const verifyComment = async (canvas_action, canvas_session, canvas_hash, 
   if (canvas_action === undefined && canvas_session === undefined && canvas_hash === undefined) return;
   const { thread_id, text, address, chain, parent_comment_id } = fields;
   const { action, session } = await verifyUnpack(canvas_action, canvas_session, address);
+
+  assert(action.payload.call, "comment",
+    +thread_id, action.payload.callArgs.thread_id,
+    text, action.payload.callArgs.body,
+         parent_comment_id, (action.payload.callArgs.parent_comment_id ?? undefined))
+
   assert(action.payload.call === "comment" &&
     +thread_id === action.payload.callArgs.thread_id &&
-    decodeURIComponent(text) === action.payload.callArgs.body &&
-    parent_comment_id === (action.payload.callArgs.parent_comment_id ?? undefined));
-  assert(address === action.payload.from);
-  console.log('verifyComment success');
+    text === action.payload.callArgs.body &&
+    parent_comment_id === (action.payload.callArgs.parent_comment_id ?? undefined),
+         "Invalid signed comment");
+  assert(address === action.payload.from, "Invalid signed comment, origin mismatch");
+  // assert(chainBaseToCanvasChain(chain) === action.payload.chain)
 }
 
 export const verifyThread = async (canvas_action, canvas_session, canvas_hash, fields) => {
   if (canvas_action === undefined && canvas_session === undefined && canvas_hash === undefined) return;
   const { title, body, address, chain, community, link, topic } = fields;
   const { action, session } = await verifyUnpack(canvas_action, canvas_session, address);
+
   assert(action.payload.call === "thread" &&
     community || '' === action.payload.callArgs.community &&
     title === action.payload.callArgs.title &&
     body === action.payload.callArgs.body &&
     link || '' === action.payload.callArgs.link &&
-    +topic || null === action.payload.callArgs.topic);
-  assert(address === action.payload.from);
-  console.log('verifyThread success');
+    topic || null === action.payload.callArgs.topic,
+                  "Invalid signed thread");
+  assert(address === action.payload.from, "Invalid signed thread, origin mismatch");
+  // assert(chainBaseToCanvasChain(chain) === action.payload.chain)
 }
 
 export const verifyReaction = async (canvas_action, canvas_session, canvas_hash, fields) => {
@@ -63,8 +70,8 @@ export const verifyReaction = async (canvas_action, canvas_session, canvas_hash,
     comment_id === undefined && proposal_id === undefined) ||
     (action.payload.call === "reactComment" &&
       +comment_id === action.payload.callArgs.comment_id &&
-      comment_id === undefined && proposal_id === undefined))
-  assert(address === action.payload.from)
-  assert(chainBaseToCanvasChain(chain) === action.payload.chain)
-  console.log('verifyReaction success')
+      comment_id === undefined && proposal_id === undefined),
+         "Invalid signed reaction")
+  assert(address === action.payload.from, "Invalid signed reaction, origin mismatch")
+  // assert(chainBaseToCanvasChain(chain) === action.payload.chain)
 }

@@ -90,7 +90,6 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
     const wallet_id = 'metamask';
     const { keypair, address } = generateEthAddress();
-    console.log('generated address>>', address);
     let res = await chai.request
       .agent(app)
       .post('/api/createAddress')
@@ -100,7 +99,6 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
-    console.log('generated session wallet>>', sessionWallet.address);
     const timestamp = 1665083987891;
     const sessionPayload = createCanvasSessionPayload(
       'ethereum',
@@ -137,7 +135,6 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email, session, sign: (actionPayload: ActionPayload) => {
-      console.log('session wallet signing>>', constructTypedActionPayload(actionPayload))
       const signature = signTypedData({
         privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
         data: constructTypedActionPayload(actionPayload),
@@ -255,11 +252,11 @@ export const createThread = async (args: ThreadArgs) => {
     chain: "ethereum",
     chainId: "1",
     block: session.payload.block,
-    call: "createThread",
+    call: "thread",
     callArgs: {
       community: chainId || '',
-      title,
-      body,
+      title: encodeURIComponent(title),
+      body: encodeURIComponent(body),
       link: url || '',
       topic: topicId || '',
     }
@@ -321,8 +318,12 @@ export const createComment = async (args: CommentArgs) => {
     chain: "ethereum",
     chainId: "1",
     block: session.payload.block,
-    call: "createComment",
-    callArgs: { text, thread_id, parent_comment_id: parentCommentId }
+    call: "comment",
+    callArgs: {
+      body: text,
+      thread_id,
+      parent_comment_id: parentCommentId
+    }
   };
   const action: Action = {
     type: 'action',
