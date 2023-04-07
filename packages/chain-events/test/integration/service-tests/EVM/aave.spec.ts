@@ -74,7 +74,7 @@ describe('Integration tests for Compound Bravo', () => {
       const result = await sdk.createProposal(1, 'aave');
       proposalId = result.proposalId;
       proposalCreatedBlockNum = result.blockNumber;
-      await delay(17000);
+      await delay(13000);
 
       events['proposal-created'] = findEvent(
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
@@ -108,7 +108,7 @@ describe('Integration tests for Compound Bravo', () => {
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         'vote-cast',
         chain_id,
-        proposalCreatedBlockNum
+        block
       );
 
       // verify the event was created and appended to the correct queue
@@ -124,7 +124,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture proposal queued events', async () => {
-      await sdk.queueProposal(proposalId, 'aave');
+      const { block } = await sdk.queueProposal(proposalId, 'aave');
 
       await delay(12000);
 
@@ -132,7 +132,7 @@ describe('Integration tests for Compound Bravo', () => {
         rmq.queuedMessages[RascalSubscriptions.ChainEvents],
         'proposal-queued',
         chain_id,
-        proposalCreatedBlockNum
+        block
       );
 
       // verify the event was created and appended to the correct queue
@@ -148,7 +148,7 @@ describe('Integration tests for Compound Bravo', () => {
     });
 
     it('Should capture proposal executed events', async () => {
-      await sdk.executeProposal(proposalId, 'aave');
+      const { block } = await sdk.executeProposal(proposalId, 'aave');
 
       await delay(10000);
 
