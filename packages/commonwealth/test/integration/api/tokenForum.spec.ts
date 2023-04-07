@@ -30,13 +30,18 @@ describe('Token Forum tests', () => {
   const topicId = undefined;
   const kind = 'discussion';
   const stage = 'discussion';
+
   let adminJWT;
   let adminAddress;
   let adminAddressId;
+  let adminSession;
+
   let userJWT;
   let userId;
   let userAddress;
   let userAddressId;
+  let userSession;
+
   let thread;
   let tbc: TokenBalanceCache;
   let tokenProvider: modelUtils.MockTokenBalanceProvider;
@@ -47,6 +52,7 @@ describe('Token Forum tests', () => {
     adminAddress = res.address;
     adminAddressId = res.address_id;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    adminSession = { session: res.session, sign: res.sign };
     const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
       chainOrCommObj: { chain_id: chain },
@@ -61,6 +67,7 @@ describe('Token Forum tests', () => {
     userId = res.user_id;
     userAddressId = res.address_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
@@ -87,6 +94,8 @@ describe('Token Forum tests', () => {
       topicId,
       body,
       jwt: userJWT,
+      session: userSession.session,
+      sign: userSession.sign,
     });
     expect(res.status).to.equal('Success');
     expect(res.result).to.not.be.null;
@@ -102,7 +111,9 @@ describe('Token Forum tests', () => {
       jwt: userJWT,
       text: markdownComment.text,
       thread_id: res.result.id,
-    });
+      session: userSession.session,
+      sign: userSession.sign,
+  });
 
     expect(cRes.status).to.equal('Success');
     expect(cRes.result).to.not.be.null;
@@ -127,6 +138,8 @@ describe('Token Forum tests', () => {
       topicId,
       body,
       jwt: userJWT,
+      session: userSession.session,
+      sign: userSession.sign,
     });
     expect(res).not.to.be.null;
     expect(res.error).not.to.be.null;
@@ -147,6 +160,8 @@ describe('Token Forum tests', () => {
       topicId,
       body,
       jwt: userJWT,
+      session: userSession.session,
+      sign: userSession.sign,
     });
     expect(res).not.to.be.null;
     expect(res.error).not.to.be.null;
@@ -167,7 +182,9 @@ describe('Token Forum tests', () => {
       topicId,
       body,
       jwt: adminJWT,
-    });
+      session: adminSession.session,
+      sign: adminSession.sign,
+  });
     expect(res.status).to.equal('Success');
     expect(res.result).to.not.be.null;
     expect(res.result.title).to.equal(encodeURIComponent(title));
@@ -182,6 +199,8 @@ describe('Token Forum tests', () => {
       jwt: adminJWT,
       text: markdownComment.text,
       thread_id: res.result.id,
+      session: adminSession.session,
+      sign: adminSession.sign,
     });
 
     expect(cRes.status).to.equal('Success');

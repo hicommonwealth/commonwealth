@@ -74,8 +74,6 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      console.log('YOOOOOOO');
-      console.log(res.body);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
@@ -263,6 +261,8 @@ describe('Webhook Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         kind: 'discussion',
         stage: 'discussion',
+        session: res.session,
+        sign: res.sign,
       });
       res = await modelUtils.createComment({
         chain,
@@ -281,6 +281,8 @@ describe('Webhook Tests', () => {
         body: decodeURIComponent(richTextThread.body),
         kind: 'discussion',
         stage: 'discussion',
+        session: res.session,
+        sign: res.sign,
       });
       res = await modelUtils.createComment({
         chain,
