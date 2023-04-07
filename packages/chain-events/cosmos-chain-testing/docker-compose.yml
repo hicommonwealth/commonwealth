@@ -1,0 +1,13 @@
+version: '3'
+services:
+  bootstrap-csdk:
+    build: .
+    ports:
+      - '1317:1317'
+      - '26657:26657'
+    volumes:
+      - simvol:/root/.simapp
+      - ./bootstrap.sh:/root/bootstrap.sh
+    entrypoint: ['sh', '-c', 'sh /root/bootstrap.sh']
+volumes:
+  simvol:

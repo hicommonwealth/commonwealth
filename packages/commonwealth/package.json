@@ -22,6 +22,7 @@
     "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
     "test-events": "nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts",
     "integration-test": "nyc ts-mocha --project tsconfig.json ./test/integration/**/*.spec.ts",
+    "test-devnet": "nyc ts-mocha --project tsconfig.json ./test/integration/api/devnet/**/*.spec.ts",
     "test-query": "ts-node server/scripts/testQuery.ts",
     "test": "nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts",
     "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json ./test/unit/**/*.spec.ts",
