@@ -1,3 +1,4 @@
+import React from 'react';
 import 'pages/contracts/contracts_page.scss';
 import app from 'state';
 
@@ -44,6 +45,7 @@ const ContractsPage = () => {
           <div className="contracts-container">
             {contracts.map((contract) => (
               <ContractCard
+                key={contract.id}
                 id={contract.id}
                 address={contract.address}
                 templates={contract.ccts}
