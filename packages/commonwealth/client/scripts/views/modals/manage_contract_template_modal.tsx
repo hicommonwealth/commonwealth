@@ -143,7 +143,9 @@ const ManageContractTemplateModal = ({
 
   const handleSelectTemplate = (item: DropdownItemType) => {
     const selectedTemplateId = +item.value;
-    const selectedTemplate = contractTemplates.find((t) => t.id === templateId);
+    const selectedTemplate = contractTemplates.find(
+      (t) => t.id === selectedTemplateId
+    );
 
     setForm((prevState) => ({
       ...prevState,
