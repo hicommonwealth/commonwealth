@@ -9,10 +9,10 @@ import app from 'state';
 import { CommunityLabel } from '../../components/community_label';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import { renderQuillTextBody } from '../../components/quill/helpers';
 import { User } from '../../components/user/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 
 type SearchChipProps = {
   isActive: boolean;
@@ -49,6 +49,7 @@ type SearchBarPreviewRowProps = {
     title: string;
     body?: string;
     text?: string;
+    chain?: string;
     created_at: string;
   };
   searchTerm?: string;
@@ -58,10 +59,12 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
 
+  const title = decodeURIComponent(searchResult.title);
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    navigate(`/discussion/${searchResult.proposalid}`);
+    const path = `/discussion/${searchResult.proposalid}`;
+    navigate(path);
   };
 
   return (
@@ -75,7 +78,7 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
         {/* <CWText type="caption">{searchResult.chain}</CWText> */}
       </div>
       <CWText type="b2" fontWeight="bold">
-        {decodeURIComponent(searchResult.title)}
+        {renderTruncatedHighlights(searchTerm, title)}
       </CWText>
       <CWText type="caption" className="excerpt-text" fontWeight="medium">
         <QuillRenderer hideFormatting={true} doc={content} searchTerm={searchTerm} />
@@ -88,22 +91,25 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
 
+  const title = decodeURIComponent(searchResult.title);
+  const content = searchResult.text;
+
+  const handleClick = () => {
+    const path = `/${searchResult.proposalid.split('_')[0]}/${searchResult.proposalid.split('_')[1]}`;
+    navigate(path);
+  };
+
   return (
-    <div
-      className="SearchBarCommentPreviewRow"
-      onClick={() => {
-        navigate(`/${searchResult.proposalid.split('_')[0]}/${searchResult.proposalid.split('_')[1]}`);
-      }}
-    >
+    <div className="SearchBarCommentPreviewRow" onClick={handleClick}>
       <CWText type="caption" className="last-updated-text">
         {moment(searchResult.created_at).format('l')}
       </CWText>
       {/* <CWText type="caption">{searchResult.chain}</CWText> */}
-      {/* <CWText type="b2" fontWeight="medium">
-          {decodeURIComponent(searchResult.title)}
-        </CWText> */}
+      <CWText type="b2" fontWeight="medium">
+        {renderTruncatedHighlights(searchTerm, title)}
+      </CWText>
       <CWText type="caption" className="excerpt-text">
-        <QuillRenderer hideFormatting={true} doc={searchResult.text} searchTerm={searchTerm} />;
+        <QuillRenderer hideFormatting={true} doc={content} searchTerm={searchTerm} />;
       </CWText>
     </div>
   );

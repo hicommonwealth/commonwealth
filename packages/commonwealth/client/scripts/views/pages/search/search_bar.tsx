@@ -23,6 +23,8 @@ import { useDebounce } from 'usehooks-ts';
 const MIN_SEARCH_TERM_LENGTH = 4;
 const NUM_RESULTS_PER_SECTION = 2;
 
+let resetTimer = null;
+
 const goToSearchPage = (
   query: SearchQuery,
   setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
@@ -96,6 +98,7 @@ export const SearchBar = () => {
 
   // when debounced search term changes, fetch search results
   useEffect(() => {
+    clearTimeout(resetTimer);
     if (debouncedSearchTerm?.length > 3) {
       handleGetSearchPreview(debouncedSearchTerm);
     }
@@ -107,9 +110,12 @@ export const SearchBar = () => {
       onBlur={() => {
         // give time for child click events to
         // fire before resetting the search bar
-        setTimeout(() => {
-          resetSearchBar();
-        }, 100);
+        if (!resetTimer) {
+          resetTimer = setTimeout(() => {
+            resetSearchBar();
+            resetTimer = null;
+          }, 300);
+        }
       }}
     >
       <div className="search-and-icon-container">

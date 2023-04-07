@@ -97,6 +97,10 @@
         padding: 16px;
       }
 
+      .Text {
+        display: inline; // fix child span/mark spacing
+      }
+
       // .history-section {
       //   border-top: 1px solid $neutral-100;
       //   display: flex;
