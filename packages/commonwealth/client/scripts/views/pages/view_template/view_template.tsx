@@ -1,4 +1,4 @@
-import 'pages/view_template/view_template.scss';
+import 'view_template/view_template.scss';
 import app from 'state';
 
 import Sublayout from '../../sublayout';
