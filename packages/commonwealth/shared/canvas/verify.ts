@@ -55,14 +55,12 @@ export const verify = async ({
       const canvasEthereum = await importChainEthereum();
       const [domain, types, value] =
         canvasEthereum.getActionSignatureData(actionPayload);
-      console.log('expected>>', canvasEthereum.getActionSignatureData(actionPayload))
       const recoveredAddr = ethersUtils.verifyTypedData(
         domain,
         types,
         value,
         signature
       );
-      console.log('recoveredAddr', recoveredAddr, 'actionSignerAddress', actionSignerAddress);
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
       const ethSigUtil = await import('@metamask/eth-sig-util');
