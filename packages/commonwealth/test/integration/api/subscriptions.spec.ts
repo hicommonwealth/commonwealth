@@ -20,6 +20,7 @@ describe.skip('Subscriptions Tests', () => {
   let jwtToken;
   let loggedInAddr;
   let loggedInAddrId;
+  let loggedInSession;
   const chain = 'ethereum';
   // const community = chain;
 
@@ -29,6 +30,7 @@ describe.skip('Subscriptions Tests', () => {
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     loggedInAddrId = result.address_id;
+    loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET
@@ -97,6 +99,8 @@ describe.skip('Subscriptions Tests', () => {
         stage: 'discussion',
         topicName: 't',
         topicId: undefined,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
       const object_id = `discussion_${res.result.id}`;
       const is_active = true;
@@ -124,6 +128,8 @@ describe.skip('Subscriptions Tests', () => {
         stage: 'discussion',
         topicName: 't',
         topicId: undefined,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
       const object_id = `discussion_${res.result.id}`;
       const is_active = true;
@@ -151,6 +157,8 @@ describe.skip('Subscriptions Tests', () => {
         stage: 'discussion',
         topicName: 't',
         topicId: undefined,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
       let res = await modelUtils.createComment({
         chain,
@@ -158,6 +166,8 @@ describe.skip('Subscriptions Tests', () => {
         jwt: jwtToken,
         text: 'cw4eva',
         thread_id: `discussion_${res1.result.id}`,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
       const object_id = `comment-${res.result.id}`;
       const is_active = true;
@@ -185,6 +195,8 @@ describe.skip('Subscriptions Tests', () => {
         stage: 'discussion',
         topicName: 't',
         topicId: undefined,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
       res = await modelUtils.createComment({
         chain,
@@ -192,6 +204,8 @@ describe.skip('Subscriptions Tests', () => {
         jwt: jwtToken,
         text: 'hi',
         thread_id: `discussion_${res.result.id}`,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
       const object_id = `comment-${res.result.id}`;
       const is_active = true;
@@ -710,6 +724,8 @@ describe.skip('Subscriptions Tests', () => {
         stage: 'discussion',
         topicName: 't',
         topicId: undefined,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
       expect(subscription).to.not.be.null;
       expect(thread).to.not.be.null;
@@ -739,6 +755,8 @@ describe.skip('Subscriptions Tests', () => {
         stage: 'discussion',
         topicName: 't',
         topicId: undefined,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
       expect(subscription).to.not.be.null;
       expect(thread).to.not.be.null;

@@ -10,11 +10,12 @@ import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from 'server/util/roles';
-import { getActionHash } from '@canvas-js/interfaces';
+import type { Action, Session, ActionPayload, SessionPayload } from '@canvas-js/interfaces';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
-import { createCanvasSessionPayload } from 'canvas';
+import { createCanvasSessionPayload, CANVAS_APPNAME } from 'canvas';
+import { constructTypedActionPayload } from 'adapters/chain/ethereum/keys';
 import { PermissionManager } from 'commonwealth/shared/permissions';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
@@ -52,7 +53,6 @@ export async function addAllowDenyPermissionsForCommunityRole(
   deny_permission: number | undefined
 ) {
   try {
-    console.log('addAllowDenyPermissionsForCommunityRole');
     const permissionsManager = new PermissionManager();
     // get community role object from the database
     const communityRole = await models.CommunityRole.findOne({
@@ -79,7 +79,6 @@ export async function addAllowDenyPermissionsForCommunityRole(
     }
     // save community role object to the database
     const updatedRole = await communityRole.save();
-    console.log('updatedRole', updatedRole);
   } catch (err) {
     throw new Error(err);
   }
@@ -89,6 +88,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
     const wallet_id = 'metamask';
     const { keypair, address } = generateEthAddress();
+    console.log('generated address>>', address);
     let res = await chai.request
       .agent(app)
       .post('/api/createAddress')
@@ -98,6 +98,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
+    console.log('generated session wallet>>', sessionWallet.address);
     const timestamp = 1665083987891;
     const sessionPayload = createCanvasSessionPayload(
       'ethereum',
@@ -108,7 +109,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       TEST_BLOCK_INFO_BLOCKHASH
     );
     const signature = signTypedData({
-      privateKey: keypair.getPrivateKey(),
+      privateKey: Buffer.from(keypair.getPrivateKey(), 'hex'),
       data: constructTypedCanvasMessage(sessionPayload),
       version: SignTypedDataVersion.V4,
     });
@@ -133,7 +134,15 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
-    return { address_id, address, user_id, email, canvas_session: sortedStringify(session) };
+    return { address_id, address, user_id, email, session, sign: (actionPayload: ActionPayload) => {
+      console.log('session wallet signing>>', constructTypedActionPayload(actionPayload))
+      const signature = signTypedData({
+        privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
+        data: constructTypedActionPayload(actionPayload),
+        version: SignTypedDataVersion.V4,
+      });
+      return signature;
+    }};
   }
   if (chain === 'edgeware') {
     const wallet_id = 'polkadot';
@@ -158,20 +167,19 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
     const sessionPayload: SessionPayload = createCanvasSessionPayload(
-      'ethereum',
+      'substrate',
       chain_id,
       address,
       sessionWallet.address,
       timestamp,
       TEST_BLOCK_INFO_BLOCKHASH
     );
+    const signature = keyPair.sign(stringToU8a(sortedStringify(sessionPayload)));
     const session: Session = {
       type: 'session',
       payload: sessionPayload,
-      signature: signature,
+      signature: new Buffer(signature).toString('hex')
     };
-
-    const signature = keyPair.sign(stringToU8a(sortedStringify(sessionPayload)));
 
     const address_id = res.body.result.id;
     res = await chai.request
@@ -181,7 +189,10 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
-    return { address_id, address, user_id, email, canvas_session: sortedStringify(session) };
+    return { address_id, address, user_id, email, session, sessionSigner: keyPair, sign: (actionPayload: ActionPayload) => {
+      return sessionWallet.sign(stringToU8a(sortedStringify(actionPayload)));
+    }};
+
   }
   throw new Error('invalid chain');
 };
@@ -214,6 +225,8 @@ export interface ThreadArgs {
   url?: string;
   attachments?: string[];
   readOnly?: boolean;
+  session: Session;
+  sign: (actionPayload: ActionPayload) => string;
 }
 
 export const createThread = async (args: ThreadArgs) => {
@@ -228,7 +241,38 @@ export const createThread = async (args: ThreadArgs) => {
     readOnly,
     kind,
     url,
+    session,
+    sign,
   } = args;
+
+  const actionPayload: ActionPayload = {
+    app: session.payload.app,
+    appName: CANVAS_APPNAME,
+    from: session.payload.from,
+    timestamp: Date.now(),
+    chain: "ethereum",
+    chainId: "1",
+    block: session.payload.block,
+    call: "createThread",
+    callArgs: {
+      community: chainId || '',
+      title,
+      body,
+      link: url || '',
+      topic: topicId || '',
+    }
+  };
+  const action: Action = {
+    type: 'action',
+    payload: actionPayload,
+    session: session.payload.sessionAddress,
+    signature: sign(actionPayload),
+  };
+  const canvas_session = sortedStringify(session)
+  const canvas_action = sortedStringify(action)
+  const canvas_hash = '' // getActionHash(action)
+  // TODO
+
   const res = await chai.request
     .agent(app)
     .post('/api/createThread')
@@ -246,6 +290,9 @@ export const createThread = async (args: ThreadArgs) => {
       url,
       readOnly: readOnly || false,
       jwt,
+      canvas_action,
+      canvas_session,
+      canvas_hash,
     });
   return res.body;
 };
@@ -257,10 +304,35 @@ export interface CommentArgs {
   text: any;
   parentCommentId?: any;
   thread_id?: any;
+  session: Session;
+  sign: (actionPayload: ActionPayload) => string;
 }
 
 export const createComment = async (args: CommentArgs) => {
-  const { chain, address, jwt, text, parentCommentId, thread_id } = args;
+  const { chain, address, jwt, text, parentCommentId, thread_id, session, sign } = args;
+
+  const actionPayload: ActionPayload = {
+    app: session.payload.app,
+    appName: CANVAS_APPNAME,
+    from: session.payload.from,
+    timestamp: Date.now(),
+    chain: "ethereum",
+    chainId: "1",
+    block: session.payload.block,
+    call: "createComment",
+    callArgs: { text, thread_id, parent_comment_id: parentCommentId }
+  };
+  const action: Action = {
+    type: 'action',
+    payload: actionPayload,
+    session: session.payload.sessionAddress,
+    signature: sign(actionPayload),
+  };
+  const canvas_session = sortedStringify(session)
+  const canvas_action = sortedStringify(action)
+  const canvas_hash = '' // getActionHash(action)
+  // TODO
+
   const res = await chai.request
     .agent(app)
     .post('/api/createComment')
@@ -274,6 +346,9 @@ export const createComment = async (args: CommentArgs) => {
       'attachments[]': undefined,
       text,
       jwt,
+      canvas_action,
+      canvas_session,
+      canvas_hash,
     });
   return res.body;
 };
@@ -313,9 +388,33 @@ export interface CreateReactionArgs {
   reaction: string;
   jwt: string;
   comment_id: number;
+  session: SessionPayload;
+  sign: (actionPayload: ActionPayload) => void;
 }
 
 export const createReaction = async (args: CreateReactionArgs) => {
+  const actionPayload: ActionPayload = {
+    app: session.payload.app,
+    appName: CANVAS_APPNAME,
+    from: session.payload.from,
+    timestamp: Date.now(),
+    chain: "ethereum",
+    chainId: "1",
+    block: session.payload.block,
+    call: "reactComment",
+    callArgs: { comment_id, value: reaction }
+  };
+  const action: Action = {
+    type: 'action',
+    payload: actionPayload,
+    session: session.payload.sessionAddress,
+    signature: sign(actionPayload),
+  };
+  const canvas_session = sortedStringify(session)
+  const canvas_action = sortedStringify(action)
+  const canvas_hash = '' // getActionHash(action)
+  // TODO
+
   const { chain, address, jwt, author_chain, reaction, comment_id } = args;
   const res = await chai.request
     .agent(app)
@@ -328,6 +427,9 @@ export const createReaction = async (args: CreateReactionArgs) => {
       comment_id,
       author_chain,
       jwt,
+      canvas_session,
+      canvas_action,
+      canvas_hash,
     });
   return res.body;
 };
