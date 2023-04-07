@@ -1,7 +1,7 @@
 import type Rascal from 'rascal';
-import type { RascalPublications } from 'common-common/src/rabbitmq';
+import type { RascalPublications } from 'common-common/src/rabbitmq/types';
+import { AbstractRabbitMQController } from 'common-common/src/rabbitmq/types';
 import {
-  AbstractRabbitMQController,
   MockRabbitMQController,
   RabbitMQController,
 } from 'common-common/src/rabbitmq';

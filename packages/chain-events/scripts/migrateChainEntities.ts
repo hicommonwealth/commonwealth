@@ -18,9 +18,8 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
 import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
 import ceModels from 'chain-events/services/database/database';
-
+import { AbstractRabbitMQController } from 'common-common/src/rabbitmq/types';
 import {
-  AbstractRabbitMQController,
   getRabbitMQConfig,
   RabbitMQController,
 } from 'common-common/src/rabbitmq';

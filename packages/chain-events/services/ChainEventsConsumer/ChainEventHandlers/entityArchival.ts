@@ -3,11 +3,11 @@
  */
 
 import { addPrefix, factory } from 'common-common/src/logging';
-import type { RmqEntityCUD } from 'common-common/src/rabbitmq';
+import type { RmqEntityCUD } from 'common-common/src/rabbitmq/types';
 import {
   AbstractRabbitMQController,
   RascalPublications,
-} from 'common-common/src/rabbitmq';
+} from 'common-common/src/rabbitmq/types';
 
 import type { DB } from '../../database/database';
 

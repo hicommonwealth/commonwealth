@@ -4,7 +4,7 @@
 import { addPrefix, factory } from 'common-common/src/logging';
 import {
   AbstractRabbitMQController,
-} from 'common-common/src/rabbitmq';
+} from 'common-common/src/rabbitmq/types';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
 import { StatsDController } from 'common-common/src/statsd';

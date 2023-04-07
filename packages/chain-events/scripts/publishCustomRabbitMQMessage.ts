@@ -3,7 +3,7 @@ import type { CWEvent } from '../src';
 import { SupportedNetwork } from '../src';
 import { publishRmqMsg } from 'common-common/src/rabbitmq/util';
 import { RABBITMQ_API_URI } from '../services/config';
-import { RascalExchanges, RascalRoutingKeys } from 'common-common/src/rabbitmq';
+import { RascalExchanges, RascalRoutingKeys } from 'common-common/src/rabbitmq/types';
 import models from 'chain-events/services/database/database';
 
 async function main() {

@@ -5,9 +5,11 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
   getRabbitMQConfig,
+} from 'common-common/src/rabbitmq';
+import {
   RascalSubscriptions,
   AbstractRabbitMQController,
-} from 'common-common/src/rabbitmq';
+} from 'common-common/src/rabbitmq/types';
 import Rollbar from 'rollbar';
 import { SubstrateTypes } from 'chain-events/src/types';
 

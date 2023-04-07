@@ -1,5 +1,5 @@
-import type { RmqMsgNamespace } from 'common-common/src/rabbitmq';
-import { RmqMsgFormatError } from 'common-common/src/rabbitmq';
+import type { RmqMsgNamespace } from 'common-common/src/rabbitmq/types';
+import { RmqMsgFormatError } from 'common-common/src/rabbitmq/types';
 import type { ChainEventNotification } from 'commonwealth/shared/types';
 
 /**

@@ -2,12 +2,14 @@ import chai from 'chai';
 import {
   getRabbitMQConfig,
   RabbitMQController,
+} from 'common-common/src/rabbitmq';
+import {
   RascalExchanges,
   RascalQueues,
   RascalRoutingKeys,
   RmqCENotificationCUD,
-  RmqEntityCUD,
-} from 'common-common/src/rabbitmq';
+  RmqEntityCUD
+} from 'common-common/src/rabbitmq/types';
 import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import {
   getQueueStats,

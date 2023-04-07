@@ -2,9 +2,11 @@ import { runSubscriberAsFunction } from '../../../../services/ChainSubscriber/ch
 import { MockRabbitMqHandler } from '../../../../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   getRabbitMQConfig,
-  RascalPublications,
-  RascalSubscriptions,
 } from 'common-common/src/rabbitmq';
+import {
+  RascalPublications,
+  RascalSubscriptions
+} from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../../../../services/config';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { compoundGovernor } from '../../../../chain-testing/src/utils/governance/compoundGov';

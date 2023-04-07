@@ -2,7 +2,7 @@
  * Processes events during migration, upgrading from simple notifications to entities.
  */
 import type { WhereOptions } from 'sequelize';
-import {AbstractRabbitMQController} from 'common-common/src/rabbitmq';
+import {AbstractRabbitMQController} from 'common-common/src/rabbitmq/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import type { CWEvent } from '../../../src';
