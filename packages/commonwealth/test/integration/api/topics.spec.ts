@@ -52,6 +52,7 @@ describe('Topic Tests', () => {
     before(async () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;
+
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
       const isAdmin = await modelUtils.updateRole({
         address_id: res.address_id,
@@ -71,6 +72,8 @@ describe('Topic Tests', () => {
         topicId,
         kind,
         stage,
+        session: res.session,
+        sign: res.sign,
       });
       expect(res2.status).to.be.equal('Success');
       expect(res2.result).to.not.be.null;
@@ -127,6 +130,8 @@ describe('Topic Tests', () => {
         topicId,
         kind,
         stage,
+        session: res.session,
+        sign: res.sign,
       });
       thread = res3.result;
     });
