@@ -72,9 +72,10 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
     };
   }, []);
 
-  const isSubscribed =
+  const [isSubscribed, setIsSubscribed] = useState(
     getCommentSubscription(thread)?.isActive &&
-    getReactionSubscription(thread)?.isActive;
+      getReactionSubscription(thread)?.isActive
+  );
 
   const hasAdminPermissions =
     app.user.activeAccount &&
@@ -219,7 +220,9 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 }}
               >
                 <PopoverMenu
-                  menuItems={[getThreadSubScriptionMenuItem(thread)]}
+                  menuItems={[
+                    getThreadSubScriptionMenuItem(thread, setIsSubscribed),
+                  ]}
                   renderTrigger={(onclick) => (
                     <CWIconButton
                       iconName={isSubscribed ? 'unsubscribe' : 'bell'}

@@ -42,7 +42,8 @@ export const handleToggleSubscription = async (
   thread: Thread,
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription,
-  isSubscribed: boolean
+  isSubscribed: boolean,
+  stateFn: (subscriptionStatus: boolean) => void,
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
@@ -69,6 +70,7 @@ export const handleToggleSubscription = async (
     ]);
     notifySuccess('Subscribed!');
   }
+  stateFn(!isSubscribed);
 
   redraw();
 };
@@ -90,7 +92,8 @@ export const getReactionSubscription = (thread: Thread) => {
 };
 
 export const getThreadSubScriptionMenuItem = (
-  thread: Thread
+  thread: Thread,
+  stateFn: (subscriptionStatus: boolean) => void,
 ): PopoverMenuItem => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
@@ -104,7 +107,8 @@ export const getThreadSubScriptionMenuItem = (
         thread,
         getCommentSubscription(thread),
         getReactionSubscription(thread),
-        isSubscribed
+        isSubscribed,
+        stateFn,
       );
       redraw();
     },
