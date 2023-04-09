@@ -1,5 +1,5 @@
 import { ProposalType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
@@ -598,6 +598,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     setIsGloballyEditing(false);
                     setIsEditingBody(false);
                     setRecentlyEdited(true);
+                    notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
                   });
               },
             },
