@@ -76,6 +76,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
     getCommentSubscription(thread)?.isActive &&
       getReactionSubscription(thread)?.isActive
   );
+  const [isLocked, setIsLocked] = useState(thread.readOnly);
 
   const hasAdminPermissions =
     app.user.activeAccount &&
@@ -142,7 +143,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
+              {isLocked && <CWIcon iconName="lock" iconSize="small" />}
             </div>
             <div className="top-row-icons">
               {isHot(thread) && <div className="flame" />}
@@ -239,6 +240,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   setIsUpdateProposalStatusModalOpen={
                     setIsUpdateProposalStatusModalOpen
                   }
+                  setIsLocked={setIsLocked}
                 />
               )}
             </div>
