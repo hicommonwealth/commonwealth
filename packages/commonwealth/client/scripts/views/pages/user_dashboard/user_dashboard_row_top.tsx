@@ -24,7 +24,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
   const {
     created_at,
     chain_id,
-    root_id,
+    thread_id,
     root_title,
     author_chain,
     author_address,
@@ -47,7 +47,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
 
   const titleText =
     decodedTitle.length < 1
-      ? `${capitalize(root_type)} ${root_id}`
+      ? `${capitalize(root_type)} ${thread_id}`
       : decodedTitle.length > 50
       ? `${decodedTitle.slice(0, 47)}...`
       : decodedTitle;

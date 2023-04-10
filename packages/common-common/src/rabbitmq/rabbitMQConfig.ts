@@ -117,10 +117,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'x-message-ttl': 600000,
             },
           },
-          [RascalQueues.ChainEventTypeCUDMain]: {
-            ...queueConfig,
-            options: queueOptions,
-          },
           [RascalQueues.SnapshotProposalNotifications]: {
             ...queueConfig,
             options: {
@@ -160,12 +156,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             destination: RascalQueues.ChainEventNotifications,
             destinationType: 'queue',
             bindingKey: RascalBindings.ChainEventNotifications,
-          },
-          [RascalBindings.ChainEventType]: {
-            source: RascalExchanges.CUD,
-            destination: RascalQueues.ChainEventTypeCUDMain,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.ChainEventTypeCUD,
           },
           [RascalBindings.SnapshotProposalNotifications]: {
             source: RascalExchanges.Notifications,
@@ -207,11 +197,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             routingKey: RascalRoutingKeys.ChainEventNotifications,
             ...publicationConfig,
           },
-          [RascalPublications.ChainEventTypeCUDMain]: {
-            exchange: RascalExchanges.CUD,
-            routingKey: RascalRoutingKeys.ChainEventTypeCUD,
-            ...publicationConfig,
-          },
           [RascalPublications.SnapshotProposalNotifications]: {
             exchange: RascalExchanges.Notifications,
             routingKey: RascalRoutingKeys.SnapshotProposalNotifications,
@@ -238,10 +223,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalSubscriptions.ChainEventNotifications]: {
             queue: RascalQueues.ChainEventNotifications,
-            ...subscriptionConfig,
-          },
-          [RascalSubscriptions.ChainEventTypeCUDMain]: {
-            queue: RascalQueues.ChainEventTypeCUDMain,
             ...subscriptionConfig,
           },
           [RascalSubscriptions.SnapshotProposalNotifications]: {
