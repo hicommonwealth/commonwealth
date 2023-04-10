@@ -15,7 +15,6 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWCard } from '../../components/component_kit/cw_card';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
@@ -27,7 +26,7 @@ import { bundleSubs } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
 import { redraw } from 'mithrilInterop';
-import { NotificationCategories } from '../../../../../../common-common/src/types';
+import { NotificationCategories } from 'common-common/src/types';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -212,12 +211,12 @@ const NotificationSettingsPage = () => {
                         ? app.user.notifications
                             .disableImmediateEmails(subs)
                             .then(() => {
-                              redraw();
+                              forceRerender();
                             })
                         : app.user.notifications
                             .enableImmediateEmails(subs)
                             .then(() => {
-                              redraw();
+                              forceRerender();
                             });
                     }}
                   />
@@ -228,12 +227,12 @@ const NotificationSettingsPage = () => {
                         ? app.user.notifications
                             .disableSubscriptions(subs)
                             .then(() => {
-                              redraw();
+                              forceRerender();
                             })
                         : app.user.notifications
                             .enableSubscriptions(subs)
                             .then(() => {
-                              redraw();
+                              forceRerender();
                             });
                     }}
                   />
@@ -271,7 +270,7 @@ const NotificationSettingsPage = () => {
                 onClick: () => {
                   app.user.updateEmailInterval('weekly');
                   setCurrentFrequency('weekly');
-                  redraw();
+                  forceRerender();
                 },
               },
               {
@@ -279,7 +278,7 @@ const NotificationSettingsPage = () => {
                 onClick: () => {
                   app.user.updateEmailInterval('never');
                   setCurrentFrequency('never');
-                  redraw();
+                  forceRerender();
                 },
               },
             ]}
@@ -334,7 +333,7 @@ const NotificationSettingsPage = () => {
                           try {
                             app.user.updateEmail(email);
                             setSentEmail(true);
-                            // redraw();
+                            // forceRerender();
                           } catch (e) {
                             console.log(e);
                           }
