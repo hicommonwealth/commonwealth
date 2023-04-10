@@ -49,6 +49,7 @@ export const ThreadPollEditorCard = ({
         }
       />
       <Modal
+        className="PollEditorCardModal"
         content={
           <PollEditorModal
             thread={thread}
