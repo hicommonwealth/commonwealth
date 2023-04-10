@@ -39,6 +39,7 @@ import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../avatar_upload';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -139,15 +140,17 @@ export const ComponentShowcase = () => {
   const [isToggled, setIsToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState<number>(1);
-  const [isRadioButtonChecked, setIsRadioButtonChecked] =
-    useState<boolean>(false);
+  const [isRadioButtonChecked, setIsRadioButtonChecked] = useState<boolean>(
+    false
+  );
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
-    useState<boolean>(false);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState<boolean>(
+    false
+  );
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
@@ -167,6 +170,36 @@ export const ComponentShowcase = () => {
         label="Full Screen Modal"
         onClick={() => setIsFullScreenModalOpen(true)}
       />
+      <CWButton
+        label="Confirmation Modal"
+        onClick={() =>
+          openConfirmation({
+            title: 'Warning',
+            description: (
+              <>
+                Do you really want to <b>delete</b> this item?
+              </>
+            ),
+            buttons: [
+              {
+                label: 'Delete',
+                buttonType: 'mini-black',
+                onClick: () => {
+                  notifySuccess('Deleted');
+                },
+              },
+              {
+                label: 'Cancel',
+                buttonType: 'mini-white',
+                onClick: () => {
+                  console.log('cancelled');
+                },
+              },
+            ],
+          })
+        }
+      />
+
       <Modal
         content={
           <div>

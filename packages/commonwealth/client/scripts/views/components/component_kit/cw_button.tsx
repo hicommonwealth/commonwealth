@@ -27,13 +27,14 @@ type ButtonType =
   | 'primary-blue-dark'
   | 'secondary-blue-dark'
   | 'mini-black'
-  | 'mini-white';
+  | 'mini-white'
+  | 'mini-red';
 
 type ButtonStyleProps = {
   buttonType?: ButtonType;
 } & BaseStyleProps;
 
-type ButtonProps = {
+export type ButtonProps = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string | React.ReactNode;

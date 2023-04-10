@@ -5,59 +5,82 @@ import 'pages/new_contract/add_contract_and_abi_form.scss';
 import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import app from 'state';
+
+import { useCommonNavigate } from 'navigation/helpers';
 
 const AddContractAndAbiForm = () => {
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [address, setAddress] = useState('');
-  const [abi, setAbi] = useState('');
+  const navigate = useCommonNavigate();
 
-  const addContract = () => {
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    address: '',
+    abi: '',
+  });
+
+  const handleAddContract = async () => {
     try {
-      console.log(address, abi);
+      setSaving(true);
+      const chainNodeId = app.chain.meta.ChainNode.id;
+
+      await app.contracts.addContractAndAbi({
+        chain_node_id: chainNodeId,
+        abi: form.abi,
+        address: form.address,
+      });
+
+      navigate(`/contracts`);
     } catch (err) {
-      notifyError('Failed to add Contract and ABI');
+      notifyError(err.message);
       console.log(err);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const resetForm = () => {
-    setAddress('');
-    setAbi('');
+  const handleCancel = () => {
+    navigate(`/contracts`);
   };
 
-  const isAddressValid = isAddress(address);
-  const isAbiValid = !!abi;
-  const isAddingDisabled = saving || loading || !isAddressValid || !isAbiValid;
+  const handleContractInput = async (e) => {
+    const newAddress = e.target.value;
+    setForm((prevState) => ({ ...prevState, address: newAddress }));
+
+    if (isAddress(newAddress)) {
+      const fetchedAbi = await app.contracts.getAbiFromEtherscan(newAddress);
+      setForm((prevState) => ({ ...prevState, abi: fetchedAbi }));
+    }
+  };
+
+  const isAddressValid = isAddress(form.address);
+  const isAddingDisabled = saving || !isAddressValid || !form.abi;
 
   return (
     <div className="AddContractAndAbiForm">
       <div className="form">
         <CWTextInput
-          inputValidationFn={() => {
-            if (isAddressValid) {
+          inputValidationFn={(value: string) => {
+            if (isAddress(value)) {
               return [];
             }
             return ['failure', 'Invalid Input'];
           }}
           label="Contract Address"
-          value={address}
+          value={form.address}
           placeholder="Enter contract address"
-          onInput={(e) => {
-            setAddress(e.target.value);
-          }}
+          onInput={handleContractInput}
         />
 
         <CWTextArea
           label="Contract ABI File"
-          value={abi}
+          value={form.abi}
           placeholder="Enter contract's ABI file"
-          onInput={(e) => {
-            setAbi(e.target.value);
-          }}
+          onInput={(e) =>
+            setForm((prevState) => ({ ...prevState, abi: e.target.value }))
+          }
         />
       </div>
 
@@ -65,15 +88,15 @@ const AddContractAndAbiForm = () => {
 
       <div className="buttons">
         <CWButton
-          buttonType="mini-white"
+          buttonType="secondary-black"
           label="Cancel"
-          onClick={() => resetForm()}
+          onClick={handleCancel}
         />
         <CWButton
-          buttonType="mini-black"
+          buttonType="primary-black"
           label="Add"
           disabled={isAddingDisabled}
-          onClick={() => addContract()}
+          onClick={handleAddContract}
         />
       </div>
     </div>

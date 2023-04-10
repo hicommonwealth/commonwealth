@@ -46,6 +46,9 @@ import type { UserModelStatic } from './models/user';
 import type { ViewCountModelStatic } from './models/viewcount';
 import type { VoteModelStatic } from './models/vote';
 import type { WebhookModelStatic } from './models/webhook';
+import type { CommunityContractTemplateStatic } from './models/community_contract_template';
+import type { CommunityContractTemplateMetadataStatic } from './models/community_contract_metadata';
+import type { TemplateModelStatic } from './models/template';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -61,6 +64,9 @@ export type Models = {
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
+  CommunityContractTemplate: CommunityContractTemplateStatic;
+  CommunityContractTemplateMetadata: CommunityContractTemplateMetadataStatic;
+  Template: TemplateModelStatic;
   CommunityRole: CommunityRoleModelStatic;
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;
