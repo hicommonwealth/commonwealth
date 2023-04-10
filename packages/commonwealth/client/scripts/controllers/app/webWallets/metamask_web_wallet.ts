@@ -100,10 +100,12 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       });
       const chainIdHex = `0x${chainId.toString(16)}`;
       try {
-        await this._web3.givenProvider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: chainIdHex }],
-        });
+        if (app.config.evmTestEnv !== 'test') {
+          await this._web3.givenProvider.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: chainIdHex }],
+          });
+        }
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
