@@ -4,7 +4,8 @@
   width: 720px;
   padding: 24px;
   height: 95vh;
-  overflow-y: scroll;
+  max-height: 820px;
+  overflow-y: auto;
 
   @include smallInclusive {
     width: auto;
