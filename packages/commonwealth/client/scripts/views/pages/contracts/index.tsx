@@ -31,6 +31,11 @@ const ContractsPage = () => {
     setContracts([...updatedContracts]);
   };
 
+  const onEditSuccess = () => {
+    const updatedContracts = app.contracts.store.getCommunityContracts();
+    setContracts([...updatedContracts]);
+  };
+
   return (
     <Sublayout>
       <div className="ContractsPage">
@@ -58,6 +63,7 @@ const ContractsPage = () => {
                 address={contract.address}
                 templates={contract.ccts}
                 onDeleteSuccess={onDeleteSuccess}
+                onEditSuccess={onEditSuccess}
               />
             ))}
           </div>

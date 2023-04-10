@@ -307,8 +307,6 @@ class ContractsController {
         hasGlobalTemplate: response.result.hasGlobalTemplate,
       });
 
-      console.log('result', response.result);
-
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -507,8 +505,6 @@ class ContractsController {
             };
           });
         }
-
-        console.log('contractWithTemplate', contractWithTemplate);
 
         this._store.add(
           Contract.fromJSON({

@@ -23,6 +23,7 @@ type ContractTemplateCardProps = {
   display: string;
   cctmd_id: number;
   cct_id: number;
+  onDeleteSuccess: () => void;
   handleShowModal: (
     templateId: number,
     cct_id: number,
@@ -53,6 +54,7 @@ export const ContractTemplateCard = ({
   id: templateId,
   cct_id,
   handleShowModal,
+  onDeleteSuccess,
   ...templateInfo
 }: ContractTemplateCardProps) => {
   const handleEditTemplate = async () => {
@@ -78,6 +80,7 @@ export const ContractTemplateCard = ({
               template_id: templateId,
               cctmd_id,
             });
+            onDeleteSuccess();
           },
         },
         {

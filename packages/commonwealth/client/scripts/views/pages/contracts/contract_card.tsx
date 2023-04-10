@@ -21,6 +21,7 @@ type ContractCardProps = {
   address: string;
   templates: Contract['ccts'];
   onDeleteSuccess: () => void;
+  onEditSuccess: () => void;
 };
 
 type ManageContractTemplateModalData = Omit<
@@ -33,6 +34,7 @@ export const ContractCard = ({
   templates,
   id,
   onDeleteSuccess,
+  onEditSuccess,
 }: ContractCardProps) => {
   const navigate = useCommonNavigate();
 
@@ -128,6 +130,7 @@ export const ContractCard = ({
                     cctmd_id={template.cctmd.id}
                     cct_id={template.id}
                     handleShowModal={handleOpenManageContractTemplateModal}
+                    onDeleteSuccess={onEditSuccess}
                   />
                 ))}
               </div>
@@ -169,7 +172,10 @@ export const ContractCard = ({
               contractTemplates={
                 manageContractTemplateModalData?.contractTemplates
               }
-              onModalClose={() => setManageContractTemplateModalData(null)}
+              onModalClose={() => {
+                setManageContractTemplateModalData(null);
+                onEditSuccess();
+              }}
             />
           }
           onClose={() => setManageContractTemplateModalData(null)}
