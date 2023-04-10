@@ -2,7 +2,7 @@ name: Write prettier changes
 on:
   push:
     branches:
-      - react
+      - master
 
 jobs:
   prettier:
@@ -36,4 +36,4 @@ jobs:
         uses: mikeal/publish-to-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: react
+          BRANCH_NAME: master
