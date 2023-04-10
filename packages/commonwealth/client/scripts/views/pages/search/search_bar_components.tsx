@@ -95,7 +95,7 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
   const content = searchResult.text;
 
   const handleClick = () => {
-    const path = `/${searchResult.proposalid.split('_')[0]}/${searchResult.proposalid.split('_')[1]}`;
+    const path = `/discussion/${searchResult.proposalid}`;
     navigate(path);
   };
 
