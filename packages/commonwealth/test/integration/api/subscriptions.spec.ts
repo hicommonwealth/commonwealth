@@ -157,7 +157,7 @@ describe.skip('Subscriptions Tests', () => {
         address: loggedInAddr,
         jwt: jwtToken,
         text: 'cw4eva',
-        root_id: `discussion_${res1.result.id}`,
+        thread_id: `discussion_${res1.result.id}`,
       });
       const object_id = `comment-${res.result.id}`;
       const is_active = true;
@@ -191,7 +191,7 @@ describe.skip('Subscriptions Tests', () => {
         address: loggedInAddr,
         jwt: jwtToken,
         text: 'hi',
-        root_id: `discussion_${res.result.id}`,
+        thread_id: `discussion_${res.result.id}`,
       });
       const object_id = `comment-${res.result.id}`;
       const is_active = true;

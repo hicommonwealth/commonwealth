@@ -1,6 +1,7 @@
 import { byAscendingCreationDate } from '../helpers';
+import type { AbridgedThread } from '../models';
 import type { Comment } from '../models';
-import type { IUniqueId } from '../models/interfaces';
+import type Thread from '../models/Thread';
 import IdStore from './IdStore';
 
 class CommentsStore extends IdStore<Comment<any>> {
@@ -17,11 +18,11 @@ class CommentsStore extends IdStore<Comment<any>> {
     }
     this._storeAuthor[comment.author].push(comment);
     this._storeAuthor[comment.author].sort(byAscendingCreationDate);
-    if (!this._storeProposal[comment.rootProposal]) {
-      this._storeProposal[comment.rootProposal] = [];
+    if (!this._storeProposal[comment.threadId]) {
+      this._storeProposal[comment.threadId] = [];
     }
-    this._storeProposal[comment.rootProposal].push(comment);
-    this._storeProposal[comment.rootProposal].sort(byAscendingCreationDate);
+    this._storeProposal[comment.threadId].push(comment);
+    this._storeProposal[comment.threadId].sort(byAscendingCreationDate);
     return this;
   }
 
@@ -36,18 +37,15 @@ class CommentsStore extends IdStore<Comment<any>> {
     }
     this._storeAuthor[comment.author].splice(authorIndex, 1);
 
-    if (comment.proposal) {
+    if (comment.threadId) {
       const proposalIndex =
-        this._storeProposal[comment.proposal.uniqueIdentifier].indexOf(comment);
+        this._storeProposal[comment.threadId].indexOf(comment);
       if (comment.proposal && proposalIndex === -1) {
         console.error(
           'Attempting to remove a comment that was not found in the proposals store'
         );
       }
-      this._storeProposal[comment.proposal.uniqueIdentifier].splice(
-        proposalIndex,
-        1
-      );
+      this._storeProposal[comment.threadId].splice(proposalIndex, 1);
     }
     return this;
   }
@@ -58,11 +56,11 @@ class CommentsStore extends IdStore<Comment<any>> {
     this._storeProposal = {};
   }
 
-  public clearProposal<T extends IUniqueId>(proposal: T) {
-    if (this._storeProposal[proposal.uniqueIdentifier]) {
-      const comments = this._storeProposal[proposal.uniqueIdentifier].slice();
+  public clearByThread(thread: Thread) {
+    if (this._storeProposal[thread.id]) {
+      const comments = this._storeProposal[thread.id].slice();
       comments.map(this.remove.bind(this));
-      delete this._storeProposal[proposal.uniqueIdentifier];
+      delete this._storeProposal[thread.id];
     }
     return this;
   }
@@ -75,15 +73,13 @@ class CommentsStore extends IdStore<Comment<any>> {
     return this._storeAuthor[address] || [];
   }
 
-  public getByProposal<T extends IUniqueId>(proposal: T): Array<Comment<any>> {
-    return this._storeProposal[proposal.uniqueIdentifier] || [];
+  public getByThread(thread: Thread | AbridgedThread): Array<Comment<any>> {
+    return this._storeProposal[thread.id] || [];
   }
 
-  public nComments<T extends IUniqueId>(proposal: T): number {
-    if (this._storeProposal[proposal.uniqueIdentifier]) {
-      return this._storeProposal[proposal.uniqueIdentifier].filter(
-        (c) => !c.deleted
-      ).length;
+  public nComments(thread: Thread): number {
+    if (this._storeProposal[thread.id]) {
+      return this._storeProposal[thread.id].filter((c) => !c.deleted).length;
     } else {
       return 0;
     }

@@ -68,7 +68,7 @@ export enum WebsocketEngineEvents {
 
 export interface IPostNotificationData {
   created_at: any;
-  root_id: number | string;
+  thread_id: number | string;
   root_title: string;
   root_type: string;
   comment_id?: number;

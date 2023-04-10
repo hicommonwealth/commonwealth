@@ -76,12 +76,12 @@ const bulkThreads = async (
         LEFT JOIN "ChainEntityMeta" AS entity_meta
         ON t.id = entity_meta.thread_id
         LEFT JOIN (
-            SELECT root_id, COUNT(*) AS number_of_comments
+            SELECT thread_id, COUNT(*) AS number_of_comments
             FROM "Comments"
             WHERE deleted_at IS NULL
-            GROUP BY root_id
+            GROUP BY thread_id
         ) comments
-        ON CONCAT(t.kind, '_', t.id) = comments.root_id
+        ON t.id = comments.thread_id
         LEFT JOIN (
             SELECT thread_id,
             STRING_AGG(ad.address::text, ',') AS addresses_reacted,
@@ -117,10 +117,7 @@ const bulkThreads = async (
       return next(new ServerError('Could not fetch threads'));
     }
 
-    const root_ids = [];
     threads = preprocessedThreads.map((t) => {
-      const root_id = `discussion_${t.thread_id}`;
-      root_ids.push(root_id);
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
