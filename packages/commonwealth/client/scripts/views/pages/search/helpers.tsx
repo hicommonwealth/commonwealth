@@ -71,7 +71,7 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
       key={comment.id}
       className="search-result-row"
       onClick={() =>
-        setRoute(`/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`)
+        setRoute(`/discussion/${proposalId}`)
       }
     >
       <CWIcon iconName="feedback" />
