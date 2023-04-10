@@ -167,11 +167,7 @@ const NotificationSettingsPage = () => {
                     disabled={true}
                     checked={false}
                     onChange={() => {
-                      app.user.notifications
-                        .enableImmediateEmails([])
-                        .then(() => {
-                          redraw();
-                        });
+                      handleEmailSubscriptions(false, []);
                     }}
                   />
                   <CWToggle
@@ -180,7 +176,7 @@ const NotificationSettingsPage = () => {
                       app.user.notifications
                         .subscribe(NotificationCategories.ChainEvent, chain.id)
                         .then(() => {
-                          redraw();
+                          forceRerender();
                         });
                     }}
                   />
@@ -207,33 +203,13 @@ const NotificationSettingsPage = () => {
                     label="Receive Emails"
                     checked={hasSomeEmailSubs}
                     onChange={() => {
-                      hasSomeEmailSubs
-                        ? app.user.notifications
-                            .disableImmediateEmails(subs)
-                            .then(() => {
-                              forceRerender();
-                            })
-                        : app.user.notifications
-                            .enableImmediateEmails(subs)
-                            .then(() => {
-                              forceRerender();
-                            });
+                      handleEmailSubscriptions(hasSomeEmailSubs, subs)
                     }}
                   />
                   <CWToggle
-                    checked={subs.some((s) => s.isActive)}
+                    checked={hasSomeInAppSubs}
                     onChange={() => {
-                      hasSomeInAppSubs
-                        ? app.user.notifications
-                            .disableSubscriptions(subs)
-                            .then(() => {
-                              forceRerender();
-                            })
-                        : app.user.notifications
-                            .enableSubscriptions(subs)
-                            .then(() => {
-                              forceRerender();
-                            });
+                      handleSubscriptions(hasSomeInAppSubs, subs)
                     }}
                   />
                 </div>
