@@ -13,6 +13,8 @@ import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 
 const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const proposalId = thread.proposalid;
@@ -23,37 +25,21 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
   }
 
   return (
-    <div
-      key={proposalId}
-      className="search-result-row"
-      onClick={() => setRoute(`/discussion/${proposalId}`)}
-    >
+    <div key={proposalId} className="search-result-row" onClick={() => setRoute(`/discussion/${proposalId}`)}>
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
           {`discussion - ${thread.chain}`}
         </CWText>
-        <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
+        <CWText className="search-results-thread-title" fontWeight="medium">
+          {renderTruncatedHighlights(searchTerm, decodeURIComponent(thread.title))}
+        </CWText>
         <div className="search-results-thread-subtitle">
-          <User
-            user={
-              new AddressInfo(
-                thread.address_id,
-                thread.address,
-                thread.address_chain,
-                null
-              )
-            }
-          />
-          <CWText className="created-at">
-            {moment(thread.created_at).fromNow()}
-          </CWText>
+          <User user={new AddressInfo(thread.address_id, thread.address, thread.address_chain, null)} />
+          <CWText className="created-at">{moment(thread.created_at).fromNow()}</CWText>
         </div>
         <CWText noWrap>
-          {/* {renderQuillTextBody(thread.body, {
-            hideFormatting: true,
-            searchTerm,
-          })} */}
+          <QuillRenderer hideFormatting={true} doc={thread.body} searchTerm={searchTerm} />
         </CWText>
       </div>
     </div>
@@ -70,38 +56,20 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
     <div
       key={comment.id}
       className="search-result-row"
-      onClick={() =>
-        setRoute(`/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`)
-      }
+      onClick={() => setRoute(`/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`)}
     >
       <CWIcon iconName="feedback" />
       <div className="inner-container">
-        <CWText fontWeight="medium">{`comment - ${
-          comment.chain || comment.community
-        }`}</CWText>
-        {/* <div className="search-results-thread-title">
-          {decodeURIComponent(comment.title)}
-        </div> */}
+        <CWText fontWeight="medium">{`comment - ${comment.chain || comment.community}`}</CWText>
+        <CWText className="search-results-thread-title">
+          {renderTruncatedHighlights(searchTerm, decodeURIComponent(comment.title))}
+        </CWText>
         <div className="search-results-thread-subtitle">
-          <User
-            user={
-              new AddressInfo(
-                comment.address_id,
-                comment.address,
-                comment.address_chain,
-                null
-              )
-            }
-          />
-          <CWText className="created-at">
-            {moment(comment.created_at).fromNow()}
-          </CWText>
+          <User user={new AddressInfo(comment.address_id, comment.address, comment.address_chain, null)} />
+          <CWText className="created-at">{moment(comment.created_at).fromNow()}</CWText>
         </div>
         <CWText noWrap>
-          {/* {renderQuillTextBody(comment.text, {
-            hideFormatting: true,
-            searchTerm,
-          })} */}
+          <QuillRenderer hideFormatting={true} doc={comment.text} searchTerm={searchTerm} />;
         </CWText>
       </div>
     </div>
@@ -125,11 +93,7 @@ const getCommunityResult = (community, setRoute) => {
   };
 
   return (
-    <div
-      key={community?.id}
-      className="community-result-row"
-      onClick={onSelect}
-    >
+    <div key={community?.id} className="community-result-row" onClick={onSelect}>
       <CommunityLabel {...params} />
     </div>
   );
@@ -145,13 +109,7 @@ const getMemberResult = (addr) => {
 
   return (
     <div key={profile.id} className="member-result-row">
-      <User
-        user={profile}
-        showRole
-        linkify
-        avatarSize={32}
-        showAddressWithDisplayName
-      />
+      <User user={profile} showRole linkify avatarSize={32} showAddressWithDisplayName />
     </div>
   );
 };

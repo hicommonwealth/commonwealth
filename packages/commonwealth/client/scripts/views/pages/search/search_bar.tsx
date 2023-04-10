@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
 import 'pages/search/search_bar.scss';

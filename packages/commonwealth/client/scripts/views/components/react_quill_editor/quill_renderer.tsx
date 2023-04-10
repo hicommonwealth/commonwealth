@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { QuillFormattedText } from '../quill/quill_formatted_text';
 import { MarkdownFormattedText } from './markdown_formatted_text';
+import { DeltaStatic } from 'quill';
 
 type QuillRendererProps = {
   doc: string;
@@ -8,21 +9,49 @@ type QuillRendererProps = {
   hideFormatting?: boolean;
 };
 
-export const QuillRenderer = ({ doc, searchTerm, hideFormatting }: QuillRendererProps) => {
-  let decodedTextbody: string;
-  try {
-    decodedTextbody = decodeURIComponent(doc);
-  } catch (e) {
-    decodedTextbody = doc;
-  }
+type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
+type MarkdownDocInfo = { format: 'markdown'; content: string };
+type UnknownDocInfo = { format: 'unknown'; content: null };
+type DocInfo = RichTextDocInfo | MarkdownDocInfo | UnknownDocInfo;
 
-  try {
-    const parsedDoc = JSON.parse(decodedTextbody);
-    if (!parsedDoc.ops) {
-      throw new Error('failed to parse doc as JSON');
+export const QuillRenderer = ({ doc, searchTerm, hideFormatting }: QuillRendererProps) => {
+  const docInfo: DocInfo = useMemo(() => {
+    let decodedText: string;
+    try {
+      decodedText = decodeURIComponent(doc);
+    } catch (e) {
+      decodedText = doc;
     }
-    return <QuillFormattedText hideFormatting={hideFormatting} doc={parsedDoc} searchTerm={searchTerm} />;
-  } catch (e) {
-    return <MarkdownFormattedText hideFormatting={hideFormatting} doc={decodedTextbody} searchTerm={searchTerm} />;
+
+    try {
+      // if JSON with ops, it's richtext
+      const delta = JSON.parse(decodedText) as DeltaStatic;
+      if (!delta.ops) {
+        console.error('parsed doc as JSON but has no ops');
+        return {
+          format: 'unknown',
+          content: null
+        } as UnknownDocInfo;
+      }
+      return {
+        format: 'richtext',
+        content: delta
+      } as RichTextDocInfo;
+    } catch (err) {
+      // otherwise it's a markdown string
+      return {
+        format: 'markdown',
+        content: decodedText
+      } as MarkdownDocInfo;
+    }
+  }, [doc]);
+
+  switch (docInfo.format) {
+    case 'richtext':
+      return <QuillFormattedText hideFormatting={hideFormatting} doc={docInfo.content} searchTerm={searchTerm} />;
+    case 'markdown':
+      return <MarkdownFormattedText hideFormatting={hideFormatting} doc={docInfo.content} searchTerm={searchTerm} />;
+    default:
+      return <>N/A</>;
   }
 };

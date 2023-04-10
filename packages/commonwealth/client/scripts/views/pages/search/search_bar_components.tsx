@@ -109,7 +109,7 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
         {renderTruncatedHighlights(searchTerm, title)}
       </CWText>
       <CWText type="caption" className="excerpt-text">
-        <QuillRenderer hideFormatting={true} doc={content} searchTerm={searchTerm} />;
+        <QuillRenderer hideFormatting={true} doc={content} searchTerm={searchTerm} />
       </CWText>
     </div>
   );
