@@ -9,19 +9,21 @@ import { BalanceType, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
+
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
 import { constructCanvasMessage } from 'shared/adapters/shared';
-import { PermissionManager } from 'shared/permissions';
+import { PermissionManager } from 'commonwealth/shared/permissions';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { Permission } from '../../server/models/role';
+
 import {
-  constructTypedMessage,
-  TEST_BLOCK_INFO_STRING,
+  constructTypedCanvasMessage,
+  TEST_BLOCK_INFO_STRING
 } from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -85,14 +87,17 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     console.log('createAndVerifyAddress res', res.body);
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
+    const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
-    const data = await constructTypedMessage(
-      address,
+    const timestamp = 1665083987891;
+    const message = constructCanvasMessage(
+      'ethereum',
       chain_id,
+      address,
       sessionWallet.address,
       TEST_BLOCK_INFO_STRING
     );
+    const data = constructTypedCanvasMessage(message);
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -106,12 +111,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({
         address,
         chain,
+        chain_id,
         signature,
         wallet_id,
         session_public_address: sessionWallet.address,
+        session_timestamp: timestamp,
         session_block_data: TEST_BLOCK_INFO_STRING,
       });
-    console.log(JSON.stringify(res.body));
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email };
@@ -138,7 +144,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     );
     const chain_id = ChainNetwork.Edgeware;
     const message = constructCanvasMessage(
-      'eth',
+      'ethereum',
       chain_id,
       address,
       sessionWallet.address,
@@ -230,11 +236,11 @@ export interface CommentArgs {
   jwt: any;
   text: any;
   parentCommentId?: any;
-  root_id?: any;
+  thread_id?: any;
 }
 
 export const createComment = async (args: CommentArgs) => {
-  const { chain, address, jwt, text, parentCommentId, root_id } = args;
+  const { chain, address, jwt, text, parentCommentId, thread_id } = args;
   const res = await chai.request
     .agent(app)
     .post('/api/createComment')
@@ -244,7 +250,7 @@ export const createComment = async (args: CommentArgs) => {
       chain,
       address,
       parent_id: parentCommentId,
-      root_id,
+      thread_id,
       'attachments[]': undefined,
       text,
       jwt,

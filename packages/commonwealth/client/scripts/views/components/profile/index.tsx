@@ -54,7 +54,7 @@ const ProfileComponent = (props: ProfileProps) => {
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
           (t) =>
-            t.id === parseInt(c.rootProposal.replace('discussion_', ''), 10)
+            t.id === parseInt(c.threadId, 10)
         );
         return { ...c, thread };
       });
