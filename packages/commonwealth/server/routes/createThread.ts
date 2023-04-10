@@ -12,7 +12,7 @@ import { findAllRoles, isAddressPermitted } from '../util/roles';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
+import { getThreadUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
@@ -143,7 +143,7 @@ const dispatchHooks = async (
     location,
     {
       created_at: new Date(),
-      root_id: finalThread.id,
+      thread_id: finalThread.id,
       root_type: ProposalType.Thread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
@@ -154,7 +154,7 @@ const dispatchHooks = async (
     {
       user: finalThread.Address.address,
       author_chain: finalThread.Address.chain,
-      url: getProposalUrl('discussion', finalThread),
+      url: getThreadUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
@@ -175,7 +175,7 @@ const dispatchHooks = async (
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: finalThread.id,
+          thread_id: finalThread.id,
           root_type: ProposalType.Thread,
           root_title: finalThread.title,
           comment_text: finalThread.body,
@@ -183,14 +183,7 @@ const dispatchHooks = async (
           author_address: finalThread.Address.address,
           author_chain: finalThread.Address.chain,
         },
-        {
-          user: finalThread.Address.address,
-          url: getProposalUrl('discussion', finalThread),
-          title: req.body.title,
-          bodyUrl: req.body.url,
-          chain: finalThread.chain,
-          body: finalThread.body,
-        },
+        null,
         [finalThread.Address.address]
       );
     });
@@ -403,16 +396,6 @@ const createThread = async (
     } catch (err) {
       return next(err);
     }
-
-    // initialize view count
-    await models.ViewCount.create(
-      {
-        chain: thread.chain,
-        object_id: thread.id,
-        view_count: 0,
-      },
-      { transaction }
-    );
 
     // update author's last activity based on thread creation
     author.last_active = new Date();

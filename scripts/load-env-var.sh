@@ -19,6 +19,6 @@ load-env-var () {
 }
 
 if [ "${1}" != "--source-only" ]; then
-    main "${@}"
+    load-env-var "${@}"
 fi
 

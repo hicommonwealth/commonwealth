@@ -1,5 +1,6 @@
 /* eslint-disable prefer-const */
 import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   ChainNetwork,
   ChainType,
@@ -9,10 +10,7 @@ import {
 import type { NextFunction, Request, Response } from 'express';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import {
-  getProposalUrl,
-  getProposalUrlWithoutObject,
-} from '../../shared/utils';
+import { getThreadUrl } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
@@ -21,7 +19,6 @@ import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -65,12 +62,11 @@ const createReaction = async (
       where: { id: thread_id },
     });
   } else if (comment_id) {
-    const root_id = (
+    const threadId = (
       await models.Comment.findOne({ where: { id: comment_id } })
-    ).root_id;
-    const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
+    ).thread_id;
     thread = await models.Thread.findOne({
-      where: { id: comment_thread_id },
+      where: { id: threadId },
     });
   }
 
@@ -181,27 +177,15 @@ const createReaction = async (
     if (!comment) return next(new AppError(Errors.NoCommentMatch));
 
     // Test on variety of comments to ensure root relation + type
-    const [prefix, id] = comment.root_id.split('_');
-    if (prefix === 'discussion') {
-      proposal = await models.Thread.findOne({
-        where: { id },
-      });
-      cwUrl = getProposalUrl(prefix, proposal, comment);
-    } else if (
-      prefix.includes('proposal') ||
-      prefix.includes('referendum') ||
-      prefix.includes('motion')
-    ) {
-      cwUrl = getProposalUrlWithoutObject(prefix, chain.id, id, comment);
-      proposal = id;
-    } else {
-      proposal = undefined;
-    }
-    root_type = prefix;
+    const id = comment.thread_id;
+    proposal = await models.Thread.findOne({
+      where: { id },
+    });
+    cwUrl = getThreadUrl(proposal, comment);
   } else if (thread_id) {
     proposal = await models.Thread.findByPk(Number(thread_id));
     if (!proposal) return next(new AppError(Errors.NoProposalMatch));
-    cwUrl = getProposalUrl('discussion', proposal, comment);
+    cwUrl = getThreadUrl(proposal, comment);
     root_type = 'discussion';
   }
 
@@ -210,11 +194,11 @@ const createReaction = async (
   // dispatch notifications
   const notification_data = {
     created_at: new Date(),
-    root_id: comment
-      ? comment.root_id.split('_')[1]
+    thread_id: comment
+      ? comment.thread_id
       : proposal instanceof models.Thread
       ? proposal.id
-      : proposal?.root_id,
+      : proposal?.thread_id,
     root_title,
     root_type,
     chain_id: finalReaction.chain,

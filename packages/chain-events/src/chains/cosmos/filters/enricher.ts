@@ -22,7 +22,7 @@ export async function Enrich(
       // query all proposals and locate the most recent one matching the tx
       // TODO: is there an easier way to do this involving MsgSubmitProposalResponse?
       //   basically, the data we need is the proposal id.
-      const { proposals } = await api.lcd.gov.proposals(0, '', '');
+      const { proposals } = await api.rpc.gov.proposals(0, '', '');
       const proposal = proposals.find((p) => {
         if (p.content.typeUrl !== submitProposal.content.typeUrl) return false;
         return Buffer.from(p.content.value).equals(
