@@ -17,8 +17,10 @@ import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import { LCD } from 'chain-events/src/chains/cosmos/types';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
+import { createLCDClient } from 'common-common/src/cosmos-ts/src/codegen/cosmos/lcd';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -38,8 +40,12 @@ export type CosmosApiType = QueryClient &
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _api: CosmosApiType;
+  private _lcd: LCD;
   public get api() {
     return this._api;
+  }
+  public get lcd() {
+    return this._lcd;
   }
 
   // TODO: rename this something like "bankDenom" or "gasDenom" or "masterDenom"
@@ -83,6 +89,25 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       cosm.setupStakingExtension,
       cosm.setupBankExtension
     );
+
+    if (chain?.cosmosGovernanceVersion === 'v1') {
+      const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
+      const lcd = await createLCDClient({
+        restEndpoint: lcdUrl,
+      });
+      this._lcd = lcd;
+    }
+
+    const {
+      pool: { bondedTokens },
+    } = await this._api.staking.pool();
+    this._staked = this.coins(new BN(bondedTokens));
+
+    const {
+      params: { bondDenom },
+    } = await this._api.staking.params();
+    this._denom = bondDenom;
+
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
@@ -98,15 +123,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this.app.chain.block.lastTime = time;
     this.app.chain.block.height = height;
 
-    const {
-      pool: { bondedTokens },
-    } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bondedTokens));
-
-    const {
-      params: { bondDenom },
-    } = await this._api.staking.params();
-    this._denom = bondDenom;
     this.app.chain.networkStatus = ApiStatus.Connected;
     m.redraw();
   }

@@ -77,6 +77,10 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       return <CannotVote label="Connect an address to vote" />;
     } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
       return <CannotVote label="Cannot vote from this address" />;
+      // TODO: remove when v1 voting is confirmed
+      // https://github.com/hicommonwealth/commonwealth/issues/3361
+    } else if (app.chain?.meta?.cosmosGovernanceVersion === 'v1') {
+      return <CannotVote label="Voting coming soon" />;
     }
 
     let user;

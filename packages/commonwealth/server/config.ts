@@ -17,8 +17,9 @@ export const SERVER_URL =
     ? 'https://commonwealth.im'
     : 'http://localhost:8080');
 
-export const ENTITIES_URL =
+export const CE_URL =
   process.env.ENTITIES_URL ||
+  process.env.CE_URL ||
   (process.env.NODE_ENV === 'production'
     ? 'https://chain-events.herokuapp.com/api'
     : 'http://localhost:8081/api');
@@ -134,3 +135,6 @@ export const DISCORD_BOT_SUCCESS_URL =
 export const ETHERSCAN_JS_API_KEY = process.env.ETHERSCAN_JS_API_KEY;
 export const CHAIN_EVENT_SERVICE_SECRET =
   process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
+export const ETH_RPC = process.env.ETH_RPC || 'prod';
+
+export const COSMOS_GOV_V1 = process.env.COSMOS_GOV_V1;

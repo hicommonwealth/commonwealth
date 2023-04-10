@@ -175,12 +175,6 @@ const deleteChain = async (
         transaction: t,
       });
 
-      // TODO: delete chain-event-types in chain-events
-      await models.ChainEventType.destroy({
-        where: { id: { [Op.like]: `%${chain.id}%` } },
-        transaction: t,
-      });
-
       // notifications + notifications_read (cascade)
       await models.Notification.destroy({
         where: { chain_id: chain.id },

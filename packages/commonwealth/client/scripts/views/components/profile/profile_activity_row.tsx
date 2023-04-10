@@ -31,7 +31,7 @@ export class NewProfileActivityRow extends ClassComponent<ProfileActivityRowAttr
     const iconUrl = app.config.chains.getById(chain)?.iconUrl;
     let decodedTitle;
     try {
-      decodedTitle = decodeURIComponent(title);
+      decodedTitle = decodeURIComponent(title ?? comment.thread.title);
     } catch (err) {
       console.error(`Could not decode title: "${title}"`);
       decodedTitle = title;
