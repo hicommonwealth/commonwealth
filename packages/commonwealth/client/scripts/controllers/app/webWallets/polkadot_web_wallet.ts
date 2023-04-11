@@ -33,7 +33,7 @@ class PolkadotWebWalletController
   public readonly chain = ChainBase.Substrate;
 
   public get available() {
-    return this.polkadot && this.polkadot.isWeb3Injected;
+    return isWeb3Injected;
   }
 
   public get enabled() {
@@ -99,7 +99,7 @@ class PolkadotWebWalletController
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account
-      this._accounts = await this.polkadot.polkadotweb3Accounts();
+      this._accounts = await this.polkadot.web3Accounts();
 
       this._enabled = true;
       this._enabling = false;
