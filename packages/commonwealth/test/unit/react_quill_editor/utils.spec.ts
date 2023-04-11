@@ -18,6 +18,18 @@ describe('react quill editor unit tests', () => {
       assert.deepEqual(result, expectedDelta)
     })
 
+    it('should convert text to delta (richtext) – bad input case', () => {
+      const text = null
+      const expectedDelta = {
+        ops: [
+          { insert: '' }
+        ],
+        ___isMarkdown: false
+      } as any as SerializableDeltaStatic
+      const result = createDeltaFromText(text)
+      assert.deepEqual(result, expectedDelta)
+    })
+
     it('should convert text to delta (markdown)', () => {
       const text = 'hello'
       const expectedDelta = {
@@ -123,6 +135,18 @@ describe('react quill editor unit tests', () => {
       const expectedOutput = {
         ops: [
           { insert: 'hello' }
+        ],
+        ___isMarkdown: true
+      } as SerializableDeltaStatic
+      const result = deserializeDelta(original)
+      assert.deepEqual(result, expectedOutput)
+    })
+
+    it('should deserialize at string (markdown) to DeltaStatic - bad input case', () => {
+      const original = null
+      const expectedOutput = {
+        ops: [
+          { insert: '' }
         ],
         ___isMarkdown: true
       } as SerializableDeltaStatic

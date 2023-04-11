@@ -9,7 +9,7 @@ export const createDeltaFromText = (
   return {
     ops: [
       {
-        insert: str,
+        insert: str || '',
       },
     ],
     ___isMarkdown: !!isMarkdown,
