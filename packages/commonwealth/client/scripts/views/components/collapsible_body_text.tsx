@@ -9,6 +9,5 @@ type CollapsibleProposalBodyProps = {
 };
 
 export const CollapsibleProposalBody = ({ proposal }: CollapsibleProposalBodyProps) => {
-  console.log({ proposal });
   return <QuillRenderer doc={proposal.description} cutoffLines={50} />;
 };
