@@ -1,9 +1,16 @@
 node_modules/
 */build
 */dist
-*/.DS_Store
 *.env
 *.log
 */build/
 .idea
-postgres-data
+
+#mac
+**/.DS_Store
+
+# compose
+postgres-data*
+redis-data*
+rabbitmq-data*
+compose-draft
