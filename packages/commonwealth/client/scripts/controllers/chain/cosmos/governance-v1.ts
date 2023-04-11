@@ -61,15 +61,6 @@ const isCompleted = (status: string): boolean => {
   return status === 'Passed' || status === 'Rejected' || status === 'Failed';
 };
 
-const asciiLiteralToDecimal = async (n: Uint8Array) => {
-  if (!n) return null;
-  // 500000000000000000 = 0.5
-  // dividing by 1000000000000000 gives 3 decimal digits of precision
-  const cosm = await import('@cosmjs/encoding');
-  const nStr = cosm.fromAscii(n);
-  return +new BN(nStr).div(new BN('1000000000000000')) / 1000;
-};
-
 export const marshalTally = (tally: TallyResult): ICosmosProposalTally => {
   if (!tally) return null;
   return {

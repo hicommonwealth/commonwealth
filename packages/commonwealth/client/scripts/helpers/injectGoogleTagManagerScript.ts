@@ -6,7 +6,7 @@ const injectGoogleTagManagerScript = () => {
   //   m.render(
   //     script,
   //     m.trust(
-  //       // eslint-disable-next-line max-len
+  // eslint-disable-next-line max-len
   //       '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'
   //     )
   //   );

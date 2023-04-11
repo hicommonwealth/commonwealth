@@ -153,7 +153,6 @@ import type BanCache from '../util/banCheckCache';
 import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
-import { addExternalRoutes } from './external';
 import generateImage from '../routes/generateImage';
 import { getChainEventServiceData } from '../routes/getChainEventServiceData';
 import { getChain } from '../routes/getChain';
@@ -178,7 +177,6 @@ import {
 } from '../routes/proposalTemplate';
 import { createTemplate, getTemplates } from '../routes/templates';
 
-import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
 
 function setupRouter(
@@ -1002,7 +1000,7 @@ function setupRouter(
   router.post(
     '/auth/magic',
     passport.authenticate('magic'),
-    (req, res, next) => {
+    (req, res) => {
       return res.json({ status: 'Success', result: req.user.toJSON() });
     }
   );

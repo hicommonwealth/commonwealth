@@ -60,7 +60,9 @@ export const getTopThreads = async (
         LEFT JOIN "Reactions" r ON t.id = r.thread_id
         INNER JOIN "Addresses" a ON t.address_id = a.id
       WHERE 
-        t.chain='${communityId}' AND c.created_at > NOW() - INTERVAL '1 WEEK' AND r.created_at > NOW() - INTERVAL '1 WEEK'
+        t.chain='${communityId}' AND
+        c.created_at > NOW() - INTERVAL '1 WEEK' AND
+        r.created_at > NOW() - INTERVAL '1 WEEK'
       GROUP BY 
         t.id, a.address
       ORDER BY 

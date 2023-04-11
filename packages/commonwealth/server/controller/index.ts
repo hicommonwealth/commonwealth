@@ -1,7 +1,7 @@
 import { QueryTypes } from 'sequelize';
 import type { Request, Response } from 'express';
 import type { DB } from '../models';
-import { PermissionManager, Action } from '../../shared/permissions';
+import { Action } from '../../shared/permissions';
 import { isAddressPermitted } from '../util/roles';
 
 export async function getRoles(models: DB, req: Request, res: Response) {
@@ -123,7 +123,7 @@ export async function getPermissions(models: DB, req: Request, res: Response) {
     return res.status(400).json({ error: 'No query provided' });
   }
 
-  const { address, address_id, chain_id } = req.query;
+  const { address } = req.query;
   if (!address) {
     return res.status(400).json({ error: 'No address provided' });
   }

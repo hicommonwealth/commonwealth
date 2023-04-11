@@ -124,7 +124,7 @@ class PollsController {
         chain_id: app.activeChainId(),
         jwt: app.user.jwt,
       },
-      success: (response) => {
+      success: () => {
         this._store.remove(this._store.getById(pollId));
         redraw();
       },

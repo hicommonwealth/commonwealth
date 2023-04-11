@@ -11,10 +11,8 @@ import type { u128 } from '@polkadot/types';
 
 import type { Compact } from '@polkadot/types/codec';
 import type {
-  ActiveEraInfo,
   Call,
   DispatchError,
-  EraIndex,
   SessionIndex,
 } from '@polkadot/types/interfaces';
 import type { CallFunction, InterfaceTypes } from '@polkadot/types/types';
@@ -25,7 +23,6 @@ import { formatCoin } from 'adapters/currency';
 import BN from 'bn.js';
 
 import { SubstrateEvents } from 'chain-events/src';
-import { ChainNetwork } from 'common-common/src/types';
 
 import {
   notifyError,

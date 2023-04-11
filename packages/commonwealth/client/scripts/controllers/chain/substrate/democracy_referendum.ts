@@ -1,5 +1,5 @@
 import type { ApiPromise } from '@polkadot/api';
-import type { Call, Conviction } from '@polkadot/types/interfaces';
+import type { Conviction } from '@polkadot/types/interfaces';
 import type {
   ISubstrateDemocracyReferendum,
   SubstrateCoin,

@@ -152,7 +152,7 @@ export const renderQuillDelta = (
           })
         );
       })
-    : consolidateOrderedLists(groups).map((group, i) => {
+    : consolidateOrderedLists(groups).map(group => {
         const renderChild = (child, ii) => {
           // handle images
           if (child.insert?.image) {
@@ -389,7 +389,7 @@ export const renderQuillDelta = (
               render(
                 getGroupTag(_group),
                 { key: `extra-${iii}` },
-                temp.pop().map(({ tag, content, key }, index) => {
+                temp.pop().map(({ tag, content }, index) => {
                   return render(tag, { key: index }, content);
                 })
               )
@@ -399,7 +399,7 @@ export const renderQuillDelta = (
           return render(
             getGroupTag(_group),
             { key: ii },
-            temp[0].map(({ tag, content, key }, index) => {
+            temp[0].map(({ tag, content }, index) => {
               return render(tag, { key: index }, content);
             })
           );

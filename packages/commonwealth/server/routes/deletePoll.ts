@@ -1,6 +1,4 @@
 import { AppError, ServerError } from 'common-common/src/errors';
-import moment from 'moment';
-import { getNextPollEndingTime } from '../../shared/utils';
 import type { DB } from '../models';
 import { findOneRole } from '../util/roles';
 import type { ValidateChainParams } from '../middleware/validateChain';

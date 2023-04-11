@@ -1,5 +1,4 @@
 /* eslint-disable no-async-promise-executor */
-import { Contract } from 'client/scripts/models';
 import { ServerError } from 'common-common/src/errors';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided

@@ -150,6 +150,7 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
   }
 
   // used for mithril's `onupdate` lifecycle hook
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public componentDidUpdate(prevProps: A) {
     this.onupdate({ attrs: this.props, children: this.props.children });
   }
@@ -170,14 +171,20 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
   }
 
   /* eslint-disable @typescript-eslint/no-empty-function */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public oninit(v: ResultNode<A>) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onupdate(v: ResultNode<A>) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onremove(v: ResultNode<A>) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public oncreate(v: ResultNode<A>) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
   abstract view(v: ResultNode<A>): Children | null;
 
   // replicates `m.redraw()` functionality -- sync is ignored
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public redraw(sync = false) {
     this.forceUpdate();
   }
@@ -199,6 +206,7 @@ export abstract class ClassComponent<A = unknown> extends ReactComponent<
 }
 
 // m.rendraw() shim. NO-OP.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function redraw(sync = false, component?: any) {
   // TODO
   if (component) {

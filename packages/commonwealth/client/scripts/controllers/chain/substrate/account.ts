@@ -1,17 +1,8 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
-import type { ApiPromise } from '@polkadot/api';
-import { decodeAddress } from '@polkadot/keyring';
-import type { Vec } from '@polkadot/types';
 import type {
   AccountId,
-  Balance,
-  BalanceLock,
-  BalanceLockTo212,
   Conviction,
-  EraIndex,
-  Exposure,
-  StakingLedger,
 } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -171,7 +162,8 @@ class SubstrateAccounts
 
   public fromAddress(address: string, isEd25519 = false): SubstrateAccount {
     try {
-      this.polkadot.decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
+      // try to decode address; this will produce an error if the address is invalid
+      this.polkadot.decodeAddress(address);
     } catch (e) {
       console.error(`Decoded invalid address: ${address}`);
       return;

@@ -1,5 +1,5 @@
 import type { DB } from '../models';
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',
@@ -9,8 +9,7 @@ export const Errors = {
 export const getSubscribedChains = async (
   models: DB,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   const chains = await models.Chain.findAll({
     where: { has_chain_events_listener: true },

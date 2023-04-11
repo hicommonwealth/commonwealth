@@ -117,7 +117,7 @@ export interface IApp {
   isLoggedIn(): boolean;
 
   isProduction(): boolean;
-  isNative(win): boolean;
+  isNative(): boolean;
 
   serverUrl(): string;
 
@@ -204,7 +204,7 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
-  isNative: (win: Window) => {
+  isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
   },
@@ -214,7 +214,7 @@ const app: IApp = {
     //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
     const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
 
-    if (app.isNative(window)) {
+    if (app.isNative()) {
       return mobileUrl;
     } else {
       return '/api';

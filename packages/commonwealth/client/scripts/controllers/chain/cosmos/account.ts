@@ -1,9 +1,3 @@
-import type {
-  MsgDelegateEncodeObject,
-  MsgSendEncodeObject,
-  MsgUndelegateEncodeObject,
-  MsgWithdrawDelegatorRewardEncodeObject,
-} from '@cosmjs/stargate';
 import BN from 'bn.js';
 import CosmosChain from 'controllers/chain/cosmos/chain';
 import type { CosmosToken } from 'controllers/chain/cosmos/types';

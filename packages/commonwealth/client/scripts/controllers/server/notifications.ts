@@ -1,10 +1,9 @@
 /* eslint-disable no-restricted-syntax */
+import { EventEmitter } from 'events';
 import $ from 'jquery';
 
-import { redraw } from 'mithrilInterop';
 import { Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
-import { EventEmitter } from 'events';
 
 import app from 'state';
 
@@ -382,8 +381,7 @@ class NotificationsController {
     return get('/viewSubscriptions', {}, (result) => {
       this._subscriptions = [];
 
-      const subs = result;
-      subs.forEach((sub) => this._subscriptions.push(modelFromServer(sub)));
+      result.forEach((sub) => this._subscriptions.push(modelFromServer(sub)));
     });
   }
 
