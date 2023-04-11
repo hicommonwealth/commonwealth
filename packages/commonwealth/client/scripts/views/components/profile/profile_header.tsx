@@ -7,7 +7,7 @@ import 'components/profile/profile_header.scss';
 import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
-import { renderQuillTextBody } from '../quill/helpers';
+import { renderQuillTextBody } from '../react_quill_editor/helpers';
 import { SocialAccounts } from '../social_accounts';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
@@ -31,23 +31,14 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
     <div className="ProfileHeader">
       <div className="edit">
         {isCurrentUser && (
-          <CWButton
-            label="Edit"
-            buttonType="mini-white"
-            iconLeft="write"
-            onClick={() => navigate(`/profile/edit`)}
-          />
+          <CWButton label="Edit" buttonType="mini-white" iconLeft="write" onClick={() => navigate(`/profile/edit`)} />
         )}
       </div>
       <div className="profile-image">
         {profile.avatarUrl ? (
           <img src={profile.avatarUrl} />
         ) : (
-          <img
-            src={`data:image/svg+xml;utf8,${encodeURIComponent(
-              jdenticon.toSvg(profile.id, 90)
-            )}`}
-          />
+          <img src={`data:image/svg+xml;utf8,${encodeURIComponent(jdenticon.toSvg(profile.id, 90))}`} />
         )}
       </div>
       <div className="profile-name-and-bio">
