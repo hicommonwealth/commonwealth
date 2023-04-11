@@ -9,7 +9,7 @@ import { CWButton } from '../component_kit/cw_button';
 import { clearEditingLocalStorage } from './helpers';
 import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../react_quill_editor';
-import { parseDeltaString } from '../react_quill_editor/utils';
+import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
 
 type EditCommentProps = {
   comment: Comment<any>;
@@ -28,8 +28,9 @@ export const EditComment = (props: EditCommentProps) => {
     updatedCommentsCallback,
   } = props;
 
-  const commentBody = (shouldRestoreEdits && savedEdits) ? savedEdits : comment.text;
-  const body = parseDeltaString(commentBody)
+  const commentBody =
+    shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+  const body = deserializeDelta(commentBody);
 
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>();
@@ -49,7 +50,7 @@ export const EditComment = (props: EditCommentProps) => {
       setIsEditing(false);
       clearEditingLocalStorage(comment.id, ContentType.Comment);
     }
-  }
+  };
 
   const save = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -57,17 +58,16 @@ export const EditComment = (props: EditCommentProps) => {
     setSaving(true);
 
     try {
-      await app.comments.edit(comment, JSON.stringify(contentDelta))
+      await app.comments.edit(comment, serializeDelta(contentDelta));
       setIsEditing(false);
       clearEditingLocalStorage(comment.id, ContentType.Comment);
       updatedCommentsCallback();
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
       setSaving(false);
     }
-    
-  }
+  };
 
   return (
     <div className="EditComment">
@@ -82,11 +82,7 @@ export const EditComment = (props: EditCommentProps) => {
           buttonType="secondary-blue"
           onClick={cancel}
         />
-        <CWButton
-          label="Save"
-          disabled={saving}
-          onClick={save}
-        />
+        <CWButton label="Save" disabled={saving} onClick={save} />
       </div>
     </div>
   );

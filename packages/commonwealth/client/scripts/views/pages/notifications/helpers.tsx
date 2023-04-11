@@ -11,7 +11,7 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import { pluralize } from 'helpers';
 import { User } from 'views/components/user/user';
-import { getProposalUrl, getCommunityUrl } from 'utils';
+import { getThreadUrl, getCommunityUrl } from 'utils';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { QuillFormattedText } from '../../components/quill/quill_formatted_text';
 
@@ -84,7 +84,7 @@ const getCommentPreview = (commentText) => {
 const getNotificationFields = (category, data: IPostNotificationData) => {
   const {
     created_at,
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -158,7 +158,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   }
 
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
     chain: chain_id,
   };
@@ -167,7 +167,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
 
-  const path = (getProposalUrl as any)(...args);
+  const path = (getThreadUrl as any)(...args);
 
   const pageJump = comment_id
     ? () => jumpHighlightNotification(comment_id)
@@ -193,7 +193,7 @@ export const getBatchNotificationFields = (
 
   const {
     created_at,
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -284,7 +284,7 @@ export const getBatchNotificationFields = (
   }
 
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
     chain: chain_id,
   };
@@ -296,7 +296,7 @@ export const getBatchNotificationFields = (
   const path =
     category === NotificationCategories.NewThread
       ? (getCommunityUrl as any)(chain_id)
-      : (getProposalUrl as any)(...args);
+      : (getThreadUrl as any)(...args);
 
   const pageJump = comment_id
     ? () => jumpHighlightNotification(comment_id)

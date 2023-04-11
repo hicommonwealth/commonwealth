@@ -22,6 +22,18 @@ export const SnapshotProposalSelector = ({
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const queryLength = searchTerm?.trim()?.length;
+
+  const getEmptyContentMessage = () => {
+    if (queryLength > 0 && queryLength < 5) {
+      return 'Query too short';
+    } else if (queryLength >= 5 && !searchTerm.length) {
+      return 'No snapshots found';
+    } else if (!snapshotProposalsToSet?.length) {
+      return 'No currently linked snapshots';
+    }
+  };
+
   useEffect(() => {
     if (allProposals.length === 0) {
       setLoading(true);
@@ -76,10 +88,14 @@ export const SnapshotProposalSelector = ({
     setSearchTerm(e.target.value);
   };
 
+  const EmptyComponent = () => (
+    <div className="empty-component">{getEmptyContentMessage()}</div>
+  );
+
   return (
     <div className="SnapshotProposalSelector">
       <CWTextInput
-        placeholder="Search for an existing snapshot proposal..."
+        placeholder="Search for snapshot proposals"
         iconRightonClick={handleClearButtonClick}
         value={searchTerm}
         iconRight="close"
@@ -89,6 +105,7 @@ export const SnapshotProposalSelector = ({
       <QueryList
         loading={loading}
         options={proposals}
+        components={{ EmptyPlaceholder: EmptyComponent }}
         renderItem={renderItem}
       />
     </div>

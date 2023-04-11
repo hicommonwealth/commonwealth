@@ -17,6 +17,7 @@ import PollsController from './controllers/server/polls';
 import NewProfilesController from './controllers/server/newProfiles';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
+import ThreadReactionsController from './controllers/server/reactions/ThreadReactionsController';
 import { RolesController } from './controllers/server/roles';
 import SearchController from './controllers/server/search';
 import SessionsController from './controllers/server/sessions';
@@ -62,6 +63,7 @@ export interface IApp {
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
   comments: CommentsController;
   reactions: ReactionsController;
+  threadReactions: ThreadReactionsController;
   reactionCounts: ReactionCountsController;
   polls: PollsController;
 
@@ -107,6 +109,7 @@ export interface IApp {
     defaultChain: string;
     chainCategories?: ChainCategoryAttributes[];
     chainCategoryTypes?: ChainCategoryTypeAttributes[];
+    evmTestEnv?: string;
   };
 
   loginStatusLoaded(): boolean;
@@ -156,6 +159,7 @@ const app: IApp = {
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   comments: new CommentsController(),
   reactions: new ReactionsController(),
+  threadReactions: new ThreadReactionsController(),
   reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
 
@@ -242,6 +246,7 @@ export async function initAppState(
         app.config.nodes.clear();
         app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
+        app.config.evmTestEnv = data.result.evmTestEnv;
 
         data.result.nodes
           .sort((a, b) => a.id - b.id)

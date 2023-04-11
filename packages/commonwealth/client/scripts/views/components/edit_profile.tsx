@@ -32,6 +32,7 @@ import {
   getTextFromDelta,
   ReactQuillEditor,
 } from './react_quill_editor';
+import { deserializeDelta, serializeDelta } from './react_quill_editor/utils';
 
 enum EditProfileError {
   None,
@@ -40,16 +41,12 @@ enum EditProfileError {
 
 const NoProfileFoundError = 'No profile found';
 
-type EditNewProfileProps = {
-  profileId: string;
-};
-
 export type Image = {
   url: string;
   imageBehavior: ImageBehavior;
 };
 
-const EditProfileComponent = (props: EditNewProfileProps) => {
+const EditProfileComponent = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<EditProfileError>(EditProfileError.None);
@@ -60,18 +57,16 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   const [avatarUrl, setAvatarUrl] = useState();
   const [bio, setBio] = React.useState<DeltaStatic>(createDeltaFromText(''));
   const [addresses, setAddresses] = useState<AddressInfo[]>();
-  const [isOwner, setIsOwner] = useState();
   const [displayNameValid, setDisplayNameValid] = useState(true);
   const [account, setAccount] = useState<Account>();
   const backgroundImageRef = useRef<Image>();
 
-  const getProfile = async (query: string) => {
+  const getProfile = async () => {
     try {
       const response = await axios.get(`${app.serverUrl()}/profile/v2`, {
         params: {
-          profileId: query,
           jwt: app.user.jwt,
-        }
+        },
       });
 
       setProfile(new Profile(response.data.result.profile));
@@ -79,8 +74,9 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
       setEmail(response.data.result.profile.email || '');
       setSocials(response.data.result.profile.socials);
       setAvatarUrl(response.data.result.profile.avatar_url);
-      setBio(response.data.result.profile.bio);
-      backgroundImageRef.current = response.data.result.profile.background_image;
+      setBio(deserializeDelta(response.data.result.profile.bio));
+      backgroundImageRef.current =
+        response.data.result.profile.background_image;
       setAddresses(
         response.data.result.addresses.map((a) => {
           try {
@@ -98,7 +94,6 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
           }
         })
       );
-      setIsOwner(response.data.result.isOwner);
     } catch (err) {
       if (
         err.status === 500 &&
@@ -144,9 +139,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
 
     if (!_.isEqual(email, profile?.email)) profileUpdate.email = email;
 
-    if (!_.isEqual(getTextFromDelta(bio), profile?.bio)) {
-      profileUpdate.bio = getTextFromDelta(bio) || '';
-    }
+    profileUpdate.bio = serializeDelta(bio);
 
     if (!_.isEqual(avatarUrl, profile?.avatarUrl))
       profileUpdate.avatarUrl = avatarUrl;
@@ -182,14 +175,8 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   };
 
   useEffect(() => {
-    if (!app.isLoggedIn()) {
-      navigate(`/profile/id/${props.profileId}`);
-    }
-
-    if (props.profileId) {
-      getProfile(props.profileId);
-    }
-  }, [navigate, props.profileId]);
+    getProfile();
+  }, []);
 
   useEffect(() => {
     // need to create an account to pass to AvatarUpload to see last upload
@@ -210,11 +197,13 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
         null
       );
 
-      setAccount(new Account({
-        chain: addresses[0].chain,
-        address: addresses[0].address,
-        profile: oldProfile,
-      }));
+      setAccount(
+        new Account({
+          chain: addresses[0].chain,
+          address: addresses[0].address,
+          profile: oldProfile,
+        })
+      );
     } else {
       setAccount(null);
     }
@@ -235,11 +224,6 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
   }
 
   if (error === EditProfileError.None) {
-    if (!isOwner) {
-      navigate(`/profile/id/${props.profileId}`);
-      return;
-    }
-
     return (
       <div className="EditProfile">
         <CWForm
@@ -400,7 +384,7 @@ const EditProfileComponent = (props: EditNewProfileProps) => {
               addresses={addresses}
               profile={profile}
               refreshProfiles={(address: string) => {
-                getProfile(props.profileId);
+                getProfile();
                 app.user.removeAddress(
                   addresses.find((a) => a.address === address)
                 );

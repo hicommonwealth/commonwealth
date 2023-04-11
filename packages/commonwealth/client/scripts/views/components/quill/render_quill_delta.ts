@@ -87,60 +87,68 @@ export const renderQuillDelta = (
   return hideFormatting || collapse
     ? groups.map((group, i) => {
         const wrapGroupForHiddenFormatting = (content) => {
-          return render(`${getGroupTag(group)}.hidden-formatting`, { key: i }, content);
+          return render(
+            `${getGroupTag(group)}.hidden-formatting`,
+            { key: i },
+            content
+          );
         };
         return wrapGroupForHiddenFormatting(
           group.parents.map((parent, ii) => {
-            return render(`${getParentTag(parent)}.hidden-formatting-inner`, { key: ii }, [
-              parent.children.map((child, iii) => {
-                if (child.insert?.mention)
-                  return render(
-                    'span.mention',
-                    { key: iii },
-                    child.insert.mention.denotationChar +
-                      child.insert.mention.value
-                  );
-                if (child.insert?.image) return;
-                if (child.insert?.twitter) return;
-                if (child.insert?.video) return;
-                if (child.attributes?.link)
-                  return render(
-                    'a',
-                    {
-                      key: iii,
-                      href: child.attributes.link,
-                      target: openLinksInNewTab ? '_blank' : '',
-                      noreferrer: 'noreferrer',
-                      noopener: 'noopener',
-                      onclick: async (e) => {
-                        if (app.isNative(window)) {
-                          await Browser.open({ url: child.attributes.link });
-                        }
-                        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
-                          return;
-                        if (
-                          child.attributes.link.startsWith(
-                            `${document.location.origin}/`
-                          )
-                        ) {
-                          // don't open a new window if the link is on Commonwealth
-                          e.preventDefault();
-                          e.stopPropagation();
-                          navigate(child.attributes.link);
-                        }
+            return render(
+              `${getParentTag(parent)}.hidden-formatting-inner`,
+              { key: ii },
+              [
+                parent.children.map((child, iii) => {
+                  if (child.insert?.mention)
+                    return render(
+                      'span.mention',
+                      { key: iii },
+                      child.insert.mention.denotationChar +
+                        child.insert.mention.value
+                    );
+                  if (child.insert?.image) return;
+                  if (child.insert?.twitter) return;
+                  if (child.insert?.video) return;
+                  if (child.attributes?.link)
+                    return render(
+                      'a',
+                      {
+                        key: iii,
+                        href: child.attributes.link,
+                        target: openLinksInNewTab ? '_blank' : '',
+                        noreferrer: 'noreferrer',
+                        noopener: 'noopener',
+                        onclick: async (e) => {
+                          if (app.isNative(window)) {
+                            await Browser.open({ url: child.attributes.link });
+                          }
+                          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
+                            return;
+                          if (
+                            child.attributes.link.startsWith(
+                              `${document.location.origin}/`
+                            )
+                          ) {
+                            // don't open a new window if the link is on Commonwealth
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate(child.attributes.link);
+                          }
+                        },
                       },
-                    },
-                    `${child.insert}`
-                  );
-                if (child.insert.match(/[A-Za-z0-9]$/)) {
-                  // add a period and space after lines that end on a word or
-                  // number, like Google does in search previews
-                  return render('span', { key: iii }, `${child.insert}. `);
-                } else {
-                  return render('span', { key: iii }, `${child.insert}`);
-                }
-              }),
-            ]);
+                      `${child.insert}`
+                    );
+                  if (child.insert.match(/[A-Za-z0-9]$/)) {
+                    // add a period and space after lines that end on a word or
+                    // number, like Google does in search previews
+                    return render('span', { key: iii }, `${child.insert}. `);
+                  } else {
+                    return render('span', { key: iii }, `${child.insert}`);
+                  }
+                }),
+              ]
+            );
           })
         );
       })
@@ -155,17 +163,21 @@ export const renderQuillDelta = (
           }
           // handle video
           if (child.insert?.video) {
-            return render('div', {
-              key: ii,
-            }, [
-              render('iframe', {
-                frameborder: 0,
-                allowfullscreen: true,
-                src: child.insert?.video,
-                key: 1
-              }),
-              render('br', { key : 2 }),
-            ]);
+            return render(
+              'div',
+              {
+                key: ii,
+              },
+              [
+                render('iframe', {
+                  frameborder: 0,
+                  allowfullscreen: true,
+                  src: child.insert?.video,
+                  key: 1,
+                }),
+                render('br', { key: 2 }),
+              ]
+            );
           }
           // handle tweets
           if (child.insert?.twitter) {
@@ -190,10 +202,10 @@ export const renderQuillDelta = (
                 key: ii,
                 class: 'twitter-tweet',
               },
-                render('a', {
-                  tabIndex: -1,
-                  href: url,
-                }),
+              render('a', {
+                tabIndex: -1,
+                href: url,
+              })
             );
           }
           // handle text nodes
@@ -308,17 +320,37 @@ export const renderQuillDelta = (
           );
         };
         // special handler for lists, which need to be un-flattened and turned into a tree
-      const renderListGroup = (_group, ii) => {
+        const renderListGroup = (_group, ii) => {
           const temp = []; // accumulator for potential parent tree nodes; will grow to the maximum depth of the tree
           _group.parents.forEach((parent, iii) => {
             const tag = getParentTag(parent);
             const content = parent.children.map(renderChild);
             if (tag === 'li.checked') {
               content.unshift(
-                render(`input[type='checkbox'][disabled][checked]`, { key: iii })
+                render(
+                  `input`,
+                  {
+                    key: `input-${iii}`,
+                    type: 'checkbox',
+                    disabled: true,
+                    checked: true,
+                  },
+                  null
+                )
               );
             } else if (tag === 'li.unchecked') {
-              content.unshift(render(`input[type='checkbox'][disabled]`, { key: iii }));
+              content.unshift(
+                render(
+                  `input`,
+                  {
+                    key: `input-${iii}`,
+                    type: 'checkbox',
+                    disabled: true,
+                    checked: false,
+                  },
+                  null
+                )
+              );
             }
             const indent = parent.attributes.indent || 0;
 
@@ -332,7 +364,7 @@ export const renderQuillDelta = (
             } else if (indent < temp.length - 1) {
               // outdent and unwind
               while (indent < temp.length - 1) {
-                let iiii = 0
+                let iiii = 0;
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   render(
@@ -343,7 +375,7 @@ export const renderQuillDelta = (
                     })
                   )
                 );
-                iiii++
+                iiii++;
               }
               temp[temp.length - 1].push({ tag, content, indent, key: ii });
             }
@@ -362,7 +394,7 @@ export const renderQuillDelta = (
                 })
               )
             );
-            iii++
+            iii++;
           }
           return render(
             getGroupTag(_group),

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Result } from 'ethers/lib/utils';
+import { ethers } from 'ethers';
 
 import 'pages/general_contract/index.scss';
 
@@ -21,7 +22,6 @@ import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
-
 type GeneralContractPageProps = {
   contractAddress?: string;
 };
@@ -30,12 +30,12 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [functionNameToFunctionOutput, setFunctionNameToFunctionOutput] =
-    useState<Map<string, Result>>(new Map<string, Result>());
-  const [functionNameToFunctionInputArgs, setFunctionNameToFunctionInputArgs] =
-    useState<Map<string, Map<number, string>>>(
-      new Map<string, Map<number, string>>()
-    );
+  const [functionNameToFunctionOutput] = useState<Map<string, Result>>(
+    new Map<string, Result>()
+  );
+  const [functionNameToFunctionInputArgs] = useState<
+    Map<string, Map<number, string>>
+  >(new Map<string, Map<number, string>>());
 
   const fetchContractAbi = async (contract: Contract) => {
     if (contract.abi === undefined) {
@@ -62,13 +62,27 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
         throw new Error('Contract not found');
       }
 
-      const result = await callContractFunction(
+      // Convert map of number to string to array of string
+      const inputArgs = functionNameToFunctionInputArgs.get(fn.name);
+      const inputArgsArray = [];
+      if (inputArgs && inputArgs.size > 0) {
+        for (let i = 0; i < inputArgs.size; i++) {
+          inputArgsArray.push(inputArgs.get(i));
+        }
+      }
+
+      const result = await callContractFunction({
         contract,
         fn,
-        functionNameToFunctionInputArgs
-      );
+        inputArgs: inputArgsArray,
+      });
 
-      functionNameToFunctionOutput.set(fn.name, result);
+      const ethersInterface = new ethers.utils.Interface(contract.abi);
+
+      functionNameToFunctionOutput.set(
+        fn.name,
+        ethersInterface.decodeFunctionResult(fn.name, result)
+      );
       setSaving(false);
       setLoaded(true);
       setLoading(false);

@@ -18,6 +18,8 @@ import { User } from '../user/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 
 type CommentAuthorProps = {
   comment: CommentType<any>;
@@ -74,6 +76,8 @@ export const Comment = (props: CommentProps) => {
     React.useState<boolean>(false);
   const [savedEdits, setSavedEdits] = React.useState<string>('');
 
+  const { isLoggedIn } = useUserLoggedIn();
+
   const handleSetIsEditingComment = (status: boolean) => {
     setIsGloballyEditing(status);
     setIsEditingComment(status);
@@ -91,7 +95,7 @@ export const Comment = (props: CommentProps) => {
     });
 
   const canReply =
-    !isLast && !isLocked && app.isLoggedIn() && app.user.activeAccount;
+    !isLast && !isLocked && isLoggedIn && app.user.activeAccount;
 
   const canEditAndDelete =
     !isLocked &&
@@ -100,7 +104,7 @@ export const Comment = (props: CommentProps) => {
   const deleteComment = async () => {
     await app.comments.delete(comment);
     updatedCommentsCallback();
-  }
+  };
 
   return (
     <div className={`Comment comment-${comment.id}`}>
@@ -140,7 +144,7 @@ export const Comment = (props: CommentProps) => {
         ) : (
           <>
             <CWText className="comment-text">
-              {renderQuillTextBody(comment.text)}
+              <QuillRenderer doc={comment.text} />
             </CWText>
             {!comment.deleted && (
               <div className="comment-footer">

@@ -3,6 +3,7 @@ import $ from 'jquery';
 import { Poll, Vote } from 'models';
 import moment from 'moment';
 import app from 'state';
+import { redraw } from 'mithrilInterop';
 
 import PollStore from 'stores/PollStore';
 
@@ -107,6 +108,32 @@ class PollsController {
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
             : 'Failed to initialize polling'
+        );
+      },
+    });
+  }
+
+  public async deletePoll(args: { threadId: number; pollId: number }) {
+    const { threadId, pollId } = args;
+    await $.ajax({
+      url: `${app.serverUrl()}/deletePoll`,
+      type: 'DELETE',
+      data: {
+        thread_id: threadId,
+        poll_id: pollId,
+        chain_id: app.activeChainId(),
+        jwt: app.user.jwt,
+      },
+      success: (response) => {
+        this._store.remove(this._store.getById(pollId));
+        redraw();
+      },
+      error: (err) => {
+        console.log('Failed to delete poll');
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Failed to delete poll'
         );
       },
     });

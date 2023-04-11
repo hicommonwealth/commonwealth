@@ -142,6 +142,7 @@ export const LinkedProposalsCard = ({
         }
       />
       <Modal
+        className="LinkedProposalsCardModal"
         content={
           <UpdateProposalStatusModal
             onChangeHandler={onChangeHandler}

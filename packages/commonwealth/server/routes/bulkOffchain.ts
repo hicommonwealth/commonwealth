@@ -1,4 +1,5 @@
 /* eslint-disable no-async-promise-executor */
+import { Contract } from 'client/scripts/models';
 import { ServerError } from 'common-common/src/errors';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided
@@ -12,10 +13,10 @@ import type { DB } from '../models';
 import type { ChatChannelInstance } from '../models/chat_channel';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
+import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { RuleInstance } from '../models/rule';
 import type { ThreadInstance } from '../models/thread';
 import type { TopicInstance } from '../models/topic';
-import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 
@@ -31,27 +32,29 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   // parallelized queries
   const [
     topics,
-    pinnedThreads,
     admins,
     mostActiveUsers,
     threadsInVoting,
     chatChannels,
     rules,
     communityBanner,
-    contracts,
+    contractsWithTemplatesData,
     communityRoles,
   ] = await (<
     Promise<
       [
         TopicInstance[],
-        unknown,
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
         ChatChannelInstance[],
         RuleInstance[],
         CommunityBannerInstance,
-        ContractInstance[],
+        Array<{
+          contract: ContractInstance;
+          ccts: Array<CommunityContractTemplateInstance>;
+          hasGlobalTemplate: boolean;
+        }>,
         CommunityRoleInstance[]
       ]
     >
@@ -60,66 +63,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     models.Topic.findAll({
       where: { chain_id: chain.id },
     }),
-    // threads, comments, reactions
-    new Promise(async (resolve, reject) => {
-      try {
-        const threadParams = Object.assign(replacements, { pinned: true });
-        const rawPinnedThreads = await models.Thread.findAll({
-          where: threadParams,
-          include: [
-            {
-              model: models.Address,
-              as: 'Address',
-            },
-            {
-              model: models.Address,
-              as: 'collaborators',
-            },
-            {
-              model: models.Topic,
-              as: 'topic',
-            },
-            {
-              model: models.ChainEntityMeta,
-              as: 'chain_entity_meta',
-            },
-            {
-              model: models.LinkedThread,
-              as: 'linked_threads',
-            },
-            {
-              model: models.Reaction,
-              as: 'reactions',
-              include: [
-                {
-                  model: models.Address,
-                  as: 'Address',
-                  required: true,
-                },
-              ],
-            },
-          ],
-          attributes: { exclude: ['version_history'] },
-        });
 
-        const threads = rawPinnedThreads.map((t) => {
-          return t.toJSON();
-        });
-
-        const threadsWithCommentsCount = await getThreadsWithCommentCount({
-          threads,
-          models,
-          chainId: chain.id,
-        });
-
-        resolve(threadsWithCommentsCount);
-      } catch (e) {
-        console.log(e);
-        reject(
-          new ServerError('Could not fetch threads, comments, or reactions')
-        );
-      }
-    }),
     // admins
     findAllRoles(
       models,
@@ -202,13 +146,44 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
             chain_id: chain.id,
           },
         });
-        const contractsPromise = models.Contract.findAll({
-          where: {
-            id: { [Op.in]: communityContracts.map((cc) => cc.contract_id) },
-          },
-          include: [{ model: models.ContractAbi, required: false }],
-        });
-        resolve(contractsPromise);
+        const contractsWithTemplates: Array<{
+          contract: ContractInstance;
+          ccts: Array<CommunityContractTemplateInstance>;
+          hasGlobalTemplate: boolean;
+        }> = [];
+        for (const cc of communityContracts) {
+          const ccts = await models.CommunityContractTemplate.findAll({
+            where: {
+              community_contract_id: cc.id,
+            },
+            include: {
+              model: models.CommunityContractTemplateMetadata,
+              required: false,
+            },
+          });
+          const contract = await models.Contract.findOne({
+            where: {
+              id: cc.contract_id,
+            },
+            include: [
+              {
+                model: models.ContractAbi,
+                required: false,
+              },
+            ],
+          });
+
+          const globalTemplate = await models.Template.findOne({
+            where: {
+              abi_id: contract.abi_id,
+            },
+          });
+
+          const hasGlobalTemplate = !!globalTemplate;
+
+          contractsWithTemplates.push({ contract, ccts, hasGlobalTemplate });
+        }
+        resolve(contractsWithTemplates);
       } catch (e) {
         reject(new ServerError('Could not fetch contracts'));
       }
@@ -225,13 +200,18 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     result: {
       topics: topics.map((t) => t.toJSON()),
       numVotingThreads,
-      pinnedThreads, // already converted to JSON earlier
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
       chatChannels: JSON.stringify(chatChannels),
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
-      contracts: contracts.map((c) => c.toJSON()),
+      contractsWithTemplatesData: contractsWithTemplatesData.map((c) => {
+        return {
+          contract: c.contract.toJSON(),
+          ccts: c.ccts,
+          hasGlobalTemplate: c.hasGlobalTemplate,
+        };
+      }),
       communityRoles: communityRoles.map((r) => r.toJSON()),
     },
   });

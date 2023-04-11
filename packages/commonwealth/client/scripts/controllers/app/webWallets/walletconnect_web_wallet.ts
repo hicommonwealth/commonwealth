@@ -50,7 +50,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
-    const block = await this._web3.givenProvider.request({
+    const block = await this._provider.request({
       method: 'eth_getBlockByNumber',
       params: ['latest', false],
     });
@@ -106,7 +106,6 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     if (this._provider.wc?.connected) {
       await this._provider.wc.killSession();
     }
-
     //  Enable session (triggers QR Code modal)
     await this._provider.enable();
     const Web3 = (await import('web3')).default;

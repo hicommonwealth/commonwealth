@@ -144,7 +144,11 @@ export const NewThreadForm = () => {
 
             <div className="buttons-row">
               <CWButton
-                label="Create thread"
+                label={
+                  app.user.activeAccount
+                    ? 'Create thread'
+                    : 'Join community to create'
+                }
                 disabled={isDisabled}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}

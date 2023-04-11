@@ -6,6 +6,7 @@ import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import 'modals/update_proposal_status_modal.scss';
 import type { ChainEntity, Thread } from 'models';
 import { ThreadStage } from 'models';
+import { SelectList } from '../components/component_kit/cw_select_list';
 
 import app from 'state';
 import { ChainEntitiesSelector } from '../components/chain_entities_selector';
@@ -126,18 +127,21 @@ export const UpdateProposalStatusModal = ({
         <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
-        {stages.length > 0 && (
-          <div className="stage-options">
-            {stages.map((targetStage) => (
-              <CWButton
-                key={targetStage}
-                iconLeft={tempStage === targetStage ? 'check' : undefined}
-                label={threadStageToLabel(targetStage)}
-                onClick={() => setTempStage(targetStage)}
-              />
-            ))}
-          </div>
-        )}
+        <SelectList
+          defaultValue={
+            tempStage
+              ? { value: tempStage, label: threadStageToLabel(tempStage) }
+              : null
+          }
+          placeholder="Select the stage"
+          isSearchable={false}
+          options={stages.map((stage) => ({
+            value: stage,
+            label: threadStageToLabel(stage),
+          }))}
+          className="StageSelector"
+          onChange={(option) => setTempStage(option.value)}
+        />
         {showSnapshot && (
           <SnapshotProposalSelector
             onSelect={handleSelectProposal}

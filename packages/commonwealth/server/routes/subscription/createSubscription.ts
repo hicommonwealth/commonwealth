@@ -42,13 +42,13 @@ export default async (
       break;
     }
     case 'snapshot-proposal': {
-      const proposal = await models.SnapshotProposal.findOne({
+      const space = await models.SnapshotSpace.findOne({
         where: {
-          id: +p_id,
+          snapshot_space: p_entity,
         },
       });
-      if (proposal) {
-        obj = { proposal_id: proposal.id };
+      if (space) {
+        obj = { snapshot_id: space.snapshot_space };
       }
       break;
     }
@@ -66,19 +66,6 @@ export default async (
         });
         if (!comment) return next(new AppError(Errors.NoComment));
         obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain };
-      } else {
-        if (!req.body.chain_id)
-          return next(new AppError(Errors.ChainRequiredForEntity));
-        const chainEntityMeta = await models.ChainEntityMeta.findOne({
-          where: {
-            ce_id: req.body.chain_entity_id,
-          },
-        });
-        if (!chainEntityMeta) return next(new AppError(Errors.NoChainEntity));
-        obj = {
-          chain_id: chainEntityMeta.chain,
-          chain_entity_id: chainEntityMeta.ce_id,
-        };
       }
       break;
     }
@@ -92,27 +79,26 @@ export default async (
         },
       });
       if (!chain) return next(new AppError(Errors.InvalidChain));
-      const chainEventType = await models.ChainEventType.findOne({
-        where: {
-          id: req.body.object_id,
-        },
-      });
-      if (!chainEventType)
-        return next(new AppError(Errors.InvalidChainEventId));
-      obj = { chain_id: p_entity, chain_event_type_id: req.body.object_id };
+
+      // object_id = req.body.object_id = [chain_id]_chainEvents
+      obj = { chain_id: p_entity };
       break;
     }
     default:
       return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
-  const subscription = await models.Subscription.create({
-    subscriber_id: req.user.id,
-    category_id: req.body.category,
-    object_id: req.body.object_id,
-    is_active: !!req.body.is_active,
-    ...obj,
-  });
+  const subscription = (
+    await models.Subscription.create({
+      subscriber_id: req.user.id,
+      category_id: req.body.category,
+      object_id: req.body.object_id,
+      is_active: !!req.body.is_active,
+      ...obj,
+    })
+  ).toJSON();
 
-  return res.json({ status: 'Success', result: subscription.toJSON() });
+  subscription.Chain = chain.toJSON();
+
+  return res.json({ status: 'Success', result: subscription });
 };

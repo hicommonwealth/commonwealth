@@ -1,7 +1,8 @@
-import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import React from 'react';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
-
+import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
+import { CWText } from '../component_kit/cw_text';
+import smartTruncate from 'smart-truncate';
 interface SnapshotProposalSelectorItemProps {
   snapshot: SnapshotProposal;
   isSelected: boolean;
@@ -17,12 +18,12 @@ const SnapshotProposalSelectorItem = ({
     <div className="proposal-item" onClick={() => onClick(snapshot)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
-        <div className="proposal-item-text" title={snapshot.title}>
+        <CWText fontWeight="medium" truncate title={snapshot.title}>
           {snapshot.title}
-        </div>
-        <div className="proposal-item-subtext" title={snapshot.id}>
-          Hash: ${snapshot.id}
-        </div>
+        </CWText>
+        <CWText type="caption" title={snapshot.id}>
+          Hash: {smartTruncate(snapshot.id, 12, { position: 4 })}
+        </CWText>
       </div>
     </div>
   );

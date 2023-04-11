@@ -9,7 +9,6 @@ import ChainFactory from './models/chain';
 import ChainCategoryFactory from './models/chain_category';
 import ChainCategoryTypeFactory from './models/chain_category_type';
 import ChainEntityMetaFactory from './models/chain_entity_meta';
-import ChainEventTypeFactory from './models/chain_event_type';
 import ChainNodeFactory from './models/chain_node';
 import ChatChannelFactory from './models/chat_channel';
 import ChatMessageFactory from './models/chat_message';
@@ -45,9 +44,11 @@ import ThreadFactory from './models/thread';
 import TokenFactory from './models/token';
 import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
-import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
+import CommunityContractTemplateFactory from './models/community_contract_template';
+import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
+import TemplateFactory from './models/template';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -85,12 +86,20 @@ const models: Models = {
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
   ContractAbi: ContractAbiFactory(sequelize, DataTypes),
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
+  CommunityContractTemplate: CommunityContractTemplateFactory(
+    sequelize,
+    DataTypes
+  ),
+  CommunityContractTemplateMetadata: CommunityContractTemplateMetadataFactory(
+    sequelize,
+    DataTypes
+  ),
+  Template: TemplateFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
@@ -107,7 +116,6 @@ const models: Models = {
   Reaction: ReactionFactory(sequelize, DataTypes),
   Thread: ThreadFactory(sequelize, DataTypes),
   Topic: TopicFactory(sequelize, DataTypes),
-  ViewCount: ViewCountFactory(sequelize, DataTypes),
   Vote: VoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),

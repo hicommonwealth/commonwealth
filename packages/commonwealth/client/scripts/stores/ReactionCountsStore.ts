@@ -57,12 +57,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   }
 
   public getPostIdentifier(
-    rxnOrPost:
-      | Reaction<any>
-      | Thread
-      | AbridgedThread
-      | AnyProposal
-      | Comment<any>
+    rxnOrPost: Reaction | Thread | AbridgedThread | AnyProposal | Comment<any>
   ) {
     if (rxnOrPost instanceof Thread || rxnOrPost instanceof AbridgedThread) {
       return `discussion-${rxnOrPost.id}`;

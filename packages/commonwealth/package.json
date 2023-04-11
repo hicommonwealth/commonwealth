@@ -39,7 +39,7 @@
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
     "profile": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json",
     "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",
-    "dump-db": "pg_dump $(heroku config:get HEROKU_POSTGRESQL_RED_URL -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
+    "dump-db": "pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "load-db-local": "psql -d commonwealth -U commonwealth -W -f local_save.dump",
@@ -47,7 +47,7 @@
     "db-all": "yarn reset-db && yarn load-db && yarn migrate-db",
     "migrate-db-down": "npx sequelize db:migrate:undo",
     "create-migration": "npx sequelize migration:generate --name",
-    "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get HEROKU_POSTGRESQL_RED_URL -a commonwealth-beta) -a -f limited_dump.sql",
+    "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get CW_READ_DB -a commonwealth-beta) -a -f limited_dump.sql",
     "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql",
     "start-ios": "npx cap run ios",
     "open-ios": "NODE_ENV=mobile npx cap open ios",
@@ -63,7 +63,7 @@
     "gen-e2e": "npx playwright codegen",
     "test-e2e": "npx playwright test ./test/e2e/*",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
-    "reset-frack-db": "heroku pg:copy commonwealth-beta::HEROKU_POSTGRESQL_RED_URL DATABASE_URL --app commonwealth-staging2 --confirm commonwealth-staging2"
+    "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-staging2 --confirm commonwealth-staging2"
   },
   "engines": {
     "node": "18.x"
@@ -99,7 +99,7 @@
     "@ethersproject/units": "^5.0.1",
     "@ethersproject/wallet": "^5.0.1",
     "@keplr-wallet/types": "^0.10.19",
-    "@magic-sdk/admin": "^1.3.1",
+    "@magic-sdk/admin": "^1.8.0",
     "@metamask/detect-provider": "^2.0.0",
     "@metamask/eth-sig-util": "^4.0.0",
     "@mui/base": "^5.0.0-alpha.114",
@@ -162,7 +162,6 @@
     "dompurify": "^2.2.6",
     "dotenv": "^8.2.0",
     "ethereum-block-by-date": "^1.2.2",
-    "ethereumjs-util": "^7.1.0",
     "ethereumjs-wallet": "^1.0.2",
     "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
@@ -179,6 +178,7 @@
     "html-webpack-plugin": "^5.5.0",
     "https-browserify": "^1.0.0",
     "ignore-loader": "^0.1.2",
+    "is-my-json-valid": "^2.20.6",
     "jdenticon": "^2.1.1",
     "jquery": "^3.3.1",
     "jsdom": "^16.5.0",

@@ -53,7 +53,7 @@ const searchComments = async (
   SELECT
       "Threads".title,
       "Comments".text,
-      "Comments".root_id as proposalId,
+      "Comments".thread_id as proposalId,
       'comment' as type,
       "Addresses".id as address_id,
       "Addresses".address,
@@ -62,8 +62,7 @@ const searchComments = async (
       "Threads".chain,
       ts_rank_cd("Comments"._search, query) as rank
     FROM "Comments"
-    JOIN "Threads" ON "Threads".id =
-        CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
+    JOIN "Threads" ON "Comments".thread_id = "Threads".id
     JOIN "Addresses" ON "Comments".address_id = "Addresses".id, 
     websearch_to_tsquery('english', $searchTerm) as query
     WHERE query @@ "Comments"._search ${communityOptions} AND "Comments".deleted_at IS NULL

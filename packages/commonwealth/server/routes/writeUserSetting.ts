@@ -2,7 +2,13 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 
-const VALID_DIGEST_INTERVALS = ['daily', 'never'];
+const VALID_DIGEST_INTERVALS = [
+  'never',
+  'weekly',
+  'daily',
+  'twoweeks',
+  'monthly',
+];
 
 export const Errors = {
   InvalidUser: 'Invalid user',

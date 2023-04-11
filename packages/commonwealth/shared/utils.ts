@@ -4,13 +4,13 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import { ProposalType } from 'common-common/src/types';
 import {
   AccessLevel,
-  PermissionManager,
   everyonePermissions,
+  PermissionManager,
 } from './permissions';
 import type { RoleObject } from './types';
-import { ProposalType } from 'common-common/src/types';
 
 export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
@@ -71,29 +71,18 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 };
 
 /* eslint-disable */
-export const getProposalUrl = (type, proposal, comment?) => {
+export const getThreadUrl = (proposal, comment?) => {
   const aId = proposal.chain;
   const tId = proposal.type_id || proposal.id;
   const tTitle = proposal.title ? `-${slugify(proposal.title)}` : '';
   const cId = comment ? `?comment=${comment.id}` : '';
 
-  if (requiresTypeSlug(type)) {
-    return process.env.NODE_ENV === 'production'
-      ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`
-      : `http://localhost:8080/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
-  } else if (type === ProposalType.Thread) {
-    return process.env.NODE_ENV === 'production'
-      ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
-      : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
-  } else {
-    return process.env.NODE_ENV === 'production'
-      ? `https://commonwealth.im/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`
-      : `http://localhost:8080/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`;
-  }
+  return process.env.NODE_ENV === 'production'
+    ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
+    : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
 };
 
-export const getProposalUrlWithoutObject = (
-  type,
+export const getThreadUrlWithoutObject = (
   proposalCommunity,
   proposalId,
   comment?
@@ -102,19 +91,9 @@ export const getProposalUrlWithoutObject = (
   const tId = proposalId;
   const cId = comment ? `?comment=${comment.id}` : '';
 
-  if (requiresTypeSlug(type)) {
-    return process.env.NODE_ENV === 'production'
-      ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${cId}`
-      : `http://localhost:8080/${aId}/proposal/${type}/${tId}${cId}`;
-  } else if (type === ProposalType.Thread) {
-    return process.env.NODE_ENV === 'production'
-      ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
-      : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
-  } else {
-    return process.env.NODE_ENV === 'production'
-      ? `https://commonwealth.im/${aId}/proposal/${tId}${cId}`
-      : `http://localhost:8080/${aId}/proposal/${tId}${cId}`;
-  }
+  return process.env.NODE_ENV === 'production'
+    ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
+    : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
 };
 
 export const getCommunityUrl = (community) => {
@@ -136,10 +115,10 @@ export const smartTrim = (text, maxLength = 200) => {
 export const validURL = (str) => {
   const pattern = new RegExp(
     '^(https?:\\/\\/)?' + // protocol
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
-    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$',
     'i'
   ); // fragment locator

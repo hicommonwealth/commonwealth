@@ -43,6 +43,13 @@ export interface SnapshotNotification {
   expire?: string;
 }
 
+export const enum SnapshotEventType {
+  Created = 'proposal/created',
+  Deleted = 'proposal/deleted',
+  Ended = 'proposal/end',
+  Started = 'proposal/start',
+}
+
 export interface INotification {
   kind: ChainEventNotification | SnapshotNotification;
 }
@@ -61,7 +68,7 @@ export enum WebsocketEngineEvents {
 
 export interface IPostNotificationData {
   created_at: any;
-  root_id: number | string;
+  thread_id: number | string;
   root_title: string;
   root_type: string;
   comment_id?: number;
@@ -83,11 +90,7 @@ export interface ICommunityNotificationData {
   chain: string;
 }
 
-export interface IChainEventNotificationData {
-  chainEvent: any;
-  chainEventType: any;
-  chain_id: string;
-}
+export interface IChainEventNotificationData extends ChainEventAttributes {}
 
 export interface ISnapshotNotificationData {
   created_at: Date;

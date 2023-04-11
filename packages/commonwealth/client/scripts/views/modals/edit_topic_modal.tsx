@@ -13,8 +13,16 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
-import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../components/react_quill_editor';
-import { DeltaStatic } from 'quill';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  ReactQuillEditor,
+} from '../components/react_quill_editor';
+import type { DeltaStatic } from 'quill';
+import {
+  deserializeDelta,
+  serializeDelta,
+} from '../components/react_quill_editor/utils';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -40,7 +48,7 @@ export const EditTopicModal = ({
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
-    createDeltaFromText('')
+    deserializeDelta(defaultOffchainTemplate)
   );
 
   const [description, setDescription] = useState<string>(descriptionProp);
@@ -52,17 +60,7 @@ export const EditTopicModal = ({
   );
   const [name, setName] = useState<string>(nameProp);
 
-  const editorText = getTextFromDelta(contentDelta)
-
-  useEffect(() => {
-    if (defaultOffchainTemplate) {
-      try {
-        setContentDelta(JSON.parse(defaultOffchainTemplate));
-      } catch (e) {
-        setContentDelta(createDeltaFromText(defaultOffchainTemplate));
-      }
-    }
-  }, [defaultOffchainTemplate]);
+  const editorText = getTextFromDelta(contentDelta);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
@@ -81,7 +79,7 @@ export const EditTopicModal = ({
       featured_in_sidebar: featuredInSidebar,
       featured_in_new_post: featuredInNewPost,
       default_offchain_template: featuredInNewPost
-        ? JSON.stringify(contentDelta)
+        ? serializeDelta(contentDelta)
         : null,
     };
 
@@ -134,7 +132,7 @@ export const EditTopicModal = ({
               newErrorMsg = `The ${pluralizeWithoutNumberPrefix(
                 disallowedCharMatches.length,
                 'char'
-              )} 
+              )}
                 ${disallowedCharMatches.join(', ')} are not permitted`;
               setErrorMsg(newErrorMsg);
               return ['failure', newErrorMsg];
