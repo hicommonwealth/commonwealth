@@ -2,7 +2,7 @@ import { assert, expect, use as chaiUse } from 'chai';
 import { BalanceType } from 'common-common/src/types';
 import { BigNumber, BigNumberish, CallOverrides } from 'ethers';
 import chaiAsPromised from 'chai-as-promised';
-import Erc721BalanceProvider from '../src/providers/erc721';
+import Erc721BalanceProvider from '../src/providers/ethToken';
 
 chaiUse(chaiAsPromised);
 
