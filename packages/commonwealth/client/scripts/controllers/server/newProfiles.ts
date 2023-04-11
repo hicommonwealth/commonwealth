@@ -1,7 +1,7 @@
+import { EventEmitter } from 'events';
 import $ from 'jquery';
 import _ from 'lodash';
 import { MinimumProfile as Profile } from 'models';
-import { EventEmitter } from 'events';
 
 import app from 'state';
 import { NewProfileStore } from 'stores';
@@ -28,7 +28,7 @@ class NewProfilesController {
     this._fetchNewProfiles = _.debounce(() => {
       this._refreshProfiles(this._unfetched);
       this._unfetched.splice(0);
-    }, 50);
+    }, 1000);
   }
 
   public getProfile(chain: string, address: string) {
@@ -60,62 +60,55 @@ class NewProfilesController {
   }
 
   private async _refreshProfiles(profiles: Profile[]): Promise<void> {
-    const chunkedProfiles = _.chunk(profiles, 20);
-    await Promise.all(
-      chunkedProfiles.map(async (chunk): Promise<Profile | Profile[]> => {
-        const requestData =
-          chunk.length === 1
-            ? {
-                address: chunk[0].address,
-                chain: chunk[0].chain,
-                jwt: app.user.jwt,
-              }
-            : {
-                'address[]': chunk.map((profile) => profile.address),
-                'chain[]': chunk.map((profile) => profile.chain),
-                jwt: app.user.jwt,
-              };
-        try {
-          const { result } = await $.post(
-            `${app.serverUrl()}/getAddressProfile`,
-            requestData
-          );
-
-          // single profile
-          if (chunk.length === 1) {
-            const profile = chunk[0];
-            profile.initialize(
-              result.name,
-              result.address,
-              result.avatarUrl,
-              result.profileId,
-              profile.chain,
-              result.lastActive
-            );
-            return profile;
-          }
-
-          // multiple profiles
-          return chunk.map((profile) => {
-            const currentProfile = result.find(
-              (r) => r.address === profile.address
-            );
-            profile.initialize(
-              currentProfile.name,
-              currentProfile.address,
-              currentProfile.avatarUrl,
-              currentProfile.profileId,
-              profile.chain,
-              currentProfile.lastActive
-            );
-
-            return profile;
-          });
-        } catch (e) {
-          console.error(e);
+    const requestData =
+      profiles.length === 1
+        ? {
+          address: profiles[0].address,
+          chain: profiles[0].chain,
+          jwt: app.user.jwt,
         }
-      })
-    );
+        : {
+          'address[]': profiles.map((profile) => profile.address),
+          'chain[]': profiles.map((profile) => profile.chain),
+          jwt: app.user.jwt,
+        };
+    try {
+      const { result } = await $.post(
+        `${app.serverUrl()}/getAddressProfile`,
+        requestData
+      );
+
+      // single profile
+      if (profiles.length === 1) {
+        const profile = profiles[0];
+        profile.initialize(
+          result.name,
+          result.address,
+          result.avatarUrl,
+          result.profileId,
+          profile.chain,
+          result.lastActive
+        );
+      } else {
+
+        // multiple profiles
+        profiles.map((profile) => {
+          const currentProfile = result.find(
+            (r) => r.address === profile.address
+          );
+          profile.initialize(
+            currentProfile.name,
+            currentProfile.address,
+            currentProfile.avatarUrl,
+            currentProfile.profileId,
+            profile.chain,
+            currentProfile.lastActive
+          );
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
     this.isFetched.emit('redraw');
   }
 }
