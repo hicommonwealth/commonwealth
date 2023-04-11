@@ -295,7 +295,7 @@ export async function deleteCommunityContractTemplate(
     const communityContractTemplate =
       await models.CommunityContractTemplate.findOne({
         where: {
-          id: template_id,
+          template_id,
           community_contract_id: communityContractId,
           cctmd_id,
         },

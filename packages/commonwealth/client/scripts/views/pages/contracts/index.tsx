@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'pages/contracts/contracts_page.scss';
 import app from 'state';
 
@@ -9,9 +9,14 @@ import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { ContractCard } from './contract_card';
 import { useCommonNavigate } from 'navigation/helpers';
+import Contract from 'models/Contract';
 
 const ContractsPage = () => {
   const navigate = useCommonNavigate();
+
+  const [contracts, setContracts] = useState<Contract[]>(
+    app.contracts.store.getCommunityContracts()
+  );
 
   const handleAddContract = () => {
     navigate(`/new/contract`);
@@ -21,7 +26,10 @@ const ContractsPage = () => {
     return <PageLoading message="Contracts Page" />;
   }
 
-  const contracts = app.contracts.store.getCommunityContracts();
+  const onUpdateSuccess = () => {
+    const updatedContracts = app.contracts.store.getCommunityContracts();
+    setContracts([...updatedContracts]);
+  };
 
   return (
     <Sublayout>
@@ -49,6 +57,7 @@ const ContractsPage = () => {
                 id={contract.id}
                 address={contract.address}
                 templates={contract.ccts}
+                onUpdateSuccess={onUpdateSuccess}
               />
             ))}
           </div>

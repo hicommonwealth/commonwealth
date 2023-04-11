@@ -21,6 +21,10 @@ class Comment<T extends IUniqueId> {
   public readonly lastEdited: moment.Moment;
   public readonly deleted: boolean;
 
+  public readonly canvasAction: string;
+  public readonly canvasSession: string;
+  public readonly canvasHash: string;
+
   constructor({
     chain,
     author,
@@ -36,6 +40,9 @@ class Comment<T extends IUniqueId> {
     authorChain,
     lastEdited, // moment.Moment
     deleted,
+    canvasAction,
+    canvasSession,
+    canvasHash,
   }) {
     this.chain = chain;
     this.author = author;
@@ -50,6 +57,9 @@ class Comment<T extends IUniqueId> {
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
     this.deleted = deleted;
+    this.canvasAction = canvasAction;
+    this.canvasSession = canvasSession;
+    this.canvasHash = canvasHash;
   }
 }
 

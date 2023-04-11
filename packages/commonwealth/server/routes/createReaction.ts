@@ -46,8 +46,16 @@ const createReaction = async (
 
   const author = req.address;
 
-  const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } =
-    req.body;
+  const {
+    reaction,
+    comment_id,
+    proposal_id,
+    thread_id,
+    chain_entity_id,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new AppError(Errors.NoPostId));
@@ -140,6 +148,9 @@ const createReaction = async (
     reaction,
     address_id: author.id,
     chain: chain.id,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
   };
 
   if (thread_id) options['thread_id'] = thread_id;
