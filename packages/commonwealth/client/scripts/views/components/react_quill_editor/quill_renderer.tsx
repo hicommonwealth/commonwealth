@@ -1,12 +1,14 @@
 import React, { useMemo } from 'react';
-import { QuillFormattedText } from '../quill/quill_formatted_text';
+import { QuillFormattedText } from './quill_formatted_text';
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import { DeltaStatic } from 'quill';
 
-type QuillRendererProps = {
+export type QuillRendererProps = {
   doc: string;
-  searchTerm?: string;
   hideFormatting?: boolean;
+  openLinksInNewTab?: boolean;
+  searchTerm?: string;
+  cutoffLines?: number;
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
@@ -14,7 +16,7 @@ type MarkdownDocInfo = { format: 'markdown'; content: string };
 type UnknownDocInfo = { format: 'unknown'; content: null };
 type DocInfo = RichTextDocInfo | MarkdownDocInfo | UnknownDocInfo;
 
-export const QuillRenderer = ({ doc, searchTerm, hideFormatting }: QuillRendererProps) => {
+export const QuillRenderer = ({ doc, searchTerm, hideFormatting, cutoffLines }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
     try {
@@ -48,9 +50,23 @@ export const QuillRenderer = ({ doc, searchTerm, hideFormatting }: QuillRenderer
 
   switch (docInfo.format) {
     case 'richtext':
-      return <QuillFormattedText hideFormatting={hideFormatting} doc={docInfo.content} searchTerm={searchTerm} />;
+      return (
+        <QuillFormattedText
+          hideFormatting={hideFormatting}
+          doc={docInfo.content}
+          searchTerm={searchTerm}
+          cutoffLines={cutoffLines}
+        />
+      );
     case 'markdown':
-      return <MarkdownFormattedText hideFormatting={hideFormatting} doc={docInfo.content} searchTerm={searchTerm} />;
+      return (
+        <MarkdownFormattedText
+          hideFormatting={hideFormatting}
+          doc={docInfo.content}
+          searchTerm={searchTerm}
+          cutoffLines={cutoffLines}
+        />
+      );
     default:
       return <>N/A</>;
   }

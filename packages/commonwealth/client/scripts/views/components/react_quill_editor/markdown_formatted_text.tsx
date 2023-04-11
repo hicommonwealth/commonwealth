@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
@@ -6,6 +6,7 @@ import { getClasses } from '../component_kit/helpers';
 import { countLinesMarkdown } from './utils';
 import { renderTruncatedHighlights } from './highlighter';
 import removeMarkdown from 'markdown-to-text';
+import { QuillRendererProps } from './quill_renderer';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -23,23 +24,19 @@ marked.setOptions({
   xhtml: true
 });
 
-type MarkdownFormattedTextProps = {
-  collapse?: boolean;
+type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
-  hideFormatting?: boolean;
-  openLinksInNewTab?: boolean;
-  searchTerm?: string;
-  cutoffLines?: number;
 };
 
-export const MarkdownFormattedText = ({
-  collapse,
-  doc,
-  hideFormatting,
-  searchTerm,
-  cutoffLines
-}: MarkdownFormattedTextProps) => {
-  const isTruncated = cutoffLines > 0 && cutoffLines < countLinesMarkdown(doc);
+export const MarkdownFormattedText = ({ doc, hideFormatting, searchTerm, cutoffLines }: MarkdownFormattedTextProps) => {
+  const [userExpand, setUserExpand] = useState<boolean>(false);
+
+  const isTruncated: boolean = useMemo(() => {
+    if (userExpand) {
+      return false;
+    }
+    return cutoffLines && cutoffLines < countLinesMarkdown(doc);
+  }, [userExpand, cutoffLines, doc]);
 
   const truncatedDoc = useMemo(() => {
     if (isTruncated) {
@@ -79,13 +76,11 @@ export const MarkdownFormattedText = ({
     return <span>{textWithHighlights}</span>;
   }, [doc, sanitizedHTML, searchTerm]);
 
-  const toggleDisplay = () => {
-    console.log('toggleDisplay');
-  };
+  const toggleDisplay = () => setUserExpand(!userExpand);
 
   return (
     <>
-      <div className={getClasses<{ collapsed?: boolean }>({ collapsed: !!collapse }, 'MarkdownFormattedText')}>
+      <div className={getClasses<{ collapsed?: boolean }>({ collapsed: isTruncated }, 'MarkdownFormattedText')}>
         {finalDoc}
       </div>
       {isTruncated && (

@@ -1,5 +1,6 @@
 import { assert } from "chai"
-import { countLinesMarkdown, createDeltaFromText, deserializeDelta, getTextFromDelta, SerializableDeltaStatic, serializeDelta } from "client/scripts/views/components/react_quill_editor/utils"
+import { countLinesMarkdown, countLinesQuill, createDeltaFromText, deserializeDelta, getTextFromDelta, SerializableDeltaStatic, serializeDelta } from "client/scripts/views/components/react_quill_editor/utils"
+import { DeltaStatic } from "quill"
 
 describe('react quill editor unit tests', () => {
 
@@ -53,6 +54,23 @@ describe('react quill editor unit tests', () => {
       const content = 'hello\nthere\nblah\n'
       const expectedNumLines = 3
       const result = countLinesMarkdown(content)
+      assert.equal(result, expectedNumLines)
+    })
+
+  })
+
+  describe('countLinesQuill', () => {
+
+    it('should return num lines in richtext', () => {
+      // content will usually have a new line at the end
+      const delta = {
+        ops: [
+          { insert: 'hello\nthere\n' },
+          { insert: 'blah\n123\n' }
+        ]
+      } as DeltaStatic
+      const expectedNumLines = 4
+      const result = countLinesQuill(delta)
       assert.equal(result, expectedNumLines)
     })
 
