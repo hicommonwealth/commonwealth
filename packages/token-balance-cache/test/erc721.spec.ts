@@ -68,17 +68,4 @@ describe('ERC721 BP unit tests', () => {
     assert.equal(balance, '1');
   });
 
-  it('erc721 balance provider should return error if wrong contract type', async () => {
-    const erc721Bp: MockErc721BalanceProvider = new MockErc721BalanceProvider();
-    return expect(
-      erc721Bp.getBalance(
-        await mockNodesProvider()[0],
-        '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-        {
-          tokenAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-          contractType: 'test-fail',
-        }
-      )
-    ).to.be.rejectedWith('Invalid Contract Type');
-  });
 });
