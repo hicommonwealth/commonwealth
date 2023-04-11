@@ -52,6 +52,7 @@ class ChainInfo {
   public communityBanner?: string;
   public discordConfigId?: string;
   public communityRoles: CommunityRole[];
+  public cosmosGovernanceVersion?: string;
 
   public get node() {
     return this.ChainNode;
@@ -93,6 +94,7 @@ class ChainInfo {
     adminOnlyPolling,
     discord_config_id,
     communityRoles,
+    cosmosGovernanceVersion,
   }) {
     this.id = id;
     this.network = network;
@@ -130,6 +132,7 @@ class ChainInfo {
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
     this.communityRoles = communityRoles;
+    this.cosmosGovernanceVersion = cosmosGovernanceVersion;
   }
 
   public static fromJSON({
@@ -181,6 +184,12 @@ class ChainInfo {
       : base === ChainBase.CosmosSDK
       ? 6
       : 18;
+
+    // TODO: this is temporary until we have a better way to handle governance versions
+    // see: https://github.com/hicommonwealth/commonwealth/issues/3292
+    const v1Chains = process.env.COSMOS_GOV_V1?.split(',');
+    const cosmos_governance_version = v1Chains?.includes(id) ? 'v1' : 'v1beta1';
+
     return new ChainInfo({
       id,
       network,
@@ -217,6 +226,7 @@ class ChainInfo {
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       communityRoles: community_roles,
+      cosmosGovernanceVersion: cosmos_governance_version,
     });
   }
 
@@ -343,6 +353,7 @@ class ChainInfo {
     this.hasHomepage = updatedChain.has_homepage;
     this.defaultAllowPermissions = updatedChain.default_allow_permissions;
     this.defaultDenyPermissions = updatedChain.default_deny_permissions;
+    this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
   }
 
   public getAvatar(size: number) {

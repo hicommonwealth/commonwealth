@@ -212,14 +212,7 @@ const editComment = async (
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.chain,
           },
-          {
-            user: finalComment.Address.address,
-            author_chain: finalComment.Address.chain,
-            url: cwUrl,
-            title: proposal.title || '',
-            chain: finalComment.chain,
-            body: finalComment.text,
-          },
+          null,
           [finalComment.Address.address]
         );
       });

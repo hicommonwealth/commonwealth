@@ -18,7 +18,6 @@ export const getChainEventServiceData = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(`${JSON.stringify(req.body)}`);
   if (!req.body.secret) {
     return next(new AppError(Errors.NeedSecret));
   }
