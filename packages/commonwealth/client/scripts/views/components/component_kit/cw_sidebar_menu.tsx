@@ -48,9 +48,6 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
   } else if (props.type === 'community') {
     const item = props.community;
     const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
-    const [isStarred, setIsStarred] = useState(
-      app.communities.isStarred(item.id)
-    );
 
     return (
       <div
@@ -83,11 +80,21 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
               }
             />
             <div
-              className={isStarred ? 'star-filled' : 'star-empty'}
+              id={item.id}
+              className={
+                app.communities.isStarred(item.id)
+                  ? 'star-filled'
+                  : 'star-empty'
+              }
               onClick={async (e) => {
                 e.stopPropagation();
                 await app.communities.setStarred(item.id);
-                setIsStarred((prevState) => !prevState);
+
+                document.getElementById(item.id).className =
+                  app.communities.isStarred(item.id)
+                    ? 'star-filled'
+                    : 'star-empty';
+
                 redraw();
               }}
             />
