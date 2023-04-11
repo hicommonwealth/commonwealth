@@ -1,3 +1,4 @@
+import React from 'react';
 import 'new_contract_template/new_contract_template_page.scss';
 import app from 'state';
 

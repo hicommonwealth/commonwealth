@@ -109,16 +109,10 @@ const ManageContractTemplateModal = ({
   const handleSaveEditingTemplate = async (e) => {
     e.preventDefault();
 
-    const {
-      slug,
-      displayOption,
-      nickname,
-      displayName,
-      templateId: templateIdForm,
-    } = form;
+    const { slug, displayOption, nickname, displayName } = form;
 
     const editedCommunityContractTemplate = {
-      cct_id: templateIdForm,
+      cct_id: template.id.toString(),
       slug,
       nickname,
       display_name: displayName,
@@ -143,7 +137,9 @@ const ManageContractTemplateModal = ({
 
   const handleSelectTemplate = (item: DropdownItemType) => {
     const selectedTemplateId = +item.value;
-    const selectedTemplate = contractTemplates.find((t) => t.id === templateId);
+    const selectedTemplate = contractTemplates.find(
+      (t) => t.id === selectedTemplateId
+    );
 
     setForm((prevState) => ({
       ...prevState,
