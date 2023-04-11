@@ -57,7 +57,7 @@ const UserDashboard = (props: UserDashboardProps) => {
     if (!activePage || activePage !== subpage) {
       setActivePage(subpage);
     }
-  }, [activePage]);
+  }, [activePage, subpage]);
 
   return (
     <Sublayout >
@@ -168,7 +168,8 @@ const UserDashboard = (props: UserDashboardProps) => {
             )}
           </>
         </div>
-        <DashboardCommunitiesPreview />
+        <div><DashboardCommunitiesPreview /></div>
+
       </div>
     </Sublayout>
   );

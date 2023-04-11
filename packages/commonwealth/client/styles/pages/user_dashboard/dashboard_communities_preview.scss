@@ -38,8 +38,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  position: absolute;
-  right: 0;
+  float: right;
+  top: 70px;
   z-index: 1;
 
   @include mediumSmallInclusive {
