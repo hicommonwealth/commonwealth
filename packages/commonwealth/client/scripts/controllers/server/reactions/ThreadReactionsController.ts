@@ -67,9 +67,20 @@ class ThreadReactionsController {
   }
 
   public async deleteOnThread(thread: Thread, reaction_id: number) {
+    const {
+      session = null,
+      action = null,
+      hash = null,
+    } = await app.sessions.signDeleteThreadReaction({
+          thread_id: thread.id,
+        });
+
     await axios.post(`${app.serverUrl()}/deleteReaction`, {
       jwt: app.user.jwt,
       reaction_id,
+      canvas_action: action,
+      canvas_session: session,
+      canvas_hash: hash,
     });
 
     this._threadIdToReactions.set(
