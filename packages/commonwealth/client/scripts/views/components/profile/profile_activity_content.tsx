@@ -34,9 +34,15 @@ const ProfileActivityContent = (props: ProfileActivityContentProps) => {
         </div>
       );
     }
-    return threads
-      .sort((a, b) => +b.createdAt - +a.createdAt)
-      .map((thread, i) => <NewProfileActivityRow key={i} activity={thread} />);
+    return (
+      <>
+        {threads
+          .sort((a, b) => +b.createdAt - +a.createdAt)
+          .map((thread, i) => (
+            <NewProfileActivityRow key={i} activity={thread} />
+          ))}
+      </>
+    );
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [
@@ -57,9 +63,13 @@ const ProfileActivityContent = (props: ProfileActivityContentProps) => {
     );
   }
 
-  return allActivities.map((activity, i) => {
-    return <NewProfileActivityRow key={i} activity={activity} />;
-  });
+  return (
+    <>
+      {allActivities.map((activity, i) => {
+        return <NewProfileActivityRow key={i} activity={activity} />;
+      })}
+    </>
+  );
 };
 
 export default ProfileActivityContent;

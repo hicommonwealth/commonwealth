@@ -3,7 +3,6 @@ import app from 'state';
 
 import { redraw } from 'mithrilInterop';
 import { StarredCommunity } from 'models';
-import app from 'state';
 
 class CommunitiesController {
   public isStarred(chain: string) {

@@ -1,0 +1,24 @@
+.CanvasVerifyDataModal {
+  max-width: 600px;
+
+  h2 {
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  h3 {
+    margin: 20px 0;
+  }
+  p {
+    margin-bottom: 15px;
+  }
+  pre {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    margin-bottom: 10px;
+    max-height: 80px;
+    overflow-y: scroll;
+  }
+  pre:last-child {
+    margin-bottom: 0;
+  }
+}

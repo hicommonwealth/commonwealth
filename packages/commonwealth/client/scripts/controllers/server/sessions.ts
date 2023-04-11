@@ -1,79 +1,64 @@
-// eslint-disable-next-line max-classes-per-file
-import { Keyring } from '@polkadot/api';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
-import { ethers } from 'ethers';
-import { KeyPair } from 'near-api-js';
-import { PublicKey } from 'near-api-js/lib/utils';
-import type { ChainBase } from '../../../../../common-common/src/types';
+import { IWebWallet, Account } from 'models';
+import { sessionSigninModal } from 'views/modals/session_signin_modal';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
-abstract class ISessionController<
-  ChainIdType extends string | number | symbol
-> {
-  addresses: Record<ChainIdType, string>;
+import {
+  constructCanvasMessage,
+  chainBaseToCanvasChain,
+  chainBaseToCanvasChainId,
+} from 'adapters/shared';
+import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
-  constructor() {
-    this.addresses = {} as Record<ChainIdType, string>;
-  }
+import app from 'state';
+import { ChainBase } from '../../../../../common-common/src/types';
+import {
+  ISessionController,
+  EthereumSessionController,
+  SubstrateSessionController,
+  CosmosSDKSessionController,
+  SolanaSessionController,
+  NEARSessionController,
+} from './sessionSigners';
 
-  abstract generateAddress(): Promise<string>;
+export async function signSessionWithAccount<T extends { address: string }>(
+  wallet: IWebWallet<T>,
+  account: Account,
+  timestamp: number
+) {
+  // Try to infer Chain ID from the currently active chain.
+  // `chainBaseToCanvasChainId` will replace idOrPrefix with the
+  // appropriate chainID for non-eth, non-cosmos chains.
+  //
+  // However, also handle the case where app.chain is empty.
+  const idOrPrefix =
+    wallet.chain === ChainBase.CosmosSDK
+      ? app.chain?.meta.bech32Prefix || 'cosmos'
+      : app.chain?.meta.node?.ethChainId || 1;
+  const canvasChain = chainBaseToCanvasChain(wallet.chain);
+  const canvasChainId = chainBaseToCanvasChainId(wallet.chain, idOrPrefix);
+  const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+    wallet.chain,
+    canvasChainId
+  );
 
-  getAddress(chainId: ChainIdType): string {
-    return this.addresses[chainId];
-  }
+  const canvasMessage = constructCanvasMessage(
+    canvasChain,
+    canvasChainId,
+    wallet.chain === ChainBase.Substrate
+      ? addressSwapper({
+          address: account.address,
+          currentPrefix: 42,
+        })
+      : account.address,
+    sessionPublicAddress,
+    timestamp,
+    account.validationBlockInfo
+      ? JSON.parse(account.validationBlockInfo).hash
+      : null
+  );
 
-  async getOrCreateAddress(chainId: ChainIdType): Promise<string> {
-    if (!this.addresses[chainId]) {
-      // create address
-      this.addresses[chainId] = await this.generateAddress();
-    }
-    return this.addresses[chainId];
-  }
-}
-
-class EthereumSessionController extends ISessionController<number> {
-  async generateAddress() {
-    return ethers.Wallet.createRandom().address;
-  }
-}
-
-class SubstrateSessionController extends ISessionController<string> {
-  keyring: Keyring;
-
-  constructor() {
-    super();
-    this.keyring = new Keyring();
-  }
-
-  async generateAddress() {
-    const mnemonic = mnemonicGenerate();
-    const pair = this.keyring.addFromUri(mnemonic, {}, 'ed25519');
-
-    return pair.address;
-  }
-}
-
-class CosmosSDKSessionController extends ISessionController<string> {
-  async generateAddress(): Promise<string> {
-    const cosm = await import('@cosmjs/proto-signing');
-    const wallet = await cosm.DirectSecp256k1HdWallet.generate();
-    const accounts = await wallet.getAccounts();
-
-    return accounts[0].address;
-  }
-}
-
-class SolanaSessionController extends ISessionController<string> {
-  async generateAddress(): Promise<string> {
-    const solw3 = await import('@solana/web3.js');
-    return solw3.Keypair.generate().publicKey.toString();
-  }
-}
-
-class NEARSessionController extends ISessionController<string> {
-  async generateAddress(): Promise<string> {
-    const ed25519Key = KeyPair.fromRandom('ed25519').getPublicKey().toString();
-    return Buffer.from(PublicKey.fromString(ed25519Key).data).toString('hex');
-  }
+  const signature = await wallet.signCanvasMessage(account, canvasMessage);
+  return { signature, chainId: canvasChainId, sessionPayload: canvasMessage };
 }
 
 class SessionsController {
@@ -91,29 +76,151 @@ class SessionsController {
     this.near = new NEARSessionController();
   }
 
-  getSessionController(chainBase: ChainBase): ISessionController<any> {
-    if (chainBase == 'ethereum') {
-      return this.ethereum;
-    } else if (chainBase == 'substrate') {
-      return this.substrate;
-    } else if (chainBase == 'cosmos') {
-      return this.cosmos;
-    } else if (chainBase == 'solana') {
-      return this.solana;
-    } else if (chainBase == 'near') {
-      return this.near;
-    }
+  getSessionController(chainBase: ChainBase): ISessionController {
+    if (chainBase == 'ethereum') return this.ethereum;
+    else if (chainBase == 'substrate') return this.substrate;
+    else if (chainBase == 'cosmos') return this.cosmos;
+    else if (chainBase == 'solana') return this.solana;
+    else if (chainBase == 'near') return this.near;
   }
 
-  getAddress(chainBase: ChainBase, chainId: string | number | symbol): string {
-    return this.getSessionController(chainBase).getAddress(chainId);
-  }
-
-  async getOrCreateAddress(
+  // Get a session address. Generate one and cache in localStorage if none exists.
+  public getOrCreateAddress(
     chainBase: ChainBase,
-    chainId: string | number | symbol
+    chainId: string
   ): Promise<string> {
     return this.getSessionController(chainBase).getOrCreateAddress(chainId);
+  }
+
+  // Provide authentication for a session address, by presenting a signed SessionPayload.
+  public authSession(
+    chainBase: ChainBase,
+    chainId: string,
+    payload: SessionPayload,
+    signature: string
+  ) {
+    return this.getSessionController(chainBase).authSession(
+      chainId,
+      payload,
+      signature
+    );
+  }
+
+  // Sign an arbitrary action, using context from the last authSession() call.
+  private async sign(
+    call: string,
+    args: Record<string, ActionArgument>
+  ): Promise<{ session: string; action: string; hash: string }> {
+    const chainBase = app.chain?.base;
+
+    // Try to infer Chain ID from the currently active chain. Note that
+    // `chainBaseToCanvasChainId` replaces idOrPrefix with the appropriate
+    // chainID for non-eth, non-cosmos chains.
+    const idOrPrefix =
+      chainBase == ChainBase.CosmosSDK
+        ? app.chain?.meta.bech32Prefix
+        : app.chain?.meta.node?.ethChainId;
+    const chainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
+
+    // Try to request a new session from the user, if one was not found.
+    const controller = this.getSessionController(chainBase);
+
+    // Load any past session
+    const hasAuthenticatedSession = await controller.hasAuthenticatedSession(
+      chainId
+    );
+
+    // TODO: Turn on the session sign-in modal
+    if (!hasAuthenticatedSession) {
+      return {
+        session: JSON.stringify({}),
+        action: JSON.stringify({}),
+        hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      };
+      // await sessionSigninModal().catch((err) => {
+      //   console.log('Login failed');
+      //   throw err;
+      // });
+    }
+
+    const { session, action, hash } = await controller.sign(
+      chainId,
+      call,
+      args
+    );
+
+    return {
+      session: JSON.stringify(session),
+      action: JSON.stringify(action),
+      hash,
+    };
+  }
+
+  // Public signer methods
+  public async signThread({ community, title, body, link, topic }) {
+    const { session, action, hash } = await this.sign('thread', {
+      community: community || '',
+      title,
+      body,
+      link: link || '',
+      topic: topic || '',
+    });
+    return { session, action, hash };
+  }
+
+  public async signDeleteThread({ thread_id }) {
+    const { session, action, hash } = await this.sign('deleteThread', {
+      thread_id,
+    });
+    return { session, action, hash };
+  }
+
+  public async signComment({ thread_id, body, parent_comment_id }) {
+    const { session, action, hash } = await this.sign('comment', {
+      thread_id,
+      body,
+      parent_comment_id,
+    });
+    return { session, action, hash };
+  }
+
+  public async signDeleteComment({ comment_id }) {
+    const { session, action, hash } = await this.sign('deleteComment', {
+      comment_id,
+    });
+    return { session, action, hash };
+  }
+
+  public async signThreadReaction({ thread_id, like }) {
+    const value = like ? 'like' : 'dislike';
+    const { session, action, hash } = await this.sign('reactThread', {
+      thread_id,
+      value,
+    });
+    return { session, action, hash };
+  }
+
+  public async signDeleteThreadReaction({ thread_id }) {
+    const { session, action, hash } = await this.sign('unreactThread', {
+      thread_id,
+    });
+    return { session, action, hash };
+  }
+
+  public async signCommentReaction({ comment_id, like }) {
+    const value = like ? 'like' : 'dislike';
+    const { session, action, hash } = await this.sign('reactComment', {
+      comment_id,
+      value,
+    });
+    return { session, action, hash };
+  }
+
+  public async signDeleteCommentReaction({ comment_id }) {
+    const { session, action, hash } = await this.sign('unreactComment', {
+      comment_id,
+    });
+    return { session, action, hash };
   }
 }
 
