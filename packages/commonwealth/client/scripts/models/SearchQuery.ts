@@ -29,7 +29,7 @@ export default class SearchQuery implements SearchParams {
   public searchScope: Array<SearchScope>;
   public sort: SearchSort;
 
-  constructor(searchTerm: string, params?: SearchParams) {
+  constructor(searchTerm = '', params?: SearchParams) {
     this.searchTerm = <Lowercase<string>>searchTerm.toLowerCase();
     this.searchScope = params?.searchScope || [SearchScope.All];
     this.chainScope = params?.chainScope;

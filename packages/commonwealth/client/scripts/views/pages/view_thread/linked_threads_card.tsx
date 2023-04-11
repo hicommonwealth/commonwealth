@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { getProposalUrlPath } from 'identifiers';
 import type { Thread } from 'models';
-import type { LinkedThreadRelation } from 'models/Thread';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -13,87 +12,96 @@ import { CWContentPageCard } from '../../components/component_kit/cw_content_pag
 import { CWText } from '../../components/component_kit/cw_text';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { Modal } from '../../components/component_kit/cw_modal';
+import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 
 type LinkedThreadsCardProps = {
+  thread: Thread;
   allowLinking: boolean;
-  threadId: number;
+  onChangeHandler: (linkedThreads: Thread[]) => void;
 };
 
-export const LinkedThreadsCard = (props: LinkedThreadsCardProps) => {
-  const { allowLinking, threadId } = props;
+export const LinkedThreadsCard = ({
+  thread,
+  allowLinking,
+  onChangeHandler,
+}: LinkedThreadsCardProps) => {
+  const [linkedThreads, setLinkedThreads] = useState<Array<Thread>>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [threadsLoaded, setThreadsLoaded] = useState(false);
 
-  const [initialized, setInitialized] = React.useState<boolean>(false);
-  const [linkedThreads, setLinkedThreads] = React.useState<Array<Thread>>([]);
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  useEffect(() => {
+    if (thread.linkedThreads.length > 0) {
+      const linkedThreadIds = thread.linkedThreads.map(
+        ({ linkedThread }) => linkedThread
+      );
 
-  const thread = app.threads.getById(threadId);
-
-  if (thread.linkedThreads.length > 0 && !initialized) {
-    setInitialized(true);
-
-    app.threads
-      .fetchThreadsFromId(
-        thread.linkedThreads.map(
-          (relation: LinkedThreadRelation) => relation.linkedThread
-        )
-      )
-      .then((result) => {
-        setLinkedThreads(result);
-        setInitialized(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setInitialized(false);
-      });
-  }
+      app.threads
+        .fetchThreadsFromId(linkedThreadIds)
+        .then((data) => {
+          setLinkedThreads(data);
+          setThreadsLoaded(true);
+        })
+        .catch(console.error);
+    } else {
+      setLinkedThreads([]);
+    }
+  }, [thread?.linkedThreads]);
 
   return (
-    <React.Fragment>
+    <>
       <CWContentPageCard
         header="Linked Discussions"
         content={
-          <div className="LinkedThreadsCard">
-            {thread.linkedThreads.length > 0 ? (
-              <div className="links-container">
-                {linkedThreads.map((t) => {
-                  const discussionLink = getProposalUrlPath(
-                    t.slug,
-                    `${t.identifier}-${slugify(t.title)}`,
-                    true
-                  );
+          thread.linkedThreads.length && !threadsLoaded ? (
+            <div className="spinner-container">
+              <CWSpinner size="medium" />
+            </div>
+          ) : (
+            <div className="LinkedThreadsCard">
+              {thread.linkedThreads.length > 0 ? (
+                <div className="links-container">
+                  {linkedThreads.map((t) => {
+                    const discussionLink = getProposalUrlPath(
+                      t.slug,
+                      `${t.identifier}-${slugify(t.title)}`,
+                      false
+                    );
 
-                  return <a href={discussionLink}>{t.title}</a>;
-                })}
-              </div>
-            ) : (
-              <CWText type="b2" className="no-threads-text">
-                There are currently no linked discussions.
-              </CWText>
-            )}
-            {allowLinking && (
-              <CWButton
-                buttonType="mini-black"
-                label="Link discussion"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsModalOpen(true);
-                }}
-              />
-            )}
-          </div>
+                    return (
+                      <a key={t.id} href={discussionLink}>
+                        {t.title}
+                      </a>
+                    );
+                  })}
+                </div>
+              ) : (
+                <CWText type="b2" className="no-threads-text">
+                  There are currently no linked discussions.
+                </CWText>
+              )}
+              {allowLinking && (
+                <CWButton
+                  buttonType="mini-black"
+                  label="Link discussion"
+                  onClick={() => setIsModalOpen(true)}
+                />
+              )}
+            </div>
+          )
         }
       />
       <Modal
         content={
           <LinkedThreadModal
-            linkingThread={thread}
+            thread={thread}
             linkedThreads={linkedThreads}
+            onSave={onChangeHandler}
             onModalClose={() => setIsModalOpen(false)}
           />
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

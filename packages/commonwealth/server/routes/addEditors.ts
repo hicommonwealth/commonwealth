@@ -1,8 +1,9 @@
+import { IThreadCollaborator } from 'models/Thread';
 import { AppError } from 'common-common/src/errors';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { getProposalUrl } from '../../shared/utils';
+import { getThreadUrl } from '../../shared/utils';
 import type { DB } from '../models';
 import emitNotifications from '../util/emitNotifications';
 import { findOneRole } from '../util/roles';
@@ -14,6 +15,11 @@ export const Errors = {
   IncorrectOwner: 'Not owned by this user',
 };
 
+export interface AddEditorsBody {
+  thread_id: string;
+  editors: IThreadCollaborator[];
+}
+
 const addEditors = async (
   models: DB,
   req: Request,
@@ -23,11 +29,11 @@ const addEditors = async (
   if (!req.body?.thread_id) {
     return next(new AppError(Errors.InvalidThread));
   }
-  const { thread_id } = req.body;
-  let editors;
-  try {
-    editors = JSON.parse(req.body.editors);
-  } catch (e) {
+
+  const { thread_id, editors } = req.body as AddEditorsBody;
+
+  // Ensure editors is an array
+  if (!Array.isArray(editors)) {
     return next(new AppError(Errors.InvalidEditorFormat));
   }
 
@@ -47,9 +53,12 @@ const addEditors = async (
   if (!thread) return next(new AppError(Errors.InvalidThread));
 
   const collaborators = await Promise.all(
-    Object.values(editors).map((editor: any) => {
+    editors.map((editor) => {
       return models.Address.findOne({
-        where: { id: editor.id },
+        where: {
+          chain: editor.chain,
+          address: editor.address,
+        },
         include: [models.RoleAssignment, models.User],
       });
     })
@@ -95,7 +104,7 @@ const addEditors = async (
           where: {
             subscriber_id: collaborator.User.id,
             category_id: NotificationCategories.NewComment,
-            object_id: `discussion_${thread.id}`,
+            object_id: thread.id,
             offchain_thread_id: thread.id,
             chain_id: thread.chain,
             is_active: true,
@@ -105,7 +114,7 @@ const addEditors = async (
           where: {
             subscriber_id: collaborator.User.id,
             category_id: NotificationCategories.NewReaction,
-            object_id: `discussion_${thread.id}`,
+            object_id: thread.id,
             offchain_thread_id: thread.id,
             chain_id: thread.chain,
             is_active: true,
@@ -122,7 +131,7 @@ const addEditors = async (
   await thread.save();
 
   if (collaborators?.length > 0) {
-    collaborators.map((collaborator) => {
+    collaborators.forEach((collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
       emitNotifications(
@@ -131,7 +140,7 @@ const addEditors = async (
         `user-${collaborator.User.id}`,
         {
           created_at: new Date(),
-          root_id: +thread.id,
+          thread_id: +thread.id,
           root_type: ProposalType.Thread,
           root_title: thread.title,
           comment_text: thread.body,
@@ -141,7 +150,7 @@ const addEditors = async (
         },
         {
           user: author.address,
-          url: getProposalUrl('discussion', thread),
+          url: getThreadUrl('discussion', thread),
           title: req.body.title,
           bodyUrl: req.body.url,
           chain: thread.chain,
@@ -162,14 +171,12 @@ const addEditors = async (
     ],
   });
 
-  const finalAddresses = await Promise.all(
-    finalCollaborations.map((e) => e.getAddress())
-  );
-
   return res.json({
     status: 'Success',
     result: {
-      collaborators: finalAddresses.map((a) => a.toJSON()),
+      collaborators: finalCollaborations
+        .map((c) => c.toJSON())
+        .map((c) => c.Address),
     },
   });
 };

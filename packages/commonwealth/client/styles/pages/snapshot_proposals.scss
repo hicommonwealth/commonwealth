@@ -7,6 +7,13 @@
   gap: 16px;
   padding: 24px;
 
+  .top-bar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .SnapshotProposalStagesBar {
     display: flex;
     flex-wrap: wrap;

@@ -8,6 +8,7 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { DB } from '../models';
 import { createRole, findOneRole } from '../util/roles';
 import { factory, formatFilename } from 'common-common/src/logging';
+import assertAddressOwnership from '../util/assertAddressOwnership';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -65,13 +66,6 @@ const linkExistingAddressToChain = async (
     return next(new AppError(Errors.NotVerifiedAddressOrUser));
   }
 
-  const originalProfile = await models.OffchainProfile.findOne({
-    where: { address_id: originalAddress.id },
-  });
-
-  const profileData =
-    originalProfile && originalProfile.data ? originalProfile.data : null;
-
   // check if the original address's token is expired. refer edge case 1)
   let verificationToken = originalAddress.verification_token;
   let verificationTokenExpires = originalAddress.verification_token_expires;
@@ -125,10 +119,15 @@ const linkExistingAddressToChain = async (
       //   we can just update with userId. this covers both edge case (1) & (2)
       // Address.updateWithTokenProvided
       existingAddress.user_id = userId;
+      const profileId = await models.Profile.findOne({
+        where: { user_id: userId },
+      });
+      existingAddress.profile_id = profileId?.id;
       existingAddress.keytype = req.body.keytype;
       existingAddress.verification_token = verificationToken;
       existingAddress.verification_token_expires = verificationTokenExpires;
       existingAddress.last_active = new Date();
+      existingAddress.name = originalAddress.name;
       const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
     } else {
@@ -149,27 +148,8 @@ const linkExistingAddressToChain = async (
       addressId = newObj.id;
     }
 
-    const existingProfile = await models.OffchainProfile.findOne({
-      where: { address_id: addressId },
-    });
-
-    if (existingProfile) {
-      await models.OffchainProfile.update(
-        {
-          data: profileData,
-        },
-        {
-          where: {
-            address_id: addressId,
-          },
-        }
-      );
-    } else {
-      await models.OffchainProfile.create({
-        address_id: addressId,
-        data: profileData,
-      });
-    }
+    // assertion check
+    await assertAddressOwnership(models, encodedAddress);
 
     const ownedAddresses = await models.Address.findAll({
       where: { user_id: originalAddress.user_id },

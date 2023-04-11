@@ -1,9 +1,13 @@
 import type { IChainEntityKind } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import type { ChainInfo, ProposalModule } from 'models';
+import type {
+  ChainInfo,
+  NotificationSubscription,
+  ProposalModule,
+} from 'models';
 import type { ProposalStore } from 'stores';
-import { requiresTypeSlug } from 'utils';
+import { requiresTypeSlug, slugify } from 'utils';
 import type ThreadsController from './controllers/server/threads';
 import app from './state';
 
@@ -31,10 +35,21 @@ export const getProposalUrlPath = (
   }
 };
 
+export const getNotificationUrlPath = (
+  subscription: NotificationSubscription
+): string => {
+  const community = subscription.Chain.id;
+  const type = subscription.Thread.slug;
+  const id = `${subscription.Thread.identifier}-${slugify(
+    subscription.Thread.title
+  )}`;
+
+  return `/${community}/${type}/${id}`;
+};
+
 export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
   if (c.base === ChainBase.CosmosSDK) return ProposalType.CosmosProposal;
   if (c.network === ChainNetwork.Sputnik) return ProposalType.SputnikProposal;
-  if (c.network === ChainNetwork.Moloch) return ProposalType.MolochProposal;
   if (c.network === ChainNetwork.Compound) return ProposalType.CompoundProposal;
   if (c.network === ChainNetwork.Aave) return ProposalType.AaveProposal;
   throw new Error(`Cannot determine proposal slug from chain ${c.id}.`);
@@ -74,9 +89,6 @@ export const proposalSlugToClass = () => {
       (app.chain as any).technicalCommittee
     );
   }
-  if (app.chain.network === ChainNetwork.Moloch) {
-    mmap.set(ProposalType.MolochProposal, (app.chain as any).governance);
-  }
   if (app.chain.network === ChainNetwork.Compound) {
     mmap.set(ProposalType.CompoundProposal, (app.chain as any).governance);
   }
@@ -106,7 +118,6 @@ export const proposalSlugToFriendlyName = new Map<ProposalType, string>([
   [ProposalType.Thread, 'Discussion Thread'],
   [ProposalType.CompoundProposal, 'Proposal'],
   [ProposalType.CosmosProposal, 'Proposal'],
-  [ProposalType.MolochProposal, 'Proposal'],
   [ProposalType.AaveProposal, 'Proposal'],
   [ProposalType.SputnikProposal, 'Proposal'],
 ]);
@@ -140,9 +151,6 @@ export const chainEntityTypeToProposalSlug = (
   else if (t === 'proposal') {
     if (app.chain.network === ChainNetwork.Sputnik) {
       return ProposalType.SputnikProposal;
-    }
-    if (app.chain.network === ChainNetwork.Moloch) {
-      return ProposalType.MolochProposal;
     }
     if (app.chain.network === ChainNetwork.Compound) {
       return ProposalType.CompoundProposal;
@@ -180,9 +188,6 @@ export const chainEntityTypeToProposalName = (t: IChainEntityKind): string => {
   else if (t === 'proposal') {
     if (app.chain.network === ChainNetwork.Sputnik) {
       return 'Sputnik Proposal';
-    }
-    if (app.chain.network === ChainNetwork.Moloch) {
-      return 'Moloch Proposal';
     }
     if (app.chain.network === ChainNetwork.Compound) {
       return 'On-Chain Proposal';

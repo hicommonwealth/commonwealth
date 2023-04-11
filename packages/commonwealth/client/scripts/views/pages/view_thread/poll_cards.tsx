@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import type { Poll, Thread } from 'models';
-
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
 
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { PollCard } from '../../components/poll_card';
@@ -18,15 +18,18 @@ import { Modal } from '../../components/component_kit/cw_modal';
 type ThreadPollEditorCardProps = {
   thread: Thread;
   threadAlreadyHasPolling: boolean;
+  onPollCreate: () => void;
 };
 
-export const ThreadPollEditorCard = (props: ThreadPollEditorCardProps) => {
-  const { thread, threadAlreadyHasPolling } = props;
-
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+export const ThreadPollEditorCard = ({
+  thread,
+  threadAlreadyHasPolling,
+  onPollCreate,
+}: ThreadPollEditorCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <CWContentPageCard
         header={`Add ${
           threadAlreadyHasPolling ? 'an' : 'another'
@@ -46,30 +49,38 @@ export const ThreadPollEditorCard = (props: ThreadPollEditorCardProps) => {
         }
       />
       <Modal
+        className="PollEditorCardModal"
         content={
           <PollEditorModal
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
+            onPollCreate={onPollCreate}
           />
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };
 
 type ThreadPollCardProps = {
   poll: Poll;
+  onVote: () => void;
+  showDeleteButton?: boolean;
+  onDelete?: () => void;
 };
 
-export const ThreadPollCard = (props: ThreadPollCardProps) => {
-  const { poll } = props;
-
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+export const ThreadPollCard = ({
+  poll,
+  onVote,
+  showDeleteButton,
+  onDelete,
+}: ThreadPollCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <PollCard
         multiSelect={false}
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
@@ -107,13 +118,26 @@ export const ThreadPollCard = (props: ThreadPollCardProps) => {
             ? null
             : 'You must join this community to vote.'
         }
-        onVoteCast={(option, callback, isSelected) =>
-          handlePollVote(poll, option, isSelected, callback)
-        }
+        onVoteCast={(option, isSelected) => {
+          handlePollVote(poll, option, isSelected, onVote);
+        }}
         onResultsClick={(e) => {
           e.preventDefault();
           if (poll.votes.length > 0) {
             setIsModalOpen(true);
+          }
+        }}
+        showDeleteButton={showDeleteButton}
+        onDeleteClick={async () => {
+          try {
+            await app.polls.deletePoll({
+              threadId: poll.threadId,
+              pollId: poll.id,
+            });
+            onDelete();
+          } catch (e) {
+            console.error(e);
+            notifyError('Failed to delete poll');
           }
         }}
       />
@@ -127,6 +151,6 @@ export const ThreadPollCard = (props: ThreadPollCardProps) => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

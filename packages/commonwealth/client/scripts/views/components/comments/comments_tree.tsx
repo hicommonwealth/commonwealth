@@ -1,10 +1,8 @@
 import React from 'react';
 
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
-
 import 'components/comments/comments_tree.scss';
-import type { AnyProposal, Comment as CommentType } from 'models';
+
+import type { Comment as CommentType } from 'models';
 import { Thread } from 'models';
 
 import app from 'state';
@@ -17,19 +15,18 @@ const MAX_THREAD_LEVEL = 2;
 
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
-  proposal: Thread | AnyProposal;
+  thread: Thread;
   setIsGloballyEditing?: (status: boolean) => void;
   updatedCommentsCallback: () => void;
 };
 
 export const CommentsTree = (props: CommentsTreeAttrs) => {
   const [commentError, setCommentError] = React.useState(null);
-  const [dom, setDom] = React.useState(null);
   const [highlightedComment, setHighlightedComment] = React.useState(false);
   const [isReplying, setIsReplying] = React.useState(false);
   const [parentCommentId, setParentCommentId] = React.useState(null);
 
-  const { comments, proposal, setIsGloballyEditing, updatedCommentsCallback } =
+  const { comments, thread, setIsGloballyEditing, updatedCommentsCallback } =
     props;
 
   // Jump to the comment indicated in the URL upon page load. Avoid
@@ -78,7 +75,7 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
         }
 
         const grandchildren = app.comments
-          .getByProposal(proposal)
+          .getByThread(thread)
           .filter((c) => c.parentComment === child.id);
 
         for (let j = 0; j < grandchildren.length; j++) {
@@ -106,7 +103,7 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
 
     return comments_.map((comment: CommentType<any>) => {
       const children = app.comments
-        .getByProposal(proposal)
+        .getByThread(thread)
         .filter((c) => c.parentComment === comment.id);
 
       if (isLivingCommentTree(comment, children)) {
@@ -116,7 +113,7 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
               comment={comment}
               handleIsReplying={handleIsReplying}
               isLast={threadLevel === 2}
-              isLocked={proposal instanceof Thread && proposal.readOnly}
+              isLocked={thread instanceof Thread && thread.readOnly}
               setIsGloballyEditing={setIsGloballyEditing}
               threadLevel={threadLevel}
               updatedCommentsCallback={updatedCommentsCallback}
@@ -128,7 +125,7 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
               <CreateComment
                 handleIsReplying={handleIsReplying}
                 parentCommentId={parentCommentId}
-                rootProposal={proposal}
+                rootThread={thread}
                 updatedCommentsCallback={updatedCommentsCallback}
               />
             )}

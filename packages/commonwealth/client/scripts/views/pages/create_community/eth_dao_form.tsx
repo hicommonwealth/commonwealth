@@ -20,12 +20,7 @@ import {
   defaultChainRows,
   ethChainRows,
 } from 'views/pages/create_community/chain_input_rows';
-import type {
-  ChainFormFields,
-  ChainFormState,
-  EthChainFormState,
-  EthFormFields,
-} from 'views/pages/create_community/types';
+import type { EthChainFormState } from 'views/pages/create_community/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import AaveApi from 'controllers/chain/ethereum/aave/api';
@@ -42,15 +37,6 @@ import {
   useEthChainFormFields,
 } from './hooks';
 
-type EthDaoFormFields = {
-  network: ChainNetwork.Aave | ChainNetwork.Compound;
-  tokenName: string;
-};
-
-type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
-
-type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
-
 export const EthDaoForm = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;
 
@@ -58,26 +44,6 @@ export const EthDaoForm = (props: EthChainFormState) => {
     ChainNetwork.Aave | ChainNetwork.Compound
   >(ChainNetwork.Compound);
   const [tokenName, setTokenName] = useState('token');
-
-  // public state: CreateEthDaoState = {
-  //   message: '',
-  //   loaded: false,
-  //   loading: false,
-  //   saving: false,
-  //   status: undefined,
-  //   form: {
-  //     address: '',
-  //     chainString: 'Ethereum Mainnet',
-  //     ethChainId: 1,
-  //     id: '',
-  //     name: '',
-  //     network: ChainNetwork.Compound,
-  //     nodeUrl: '',
-  //     symbol: '',
-  //     tokenName: 'token',
-  //     ...initChainForm(),
-  //   },
-  // };
 
   const { id, setId, name, setName, symbol, setSymbol } =
     useChainFormIdFields();
@@ -93,10 +59,6 @@ export const EthDaoForm = (props: EthChainFormState) => {
   useEffect(() => {
     ethChainFormFields.setNodeUrl(ethChains[1].url);
   }, []);
-
-  // oninit(vnode: ResultNode<EthChainFormState>) {
-  //   nodeUrl = vnode.attrs.ethChains[1].url;
-  // }
 
   const validAddress = isAddress(ethChainFormFields.address);
   const disableField = !validAddress || !chainFormState.loaded;

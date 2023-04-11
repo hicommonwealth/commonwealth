@@ -10,7 +10,7 @@ import type {
 } from './social_account';
 import type { ModelInstance, ModelStatic } from './types';
 
-export type EmailNotificationInterval = 'daily' | 'never';
+export type EmailNotificationInterval = 'week' | 'never';
 
 export type UserAttributes = {
   email: string;
@@ -85,8 +85,7 @@ export default (
         defaultValue: false,
       },
       emailNotificationInterval: {
-        type: dataTypes.ENUM,
-        values: ['daily', 'never'],
+        type: dataTypes.STRING,
         defaultValue: 'never',
         allowNull: false,
       },
@@ -113,7 +112,6 @@ export default (
       defaultScope: {
         attributes: {
           exclude: [
-            'email',
             'emailVerified',
             'emailNotificationInterval',
             'isAdmin',
@@ -135,7 +133,9 @@ export default (
   ): Promise<UserInstance> => {
     const newUser = await User.create(attrs, options);
     const profile = await models.Profile.create(
-      { user_id: newUser.id },
+      {
+        user_id: newUser.id,
+      },
       options
     );
     newUser.Profiles = [profile];

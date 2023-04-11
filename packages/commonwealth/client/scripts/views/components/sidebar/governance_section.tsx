@@ -36,7 +36,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     }
   }
 
-  currentTree[split[split.length - 1]] = toggle;
+  currentTree[split[split.length - 1]] = !toggle;
 
   const newTree = currentTree;
 
@@ -54,7 +54,6 @@ export const GovernanceSection = () => {
       app.chain.network === ChainNetwork.Sputnik ||
       (app.chain.base === ChainBase.Substrate &&
         app.chain.network !== ChainNetwork.Plasm) ||
-      app.chain.network === ChainNetwork.Moloch ||
       app.chain.network === ChainNetwork.Compound ||
       app.chain.network === ChainNetwork.Aave ||
       // app.chain.network === ChainNetwork.CommonProtocol ||
@@ -84,7 +83,6 @@ export const GovernanceSection = () => {
     (app.chain?.base === ChainBase.CosmosSDK &&
       app.chain.network !== ChainNetwork.Terra) ||
     app.chain?.network === ChainNetwork.Sputnik ||
-    app.chain?.network === ChainNetwork.Moloch ||
     app.chain?.network === ChainNetwork.Compound ||
     app.chain?.network === ChainNetwork.Aave;
 

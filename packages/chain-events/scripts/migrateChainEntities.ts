@@ -28,6 +28,9 @@ import type { BrokerConfig } from 'rascal';
 import { RABBITMQ_URI } from '../../commonwealth/server/config';
 import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
 import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from '../services/config';
+import NotificationsHandler from '../services/ChainEventsConsumer/ChainEventHandlers/notification';
+import models from '../services/database/database';
+import { EventKind } from '../src/chains/substrate/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -95,6 +98,14 @@ async function migrateChainEntity(
       rmqController,
       chain
     );
+
+    const excludedNotificationEvents = [EventKind.DemocracyTabled];
+    const notificationsHandler = new NotificationsHandler(
+      models,
+      rmqController,
+      excludedNotificationEvents
+    );
+
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainInstance.base === ChainBase.Substrate) {
@@ -108,10 +119,6 @@ async function migrateChainEntity(
     } else if (chainInstance.base === ChainBase.CosmosSDK) {
       const api = await CosmosEvents.createApi(node.private_url || node.url);
       fetcher = new CosmosEvents.StorageFetcher(api);
-    } else if (chainInstance.network === ChainNetwork.Moloch) {
-      // TODO: determine moloch API version
-      // TODO: construct dater
-      throw new Error('Moloch migration not yet implemented.');
     } else if (chainInstance.network === ChainNetwork.Compound) {
       const contracts = await fetchData(
         `${CW_SERVER_URL}/api/getChainContracts`,
@@ -157,7 +164,8 @@ async function migrateChainEntity(
       try {
         // eslint-disable-next-line no-await-in-loop
         const dbEvent = await migrationHandler.handle(event);
-        await entityArchivalHandler.handle(event, dbEvent);
+        const ceEvent = await entityArchivalHandler.handle(event, dbEvent);
+        await notificationsHandler.handle(event, ceEvent);
       } catch (e) {
         log.error(`Event handle failure: ${e.message}`);
       }

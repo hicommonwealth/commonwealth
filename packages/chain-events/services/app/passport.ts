@@ -6,7 +6,7 @@ import { JWT_SECRET } from '../config';
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
-function useDefaultUserAuth() {
+function initDefaultUserAuth() {
   passport.use(
     new JWTStrategy(
       {
@@ -26,7 +26,7 @@ function useDefaultUserAuth() {
 }
 
 function setupPassport(): void {
-  useDefaultUserAuth();
+  initDefaultUserAuth();
 }
 
 export default setupPassport;

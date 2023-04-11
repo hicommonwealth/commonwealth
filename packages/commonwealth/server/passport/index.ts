@@ -4,13 +4,13 @@ import passportJWT from 'passport-jwt';
 import { JWT_SECRET } from '../config';
 import type { DB } from '../models';
 import '../types';
-import { useMagicAuth } from './magic';
-import { useSocialAccountAuth } from './socialAccount';
+import { initMagicAuth } from './magic';
+import { initSocialAccountAuth } from './socialAccount';
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
-function useDefaultUserAuth(models: DB) {
+function initDefaultUserAuth(models: DB) {
   passport.use(
     new JWTStrategy(
       {
@@ -42,9 +42,9 @@ function useDefaultUserAuth(models: DB) {
 }
 
 export function setupPassport(models: DB) {
-  useDefaultUserAuth(models);
-  useSocialAccountAuth(models);
-  useMagicAuth(models);
+  initDefaultUserAuth(models);
+  initSocialAccountAuth(models);
+  initMagicAuth(models);
 
   passport.serializeUser<any>((user, done) => {
     StatsDController.get().increment('cw.users.logged_in');

@@ -10,9 +10,11 @@ import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const allCommunities = app.config.chains
     .getAll()
@@ -29,12 +31,11 @@ export const SidebarQuickSwitcher = () => {
   return (
     <div className="SidebarQuickSwitcher">
       <div className="community-nav-bar">
-        {app.isLoggedIn() && (
+        {isLoggedIn && (
           <CWIconButton
             iconName="plusCircle"
             iconButtonTheme="black"
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() => {
               app.sidebarMenu = 'createContent';
               app.sidebarRedraw.emit('redraw');
             }}
@@ -43,10 +44,9 @@ export const SidebarQuickSwitcher = () => {
         <CWIconButton
           iconName="compass"
           iconButtonTheme="black"
-          onClick={(e) => {
-            e.preventDefault();
-            app.sidebarRedraw.emit('redraw');
+          onClick={() => {
             app.sidebarMenu = 'exploreCommunities';
+            app.sidebarRedraw.emit('redraw');
           }}
         />
       </div>
@@ -57,7 +57,7 @@ export const SidebarQuickSwitcher = () => {
             key={item.id}
             size="large"
             community={item}
-            onClick={link ? () => navigate(`/${item.id}`) : undefined}
+            onClick={link ? () => navigate(`/${item.id}`, {}, null) : undefined}
           />
         ))}
       </div>

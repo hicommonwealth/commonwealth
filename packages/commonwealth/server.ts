@@ -40,7 +40,7 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
-import setupEntityProxy from './server/util/entitiesProxy';
+import setupCEProxy from './server/util/entitiesProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import RuleCache from './server/util/rules/ruleCache';
@@ -126,16 +126,32 @@ async function main() {
     // redirect from commonwealthapp.herokuapp.com to commonwealth.im
     app.all(/.*/, (req, res, next) => {
       const host = req.header('host');
-      if (host.match(/commonwealthapp.herokuapp.com/i)) {
+      const origin = req.get('origin');
+
+      // For development only - need to figure out prod solution
+      // if host is native mobile app, don't redirect
+      if (origin?.includes('capacitor://')) {
+        res.header('Access-Control-Allow-Origin', '*');
+      }
+
+      if (host?.match(/commonwealthapp.herokuapp.com/i)) {
         res.redirect(301, `https://commonwealth.im${req.url}`);
       } else {
         next();
       }
     });
 
-    // redirect to https:// unless we are using a test domain
+    // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
     app.use(
-      redirectToHTTPS([/localhost:(\d{4})/, /127.0.0.1:(\d{4})/], [], 301)
+      redirectToHTTPS(
+        [
+          /localhost:(\d{4})/,
+          /127.0.0.1:(\d{4})/,
+          /192.168.1.(\d{1,3}):(\d{4})/,
+        ],
+        [],
+        301
+      )
     );
 
     // dynamic compression settings used
@@ -275,7 +291,7 @@ async function main() {
 
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
-  setupEntityProxy(app);
+  setupCEProxy(app);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 
   setupErrorHandlers(app, rollbar);

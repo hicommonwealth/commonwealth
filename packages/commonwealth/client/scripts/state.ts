@@ -1,7 +1,3 @@
-import type { ModalStore } from 'controllers/app/modals';
-import { getModalStore } from 'controllers/app/modals';
-import type { ToastStore } from 'controllers/app/toasts';
-import { getToastStore } from 'controllers/app/toasts';
 import ChainEntityController from 'controllers/server/chain_entities';
 import DiscordController from 'controllers/server/discord';
 import { WebSocketController } from 'controllers/server/socket';
@@ -18,9 +14,10 @@ import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
 import PollsController from './controllers/server/polls';
-import ProfilesController from './controllers/server/profiles';
+import NewProfilesController from './controllers/server/newProfiles';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
+import ThreadReactionsController from './controllers/server/reactions/ThreadReactionsController';
 import { RolesController } from './controllers/server/roles';
 import SearchController from './controllers/server/search';
 import SessionsController from './controllers/server/sessions';
@@ -66,6 +63,7 @@ export interface IApp {
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
   comments: CommentsController;
   reactions: ReactionsController;
+  threadReactions: ThreadReactionsController;
   reactionCounts: ReactionCountsController;
   polls: PollsController;
 
@@ -87,24 +85,22 @@ export interface IApp {
   user: UserController;
   roles: RolesController;
   recentActivity: RecentActivityController;
-  profiles: ProfilesController;
+  newProfiles: NewProfilesController;
   sessions: SessionsController;
 
   // Web3
   wallets: WebWalletController;
   snapshot: SnapshotController;
 
-  toasts: ToastStore;
-  modals: ModalStore;
-
   mobileMenu: MobileMenuName;
-  mobileMenuRedraw: EventEmitter;
   sidebarMenu: SidebarMenuName;
   sidebarRedraw: EventEmitter;
 
   sidebarToggled: boolean;
 
   loginState: LoginState;
+  loginStateEmitter: EventEmitter;
+
   // stored on server-side
   config: {
     chains: ChainStore;
@@ -113,6 +109,7 @@ export interface IApp {
     defaultChain: string;
     chainCategories?: ChainCategoryAttributes[];
     chainCategoryTypes?: ChainCategoryTypeAttributes[];
+    evmTestEnv?: string;
   };
 
   loginStatusLoaded(): boolean;
@@ -120,6 +117,7 @@ export interface IApp {
   isLoggedIn(): boolean;
 
   isProduction(): boolean;
+  isNative(win): boolean;
 
   serverUrl(): string;
 
@@ -132,13 +130,6 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
-
-  _lastNavigatedBack: boolean;
-  _lastNavigatedFrom: string;
-
-  lastNavigatedBack(): boolean;
-
-  lastNavigatedFrom(): string;
 }
 
 // INJECT DEPENDENCIES
@@ -168,6 +159,7 @@ const app: IApp = {
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   comments: new CommentsController(),
   reactions: new ReactionsController(),
+  threadReactions: new ThreadReactionsController(),
   reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
 
@@ -193,19 +185,16 @@ const app: IApp = {
   user,
   roles,
   recentActivity: new RecentActivityController(),
-  profiles: new ProfilesController(),
+  newProfiles: new NewProfilesController(),
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
+  loginStateEmitter: new EventEmitter(),
 
   // Global nav state
   mobileMenu: null,
-  mobileMenuRedraw: new EventEmitter(),
   sidebarMenu: 'default',
   sidebarRedraw: new EventEmitter(),
   sidebarToggled: false,
-
-  toasts: getToastStore(),
-  modals: getModalStore(),
 
   config: {
     chains: new ChainStore(),
@@ -215,9 +204,22 @@ const app: IApp = {
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
+  isNative: (win: Window) => {
+    const capacitor = window['Capacitor'];
+    return !!(capacitor && capacitor.isNative);
+  },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
-  serverUrl: () => '/api',
+  serverUrl: () => {
+    //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
+    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
+
+    if (app.isNative(window)) {
+      return mobileUrl;
+    } else {
+      return '/api';
+    }
+  },
 
   loadingError: null,
 
@@ -229,11 +231,6 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
-
-  _lastNavigatedFrom: null,
-  _lastNavigatedBack: false,
-  lastNavigatedBack: () => app._lastNavigatedBack,
-  lastNavigatedFrom: () => app._lastNavigatedFrom,
 };
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
@@ -249,6 +246,7 @@ export async function initAppState(
         app.config.nodes.clear();
         app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
+        app.config.evmTestEnv = data.result.evmTestEnv;
 
         data.result.nodes
           .sort((a, b) => a.id - b.id)
@@ -296,12 +294,14 @@ export async function initAppState(
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => redraw());
+          app.loginStateEmitter.emit('redraw');
         } else if (
           app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected
         ) {
           // TODO: create global deinit function
           app.socket.disconnect();
+          app.loginStateEmitter.emit('redraw');
         }
 
         app.user.setStarredCommunities(

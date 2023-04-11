@@ -7,32 +7,29 @@ import type { ApiPromise as SubstrateApi } from '@polkadot/api';
 import type { ChainEventInstance } from '../services/database/models/chain_event';
 
 import * as SubstrateTypes from './chains/substrate/types';
-import * as MolochTypes from './chains/moloch/types';
 import * as CompoundTypes from './chains/compound/types';
 import * as Erc20Types from './chains/erc20/types';
 import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CommonwealthTypes from './chains/commonwealth/types';
 import * as CosmosTypes from './chains/cosmos/types';
-import type { Api as MolochApi } from './chains/moloch/types';
 import type { IErc721Contracts as ERC721Api } from './chains/erc721/types';
 import type { IErc20Contracts as ERC20Api } from './chains/erc20/types';
 import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as CommonwealthApi } from './chains/commonwealth/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 // add other events here as union types
 export type IChainEntityKind =
   | SubstrateTypes.EntityKind
-  | MolochTypes.EntityKind
   | CompoundTypes.EntityKind
   | AaveTypes.EntityKind
   | CommonwealthTypes.EntityKind
   | CosmosTypes.EntityKind;
 export type IChainEventData =
   | SubstrateTypes.IEventData
-  | MolochTypes.IEventData
   | CompoundTypes.IEventData
   | AaveTypes.IEventData
   | Erc20Types.IEventData
@@ -41,7 +38,6 @@ export type IChainEventData =
   | CosmosTypes.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
-  | MolochTypes.EventKind
   | CompoundTypes.EventKind
   | AaveTypes.EventKind
   | Erc20Types.EventKind
@@ -50,7 +46,6 @@ export type IChainEventKind =
   | CosmosTypes.EventKind;
 export type IAPIs =
   | SubstrateApi
-  | MolochApi
   | ERC721Api
   | ERC20Api
   | CompoundApi
@@ -66,7 +61,6 @@ export type IAnyListener = Listener<
 
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
-  ...MolochTypes.EventKinds,
   ...CompoundTypes.EventKinds,
   ...AaveTypes.EventKinds,
   ...Erc20Types.EventKinds,
@@ -80,7 +74,6 @@ export enum SupportedNetwork {
   Substrate = 'substrate',
   Aave = 'aave',
   Compound = 'compound',
-  Moloch = 'moloch',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
   Commonwealth = 'commonwealth',
@@ -215,6 +208,27 @@ export interface IEventTitle {
 export type TitlerFilter = (kind: IChainEventKind) => IEventTitle;
 
 /**
+ * This function takes the network and base attribute of our current chains model and returns the relevant chain-event
+ * network. The chain-event network is an instance of SupportedNetwork enum. This is NOT the same as the network on
+ * the commonwealth chains model. This function is useful for determining which SupportedNetwork listener a
+ * Commonwealth 'chain' should use. Throws if the given chainNetwork and chainBase don't  match a chain-event network
+ * i.e. SupportedNetwork.
+ * @param chainNetwork The network attribute of the Commonwealth chain model
+ * @param chainBase The base attribute of the Commonwealth chain model
+ */
+export function getChainEventNetwork(
+  chainNetwork: string,
+  chainBase: string
+): SupportedNetwork {
+  if (chainBase === ChainBase.Substrate) return SupportedNetwork.Substrate;
+  else if (chainBase === ChainBase.CosmosSDK) return SupportedNetwork.Cosmos;
+  else if (chainNetwork === ChainNetwork.Compound)
+    return SupportedNetwork.Compound;
+  else if (chainNetwork === ChainNetwork.Aave) return SupportedNetwork.Aave;
+  else throw new Error('No matching SupportedNetwork');
+}
+
+/**
  * Returns the key of the value that is unique to the entities chain and type i.e. the key whose associated value
  * becomes the type_id of the chain-entity. The combination of chain, type, and type_id must/will always be unique.
  * @param network An instance of a network for which chain-events supports chain-events and chain-entities
@@ -229,9 +243,6 @@ export function getUniqueEntityKey(
   }
   if (network === SupportedNetwork.Aave) {
     return 'id';
-  }
-  if (network === SupportedNetwork.Moloch) {
-    return 'proposalIndex';
   }
   if (network === SupportedNetwork.Commonwealth) {
     return 'id';
@@ -252,15 +263,6 @@ export function getUniqueEntityKey(
     case SubstrateTypes.EntityKind.TreasuryProposal: {
       return 'proposalIndex';
     }
-    case SubstrateTypes.EntityKind.TreasuryBounty: {
-      return 'bountyIndex';
-    }
-    case SubstrateTypes.EntityKind.CollectiveProposal: {
-      return 'proposalIndex';
-    }
-    case SubstrateTypes.EntityKind.SignalingProposal: {
-      return 'proposalHash';
-    }
     case SubstrateTypes.EntityKind.TipProposal: {
       return 'proposalHash';
     }
@@ -274,24 +276,6 @@ export function eventToEntity(
   network: SupportedNetwork,
   event: IChainEventKind
 ): [IChainEntityKind, EntityEventKind] {
-  if (network === SupportedNetwork.Moloch) {
-    switch (event) {
-      case MolochTypes.EventKind.SubmitProposal: {
-        return [MolochTypes.EntityKind.Proposal, EntityEventKind.Create];
-      }
-      case MolochTypes.EventKind.SubmitVote: {
-        return [MolochTypes.EntityKind.Proposal, EntityEventKind.Vote];
-      }
-      case MolochTypes.EventKind.ProcessProposal: {
-        return [MolochTypes.EntityKind.Proposal, EntityEventKind.Complete];
-      }
-      case MolochTypes.EventKind.Abort: {
-        return [MolochTypes.EntityKind.Proposal, EntityEventKind.Complete];
-      }
-      default:
-        return null;
-    }
-  }
   if (network === SupportedNetwork.Compound) {
     switch (event) {
       case CompoundTypes.EventKind.ProposalCanceled: {
@@ -454,101 +438,6 @@ export function eventToEntity(
           SubstrateTypes.EntityKind.TreasuryProposal,
           EntityEventKind.Complete,
         ];
-      }
-
-      // Bounty Events
-      case SubstrateTypes.EventKind.TreasuryBountyProposed: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyAwarded: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyBecameActive: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyCanceled: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Complete,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyClaimed: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Complete,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyExtended: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.TreasuryBountyRejected: {
-        return [
-          SubstrateTypes.EntityKind.TreasuryBounty,
-          EntityEventKind.Complete,
-        ];
-      }
-
-      // Collective Events
-      case SubstrateTypes.EventKind.CollectiveProposed: {
-        return [
-          SubstrateTypes.EntityKind.CollectiveProposal,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.CollectiveVoted: {
-        return [
-          SubstrateTypes.EntityKind.CollectiveProposal,
-          EntityEventKind.Vote,
-        ];
-      }
-      case SubstrateTypes.EventKind.CollectiveApproved: {
-        return [
-          SubstrateTypes.EntityKind.CollectiveProposal,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.CollectiveDisapproved:
-      case SubstrateTypes.EventKind.CollectiveExecuted: {
-        return [
-          SubstrateTypes.EntityKind.CollectiveProposal,
-          EntityEventKind.Complete,
-        ];
-      }
-
-      // Signaling Events
-      case SubstrateTypes.EventKind.SignalingNewProposal: {
-        return [
-          SubstrateTypes.EntityKind.SignalingProposal,
-          EntityEventKind.Create,
-        ];
-      }
-      case SubstrateTypes.EventKind.SignalingCommitStarted:
-      case SubstrateTypes.EventKind.SignalingVotingStarted: {
-        return [
-          SubstrateTypes.EntityKind.SignalingProposal,
-          EntityEventKind.Update,
-        ];
-      }
-      case SubstrateTypes.EventKind.SignalingVotingCompleted: {
-        return [
-          SubstrateTypes.EntityKind.SignalingProposal,
-          EntityEventKind.Complete,
-        ];
-      }
-      default: {
-        return null;
       }
     }
   }

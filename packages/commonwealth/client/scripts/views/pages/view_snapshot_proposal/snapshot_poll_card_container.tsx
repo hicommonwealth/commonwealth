@@ -1,19 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-import { redraw } from 'mithrilInterop';
-import type {
-  SnapshotProposal,
-  SnapshotProposalVote,
-  SnapshotSpace,
-} from 'helpers/snapshot_utils';
+import type { SnapshotProposal, SnapshotProposalVote, SnapshotSpace } from 'helpers/snapshot_utils';
 import moment from 'moment';
 
-import app from 'state';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
 import { Modal } from '../../components/component_kit/cw_modal';
 
 type SnapshotProposalCardsProps = {
+  activeUserAddress: string;
   identifier: string;
   proposal: SnapshotProposal;
   scores: number[];
@@ -28,7 +23,7 @@ type SnapshotProposalCardsProps = {
 
 const enum VotingError {
   NOT_VALIDATED = 'You cannot vote on this poll or are not logged in.',
-  ALREADY_VOTED = 'Already Submitted Vote',
+  ALREADY_VOTED = 'Already Submitted Vote'
 }
 
 function calculateTimeRemaining(proposal: SnapshotProposal) {
@@ -37,16 +32,13 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
   const duration = moment.duration(endTime.diff(now));
   const days = duration.days();
   const hours = duration.hours();
-  const timeRemainingString = `${days} ${days > 1 ? 'days' : 'day'} ${hours}${
-    hours > 1 ? 'hrs' : 'hr'
-  } remaining`;
+  const timeRemainingString = `${days} ${days > 1 ? 'days' : 'day'} ${hours}${hours > 1 ? 'hrs' : 'hr'} remaining`;
   return timeRemainingString;
 }
 
-export const SnapshotPollCardContainer = (
-  props: SnapshotProposalCardsProps
-) => {
+export const SnapshotPollCardContainer = (props: SnapshotProposalCardsProps) => {
   const {
+    activeUserAddress,
     identifier,
     proposal,
     scores,
@@ -55,22 +47,19 @@ export const SnapshotPollCardContainer = (
     votes,
     validatedAgainstStrategies,
     fetchedPower,
-    totalScore,
+    totalScore
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [choice, setChoice] = React.useState<string>();
   const [callback, setCallback] = React.useState<() => any>();
 
-  const isActive =
-    proposal &&
-    moment(+proposal.start * 1000) <= moment() &&
-    moment(+proposal.end * 1000) > moment();
+  const isActive = proposal && moment(+proposal.start * 1000) <= moment() && moment(+proposal.end * 1000) > moment();
 
   const userVote =
     proposal.choices[
       votes.find((vote) => {
-        return vote.voter === app.user?.activeAccount?.address;
+        return vote.voter === activeUserAddress;
       })?.choice - 1
     ];
   const hasVoted = userVote !== undefined;
@@ -81,47 +70,48 @@ export const SnapshotPollCardContainer = (
     ? VotingError.ALREADY_VOTED
     : null;
 
-  const buildVoteInformation = (
-    choices,
-    snapshotVotes: SnapshotProposalVote[]
-  ) => {
-    const voteInfo = [];
+  const timeRemaining = useMemo(() => {
+    return calculateTimeRemaining(proposal);
+  }, [proposal]);
 
+  const voteInformation = useMemo(() => {
+    if (!proposal) {
+      return [];
+    }
+    const { choices } = proposal;
+    const voteInfo = [];
     for (let i = 0; i < choices.length; i++) {
-      const totalVotes = snapshotVotes
-        .filter((vote) => vote.choice === i + 1)
-        .reduce((sum, vote) => sum + vote.balance, 0);
+      const totalVotes = votes.filter((vote) => vote.choice === i + 1).reduce((sum, vote) => sum + vote.balance, 0);
       voteInfo.push({
         label: choices[i],
         value: choices[i],
-        voteCount: totalVotes,
+        voteCount: totalVotes
       });
     }
-
     return voteInfo;
-  };
+  }, [proposal, votes]);
 
   return (
-    <React.Fragment>
+    <>
       <SnapshotPollCard
         pollEnded={!isActive}
         hasVoted={hasVoted}
         votedFor={hasVoted ? userVote : ''}
         disableVoteButton={!fetchedPower || voteErrorText !== null}
         proposalTitle={proposal.title}
-        timeRemaining={calculateTimeRemaining(proposal)}
+        timeRemaining={timeRemaining}
         tokenSymbol={space.symbol}
         totalVoteCount={totals.sumOfResultsBalance}
-        voteInformation={buildVoteInformation(proposal?.choices, votes)}
-        onVoteCast={(_choice, _callback) => {
+        voteInformation={voteInformation}
+        onSnapshotVoteCast={(_choice, _callback) => {
           setChoice(_choice);
           setCallback(_callback);
-
           if (choice && callback) {
             setIsModalOpen(true);
           }
-
-          redraw();
+        }}
+        onVoteCast={() => {
+          setIsModalOpen(false);
         }}
         incrementalVoteCast={totalScore}
         tooltipErrorMessage={voteErrorText}
@@ -144,6 +134,6 @@ export const SnapshotPollCardContainer = (
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

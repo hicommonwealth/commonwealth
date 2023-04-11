@@ -1,8 +1,4 @@
-import { alertModalWithText } from 'views/modals/alert_modal';
-import {
-  APPLICATION_UPDATE_ACTION,
-  APPLICATION_UPDATE_MESSAGE,
-} from 'helpers/constants';
+import { APPLICATION_UPDATE_MESSAGE } from 'helpers/constants';
 import { notifyError } from 'controllers/app/notifications';
 
 const handleWindowError = () => {
@@ -20,10 +16,7 @@ const handleWindowError = () => {
     }
 
     if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
-      alertModalWithText(
-        APPLICATION_UPDATE_MESSAGE,
-        APPLICATION_UPDATE_ACTION
-      )();
+      window.confirm(APPLICATION_UPDATE_MESSAGE);
       return false;
     }
 

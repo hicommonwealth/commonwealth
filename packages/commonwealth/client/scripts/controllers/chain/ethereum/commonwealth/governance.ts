@@ -75,7 +75,7 @@ export default class CommonwealthGovernance extends ProposalModule<
     // if (this._usingServerChainEntities) {
     //   console.log('Fetching moloch proposals from backend.');
     //   await this.app.chainEntities.refresh(this.app.chain.id);
-    //   const entities = this.app.chainEntities.store.getByType(CommonwealthEvents.Types.EntityKind.Proposal);
+    //   const entities = this.app.chainEntities.getByType(CommonwealthEvents.Types.EntityKind.Proposal);
     //   entities.map((p) => this._entityConstructor(p));
     // } else {
     //   console.log('Fetching moloch proposals from chain.');

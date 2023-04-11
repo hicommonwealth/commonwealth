@@ -66,7 +66,9 @@ export const CWContentPage = (props: ContentPageProps) => {
   } = props;
 
   // @REACT TODO: this needs to be aware of which view to default to
-  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>('sidebarView');
+  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
+    'sidebarView'
+  );
   const [tabSelected, setTabSelected] = React.useState<number>(0);
 
   React.useEffect(() => {
@@ -139,7 +141,9 @@ export const CWContentPage = (props: ContentPageProps) => {
           {mainBody}
           {showSidebar && (
             <div className="sidebar">
-              {sidebarComponents.map((c) => c.item)}
+              {sidebarComponents.map((c) => (
+                <React.Fragment key={c.label}>{c.item}</React.Fragment>
+              ))}
             </div>
           )}
         </div>
@@ -156,6 +160,7 @@ export const CWContentPage = (props: ContentPageProps) => {
             />
             {sidebarComponents.map((item, i) => (
               <CWTab
+                key={item.label}
                 label={item.label}
                 onClick={() => {
                   setTabSelected(i + 1);

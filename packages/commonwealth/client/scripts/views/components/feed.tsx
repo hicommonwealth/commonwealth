@@ -3,10 +3,11 @@ import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
 
-import { DashboardActivityNotification } from 'models';
+import type { DashboardActivityNotification } from 'models';
+
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
-import { CWSpinner } from './component_kit/cw_spinner';
 import { PageNotFound } from '../pages/404';
+import { CWSpinner } from './component_kit/cw_spinner';
 
 type FeedProps = {
   fetchData: () => Promise<any>;
@@ -17,41 +18,37 @@ type FeedProps = {
 
 const DEFAULT_COUNT = 10;
 
-export const Feed = (props: FeedProps) => {
+export const Feed = ({
+  defaultCount,
+  fetchData,
+  noFeedMessage,
+  onFetchedDataCallback,
+}: FeedProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [data, setData] = useState<DashboardActivityNotification[]>();
   const [currentCount, setCurrentCount] = useState<number>(
-    props.defaultCount || DEFAULT_COUNT
+    defaultCount || DEFAULT_COUNT
   );
-  const { fetchData, onFetchedDataCallback } = props;
-
-  const Footer = () => {
-    return (
-      <div className="loading-spinner small">
-        <CWSpinner />
-      </div>
-    );
-  };
 
   const loadMore = useCallback(() => {
     return setTimeout(() => {
       setCurrentCount(
-        (currentCount) => currentCount + (props.defaultCount || DEFAULT_COUNT)
+        (prevState) => prevState + (defaultCount || DEFAULT_COUNT)
       );
     }, 500);
-  }, [setCurrentCount]);
+  }, [setCurrentCount, defaultCount]);
 
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetchData();
-        if (onFetchedDataCallback) {
-          data.result = data.result.map((activity) => {
-            return onFetchedDataCallback(activity);
-          });
-        }
-        setData(data.result);
+        const response = await fetchData();
+
+        setData(
+          onFetchedDataCallback
+            ? response.result.map((activity) => onFetchedDataCallback(activity))
+            : response.result
+        );
       } catch (err) {
         setError(true);
       }
@@ -61,15 +58,7 @@ export const Feed = (props: FeedProps) => {
     getData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="Feed">
-        <div className="loading-spinner">
-          <CWSpinner />
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <CWSpinner />;
 
   if (error) {
     return <PageNotFound message="There was an error rendering the feed." />;
@@ -78,7 +67,7 @@ export const Feed = (props: FeedProps) => {
   if (!data || data?.length === 0) {
     return (
       <div className="Feed">
-        <div className="no-feed-message">{props.noFeedMessage}</div>
+        <div className="no-feed-message">{noFeedMessage}</div>
       </div>
     );
   }
@@ -94,7 +83,6 @@ export const Feed = (props: FeedProps) => {
         itemContent={(i) => {
           return <UserDashboardRow key={i} notification={data[i]} />;
         }}
-        components={{ Footer }}
       />
     </div>
   );

@@ -19,11 +19,11 @@ export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
     'textProposal' | 'communitySpend'
   >('textProposal');
-  const [deposit, setDeposit] = useState<number | undefined>();
-  const [description, setDescription] = useState();
-  const [payoutAmount, setPayoutAmount] = useState();
-  const [recipient, setRecipient] = useState();
-  const [title, setTitle] = useState();
+  const [deposit, setDeposit] = useState<number>(0);
+  const [description, setDescription] = useState<string>('');
+  const [payoutAmount, setPayoutAmount] = useState<number>(0);
+  const [recipient, setRecipient] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
 
   const navigate = useCommonNavigate();
 

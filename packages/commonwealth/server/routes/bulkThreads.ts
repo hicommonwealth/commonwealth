@@ -13,7 +13,7 @@ const bulkThreads = async (
   next: NextFunction
 ) => {
   const chain = req.chain;
-  const { cutoff_date, topic_id, stage } = req.query;
+  const { cutoff_date, topic_id, includePinnedThreads, stage } = req.query;
 
   const bind = { chain: chain.id };
 
@@ -33,12 +33,14 @@ const bulkThreads = async (
   if (cutoff_date) {
     const query = `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
-        addr.chain AS addr_chain, thread_id, thread_title,
+        addr.chain AS addr_chain, threads.thread_id, thread_title,
         thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
         threads.has_poll, threads.plaintext,
-        threads.url, threads.pinned, threads.number_of_comments, topics.id AS topic_id, topics.name AS topic_name,
-        topics.description AS topic_description, topics.chain_id AS topic_chain,
+        threads.url, threads.pinned, threads.number_of_comments,
+        threads.reaction_ids, threads.reaction_type, threads.addresses_reacted,
+        topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
+        topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
         collaborators, chain_entity_meta, linked_threads
       FROM "Addresses" AS addr
@@ -46,6 +48,7 @@ const bulkThreads = async (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
           t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted,
           t.has_poll,
           t.plaintext,
           t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
@@ -73,23 +76,36 @@ const bulkThreads = async (
         LEFT JOIN "ChainEntityMeta" AS entity_meta
         ON t.id = entity_meta.thread_id
         LEFT JOIN (
-            SELECT root_id, COUNT(*) AS number_of_comments
+            SELECT thread_id, COUNT(*) AS number_of_comments
             FROM "Comments"
             WHERE deleted_at IS NULL
-            GROUP BY root_id
+            GROUP BY thread_id
         ) comments
-        ON CONCAT(t.kind, '_', t.id) = comments.root_id
+        ON t.id = comments.thread_id
+        LEFT JOIN (
+            SELECT thread_id,
+            STRING_AGG(ad.address::text, ',') AS addresses_reacted,
+            STRING_AGG(r.reaction::text, ',') AS reaction_type,
+            STRING_AGG(r.id::text, ',') AS reaction_ids
+            FROM "Reactions" as r
+            LEFT JOIN "Addresses" ad
+            ON r.address_id = ad.id
+            GROUP BY thread_id
+        ) reactions
+        ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          AND t.chain = $chain 
+          AND t.chain = $chain
           ${topicOptions}
-          AND COALESCE(t.last_commented_on, t.created_at) < $created_at
-          AND t.pinned = false
-          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments)
-          ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
+          AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
+          (COALESCE(t.last_commented_on, t.created_at) < $created_at AND t.pinned = false))
+          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
+           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
+          ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics
-      ON threads.topic_id = topics.id`;
+      ON threads.topic_id = topics.id
+      ${includePinnedThreads ? 'ORDER BY threads.pinned DESC' : ''}`;
     let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
@@ -101,10 +117,7 @@ const bulkThreads = async (
       return next(new ServerError('Could not fetch threads'));
     }
 
-    const root_ids = [];
     threads = preprocessedThreads.map((t) => {
-      const root_id = `discussion_${t.thread_id}`;
-      root_ids.push(root_id);
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
@@ -140,6 +153,11 @@ const bulkThreads = async (
           chain: t.addr_chain,
         },
         numberOfComments: t.number_of_comments,
+        reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
+        addressesReacted: t.addresses_reacted
+          ? t.addresses_reacted.split(',')
+          : [],
+        reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
       };
       if (t.topic_id) {
         data['topic'] = {

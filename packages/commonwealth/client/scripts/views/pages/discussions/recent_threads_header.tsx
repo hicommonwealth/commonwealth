@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
+import type { Topic } from 'models';
 import { ThreadStage } from 'models';
 
 import 'pages/discussions/recent_threads_header.scss';
@@ -14,6 +15,8 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { StagesMenu } from './stages_menu';
 import { TopicsMenu } from './topics_menu';
 import { useCommonNavigate } from 'navigation/helpers';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { EditTopicModal } from 'views/modals/edit_topic_modal';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -27,6 +30,7 @@ export const RecentThreadsHeader = ({
   totalThreadCount,
 }: RecentThreadsHeaderProps) => {
   const navigate = useCommonNavigate();
+  const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
   const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
     isWindowExtraSmall(window.innerWidth)
@@ -44,7 +48,7 @@ export const RecentThreadsHeader = ({
     };
   }, []);
 
-  const { stagesEnabled, customStages } = app.chain.meta;
+  const { stagesEnabled, customStages } = app.chain?.meta || {};
 
   const topics = app.topics.getByCommunity(app.activeChainId());
 
@@ -122,6 +126,7 @@ export const RecentThreadsHeader = ({
               otherTopics={otherTopics}
               selectedTopic={selectedTopic}
               topic={topic}
+              onEditClick={(editTopic) => setTopicSelectedToEdit(editTopic)}
             />
           )}
           {stagesEnabled && (
@@ -133,6 +138,17 @@ export const RecentThreadsHeader = ({
           )}
         </div>
       )}
+
+      <Modal
+        content={
+          <EditTopicModal
+            topic={topicSelectedToEdit}
+            onModalClose={() => setTopicSelectedToEdit(null)}
+          />
+        }
+        onClose={() => setTopicSelectedToEdit(null)}
+        open={!!topicSelectedToEdit}
+      />
     </div>
   );
 };

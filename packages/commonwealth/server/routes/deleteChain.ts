@@ -165,11 +165,6 @@ const deleteChain = async (
         where: { chain: chain.id },
       });
 
-      await models.OffchainProfile.destroy({
-        where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
-        transaction: t,
-      });
-
       await models.ChainCategory.destroy({
         where: { chain_id: chain.id },
         transaction: t,
@@ -177,12 +172,6 @@ const deleteChain = async (
 
       await models.CommunityBanner.destroy({
         where: { chain_id: chain.id },
-        transaction: t,
-      });
-
-      // TODO: delete chain-event-types in chain-events
-      await models.ChainEventType.destroy({
-        where: { id: { [Op.like]: `%${chain.id}%` } },
         transaction: t,
       });
 

@@ -5,13 +5,12 @@ import { detectURL } from 'helpers/threads';
 import $ from 'jquery';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import _ from 'lodash';
-import { Profile } from 'models';
+import { MinimumProfile as Profile } from 'models';
 import moment from 'moment';
 import Quill from 'quill';
 import type QuillMention from 'quill-mention';
 
 import app from 'state';
-import { PreviewModal } from 'views/modals/preview_modal';
 import type {
   DeltaOps,
   QuillActiveMode,
@@ -381,14 +380,15 @@ export default class QuillEditorInternal {
       .find('button.ql-preview')
       .on('click', (e) => {
         const markdownMode = this._activeMode === 'markdown';
-        app.modals.create({
-          modal: PreviewModal,
-          data: {
-            doc: markdownMode
-              ? this._quill.getText()
-              : JSON.stringify(this._quill.getContents()),
-          },
-        });
+
+        return null;
+        // @REACT @TODO: Re-add modal using new pattern
+        //   modal: PreviewModal,
+        //   data: {
+        //     doc: markdownMode
+        //       ? this._quill.getText()
+        //       : JSON.stringify(this._quill.getContents()),
+        //   },
       });
   }
 
@@ -663,7 +663,7 @@ export default class QuillEditorInternal {
         chainScope: app.activeChainId(),
       });
       formattedMatches = members.map((addr) => {
-        const profile: Profile = app.profiles.getProfile(
+        const profile: Profile = app.newProfiles.getProfile(
           addr.chain,
           addr.address
         );

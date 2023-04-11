@@ -9,6 +9,8 @@ import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
+import type { ContractAbiInstance } from 'server/models/contract_abi';
+import validateRoles from '../../util/validateRoles';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -41,10 +43,12 @@ export type CreateContractReq = ContractAttributes &
     abi?: string;
     abiNickname?: string;
     contractType: ContractType;
+    chain_id: string;
   };
 
 export type CreateContractResp = {
   contract: ContractAttributes;
+  hasGlobalTemplate?: boolean;
 };
 
 const createContract = async (
@@ -55,50 +59,33 @@ const createContract = async (
   const {
     community,
     address,
-    contractType,
+    contractType = '',
     abi,
-    abiNickname,
-    symbol,
-    token_name,
-    decimals,
+    symbol = '',
+    token_name = '',
+    decimals = 0,
     chain_node_id,
-    balance_type,
+    chain_id,
   } = req.body;
 
   if (!req.user) {
     throw new AppError('Not logged in');
   }
-  // require Admin privilege for creating Contract
-  // TODO: should be admin role, not JUST site admin
-  if (!req.user.isAdmin) {
-    throw new AppError(Errors.NotAdmin);
-  }
 
-  if (!contractType || !contractType.trim()) {
-    throw new AppError(Errors.NoType);
-  }
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
+  if (!isAdmin) throw new AppError('Must be admin');
 
   const Web3 = (await import('web3-utils')).default;
   if (!Web3.isAddress(address)) {
     throw new AppError(Errors.InvalidAddress);
   }
 
-  if (decimals < 0 || decimals > 18) {
-    throw new AppError(Errors.InvalidDecimal);
-  }
   if (!chain_node_id) {
     throw new AppError(Errors.NoNodeUrl);
-  }
-  if (!balance_type) {
-    throw new AppError(Errors.InvalidBalanceType);
   }
 
   let abiAsRecord: Array<Record<string, unknown>>;
   if (abi) {
-    if (!abiNickname) {
-      throw new AppError(Errors.NoAbiNickname);
-    }
-
     if ((Object.keys(abi) as Array<string>).length === 0) {
       throw new AppError(Errors.InvalidABI);
     }
@@ -114,11 +101,19 @@ const createContract = async (
     // contract already exists so attempt to add it to the community if it's not already there
     await models.CommunityContract.findOrCreate({
       where: {
-        chain_id: community,
+        chain_id,
         contract_id: oldContract.id,
       },
     });
-    return success(res, { contract: oldContract.toJSON() });
+    const globalTemplate = await models.Template.findOne({
+      where: {
+        abi_id: oldContract.abi_id,
+      },
+    });
+    return success(res, {
+      contract: oldContract.toJSON(),
+      hasGlobalTemplate: !!globalTemplate,
+    });
   }
 
   // override provided URL for eth chains (typically ERC20) with stored, unless none found
@@ -133,16 +128,25 @@ const createContract = async (
   }
 
   let contract: ContractInstance;
+  let contract_abi: ContractAbiInstance;
   if (abi) {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
-      const contract_abi = await models.ContractAbi.create(
-        {
-          abi: abiAsRecord,
-          nickname: abiNickname,
+      contract_abi = await models.ContractAbi.findOne({
+        where: {
+          abi: JSON.stringify(abiAsRecord),
         },
-        { transaction: t }
-      );
+        transaction: t,
+      });
+
+      if (!contract_abi) {
+        contract_abi = await models.ContractAbi.create(
+          {
+            abi: JSON.stringify(abiAsRecord),
+          },
+          { transaction: t }
+        );
+      }
 
       [contract] = await models.Contract.findOrCreate({
         where: {
@@ -159,13 +163,23 @@ const createContract = async (
 
       await models.CommunityContract.create(
         {
-          chain_id: community,
+          chain_id,
           contract_id: contract.id,
         },
         { transaction: t }
       );
     });
-    return success(res, { contract: contract.toJSON() });
+
+    const globalTemplate = await models.Template.findOne({
+      where: {
+        abi_id: contract.abi_id,
+      },
+    });
+
+    return success(res, {
+      contract: contract.toJSON(),
+      hasGlobalTemplate: !!globalTemplate,
+    });
   } else {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
@@ -182,13 +196,23 @@ const createContract = async (
       });
       await models.CommunityContract.create(
         {
-          chain_id: community,
+          chain_id,
           contract_id: contract.id,
         },
         { transaction: t }
       );
     });
-    return success(res, { contract: contract.toJSON() });
+
+    const globalTemplate = await models.Template.findOne({
+      where: {
+        abi_id: contract.abi_id,
+      },
+    });
+
+    return success(res, {
+      contract: contract.toJSON(),
+      hasGlobalTemplate: !!globalTemplate,
+    });
   }
 };
 

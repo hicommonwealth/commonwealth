@@ -7,7 +7,6 @@ import moment from 'moment';
 import app from 'state';
 import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
@@ -19,6 +18,8 @@ import { User } from '../user/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 
 type CommentAuthorProps = {
   comment: CommentType<any>;
@@ -75,6 +76,8 @@ export const Comment = (props: CommentProps) => {
     React.useState<boolean>(false);
   const [savedEdits, setSavedEdits] = React.useState<string>('');
 
+  const { isLoggedIn } = useUserLoggedIn();
+
   const handleSetIsEditingComment = (status: boolean) => {
     setIsGloballyEditing(status);
     setIsEditingComment(status);
@@ -92,11 +95,16 @@ export const Comment = (props: CommentProps) => {
     });
 
   const canReply =
-    !isLast && !isLocked && app.isLoggedIn() && app.user.activeAccount;
+    !isLast && !isLocked && isLoggedIn && app.user.activeAccount;
 
   const canEditAndDelete =
     !isLocked &&
     (comment.author === app.user.activeAccount?.address || isAdminOrMod);
+
+  const deleteComment = async () => {
+    await app.comments.delete(comment);
+    updatedCommentsCallback();
+  };
 
   return (
     <div className={`Comment comment-${comment.id}`}>
@@ -136,7 +144,7 @@ export const Comment = (props: CommentProps) => {
         ) : (
           <>
             <CWText className="comment-text">
-              {renderQuillTextBody(comment.text)}
+              <QuillRenderer doc={comment.text} />
             </CWText>
             {!comment.deleted && (
               <div className="comment-footer">
@@ -185,13 +193,12 @@ export const Comment = (props: CommentProps) => {
                                 comment.id,
                                 ContentType.Comment
                               );
-                              setShouldRestoreEdits(
-                                await confirmationModalWithText(
-                                  'Previous changes found. Restore edits?',
-                                  'Yes',
-                                  'No'
-                                )()
+
+                              const confirmationResult = window.confirm(
+                                'Previous changes found. Restore edits?'
                               );
+
+                              setShouldRestoreEdits(confirmationResult);
                             }
                             handleSetIsEditingComment(true);
                           },
@@ -199,9 +206,7 @@ export const Comment = (props: CommentProps) => {
                         {
                           label: 'Delete',
                           iconLeft: 'trash',
-                          onClick: () => {
-                            app.comments.delete(comment);
-                          },
+                          onClick: deleteComment,
                         },
                       ]}
                     />

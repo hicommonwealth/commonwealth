@@ -13,6 +13,7 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { useCommonNavigate } from 'navigation/helpers';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
@@ -39,6 +40,33 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSubstrateProposalItems =
     app.chain?.base === ChainBase.Substrate &&
     app.chain?.network !== ChainNetwork.Plasm;
+
+  const getTemplateItems = (): PopoverMenuItem[] => {
+    const contracts = app.contracts.getCommunityContracts();
+
+    const items = [];
+
+    contracts.forEach((contract) => {
+      if (contract.ccts) {
+        for (const cct of contract.ccts) {
+          if (
+            cct.cctmd.display_options === '2' ||
+            cct.cctmd.display_options === '3'
+          ) {
+            const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
+            items.push({
+              label: `New ${cct.cctmd.nickname}`,
+              iconLeft: 'star',
+              onclick: () =>
+                navigate(`/${contract.address}/${slugWithSlashRemoved}`),
+            });
+          }
+        }
+      }
+    });
+
+    return items;
+  };
 
   const getTopicTemplateItems = (): PopoverMenuItem[] =>
     topics.map((t) => ({
@@ -203,6 +231,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           ...getSputnikProposalItem(),
           ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
+          ...getTemplateItems(),
         ]
       : []),
     {
@@ -249,7 +278,7 @@ export const CreateContentMenu = () => {
         label: 'Create',
         onClick: () => {
           app.mobileMenu = 'MainMenu';
-          app.mobileMenuRedraw.emit('redraw');
+          app.sidebarRedraw.emit('redraw');
         },
       }}
       menuItems={getCreateContentMenuItems(navigate)}
@@ -259,9 +288,10 @@ export const CreateContentMenu = () => {
 
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUserLoggedIn();
 
   if (
-    !app.isLoggedIn() ||
+    !isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
     !app.user.activeAccount

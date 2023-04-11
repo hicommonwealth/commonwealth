@@ -8,31 +8,30 @@ import { sequelize } from '../database';
 const log = factory.getLogger(formatFilename(__filename));
 
 type UniqueAddresses = {
-  root_id: string;
+  thread_id: number;
   address_id: number;
   address: string;
   chain;
 };
 
-const fetchUniqueAddressesByRootIds = async (
+const fetchUniqueAddressesByThreadIds = async (
   models: DB,
-  { chain, root_ids }
+  { chain, thread_ids }
 ) => {
-  const formattedIds = root_ids.map((root_id) => `${root_id}`);
   return sequelize.query<UniqueAddresses>(
     `
-    SELECT distinct cts.address_id, address, root_id, cts.chain
+    SELECT distinct cts.address_id, address, thread_id, cts.chain
     FROM "Comments" cts INNER JOIN "Addresses" adr
     ON adr.id = cts.address_id
-    WHERE root_id IN ($root_ids)
+    WHERE thread_id = ANY($thread_ids)
     AND cts.chain = $chain
     AND deleted_at IS NULL
-    ORDER BY root_id
+    ORDER BY thread_id
   `,
     {
       type: QueryTypes.SELECT,
       bind: {
-        root_ids: formattedIds,
+        thread_ids,
         chain,
       },
     }
@@ -40,7 +39,7 @@ const fetchUniqueAddressesByRootIds = async (
 };
 
 /*
-1) Get the number of distinct users for list of threads(root_id)
+1) Get the number of distinct users for list of threads(thread_id)
 2) Get first 2 avatars for each group of users
 3) Get latest comment
 
@@ -55,32 +54,32 @@ const threadsUsersCountAndAvatar = async (
   const { chain, threads = [] } = req.body;
   try {
     if (chain && threads.length) {
-      const root_ids = threads.map(({ root_id }) => root_id);
-      const uniqueAddressesByRootIds = await fetchUniqueAddressesByRootIds(
+      const thread_ids = threads.map(({ thread_id }) => thread_id);
+      const uniqueAddressesByRootIds = await fetchUniqueAddressesByThreadIds(
         models,
-        { chain, root_ids }
+        { chain, thread_ids }
       );
       const uniqueAddressesByThread = groupBy<UniqueAddresses>(
         uniqueAddressesByRootIds,
-        ({ root_id }) => root_id
+        ({ thread_id }) => thread_id
       );
       return res.json(
-        threads.map(({ root_id: rootId, author: authorAddress }) => {
+        threads.map(({ thread_id: thread_id, author: authorAddress }) => {
           const uniqueAddresses = (
-            uniqueAddressesByThread[rootId] || []
+            uniqueAddressesByThread[thread_id] || []
           ).filter(({ address }) => address !== authorAddress);
           const addressesCount = uniqueAddresses.length + 1;
           const addresses = uniqueAddresses
             .concat({
-              root_id: rootId,
+              thread_id: thread_id,
               address: authorAddress,
               address_id: null,
               chain,
             })
             .slice(0, 2);
           return {
-            id: rootId,
-            rootId,
+            id: thread_id,
+            thread_id,
             addresses,
             count: addressesCount > 2 ? addressesCount - 2 : 0,
           };

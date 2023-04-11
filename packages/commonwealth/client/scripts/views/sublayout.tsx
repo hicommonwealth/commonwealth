@@ -9,6 +9,8 @@ import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { SublayoutHeader } from './sublayout_header';
+import useForceRerender from 'hooks/useForceRerender';
+import { setDarkMode } from '../helpers';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -18,16 +20,28 @@ type SublayoutProps = {
 
 const Sublayout = ({
   children,
-  hideFooter = false,
+  hideFooter = true,
   hideSearch,
   onScroll,
 }: SublayoutProps) => {
+  const forceRerender = useForceRerender();
   const [isWindowSmall, setIsWindowSmall] = useState(
     isWindowSmallInclusive(window.innerWidth)
   );
 
   useEffect(() => {
-    if (localStorage.getItem('dark-mode-state') === 'on') {
+    app.sidebarRedraw.on('redraw', () => forceRerender());
+
+    return () => {
+      app.sidebarRedraw.off('redraw', () => forceRerender());
+    };
+  });
+
+  useEffect(() => {
+    if (
+      localStorage.getItem('dark-mode-state') === 'on' &&
+      localStorage.getItem('user-dark-mode-state') === 'on'
+    ) {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
 

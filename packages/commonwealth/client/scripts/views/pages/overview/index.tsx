@@ -103,6 +103,7 @@ const OverviewPage = () => {
               onClick={() => {
                 navigate('/new/discussion');
               }}
+              disabled={!app.user.activeAccount}
             />
           ) : (
             <CWButton
@@ -112,6 +113,7 @@ const OverviewPage = () => {
               onClick={() => {
                 navigate('/new/discussion');
               }}
+              disabled={!app.user.activeAccount}
             />
           )}
         </div>

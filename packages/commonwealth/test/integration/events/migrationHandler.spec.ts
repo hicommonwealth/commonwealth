@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable dot-notation */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
@@ -14,8 +12,6 @@ import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
 import type { BrokerConfig } from 'rascal';
 
-import { resetDatabase } from '../../../server-test';
-
 chai.use(chaiHttp);
 const { assert } = chai;
 
@@ -29,10 +25,6 @@ const setupDbEvent = async (event: CWEvent) => {
 };
 
 describe('Edgeware Migration Event Handler Tests', () => {
-  before('reset database', async () => {
-    await resetDatabase();
-  });
-
   it('should create new event', async () => {
     // setup
     const event: CWEvent<SubstrateTypes.IEventData> = {
@@ -60,18 +52,12 @@ describe('Edgeware Migration Event Handler Tests', () => {
     assert.deepEqual(dbEvent.event_data, event.data);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
-        chain_event_type_id: 'edgeware-democracy-started',
+        chain: 'edgeware',
         block_number: 10,
       },
     });
     assert.lengthOf(chainEvents, 1);
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
-
-    const dbEventType = await dbEvent.getChainEventType();
-    const chainEventType = await models['ChainEventType'].findOne({
-      where: { id: 'edgeware-democracy-started' },
-    });
-    assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
 
   it('should upgrade existing event', async () => {
@@ -111,18 +97,12 @@ describe('Edgeware Migration Event Handler Tests', () => {
     assert.deepEqual(dbEvent.event_data, currentEvent.data);
     const chainEvents = await models['ChainEvent'].findAll({
       where: {
-        chain_event_type_id: 'edgeware-preimage-noted',
+        chain: 'edgeware',
         block_number: 10,
       },
     });
     assert.lengthOf(chainEvents, 1);
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
-
-    const dbEventType = await dbEvent.getChainEventType();
-    const chainEventType = await models['ChainEventType'].findOne({
-      where: { id: 'edgeware-preimage-noted' },
-    });
-    assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
 
   it('should ignore irrelevant events', async () => {

@@ -3,8 +3,6 @@ import type { Poll } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import { alertModalWithText } from '../../modals/alert_modal';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const handlePollVote = async (
   poll: Poll,
@@ -26,7 +24,7 @@ export const handlePollVote = async (
     confirmationText = `Submit a vote for '${option}'?`;
   }
 
-  const confirmed = await confirmationModalWithText(confirmationText)();
+  const confirmed = window.confirm(confirmationText);
 
   if (!confirmed) return;
   // submit vote
@@ -34,12 +32,11 @@ export const handlePollVote = async (
     .submitVote(...userInfo, option)
     .then(() => {
       callback();
-      redraw();
     })
-    .catch(async () => {
-      await alertModalWithText(
+    .catch(() => {
+      window.confirm(
         'Error submitting vote. Maybe the poll has already ended?'
-      )();
+      );
     });
 };
 

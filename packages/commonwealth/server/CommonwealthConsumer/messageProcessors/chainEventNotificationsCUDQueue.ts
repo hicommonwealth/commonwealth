@@ -29,16 +29,11 @@ export async function processChainEventNotificationsCUD(
     dbNotification = await emitNotifications(
       this.models,
       NotificationCategories.ChainEvent,
-      chainEvent.ChainEventType.id,
+      data.ChainEvent.chain,
+      chainEvent,
       {
         chainEvent,
-        chainEventType: chainEvent.ChainEventType,
-        chain_id: chainEvent.ChainEventType.chain,
-      },
-      {
-        chainEvent,
-        chainEventType: chainEvent.ChainEventType,
-        chain: chainEvent.ChainEventType.chain,
+        chain: chainEvent.chain,
       },
       data.event.excludeAddresses,
       data.event.includeAddresses

@@ -68,12 +68,7 @@ type ProposalSubheaderProps = {
 } & BaseCancelButtonProps;
 
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
-  const {
-    onModalClose,
-    proposal,
-    toggleVotingModal,
-    votingModalOpen,
-  } = props;
+  const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
 
   return (
     <div className="ProposalSubheader">

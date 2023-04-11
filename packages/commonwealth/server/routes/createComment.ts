@@ -13,8 +13,8 @@ import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
 import {
-  getProposalUrl,
-  getProposalUrlWithoutObject,
+  getThreadUrl,
+  getThreadUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
@@ -32,7 +32,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
-  MissingRootId: 'Must provide valid root_id',
+  MissingRootId: 'Must provide valid thread_id',
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
@@ -57,9 +57,9 @@ const createComment = async (
 
   const author = req.address;
 
-  const { parent_id, root_id, text } = req.body;
+  const { parent_id, thread_id, text } = req.body;
 
-  if (!root_id || root_id.indexOf('_') === -1) {
+  if (!thread_id) {
     return next(new AppError(Errors.MissingRootId));
   }
   if (
@@ -104,31 +104,32 @@ const createComment = async (
     }
   }
 
-  const thread_id = root_id.substring(root_id.indexOf('_') + 1);
-  const thread = await models.Thread.findOne({
+  let thread = await models.Thread.findOne({
     where: { id: thread_id },
   });
 
-  if (thread?.id) {
-    const topic = await models.Topic.findOne({
-      include: {
-        model: models.Thread,
-        where: { id: thread.id },
-        required: true,
-        as: 'threads',
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        ruleCache,
-        models,
-        topic.rule_id,
-        author.address
-      );
-      if (!passesRules) {
-        return next(new AppError(Errors.RuleCheckFailed));
-      }
+  if (!thread) {
+    return next(new AppError(Errors.MissingRootId));
+  }
+
+  const topic = await models.Topic.findOne({
+    include: {
+      model: models.Thread,
+      where: { id: thread.id },
+      required: true,
+      as: 'threads',
+    },
+    attributes: ['rule_id'],
+  });
+  if (topic?.rule_id) {
+    const passesRules = await checkRule(
+      ruleCache,
+      models,
+      topic.rule_id,
+      author.address
+    );
+    if (!passesRules) {
+      return next(new AppError(Errors.RuleCheckFailed));
     }
   }
 
@@ -190,7 +191,7 @@ const createComment = async (
   };
   const version_history: string[] = [JSON.stringify(firstVersion)];
   const commentContent = {
-    root_id,
+    thread_id,
     text,
     plaintext,
     version_history,
@@ -242,51 +243,25 @@ const createComment = async (
     include: [models.Address, models.Attachment],
   });
 
-  // get parent entity if the comment is on a thread
-  // no parent entity if the comment is on an onchain entity
-  let proposal;
-  const [prefix, id] = finalComment.root_id.split('_') as [
-    ProposalType,
-    string
-  ];
-  if (prefix === ProposalType.Thread) {
-    proposal = await models.Thread.findOne({
-      where: { id },
-    });
-    // TODO: put this part on the front-end and pass in just the chain-entity id
-    //  so we can check if it exists for the email part --- similar for reaction
-  } else if (
-    prefix.includes('proposal') ||
-    prefix.includes('referendum') ||
-    prefix.includes('motion')
-  ) {
-    proposal = id;
-  } else {
-    log.error(
-      `No matching proposal of thread for root_id ${finalComment.root_id}`
-    );
-  }
+  thread = await models.Thread.findOne({
+    where: { id: thread_id },
+  });
 
-  if (!proposal) {
+  if (!thread) {
     await finalComment.destroy();
     return next(new AppError(Errors.ThreadNotFound));
   }
-  if (typeof proposal !== 'string' && proposal.read_only) {
+  if (typeof thread !== 'string' && thread.read_only) {
     await finalComment.destroy();
     return next(new AppError(Errors.CantCommentOnReadOnly));
   }
 
   // craft commonwealth url
   const cwUrl =
-    typeof proposal === 'string'
-      ? getProposalUrlWithoutObject(
-          prefix,
-          finalComment.chain,
-          proposal,
-          finalComment
-        )
-      : getProposalUrl(prefix, proposal, finalComment);
-  const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
+    typeof thread === 'string'
+      ? getThreadUrlWithoutObject(finalComment.chain, thread, finalComment)
+      : getThreadUrl(thread, finalComment);
+  const root_title = typeof thread === 'string' ? '' : thread.title || '';
 
   // auto-subscribe comment author to reactions & child comments
   await models.Subscription.create({
@@ -338,12 +313,12 @@ const createComment = async (
   emitNotifications(
     models,
     NotificationCategories.NewComment,
-    root_id,
+    thread_id,
     {
       created_at: new Date(),
-      root_id: id,
+      thread_id: thread_id,
       root_title,
-      root_type: prefix,
+      root_type: ProposalType.Thread,
       comment_id: +finalComment.id,
       comment_text: finalComment.text,
       chain_id: finalComment.chain,
@@ -369,9 +344,9 @@ const createComment = async (
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id: +id,
+        thread_id: +thread_id,
         root_title,
-        root_type: prefix,
+        root_type: ProposalType.Thread,
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
         parent_comment_id: +parent_id,
@@ -380,14 +355,7 @@ const createComment = async (
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
-      {
-        user: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
-        url: cwUrl,
-        title: proposal.title || '',
-        chain: finalComment.chain,
-        body: finalComment.text,
-      },
+      null,
       excludedAddrs
     );
   }
@@ -405,23 +373,16 @@ const createComment = async (
           `user-${mentionedAddress.User.id}`,
           {
             created_at: new Date(),
-            root_id: +id,
+            thread_id: +thread_id,
             root_title,
-            root_type: prefix,
+            root_type: ProposalType.Thread,
             comment_id: +finalComment.id,
             comment_text: finalComment.text,
             chain_id: finalComment.chain,
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.chain,
           },
-          {
-            user: finalComment.Address.address,
-            author_chain: finalComment.Address.chain,
-            url: cwUrl,
-            title: proposal.title || '',
-            chain: finalComment.chain,
-            body: finalComment.text,
-          }, // TODO: add webhook data for mentions
+          null,
           [finalComment.Address.address]
         );
     });
@@ -432,10 +393,8 @@ const createComment = async (
   author.save();
 
   // update proposal updated_at timestamp
-  if (prefix === ProposalType.Thread) {
-    proposal.last_commented_on = Date.now();
-    proposal.save();
-  }
+  thread.last_commented_on = new Date();
+  thread.save();
 
   if (process.env.NODE_ENV !== 'test') {
     mixpanelTrack({

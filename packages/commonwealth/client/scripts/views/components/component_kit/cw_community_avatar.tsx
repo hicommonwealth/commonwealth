@@ -28,7 +28,7 @@ export const CWCommunityAvatar = (props: CommunityAvatarProps) => {
       )}
       onClick={onClick}
     >
-      {community.iconUrl ? (
+      {community?.iconUrl ? (
         <img className="community-image" src={community.iconUrl} />
       ) : (
         <div className={getClasses<{ size: IconSize }>({ size }, 'no-image')}>
@@ -37,7 +37,7 @@ export const CWCommunityAvatar = (props: CommunityAvatarProps) => {
             className="avatar-no-image-letter"
             fontWeight="medium"
           >
-            {community.name?.slice(0, 1)}
+            {community?.name?.slice(0, 1)}
           </CWText>
         </div>
       )}

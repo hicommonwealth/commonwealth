@@ -2,7 +2,7 @@ import React from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
-import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
+import getFetch from 'helpers/getFetch';
 import $ from 'jquery';
 import type { NotificationSubscription } from 'models';
 
@@ -56,6 +56,7 @@ export const subscribeToThread = async (
     ]);
 
     notifySuccess('Unsubscribed!');
+    return Promise.resolve();
   } else if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
       app.user.notifications.subscribe(
@@ -69,6 +70,7 @@ export const subscribeToThread = async (
     ]);
 
     notifySuccess('Subscribed!');
+    return Promise.resolve();
   } else {
     await app.user.notifications.enableSubscriptions([
       commentSubscription,
@@ -76,6 +78,7 @@ export const subscribeToThread = async (
     ]);
 
     notifySuccess('Subscribed!');
+    return Promise.resolve();
   }
 };
 
@@ -86,10 +89,10 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       jwt: app.user.jwt,
     });
   } else if (requestType === DashboardViews.Chain) {
-    const events = await getFetch(
-      getBaseUrl(ServiceUrls.chainEvents) + '/events',
-      { limit: 50, ordered: true }
-    );
+    const events = await getFetch(`${app.serverUrl()}/ce/events`, {
+      limit: 50,
+      ordered: true,
+    });
 
     if (!Array.isArray(events)) {
       return { status: 'Failure', result: [] };

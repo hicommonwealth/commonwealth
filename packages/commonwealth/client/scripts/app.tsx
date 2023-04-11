@@ -1,20 +1,27 @@
 import React, { StrictMode } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
 import useInitApp from 'hooks/useInitApp';
-import { ToastContainer } from 'react-toastify';
-import AppNavigator from 'navigation/AppNavigator';
-import 'react-toastify/dist/ReactToastify.css';
+import { CWSpinner } from 'views/components/component_kit/cw_spinner';
+
+import router from 'navigation/router';
 
 const App = () => {
-  const { customDomain } = useInitApp();
+  const { customDomain, loading } = useInitApp();
+
+  if (loading) {
+    return (
+      <div className="app-loading">
+        <CWSpinner />
+      </div>
+    );
+  }
 
   return (
     <StrictMode>
-      <BrowserRouter>
-        <AppNavigator customDomain={customDomain} />
-        <ToastContainer />
-      </BrowserRouter>
+      <RouterProvider router={router(customDomain)} />
+      <ToastContainer />
     </StrictMode>
   );
 };

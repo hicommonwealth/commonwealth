@@ -3,7 +3,6 @@ import React, { Suspense } from 'react';
 import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode, ClassComponentRouter } from 'mithrilInterop';
 
-import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
 
 import {
@@ -15,34 +14,42 @@ import {
 
 import app from 'state';
 import { PageNotFound } from 'views/pages/404';
-import { AppToasts } from 'views/toast';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
 import withRouter from 'navigation/helpers';
 import { useParams } from 'react-router-dom';
+import { ChainType } from 'common-common/src/types';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorPage from 'views/pages/error';
 
-class LoadingLayout extends ClassComponent {
-  view() {
-    return (
-      <div className="Layout">
-        <div className="spinner-container">
-          <CWSpinner size="xl" />
-        </div>
-        {/*<AppModals />*/}
-        <AppToasts />
+const LoadingLayout = () => {
+  return (
+    <div className="Layout">
+      <div className="spinner-container">
+        <CWSpinner size="xl" />
       </div>
-    );
-  }
+    </div>
+  );
+};
+
+interface ShouldDeferChainAttrs {
+  deferChain: boolean;
 }
+
+const shouldDeferChain = ({ deferChain }: ShouldDeferChainAttrs) => {
+  if (app.chain?.meta.type === ChainType.Token) {
+    return false;
+  }
+
+  return deferChain;
+};
 
 type LayoutAttrs = {
   deferChain?: boolean;
-  hideSidebar?: boolean;
   scope?: string;
-  initFn?: Function;
-  params?;
   router?: ClassComponentRouter;
+  children: React.ReactNode;
 };
 
 class LayoutComponent extends ClassComponent<LayoutAttrs> {
@@ -51,19 +58,8 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
 
-  oninit(vnode: ResultNode<LayoutAttrs>) {
-    if (vnode.attrs.initFn) {
-      vnode.attrs.initFn().then(() => this.redraw());
-    }
-  }
-
   view(vnode: ResultNode<LayoutAttrs>) {
-    const {
-      deferChain,
-      router: {
-        params: { scope },
-      },
-    } = vnode.attrs;
+    const { scope, deferChain, router } = vnode.attrs;
 
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
@@ -89,32 +85,32 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
               </div>
             }
           />
-          {/*<AppModals />*/}
-          <AppToasts />
         </div>
       );
-    } else if (!app.loginStatusLoaded()) {
+    }
+
+    if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
       return <LoadingLayout />;
-    } else if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
+    }
+
+    if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
       this.loadingScope = scope;
-      initNewTokenChain(scope, this.props.router.navigate);
+      initNewTokenChain(scope, router.navigate);
       return <LoadingLayout />;
-    } else if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
+    }
+
+    if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return (
         <div className="Layout">
           <PageNotFound />
-          {/*<AppModals />*/}
-          <AppToasts />
         </div>
       );
-    } else if (
-      scope &&
-      scope !== app.activeChainId() &&
-      scope !== this.loadingScope
-    ) {
+    }
+
+    if (scope && scope !== app.activeChainId() && scope !== this.loadingScope) {
       // If we are supposed to load a new chain or community, we do so now
       // This happens only once, and then loadingScope should be set
       this.loadingScope = scope;
@@ -122,18 +118,26 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
         this.deferred = deferChain;
         selectChain(scopeMatchesChain, deferChain).then((response) => {
           if (!deferChain && response) {
-            initChain().then(() => this.redraw());
+            initChain().then(() => {
+              this.redraw();
+            });
           } else {
             this.redraw();
           }
         });
         return <LoadingLayout />;
       }
-    } else if (scope && this.deferred && !deferChain) {
+    }
+
+    if (scope && this.deferred && !deferChain) {
       this.deferred = false;
-      initChain().then(() => this.redraw());
+      initChain().then(() => {
+        this.redraw();
+      });
       return <LoadingLayout />;
-    } else if (!scope && app.chain && app.chain.network) {
+    }
+
+    if (!scope && app.chain && app.chain.network) {
       // Handle the case where we unload the network or community, if we're
       // going to a page that doesn't have one
       // Include this in if for isCustomDomain, scope gets unset on redirect
@@ -146,11 +150,10 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       }
       return <LoadingLayout />;
     }
+
     return (
       <div className="Layout">
         {vnode.children}
-        {/*<AppModals />*/}
-        <AppToasts />
         {/*<UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />*/}
       </div>
     );
@@ -161,8 +164,14 @@ export const LayoutWrapper = ({ Component, params }) => {
   const routerParams = useParams();
   const LayoutComp = withRouter(LayoutComponent);
 
+  const pathScope = routerParams?.scope?.toString() || app.customDomainId();
+  const scope = params.scoped ? pathScope : null;
+  const deferChain = shouldDeferChain({
+    deferChain: params.deferChain,
+  });
+
   return (
-    <LayoutComp params={Object.assign(params, routerParams)}>
+    <LayoutComp scope={scope} deferChain={deferChain}>
       <Component {...routerParams} />
     </LayoutComp>
   );
@@ -170,8 +179,12 @@ export const LayoutWrapper = ({ Component, params }) => {
 
 export const withLayout = (Component, params) => {
   return (
-    <Suspense fallback={null}>
-      <LayoutWrapper Component={Component} params={params} />
-    </Suspense>
+    <ErrorBoundary
+      FallbackComponent={({ error }) => <ErrorPage message={error?.message} />}
+    >
+      <Suspense fallback={null}>
+        <LayoutWrapper Component={Component} params={params} />
+      </Suspense>
+    </ErrorBoundary>
   );
 };

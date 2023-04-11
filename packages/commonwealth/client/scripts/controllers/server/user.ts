@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import $ from 'jquery';
+import { EventEmitter } from 'events';
 
 import type {
   Account,
@@ -12,6 +13,7 @@ import type {
 } from 'models';
 import app from 'state';
 import DraftsController from './drafts';
+import { notifyError } from '../app/notifications';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';
@@ -21,6 +23,8 @@ export class UserController {
   public get activeAccount(): Account {
     return this._activeAccount;
   }
+
+  public isFetched = new EventEmitter();
 
   private _setActiveAccount(account: Account): void {
     this._activeAccount = account;
@@ -78,6 +82,7 @@ export class UserController {
 
   private _setActiveAccounts(activeAccounts: Account[]): void {
     this._activeAccounts = activeAccounts;
+    this.isFetched.emit('redraw');
   }
 
   private _socialAccounts: SocialAccount[] = [];
@@ -173,8 +178,36 @@ export class UserController {
     this._setEmail(email);
   }
 
+  public updateEmail(email: string): void {
+    this._setEmail(email);
+
+    try {
+      $.post(`${app.serverUrl()}/updateEmail`, {
+        email: email,
+        jwt: app.user.jwt,
+      });
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to update email');
+    }
+  }
+
   public setEmailInterval(emailInterval: string): void {
     this._setEmailInterval(emailInterval);
+  }
+
+  public updateEmailInterval(emailInterval: string): void {
+    try {
+      $.post(`${app.serverUrl()}/writeUserSetting`, {
+        jwt: app.user.jwt,
+        key: 'updateEmailInterval',
+        value: emailInterval,
+      });
+      this._setEmailInterval(emailInterval);
+    } catch (e) {
+      console.log(e);
+      notifyError('Unable to set email interval');
+    }
   }
 
   public setEmailVerified(verified: boolean): void {

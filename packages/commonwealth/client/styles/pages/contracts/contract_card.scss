@@ -1,0 +1,68 @@
+@import '../../shared';
+
+.ContractCard {
+  .label {
+    color: $neutral-500;
+    margin-bottom: 8px;
+  }
+
+  .header {
+    width: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+
+    .address {
+      word-break: break-word;
+    }
+
+    .delete-icon {
+      margin-left: 20px;
+    }
+  }
+
+  .templates {
+    width: 100%;
+    margin-top: 44px;
+
+    .no-templates-container {
+      min-height: 56px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .no-templates-info {
+        text-align: center;
+        color: $neutral-500;
+      }
+    }
+
+    .templates-container {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .add-template-btn {
+      padding-inline: 0;
+      margin-top: 16px;
+
+      .Text {
+        font-size: 12px;
+      }
+    }
+
+    .create-template-info {
+      color: $neutral-500;
+      display: inline-block;
+
+      .cta {
+        display: inline-block;
+        margin-left: 4px;
+        color: $primary-500;
+      }
+    }
+  }
+}

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { redraw } from 'mithrilInterop';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import {
@@ -53,37 +52,35 @@ type LinkedProposalsCardProps = {
   thread: Thread;
 };
 
-export const LinkedProposalsCard = (props: LinkedProposalsCardProps) => {
-  const { onChangeHandler, thread, showAddProposalButton } = props;
+export const LinkedProposalsCard = ({
+  onChangeHandler,
+  thread,
+  showAddProposalButton,
+}: LinkedProposalsCardProps) => {
+  const [snapshot, setSnapshot] = useState<SnapshotProposal>(null);
+  const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
+  const [space, setSpace] = useState<SnapshotSpace>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [initialized, setInitialized] = React.useState<boolean>(false);
-  const [snapshot, setSnapshot] = React.useState<SnapshotProposal>();
-  const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] =
-    React.useState<boolean>(false);
-  const [space, setSpace] = React.useState<SnapshotSpace>();
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  useEffect(() => {
+    if (thread.snapshotProposal?.length > 0) {
+      loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+        for (const { space: _space, proposals } of data) {
+          const matchingSnapshot = proposals.find(
+            (sn) => sn.id === thread.snapshotProposal
+          );
 
-  if (!initialized && thread.snapshotProposal?.length > 0) {
-    setInitialized(true);
-
-    loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
-      for (const { space: _space, proposals } of data) {
-        const matchingSnapshot = proposals.find(
-          (sn) => sn.id === thread.snapshotProposal
-        );
-
-        if (matchingSnapshot) {
-          setSnapshot(matchingSnapshot);
-          setSpace(_space);
-          break;
+          if (matchingSnapshot) {
+            setSnapshot(matchingSnapshot);
+            setSpace(_space);
+            break;
+          }
         }
-      }
 
-      setSnapshotProposalsLoaded(true);
-      setInitialized(false);
-      redraw();
-    });
-  }
+        setSnapshotProposalsLoaded(true);
+      });
+    }
+  }, [thread.snapshotProposal]);
 
   let snapshotUrl = '';
 
@@ -97,7 +94,7 @@ export const LinkedProposalsCard = (props: LinkedProposalsCardProps) => {
     thread.snapshotProposal?.length > 0 && snapshotProposalsLoaded;
 
   return (
-    <React.Fragment>
+    <>
       <CWContentPageCard
         header="Linked Proposals"
         content={
@@ -145,6 +142,7 @@ export const LinkedProposalsCard = (props: LinkedProposalsCardProps) => {
         }
       />
       <Modal
+        className="LinkedProposalsCardModal"
         content={
           <UpdateProposalStatusModal
             onChangeHandler={onChangeHandler}
@@ -155,6 +153,6 @@ export const LinkedProposalsCard = (props: LinkedProposalsCardProps) => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-    </React.Fragment>
+    </>
   );
 };

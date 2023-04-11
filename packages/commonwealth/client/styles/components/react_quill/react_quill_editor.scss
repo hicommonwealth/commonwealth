@@ -1,0 +1,85 @@
+.QuillEditorWrapper {
+  .ql-editor {
+    min-height: 180px;
+  }
+
+  .custom-buttons {
+    position: relative;
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: row;
+
+    .custom-button {
+      color: #333;
+      text-align: center;
+      font-size: 1.2em;
+      width: 1.2em;
+      height: 1.2em;
+      align-items: center;
+      justify-content: center;
+      margin-left: 5px;
+
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+      -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+      user-select: none; /* Non-prefixed version, currently
+                                      supported by Chrome, Edge, Opera and Firefox */
+
+      &.preview {
+        padding: 3px;
+      }
+
+      &:hover {
+        color: #888;
+      }
+    }
+  }
+
+  .LoadingIndicator {
+    position: relative;
+    left: 50%;
+    top: calc(50% + 15px);
+
+    .outer-circle {
+      width: 10px;
+      height: 10px;
+      background-color: #fff;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+    }
+
+    .inner-circle {
+      border-radius: inherit;
+      background-image: conic-gradient(
+        #fff,
+        rgba(80, 200, 120, 0.3),
+        rgb(80, 200, 120)
+      );
+      position: absolute;
+      z-index: -1;
+      margin: auto;
+      top: -0.8rem;
+      bottom: -0.8rem;
+      left: -0.8rem;
+      right: -0.8rem;
+      animation: circle-anim 0.6s linear infinite;
+    }
+
+    @keyframes circle-anim {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  }
+}

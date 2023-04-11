@@ -1,5 +1,5 @@
 import type { Response, NextFunction, Request } from 'express';
-import { AppError } from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 import type { DB } from '../../database/database';
 
@@ -22,7 +22,6 @@ const entities: any = async (
       {
         model: models.ChainEvent,
         order: [[models.ChainEvent, 'id', 'asc']],
-        include: [models.ChainEventType],
       },
     ],
     order: [['created_at', 'DESC']],
@@ -42,11 +41,17 @@ const entities: any = async (
   if (req.query.completed) {
     entityFindOptions.where.completed = true;
   }
-  const entities = await models.ChainEntity.findAll(entityFindOptions);
-  return res.json({
-    status: 'Success',
-    result: entities.map((e) => e.toJSON()),
-  });
+
+  try {
+    const fetchedEntities = await models.ChainEntity.findAll(entityFindOptions);
+    return res.json({
+      status: 'Success',
+      result: fetchedEntities.map((e) => e.toJSON()),
+    });
+  } catch (err) {
+    console.error(err);
+    return next(new ServerError(`Failed to fetch entities from DB`, err));
+  }
 };
 
 export default entities;

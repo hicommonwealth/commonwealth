@@ -22,7 +22,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
 import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle } from './cw_toggle';
+import { CWToggle, toggleDarkMode } from './cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
@@ -39,6 +39,7 @@ import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../avatar_upload';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -139,19 +140,25 @@ export const ComponentShowcase = () => {
   const [isToggled, setIsToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState<number>(1);
-  const [isRadioButtonChecked, setIsRadioButtonChecked] =
-    useState<boolean>(false);
+  const [isRadioButtonChecked, setIsRadioButtonChecked] = useState<boolean>(
+    false
+  );
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
-    useState<boolean>(false);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState<boolean>(
+    false
+  );
+  const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
+    localStorage.getItem('dark-mode-state') === 'on'
+  );
 
   return (
     <div className="ComponentShowcase">
       <AvatarUpload scope="community" />
+      <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
       <Modal
         content={<div>hi</div>}
@@ -163,6 +170,36 @@ export const ComponentShowcase = () => {
         label="Full Screen Modal"
         onClick={() => setIsFullScreenModalOpen(true)}
       />
+      <CWButton
+        label="Confirmation Modal"
+        onClick={() =>
+          openConfirmation({
+            title: 'Warning',
+            description: (
+              <>
+                Do you really want to <b>delete</b> this item?
+              </>
+            ),
+            buttons: [
+              {
+                label: 'Delete',
+                buttonType: 'mini-black',
+                onClick: () => {
+                  notifySuccess('Deleted');
+                },
+              },
+              {
+                label: 'Cancel',
+                buttonType: 'mini-white',
+                onClick: () => {
+                  console.log('cancelled');
+                },
+              },
+            ],
+          })
+        }
+      />
+
       <Modal
         content={
           <div>
@@ -655,6 +692,20 @@ export const ComponentShowcase = () => {
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Toggle</CWText>
+        <div className="toggle-gallery">
+          <CWToggle
+            checked={isDarkModeOn}
+            onChange={(e) => {
+              isDarkModeOn
+                ? toggleDarkMode(false, setIsDarkModeOn)
+                : toggleDarkMode(true, setIsDarkModeOn);
+              e.stopPropagation();
+            }}
+          />
+          <div className="toggle-label">
+            <CWText type="caption">Dark mode</CWText>
+          </div>
+        </div>
         <CWToggle
           checked={isToggled}
           onChange={() => {
@@ -792,6 +843,7 @@ export const ComponentShowcase = () => {
           uploadCompleteCallback={(url: string) => {
             notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
           }}
+          enableGenerativeAI
         />
       </div>
       <div className="choice-gallery">

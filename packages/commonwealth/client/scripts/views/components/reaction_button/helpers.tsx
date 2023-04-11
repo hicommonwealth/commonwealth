@@ -1,38 +1,35 @@
 import React from 'react';
-
 import $ from 'jquery';
+
 import type { ChainInfo, Comment } from 'models';
-import { AddressInfo, Thread } from 'models';
 
 import app from 'state';
+import { AddressInfo, Thread } from 'models';
 import { User } from 'views/components/user/user';
 import { CWText } from '../component_kit/cw_text';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
-type ReactorAttrs = {
-  likes: number;
-  reactors: any;
+type ReactorProps = {
+  reactors: string[];
 };
 
 type Post = Thread | Comment<any>;
 
-export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
-  const { reactors = [], likes = 0 } = reactorAttrs;
-
+export const getDisplayedReactorsForPopup = ({
+  reactors = [],
+}: ReactorProps) => {
   const slicedReactors = reactors
     .slice(0, MAX_VISIBLE_REACTING_ACCOUNTS)
     .map((rxn) => {
-      const {
-        Address: { address, chain },
-      } = rxn;
-
       return (
-        <div key={address + "#" + (chain?.id || chain)} style={{ display: 'flex', width: '120px' }}>
+        <div
+          key={rxn + '#' + (app.chain?.id || app.chain)}
+          style={{ display: 'flex', width: '120px' }}
+        >
           <CWText noWrap>
             <User
-              user={new AddressInfo(null, address, chain?.id || chain, null)}
+              user={new AddressInfo(null, rxn, app.chain.id, null)}
               linkify
             />
           </CWText>
@@ -40,8 +37,8 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       );
     });
 
-  if (slicedReactors.length < likes) {
-    const diff = likes - slicedReactors.length;
+  if (slicedReactors.length > MAX_VISIBLE_REACTING_ACCOUNTS) {
+    const diff = slicedReactors.length - MAX_VISIBLE_REACTING_ACCOUNTS;
 
     slicedReactors.push(<CWText key="final">{`and ${diff} more`}</CWText>);
   }
@@ -74,19 +71,16 @@ export const fetchReactionsByPost = async (post: Post) => {
 export const onReactionClick = (
   e: React.MouseEvent<HTMLDivElement>,
   hasReacted: boolean,
-  dislike: (userAddress: string) => void,
+  dislike: () => void,
   like: (chain: ChainInfo, chainId: string, userAddress: string) => void
 ) => {
-  e.preventDefault();
-  e.stopPropagation();
-
   const { address: userAddress, chain } = app.user.activeAccount;
 
   // if it's a community use the app.user.activeAccount.chain.id instead of author chain
   const chainId = app.activeChainId();
 
   if (hasReacted) {
-    dislike(userAddress);
+    dislike();
   } else {
     like(chain, chainId, userAddress);
   }

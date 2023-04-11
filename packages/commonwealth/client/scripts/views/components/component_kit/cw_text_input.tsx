@@ -24,7 +24,7 @@ export type BaseTextInputProps = {
   iconRight?: IconName;
   iconRightonClick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
-  label?: string;
+  label?: string | React.ReactNode;
   maxLength?: number;
   name?: string;
   onInput?: (e) => void;
@@ -32,6 +32,8 @@ export type BaseTextInputProps = {
   onClick?: (e) => void;
   placeholder?: string;
   tabIndex?: number;
+  manualStatusMessage?: string;
+  manualValidationStatus?: ValidationStatus;
 };
 
 type InputStyleProps = {
@@ -50,7 +52,7 @@ type InputInternalStyleProps = {
 
 type MessageRowProps = {
   hasFeedback?: boolean;
-  label: string;
+  label: string | React.ReactNode;
   statusMessage?: string;
   validationStatus?: ValidationStatus;
 };
@@ -135,6 +137,8 @@ export const CWTextInput = (props: TextInputProps) => {
     size = 'large',
     tabIndex,
     displayOnly,
+    manualStatusMessage = '',
+    manualValidationStatus = '',
   } = props;
 
   return (
@@ -155,8 +159,10 @@ export const CWTextInput = (props: TextInputProps) => {
         <MessageRow
           hasFeedback={!!inputValidationFn}
           label={label}
-          statusMessage={validationProps.statusMessage}
-          validationStatus={validationProps.validationStatus}
+          statusMessage={manualStatusMessage || validationProps.statusMessage}
+          validationStatus={
+            manualValidationStatus || validationProps.validationStatus
+          }
         />
       )}
       <div className="input-and-icon-container">
@@ -232,7 +238,6 @@ export const CWTextInput = (props: TextInputProps) => {
               iconName={iconRight}
               iconSize="small"
               onClick={iconRightonClick}
-              iconButtonTheme="primary"
             />
           </div>
         ) : !!iconRight && !disabled ? (

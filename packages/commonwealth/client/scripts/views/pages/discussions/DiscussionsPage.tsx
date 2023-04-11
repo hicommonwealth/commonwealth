@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
+import { useSearchParams } from 'react-router-dom';
 
 import 'pages/discussions/index.scss';
 
@@ -8,41 +9,28 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
-import { Footer } from '../../footer';
 
 type DiscussionsPageProps = {
   topicName?: string;
-  stageName?: string;
 };
 
-const DiscussionsPage = ({ topicName, stageName }: DiscussionsPageProps) => {
+const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
   const [initializing, setInitializing] = useState(true);
+  const [searchParams, _] = useSearchParams();
+  const stageName: string = searchParams.get('stage');
 
   // setup initial threads
   useEffect(() => {
-    // set pinned threads
-    setThreads(
-      app.threads.listingStore.getThreads({
-        topicName,
-        stageName,
-        pinned: true,
-      })
-    );
-    app.threads.loadNextPage({ topicName, stageName }).then(() => {
-      // add unpinned threads
-      setThreads((oldThreads) => [
-        ...oldThreads,
-        ...app.threads.listingStore.getThreads({
-          topicName,
-          stageName,
-          pinned: false,
-        }),
-      ]);
+    app.threads
+      .loadNextPage({ topicName, stageName, includePinnedThreads: true })
+      .then((t) => {
+        // Fetch first 20 + unpinned threads
+        setThreads(t);
 
-      setInitializing(false);
-    });
-  }, []);
+        setInitializing(false);
+      });
+  }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
     const newThreads = await app.threads.loadNextPage({ topicName, stageName });
@@ -58,12 +46,12 @@ const DiscussionsPage = ({ topicName, stageName }: DiscussionsPageProps) => {
     return <PageLoading />;
   }
   return (
-    <Sublayout hideFooter>
+    <Sublayout>
       <div className="DiscussionsPage">
         <RecentThreadsHeader
           topic={topicName}
           stage={stageName}
-          totalThreadCount={threads.length}
+          totalThreadCount={threads?.length || 0}
         />
         <Virtuoso
           style={{ height: '100%', width: '100%' }}
@@ -73,11 +61,6 @@ const DiscussionsPage = ({ topicName, stageName }: DiscussionsPageProps) => {
           }}
           endReached={loadMore}
           overscan={200}
-          components={{
-            Footer: () => {
-              return <Footer />;
-            },
-          }}
         />
       </div>
     </Sublayout>

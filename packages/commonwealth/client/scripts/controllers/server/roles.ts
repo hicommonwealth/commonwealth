@@ -22,6 +22,8 @@ const getPermissionLevel = (permission: AccessLevel | undefined) => {
 };
 
 export class RolesController {
+  private permissionManager = new PermissionManager();
+
   constructor(public readonly User: UserController) {}
 
   private _roles: RoleInfo[] = [];

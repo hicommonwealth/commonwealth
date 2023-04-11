@@ -43,7 +43,7 @@ class ThreadUniqueAddressesCountController {
       data: JSON.stringify({
         threads: threads.map(
           ({ id, Address: { address = null } = {}, author }) => ({
-            root_id: `discussion_${id}`,
+            thread_id: id,
             author: address || author,
           })
         ),
@@ -59,15 +59,6 @@ class ThreadUniqueAddressesCountController {
       this._initializedPinned = true;
     }
   };
-
-  public getUniqueAddressesByRootId(proposal: Thread) {
-    const { id, slug } = proposal;
-    const rootId = `${slug}_${id}`;
-    const { addresses = [] } = this._store.getById(rootId) || {};
-    return addresses.map(
-      ({ address, chain }) => new AddressInfo(null, address, chain, null)
-    );
-  }
 
   public deinit() {
     this._initializedPinned = false;

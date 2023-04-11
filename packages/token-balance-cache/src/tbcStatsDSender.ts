@@ -6,7 +6,7 @@ export class TbcStatsDSender {
   private statsD = StatsDController.get();
 
   // Log requests per provider + node + contract
-  sendProviderInfo(bps: BalanceProvider[], nodeId?: number) {
+  sendProviderInfo(bps: BalanceProvider<any>[], nodeId?: number) {
     bps.forEach((bp) => {
       const tags = {
         name: bp.name,

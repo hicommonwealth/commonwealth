@@ -75,15 +75,24 @@ the number of possible errors you might run into.
 You should also download a copy of the production database if possible.
 following the Production Database instructions afterwards.
 
-## Trouble Shooting for M1 Mac Users**
+## Trouble Shooting for M1 Mac Users
 
-For development, you should follow the same steps as in the **nvm** section, except you must make sure you are using the
-Rosetta2 Terminal. Follow these steps to enable Rosetta
-2 `https://www.courier.com/blog/tips-and-tricks-to-setup-your-apple-m1-for-development/`.
+Newer Macs use Apple Silicon (M1, M2, etc), instead of the common Intel chips.
+Several critical CLI tools like `nvm` and `brew` do not yet have native versions 
+built for the new M1 architecture. Follow these steps to enable Rosetta 2 
+([source](https://www.courier.com/blog/tips-and-tricks-to-setup-your-apple-m1-for-development/)):
 
-ALL TIMES you will need to install using this following in front of brew. For example for
-python: `arch -arm64 brew install python@3.9`. This will allow you to install using the M1 homebrew with Rosetta. This
-is crucial.
+For M1+ development, you should follow the same steps as in the **nvm** section, 
+except you must make sure you are using the Rosetta2 Terminal.
+- Download a terminal alternative like [iTerm2](https://iterm2.com/) to your Applications (optionally, rename it, ie: "Rosetta Terminal")
+- In the Applications menu, right-click the new terminal app and click "Get Info"
+- From the “Get info” menu, select “Open using Rosetta“
+- Confirm that you are using a Rosetta Terminal by entering the `arch` command, which should return `i386`
+- You may now use this terminal to install `nvm` and other applications. They will run fine in your usual terminal.
+
+_FOR ALL CLI INSTALLS_ you must prefix `arch -arm64` in front of the command.
+For example for python: `arch -arm64 brew install python@3.9`. This will allow you 
+to install using the M1 homebrew with Rosetta. This is crucial.
 
 If errors occur try these steps:
 
@@ -98,7 +107,7 @@ If errors occur try these steps:
 ```
 
 Make sure you have python installed in your Rosetta Terminal path.
-See: `https://stackoverflow.com/questions/71468590/env-python-no-such-file-or-directory-when-building-app-with-xcode`.
+See [link](https://stackoverflow.com/questions/71468590/env-python-no-such-file-or-directory-when-building-app-with-xcode).
 You need to be able to call `python` in the terminal.
 
 ## Environment Variables
@@ -123,6 +132,7 @@ Environment variables used for external services include:
 - MAGIC_API_KEY
 - MAGIC_SUPPORTED_BASES
 - MAGIC_DEFAULT_CHAIN
+- COSMOS_GOV_V1
 - DISCORD_CLIENT_ID: for Discord OAuth login
 - DISCORD_CLIENT_SECRET: for Discord OAuth login
 - DISCORD_OAUTH_SCOPES: scopes (usually just 'identify')

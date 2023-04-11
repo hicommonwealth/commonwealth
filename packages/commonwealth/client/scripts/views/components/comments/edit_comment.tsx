@@ -5,11 +5,11 @@ import type { Comment } from 'models';
 
 import app from 'state';
 import { ContentType } from 'types';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWButton } from '../component_kit/cw_button';
-import type { QuillEditor } from '../quill/quill_editor';
-import { QuillEditorComponent } from '../quill/quill_editor_component';
 import { clearEditingLocalStorage } from './helpers';
+import type { DeltaStatic } from 'quill';
+import { ReactQuillEditor } from '../react_quill_editor';
+import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
 
 type EditCommentProps = {
   comment: Comment<any>;
@@ -28,68 +28,61 @@ export const EditComment = (props: EditCommentProps) => {
     updatedCommentsCallback,
   } = props;
 
-  const [quillEditorState, setQuillEditorState] = React.useState<QuillEditor>();
+  const commentBody =
+    shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+  const body = deserializeDelta(commentBody);
+
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>();
 
-  const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+  const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    let cancelConfirmed = true;
+
+    if (JSON.stringify(body) !== JSON.stringify(contentDelta)) {
+      cancelConfirmed = window.confirm(
+        'Cancel editing? Changes will not be saved.'
+      );
+    }
+
+    if (cancelConfirmed) {
+      setIsEditing(false);
+      clearEditingLocalStorage(comment.id, ContentType.Comment);
+    }
+  };
+
+  const save = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    setSaving(true);
+
+    try {
+      await app.comments.edit(comment, serializeDelta(contentDelta));
+      setIsEditing(false);
+      clearEditingLocalStorage(comment.id, ContentType.Comment);
+      updatedCommentsCallback();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="EditComment">
-      <QuillEditorComponent
-        contentsDoc={body}
-        oncreateBind={(state: QuillEditor) => {
-          setQuillEditorState(state);
-        }}
-        imageUploader
-        theme="snow"
-        editorNamespace={`edit-comment-${comment.id}`}
+      <ReactQuillEditor
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
       />
       <div className="buttons-row">
         <CWButton
           label="Cancel"
           disabled={saving}
           buttonType="secondary-blue"
-          onClick={async (e) => {
-            e.preventDefault();
-
-            let confirmed = true;
-
-            const commentText = quillEditorState.textContentsAsString;
-
-            if (commentText !== body) {
-              confirmed = await confirmationModalWithText(
-                'Cancel editing? Changes will not be saved.',
-                'Delete changes',
-                'Keep editing'
-              )();
-            }
-
-            if (confirmed) {
-              setIsEditing(false);
-              clearEditingLocalStorage(comment.id, ContentType.Comment);
-            }
-          }}
+          onClick={cancel}
         />
-        <CWButton
-          label="Save"
-          disabled={saving}
-          onClick={(e) => {
-            e.preventDefault();
-
-            setSaving(true);
-
-            quillEditorState.disable();
-
-            const itemText = quillEditorState.textContentsAsString;
-
-            app.comments.edit(comment, itemText).then(() => {
-              setSaving(false);
-              clearEditingLocalStorage(comment.id, ContentType.Comment);
-              setIsEditing(false);
-              updatedCommentsCallback();
-            });
-          }}
-        />
+        <CWButton label="Save" disabled={saving} onClick={save} />
       </div>
     </div>
   );

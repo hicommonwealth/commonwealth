@@ -6,7 +6,7 @@ import { CWText } from './cw_text';
 import { ComponentType } from './types';
 
 type LabelProps = {
-  label: string;
+  label: string | React.ReactNode;
 };
 
 export const CWLabel = (props: LabelProps) => {

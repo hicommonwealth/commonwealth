@@ -1,14 +1,12 @@
-import React from 'react';
-
-import { notifyInfo } from 'controllers/app/notifications';
-import { DashboardActivityNotification } from 'models';
+import React, { useEffect } from 'react';
 
 import 'pages/user_dashboard/index.scss';
 
 import app, { LoginState } from 'state';
+import { notifyInfo } from 'controllers/app/notifications';
+import { DashboardActivityNotification } from 'models';
 import Sublayout from 'views/sublayout';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWText } from '../../components/component_kit/cw_text';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -35,11 +33,13 @@ const UserDashboard = (props: UserDashboardProps) => {
 
   const loggedIn = app.loginState === LoginState.LoggedIn;
 
-  if (!type) {
-    navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
-  } else if (type === 'for-you' && !loggedIn) {
-    navigate('/dashboard/global');
-  }
+  useEffect(() => {
+    if (!type) {
+      navigate(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+    } else if (type === 'for-you' && !loggedIn) {
+      navigate('/dashboard/global');
+    }
+  }, [loggedIn, navigate, type]);
 
   const subpage: DashboardViews =
     type === 'chain-events'
@@ -61,9 +61,6 @@ const UserDashboard = (props: UserDashboardProps) => {
       <div className="UserDashboard">
         <div className="dashboard-column">
           <div className="dashboard-header">
-            <CWText type="h3" fontWeight="medium">
-              Home
-            </CWText>
             <CWTabBar>
               <CWTab
                 label={DashboardViews.ForYou}

@@ -1,7 +1,6 @@
 @import '../shared';
 
 .TopicSelector {
-  .cui-popover-content {
-    padding: 0;
-  }
+  flex: 1;
+  width: 100%;
 }

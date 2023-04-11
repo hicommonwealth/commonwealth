@@ -4,6 +4,7 @@
   align-items: center;
   border: 2px solid transparent;
   border-radius: $border-radius-corners;
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   gap: 8px;
@@ -112,5 +113,11 @@
     height: 24px;
 
     @include miniWhite;
+  }
+
+  &.mini-red {
+    height: 24px;
+
+    @include miniRed;
   }
 }

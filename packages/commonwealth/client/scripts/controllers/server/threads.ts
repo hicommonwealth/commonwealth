@@ -9,7 +9,7 @@ import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 
 import { redraw } from 'mithrilInterop';
-import type { ChainEntity, Profile, Topic } from 'models';
+import type { ChainEntity, MinimumProfile as Profile, Topic } from 'models';
 import {
   Attachment,
   NotificationSubscription,
@@ -143,6 +143,8 @@ class ThreadsController {
       numberOfComments,
     } = thread;
 
+    let { reactionIds, reactionType, addressesReacted } = thread;
+
     const attachments = Attachments
       ? Attachments.map((a) => new Attachment(a.url, a.description))
       : [];
@@ -151,6 +153,9 @@ class ThreadsController {
       for (const reaction of reactions) {
         app.reactions.store.add(modelReactionFromServer(reaction));
       }
+      reactionIds = reactions.map((r) => r.id);
+      reactionType = reactions.map((r) => r.type);
+      addressesReacted = reactions.map((r) => r.address);
     }
 
     let versionHistoryProcessed;
@@ -177,7 +182,9 @@ class ThreadsController {
     const chainEntitiesProcessed: ChainEntity[] = [];
     if (chain_entity_meta) {
       for (const meta of chain_entity_meta) {
-        const full_entity = app.chainEntities.store.getById(meta.ce_id);
+        const full_entity = Array.from(app.chainEntities.store.values())
+          .flat()
+          .filter((e) => e.id === meta.ce_id)[0];
         if (full_entity) {
           if (meta.title) full_entity.title = meta.title;
           chainEntitiesProcessed.push(full_entity);
@@ -245,6 +252,9 @@ class ThreadsController {
       lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
       linkedThreads,
       numberOfComments,
+      reactionIds,
+      reactionType,
+      addressesReacted,
     });
 
     ThreadsController.Instance.store.add(t);
@@ -410,6 +420,7 @@ class ThreadsController {
       },
       error: (err) => {
         console.log('Failed to update stage');
+        notifyError(`Failed to update stage: ${err.responseJSON.error}`);
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
@@ -483,7 +494,10 @@ class ThreadsController {
         return thread;
       },
       error: (err) => {
-        console.log('Failed to update linked snapshot proposal');
+        notifyError(
+          `Could not update Snapshot Linked Proposal: ${err.responseJSON.error}`
+        );
+        console.error('Failed to update linked snapshot proposal');
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
@@ -523,6 +537,9 @@ class ThreadsController {
       },
       error: (err) => {
         console.log('Failed to update linked proposals');
+        notifyError(
+          `Failed to update linked proposals: ${err.responseJSON.error}`
+        );
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
@@ -597,7 +614,7 @@ class ThreadsController {
     };
     const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/getThreads`, params),
-      app.chainEntities.refreshRawEntities(app.activeChainId()),
+      app.chainEntities.getRawEntities(app.activeChainId()),
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
@@ -628,6 +645,7 @@ class ThreadsController {
         active_address: app.user.activeAccount?.address,
       }),
     });
+
     for (const rc of reactionCounts) {
       const id = app.reactionCounts.store.getIdentifier({
         threadId: rc.thread_id,
@@ -651,11 +669,12 @@ class ThreadsController {
   public async loadNextPage(options: {
     topicName?: string;
     stageName?: string;
+    includePinnedThreads?: boolean;
   }) {
     if (this.listingStore.isDepleted(options)) {
       return;
     }
-    const { topicName, stageName } = options;
+    const { topicName, stageName, includePinnedThreads } = options;
     const chain = app.activeChainId();
     const params = {
       chain,
@@ -667,11 +686,12 @@ class ThreadsController {
 
     if (topicId) params['topic_id'] = topicId;
     if (stageName) params['stage'] = stageName;
+    if (includePinnedThreads) params['includePinnedThreads'] = true;
 
     // fetch threads and refresh entities so we can join them together
     const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/bulkThreads`, params),
-      app.chainEntities.refreshRawEntities(chain),
+      app.chainEntities.getRawEntities(chain),
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
@@ -681,6 +701,8 @@ class ThreadsController {
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
     });
+
+    app.threadReactions.refreshReactionsFromThreads(modeledThreads);
 
     modeledThreads.forEach((thread) => {
       try {
@@ -692,9 +714,10 @@ class ThreadsController {
     });
 
     // Update listing cutoff date (date up to which threads have been fetched)
+    const unPinnedThreads = modeledThreads.filter((t) => !t.pinned);
     if (modeledThreads?.length) {
-      const lastThread = modeledThreads.sort(orderDiscussionsbyLastComment)[
-        modeledThreads.length - 1
+      const lastThread = unPinnedThreads.sort(orderDiscussionsbyLastComment)[
+        unPinnedThreads.length - 1
       ];
       const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
       this.listingStore.setCutoffDate(options, cutoffDate);
@@ -711,7 +734,10 @@ class ThreadsController {
     if (!this.listingStore.isInitialized(options)) {
       this.listingStore.initializeListing(options);
     }
-    if (threads.length < DEFAULT_PAGE_SIZE) {
+    if (
+      (includePinnedThreads ? threads.length : unPinnedThreads.length) <
+      DEFAULT_PAGE_SIZE
+    ) {
       this.listingStore.depleteListing(options);
     }
 

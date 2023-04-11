@@ -38,7 +38,7 @@ export const orderDiscussionsbyLastComment = (a, b) => {
   return tsB - tsA;
 };
 
-const handleToggleSubscription = async (
+export const handleToggleSubscription = async (
   thread: Thread,
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription,
@@ -99,8 +99,7 @@ export const getThreadSubScriptionMenuItem = (
     commentSubscription?.isActive && reactionSubscription?.isActive;
 
   return {
-    onClick: (e) => {
-      e.preventDefault();
+    onClick: () => {
       handleToggleSubscription(
         thread,
         getCommentSubscription(thread),

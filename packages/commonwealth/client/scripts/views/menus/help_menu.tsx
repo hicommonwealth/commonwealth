@@ -18,7 +18,7 @@ export const HelpMenu = () => {
           label: 'Help',
           onClick: () => {
             app.mobileMenu = 'MainMenu';
-            app.mobileMenuRedraw.emit('redraw');
+            app.sidebarRedraw.emit('redraw');
           },
         }}
         menuItems={[

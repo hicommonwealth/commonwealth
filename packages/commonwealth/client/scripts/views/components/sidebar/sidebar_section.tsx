@@ -75,7 +75,8 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
       setToggled(!toggled);
     }
 
-    app.sidebarToggled = false;
+    app.sidebarToggled = true;
+    app.sidebarRedraw.emit('redraw');
 
     onClick(e, toggled);
   };
@@ -172,7 +173,7 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
 
     setToggled(!toggled);
 
-    localStorage.setItem(`${sectionName}-toggled`, (!!toggled).toString());
+    localStorage.setItem(`${sectionName}-toggled`, (!toggled).toString());
 
     if (toggled) {
       setHoverColor('none');

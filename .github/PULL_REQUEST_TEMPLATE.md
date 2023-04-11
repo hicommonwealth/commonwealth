@@ -1,24 +1,22 @@
 <!--- Provide a general summary of your changes in the Title above -->
 
-## Description
-<!--- Describe your changes in detail -->
+## Link to Issue
+Closes: #TODO
 
-## Motivation and Context
-<!--- Why is this change required? What problem does it solve? -->
-<!--- If it fixes an open issue, please link to the issue here. -->
+## Description of Changes
+- Adds FIXME widget to TODO page.
+- 
 
-## How has this been tested?
-<!--- Please describe in detail how you tested your changes. -->
-<!--- Include details of your testing environment, tests ran to see how -->
-<!--- your change affects other areas of the code, etc. -->
+## Test Plan
+- Unit tested the `FIXME()` call.
+- CA (click around) tested on local and frack:
+  - TODO page
+  - 
 
-## Does this PR affect any server routes?
-chose YES or NO
+## Deployment Plan
+<!--- Omit if unneeded -->
+1. 
 
-
-## If this PR affects server routes, what are the security implications?
-<!--- Please describe which security concerns were considered, -->
-<!--- such as argument validation, private data leaking, etc. -->
-
-## Have you added the issue number here?
-(In the right sidebar, under "development")
+## Other Considerations
+<!--- Follow-up tickets, breaking changes, etc -->
+- 

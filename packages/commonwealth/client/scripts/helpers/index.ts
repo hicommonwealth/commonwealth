@@ -2,14 +2,11 @@ import type { ClassComponent } from 'mithrilInterop';
 import { render } from 'mithrilInterop';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import $ from 'jquery';
 import { ThreadStage } from 'models';
 import type { IChainAdapter, Account } from 'models';
-import type { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import app from 'state';
 import type { Coin } from 'adapters/currency';
-import { NavigateFunction } from 'react-router-dom';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -40,9 +37,9 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return (arr
+  return arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown) as ThreadStage[];
+    .filter((s) => s) as unknown as ThreadStage[];
 }
 
 /*
@@ -330,25 +327,6 @@ export const loadScript = (scriptURI) => {
   });
 };
 
-export const removeOrAddClasslistToAllElements = (
-  cardList: ICardListItem[],
-  classlist: string,
-  method: string
-) => {
-  cardList.forEach((chain: ICardListItem) => {
-    const {
-      card: { id },
-    } = chain;
-
-    const METHODS = {
-      add: () => document.getElementById(id).classList.add(classlist),
-      remove: () => document.getElementById(id).classList.remove(classlist),
-    };
-
-    return METHODS[method]();
-  });
-};
-
 export const tokensToWei = (input: string, decimals: number): string => {
   const value = new BigNumber(input);
   if (value.isNaN()) {
@@ -433,3 +411,11 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
 
   return decimals;
 }
+
+export const setDarkMode = (state: boolean) => {
+  const stateStr = state ? 'on' : 'off';
+  localStorage.setItem('dark-mode-state', stateStr);
+  state
+    ? document.getElementsByTagName('html')[0].classList.add('invert')
+    : document.getElementsByTagName('html')[0].classList.remove('invert');
+};

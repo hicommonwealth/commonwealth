@@ -34,7 +34,7 @@ export default function DiscussionsRedirect() {
       default:
         navigate('/discussions');
     }
-  });
+  }, [navigate]);
 
   return <PageLoading />;
 }

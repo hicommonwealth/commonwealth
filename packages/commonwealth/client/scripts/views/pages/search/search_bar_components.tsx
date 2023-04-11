@@ -51,9 +51,7 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   return (
     <div
       className="SearchBarThreadPreviewRow"
-      onClick={() =>
-        navigate(`/${searchResult.chain}/discussion/${searchResult.proposalid}`)
-      }
+      onClick={() => navigate(`/discussion/${searchResult.proposalid}`)}
     >
       <div className="header-row">
         <User
@@ -93,11 +91,7 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
     <div
       className="SearchBarCommentPreviewRow"
       onClick={() => {
-        navigate(
-          `/${searchResult.chain}/proposal/${
-            searchResult.proposalid.split('_')[0]
-          }/${searchResult.proposalid.split('_')[1]}`
-        );
+        navigate(`/${searchResult.chain}/discussion/${searchResult.proposalid}`);
       }}
     >
       <CWText type="caption" className="last-updated-text">
@@ -147,7 +141,10 @@ export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
   return (
     <div className="SearchBarMemberPreviewRow">
       <User
-        user={app.profiles.getProfile(searchResult.chain, searchResult.address)}
+        user={app.newProfiles.getProfile(
+          searchResult.chain,
+          searchResult.address
+        )}
         linkify
       />
     </div>

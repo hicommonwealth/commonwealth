@@ -1,5 +1,7 @@
 import React from 'react';
 
+import 'pages/view_proposal/proposal_header_links.scss';
+
 import app from 'state';
 import {
   externalLink,
@@ -87,7 +89,7 @@ export const ThreadStage = (props: ThreadComponentProps) => {
       )}
       onClick={(e) => {
         e.preventDefault();
-        navigate(`?stage=${thread.stage}`);
+        navigate(`/discussions?stage=${thread.stage}`);
       }}
     >
       {threadStageToLabel(thread.stage)}

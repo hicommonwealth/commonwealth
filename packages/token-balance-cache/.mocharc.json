@@ -2,6 +2,6 @@
   "extension": [".spec.ts"],
   "package": "./package.json",
   "timeout": 60000,
-  "require": [ "tsconfig-paths/register", "source-map-support/register" ],
+  "require": ["tsconfig-paths/register", "source-map-support/register"],
   "exit": true
 }

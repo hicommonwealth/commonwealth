@@ -62,7 +62,15 @@ const getFilteredContent = (content, address) => {
         : content.notificationCategory === NotificationCategories.NewThread
         ? 'created a new thread'
         : '';
-    const actedOn = decodeURIComponent(content.title);
+
+    // Titles may be URI-encoded, or not (e.g. some imports)
+    let actedOn;
+    try {
+      actedOn = decodeURIComponent(content.title);
+    } catch (err) {
+      actedOn = content.title;
+    }
+
     const actedOnLink = content.url;
 
     const notificationTitlePrefix =
@@ -74,7 +82,6 @@ const getFilteredContent = (content, address) => {
         ? 'Reaction on: '
         : 'Activity on: ';
 
-    // url decoded
     const bodytext = decodeURIComponent(content.body);
 
     const notificationPreviewImageUrl = (() => {
@@ -114,13 +121,16 @@ const getFilteredContent = (content, address) => {
 
 const send = async (models, content: WebhookContent) => {
   let address;
+  let profile;
   try {
     address = await models.Address.findOne({
       where: {
         address: content.user,
         chain: content.author_chain,
       },
+      include: [models.Profile],
     });
+    profile = await address.getProfile();
   } catch (err) {
     // pass nothing if no matching address is found
   }
@@ -164,13 +174,8 @@ const send = async (models, content: WebhookContent) => {
     ? `${SERVER_URL}/${address.chain}/account/${address.address}`
     : null;
 
-  if (address?.id) {
-    const actorProfile = await models.OffchainProfile.findOne({
-      where: { address_id: address.id },
-    });
-    if (actorProfile?.data) {
-      actorAvatarUrl = JSON.parse(actorProfile.data).avatarUrl;
-    }
+  if (profile) {
+    actorAvatarUrl = profile.avatar_url;
   }
 
   let previewImageUrl = null; // image url of webhook preview

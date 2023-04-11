@@ -12,6 +12,7 @@ import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
 import deleteAddress from '../routes/deleteAddress';
 import getAddressStatus from '../routes/getAddressStatus';
+import getAddressProfile from '../routes/getAddressProfile';
 import selectChain from '../routes/selectChain';
 import startEmailLogin from '../routes/startEmailLogin';
 import finishEmailLogin from '../routes/finishEmailLogin';
@@ -35,7 +36,10 @@ import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
 import updateBanner from '../routes/updateBanner';
 import communityStats from '../routes/communityStats';
-import fetchEtherscanContract from '../routes/etherscanAPI';
+import {
+  fetchEtherscanContract,
+  fetchEtherscanContractAbi,
+} from '../routes/etherscanAPI';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
@@ -57,7 +61,7 @@ import bulkMembers from '../routes/bulkMembers';
 import bulkAddresses from '../routes/bulkAddresses';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
-import getProfileOld from '../routes/getProfile';
+import getProfileNew from '../routes/getNewProfile';
 
 import createRole from '../routes/createRole';
 import deleteRole from '../routes/deleteRole';
@@ -69,6 +73,7 @@ import createThread from '../routes/createThread';
 import editThread from '../routes/editThread';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
+import deletePoll from '../routes/deletePoll';
 import updateThreadStage from '../routes/updateThreadStage';
 import updateThreadPrivacy from '../routes/updateThreadPrivacy';
 import updateThreadPinned from '../routes/updateThreadPinned';
@@ -93,8 +98,7 @@ import editDraft from '../routes/drafts/editDraft';
 import getDrafts from '../routes/drafts/getDrafts';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
-import bulkProfiles from '../routes/bulkProfiles';
-import updateProfile from '../routes/updateProfile';
+import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
@@ -162,6 +166,18 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+
+import {
+  createCommunityContractTemplateAndMetadata,
+  getCommunityContractTemplate,
+  updateCommunityContractTemplate,
+  deleteCommunityContractTemplate,
+  getCommunityContractTemplateMetadata,
+  updateCommunityContractTemplateMetadata,
+  deleteCommunityContractTemplateMetadata,
+} from '../routes/proposalTemplate';
+import { createTemplate, getTemplates } from '../routes/templates';
+
 import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
 
@@ -225,6 +241,7 @@ function setupRouter(
     linkExistingAddressToChain.bind(this, models)
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
+  router.post('/getAddressProfile', getAddressProfile.bind(this, models));
   router.post(
     '/selectChain',
     passport.authenticate('jwt', { session: false }),
@@ -254,6 +271,12 @@ function setupRouter(
     '/etherscanAPI/fetchEtherscanContract',
     passport.authenticate('jwt', { session: false }),
     fetchEtherscanContract.bind(this, models)
+  );
+
+  router.post(
+    '/etherscanAPI/fetchEtherscanContractAbi',
+    passport.authenticate('jwt', { session: false }),
+    fetchEtherscanContractAbi.bind(this, models)
   );
 
   router.post(
@@ -306,6 +329,11 @@ function setupRouter(
     databaseValidationService.validateChain,
     getPolls.bind(this, models)
   );
+  router.delete(
+    '/deletePoll',
+    passport.authenticate('jwt', { session: false }),
+    deletePoll.bind(this, models)
+  );
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
@@ -357,6 +385,60 @@ function setupRouter(
     '/contractAbi',
     passport.authenticate('jwt', { session: false }),
     createContractAbi.bind(this, models)
+  );
+
+  // Templates
+  router.post(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    createTemplate.bind(this, models)
+  );
+
+  router.get(
+    '/contract/template',
+    passport.authenticate('jwt', { session: false }),
+    getTemplates.bind(this, models)
+  );
+
+  // community contract
+  router.post(
+    '/contract/community_template_and_metadata',
+    passport.authenticate('jwt', { session: false }),
+    createCommunityContractTemplateAndMetadata.bind(this, models)
+  );
+  router.get(
+    '/contract/community_template',
+    getCommunityContractTemplate.bind(this, models)
+  );
+
+  router.put(
+    '/contract/community_template',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityContractTemplate.bind(this, models)
+  );
+
+  router.delete(
+    '/contract/community_template',
+    passport.authenticate('jwt', { session: false }),
+    deleteCommunityContractTemplate.bind(this, models)
+  );
+
+  // community contract metadata
+  router.get(
+    '/contract/community_template/metadata',
+    getCommunityContractTemplateMetadata.bind(this, models)
+  );
+
+  router.put(
+    '/contract/community_template/metadata',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityContractTemplateMetadata.bind(this, models)
+  );
+
+  router.delete(
+    '/contract/community_template/metadata',
+    passport.authenticate('jwt', { session: false }),
+    deleteCommunityContractTemplateMetadata.bind(this, models)
   );
 
   router.post(
@@ -417,7 +499,7 @@ function setupRouter(
     searchComments.bind(this, models)
   );
 
-  router.get('/profile', getProfileOld.bind(this, models));
+  router.get('/profile/v2', getProfileNew.bind(this, models));
 
   // discussion drafts
   router.post(
@@ -643,14 +725,12 @@ function setupRouter(
     setDefaultRole.bind(this, models)
   );
 
-  // profiles
+  // new profile
   router.post(
-    '/updateProfile',
+    '/updateProfile/v2',
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateProfile.bind(this, models)
+    updateProfileNew.bind(this, models)
   );
-  router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
   // social accounts
   router.delete(

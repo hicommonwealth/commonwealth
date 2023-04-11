@@ -29,7 +29,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
       return;
     }
   }
-  currentTree[split[split.length - 1]] = toggle;
+  currentTree[split[split.length - 1]] = !toggle;
   const newTree = currentTree;
   localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
     JSON.stringify(newTree);
