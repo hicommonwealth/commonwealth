@@ -60,7 +60,7 @@ nvm install
     - This is equivalent to `yarn update`
     - Do not run `yarn upgrade` unless you are explicitly trying to upgrade packages
 - Run the development server in one terminal: `yarn start`
-- Reset the dev DB (this will wipe all data): `yarn reset-server`
+- Reset the dev DB (this will wipe all data): `yarn reset-db`
 - Connect to the dev DB: `yarn psql` (or use Postico on Mac)
 - Lint your code: `npm install -g eslint`, then `eslint [files]`
 - Lint your styles: `yarn stylelint` or `stylelint client/styles/*`
@@ -102,7 +102,7 @@ If errors occur try these steps:
 ```bash
   env: python: No such file or directory
   make: *** [Release/sass.a] Error 127
-  gyp ERR! build error 
+  gyp ERR! build error
   gyp ERR! stack Error: `make` failed with exit code: 2
 ```
 
@@ -196,7 +196,7 @@ heroku pg:psql -a <APP_NAME>
 # exit the remote server and log in to local instance
 exit
 psql -d commonwealth -U commonwealth
-# load the local .csv to the local database 
+# load the local .csv to the local database
 # example: \COPY "ChainEvents" FROM '/var/www/html/commonwealth/ChainEvents.csv' CSV;
 \COPY "<TABLE_NAME>" FROM '<LOCAL_PATH><FILENAME>.csv' CSV;
 

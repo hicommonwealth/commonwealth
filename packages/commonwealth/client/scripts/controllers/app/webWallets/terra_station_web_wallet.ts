@@ -1,6 +1,8 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
+
+import type { SessionPayload } from '@canvas-js/interfaces';
+
 import app from 'state';
 
 type TerraAddress = {
@@ -88,9 +90,10 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
     // timeout?
+    const canvas = await import('@canvas-js/interfaces');
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
         if (payload.result?.signature) resolve(payload.result);
@@ -98,24 +101,20 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(JSON.stringify(canvasMessage)),
+          bytes: Buffer.from(canvas.serializeSessionPayload(canvasMessage)),
         });
       } catch (error) {
         console.error(error);
       }
     });
 
-    console.log(result);
-    const signature = {
-      signature: {
-        pub_key: {
-          type: 'tendermint/PubKeySecp256k1',
-          value: result.public_key,
-        },
-        signature: result.signature,
+    return JSON.stringify({
+      pub_key: {
+        type: 'tendermint/PubKeySecp256k1',
+        value: result.public_key,
       },
-    };
-    return JSON.stringify(signature);
+      signature: result.signature,
+    });
   }
 }
 

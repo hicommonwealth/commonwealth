@@ -20,6 +20,8 @@ import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
+import { showCanvasVerifyDataModal } from '../../modals/canvas_verify_data_modal';
+import { verify } from '../../../helpers/canvas';
 
 type CommentAuthorProps = {
   comment: CommentType<any>;
@@ -106,6 +108,32 @@ export const Comment = (props: CommentProps) => {
     updatedCommentsCallback();
   };
 
+  // if (!this.verificationChecked) {
+  //   this.verificationChecked = true;
+  //   try {
+  //     const session = JSON.parse(comment.canvasSession);
+  //     const action = JSON.parse(comment.canvasAction);
+  //     const actionSignerAddress = session?.payload?.sessionAddress;
+  //     if (
+  //       !comment.canvasSession ||
+  //       !comment.canvasAction ||
+  //       !actionSignerAddress
+  //     )
+  //       return;
+  //     verify({ session })
+  //       .then((result) => (this.verifiedSession = true))
+  //       .catch((err) => console.log('Could not verify session'))
+  //       .finally(() => m.redraw());
+  //     verify({ action, actionSignerAddress })
+  //       .then((result) => (this.verifiedAction = true))
+  //       .catch((err) => console.log('Could not verify action'))
+  //       .finally(() => m.redraw());
+  //   } catch (err) {
+  //     console.log('Unexpected error while verifying action/session');
+  //     return;
+  //   }
+  // }
+
   return (
     <div className={`Comment comment-${comment.id}`}>
       {threadLevel > 0 && (
@@ -163,6 +191,16 @@ export const Comment = (props: CommentProps) => {
                       </CWText>
                     </div>
                   )}
+                  {/* this.verifiedAction && this.verifiedSession && (
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="verification-icon"
+                onclick={() => showCanvasVerifyDataModal(comment)}
+              >
+                <CWIcon iconName="checkCircle" iconSize="xs" />
+              </CWText>
+            ) */}
                 </div>
                 <div className="menu-buttons-right">
                   <SharePopover commentId={comment.id} />
