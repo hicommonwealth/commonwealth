@@ -23,13 +23,27 @@ class ThreadReactionsController {
     thread: Thread,
     reaction: string
   ) {
+    // TODO: use canvas id
+    const like = reaction === 'like';
+    const {
+      session = null,
+      action = null,
+      hash = null,
+    } = await app.sessions.signThreadReaction({
+          thread_id: thread.id,
+          like,
+        });
+
     const options = {
       author_chain: app.user.activeAccount.chain.id,
-      chain: app.chain.id,
       thread_id: thread.id,
+      chain: app.chain.id,
       address,
       reaction,
       jwt: app.user.jwt,
+      canvas_action: action,
+      canvas_session: session,
+      canvas_hash: hash,
     };
 
     const response = (
