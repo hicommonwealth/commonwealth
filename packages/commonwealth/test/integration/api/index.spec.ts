@@ -10,6 +10,7 @@ import app, { resetDatabase } from '../../../server-test';
 import {
   constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
+  TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../../shared/adapters/chain/ethereum/keys';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -68,14 +69,16 @@ describe('API Tests', () => {
           block_info: TEST_BLOCK_INFO_STRING,
         });
       const token = res.body.result.verification_token;
-      const chain_id = 1; // use ETH mainnet for testing
+      const chain_id = '1'; // use ETH mainnet for testing
       const sessionWallet = ethers.Wallet.createRandom();
+      const timestamp = 1665083987891;
       const message = constructCanvasMessage(
-        'eth',
+        'ethereum',
         chain_id,
         address,
         sessionWallet.address,
-        TEST_BLOCK_INFO_STRING
+        timestamp,
+        TEST_BLOCK_INFO_BLOCKHASH
       );
       const data = constructTypedCanvasMessage(message);
       const privateKey = keypair.getPrivateKey();
@@ -91,9 +94,11 @@ describe('API Tests', () => {
         .send({
           address,
           chain,
+          chain_id,
           signature,
           wallet_id,
           session_public_address: sessionWallet.address,
+          session_timestamp: timestamp,
           session_block_data: TEST_BLOCK_INFO_STRING,
         });
       expect(res.body).to.not.be.null;

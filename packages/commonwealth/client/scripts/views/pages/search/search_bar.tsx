@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
 import 'pages/search/search_bar.scss';
@@ -15,9 +15,15 @@ import {
   SearchBarCommentPreviewRow,
   SearchBarCommunityPreviewRow,
   SearchBarMemberPreviewRow,
-  SearchBarThreadPreviewRow,
+  SearchBarThreadPreviewRow
 } from './search_bar_components';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useDebounce } from 'usehooks-ts';
+
+const MIN_SEARCH_TERM_LENGTH = 4;
+const NUM_RESULTS_PER_SECTION = 2;
+
+let resetTimer = null;
 
 const goToSearchPage = (
   query: SearchQuery,
@@ -28,8 +34,9 @@ const goToSearchPage = (
     return;
   }
 
-  if (query.searchTerm.length < 4) {
-    notifyError('Query must be at least 4 characters');
+  if (query.searchTerm.length < MIN_SEARCH_TERM_LENGTH) {
+    notifyError(`Query must be at least ${MIN_SEARCH_TERM_LENGTH} characters`);
+    return;
   }
 
   app.search.addToHistory(query);
@@ -38,67 +45,24 @@ const goToSearchPage = (
 };
 
 export const SearchBar = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [searchResults, setSearchResults] =
-    useState<Record<string, Array<any>>>();
-  const [searchTerm, setSearchTerm] = useState('');
-
   const navigate = useCommonNavigate();
 
-  // const historyList = app.search.getHistory().map((previousQuery) => (
-  //   <div
-  //     className="history-row"
-  //     onClick={() => {
-  //       searchTerm = previousQuery.searchTerm;
-  //       getSearchPreview(previousQuery, this);
-  //     }}
-  //   >
-  //     {previousQuery.searchTerm}
-  //     <CWIconButton
-  //       iconName="close"
-  //       onClick={(e) => {
-  //         e.stopPropagation();
-  //         app.search.removeFromHistory(previousQuery);
-  //       }}
-  //     />
-  //   </div>
-  // ));
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<Record<string, Array<any>>>({});
 
-  const handleGetSearchPreview = async (value: string) => {
-    const searchQuery = new SearchQuery(value, {
-      isSearchPreview: true,
-      chainScope: app.activeChainId(),
-    });
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-    try {
-      await app.search.search(searchQuery);
-      const searchResponse = app.search.getByQuery(searchQuery)?.results;
+  const showDropdown = Object.keys(searchResults || {}).length > 0 && searchTerm.length > 0;
 
-      const results = searchResponse
-        ? Object.fromEntries(
-            Object.entries(searchResponse).map(([k, v]) => [k, v.slice(0, 2)])
-          )
-        : {};
-
-      setSearchResults(results);
-      app.search.addToHistory(searchQuery);
-    } catch (err) {
-      setSearchResults({});
-
-      notifyError(
-        err.responseJSON?.error || err.responseText || err.toString()
-      );
-    }
+  const resetSearchBar = () => {
+    setSearchTerm('');
+    setSearchResults({});
   };
 
   const handleGoToSearchPage = () => {
-    if (searchTerm?.length < 4) {
-      return;
-    }
-
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: app.activeChainId(),
+      chainScope: app.activeChainId()
     });
 
     goToSearchPage(searchQuery, navigate);
@@ -107,27 +71,64 @@ export const SearchBar = () => {
   const handleInputChange = (e) => {
     const value = e.target.value?.toLowerCase();
     setSearchTerm(value);
+  };
 
-    if (value?.length > 3) {
-      handleGetSearchPreview(value);
+  const handleGetSearchPreview = async (value: string) => {
+    const searchQuery = new SearchQuery(value, {
+      isSearchPreview: true,
+      chainScope: app.activeChainId()
+    });
+
+    try {
+      await app.search.search(searchQuery);
+      const searchResponse = app.search.getByQuery(searchQuery)?.results;
+
+      const results = searchResponse
+        ? Object.fromEntries(Object.entries(searchResponse).map(([k, v]) => [k, v.slice(0, NUM_RESULTS_PER_SECTION)]))
+        : {};
+
+      setSearchResults(results);
+      app.search.addToHistory(searchQuery);
+    } catch (err) {
+      setSearchResults({});
+
+      notifyError(err.responseJSON?.error || err.responseText || err.toString());
     }
   };
 
+  // when debounced search term changes, fetch search results
+  useEffect(() => {
+    clearTimeout(resetTimer);
+    if (debouncedSearchTerm?.length > 3) {
+      handleGetSearchPreview(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm]);
+
   return (
-    <div className="SearchBar">
+    <div
+      className="SearchBar"
+      onBlur={() => {
+        // give time for child click events to
+        // fire before resetting the search bar
+        if (!resetTimer) {
+          resetTimer = setTimeout(() => {
+            resetSearchBar();
+            resetTimer = null;
+          }, 300);
+        }
+      }}
+    >
       <div className="search-and-icon-container">
         <div className="search-icon">
           <CWIconButton iconName="search" onClick={handleGoToSearchPage} />
         </div>
         <input
           className={getClasses<{ isClearable: boolean }>({
-            isClearable: searchTerm?.length > 0,
+            isClearable: searchTerm?.length > 0
           })}
           placeholder="Search Common"
           value={searchTerm}
           autoComplete="off"
-          onFocus={() => setShowDropdown(true)}
-          onBlur={() => setShowDropdown(false)}
           onChange={handleInputChange}
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
@@ -140,7 +141,7 @@ export const SearchBar = () => {
             <CWIconButton iconName="close" onClick={() => setSearchTerm('')} />
           </div>
         )}
-        {searchResults && showDropdown && (
+        {showDropdown && (
           <div className="search-results-dropdown">
             {Object.values(searchResults).flat(1).length > 0 ? (
               <div className="previews-section">
@@ -149,20 +150,13 @@ export const SearchBar = () => {
                     return (
                       <div className="preview-section" key={k}>
                         <div className="section-header">
-                          <CWText
-                            type="caption"
-                            className="section-header-text"
-                          >
+                          <CWText type="caption" className="section-header-text">
                             Threads
                           </CWText>
                           <CWDivider />
                         </div>
                         {v.map((res, i) => (
-                          <SearchBarThreadPreviewRow
-                            searchResult={res}
-                            searchTerm={searchTerm}
-                            key={i}
-                          />
+                          <SearchBarThreadPreviewRow searchResult={res} searchTerm={searchTerm} key={i} />
                         ))}
                       </div>
                     );
@@ -170,20 +164,13 @@ export const SearchBar = () => {
                     return (
                       <div className="preview-section" key={k}>
                         <div className="section-header">
-                          <CWText
-                            type="caption"
-                            className="section-header-text"
-                          >
+                          <CWText type="caption" className="section-header-text">
                             Comments
                           </CWText>
                           <CWDivider />
                         </div>
                         {v.map((res, i) => (
-                          <SearchBarCommentPreviewRow
-                            key={i}
-                            searchResult={res}
-                            searchTerm={searchTerm}
-                          />
+                          <SearchBarCommentPreviewRow key={i} searchResult={res} searchTerm={searchTerm} />
                         ))}
                       </div>
                     );
@@ -191,19 +178,13 @@ export const SearchBar = () => {
                     return (
                       <div className="preview-section" key={k}>
                         <div className="section-header">
-                          <CWText
-                            type="caption"
-                            className="section-header-text"
-                          >
+                          <CWText type="caption" className="section-header-text">
                             Communities
                           </CWText>
                           <CWDivider />
                         </div>
                         {v.map((res, i) => (
-                          <SearchBarCommunityPreviewRow
-                            searchResult={res}
-                            key={i}
-                          />
+                          <SearchBarCommunityPreviewRow searchResult={res} key={i} />
                         ))}
                       </div>
                     );
@@ -211,19 +192,13 @@ export const SearchBar = () => {
                     return (
                       <div className="preview-section" key={k}>
                         <div className="section-header">
-                          <CWText
-                            type="caption"
-                            className="section-header-text"
-                          >
+                          <CWText type="caption" className="section-header-text">
                             Members
                           </CWText>
                           <CWDivider />
                         </div>
                         {v.map((res, i) => (
-                          <SearchBarMemberPreviewRow
-                            searchResult={res}
-                            key={i}
-                          />
+                          <SearchBarMemberPreviewRow searchResult={res} key={i} />
                         ))}
                       </div>
                     );
@@ -237,18 +212,6 @@ export const SearchBar = () => {
                 No Results
               </CWText>
             )}
-            {/* {historyList.length > 0 && (
-                <div className="history-section">
-                  <CWText
-                    type="caption"
-                    fontWeight="medium"
-                    className="search-history-header"
-                  >
-                    Search History
-                  </CWText>
-                  {historyList}
-                </div>
-              )} */}
           </div>
         )}
       </div>

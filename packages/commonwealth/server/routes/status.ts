@@ -19,6 +19,7 @@ import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
+import { ETH_RPC } from '../config';
 
 type ThreadCountQueryData = {
   concat: string;
@@ -52,6 +53,7 @@ type StatusResp = {
     discussionDrafts: DiscussionDraftAttributes[];
     unseenPosts: { [chain: string]: number };
   };
+  evmTestEnv?: string;
 };
 
 const status = async (
@@ -136,6 +138,7 @@ const status = async (
         chainCategories,
         chainCategoryTypes,
         recentThreads: threadCountQueryData,
+        evmTestEnv: ETH_RPC,
       });
     }
 
@@ -278,12 +281,12 @@ const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime());
       // append the SELECT query
-      query += `SELECT root_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`;
+      query += `SELECT thread_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`;
       if (i === commsAndChains.length - 1) query += ';';
     }
 
     // populate query and execute
-    const commentNum: { root_id: string; chain: string }[] = <any>(
+    const commentNum: { thread_id: string; chain: string }[] = <any>(
       await sequelize.query(query, {
         raw: true,
         type: QueryTypes.SELECT,
@@ -294,8 +297,7 @@ const status = async (
     // iterates through the retrieved comments and adds each thread id to the activePosts set
     for (const comment of commentNum) {
       if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {};
-      // extract the thread id from the comments root id
-      const id = comment.root_id.split('_')[1];
+      const id = comment.thread_id;
       unseenPosts[comment.chain].activePosts
         ? unseenPosts[comment.chain].activePosts.add(id)
         : (unseenPosts[comment.chain].activePosts = new Set(id));
@@ -364,6 +366,7 @@ const status = async (
         discussionDrafts,
         unseenPosts,
       },
+      evmTestEnv: ETH_RPC,
     });
   } catch (error) {
     console.log(error);

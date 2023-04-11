@@ -11,15 +11,11 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import { pluralize } from 'helpers';
 import { User } from 'views/components/user/user';
-import { getProposalUrl, getCommunityUrl } from 'utils';
+import { getThreadUrl, getCommunityUrl } from 'utils';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
-import { QuillFormattedText } from '../../components/quill/quill_formatted_text';
+import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
 
-const jumpHighlightNotification = (
-  commentId,
-  shouldScroll = true,
-  animationDelayTime = 2000
-) => {
+const jumpHighlightNotification = (commentId, shouldScroll = true, animationDelayTime = 2000) => {
   const $div =
     commentId === 'parent' || commentId === 'body'
       ? $('html, body').find('.ProposalHeader')
@@ -73,9 +69,7 @@ const getCommentPreview = (commentText) => {
       doc = doc.replace(match[0], match[1]);
     });
 
-    decodedCommentText = (
-      <MarkdownFormattedText doc={doc.slice(0, 140)} hideFormatting collapse />
-    );
+    decodedCommentText = <MarkdownFormattedText doc={doc.slice(0, 140)} hideFormatting collapse />;
   }
 
   return decodedCommentText;
@@ -84,7 +78,7 @@ const getCommentPreview = (commentText) => {
 const getNotificationFields = (category, data: IPostNotificationData) => {
   const {
     created_at,
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -92,14 +86,13 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     parent_comment_id,
     chain_id,
     author_address,
-    author_chain,
+    author_chain
   } = data;
 
   let notificationHeader;
   let notificationBody;
 
-  const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+  const communityName = app.config.chains.getById(chain_id)?.name || 'Unknown chain';
 
   const decodedTitle = decodeURIComponent(root_title).trim();
 
@@ -109,12 +102,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = (
-    <User
-      user={new AddressInfo(null, author_address, author_chain, null)}
-      hideAvatar
-    />
-  );
+  const actorName = <User user={new AddressInfo(null, author_address, author_chain, null)} hideAvatar />;
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -158,20 +146,16 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   }
 
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: chain_id
   };
 
-  const args = comment_id
-    ? [root_type, pseudoProposal, { id: comment_id }]
-    : [root_type, pseudoProposal];
+  const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
 
-  const path = (getProposalUrl as any)(...args);
+  const path = (getThreadUrl as any)(...args);
 
-  const pageJump = comment_id
-    ? () => jumpHighlightNotification(comment_id)
-    : () => jumpHighlightNotification('parent');
+  const pageJump = comment_id ? () => jumpHighlightNotification(comment_id) : () => jumpHighlightNotification('parent');
 
   return {
     authorInfo: [[author_chain, author_address]],
@@ -179,21 +163,18 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationHeader,
     notificationBody,
     path,
-    pageJump,
+    pageJump
   };
 };
 
-export const getBatchNotificationFields = (
-  category,
-  data: IPostNotificationData[]
-) => {
+export const getBatchNotificationFields = (category, data: IPostNotificationData[]) => {
   if (data.length === 1) {
     return getNotificationFields(category, data[0]);
   }
 
   const {
     created_at,
-    root_id,
+    thread_id,
     root_title,
     root_type,
     comment_id,
@@ -201,17 +182,14 @@ export const getBatchNotificationFields = (
     parent_comment_id,
     chain_id,
     author_address,
-    author_chain,
+    author_chain
   } = data[0];
 
-  const authorInfo = _.uniq(
-    data.map((d) => `${d.author_chain}#${d.author_address}`)
-  ).map((u) => u.split('#'));
+  const authorInfo = _.uniq(data.map((d) => `${d.author_chain}#${d.author_address}`)).map((u) => u.split('#'));
 
   const length = authorInfo.length - 1;
 
-  const communityName =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+  const communityName = app.config.chains.getById(chain_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
@@ -223,12 +201,7 @@ export const getBatchNotificationFields = (
     notificationBody = null;
   }
 
-  const actorName = (
-    <User
-      user={new AddressInfo(null, author_address, author_chain, null)}
-      hideAvatar
-    />
-  );
+  const actorName = <User user={new AddressInfo(null, author_address, author_chain, null)} hideAvatar />;
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -249,58 +222,47 @@ export const getBatchNotificationFields = (
     notificationHeader = (
       <div>
         {actorName}
-        {length > 0 && ` and ${pluralize(length, 'other')}`} created new threads
-        in {communityName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} created new threads in {communityName}
       </div>
     );
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = !comment_id ? (
       <div>
         {actorName}
-        {length > 0 && ` and ${pluralize(length, 'other')}`} mentioned you in{' '}
-        {communityName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} mentioned you in {communityName}
       </div>
     ) : (
       <div>
         {actorName}
-        {length > 0 && ` and ${pluralize(length, 'other')}`} mentioned you in{' '}
-        {decodedTitle || communityName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} mentioned you in {decodedTitle || communityName}
       </div>
     );
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = !comment_id ? (
       <div>
         {actorName}
-        {length > 0 && ` and ${pluralize(length, 'other')}`} liked the post{' '}
-        {communityName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} liked the post {communityName}
       </div>
     ) : (
       <div>
         {actorName}
-        {length > 0 && ` and ${pluralize(length, 'other')}`} liked your comment
-        in {decodedTitle || communityName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} liked your comment in {decodedTitle || communityName}
       </div>
     );
   }
 
   const pseudoProposal = {
-    id: root_id,
+    id: thread_id,
     title: root_title,
-    chain: chain_id,
+    chain: chain_id
   };
 
-  const args = comment_id
-    ? [root_type, pseudoProposal, { id: comment_id }]
-    : [root_type, pseudoProposal];
+  const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
 
   const path =
-    category === NotificationCategories.NewThread
-      ? (getCommunityUrl as any)(chain_id)
-      : (getProposalUrl as any)(...args);
+    category === NotificationCategories.NewThread ? (getCommunityUrl as any)(chain_id) : (getThreadUrl as any)(...args);
 
-  const pageJump = comment_id
-    ? () => jumpHighlightNotification(comment_id)
-    : () => jumpHighlightNotification('parent');
+  const pageJump = comment_id ? () => jumpHighlightNotification(comment_id) : () => jumpHighlightNotification('parent');
 
   return {
     authorInfo,
@@ -308,6 +270,6 @@ export const getBatchNotificationFields = (
     notificationHeader,
     notificationBody,
     path,
-    pageJump,
+    pageJump
   };
 };

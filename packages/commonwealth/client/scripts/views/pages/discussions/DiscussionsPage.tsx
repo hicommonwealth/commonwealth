@@ -40,7 +40,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     }
 
     return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
-  }, [threads]);
+  }, [stageName, topicName]);
 
   if (initializing) {
     return <PageLoading />;

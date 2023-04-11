@@ -20,12 +20,17 @@ export type ThreadAttributes = {
   topic_id?: number;
   pinned?: boolean;
   chain: string;
+  view_count: number;
 
   read_only?: boolean;
   version_history?: string[];
   snapshot_proposal?: string;
 
   has_poll?: boolean;
+
+  canvas_action: string;
+  canvas_session: string;
+  canvas_hash: string;
 
   created_at?: Date;
   updated_at?: Date;
@@ -74,6 +79,11 @@ export default (
         allowNull: false,
       },
       chain: { type: dataTypes.STRING, allowNull: false },
+      view_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -88,6 +98,11 @@ export default (
 
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
+      // signed data
+      canvas_action: { type: dataTypes.JSONB, allowNull: true },
+      canvas_session: { type: dataTypes.JSONB, allowNull: true },
+      canvas_hash: { type: dataTypes.STRING, allowNull: true },
+      // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -108,6 +123,7 @@ export default (
         { fields: ['chain', 'updated_at'] },
         { fields: ['chain', 'pinned'] },
         { fields: ['chain', 'has_poll'] },
+        { fields: ['canvas_hash'] },
       ],
     }
   );

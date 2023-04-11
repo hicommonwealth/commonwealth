@@ -7,9 +7,9 @@ import $ from 'jquery';
 import type { NotificationSubscription } from 'models';
 
 import app from 'state';
-import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
-import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { DashboardViews } from '.';
+import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
+import { MarkdownFormattedText } from '../../components/react_quill_editor/markdown_formatted_text';
 
 export const getCommentPreview = (commentText) => {
   // TODO Graham 6-5-22: Duplicate with notification_row.ts? See relevant note there
@@ -32,9 +32,7 @@ export const getCommentPreview = (commentText) => {
       doc = doc.replace(match[0], match[1]);
     });
 
-    decodedCommentText = (
-      <MarkdownFormattedText doc={doc.slice(0, 140)} collapse />
-    );
+    decodedCommentText = <MarkdownFormattedText doc={doc.slice(0, 140)} />;
   }
 
   return decodedCommentText;
@@ -50,32 +48,20 @@ export const subscribeToThread = async (
   const adjustedId = `discussion_${threadId}`;
 
   if (bothActive) {
-    await app.user.notifications.disableSubscriptions([
-      commentSubscription,
-      reactionSubscription,
-    ]);
+    await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
 
     notifySuccess('Unsubscribed!');
     return Promise.resolve();
   } else if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
-      app.user.notifications.subscribe(
-        NotificationCategories.NewReaction,
-        adjustedId
-      ),
-      app.user.notifications.subscribe(
-        NotificationCategories.NewComment,
-        adjustedId
-      ),
+      app.user.notifications.subscribe(NotificationCategories.NewReaction, adjustedId),
+      app.user.notifications.subscribe(NotificationCategories.NewComment, adjustedId)
     ]);
 
     notifySuccess('Subscribed!');
     return Promise.resolve();
   } else {
-    await app.user.notifications.enableSubscriptions([
-      commentSubscription,
-      reactionSubscription,
-    ]);
+    await app.user.notifications.enableSubscriptions([commentSubscription, reactionSubscription]);
 
     notifySuccess('Subscribed!');
     return Promise.resolve();
@@ -86,12 +72,12 @@ export const fetchActivity = async (requestType: DashboardViews) => {
   let activity;
   if (requestType === DashboardViews.ForYou) {
     activity = await $.post(`${app.serverUrl()}/viewUserActivity`, {
-      jwt: app.user.jwt,
+      jwt: app.user.jwt
     });
   } else if (requestType === DashboardViews.Chain) {
     const events = await getFetch(`${app.serverUrl()}/ce/events`, {
       limit: 50,
-      ordered: true,
+      ordered: true
     });
 
     if (!Array.isArray(events)) {
@@ -103,10 +89,12 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       chains.add(event.chain);
     }
 
-    const res: { result: { id: string; icon_url: string }[]; status: boolean } =
-      await $.post(`${app.serverUrl()}/viewChainIcons`, {
-        chains: JSON.stringify(Array.from(chains)),
-      });
+    const res: { result: { id: string; icon_url: string }[]; status: boolean } = await $.post(
+      `${app.serverUrl()}/viewChainIcons`,
+      {
+        chains: JSON.stringify(Array.from(chains))
+      }
+    );
 
     const chainIconUrls = {};
     for (const item of res.result) {
@@ -119,7 +107,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
 
     activity = {
       status: 'Success',
-      result: events,
+      result: events
     };
   } else if (requestType === DashboardViews.Global) {
     activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);

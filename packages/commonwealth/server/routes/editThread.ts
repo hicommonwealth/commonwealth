@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import {
-  getProposalUrl,
+  getThreadUrl,
   renderQuillDeltaToText,
   validURL,
 } from '../../shared/utils';
@@ -28,7 +28,17 @@ const editThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { body, title, kind, stage, thread_id, url } = req.body;
+  const {
+    body,
+    title,
+    kind,
+    stage,
+    thread_id,
+    url,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
   if (!thread_id) {
     return next(new AppError(Errors.NoThreadId));
   }
@@ -137,6 +147,9 @@ const editThread = async (
     }
     thread.body = body;
     thread.stage = stage;
+    thread.canvas_action = canvas_action;
+    thread.canvas_session = canvas_session;
+    thread.canvas_hash = canvas_hash;
     thread.plaintext = (() => {
       try {
         return renderQuillDeltaToText(JSON.parse(decodeURIComponent(body)));
@@ -179,7 +192,7 @@ const editThread = async (
       '',
       {
         created_at: new Date(),
-        root_id: +finalThread.id,
+        thread_id: +finalThread.id,
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
@@ -245,7 +258,7 @@ const editThread = async (
           `user-${mentionedAddress.User.id}`,
           {
             created_at: new Date(),
-            root_id: +finalThread.id,
+            thread_id: +finalThread.id,
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
@@ -253,14 +266,7 @@ const editThread = async (
             author_address: finalThread.Address.address,
             author_chain: finalThread.Address.chain,
           },
-          {
-            user: finalThread.Address.address,
-            url: getProposalUrl('discussion', finalThread),
-            title: req.body.title,
-            bodyUrl: req.body.url,
-            chain: finalThread.chain,
-            body: finalThread.body,
-          },
+          null,
           [finalThread.Address.address]
         );
       });

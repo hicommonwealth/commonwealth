@@ -71,6 +71,14 @@ export const NewThreadForm = () => {
 
     setIsSaving(true);
 
+    const { session, action, hash } = await app.sessions.signThread({
+      community: app.activeChainId(),
+      title: threadTitle,
+      body: deltaString,
+      link: threadUrl,
+      topic: threadTopic,
+    });
+
     try {
       const result = await app.threads.create(
         author.address,

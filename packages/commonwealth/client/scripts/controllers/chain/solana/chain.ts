@@ -10,8 +10,6 @@ import type SolanaAccount from './account';
 
 import { SolanaToken } from './types';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 export default class SolanaChain
   implements IChainModule<SolanaToken, SolanaAccount>
 {
