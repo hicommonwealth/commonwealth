@@ -27,8 +27,7 @@ class NewProfilesController {
     this._unfetched = [];
     this._fetchNewProfiles = _.debounce(() => {
       this._refreshProfiles(this._unfetched);
-      this._unfetched.splice(0);
-    }, 1000);
+    }, 500);
   }
 
   public getProfile(chain: string, address: string) {
@@ -60,6 +59,10 @@ class NewProfilesController {
   }
 
   private async _refreshProfiles(profiles: Profile[]): Promise<void> {
+    if (profiles.length === 0) {
+      return;
+    }
+
     const requestData =
       profiles.length === 1
         ? {
@@ -90,12 +93,10 @@ class NewProfilesController {
           result.lastActive
         );
       } else {
-
+        const resultMap = new Map(result.map(r => [r.address, r]));
         // multiple profiles
-        profiles.map((profile) => {
-          const currentProfile = result.find(
-            (r) => r.address === profile.address
-          );
+        profiles.forEach((profile) => {
+          const currentProfile = resultMap.get(profile.address) as any;
           profile.initialize(
             currentProfile.name,
             currentProfile.address,
