@@ -8,6 +8,7 @@ import type {
   BankExtension,
   Coin,
 } from '@cosmjs/stargate';
+import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
 
 export interface ListenerOptions {
   url: string;
@@ -17,7 +18,17 @@ export interface ListenerOptions {
 
 export type Api = {
   tm: Tendermint34Client;
-  lcd: QueryClient & StakingExtension & GovExtension & BankExtension;
+  rpc: QueryClient & StakingExtension & GovExtension & BankExtension;
+  lcd: LCD;
+};
+
+// currently just used for gov v1, but this can be expanded
+export type LCD = {
+  cosmos: {
+    gov: {
+      v1: GovV1Client;
+    };
+  };
 };
 
 export type RawEvent = {
