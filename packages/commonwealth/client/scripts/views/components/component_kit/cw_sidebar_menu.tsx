@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { redraw } from 'mithrilInterop';
 
@@ -48,6 +48,10 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
   } else if (props.type === 'community') {
     const item = props.community;
     const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
+    const [isStarred, setIsStarred] = useState(
+      app.communities.isStarred(item.id)
+    );
+
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
@@ -79,14 +83,11 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
               }
             />
             <div
-              className={
-                app.communities.isStarred(item.id)
-                  ? 'star-filled'
-                  : 'star-empty'
-              }
+              className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await app.communities.setStarred(item.id);
+                setIsStarred((prevState) => !prevState);
                 redraw();
               }}
             />
