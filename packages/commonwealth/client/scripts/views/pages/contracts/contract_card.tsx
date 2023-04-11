@@ -20,8 +20,7 @@ type ContractCardProps = {
   id: number;
   address: string;
   templates: Contract['ccts'];
-  onDeleteSuccess: () => void;
-  onEditSuccess: () => void;
+  onUpdateSuccess: () => void;
 };
 
 type ManageContractTemplateModalData = Omit<
@@ -33,8 +32,7 @@ export const ContractCard = ({
   address,
   templates,
   id,
-  onDeleteSuccess,
-  onEditSuccess,
+  onUpdateSuccess,
 }: ContractCardProps) => {
   const navigate = useCommonNavigate();
 
@@ -62,7 +60,7 @@ export const ContractCard = ({
               await app.contracts.deleteCommunityContract({
                 contract_id: id,
               });
-              onDeleteSuccess();
+              onUpdateSuccess();
             } catch (err) {
               console.log(err);
             }
@@ -130,7 +128,7 @@ export const ContractCard = ({
                     cctmd_id={template.cctmd.id}
                     cct_id={template.id}
                     handleShowModal={handleOpenManageContractTemplateModal}
-                    onDeleteSuccess={onEditSuccess}
+                    onUpdateSuccess={onUpdateSuccess}
                   />
                 ))}
               </div>
@@ -174,7 +172,7 @@ export const ContractCard = ({
               }
               onModalClose={() => {
                 setManageContractTemplateModalData(null);
-                onEditSuccess();
+                onUpdateSuccess();
               }}
             />
           }

@@ -26,12 +26,7 @@ const ContractsPage = () => {
     return <PageLoading message="Contracts Page" />;
   }
 
-  const onDeleteSuccess = () => {
-    const updatedContracts = app.contracts.store.getCommunityContracts();
-    setContracts([...updatedContracts]);
-  };
-
-  const onEditSuccess = () => {
+  const onUpdateSuccess = () => {
     const updatedContracts = app.contracts.store.getCommunityContracts();
     setContracts([...updatedContracts]);
   };
@@ -62,8 +57,7 @@ const ContractsPage = () => {
                 id={contract.id}
                 address={contract.address}
                 templates={contract.ccts}
-                onDeleteSuccess={onDeleteSuccess}
-                onEditSuccess={onEditSuccess}
+                onUpdateSuccess={onUpdateSuccess}
               />
             ))}
           </div>
