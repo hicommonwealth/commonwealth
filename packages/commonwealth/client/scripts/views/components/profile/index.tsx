@@ -95,7 +95,7 @@ const ProfileComponent = (props: ProfileProps) => {
     return (
       <div className="Profile loading">
         <div className="loading-spinner">
-          <CWSpinner />
+          <CWSpinner shouldDebounce />
         </div>
       </div>
     );

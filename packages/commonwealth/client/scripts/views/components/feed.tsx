@@ -58,7 +58,7 @@ export const Feed = ({
     getData();
   }, []);
 
-  if (loading) return <CWSpinner />;
+  if (loading) return <CWSpinner shouldDebounce />;
 
   if (error) {
     return <PageNotFound message="There was an error rendering the feed." />;

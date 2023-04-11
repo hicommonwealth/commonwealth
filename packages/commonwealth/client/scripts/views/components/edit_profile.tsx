@@ -213,7 +213,7 @@ const EditProfileComponent = () => {
     return (
       <div className="EditProfile full-height">
         <div className="loading-spinner">
-          <CWSpinner />
+          <CWSpinner shouldDebounce />
         </div>
       </div>
     );
