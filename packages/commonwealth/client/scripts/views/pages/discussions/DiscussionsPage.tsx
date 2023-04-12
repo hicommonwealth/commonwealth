@@ -45,26 +45,28 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   if (initializing) {
     return <PageLoading />;
   }
-  return (
-    <Sublayout>
-      <div className="DiscussionsPage">
-        <RecentThreadsHeader
-          topic={topicName}
-          stage={stageName}
-          totalThreadCount={threads?.length || 0}
-        />
-        <Virtuoso
-          style={{ height: '100%', width: '100%' }}
-          data={threads}
-          itemContent={(i, thread) => {
-            return <ThreadPreview thread={thread} key={`${i}`} />;
-          }}
-          endReached={loadMore}
-          overscan={200}
-        />
-      </div>
-    </Sublayout>
-  );
-};
+  return <Sublayout hideFooter={true}>
+    <Virtuoso
+      style={{ height: '100%', width: '100%' }}
+      data={threads}
+      itemContent={(i, thread) => {
+        return <ThreadPreview thread={thread} key={`${i}`}/>;
+      }}
+      endReached={loadMore}
+      overscan={200}
+      components={{
+        Header: () => {
+          return <div className="DiscussionsPage">
+            <RecentThreadsHeader
+              topic={topicName}
+              stage={stageName}
+              totalThreadCount={threads.length}
+            />
+          </div>;
+        }
+      }}
+    />
+  </Sublayout>;
+}
 
 export default DiscussionsPage;
