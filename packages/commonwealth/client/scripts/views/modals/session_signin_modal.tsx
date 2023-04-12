@@ -65,3 +65,21 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
     </div>
   );
 };
+
+export const showSessionSigninModal = () => {
+  const id = uuidv4();
+  const target = document.createElement('div');
+  let root: Root = null;
+
+  target.id = id;
+
+  const removeModal = () => {
+    root.unmount();
+    target.remove();
+  };
+
+  root = createRoot(target);
+  root.render(<SessionSigninModal removeModal={removeModal} />);
+
+  return { remove: removeModal };
+};

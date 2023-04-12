@@ -1,5 +1,5 @@
 import { IWebWallet, Account } from 'models';
-import { sessionSigninModal } from 'views/modals/session_signin_modal';
+import { showSessionSigninModal } from 'views/modals/session_signin_modal';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import {
@@ -131,7 +131,7 @@ class SessionsController {
     );
 
     if (!hasAuthenticatedSession) {
-      await sessionSigninModal().catch((err) => {
+      await showSessionSigninModal().catch((err) => {
         console.log('Login failed');
         throw err;
       });
