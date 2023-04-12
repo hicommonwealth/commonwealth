@@ -17,11 +17,7 @@ export const PageLoading = (props: PageLoadingProps) => {
     <Sublayout hideSearch>
       <div className="LoadingPage">
         <div className="inner-content">
-          <CWSpinner
-            size="xl"
-            shouldDebounce={!message}
-            debounceMilliseconds={500}
-          />
+          <CWSpinner size="xl" shouldDebounce={!message} />
           <CWText>{message}</CWText>
         </div>
       </div>
