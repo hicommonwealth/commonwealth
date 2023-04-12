@@ -20,7 +20,6 @@ import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 
-import { factory, formatFilename } from 'common-common/src/logging';
 import { verifyReaction } from '../../shared/canvas/serverVerify';
 
 const log = factory.getLogger(formatFilename(__filename));

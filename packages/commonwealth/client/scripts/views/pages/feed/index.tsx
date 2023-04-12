@@ -79,7 +79,7 @@ const FeedPage = () => {
         <CWText type="h3" fontWeight="semiBold">
           Home
         </CWText>
-        <Feed fetchData={getCombinedFeed} noFeedMessage="No activity yet" />
+      <Feed fetchData={getCombinedFeed} noFeedMessage={<>"No activity yet"</>} />
       </div>
     </Sublayout>
   );

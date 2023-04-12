@@ -139,7 +139,7 @@ class CommentsController {
     try {
       // TODO: Create a new type for proposal comments?
       const { session, action, hash } = await app.sessions.signComment({
-        thread_id: proposalIdentifier,
+        thread_id: threadId,
         body: unescapedText,
         parent_comment_id: parentCommentId,
       });
@@ -184,7 +184,7 @@ class CommentsController {
     try {
       // TODO: Change to PUT /comment
       const { session, action, hash } = await app.sessions.signComment({
-        thread_id: comment.rootProposal,
+        thread_id: comment.threadId,
         body,
         parent_comment_id: comment.parentComment,
       });

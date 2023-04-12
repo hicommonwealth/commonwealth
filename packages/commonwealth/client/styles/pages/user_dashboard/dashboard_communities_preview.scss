@@ -38,6 +38,11 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  position: fixed;
+  right: 50px;
+  float: right;
+  top: 70px;
+  z-index: 1;
 
   @include mediumSmallInclusive {
     display: none;

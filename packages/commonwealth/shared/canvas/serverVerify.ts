@@ -1,4 +1,3 @@
-import esm from "esm";
 import { getActionHash, getSessionHash } from '@canvas-js/interfaces';
 import { chainBaseToCanvasChain } from "./chainMappings";
 import { verify } from "./verify";

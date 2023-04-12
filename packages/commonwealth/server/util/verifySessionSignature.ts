@@ -15,10 +15,9 @@ import {
 } from 'common-common/src/types';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
-import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 
-import { getCosmosSessionSignatureData } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
+import { getCosmosSessionSignatureData } from '../../shared/adapters/chain/cosmos/keys';
 import { addressSwapper } from '../../shared/utils';
 import {
   chainBaseToCanvasChain,

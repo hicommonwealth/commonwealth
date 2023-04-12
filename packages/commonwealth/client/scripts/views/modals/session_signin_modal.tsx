@@ -58,22 +58,10 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
             }}
             accountVerifiedCallback={() => onModalClose()}
             linking={false}
-            hideConnectAnotherWayLink={true}
             showResetWalletConnect={wcEnabled}
           />
         </div>
       </div>
     </div>
   );
-};
-
-export const sessionSigninModal = () => {
-  return new Promise<void>((resolve, reject) => {
-    app.modals.create({
-      modal: SessionSigninModal,
-      data: {},
-      completeCallback: () => resolve(),
-      exitCallback: () => reject(new Error('Invalid signature')),
-    });
-  });
 };

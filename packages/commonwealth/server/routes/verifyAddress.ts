@@ -23,8 +23,6 @@ import {
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 
-import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
-import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
