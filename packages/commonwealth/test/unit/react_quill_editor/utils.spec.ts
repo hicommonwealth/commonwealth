@@ -18,6 +18,18 @@ describe('react quill editor unit tests', () => {
       assert.deepEqual(result, expectedDelta)
     })
 
+    it('should convert text to delta (richtext) – bad input case', () => {
+      const text = null
+      const expectedDelta = {
+        ops: [
+          { insert: '' }
+        ],
+        ___isMarkdown: false
+      } as any as SerializableDeltaStatic
+      const result = createDeltaFromText(text)
+      assert.deepEqual(result, expectedDelta)
+    })
+
     it('should convert text to delta (markdown)', () => {
       const text = 'hello'
       const expectedDelta = {
@@ -106,7 +118,7 @@ describe('react quill editor unit tests', () => {
 
   describe('deserializeDelta', () => {
 
-    it('should deserialize at string (richtext) to DeltaStatic', () => {
+    it('should deserialize a string (richtext) to DeltaStatic', () => {
       const original = '{"ops":[{"insert":"hello"}],"___isMarkdown":false}'
       const expectedOutput = {
         ops: [
@@ -118,7 +130,20 @@ describe('react quill editor unit tests', () => {
       assert.deepEqual(result, expectedOutput)
     })
 
-    it('should deserialize at string (markdown) to DeltaStatic', () => {
+    it('should deserialize a string (richtext) to DeltaStatic - bad input case', () => {
+      // bad input should return an empty richtext delta
+      const original = null
+      const expectedOutput = {
+        ops: [
+          { insert: '' }
+        ],
+        ___isMarkdown: false
+      } as SerializableDeltaStatic
+      const result = deserializeDelta(original)
+      assert.deepEqual(result, expectedOutput)
+    })
+
+    it('should deserialize a string (markdown) to DeltaStatic', () => {
       const original = 'hello'
       const expectedOutput = {
         ops: [
