@@ -102,11 +102,12 @@ export class ChainTesting {
    * Get voting power via ERC20 token for a given wallet
    * @param accountIndex account index of test chain to get tokens
    * @param numberOfVotes amount of votes/tokens to receive
+   * @param govType type of governor. 'compound' || 'aave
    */
   public async getVotingPower(
     accountIndex: number,
     numberOfVotes: string,
-    govType: string = 'compound'
+    govType = 'compound'
   ) {
     const request: govCompGetVotes = { accountIndex, numberOfVotes };
     const response = await axios.post(
@@ -125,7 +126,7 @@ export class ChainTesting {
    */
   public async createProposal(
     accountIndex: number,
-    govType: string = 'compound'
+    govType = 'compound'
   ): Promise<any> {
     const request: govCompCreate = { accountIndex };
     const response = await axios.post(
@@ -144,7 +145,7 @@ export class ChainTesting {
    */
   public async cancelProposal(
     proposalId: string,
-    govType: string = 'compound'
+    govType = 'compound'
   ): Promise<any> {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
@@ -166,7 +167,7 @@ export class ChainTesting {
     proposalId: string,
     accountIndex: number,
     forAgainst: boolean,
-    govType: string = 'compound'
+    govType = 'compound'
   ) {
     const request: govCompVote = { proposalId, accountIndex, forAgainst };
     const response = await axios.post(
@@ -182,7 +183,7 @@ export class ChainTesting {
    * @param proposalId
    * @param govType type of governor. 'compound' || 'aave
    */
-  public async queueProposal(proposalId: string, govType: string = 'compound') {
+  public async queueProposal(proposalId: string, govType = 'compound') {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
       `${this.host}/gov/${govType}/queue`,
@@ -199,7 +200,7 @@ export class ChainTesting {
    */
   public async executeProposal(
     proposalId: string,
-    govType: string = 'compound'
+    govType = 'compound'
   ) {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
@@ -214,7 +215,7 @@ export class ChainTesting {
    * Runs a full proposal cycle from getting voting power to execution
    * @param govType type of governor. 'compound' || 'aave
    */
-  public async runProposalCycle(govType: string = 'compound') {
+  public async runProposalCycle(govType = 'compound') {
     await axios.get(`${this.host}/gov/${govType}/runFullCylce`);
   }
 
@@ -226,7 +227,7 @@ export class ChainTesting {
    */
   public async getProposalDetails(
     proposalId: string,
-    govType: string = 'compound'
+    govType = 'compound'
   ) {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
