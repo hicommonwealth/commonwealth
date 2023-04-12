@@ -20,16 +20,9 @@ type EditCommentProps = {
 };
 
 export const EditComment = (props: EditCommentProps) => {
-  const {
-    comment,
-    savedEdits,
-    setIsEditing,
-    shouldRestoreEdits,
-    updatedCommentsCallback,
-  } = props;
+  const { comment, savedEdits, setIsEditing, shouldRestoreEdits, updatedCommentsCallback } = props;
 
-  const commentBody =
-    shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+  const commentBody = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
   const body = deserializeDelta(commentBody);
 
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
@@ -41,9 +34,7 @@ export const EditComment = (props: EditCommentProps) => {
     let cancelConfirmed = true;
 
     if (JSON.stringify(body) !== JSON.stringify(contentDelta)) {
-      cancelConfirmed = window.confirm(
-        'Cancel editing? Changes will not be saved.'
-      );
+      cancelConfirmed = window.confirm('Cancel editing? Changes will not be saved.');
     }
 
     if (cancelConfirmed) {
@@ -71,17 +62,9 @@ export const EditComment = (props: EditCommentProps) => {
 
   return (
     <div className="EditComment">
-      <ReactQuillEditor
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-      />
+      <ReactQuillEditor contentDelta={contentDelta} setContentDelta={setContentDelta} />
       <div className="buttons-row">
-        <CWButton
-          label="Cancel"
-          disabled={saving}
-          buttonType="secondary-blue"
-          onClick={cancel}
-        />
+        <CWButton label="Cancel" disabled={saving} buttonType="secondary-blue" onClick={cancel} />
         <CWButton label="Save" disabled={saving} onClick={save} />
       </div>
     </div>

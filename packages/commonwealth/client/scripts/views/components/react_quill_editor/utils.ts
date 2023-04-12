@@ -2,17 +2,14 @@ import axios from 'axios';
 import type { DeltaStatic } from 'quill';
 
 // createDeltaFromText returns a new DeltaStatic object from a string
-export const createDeltaFromText = (
-  str: string,
-  isMarkdown?: boolean
-): SerializableDeltaStatic => {
+export const createDeltaFromText = (str: string, isMarkdown?: boolean): SerializableDeltaStatic => {
   return {
     ops: [
       {
-        insert: str || '',
-      },
+        insert: str || ''
+      }
     ],
-    ___isMarkdown: !!isMarkdown,
+    ___isMarkdown: !!isMarkdown
   } as SerializableDeltaStatic;
 };
 
@@ -53,11 +50,7 @@ export const base64ToFile = (data: string, fileType: string): File => {
 };
 
 // uploadFileToS3 uploads file data to S3 and returns the URL for the file
-export const uploadFileToS3 = async (
-  file: File,
-  appServerUrl: string,
-  jwtToken: string
-): Promise<string> => {
+export const uploadFileToS3 = async (file: File, appServerUrl: string, jwtToken: string): Promise<string> => {
   try {
     // get a signed upload URL for s3
     const sigResponse = await axios.post(
@@ -66,14 +59,12 @@ export const uploadFileToS3 = async (
         mimetype: file.type,
         name: file.name,
         auth: 'true',
-        jwt: jwtToken,
+        jwt: jwtToken
       })
     );
 
     if (sigResponse.status != 200) {
-      throw new Error(
-        `failed to get an S3 signed upload URL: ${sigResponse.data.error}`
-      );
+      throw new Error(`failed to get an S3 signed upload URL: ${sigResponse.data.error}`);
     }
 
     const signedUploadUrl = sigResponse.data.result;
@@ -81,8 +72,8 @@ export const uploadFileToS3 = async (
     // upload the file via the signed URL
     await axios.put(signedUploadUrl, file, {
       params: {
-        'Content-Type': file.type,
-      },
+        'Content-Type': file.type
+      }
     });
 
     const trimmedURL = signedUploadUrl.split('?')[0];
@@ -126,7 +117,7 @@ export const deserializeDelta = (str: string): DeltaStatic => {
 };
 
 // countLinesQuill returns the number of text lines for a quill ops array
-export const countLinesQuill = (delta: DeltaStatic) : number => {
+export const countLinesQuill = (delta: DeltaStatic): number => {
   if (!delta || !delta.ops) {
     return 0;
   }
