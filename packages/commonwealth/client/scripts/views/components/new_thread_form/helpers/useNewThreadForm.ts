@@ -6,9 +6,7 @@ import { ThreadKind } from 'models';
 import { getTextFromDelta } from '../../react_quill_editor';
 
 const useNewThreadForm = (authorName: string, hasTopics: boolean) => {
-  const [threadKind, setThreadKind] = useState<ThreadKind>(
-    ThreadKind.Discussion
-  );
+  const [threadKind, setThreadKind] = useState<ThreadKind>(ThreadKind.Discussion);
   const [threadTitle, setThreadTitle] = useState('');
   const [threadTopic, setThreadTopic] = useState<Topic>(null);
   const [threadUrl, setThreadUrl] = useState('');
@@ -24,12 +22,7 @@ const useNewThreadForm = (authorName: string, hasTopics: boolean) => {
   const linkContentMissing = !isDiscussion && !threadUrl;
   const contentMissing = editorText.length === 0;
 
-  const isDisabled =
-    disableSave ||
-    titleMissing ||
-    topicMissing ||
-    linkContentMissing ||
-    contentMissing;
+  const isDisabled = disableSave || titleMissing || topicMissing || linkContentMissing || contentMissing;
 
   return {
     threadKind,
@@ -44,7 +37,7 @@ const useNewThreadForm = (authorName: string, hasTopics: boolean) => {
     setThreadContentDelta,
     isSaving,
     setIsSaving,
-    isDisabled,
+    isDisabled
   };
 };
 
