@@ -1,14 +1,14 @@
-import * as _m0 from "protobufjs/minimal";
-import { isSet, bytesFromBase64, base64FromBytes } from "../../helpers";
+import * as _m0 from 'protobufjs/minimal';
+import { isSet, bytesFromBase64, base64FromBytes } from '../../helpers';
 /**
  * `Any` contains an arbitrary serialized protocol buffer message along with a
  * URL that describes the type of the serialized message.
- * 
+ *
  * Protobuf library provides support to pack/unpack Any values in the form
  * of utility functions or additional generated methods of the Any type.
- * 
+ *
  * Example 1: Pack and unpack a message in C++.
- * 
+ *
  *     Foo foo = ...;
  *     Any any;
  *     any.PackFrom(foo);
@@ -16,18 +16,18 @@ import { isSet, bytesFromBase64, base64FromBytes } from "../../helpers";
  *     if (any.UnpackTo(&foo)) {
  *       ...
  *     }
- * 
+ *
  * Example 2: Pack and unpack a message in Java.
- * 
+ *
  *     Foo foo = ...;
  *     Any any = Any.pack(foo);
  *     ...
  *     if (any.is(Foo.class)) {
  *       foo = any.unpack(Foo.class);
  *     }
- * 
+ *
  *  Example 3: Pack and unpack a message in Python.
- * 
+ *
  *     foo = Foo(...)
  *     any = Any()
  *     any.Pack(foo)
@@ -35,9 +35,9 @@ import { isSet, bytesFromBase64, base64FromBytes } from "../../helpers";
  *     if any.Is(Foo.DESCRIPTOR):
  *       any.Unpack(foo)
  *       ...
- * 
+ *
  *  Example 4: Pack and unpack a message in Go
- * 
+ *
  *      foo := &pb.Foo{...}
  *      any, err := ptypes.MarshalAny(foo)
  *      ...
@@ -45,37 +45,37 @@ import { isSet, bytesFromBase64, base64FromBytes } from "../../helpers";
  *      if err := ptypes.UnmarshalAny(any, foo); err != nil {
  *        ...
  *      }
- * 
+ *
  * The pack methods provided by protobuf library will by default use
  * 'type.googleapis.com/full.type.name' as the type URL and the unpack
  * methods only use the fully qualified type name after the last '/'
  * in the type URL, for example "foo.bar.com/x/y.z" will yield type
  * name "y.z".
- * 
- * 
+ *
+ *
  * JSON
  * ====
  * The JSON representation of an `Any` value uses the regular
  * representation of the deserialized, embedded message, with an
  * additional field `@type` which contains the type URL. Example:
- * 
+ *
  *     package google.profile;
  *     message Person {
  *       string first_name = 1;
  *       string last_name = 2;
  *     }
- * 
+ *
  *     {
  *       "@type": "type.googleapis.com/google.profile.Person",
  *       "firstName": <string>,
  *       "lastName": <string>
  *     }
- * 
+ *
  * If the embedded message type is well-known and has a custom JSON
  * representation, that representation will be embedded adding a field
  * `value` which holds the custom JSON in addition to the `@type`
  * field. Example (for message [google.protobuf.Duration][]):
- * 
+ *
  *     {
  *       "@type": "type.googleapis.com/google.protobuf.Duration",
  *       "value": "1.212s"
@@ -90,12 +90,12 @@ export interface Any {
    * the fully qualified name of the type (as in
    * `path/google.protobuf.Duration`). The name should be in a canonical form
    * (e.g., leading "." is not accepted).
-   * 
+   *
    * In practice, teams usually precompile into the binary all types that they
    * expect it to use in the context of Any. However, for URLs which use the
    * scheme `http`, `https`, or no scheme, one can optionally set up a type
    * server that maps type URLs to message definitions as follows:
-   * 
+   *
    * * If no scheme is provided, `https` is assumed.
    * * An HTTP GET on the URL must yield a [google.protobuf.Type][]
    *   value in binary format, or produce an error.
@@ -104,11 +104,11 @@ export interface Any {
    *   lookup. Therefore, binary compatibility needs to be preserved
    *   on changes to types. (Use versioned type names to manage
    *   breaking changes.)
-   * 
+   *
    * Note: this functionality is not currently available in the official
    * protobuf release, and it is not used for type URLs beginning with
    * type.googleapis.com.
-   * 
+   *
    * Schemes other than `http`, `https` (or the empty scheme) might be
    * used with implementation specific semantics.
    */
@@ -120,12 +120,12 @@ export interface Any {
 /**
  * `Any` contains an arbitrary serialized protocol buffer message along with a
  * URL that describes the type of the serialized message.
- * 
+ *
  * Protobuf library provides support to pack/unpack Any values in the form
  * of utility functions or additional generated methods of the Any type.
- * 
+ *
  * Example 1: Pack and unpack a message in C++.
- * 
+ *
  *     Foo foo = ...;
  *     Any any;
  *     any.PackFrom(foo);
@@ -133,18 +133,18 @@ export interface Any {
  *     if (any.UnpackTo(&foo)) {
  *       ...
  *     }
- * 
+ *
  * Example 2: Pack and unpack a message in Java.
- * 
+ *
  *     Foo foo = ...;
  *     Any any = Any.pack(foo);
  *     ...
  *     if (any.is(Foo.class)) {
  *       foo = any.unpack(Foo.class);
  *     }
- * 
+ *
  *  Example 3: Pack and unpack a message in Python.
- * 
+ *
  *     foo = Foo(...)
  *     any = Any()
  *     any.Pack(foo)
@@ -152,9 +152,9 @@ export interface Any {
  *     if any.Is(Foo.DESCRIPTOR):
  *       any.Unpack(foo)
  *       ...
- * 
+ *
  *  Example 4: Pack and unpack a message in Go
- * 
+ *
  *      foo := &pb.Foo{...}
  *      any, err := ptypes.MarshalAny(foo)
  *      ...
@@ -162,37 +162,37 @@ export interface Any {
  *      if err := ptypes.UnmarshalAny(any, foo); err != nil {
  *        ...
  *      }
- * 
+ *
  * The pack methods provided by protobuf library will by default use
  * 'type.googleapis.com/full.type.name' as the type URL and the unpack
  * methods only use the fully qualified type name after the last '/'
  * in the type URL, for example "foo.bar.com/x/y.z" will yield type
  * name "y.z".
- * 
- * 
+ *
+ *
  * JSON
  * ====
  * The JSON representation of an `Any` value uses the regular
  * representation of the deserialized, embedded message, with an
  * additional field `@type` which contains the type URL. Example:
- * 
+ *
  *     package google.profile;
  *     message Person {
  *       string first_name = 1;
  *       string last_name = 2;
  *     }
- * 
+ *
  *     {
  *       "@type": "type.googleapis.com/google.profile.Person",
  *       "firstName": <string>,
  *       "lastName": <string>
  *     }
- * 
+ *
  * If the embedded message type is well-known and has a custom JSON
  * representation, that representation will be embedded adding a field
  * `value` which holds the custom JSON in addition to the `@type`
  * field. Example (for message [google.protobuf.Duration][]):
- * 
+ *
  *     {
  *       "@type": "type.googleapis.com/google.protobuf.Duration",
  *       "value": "1.212s"
@@ -207,12 +207,12 @@ export interface AnySDKType {
    * the fully qualified name of the type (as in
    * `path/google.protobuf.Duration`). The name should be in a canonical form
    * (e.g., leading "." is not accepted).
-   * 
+   *
    * In practice, teams usually precompile into the binary all types that they
    * expect it to use in the context of Any. However, for URLs which use the
    * scheme `http`, `https`, or no scheme, one can optionally set up a type
    * server that maps type URLs to message definitions as follows:
-   * 
+   *
    * * If no scheme is provided, `https` is assumed.
    * * An HTTP GET on the URL must yield a [google.protobuf.Type][]
    *   value in binary format, or produce an error.
@@ -221,11 +221,11 @@ export interface AnySDKType {
    *   lookup. Therefore, binary compatibility needs to be preserved
    *   on changes to types. (Use versioned type names to manage
    *   breaking changes.)
-   * 
+   *
    * Note: this functionality is not currently available in the official
    * protobuf release, and it is not used for type URLs beginning with
    * type.googleapis.com.
-   * 
+   *
    * Schemes other than `http`, `https` (or the empty scheme) might be
    * used with implementation specific semantics.
    */
@@ -237,14 +237,14 @@ export interface AnySDKType {
 
 function createBaseAny(): Any {
   return {
-    typeUrl: "",
-    value: new Uint8Array()
+    typeUrl: '',
+    value: new Uint8Array(),
   };
 }
 
 export const Any = {
   encode(message: Any, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.typeUrl !== "") {
+    if (message.typeUrl !== '') {
       writer.uint32(10).string(message.typeUrl);
     }
 
@@ -283,21 +283,26 @@ export const Any = {
 
   fromJSON(object: any): Any {
     return {
-      typeUrl: isSet(object.typeUrl) ? String(object.typeUrl) : "",
-      value: isSet(object.value) ? bytesFromBase64(object.value) : new Uint8Array()
+      typeUrl: isSet(object.typeUrl) ? String(object.typeUrl) : '',
+      value: isSet(object.value)
+        ? bytesFromBase64(object.value)
+        : new Uint8Array(),
     };
   },
 
   toJSON(message: Any): unknown {
     const obj: any = {};
     message.typeUrl !== undefined && (obj.typeUrl = message.typeUrl);
-    message.value !== undefined && (obj.value = base64FromBytes(message.value !== undefined ? message.value : new Uint8Array()));
+    message.value !== undefined &&
+      (obj.value = base64FromBytes(
+        message.value !== undefined ? message.value : new Uint8Array()
+      ));
     return obj;
   },
 
   fromPartial(object: Partial<Any>): Any {
     const message = createBaseAny();
-    message.typeUrl = object.typeUrl ?? "";
+    message.typeUrl = object.typeUrl ?? '';
     message.value = object.value ?? new Uint8Array();
     return message;
   },
@@ -305,8 +310,7 @@ export const Any = {
   fromSDK(object: AnySDKType): Any {
     return {
       typeUrl: isSet(object.type_url) ? object.type_url : undefined,
-      value: isSet(object.value) ? object.value : undefined
+      value: isSet(object.value) ? object.value : undefined,
     };
-  }
-
+  },
 };
