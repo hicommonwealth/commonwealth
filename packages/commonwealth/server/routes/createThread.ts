@@ -212,7 +212,18 @@ const createThread = async (
     return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
-  const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
+  const {
+    topic_name,
+    title,
+    body,
+    kind,
+    stage,
+    url,
+    readOnly,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
   let { topic_id } = req.body;
 
   if (kind === 'discussion') {
@@ -283,6 +294,9 @@ const createThread = async (
     stage,
     url,
     read_only: readOnly || false,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
   };
 
   // begin essential database changes within transaction
