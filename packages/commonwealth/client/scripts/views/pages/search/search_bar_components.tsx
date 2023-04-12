@@ -42,6 +42,7 @@ export const SearchChip = (props: SearchChipProps) => {
 
 type SearchBarPreviewRowProps = {
   searchResult: {
+    id: string;
     address_id: number;
     address: string;
     address_chain: string;
