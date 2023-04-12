@@ -38,3 +38,10 @@ if ! $found; then
 else
   echo "Datadog Add-on exists"
 fi
+
+# add new config restart(s) app
+enable_heroku_postgres=$(heroku config:get ENABLE_HEROKU_POSTGRES -a ${HEROKU_APP_NAME})
+if [ -z "$enable_heroku_postgres" ]; then
+  echo "Set ENABLE_HEROKU_POSTGRES to true"
+  heroku config:set ENABLE_HEROKU_POSTGRES=true -a ${HEROKU_APP_NAME}
+fi
