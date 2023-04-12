@@ -38,6 +38,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { ChangeTopicModal } from 'views/modals/change_topic_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 type ThreadPreviewProps = {
   thread: Thread;
@@ -53,6 +54,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
   );
 
   const navigate = useCommonNavigate();
+  const { isLoggedIn } = useUserLoggedIn();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -227,7 +229,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   )}
                 />
               </div>
-              {app.isLoggedIn() && (isAuthor || hasAdminPermissions) && (
+              {isLoggedIn && (isAuthor || hasAdminPermissions) && (
                 <ThreadPreviewMenu
                   thread={thread}
                   setIsChangeTopicModalOpen={setIsChangeTopicModalOpen}

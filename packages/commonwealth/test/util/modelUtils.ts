@@ -12,8 +12,9 @@ import { createRole, findOneRole } from 'server/util/roles';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
-import { PermissionManager } from 'shared/permissions';
+import { PermissionManager } from '../../shared/permissions';
 import { constructCanvasMessage } from 'canvas';
+
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
@@ -240,11 +241,11 @@ export interface CommentArgs {
   jwt: any;
   text: any;
   parentCommentId?: any;
-  root_id?: any;
+  thread_id?: any;
 }
 
 export const createComment = async (args: CommentArgs) => {
-  const { chain, address, jwt, text, parentCommentId, root_id } = args;
+  const { chain, address, jwt, text, parentCommentId, thread_id } = args;
   const res = await chai.request
     .agent(app)
     .post('/api/createComment')
@@ -254,7 +255,7 @@ export const createComment = async (args: CommentArgs) => {
       chain,
       address,
       parent_id: parentCommentId,
-      root_id,
+      thread_id,
       'attachments[]': undefined,
       text,
       jwt,

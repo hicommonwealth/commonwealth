@@ -129,7 +129,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       return [];
     }
 
-    const { proposal } = await this._api.lcd.gov.proposal(id);
+    const { proposal } = await this._api.rpc.gov.proposal(id);
     return this._proposalToEvents(proposal);
   }
 
@@ -151,7 +151,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const proposals = await this._getAllPaginated<
       Proposal,
       QueryProposalsResponse
-    >((key) => this._api.lcd.gov.proposals(0, '', '', key), 'proposals');
+    >((key) => this._api.rpc.gov.proposals(0, '', '', key), 'proposals');
     const proposalEvents = [];
     for (const proposal of proposals) {
       const events = await this._proposalToEvents(proposal);

@@ -4,12 +4,12 @@ import jdenticon from 'jdenticon';
 
 import 'components/profile/profile_header.scss';
 
-import app from 'state';
 import type { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
 import { SocialAccounts } from '../social_accounts';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 type ProfileHeaderProps = {
   profile: Profile;
@@ -18,13 +18,14 @@ type ProfileHeaderProps = {
 
 const ProfileHeader = (props: ProfileHeaderProps) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useUserLoggedIn();
 
   const { profile, isOwner } = props;
 
   if (!profile) return;
   const { bio, name } = profile;
 
-  const isCurrentUser = app.isLoggedIn() && isOwner;
+  const isCurrentUser = isLoggedIn && isOwner;
 
   return (
     <div className="ProfileHeader">

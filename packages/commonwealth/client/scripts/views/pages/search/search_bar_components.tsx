@@ -91,11 +91,7 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
     <div
       className="SearchBarCommentPreviewRow"
       onClick={() => {
-        navigate(
-          `/${searchResult.proposalid.split('_')[0]}/${
-            searchResult.proposalid.split('_')[1]
-          }`
-        );
+        navigate(`/${searchResult.chain}/discussion/${searchResult.proposalid}`);
       }}
     >
       <CWText type="caption" className="last-updated-text">

@@ -49,6 +49,7 @@ export const ThreadPollEditorCard = ({
         }
       />
       <Modal
+        className="PollEditorCardModal"
         content={
           <PollEditorModal
             thread={thread}
@@ -66,8 +67,8 @@ export const ThreadPollEditorCard = ({
 type ThreadPollCardProps = {
   poll: Poll;
   onVote: () => void;
-  showDeleteButton: boolean;
-  onDelete: () => void;
+  showDeleteButton?: boolean;
+  onDelete?: () => void;
 };
 
 export const ThreadPollCard = ({

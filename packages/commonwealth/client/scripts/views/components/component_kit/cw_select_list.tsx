@@ -22,6 +22,10 @@ export const SelectList = <
           boxShadow: 'none',
           minHeight: 'unset',
         }),
+        menu: (baseStyles) => ({
+          ...baseStyles,
+          maxHeight: '300px',
+        }),
       }}
       className={`SelectList ${props.className || ''}`}
     />

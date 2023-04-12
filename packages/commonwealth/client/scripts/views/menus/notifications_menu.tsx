@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
@@ -21,6 +21,7 @@ import { byDescendingCreationDate } from 'helpers';
 
 export const NotificationsMenu = () => {
   const navigate = useCommonNavigate();
+  const [allRead, setAllRead] = useState<boolean>(false);
 
   const discussionNotifications =
     app.user.notifications.discussionNotifications;
@@ -43,7 +44,7 @@ export const NotificationsMenu = () => {
             }
             data={mostRecentFirst}
             itemContent={(i, data) => (
-              <NotificationRow key={i} notification={data} />
+              <NotificationRow key={i} notification={data} allRead={allRead} />
             )}
           />
         ) : (
@@ -70,6 +71,7 @@ export const NotificationsMenu = () => {
             if (mostRecentFirst.length < 1) return;
 
             app.user.notifications.markAsRead(mostRecentFirst);
+            setAllRead(true);
           }}
         />
       </div>
