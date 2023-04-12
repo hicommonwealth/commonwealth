@@ -16,7 +16,11 @@ HEROKU_APP_DATABASE=$(heroku pg:info DATABASE_URL -a ${HEROKU_APP_NAME}| grep -i
 # create datadog credential
 heroku pg:credentials:create --name datadog --app ${HEROKU_APP_NAME}
 
-# check if datadog addon environment exists in app config
+# run datadog postgres script
+heroku pg:psql ${HEROKU_APP_DATABASE} -a ${HEROKU_APP_NAME} < ${SCRIPT_DIR}/datadog-postgres.sql
+
+# this step will be skipped if datadog addon already exists
+# this step will restart app
 url_list=$(heroku pg:info -a ${HEROKU_APP_NAME} | head -n 1 | tr ',' '\n' | awk '{gsub(/=== /,""); print}' | awk '{$1=$1; print}')
 found=false
 
@@ -34,6 +38,3 @@ if ! $found; then
 else
   echo "Datadog Add-on exists"
 fi
-
-# run datadog postgres script
-heroku pg:psql ${HEROKU_APP_DATABASE} -a ${HEROKU_APP_NAME} < ${SCRIPT_DIR}/datadog-postgres.sql
