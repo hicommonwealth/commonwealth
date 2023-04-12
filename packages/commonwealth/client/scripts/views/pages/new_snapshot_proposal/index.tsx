@@ -1,6 +1,5 @@
 import React, { FormEvent, useEffect, useMemo, useState } from 'react';
 
-import { parsePathname } from 'mithrilInterop';
 import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
@@ -20,12 +19,9 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import type { ThreadForm } from './types';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import { useLocation } from 'react-router';
-import {
-  createDeltaFromText,
-  ReactQuillEditor,
-} from '../../components/react_quill_editor';
+import { createDeltaFromText, ReactQuillEditor } from '../../components/react_quill_editor';
 import { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
 
@@ -33,19 +29,14 @@ type NewSnapshotProposalPageProps = {
   snapshotId: string;
 };
 
-export const NewSnapshotProposalPageComponent = ({
-  snapshotId,
-}: NewSnapshotProposalPageProps) => {
+export const NewSnapshotProposalPageComponent = ({ snapshotId }: NewSnapshotProposalPageProps) => {
   const navigate = useCommonNavigate();
 
   const [form, setForm] = useState<ThreadForm | null>(null);
   const [members, setMembers] = useState<string[]>([]);
-  const [contentDelta, setContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
-  );
+  const [contentDelta, setContentDelta] = useState<DeltaStatic>(createDeltaFromText(''));
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [snapshotScoresFetched, setSnapshotScoresFetched] =
-    useState<boolean>(false);
+  const [snapshotScoresFetched, setSnapshotScoresFetched] = useState<boolean>(false);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [userScore, setUserScore] = useState<number>(0);
 
@@ -60,9 +51,7 @@ export const NewSnapshotProposalPageComponent = ({
   }, [location]);
 
   const clearLocalStorage = () => {
-    localStorage.removeItem(
-      `${app.activeChainId()}-new-snapshot-proposal-name`
-    );
+    localStorage.removeItem(`${app.activeChainId()}-new-snapshot-proposal-name`);
   };
 
   const handlePublish = async () => {
@@ -99,14 +88,12 @@ export const NewSnapshotProposalPageComponent = ({
         end: moment().add(5, 'days').toDate().getTime(),
         snapshot: 0,
         metadata: {},
-        type: 'single-choice',
+        type: 'single-choice'
       };
 
       if (pathVars.fromProposalType && pathVars.fromProposalId) {
         const fromProposalId =
-          typeof pathVars.fromProposalId === 'number'
-            ? pathVars.fromProposalId
-            : pathVars.fromProposalId.toString();
+          typeof pathVars.fromProposalId === 'number' ? pathVars.fromProposalId : pathVars.fromProposalId.toString();
 
         const fromProposalType = pathVars.fromProposalType.toString();
 
@@ -127,10 +114,7 @@ export const NewSnapshotProposalPageComponent = ({
       setForm(initialForm);
 
       const snapshotSpace = app.snapshot.space;
-      const scoreResponse = await getScore(
-        snapshotSpace,
-        app.user.activeAccount.address
-      );
+      const scoreResponse = await getScore(snapshotSpace, app.user.activeAccount.address);
       setUserScore(scoreResponse);
       setSpace(snapshotSpace);
       setMembers(snapshotSpace.members);
@@ -145,26 +129,16 @@ export const NewSnapshotProposalPageComponent = ({
   const author = app.user.activeAccount;
 
   const isMember =
-    author &&
-    author.address &&
-    !!members.find(
-      (member) => member.toLowerCase() === author.address.toLowerCase()
-    );
+    author && author.address && !!members.find((member) => member.toLowerCase() === author.address.toLowerCase());
 
   const hasMinScore = userScore >= space.filters?.minScore;
 
-  const showScoreWarning =
-    space.filters?.minScore > 0 &&
-    !hasMinScore &&
-    !isMember &&
-    userScore !== null;
+  const showScoreWarning = space.filters?.minScore > 0 && !hasMinScore && !isMember && userScore !== null;
 
   const isValid =
     !!space &&
     (!space.filters?.onlyMembers || (space.filters?.onlyMembers && isMember)) &&
-    (space.filters?.minScore === 0 ||
-      (space.filters?.minScore > 0 && userScore > space.filters?.minScore) ||
-      isMember);
+    (space.filters?.minScore === 0 || (space.filters?.minScore > 0 && userScore > space.filters?.minScore) || isMember);
 
   return (
     <Sublayout>
@@ -173,14 +147,11 @@ export const NewSnapshotProposalPageComponent = ({
           New Snapshot Proposal
         </CWText>
         {space.filters?.onlyMembers && !isMember && (
-          <CWText>
-            You need to be a member of the space in order to submit a proposal.
-          </CWText>
+          <CWText>You need to be a member of the space in order to submit a proposal.</CWText>
         )}
         {showScoreWarning ? (
           <CWText>
-            You need to have a minimum of {space.filters.minScore}{' '}
-            {space.symbol} in order to submit a proposal.
+            You need to have a minimum of {space.filters.minScore} {space.symbol} in order to submit a proposal.
           </CWText>
         ) : (
           <CWSpinner />
@@ -191,12 +162,9 @@ export const NewSnapshotProposalPageComponent = ({
           onInput={(e) => {
             setForm({
               ...form,
-              name: e.target.value,
+              name: e.target.value
             });
-            localStorage.setItem(
-              `${app.activeChainId()}-new-snapshot-proposal-name`,
-              form.name
-            );
+            localStorage.setItem(`${app.activeChainId()}-new-snapshot-proposal-name`, form.name);
           }}
           defaultValue={form.name}
         />
@@ -205,24 +173,18 @@ export const NewSnapshotProposalPageComponent = ({
             <CWTextInput
               key={`choice-${idx}`}
               label={`Choice ${idx + 1}`}
-              placeholder={
-                idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
-              }
+              placeholder={idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`}
               onInput={(e) => {
                 setForm({
                   ...form,
-                  choices: form.choices.map((choice, i) =>
-                    i === idx ? e.target.value : choice
-                  ),
+                  choices: form.choices.map((choice, i) => (i === idx ? e.target.value : choice))
                 });
               }}
-              iconRight={
-                idx > 1 && idx === form.choices.length - 1 ? 'trash' : undefined
-              }
+              iconRight={idx > 1 && idx === form.choices.length - 1 ? 'trash' : undefined}
               iconRightonClick={() => {
                 setForm({
                   ...form,
-                  choices: form.choices.slice(0, -1),
+                  choices: form.choices.slice(0, -1)
                 });
               }}
             />
@@ -234,7 +196,7 @@ export const NewSnapshotProposalPageComponent = ({
           onClick={() => {
             setForm({
               ...form,
-              choices: form.choices.concat(`Option ${form.choices.length + 1}`),
+              choices: form.choices.concat(`Option ${form.choices.length + 1}`)
             });
           }}
         />
@@ -247,7 +209,7 @@ export const NewSnapshotProposalPageComponent = ({
             onChange={(e: FormEvent<HTMLInputElement>) => {
               const values: Partial<ThreadForm> = {
                 range: e.currentTarget.value,
-                start: new Date().getTime(),
+                start: new Date().getTime()
               };
 
               if (form.range === '4d') {
@@ -256,7 +218,7 @@ export const NewSnapshotProposalPageComponent = ({
 
               setForm({
                 ...form,
-                ...values,
+                ...values
               });
             }}
           />
@@ -266,11 +228,7 @@ export const NewSnapshotProposalPageComponent = ({
           setContentDelta={setContentDelta}
           placeholder={'What is your proposal?'}
         />
-        <CWButton
-          label="Publish"
-          disabled={!author || isSaving || !isValid}
-          onClick={handlePublish}
-        />
+        <CWButton label="Publish" disabled={!author || isSaving || !isValid} onClick={handlePublish} />
       </div>
     </Sublayout>
   );

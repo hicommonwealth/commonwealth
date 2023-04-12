@@ -14,12 +14,7 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
 import { useCommonNavigate } from 'navigation/helpers';
 
-import {
-  useNewThreadForm,
-  useAuthorName,
-  checkNewThreadErrors,
-  updateTopicList,
-} from './helpers';
+import { useNewThreadForm, useAuthorName, checkNewThreadErrors, updateTopicList } from './helpers';
 import { ReactQuillEditor } from '../react_quill_editor';
 
 export const NewThreadForm = () => {
@@ -43,17 +38,13 @@ export const NewThreadForm = () => {
     threadContentDelta,
     setThreadContentDelta,
     setIsSaving,
-    isDisabled,
+    isDisabled
   } = useNewThreadForm(authorName, hasTopics);
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
   const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
-    return (
-      isAdmin ||
-      t.tokenThreshold.isZero() ||
-      !TopicGateCheck.isGatedTopic(t.name)
-    );
+    return isAdmin || t.tokenThreshold.isZero() || !TopicGateCheck.isGatedTopic(t.name);
   });
 
   const handleNewThreadCreation = async () => {
@@ -64,19 +55,16 @@ export const NewThreadForm = () => {
 
     const deltaString = JSON.stringify(threadContentDelta);
 
-    checkNewThreadErrors(
-      { threadKind, threadUrl, threadTitle, threadTopic },
-      deltaString
-    );
+    checkNewThreadErrors({ threadKind, threadUrl, threadTitle, threadTopic }, deltaString);
 
     setIsSaving(true);
 
-    const { session, action, hash } = await app.sessions.signThread({
+    await app.sessions.signThread({
       community: app.activeChainId(),
       title: threadTitle,
       body: deltaString,
       link: threadUrl,
-      topic: threadTopic,
+      topic: threadTopic
     });
 
     try {
@@ -121,11 +109,7 @@ export const NewThreadForm = () => {
           <div className="new-thread-form-inputs">
             <div className="topics-and-title-row">
               {hasTopics && (
-                <TopicSelector
-                  defaultTopic={threadTopic}
-                  topics={topicsForSelector}
-                  onChange={setThreadTopic}
-                />
+                <TopicSelector defaultTopic={threadTopic} topics={topicsForSelector} onChange={setThreadTopic} />
               )}
               <CWTextInput
                 autoFocus
@@ -145,18 +129,11 @@ export const NewThreadForm = () => {
               />
             )}
 
-            <ReactQuillEditor
-              contentDelta={threadContentDelta}
-              setContentDelta={setThreadContentDelta}
-            />
+            <ReactQuillEditor contentDelta={threadContentDelta} setContentDelta={setThreadContentDelta} />
 
             <div className="buttons-row">
               <CWButton
-                label={
-                  app.user.activeAccount
-                    ? 'Create thread'
-                    : 'Join community to create'
-                }
+                label={app.user.activeAccount ? 'Create thread' : 'Join community to create'}
                 disabled={isDisabled}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
