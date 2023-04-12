@@ -109,6 +109,15 @@ export enum ContentType {
   // Proposal = 'proposal',
 }
 
+export enum ThreadActionType {
+  Deletion = 'deletion',
+  Locking = 'locking',
+  Pinning = 'pinning',
+  StatusChange = 'statuschange',
+  Subscription = 'subscription',
+  TopicChange = 'topicchange',
+}
+
 export interface IChatNotification {
   message_id: string | number;
   channel_id: string | number;

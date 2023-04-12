@@ -9,7 +9,7 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
-import { ThreadActionType } from '../../../../../../common-common/src/types';
+import { ThreadActionType } from '../../../../../shared/types';
 
 type DiscussionsPageProps = {
   topicName?: string;

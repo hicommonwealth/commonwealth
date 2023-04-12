@@ -4,7 +4,7 @@ import { Topic } from 'models';
 import app from 'state';
 
 import { TopicStore } from 'stores';
-import { ThreadActionType } from '../../../../../common-common/src/types';
+import { ThreadActionType } from '../../../../shared/types';
 
 class TopicsController {
   private _store: TopicStore = new TopicStore();

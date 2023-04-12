@@ -8,7 +8,7 @@ import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popove
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import { notifySuccess } from '../../../controllers/app/notifications';
-import { ThreadActionType } from '../../../../../../common-common/src/types';
+import { ThreadActionType } from '../../../../../shared/types';
 
 type ThreadPreviewMenuProps = {
   thread: Thread;
@@ -23,7 +23,6 @@ export const ThreadPreviewMenu = ({
   setIsUpdateProposalStatusModalOpen,
   setIsLocked,
 }: ThreadPreviewMenuProps) => {
-  const navigate = useCommonNavigate();
   const [isReadOnly, setIsReadOnly] = useState(thread.readOnly);
 
   const hasAdminPermissions =
