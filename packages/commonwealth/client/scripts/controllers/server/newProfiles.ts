@@ -13,20 +13,20 @@ class NewProfilesController {
     return this._store;
   }
 
-  private _unfetched: Profile[];
+  private _unfetched: Map<string, Profile>;
 
   private _fetchNewProfiles;
 
   public allLoaded() {
-    return this._unfetched.length === 0;
+    return this._unfetched.size === 0;
   }
 
   public isFetched = new EventEmitter();
 
   public constructor() {
-    this._unfetched = [];
+    this._unfetched = new Map();
     this._fetchNewProfiles = _.debounce(() => {
-      this._refreshProfiles(this._unfetched);
+      this._refreshProfiles(Array.from(this._unfetched.values()));
     }, 500);
   }
 
@@ -37,7 +37,7 @@ class NewProfilesController {
     }
     const profile = new Profile(address, chain);
     this._store.add(profile);
-    this._unfetched.push(profile);
+    this._unfetched.set(profile.address, profile);
     this._fetchNewProfiles();
     return profile;
   }

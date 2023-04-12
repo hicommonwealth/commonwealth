@@ -166,7 +166,8 @@ const EditProfileComponent = () => {
         new Account({
           chain: addresses[0].chain,
           address: addresses[0].address,
-          profile: oldProfile
+          profile: oldProfile,
+          ignoreProfile: false
         })
       );
     } else {
