@@ -8,6 +8,7 @@ import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popove
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import { notifySuccess } from '../../../controllers/app/notifications';
+import { ThreadActionType } from '../../../../../../common-common/src/types';
 
 type ThreadPreviewMenuProps = {
   thread: Thread;
@@ -56,7 +57,10 @@ export const ThreadPreviewMenu = ({
                   {
                     onClick: () => {
                       app.threads.pin({ proposal: thread }).then(() => {
-                        navigate('/discussions');
+                        app.threadUpdateEmitter.emit('threadUpdated', {
+                          threadId: thread.id,
+                          action: ThreadActionType.Pinning,
+                        });
                         redraw();
                       });
                     },
@@ -116,8 +120,13 @@ export const ThreadPreviewMenu = ({
 
                       if (!confirmed) return;
 
+                      // console.log(first)
+
                       app.threads.delete(thread).then(() => {
-                        navigate('/discussions');
+                        app.threadUpdateEmitter.emit('threadUpdated', {
+                          threadId: thread.id,
+                          action: ThreadActionType.Deletion,
+                        });
                       });
                     },
                     label: 'Delete',

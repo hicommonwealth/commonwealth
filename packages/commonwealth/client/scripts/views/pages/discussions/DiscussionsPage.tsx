@@ -9,6 +9,7 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
+import { ThreadActionType } from '../../../../../../common-common/src/types';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -20,12 +21,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams, _] = useSearchParams();
   const stageName: string = searchParams.get('stage');
 
-  const handleThreadUpdate = (data: { threadId: number; topicId: number }) => {
-    const { threadId, topicId } = data;
+  const handleThreadUpdate = (data: {
+    threadId: number;
+    action: ThreadActionType;
+  }) => {
+    const { threadId, action } = data;
 
-    // Since topic changes do not update the listingStore,
-    // the state change relies on the list without the updated thread
-    if (topicId && topicName) {
+    if (
+      action === ThreadActionType.TopicChange ||
+      action === ThreadActionType.Deletion
+    ) {
       const updatedThreadList = threads.filter((t) => t.id !== threadId);
 
       setThreads(updatedThreadList);
