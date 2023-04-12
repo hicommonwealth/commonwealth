@@ -32,8 +32,6 @@ export const ExploreCommunitiesSidebar = () => {
     (c) => isInCommunity(c) && !app.communities.isStarred(c.id)
   );
 
-  const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
-
   const communityList: MenuItem[] = [
     ...(app.isLoggedIn()
       ? [
@@ -53,15 +51,8 @@ export const ExploreCommunitiesSidebar = () => {
           ...(starredCommunities.length === 0 && joinedCommunities.length === 0
             ? [{ type: 'default', label: 'None' } as MenuItem]
             : []),
-          { type: 'header', label: 'Other communities' } as MenuItem,
         ]
       : []),
-    ...(unjoinedCommunities.map((c: ChainInfo) => {
-      return {
-        community: c,
-        type: 'community',
-      };
-    }) as MenuItem[]),
   ];
 
   return (
