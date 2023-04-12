@@ -4,15 +4,6 @@ import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
 import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
-import {
-  ERC1155,
-  ERC1155__factory,
-  ERC20,
-  ERC20__factory,
-  ERC721,
-  ERC721__factory,
-} from 'common-common/src/eth/types';
-import { BigNumber, providers } from 'ethers';
 
 export default class evmBalanceProvider extends BalanceProvider<Web3> {
   public name = 'eth-token';
@@ -24,6 +15,8 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
 
   public validBases = [BalanceType.Ethereum];
 
+  private balanceSelectors = { erc20: '0x70a08231', erc1155: '0x8f32d59b' };
+
   public getCacheKey(node: IChainNode, address: string): string {
     return this.opts.contractType
       ? `${node.id}-${address}-${this.opts.tokenAddress}`
@@ -33,48 +26,10 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
   public async getExternalProvider(
     node: IChainNode,
     opts: EthBPOpts
-  ): Promise<any> {
+  ): Promise<Web3> {
     const url = node.private_url || node.url;
     const provider = new Web3.providers.WebsocketProvider(url);
-    if (!opts.contractType) {
-      return new Web3(provider);
-    }
-
-    switch (opts.contractType) {
-      case 'erc20': {
-        const erc20Api = ERC20__factory.connect(
-          opts.tokenAddress,
-          new providers.Web3Provider(provider)
-        );
-        await erc20Api.deployed();
-        return erc20Api;
-      }
-      case 'erc721': {
-        const provider = new Web3.providers.WebsocketProvider(url);
-
-        const erc721Api = ERC721__factory.connect(
-          opts.tokenAddress,
-          new providers.Web3Provider(provider)
-        );
-        await erc721Api.deployed();
-        return erc721Api;
-      }
-      case 'erc1155': {
-        const url = node.private_url || node.url;
-        const { tokenAddress } = opts;
-        const provider = new Web3.providers.WebsocketProvider(url);
-
-        const erc1155Api: ERC1155 = ERC1155__factory.connect(
-          tokenAddress,
-          new providers.Web3Provider(provider)
-        );
-        await erc1155Api.deployed();
-        return erc1155Api;
-      }
-      default: {
-        throw Error('Not a valid contract type');
-      }
-    }
+    return new Web3(provider);
   }
 
   public async getBalance(
@@ -94,38 +49,48 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
       (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
       // use native token if no args provided
       return balance;
-    } else if (contractType == 'erc20') {
-      validateOpts(address, opts);
-      const erc20Api: ERC20 = api;
-      const balanceBigNum: BigNumber = await erc20Api.balanceOf(address);
-      (
-        (erc20Api.provider as providers.Web3Provider)
-          .provider as WebsocketProvider
-      ).disconnect(1000, 'finished');
-      return balanceBigNum.toString();
-    } else if (contractType == 'erc721') {
-      validateOpts(address, opts);
+    }
 
-      const erc721Api: ERC721 = api;
-
-      const balanceBigNum: BigNumber = await erc721Api.balanceOf(address);
-      (
-        (erc721Api.provider as providers.Web3Provider)
-          .provider as WebsocketProvider
-      ).disconnect(1000, 'finished');
-      return balanceBigNum.toString();
-    } else if (contractType == 'erc1155') {
+    let calldata;
+    if (contractType == 'erc20' || 'erc721') {
       validateOpts(address, opts);
-      const erc1155Api: ERC1155 = api;
-      const balanceBigNum: BigNumber = await erc1155Api.balanceOf(
-        address,
-        opts.tokenId
+      // function selector + calldata
+      const data = api.eth.abi
+        .encodeParameters(['address'], [address])
+        .substring(2);
+      //console.log(data)
+      calldata = `${this.balanceSelectors.erc20}${data}`;
+    } else if (contractType == '1155') {
+      validateOpts(address, opts);
+      calldata = `${this.balanceSelectors.erc1155}${api.eth.abi
+        .encodeParameters(['address', 'uint256'], [address, opts.tokenId])
+        .substring(2)}`;
+    } else {
+      throw new Error('Invalid Contract type');
+    }
+    const result = await api.eth.call({
+      to: tokenAddress,
+      data: calldata,
+    });
+    const decodedResult = api.eth.abi
+      .decodeParameter('uint256', result)
+      .toString();
+
+    if (contractType == 'erc20') {
+      // We need to dynamically convert erc20 balances wei -> ether/gwei for use in the app
+      const decimal = await api.eth.call({
+        to: tokenAddress,
+        data: '0x313ce567',
+      });
+      (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
+      return api.utils.fromWei(
+        decodedResult,
+        api.eth.abi.decodeParameter('uint8', decimal).toString() == '18'
+          ? 'ether'
+          : 'gwei'
       );
-      (
-        (erc1155Api.provider as providers.Web3Provider)
-          .provider as WebsocketProvider
-      ).disconnect(1000, 'finished');
-      return balanceBigNum.toString();
-    } // will have thrown error in getExternalProvider if code reaches this step
+    }
+    (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
+    return decodedResult;
   }
 }
