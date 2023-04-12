@@ -184,7 +184,7 @@
     "https-browserify": "^1.0.0",
     "ignore-loader": "^0.1.2",
     "jdenticon": "^2.1.1",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "jsdom": "^16.5.0",
     "jsdom-global": "^3.0.2",
     "jsonwebtoken": "^9.0.0",
