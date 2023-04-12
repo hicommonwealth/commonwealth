@@ -197,9 +197,8 @@ export async function setupWebSocketServer(
 
   const redisCache = new RedisCache();
   console.log('Initializing Redis Cache for WebSockets...');
-  redisCache.init(REDIS_URL, VULTR_IP).then(() => {
-    console.log('Redis Cache initialized!');
-  });
+  await redisCache.init(REDIS_URL, VULTR_IP);
+  console.log('Redis Cache initialized!');
 
   const chainEventsNamespace = createNamespace(
     io,
