@@ -32,6 +32,11 @@ describe('Webhook Tests', () => {
   let loggedInAddr;
   let notLoggedInAddr;
   let loggedInNotAdminAddr;
+
+  let loggedInSession;
+  let notLoggedInSession;
+  let loggedInNotAdminSession;
+
   let notAdminJWT;
   const chain = 'ethereum';
   const topicName = 'test';
@@ -45,6 +50,7 @@ describe('Webhook Tests', () => {
     // get logged in address/user with JWT
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
+    loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET
@@ -57,9 +63,11 @@ describe('Webhook Tests', () => {
     // get not logged in address
     result = await modelUtils.createAndVerifyAddress({ chain });
     notLoggedInAddr = result.address;
+    notLoggedInSession = { session: result.session, sign: result.sign };
     // get logged in not admin address
     result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInNotAdminAddr = result.address;
+    loggedInNotAdminSession = { session: result.session, sign: result.sign };
     notAdminJWT = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET
@@ -261,16 +269,20 @@ describe('Webhook Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         kind: 'discussion',
         stage: 'discussion',
-        session: res.session,
-        sign: res.sign,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
+      // expect(res.statusCode).to.be.equal(200);
       res = await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(markdownComment.text),
         thread_id: `$`,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
+      // expect(res.statusCode).to.be.equal(200);
       res = await modelUtils.createThread({
         chainId: chain,
         topicName,
@@ -281,16 +293,20 @@ describe('Webhook Tests', () => {
         body: decodeURIComponent(richTextThread.body),
         kind: 'discussion',
         stage: 'discussion',
-        session: res.session,
-        sign: res.sign,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
+      // expect(res.statusCode).to.be.equal(200);
       res = await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(richTextComment.text),
         thread_id: `discussion_`,
+        session: loggedInSession.session,
+        sign: loggedInSession.sign,
       });
+      // expect(res.statusCode).to.be.equal(200);
     });
   });
 });

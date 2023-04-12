@@ -30,11 +30,6 @@ export const verifyComment = async (canvas_action, canvas_session, canvas_hash, 
   const { thread_id, text, address, chain, parent_comment_id } = fields;
   const { action, session } = await verifyUnpack(canvas_action, canvas_session, address);
 
-  assert(action.payload.call, "comment",
-    +thread_id, action.payload.callArgs.thread_id,
-    text, action.payload.callArgs.body,
-         parent_comment_id, (action.payload.callArgs.parent_comment_id ?? undefined))
-
   assert(action.payload.call === "comment" &&
     +thread_id === action.payload.callArgs.thread_id &&
     text === action.payload.callArgs.body &&
