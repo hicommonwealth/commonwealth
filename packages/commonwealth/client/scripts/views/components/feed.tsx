@@ -1,13 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
-
 import 'components/feed.scss';
 
 import type { DashboardActivityNotification } from 'models';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { PageNotFound } from '../pages/404';
 
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
-import { PageNotFound } from '../pages/404';
-import { CWSpinner } from './component_kit/cw_spinner';
+import { CWSpinner, FormattedCWSpinner } from './component_kit/cw_spinner';
 
 type FeedProps = {
   fetchData: () => Promise<any>;
@@ -32,6 +31,7 @@ export const Feed = ({
   const [currentCount, setCurrentCount] = useState<number>(
     defaultCount || DEFAULT_COUNT
   );
+  const [endReached, setEndReached] = useState(false);
 
   const loadMore = useCallback(() => {
     return setTimeout(() => {
@@ -51,6 +51,7 @@ export const Feed = ({
             ? response.result.map((activity) => onFetchedDataCallback(activity))
             : response.result
         );
+        console.log(response);
       } catch (err) {
         setError(true);
       }
@@ -60,10 +61,10 @@ export const Feed = ({
     getData();
   }, []);
 
-  if (loading) return <CWSpinner />;
+  if (loading) return <CWSpinner/>;
 
   if (error) {
-    return <PageNotFound message="There was an error rendering the feed." />;
+    return <PageNotFound message="There was an error rendering the feed."/>;
   }
 
   if (!data || data?.length === 0) {
@@ -78,12 +79,20 @@ export const Feed = ({
 
   return (
     <div className="Feed">
-      <Virtuoso customScrollParent={customScrollParent}
+      <Virtuoso
+        customScrollParent={customScrollParent}
         totalCount={currentCount}
         endReached={loadMore}
         style={{ height: '100%' }}
         itemContent={(i) => {
-          return <UserDashboardRow key={i} notification={data[i]} />;
+          return <UserDashboardRow key={i} notification={data[i]}/>;
+        }}
+        components={{
+          Footer: () => {
+            if (false) {
+              return <FormattedCWSpinner size="xl"/>;
+            }
+          }
         }}
       />
     </div>
