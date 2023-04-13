@@ -169,6 +169,7 @@ export const ChainMetadataRows = ({
       });
       onSave();
       notifySuccess('Chain updated');
+      app.sidebarRedraw.emit('redraw');
     } catch (err) {
       notifyError(err || 'Chain update failed');
     }
@@ -301,11 +302,9 @@ export const ChainMetadataRows = ({
       <ToggleRow
         title="Stages"
         defaultValue={stagesEnabled}
-        onToggle={(checked) => {
-          setStagesEnabled(checked);
-        }}
-        caption={(checked) =>
-          checked
+        onToggle={() => setStagesEnabled((prevState) => !prevState)}
+        caption={() =>
+          stagesEnabled
             ? 'Show proposal progress on threads'
             : "Don't show progress on threads"
         }
@@ -313,11 +312,13 @@ export const ChainMetadataRows = ({
       <ToggleRow
         title="Homepage"
         defaultValue={hasHomepage}
-        onToggle={(checked) => {
-          setHasHomepage(checked);
-          if (checked) {
-            setDefaultPage(DefaultPage.Homepage);
-          }
+        onToggle={() => {
+          setHasHomepage((prevHasHomepage) => {
+            if (!prevHasHomepage) {
+              setDefaultPage(DefaultPage.Homepage);
+            }
+            return !prevHasHomepage;
+          });
         }}
         caption={(checked) =>
           checked
