@@ -73,7 +73,9 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
   const chain = comment.chain;
 
   const handleClick = () => {
-    setRoute(`/${comment.chain}/discussion/${proposalId}`);
+    setRoute(
+      `/${comment.chain}/discussion/${proposalId}?comment=${comment.id}`
+    );
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;

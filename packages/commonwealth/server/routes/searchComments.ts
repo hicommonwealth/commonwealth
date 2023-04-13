@@ -55,6 +55,7 @@ const search = async (
   const comments = await models.sequelize.query(
     `
     SELECT
+        "Comments".id,
         "Threads".title,
         "Comments".text,
         "Comments".thread_id as proposalId,

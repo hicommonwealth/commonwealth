@@ -42,6 +42,7 @@ export const SearchChip = (props: SearchChipProps) => {
 
 type SearchBarPreviewRowProps = {
   searchResult: {
+    id?: string;
     address_id: number;
     address: string;
     address_chain: string;
@@ -64,7 +65,7 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
 
   const handleClick = () => {
     const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}`;
-    navigate(path);
+    navigate(path, {}, null);
   };
 
   return (
@@ -108,7 +109,7 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
   const content = searchResult.text;
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}`;
+    const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
     navigate(path, {}, null);
   };
 
