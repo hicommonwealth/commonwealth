@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 import type { DB } from '../models';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import { AppError } from '../../../common-common/src/errors';
+import { uniqBy } from 'lodash';
 
 const { Op } = Sequelize;
 
@@ -18,7 +19,7 @@ export const Errors = {
 // Otherwise, it defaults to returning them in order of ['created_at', 'DESC'] (following to /bulkMembers).
 
 const bulkAddresses = async (models: DB, req, res) => {
-  const options = {
+  const options: any = {
     order: req.query.order ? [[req.query.order]] : [['created_at', 'DESC']],
   };
 
@@ -28,16 +29,7 @@ const bulkAddresses = async (models: DB, req, res) => {
     throw new AppError(Errors.InvalidChain);
   }
 
-  if (req.query.chain === ALL_CHAINS) {
-    const allChains = await models.Chain.findAll({});
-    const allChainIds = allChains.map((chain) => chain.id);
-    options['where'] = {
-      chain: {
-        [Op.in]: allChainIds,
-      },
-    };
-    options['group'] = 'address';
-  } else {
+  if (req.query.chain !== ALL_CHAINS) {
     options['where'] = { chain: req.query.chain };
   }
 
@@ -57,12 +49,19 @@ const bulkAddresses = async (models: DB, req, res) => {
       ? Object.assign(options['where'], subStr)
       : subStr;
   }
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const addresses = await models.Address.findAll(options);
+
+  // TODO: perform deduplication through the SQL query instead of code
+  const uniqueAddresses = uniqBy(
+    addresses.map((p) => p.toJSON()),
+    (address) => {
+      return address.address;
+    }
+  );
+
   return res.json({
     status: 'Success',
-    result: addresses.map((p) => p.toJSON()),
+    result: uniqueAddresses,
   });
 };
 

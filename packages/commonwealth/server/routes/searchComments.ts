@@ -23,27 +23,23 @@ type SearchCommentsQuery = {
 };
 
 type SearchCommentsBindOptions = {
-  chains?: string[];
+  chain?: string;
   searchTerm?: string;
   limit?: number;
 };
 
 const search = async (
   models: DB,
-  chains: ChainInstance[],
+  chain: ChainInstance | null,
   options: SearchCommentsQuery
 ) => {
-  if (chains.length === 0) {
-    throw new AppError(Errors.NoChains);
-  }
-
-  const allChainIds = chains.map((chain) => chain.id);
-
   const bind: SearchCommentsBindOptions = {
-    chains: allChainIds,
     searchTerm: options.search,
     limit: 50, // must be same as SEARCH_PAGE_SIZE on frontend
   };
+  if (chain) {
+    bind.chain = chain.id;
+  }
 
   const sortOption =
     options.sort === 'Newest'
@@ -52,6 +48,8 @@ const search = async (
       ? '"Comments".created_at ASC'
       : 'rank DESC';
   const sort = `ORDER BY ${sortOption}`;
+
+  const chainWhere = bind.chain ? '"Comments".chain = ANY($chains) AND' : '';
 
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   const comments = await models.sequelize.query(
@@ -72,8 +70,8 @@ const search = async (
       JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
       websearch_to_tsquery('english', $searchTerm) as query
       WHERE
+        ${chainWhere}
         "Comments".deleted_at IS NULL AND
-        "Comments".chain = ANY($chains) AND
         query @@ "Comments"._search
       ${sort} LIMIT $limit
     `,
@@ -103,22 +101,12 @@ const searchComments = async (
     if (!options.chain) {
       throw new AppError(Errors.NoChains);
     }
-    if (!req.chain) {
-      // must explicitly request all chains
-      if (options.chain !== ALL_CHAINS) {
-        throw new AppError(Errors.NoChains);
-      }
-
-      const allChains = await models.Chain.findAll({});
-      const allSearchResults = await search(models, allChains, req.query);
-
-      return res.json({
-        status: 'Success',
-        result: allSearchResults,
-      });
+    if (!req.chain && options.chain !== ALL_CHAINS) {
+      // if no chain resolved, ensure that client explicitly requested all chains
+      throw new AppError(Errors.NoChains);
     }
 
-    const comments = await search(models, [req.chain], req.query);
+    const comments = await search(models, req.chain, req.query);
     return res.json({
       status: 'Success',
       result: comments,
