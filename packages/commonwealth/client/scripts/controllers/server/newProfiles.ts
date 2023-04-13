@@ -102,13 +102,6 @@ class NewProfilesController {
 
     this.isFetched.emit('redraw');
   }
-
-  private calculateChunks() {
-    const limitBytes = 1000000;
-    const addressBytes = 42;
-
-    return (limitBytes - 50) / addressBytes;
-  }
 }
 
 export default NewProfilesController;
