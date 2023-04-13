@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import $ from 'jquery';
 import _ from 'underscore';
 import { v4 as uuidv4 } from 'uuid';
 
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
+
+import { Modal } from '../components/component_kit/cw_modal';
+import { openConfirmation } from './confirmation_modal';
 
 import 'modals/session_signin_modal.scss';
 
@@ -15,11 +18,12 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 type SessionSigninModalProps = {
+  onClose: () => void;
   onVerified: () => void;
 };
 
 export const SessionSigninModal = (props: SessionSigninModalProps) => {
-  const { onVerified } = props;
+  const { onVerified, onClose } = props;
 
   const chainbase = app.chain?.meta?.base;
   const wallets = app.wallets.availableWallets(chainbase);
@@ -33,6 +37,9 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
   );
 
   return (
+    <Modal
+      content={
+
     <div
       className="SessionSigninModal"
       onClick={(e) => {
@@ -67,6 +74,9 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
         </div>
       </div>
     </div>
+      }
+      onClose={onClose}
+      open={true} />
   );
 };
 
