@@ -23,7 +23,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   // setup initial threads
   useEffect(() => {
     app.threads
-      .loadNextPage({ topicName, stageName, includePinnedThreads: true })
+      .loadNextPage({ topicName, stageName, includePinnedThreads: true }, true)
       .then((t) => {
         // Fetch first 20 + unpinned threads
         setThreads(t);
@@ -45,28 +45,32 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   if (initializing) {
     return <PageLoading />;
   }
-  return <Sublayout hideFooter={true}>
-    <Virtuoso
-      style={{ height: '100%', width: '100%' }}
-      data={threads}
-      itemContent={(i, thread) => {
-        return <ThreadPreview thread={thread} key={`${i}`}/>;
-      }}
-      endReached={loadMore}
-      overscan={200}
-      components={{
-        Header: () => {
-          return <div className="DiscussionsPage">
-            <RecentThreadsHeader
-              topic={topicName}
-              stage={stageName}
-              totalThreadCount={threads.length}
-            />
-          </div>;
-        }
-      }}
-    />
-  </Sublayout>;
-}
+  return (
+    <Sublayout hideFooter={true}>
+      <Virtuoso
+        style={{ height: '100%', width: '100%' }}
+        data={threads}
+        itemContent={(i, thread) => {
+          return <ThreadPreview thread={thread} key={`${i}`} />;
+        }}
+        endReached={loadMore}
+        overscan={200}
+        components={{
+          Header: () => {
+            return (
+              <div className="DiscussionsPage">
+                <RecentThreadsHeader
+                  topic={topicName}
+                  stage={stageName}
+                  totalThreadCount={threads.length}
+                />
+              </div>
+            );
+          },
+        }}
+      />
+    </Sublayout>
+  );
+};
 
 export default DiscussionsPage;

@@ -703,11 +703,18 @@ class ThreadsController {
     }
   };
 
-  public async loadNextPage(options: {
-    topicName?: string;
-    stageName?: string;
-    includePinnedThreads?: boolean;
-  }) {
+  public async loadNextPage(
+    options: {
+      topicName?: string;
+      stageName?: string;
+      includePinnedThreads?: boolean;
+    },
+    resetPagination = false
+  ) {
+    if (resetPagination) {
+      this.listingStore.clear();
+    }
+
     if (this.listingStore.isDepleted(options)) {
       return;
     }
