@@ -46,7 +46,8 @@ export const renderQuillDelta = (
     if (collapse) return 'span';
     if (group.listtype === 'bullet') return 'ul';
     if (group.listtype === 'ordered') return 'ol';
-    if (group.listtype === 'checked' || group.listtype === 'unchecked') return 'ul.checklist';
+    if (group.listtype === 'checked' || group.listtype === 'unchecked')
+      return 'ul.checklist';
     return 'div';
   };
 
@@ -86,54 +87,68 @@ export const renderQuillDelta = (
   return hideFormatting || collapse
     ? groups.map((group, i) => {
         const wrapGroupForHiddenFormatting = (content) => {
-          return render(`${getGroupTag(group)}.hidden-formatting`, { key: i }, content);
+          return render(
+            `${getGroupTag(group)}.hidden-formatting`,
+            { key: i },
+            content
+          );
         };
         return wrapGroupForHiddenFormatting(
           group.parents.map((parent, ii) => {
-            return render(`${getParentTag(parent)}.hidden-formatting-inner`, { key: ii }, [
-              parent.children.map((child, iii) => {
-                if (child.insert?.mention)
-                  return render(
-                    'span.mention',
-                    { key: iii },
-                    child.insert.mention.denotationChar + child.insert.mention.value
-                  );
-                if (child.insert?.image) return;
-                if (child.insert?.twitter) return;
-                if (child.insert?.video) return;
-                if (child.attributes?.link)
-                  return render(
-                    'a',
-                    {
-                      key: iii,
-                      href: child.attributes.link,
-                      target: openLinksInNewTab ? '_blank' : '',
-                      noreferrer: 'noreferrer',
-                      noopener: 'noopener',
-                      onclick: async (e) => {
-                        if (app.isNative(window)) {
-                          await Browser.open({ url: child.attributes.link });
-                        }
-                        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-                        if (child.attributes.link.startsWith(`${document.location.origin}/`)) {
-                          // don't open a new window if the link is on Commonwealth
-                          e.preventDefault();
-                          e.stopPropagation();
-                          navigate(child.attributes.link);
-                        }
-                      }
-                    },
-                    `${child.insert}`
-                  );
-                if (child.insert.match(/[A-Za-z0-9]$/)) {
-                  // add a period and space after lines that end on a word or
-                  // number, like Google does in search previews
-                  return render('span', { key: iii }, `${child.insert}. `);
-                } else {
-                  return render('span', { key: iii }, `${child.insert}`);
-                }
-              })
-            ]);
+            return render(
+              `${getParentTag(parent)}.hidden-formatting-inner`,
+              { key: ii },
+              [
+                parent.children.map((child, iii) => {
+                  if (child.insert?.mention)
+                    return render(
+                      'span.mention',
+                      { key: iii },
+                      child.insert.mention.denotationChar +
+                        child.insert.mention.value
+                    );
+                  if (child.insert?.image) return;
+                  if (child.insert?.twitter) return;
+                  if (child.insert?.video) return;
+                  if (child.attributes?.link)
+                    return render(
+                      'a',
+                      {
+                        key: iii,
+                        href: child.attributes.link,
+                        target: openLinksInNewTab ? '_blank' : '',
+                        noreferrer: 'noreferrer',
+                        noopener: 'noopener',
+                        onclick: async (e) => {
+                          if (app.isNative(window)) {
+                            await Browser.open({ url: child.attributes.link });
+                          }
+                          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
+                            return;
+                          if (
+                            child.attributes.link.startsWith(
+                              `${document.location.origin}/`
+                            )
+                          ) {
+                            // don't open a new window if the link is on Commonwealth
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate(child.attributes.link);
+                          }
+                        },
+                      },
+                      `${child.insert}`
+                    );
+                  if (child.insert.match(/[A-Za-z0-9]$/)) {
+                    // add a period and space after lines that end on a word or
+                    // number, like Google does in search previews
+                    return render('span', { key: iii }, `${child.insert}. `);
+                  } else {
+                    return render('span', { key: iii }, `${child.insert}`);
+                  }
+                }),
+              ]
+            );
           })
         );
       })
@@ -143,7 +158,7 @@ export const renderQuillDelta = (
           if (child.insert?.image) {
             return render('img', {
               key: ii,
-              src: child.insert?.image
+              src: child.insert?.image,
             });
           }
           // handle video
@@ -151,16 +166,16 @@ export const renderQuillDelta = (
             return render(
               'div',
               {
-                key: ii
+                key: ii,
               },
               [
                 render('iframe', {
                   frameborder: 0,
                   allowfullscreen: true,
                   src: child.insert?.video,
-                  key: 1
+                  key: 1,
                 }),
-                render('br', { key: 2 })
+                render('br', { key: 2 }),
               ]
             );
           }
@@ -185,11 +200,11 @@ export const renderQuillDelta = (
               'blockquote',
               {
                 key: ii,
-                class: 'twitter-tweet'
+                class: 'twitter-tweet',
               },
               render('a', {
                 tabIndex: -1,
-                href: url
+                href: url,
               })
             );
           }
@@ -202,7 +217,7 @@ export const renderQuillDelta = (
                 key: ii,
                 onClick: () => {
                   // alert(child.insert.mention.id)
-                }
+                },
               },
               child.insert.mention.denotationChar + child.insert.mention.value
             );
@@ -217,13 +232,17 @@ export const renderQuillDelta = (
                 noopener: 'noopener',
                 onClick: (e) => {
                   if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-                  if (child.attributes.link.startsWith(`${document.location.origin}/`)) {
+                  if (
+                    child.attributes.link.startsWith(
+                      `${document.location.origin}/`
+                    )
+                  ) {
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
                     navigate(child.attributes.link);
                   }
-                }
+                },
               },
               `${child.insert}`
             );
@@ -262,7 +281,11 @@ export const renderQuillDelta = (
         };
         const renderParent = (parent, ii) => {
           // render empty parent nodes as .between-paragraphs
-          if (!parent.attributes && parent.children.length === 1 && parent.children[0].insert === '\n') {
+          if (
+            !parent.attributes &&
+            parent.children.length === 1 &&
+            parent.children[0].insert === '\n'
+          ) {
             return render('.between-paragraphs', { key: ii });
           }
           // render normal parent nodes with content
@@ -310,7 +333,7 @@ export const renderQuillDelta = (
                     key: `input-${iii}`,
                     type: 'checkbox',
                     disabled: true,
-                    checked: true
+                    checked: true,
                   },
                   null
                 )
@@ -323,7 +346,7 @@ export const renderQuillDelta = (
                     key: `input-${iii}`,
                     type: 'checkbox',
                     disabled: true,
-                    checked: false
+                    checked: false,
                   },
                   null
                 )

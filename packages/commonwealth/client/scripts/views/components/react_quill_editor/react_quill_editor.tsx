@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { DeltaOperation } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import ReactQuill, { Quill } from 'react-quill';
@@ -45,7 +51,7 @@ const ReactQuillEditor = ({
   placeholder,
   tabIndex,
   contentDelta,
-  setContentDelta
+  setContentDelta,
 }: ReactQuillEditorProps) => {
   const editorRef = useRef<ReactQuill>();
 
@@ -68,7 +74,7 @@ const ReactQuillEditor = ({
   const handleChange = (value, delta, source, editor) => {
     setContentDelta({
       ...editor.getContents(),
-      ___isMarkdown: isMarkdownEnabled
+      ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
   };
 
@@ -90,10 +96,13 @@ const ReactQuillEditor = ({
           imageType = 'image/png';
         }
 
-        const selectedIndex = editor.getSelection()?.index || editor.getLength() || 0;
+        const selectedIndex =
+          editor.getSelection()?.index || editor.getLength() || 0;
 
         // filter out ops that contain a base64 image
-        const opsWithoutBase64Images: DeltaOperation[] = (editor.getContents() || []).filter((op) => {
+        const opsWithoutBase64Images: DeltaOperation[] = (
+          editor.getContents() || []
+        ).filter((op) => {
           for (const opImageType of VALID_IMAGE_TYPES) {
             const base64Prefix = `data:image/${opImageType};base64`;
             if (op.insert?.image?.startsWith(base64Prefix)) {
@@ -104,12 +113,16 @@ const ReactQuillEditor = ({
         });
         setContentDelta({
           ops: opsWithoutBase64Images,
-          ___isMarkdown: isMarkdownEnabled
+          ___isMarkdown: isMarkdownEnabled,
         } as SerializableDeltaStatic);
 
         const file = base64ToFile(imageDataUrl, imageType);
 
-        const uploadedFileUrl = await uploadFileToS3(file, app.serverUrl(), app.user.jwt);
+        const uploadedFileUrl = await uploadFileToS3(
+          file,
+          app.serverUrl(),
+          app.user.jwt
+        );
 
         // insert image op at the selected index
         if (isMarkdownEnabled) {
@@ -119,7 +132,7 @@ const ReactQuillEditor = ({
         }
         setContentDelta({
           ...editor.getContents(),
-          ___isMarkdown: isMarkdownEnabled
+          ___isMarkdown: isMarkdownEnabled,
         } as SerializableDeltaStatic); // sync state with editor content
       } catch (err) {
         console.error(err);
@@ -141,14 +154,16 @@ const ReactQuillEditor = ({
     if (newMarkdownEnabled) {
       let confirmed = true;
       if (getTextFromDelta(editor.getContents()).length > 0) {
-        confirmed = window.confirm('All formatting and images will be lost. Continue?');
+        confirmed = window.confirm(
+          'All formatting and images will be lost. Continue?'
+        );
       }
       if (confirmed) {
         editor.removeFormat(0, editor.getLength());
         setIsMarkdownEnabled(newMarkdownEnabled);
         setContentDelta({
           ...editor.getContents(),
-          ___isMarkdown: newMarkdownEnabled
+          ___isMarkdown: newMarkdownEnabled,
         });
       }
     } else {
@@ -171,11 +186,11 @@ const ReactQuillEditor = ({
               header: false,
               align: false,
               color: false,
-              background: false
+              background: false,
             })
           );
-        }
-      ]
+        },
+      ],
     ];
   }, []);
 
@@ -186,7 +201,7 @@ const ReactQuillEditor = ({
     if (editor) {
       setContentDelta({
         ...editor.getContents(),
-        ___isMarkdown: isMarkdownEnabled
+        ___isMarkdown: isMarkdownEnabled,
       } as SerializableDeltaStatic);
     }
     refreshQuillComponent();
@@ -213,7 +228,7 @@ const ReactQuillEditor = ({
     return ([[{ header: 1 }, { header: 2 }]] as any).concat([
       ['bold', 'italic', 'strike'],
       ['link', 'code-block', 'blockquote'],
-      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }]
+      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
     ]);
   }, [isMarkdownEnabled]);
 
@@ -223,7 +238,9 @@ const ReactQuillEditor = ({
       <Modal
         content={
           <PreviewModal
-            doc={isMarkdownEnabled ? getTextFromDelta(contentDelta) : contentDelta}
+            doc={
+              isMarkdownEnabled ? getTextFromDelta(contentDelta) : contentDelta
+            }
             onModalClose={handlePreviewModalClose}
             title={isMarkdownEnabled ? 'As Markdown' : 'As Rich Text'}
           />
@@ -277,11 +294,11 @@ const ReactQuillEditor = ({
           modules={{
             toolbar,
             imageDropAndPaste: {
-              handler: handleImageDropAndPaste
+              handler: handleImageDropAndPaste,
             },
             clipboard: {
-              matchers: clipboardMatchers
-            }
+              matchers: clipboardMatchers,
+            },
           }}
         />
       )}

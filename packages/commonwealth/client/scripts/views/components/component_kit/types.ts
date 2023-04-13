@@ -46,7 +46,7 @@ export enum ComponentType {
   Toggle = 'Toggle',
   Tooltip = 'Tooltip',
   ValidationText = 'ValidationText',
-  WalletOptionRow = 'WalletOptionRow'
+  WalletOptionRow = 'WalletOptionRow',
 }
 
 export type BaseStyleProps = {
@@ -83,4 +83,9 @@ export type CommunityMenuItem = {
   type?: 'community';
 };
 
-export type MenuItem = DividerMenuItem | HeaderMenuItem | DefaultMenuItem | NotificationMenuItem | CommunityMenuItem;
+export type MenuItem =
+  | DividerMenuItem
+  | HeaderMenuItem
+  | DefaultMenuItem
+  | NotificationMenuItem
+  | CommunityMenuItem;

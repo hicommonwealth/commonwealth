@@ -6,7 +6,7 @@ import {
   deserializeDelta,
   getTextFromDelta,
   SerializableDeltaStatic,
-  serializeDelta
+  serializeDelta,
 } from 'client/scripts/views/components/react_quill_editor/utils';
 import { DeltaStatic } from 'quill';
 
@@ -16,7 +16,7 @@ describe('react quill editor unit tests', () => {
       const text = 'hello';
       const expectedDelta = {
         ops: [{ insert: 'hello' }],
-        ___isMarkdown: false
+        ___isMarkdown: false,
       } as any as SerializableDeltaStatic;
       const result = createDeltaFromText(text);
       assert.deepEqual(result, expectedDelta);
@@ -26,7 +26,7 @@ describe('react quill editor unit tests', () => {
       const text = null;
       const expectedDelta = {
         ops: [{ insert: '' }],
-        ___isMarkdown: false
+        ___isMarkdown: false,
       } as any as SerializableDeltaStatic;
       const result = createDeltaFromText(text);
       assert.deepEqual(result, expectedDelta);
@@ -36,7 +36,7 @@ describe('react quill editor unit tests', () => {
       const text = 'hello';
       const expectedDelta = {
         ops: [{ insert: 'hello' }],
-        ___isMarkdown: true
+        ___isMarkdown: true,
       } as any as SerializableDeltaStatic;
       const result = createDeltaFromText(text, true);
       assert.deepEqual(result, expectedDelta);
@@ -46,7 +46,7 @@ describe('react quill editor unit tests', () => {
   describe('getTextFromDelta', () => {
     it('should convert delta to text', () => {
       const delta = {
-        ops: [{ insert: 'wasup' }]
+        ops: [{ insert: 'wasup' }],
       } as SerializableDeltaStatic;
       const expectedText = 'wasup';
       const result = getTextFromDelta(delta);
@@ -68,7 +68,7 @@ describe('react quill editor unit tests', () => {
     it('should return num lines in richtext', () => {
       // content will usually have a new line at the end
       const delta = {
-        ops: [{ insert: 'hello\nthere\n' }, { insert: 'blah\n123\n' }]
+        ops: [{ insert: 'hello\nthere\n' }, { insert: 'blah\n123\n' }],
       } as DeltaStatic;
       const expectedNumLines = 4;
       const result = countLinesQuill(delta);
@@ -80,9 +80,10 @@ describe('react quill editor unit tests', () => {
     it('should serialize a DeltaStatic (richtext) to string', () => {
       const original = {
         ops: [{ insert: 'hello' }],
-        ___isMarkdown: false
+        ___isMarkdown: false,
       } as SerializableDeltaStatic;
-      const expectedOutput = '{"ops":[{"insert":"hello"}],"___isMarkdown":false}';
+      const expectedOutput =
+        '{"ops":[{"insert":"hello"}],"___isMarkdown":false}';
       const result = serializeDelta(original);
       assert.equal(result, expectedOutput);
     });
@@ -90,7 +91,7 @@ describe('react quill editor unit tests', () => {
     it('should serialize a DeltaStatic (markdown) to string', () => {
       const original = {
         ops: [{ insert: 'hello' }],
-        ___isMarkdown: true
+        ___isMarkdown: true,
       } as SerializableDeltaStatic;
       const expectedOutput = 'hello';
       const result = serializeDelta(original);
@@ -103,7 +104,7 @@ describe('react quill editor unit tests', () => {
       const original = '{"ops":[{"insert":"hello"}],"___isMarkdown":false}';
       const expectedOutput = {
         ops: [{ insert: 'hello' }],
-        ___isMarkdown: false
+        ___isMarkdown: false,
       } as SerializableDeltaStatic;
       const result = deserializeDelta(original);
       assert.deepEqual(result, expectedOutput);
@@ -114,7 +115,7 @@ describe('react quill editor unit tests', () => {
       const original = null;
       const expectedOutput = {
         ops: [{ insert: '' }],
-        ___isMarkdown: false
+        ___isMarkdown: false,
       } as SerializableDeltaStatic;
       const result = deserializeDelta(original);
       assert.deepEqual(result, expectedOutput);
@@ -124,7 +125,7 @@ describe('react quill editor unit tests', () => {
       const original = 'hello';
       const expectedOutput = {
         ops: [{ insert: 'hello' }],
-        ___isMarkdown: true
+        ___isMarkdown: true,
       } as SerializableDeltaStatic;
       const result = deserializeDelta(original);
       assert.deepEqual(result, expectedOutput);

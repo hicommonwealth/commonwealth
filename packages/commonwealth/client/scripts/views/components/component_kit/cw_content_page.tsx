@@ -62,16 +62,22 @@ export const CWContentPage = (props: ContentPageProps) => {
     subBody,
     subHeader,
     title,
-    viewCount
+    viewCount,
   } = props;
 
   // @REACT TODO: this needs to be aware of which view to default to
-  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>('sidebarView');
+  const [viewType, setViewType] = React.useState<'sidebarView' | 'tabsView'>(
+    'sidebarView'
+  );
   const [tabSelected, setTabSelected] = React.useState<number>(0);
 
   React.useEffect(() => {
     const onResize = () => {
-      setViewType(isWindowMediumSmallInclusive(window.innerWidth) && showSidebar ? 'tabsView' : 'sidebarView');
+      setViewType(
+        isWindowMediumSmallInclusive(window.innerWidth) && showSidebar
+          ? 'tabsView'
+          : 'sidebarView'
+      );
     };
 
     window.addEventListener('resize', onResize);
@@ -109,7 +115,13 @@ export const CWContentPage = (props: ContentPageProps) => {
           {readOnly && <CWIcon iconName="lock" iconSize="small" />}
           {actions && (
             <PopoverMenu
-              renderTrigger={(onclick) => <CWIconButton iconName="dotsVertical" iconSize="small" onClick={onclick} />}
+              renderTrigger={(onclick) => (
+                <CWIconButton
+                  iconName="dotsVertical"
+                  iconSize="small"
+                  onClick={onclick}
+                />
+              )}
               menuItems={actions}
             />
           )}
@@ -159,9 +171,15 @@ export const CWContentPage = (props: ContentPageProps) => {
             ))}
           </CWTabBar>
           {tabSelected === 0 && mainBody}
-          {sidebarComponents.length >= 1 && tabSelected === 1 && sidebarComponents[0].item}
-          {sidebarComponents.length >= 2 && tabSelected === 2 && sidebarComponents[1].item}
-          {sidebarComponents.length === 3 && tabSelected === 3 && sidebarComponents[2].item}
+          {sidebarComponents.length >= 1 &&
+            tabSelected === 1 &&
+            sidebarComponents[0].item}
+          {sidebarComponents.length >= 2 &&
+            tabSelected === 2 &&
+            sidebarComponents[1].item}
+          {sidebarComponents.length === 3 &&
+            tabSelected === 3 &&
+            sidebarComponents[2].item}
         </div>
       )}
     </div>
