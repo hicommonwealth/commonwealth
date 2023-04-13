@@ -8,6 +8,7 @@ android
 *.env
 *node_modules
 packages/chain-events/.eslintrc.js
+packages/common-common/src/cosmos-ts
 capacitor.config.ts
 *.mocharc.json
 *.nycrc

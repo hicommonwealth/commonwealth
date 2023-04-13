@@ -7,7 +7,6 @@ import type { ChainModelStatic } from './models/chain';
 import type { ChainCategoryModelStatic } from './models/chain_category';
 import type { ChainCategoryTypeModelStatic } from './models/chain_category_type';
 import type { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
-import type { ChainEventTypeModelStatic } from './models/chain_event_type';
 import type { ChainNodeModelStatic } from './models/chain_node';
 import type { ChatChannelModelStatic } from './models/chat_channel';
 import type { ChatMessageModelStatic } from './models/chat_message';
@@ -43,9 +42,11 @@ import type { ThreadModelStatic } from './models/thread';
 import type { TokenModelStatic } from './models/token';
 import type { TopicModelStatic } from './models/topic';
 import type { UserModelStatic } from './models/user';
-import type { ViewCountModelStatic } from './models/viewcount';
 import type { VoteModelStatic } from './models/vote';
 import type { WebhookModelStatic } from './models/webhook';
+import type { CommunityContractTemplateStatic } from './models/community_contract_template';
+import type { CommunityContractTemplateMetadataStatic } from './models/community_contract_metadata';
+import type { TemplateModelStatic } from './models/template';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -54,13 +55,15 @@ export type Models = {
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainEntityMeta: ChainEntityMetaModelStatic;
-  ChainEventType: ChainEventTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
   ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
+  CommunityContractTemplate: CommunityContractTemplateStatic;
+  CommunityContractTemplateMetadata: CommunityContractTemplateMetadataStatic;
+  Template: TemplateModelStatic;
   CommunityRole: CommunityRoleModelStatic;
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;
@@ -78,7 +81,6 @@ export type Models = {
   Reaction: ReactionModelStatic;
   Thread: ThreadModelStatic;
   Topic: TopicModelStatic;
-  ViewCount: ViewCountModelStatic;
   Vote: VoteModelStatic;
   Profile: ProfileModelStatic;
   RoleAssignment: RoleAssignmentModelStatic;

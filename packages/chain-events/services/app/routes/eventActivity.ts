@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { AppError } from 'common-common/src/errors';
-import { QueryTypes } from 'sequelize';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 import type { DB } from '../../database/database';
 
@@ -18,26 +17,21 @@ const eventActivity: any = async (
     return next(new AppError(Errors.NeedLimit));
   }
 
-  const events = await models.sequelize.query(
-    `
-      SELECT ce.id,
-             ce.chain_event_type_id,
-             ce.block_number,
-             ce.event_data,
-             ce.created_at,
-             ce.updated_at,
-             ce.entity_id,
-             cet.chain,
-             cet.event_network
-      FROM "ChainEvents" ce
-               JOIN "ChainEventTypes" cet ON ce.chain_event_type_id = cet.id
-      ORDER BY ce.created_at DESC
-      LIMIT ?;
-  `,
-    { replacements: [req.query.limit], raw: true, type: QueryTypes.SELECT }
-  );
-
-  return res.json({ status: 'Success', result: events });
+  try {
+    // we can order by id since the resulting order is almost exactly the same as when ordered by created_at
+    // but ordering by id is much faster due to primary key index
+    const events = await models.ChainEvent.findAll({
+      order: [['id', 'DESC']],
+      limit: req.query.limit,
+    });
+    return res.json({
+      status: 'Success',
+      result: events.map((e) => e.toJSON()),
+    });
+  } catch (e) {
+    console.error(e);
+    return next(new ServerError(`Failed to fetch events from DB`, e));
+  }
 };
 
 export default eventActivity;

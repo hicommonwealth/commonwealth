@@ -110,6 +110,7 @@ export interface IApp {
     defaultChain: string;
     chainCategories?: ChainCategoryAttributes[];
     chainCategoryTypes?: ChainCategoryTypeAttributes[];
+    evmTestEnv?: string;
   };
 
   loginStatusLoaded(): boolean;
@@ -247,6 +248,7 @@ export async function initAppState(
         app.config.nodes.clear();
         app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
+        app.config.evmTestEnv = data.result.evmTestEnv;
 
         data.result.nodes
           .sort((a, b) => a.id - b.id)

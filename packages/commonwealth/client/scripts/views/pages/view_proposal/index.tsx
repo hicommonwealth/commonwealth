@@ -1,29 +1,21 @@
 import React from 'react';
 
 import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import {
-  chainToProposalSlug,
-  getProposalUrlPath,
-  idToProposal,
-  proposalSlugToClass,
-} from 'identifiers';
-import type { AnyProposal, Comment, ProposalModule } from 'models';
+import { chainToProposalSlug, getProposalUrlPath, idToProposal, proposalSlugToClass } from 'identifiers';
+import type { AnyProposal, ProposalModule } from 'models';
 import { Account } from 'models';
 
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-import { CommentsTree } from '../../components/comments/comments_tree';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
@@ -35,10 +27,10 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import withRouter from 'navigation/helpers';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 
 type ProposalPrefetch = {
   [identifier: string]: {
-    commentsStarted: boolean;
     profilesFinished: boolean;
     profilesStarted: boolean;
   };
@@ -50,7 +42,6 @@ type ViewProposalPageAttrs = {
 };
 
 class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
-  private comments: Comment<AnyProposal>[];
   private prefetch: ProposalPrefetch;
   private proposal: AnyProposal;
   private tipAmount: number;
@@ -82,22 +73,17 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
     const proposalType = type;
     const proposalIdAndType = `${proposalId}-${proposalType}`;
 
-    // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
+    // we will want to prefetch profiles, and viewCount on the page before rendering anything
     if (!this.prefetch || !this.prefetch[proposalIdAndType]) {
       this.prefetch = {};
 
       this.prefetch[proposalIdAndType] = {
-        commentsStarted: false,
         profilesFinished: false,
-        profilesStarted: false,
+        profilesStarted: false
       };
     }
 
-    if (
-      this.proposal &&
-      (+this.proposal.identifier !== +proposalId ||
-        this.proposal.slug !== proposalType)
-    ) {
+    if (this.proposal && (+this.proposal.identifier !== +proposalId || this.proposal.slug !== proposalType)) {
       this.proposal = undefined;
     }
 
@@ -115,11 +101,7 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
         }
 
         // check if module is still initializing
-        const c = proposalSlugToClass().get(proposalType) as ProposalModule<
-          any,
-          any,
-          any
-        >;
+        const c = proposalSlugToClass().get(proposalType) as ProposalModule<any, any, any>;
 
         if (!c) {
           return <PageNotFound message="Invalid proposal type" />;
@@ -130,12 +112,7 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
           // load sibling modules too
           if (app.chain.base === ChainBase.Substrate) {
             const chain = app.chain as Substrate;
-            app.chain.loadModules([
-              chain.treasury,
-              chain.democracyProposals,
-              chain.democracy,
-              chain.tips,
-            ]);
+            app.chain.loadModules([chain.treasury, chain.democracyProposals, chain.democracy, chain.tips]);
           } else {
             app.chain.loadModules([c]);
           }
@@ -152,82 +129,22 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
     }
 
     if (identifier !== `${proposalId}-${slugify(this.proposal.title)}`) {
-      this.setRoute(
-        getProposalUrlPath(
-          this.proposal.slug,
-          `${proposalId}-${slugify(this.proposal.title)}`,
-          true
-        ),
-        { replace: true }
-      );
-    }
-
-    // load comments
-    if (!this.prefetch[proposalIdAndType]['commentsStarted']) {
-      app.comments
-        .refresh(this.proposal, app.activeChainId())
-        .then(async () => {
-          this.comments = app.comments
-            .getByProposal(this.proposal)
-            .filter((c) => c.parentComment === null);
-
-          this.redraw();
-        })
-        .catch(() => {
-          notifyError('Failed to load comments');
-          this.comments = [];
-          this.redraw();
-        });
-
-      this.prefetch[proposalIdAndType]['commentsStarted'] = true;
-    }
-
-    if (this.comments?.length) {
-      const mismatchedComments = this.comments.filter((c) => {
-        return c.rootProposal !== `${type}_${proposalId}`;
+      this.setRoute(getProposalUrlPath(this.proposal.slug, `${proposalId}-${slugify(this.proposal.title)}`, true), {
+        replace: true
       });
-
-      if (mismatchedComments.length) {
-        this.prefetch[proposalIdAndType]['commentsStarted'] = false;
-      }
-    }
-
-    const updatedCommentsCallback = () => {
-      this.comments = app.comments
-        .getByProposal(this.proposal)
-        .filter((c) => c.parentComment === null);
-      this.redraw();
-    };
-
-    if (this.comments === undefined) {
-      return (
-        <PageLoading
-        //  title={headerTitle}
-        />
-      );
     }
 
     // load profiles
     if (this.prefetch[proposalIdAndType]['profilesStarted'] === undefined) {
       if (this.proposal.author instanceof Account) {
         // AnyProposal
-        app.newProfiles.getProfile(
-          this.proposal.author.chain.id,
-          this.proposal.author.address
-        );
+        app.newProfiles.getProfile(this.proposal.author.chain.id, this.proposal.author.address);
       }
-
-      this.comments.forEach((comment) => {
-        app.newProfiles.getProfile(comment.authorChain, comment.author);
-      });
 
       this.prefetch[proposalIdAndType]['profilesStarted'] = true;
     }
 
-    if (
-      !app.newProfiles.allLoaded() &&
-      !this.prefetch[proposalIdAndType]['profilesFinished']
-    ) {
+    if (!app.newProfiles.allLoaded() && !this.prefetch[proposalIdAndType]['profilesFinished']) {
       return (
         <PageLoading
         //  title={headerTitle}
@@ -256,16 +173,7 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
       >
         <CWContentPage
           title={this.proposal.title}
-          author={
-            !!this.proposal.author && (
-              <User
-                avatarSize={24}
-                user={this.proposal.author}
-                popover
-                linkify
-              />
-            )
-          }
+          author={!!this.proposal.author && <User avatarSize={24} user={this.proposal.author} popover linkify />}
           createdAt={this.proposal.createdAt}
           subHeader={
             <ProposalSubheader
@@ -274,19 +182,11 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
               votingModalOpen={this.votingModalOpen}
             />
           }
-          body={
-            !!this.proposal.description && (
-              <CollapsibleProposalBody proposal={this.proposal} />
-            )
-          }
+          body={!!this.proposal.description && <CollapsibleProposalBody proposal={this.proposal} />}
           subBody={
             <>
-              <LinkedProposalsEmbed
-                proposal={this.proposal as LinkedSubstrateProposal}
-              />
-              {this.proposal instanceof AaveProposal && (
-                <AaveViewProposalDetail proposal={this.proposal} />
-              )}
+              <LinkedProposalsEmbed proposal={this.proposal as LinkedSubstrateProposal} />
+              {this.proposal instanceof AaveProposal && <AaveViewProposalDetail proposal={this.proposal} />}
               <VotingResults proposal={this.proposal} />
               <VotingActions
                 onModalClose={onModalClose}
@@ -295,13 +195,6 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
                 votingModalOpen={this.votingModalOpen}
               />
             </>
-          }
-          comments={
-            <CommentsTree
-              comments={this.comments}
-              proposal={this.proposal}
-              updatedCommentsCallback={updatedCommentsCallback}
-            />
           }
         />
       </Sublayout>

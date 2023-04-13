@@ -20,8 +20,7 @@ export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
   const { proposal, snapshotId } = props;
   const navigate = useCommonNavigate();
 
-  const symbol = app.snapshot.space.symbol.toLowerCase();
-  const proposalLink = `/${symbol}/snapshot/${snapshotId}/${proposal.id}`;
+  const proposalLink = `/snapshot/${snapshotId}/${proposal.id}`;
 
   const time = moment(+proposal.end * 1000);
   const now = moment();

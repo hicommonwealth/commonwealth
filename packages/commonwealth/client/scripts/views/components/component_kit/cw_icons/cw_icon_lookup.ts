@@ -10,6 +10,7 @@ export const iconLookup = {
   cautionCircle: Icons.CWCautionCircle,
   cautionTriangle: Icons.CWCautionTriangle,
   check: Icons.CWCheck,
+  checkCircle: Icons.CWCheckCircle,
   chevronDown: Icons.CWChevronDown,
   chevronLeft: Icons.CWChevronLeft,
   chevronRight: Icons.CWChevronRight,

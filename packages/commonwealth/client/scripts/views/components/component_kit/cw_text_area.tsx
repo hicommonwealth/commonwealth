@@ -73,7 +73,7 @@ export const CWTextArea = (props: TextAreaProps) => {
             validationProps.setInputTimeout(
               setTimeout(() => {
                 validationProps.setIsTyping(false);
-                if (inputValidationFn && e.currentTarget.value?.length > 3) {
+                if (inputValidationFn && e.currentTarget.value.length > 3) {
                   const result = inputValidationFn(e.currentTarget.value);
                   validationProps.setValidationStatus(result[0]);
                   validationProps.setStatusMessage(result[1]);

@@ -10,7 +10,6 @@ import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { SublayoutHeader } from './sublayout_header';
 import useForceRerender from 'hooks/useForceRerender';
-import { setDarkMode } from '../helpers';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -30,12 +29,12 @@ const Sublayout = ({
   );
 
   useEffect(() => {
-    app.sidebarRedraw.on('redraw', () => forceRerender());
+    app.sidebarRedraw.on('redraw', forceRerender);
 
     return () => {
-      app.sidebarRedraw.off('redraw', () => forceRerender());
+      app.sidebarRedraw.off('redraw', forceRerender);
     };
-  });
+  }, [forceRerender]);
 
   useEffect(() => {
     if (

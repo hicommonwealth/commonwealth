@@ -30,6 +30,7 @@ import type CosmosChain from './chain';
 import type { CosmosApiType } from './chain';
 import type CosmosGovernance from './governance';
 import { marshalTally } from './governance';
+import type CosmosGovernanceV1 from './governance-v1';
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
   if (typeof voteOption === 'number') {
@@ -129,12 +130,12 @@ export class CosmosProposal extends Proposal<
 
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
-  private _Governance: CosmosGovernance;
+  private _Governance: CosmosGovernance | CosmosGovernanceV1;
 
   constructor(
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
-    Governance: CosmosGovernance,
+    Governance: CosmosGovernance | CosmosGovernanceV1,
     data: ICosmosProposal
   ) {
     super(ProposalType.CosmosProposal, data);

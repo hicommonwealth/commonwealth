@@ -12,11 +12,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 
-type NewContractPageProps = {
-  scope?;
-};
-
-const NewContractPage = ({ scope }: NewContractPageProps) => {
+const NewContractPage = () => {
   // Payable functions are not supported in this implementation
   if (!app.contracts || !app.chain) {
     return <PageLoading message="General Contract" />;
@@ -33,7 +29,7 @@ const NewContractPage = ({ scope }: NewContractPageProps) => {
       <div className="NewContractPage">
         <CWBreadcrumbs
           breadcrumbs={[
-            { label: 'Contracts', path: `${scope}/contracts` },
+            { label: 'Contracts', path: `/contracts` },
             { label: 'Add Contract and ABI', path: '' },
           ]}
         />

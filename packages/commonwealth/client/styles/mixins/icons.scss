@@ -1,3 +1,5 @@
+$xxs-icon: 9px;
+$xs-icon: 12px;
 $small-icon: 16px;
 $medium-icon: 24px;
 $large-icon: 32px;
@@ -9,6 +11,14 @@ $xxl-icon: 60px;
   flex-shrink: 0;
   height: 1em;
   width: 1em;
+
+  &.xxs {
+    font-size: $xxs-icon;
+  }
+
+  &.xs {
+    font-size: $xs-icon;
+  }
 
   &.small {
     font-size: $small-icon;

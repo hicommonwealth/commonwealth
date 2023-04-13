@@ -1,20 +1,17 @@
 import { AppError, ServerError } from 'common-common/src/errors';
-import { NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import {
-  getProposalUrl,
-  getProposalUrlWithoutObject,
+  getThreadUrl,
+  getThreadUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { factory, formatFilename } from 'common-common/src/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -113,38 +110,16 @@ const editComment = async (
       where: { id: comment.id },
       include: [models.Address, models.Attachment],
     });
+
     // get thread for crafting commonwealth url
-    let proposal;
-    const [prefix, id] = comment.root_id.split('_');
-    if (prefix === 'discussion') {
-      proposal = await models.Thread.findOne({
-        where: { id },
-      });
-    } else if (
-      prefix.includes('proposal') ||
-      prefix.includes('referendum') ||
-      prefix.includes('motion')
-    ) {
-      // TODO: better check for on-chain proposal types
-      proposal = id;
-    } else {
-      log.error(
-        `No matching proposal of thread for root_id ${comment.root_id}`
-      );
-    }
-    if (!proposal) {
-      throw new AppError(Errors.NoProposal);
-    }
+    const proposal = await models.Thread.findOne({
+      where: { id: comment.thread_id },
+    });
 
     const cwUrl =
       typeof proposal === 'string'
-        ? getProposalUrlWithoutObject(
-            prefix,
-            comment.chain,
-            proposal,
-            finalComment
-          )
-        : getProposalUrl(prefix, proposal, comment);
+        ? getThreadUrlWithoutObject(comment.chain, proposal, finalComment)
+        : getThreadUrl(proposal, comment);
     const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
     // dispatch notifications to subscribers of the comment/thread
@@ -154,9 +129,9 @@ const editComment = async (
       '',
       {
         created_at: new Date(),
-        root_id: comment.root_id,
+        thread_id: comment.thread_id,
         root_title,
-        root_type: prefix,
+        root_type: ProposalType.Thread,
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
@@ -228,23 +203,16 @@ const editComment = async (
           `user-${mentionedAddress.User.id}`,
           {
             created_at: new Date(),
-            root_id: +id,
+            thread_id: +comment.thread_id,
             root_title,
-            root_type: prefix,
+            root_type: ProposalType.Thread,
             comment_id: +finalComment.id,
             comment_text: finalComment.text,
             chain_id: finalComment.chain,
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.chain,
           },
-          {
-            user: finalComment.Address.address,
-            author_chain: finalComment.Address.chain,
-            url: cwUrl,
-            title: proposal.title || '',
-            chain: finalComment.chain,
-            body: finalComment.text,
-          },
+          null,
           [finalComment.Address.address]
         );
       });

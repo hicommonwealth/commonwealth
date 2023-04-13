@@ -114,4 +114,10 @@
 
     @include miniWhite;
   }
+
+  &.mini-red {
+    height: 24px;
+
+    @include miniRed;
+  }
 }

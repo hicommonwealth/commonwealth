@@ -37,12 +37,14 @@ const OverviewPage = () => {
   }, []);
 
   useEffect(() => {
-    app.threads.isFetched.on('redraw', () => forceRerender());
+    app.threads.isFetched.on('redraw', forceRerender);
+    app.loginStateEmitter.on('redraw', forceRerender);
 
     return () => {
-      app.threads.isFetched.off('redraw', () => forceRerender());
+      app.threads.isFetched.off('redraw', forceRerender);
+      app.loginStateEmitter.off('redraw', forceRerender);
     };
-  }, []);
+  }, [forceRerender]);
 
   const allMonthlyThreads = app.threads.overviewStore.getAll();
   const allPinnedThreads = app.threads.listingStore.getThreads({

@@ -41,6 +41,33 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     app.chain?.base === ChainBase.Substrate &&
     app.chain?.network !== ChainNetwork.Plasm;
 
+  const getTemplateItems = (): PopoverMenuItem[] => {
+    const contracts = app.contracts.getCommunityContracts();
+
+    const items = [];
+
+    contracts.forEach((contract) => {
+      if (contract.ccts) {
+        for (const cct of contract.ccts) {
+          if (
+            cct.cctmd.display_options === '2' ||
+            cct.cctmd.display_options === '3'
+          ) {
+            const slugWithSlashRemoved = cct.cctmd.slug.replace('/', '');
+            items.push({
+              label: `New ${cct.cctmd.nickname}`,
+              iconLeft: 'star',
+              onClick: () =>
+                navigate(`/${contract.address}/${slugWithSlashRemoved}`),
+            });
+          }
+        }
+      }
+    });
+
+    return items;
+  };
+
   const getTopicTemplateItems = (): PopoverMenuItem[] =>
     topics.map((t) => ({
       label: `New ${t.name} Thread`,
@@ -204,6 +231,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           ...getSputnikProposalItem(),
           ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
+          ...getTemplateItems(),
         ]
       : []),
     {
