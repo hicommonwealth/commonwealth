@@ -115,7 +115,7 @@ const verifySessionSignature = async (
     //
     // ethereum address handling on cosmos chains via metamask
     //
-    const msgBuffer = Buffer.from(sortedStringify(canvasMessage));
+    const msgBuffer = Buffer.from(sortedStringify(canvasSessionPayload));
 
     // toBuffer() doesn't work if there is a newline
     const msgHash = ethUtil.hashPersonalMessage(msgBuffer);

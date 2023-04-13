@@ -109,7 +109,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       TEST_BLOCK_INFO_BLOCKHASH
     );
     const signature = signTypedData({
-      privateKey: Buffer.from(keypair.getPrivateKey(), 'hex'),
+      privateKey: keypair.getPrivateKey(),
       data: constructTypedCanvasMessage(sessionPayload),
       version: SignTypedDataVersion.V4,
     });
@@ -189,7 +189,9 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email, session, sessionSigner: keyPair, sign: (actionPayload: ActionPayload) => {
-      return sessionWallet.sign(stringToU8a(sortedStringify(actionPayload)));
+      const signatureBytes = sessionWallet.sign(stringToU8a(sortedStringify(actionPayload)));
+      const signature = new Buffer(signatureBytes).toString('hex');
+      return signature;
     }};
 
   }
@@ -391,11 +393,13 @@ export interface CreateReactionArgs {
   reaction: string;
   jwt: string;
   comment_id: number;
-  session: SessionPayload;
-  sign: (actionPayload: ActionPayload) => void;
+  session: Session;
+  sign: (actionPayload: ActionPayload) => string;
 }
 
 export const createReaction = async (args: CreateReactionArgs) => {
+  const { chain, address, jwt, author_chain, reaction, comment_id, session, sign } = args;
+
   const actionPayload: ActionPayload = {
     app: session.payload.app,
     appName: CANVAS_APPNAME,
@@ -418,7 +422,6 @@ export const createReaction = async (args: CreateReactionArgs) => {
   const canvas_hash = '' // getActionHash(action)
   // TODO
 
-  const { chain, address, jwt, author_chain, reaction, comment_id } = args;
   const res = await chai.request
     .agent(app)
     .post('/api/createReaction')

@@ -12,6 +12,7 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
+import { Modal as CWModal } from '../component_kit/cw_modal';
 import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
 import { SharePopover } from '../share_popover';
 import { User } from '../user/user';
@@ -69,8 +70,8 @@ export const Comment = (props: CommentProps) => {
   const [isEditingComment, setIsEditingComment] = React.useState<boolean>(false);
   const [shouldRestoreEdits, setShouldRestoreEdits] = React.useState<boolean>(false);
 
-  const [verifiedAction, setVerifiedAction] = React.useState<Action>(false);
-  const [verifiedSession, setVerifiedSession] = React.useState<Session>(false);
+  const [verifiedAction, setVerifiedAction] = React.useState<Action>();
+  const [verifiedSession, setVerifiedSession] = React.useState<Session>();
 
   const [savedEdits, setSavedEdits] = React.useState<string>('');
 
@@ -176,7 +177,7 @@ export const Comment = (props: CommentProps) => {
                       </CWText>
                     </div>
                   )}
-              {isCanvasVerifyModalVisible && <Modal
+              {isCanvasVerifyModalVisible && <CWModal
 	             content={<CanvasVerifyDataModal obj={comment} />}
                onClose={() => setIsCanvasVerifyDataModalVisible(false)}
                open={isCanvasVerifyModalVisible}

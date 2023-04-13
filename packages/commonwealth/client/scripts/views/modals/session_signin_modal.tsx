@@ -1,6 +1,10 @@
 import React from 'react';
 import $ from 'jquery';
 import _ from 'underscore';
+import { v4 as uuidv4 } from 'uuid';
+
+import type { Root } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 
 import 'modals/session_signin_modal.scss';
 
@@ -11,11 +15,11 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 type SessionSigninModalProps = {
-  onModalClose: () => void;
+  onVerified: () => void;
 };
 
 export const SessionSigninModal = (props: SessionSigninModalProps) => {
-  const { onModalClose } = props;
+  const { onVerified } = props;
 
   const chainbase = app.chain?.meta?.base;
   const wallets = app.wallets.availableWallets(chainbase);
@@ -56,7 +60,7 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
             setSelectedWallet={(wallet) => {
               /* do nothing */
             }}
-            accountVerifiedCallback={() => onModalClose()}
+            accountVerifiedCallback={() => onVerified()}
             linking={false}
             showResetWalletConnect={wcEnabled}
           />
@@ -73,13 +77,13 @@ export const showSessionSigninModal = () => {
 
   target.id = id;
 
-  const removeModal = () => {
-    root.unmount();
-    target.remove();
-  };
-
   root = createRoot(target);
-  root.render(<SessionSigninModal removeModal={removeModal} />);
 
-  return { remove: removeModal };
+  return new Promise((resolve) => {
+    root.render(<SessionSigninModal onVerified={() => {
+      resolve();
+      root.unmount();
+      target.remove();
+    }} />);
+  });
 };
