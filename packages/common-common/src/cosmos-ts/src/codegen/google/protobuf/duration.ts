@@ -1,5 +1,5 @@
-import * as _m0 from "protobufjs/minimal";
-import { Long, isSet } from "../../helpers";
+import * as _m0 from 'protobufjs/minimal';
+import { Long, isSet } from '../../helpers';
 /**
  * A Duration represents a signed, fixed-length span of time represented
  * as a count of seconds and fractions of seconds at nanosecond
@@ -7,18 +7,18 @@ import { Long, isSet } from "../../helpers";
  * or "month". It is related to Timestamp in that the difference between
  * two Timestamp values is a Duration and it can be added or subtracted
  * from a Timestamp. Range is approximately +-10,000 years.
- * 
+ *
  * # Examples
- * 
+ *
  * Example 1: Compute Duration from two Timestamps in pseudo code.
- * 
+ *
  *     Timestamp start = ...;
  *     Timestamp end = ...;
  *     Duration duration = ...;
- * 
+ *
  *     duration.seconds = end.seconds - start.seconds;
  *     duration.nanos = end.nanos - start.nanos;
- * 
+ *
  *     if (duration.seconds < 0 && duration.nanos > 0) {
  *       duration.seconds += 1;
  *       duration.nanos -= 1000000000;
@@ -26,16 +26,16 @@ import { Long, isSet } from "../../helpers";
  *       duration.seconds -= 1;
  *       duration.nanos += 1000000000;
  *     }
- * 
+ *
  * Example 2: Compute Timestamp from Timestamp + Duration in pseudo code.
- * 
+ *
  *     Timestamp start = ...;
  *     Duration duration = ...;
  *     Timestamp end = ...;
- * 
+ *
  *     end.seconds = start.seconds + duration.seconds;
  *     end.nanos = start.nanos + duration.nanos;
- * 
+ *
  *     if (end.nanos < 0) {
  *       end.seconds -= 1;
  *       end.nanos += 1000000000;
@@ -43,15 +43,15 @@ import { Long, isSet } from "../../helpers";
  *       end.seconds += 1;
  *       end.nanos -= 1000000000;
  *     }
- * 
+ *
  * Example 3: Compute Duration from datetime.timedelta in Python.
- * 
+ *
  *     td = datetime.timedelta(days=3, minutes=10)
  *     duration = Duration()
  *     duration.FromTimedelta(td)
- * 
+ *
  * # JSON Mapping
- * 
+ *
  * In JSON format, the Duration type is encoded as a string rather than an
  * object, where the string ends in the suffix "s" (indicating seconds) and
  * is preceded by the number of seconds, with nanoseconds expressed as
@@ -86,18 +86,18 @@ export interface Duration {
  * or "month". It is related to Timestamp in that the difference between
  * two Timestamp values is a Duration and it can be added or subtracted
  * from a Timestamp. Range is approximately +-10,000 years.
- * 
+ *
  * # Examples
- * 
+ *
  * Example 1: Compute Duration from two Timestamps in pseudo code.
- * 
+ *
  *     Timestamp start = ...;
  *     Timestamp end = ...;
  *     Duration duration = ...;
- * 
+ *
  *     duration.seconds = end.seconds - start.seconds;
  *     duration.nanos = end.nanos - start.nanos;
- * 
+ *
  *     if (duration.seconds < 0 && duration.nanos > 0) {
  *       duration.seconds += 1;
  *       duration.nanos -= 1000000000;
@@ -105,16 +105,16 @@ export interface Duration {
  *       duration.seconds -= 1;
  *       duration.nanos += 1000000000;
  *     }
- * 
+ *
  * Example 2: Compute Timestamp from Timestamp + Duration in pseudo code.
- * 
+ *
  *     Timestamp start = ...;
  *     Duration duration = ...;
  *     Timestamp end = ...;
- * 
+ *
  *     end.seconds = start.seconds + duration.seconds;
  *     end.nanos = start.nanos + duration.nanos;
- * 
+ *
  *     if (end.nanos < 0) {
  *       end.seconds -= 1;
  *       end.nanos += 1000000000;
@@ -122,15 +122,15 @@ export interface Duration {
  *       end.seconds += 1;
  *       end.nanos -= 1000000000;
  *     }
- * 
+ *
  * Example 3: Compute Duration from datetime.timedelta in Python.
- * 
+ *
  *     td = datetime.timedelta(days=3, minutes=10)
  *     duration = Duration()
  *     duration.FromTimedelta(td)
- * 
+ *
  * # JSON Mapping
- * 
+ *
  * In JSON format, the Duration type is encoded as a string rather than an
  * object, where the string ends in the suffix "s" (indicating seconds) and
  * is preceded by the number of seconds, with nanoseconds expressed as
@@ -162,12 +162,15 @@ export interface DurationSDKType {
 function createBaseDuration(): Duration {
   return {
     seconds: Long.ZERO,
-    nanos: 0
+    nanos: 0,
   };
 }
 
 export const Duration = {
-  encode(message: Duration, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: Duration,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (!message.seconds.isZero()) {
       writer.uint32(8).int64(message.seconds);
     }
@@ -189,7 +192,7 @@ export const Duration = {
 
       switch (tag >>> 3) {
         case 1:
-          message.seconds = (reader.int64() as Long);
+          message.seconds = reader.int64() as Long;
           break;
 
         case 2:
@@ -207,21 +210,27 @@ export const Duration = {
 
   fromJSON(object: any): Duration {
     return {
-      seconds: isSet(object.seconds) ? Long.fromValue(object.seconds) : Long.ZERO,
-      nanos: isSet(object.nanos) ? Number(object.nanos) : 0
+      seconds: isSet(object.seconds)
+        ? Long.fromValue(object.seconds)
+        : Long.ZERO,
+      nanos: isSet(object.nanos) ? Number(object.nanos) : 0,
     };
   },
 
   toJSON(message: Duration): unknown {
     const obj: any = {};
-    message.seconds !== undefined && (obj.seconds = (message.seconds || Long.ZERO).toString());
+    message.seconds !== undefined &&
+      (obj.seconds = (message.seconds || Long.ZERO).toString());
     message.nanos !== undefined && (obj.nanos = Math.round(message.nanos));
     return obj;
   },
 
   fromPartial(object: Partial<Duration>): Duration {
     const message = createBaseDuration();
-    message.seconds = object.seconds !== undefined && object.seconds !== null ? Long.fromValue(object.seconds) : Long.ZERO;
+    message.seconds =
+      object.seconds !== undefined && object.seconds !== null
+        ? Long.fromValue(object.seconds)
+        : Long.ZERO;
     message.nanos = object.nanos ?? 0;
     return message;
   },
@@ -229,8 +238,7 @@ export const Duration = {
   fromSDK(object: DurationSDKType): Duration {
     return {
       seconds: isSet(object.seconds) ? object.seconds : undefined,
-      nanos: isSet(object.nanos) ? object.nanos : undefined
+      nanos: isSet(object.nanos) ? object.nanos : undefined,
     };
-  }
-
+  },
 };

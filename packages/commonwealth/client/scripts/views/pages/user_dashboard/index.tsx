@@ -60,8 +60,8 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [activePage, subpage]);
 
   return (
-    <Sublayout >
-      <div ref={setScrollElement} className="UserDashboard" >
+    <Sublayout>
+      <div ref={setScrollElement} className="UserDashboard">
         <div className="dashboard-column">
           <div className="dashboard-header">
             <CWTabBar>
@@ -168,8 +168,9 @@ const UserDashboard = (props: UserDashboardProps) => {
             )}
           </>
         </div>
-        <div><DashboardCommunitiesPreview /></div>
-
+        <div>
+          <DashboardCommunitiesPreview />
+        </div>
       </div>
     </Sublayout>
   );

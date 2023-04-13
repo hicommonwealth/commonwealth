@@ -21,7 +21,7 @@ marked.setOptions({
   gfm: true, // use github flavored markdown
   smartypants: true,
   smartLists: true,
-  xhtml: true
+  xhtml: true,
 });
 
 type MarkdownFormattedTextAttrs = {
@@ -41,7 +41,9 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
   isTruncated: boolean;
 
   oninit(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
-    this.isTruncated = vnode.attrs.cutoffLines && vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
+    this.isTruncated =
+      vnode.attrs.cutoffLines &&
+      vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
     if (this.isTruncated) {
       this.truncatedDoc = vnode.attrs.doc.slice(
         0,
@@ -53,14 +55,24 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
   }
 
   view(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
-    const { doc, hideFormatting, collapse, searchTerm, openLinksInNewTab, cutoffLines } = vnode.attrs;
+    const {
+      doc,
+      hideFormatting,
+      collapse,
+      searchTerm,
+      openLinksInNewTab,
+      cutoffLines,
+    } = vnode.attrs;
 
     if (!doc) return;
 
     const toggleDisplay = () => {
       this.isTruncated = !this.isTruncated;
       if (this.isTruncated) {
-        this.truncatedDoc = doc.slice(0, doc.split('\n', cutoffLines).join('\n').length);
+        this.truncatedDoc = doc.slice(
+          0,
+          doc.split('\n', cutoffLines).join('\n').length
+        );
       } else {
         this.truncatedDoc = doc;
       }
@@ -68,7 +80,9 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
     };
 
     renderer.link = (href, title, text) => {
-      return `<a ${href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'} ${
+      return `<a ${
+        href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
+      } ${
         openLinksInNewTab ? 'target="_blank"' : ''
       } href="${href}">${text}</a>`;
     };
@@ -81,7 +95,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
 
         const sanitized = DOMPurify.sanitize(unsanitized, {
           ALLOWED_TAGS: ['a'],
-          ADD_ATTR: ['target']
+          ADD_ATTR: ['target'],
         });
 
         const vnodes = render.trust(sanitized);
@@ -90,53 +104,65 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
 
         rootRender(root, vnodes);
 
-        const textToHighlight = root.innerText.replace(/\n/g, ' ').replace(/\ +/g, ' ');
+        const textToHighlight = root.innerText
+          .replace(/\n/g, ' ')
+          .replace(/\ +/g, ' ');
 
         const chunks = findAll({
           searchWords: [searchTerm.trim()],
-          textToHighlight
+          textToHighlight,
         });
 
         this.cachedDocWithHighlights = JSON.stringify(doc);
 
-        this.cachedResultWithHighlights = chunks.map(({ end, highlight, start }, index) => {
-          const middle = 15;
+        this.cachedResultWithHighlights = chunks.map(
+          ({ end, highlight, start }, index) => {
+            const middle = 15;
 
-          const subString = textToHighlight.substr(start, end - start);
+            const subString = textToHighlight.substr(start, end - start);
 
-          let text = smartTruncate(
-            subString,
-            chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
-            chunks.length <= 1
-              ? {}
-              : index === 0
-              ? { position: 0 }
-              : index === chunks.length - 1
-              ? {}
-              : { position: middle }
-          );
+            let text = smartTruncate(
+              subString,
+              chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
+              chunks.length <= 1
+                ? {}
+                : index === 0
+                ? { position: 0 }
+                : index === chunks.length - 1
+                ? {}
+                : { position: middle }
+            );
 
-          if (subString[subString.length - 1] === ' ') {
-            text += ' ';
+            if (subString[subString.length - 1] === ' ') {
+              text += ' ';
+            }
+
+            if (subString[0] === ' ') {
+              text = ` ${text}`;
+            }
+
+            return highlight ? <mark>{text}</mark> : <span>{text}</span>;
           }
-
-          if (subString[0] === ' ') {
-            text = ` ${text}`;
-          }
-
-          return highlight ? <mark>{text}</mark> : <span>{text}</span>;
-        });
+        );
       }
 
       return (
-        <div className={getClasses<{ collapsed?: boolean }>({ collapsed: !!collapse }, 'MarkdownFormattedText')}>
+        <div
+          className={getClasses<{ collapsed?: boolean }>(
+            { collapsed: !!collapse },
+            'MarkdownFormattedText'
+          )}
+        >
           {this.cachedResultWithHighlights}
         </div>
       );
     } else {
       if (!doc) return <></>;
       if (this.isTruncated) {
-        this.truncatedDoc = doc.slice(0, doc.split('\n', cutoffLines).join('\n').length);
+        this.truncatedDoc = doc.slice(
+          0,
+          doc.split('\n', cutoffLines).join('\n').length
+        );
       }
       if (!this.truncatedDoc) return <></>;
 
@@ -145,18 +171,23 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
       const sanitized = hideFormatting
         ? DOMPurify.sanitize(unsanitized, {
             ALLOWED_TAGS: ['a'],
-            ADD_ATTR: ['target']
+            ADD_ATTR: ['target'],
           })
         : DOMPurify.sanitize(unsanitized, {
             USE_PROFILES: { html: true },
-            ADD_ATTR: ['target']
+            ADD_ATTR: ['target'],
           });
 
       const results = render.trust(sanitized);
 
       return (
         <>
-          <div className={getClasses<{ collapsed?: boolean }>({ collapsed: !!collapse }, 'MarkdownFormattedText')}>
+          <div
+            className={getClasses<{ collapsed?: boolean }>(
+              { collapsed: !!collapse },
+              'MarkdownFormattedText'
+            )}
+          >
             {results}
           </div>
           {this.isTruncated && (

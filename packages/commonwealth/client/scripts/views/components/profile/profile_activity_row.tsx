@@ -41,7 +41,9 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
     decodedTitle = title;
   }
 
-  const renderTrigger = (onclick) => <CWIconButton iconName="share" iconSize="small" onClick={onclick} />;
+  const renderTrigger = (onclick) => (
+    <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
+  );
 
   const handleClickLink = (path) => {
     const isExternalLink = chain !== app.customDomainId();
@@ -102,7 +104,9 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleClickLink(`/discussion/${comment.thread?.id}?comment=${comment.id}`);
+                handleClickLink(
+                  `/discussion/${comment.thread?.id}?comment=${comment.id}`
+                );
               }}
             >
               {decodedTitle}
@@ -112,7 +116,9 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
       </div>
       <div className="content">
         <CWText type="b2" className="gray-text">
-          {isThread ? renderQuillTextBody(body) : renderQuillTextBody(comment.text)}
+          {isThread
+            ? renderQuillTextBody(body)
+            : renderQuillTextBody(comment.text)}
         </CWText>
         <div className="actions">
           <PopoverMenu
@@ -123,13 +129,15 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
                 label: 'Copy URL',
                 onClick: async () => {
                   if (isThread) {
-                    await navigator.clipboard.writeText(`${domain}/${chain}/discussion/${id}`);
+                    await navigator.clipboard.writeText(
+                      `${domain}/${chain}/discussion/${id}`
+                    );
                     return;
                   }
                   await navigator.clipboard.writeText(
                     `${domain}/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`
                   );
-                }
+                },
               },
               {
                 iconLeft: 'twitter',
@@ -147,8 +155,8 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
                       ?comment=${comment.id}`,
                     '_blank'
                   );
-                }
-              }
+                },
+              },
             ]}
           />
         </div>

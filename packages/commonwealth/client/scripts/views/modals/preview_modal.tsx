@@ -23,7 +23,11 @@ type PreviewModalProps = {
   title: string;
 };
 
-export const PreviewModal = ({ doc, onModalClose, title }: PreviewModalProps) => {
+export const PreviewModal = ({
+  doc,
+  onModalClose,
+  title,
+}: PreviewModalProps) => {
   return (
     <div className="PreviewModal">
       <div className="compact-modal-title">
@@ -31,7 +35,9 @@ export const PreviewModal = ({ doc, onModalClose, title }: PreviewModalProps) =>
         <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
       <div className="compact-modal-body">
-        <QuillRenderer doc={typeof doc === 'string' ? doc : JSON.stringify(doc)} />
+        <QuillRenderer
+          doc={typeof doc === 'string' ? doc : JSON.stringify(doc)}
+        />
       </div>
     </div>
   );

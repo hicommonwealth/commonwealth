@@ -1,6 +1,10 @@
 import React, { useMemo } from 'react';
 
-import type { SnapshotProposal, SnapshotProposalVote, SnapshotSpace } from 'helpers/snapshot_utils';
+import type {
+  SnapshotProposal,
+  SnapshotProposalVote,
+  SnapshotSpace,
+} from 'helpers/snapshot_utils';
 import moment from 'moment';
 
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
@@ -23,7 +27,7 @@ type SnapshotProposalCardsProps = {
 
 const enum VotingError {
   NOT_VALIDATED = 'You cannot vote on this poll or are not logged in.',
-  ALREADY_VOTED = 'Already Submitted Vote'
+  ALREADY_VOTED = 'Already Submitted Vote',
 }
 
 function calculateTimeRemaining(proposal: SnapshotProposal) {
@@ -32,11 +36,15 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
   const duration = moment.duration(endTime.diff(now));
   const days = duration.days();
   const hours = duration.hours();
-  const timeRemainingString = `${days} ${days > 1 ? 'days' : 'day'} ${hours}${hours > 1 ? 'hrs' : 'hr'} remaining`;
+  const timeRemainingString = `${days} ${days > 1 ? 'days' : 'day'} ${hours}${
+    hours > 1 ? 'hrs' : 'hr'
+  } remaining`;
   return timeRemainingString;
 }
 
-export const SnapshotPollCardContainer = (props: SnapshotProposalCardsProps) => {
+export const SnapshotPollCardContainer = (
+  props: SnapshotProposalCardsProps
+) => {
   const {
     activeUserAddress,
     identifier,
@@ -47,14 +55,17 @@ export const SnapshotPollCardContainer = (props: SnapshotProposalCardsProps) => 
     votes,
     validatedAgainstStrategies,
     fetchedPower,
-    totalScore
+    totalScore,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [choice, setChoice] = React.useState<string>();
   const [callback, setCallback] = React.useState<() => any>();
 
-  const isActive = proposal && moment(+proposal.start * 1000) <= moment() && moment(+proposal.end * 1000) > moment();
+  const isActive =
+    proposal &&
+    moment(+proposal.start * 1000) <= moment() &&
+    moment(+proposal.end * 1000) > moment();
 
   const userVote =
     proposal.choices[
@@ -81,11 +92,13 @@ export const SnapshotPollCardContainer = (props: SnapshotProposalCardsProps) => 
     const { choices } = proposal;
     const voteInfo = [];
     for (let i = 0; i < choices.length; i++) {
-      const totalVotes = votes.filter((vote) => vote.choice === i + 1).reduce((sum, vote) => sum + vote.balance, 0);
+      const totalVotes = votes
+        .filter((vote) => vote.choice === i + 1)
+        .reduce((sum, vote) => sum + vote.balance, 0);
       voteInfo.push({
         label: choices[i],
         value: choices[i],
-        voteCount: totalVotes
+        voteCount: totalVotes,
       });
     }
     return voteInfo;

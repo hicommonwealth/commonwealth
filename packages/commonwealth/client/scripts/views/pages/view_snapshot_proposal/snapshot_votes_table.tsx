@@ -27,7 +27,8 @@ type SnapshotVotesTableProps = {
 export const SnapshotVotesTable = (props: SnapshotVotesTableProps) => {
   const { choices, symbol, voters } = props;
 
-  const [isVotersListExpanded, setIsVotersListExpanded] = React.useState<boolean>(false);
+  const [isVotersListExpanded, setIsVotersListExpanded] =
+    React.useState<boolean>(false);
 
   const toggleExpandedVoterList = () => {
     setIsVotersListExpanded(!isVotersListExpanded);
@@ -62,9 +63,18 @@ export const SnapshotVotesTable = (props: SnapshotVotesTableProps) => {
         {displayedVoters.map((vote) => (
           <div key={vote.id} className="vote-row">
             {app.chain ? (
-              <User user={new AddressInfo(null, vote.voter, app.activeChainId(), null)} linkify popover />
+              <User
+                user={
+                  new AddressInfo(null, vote.voter, app.activeChainId(), null)
+                }
+                linkify
+                popover
+              />
             ) : (
-              <CWText className="column-text">{`${vote.voter.slice(0, 15)}...`}</CWText>
+              <CWText className="column-text">{`${vote.voter.slice(
+                0,
+                15
+              )}...`}</CWText>
             )}
             <CWText className="column-text" noWrap>
               {choices[vote.choice - 1]}

@@ -8,7 +8,12 @@ import 'components/edit_profile.scss';
 
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { NewProfile as Profile, Account, AddressInfo, MinimumProfile } from '../../models';
+import {
+  NewProfile as Profile,
+  Account,
+  AddressInfo,
+  MinimumProfile,
+} from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { AvatarUpload } from '../components/avatar_upload';
@@ -27,7 +32,7 @@ import { deserializeDelta, serializeDelta } from './react_quill_editor/utils';
 
 enum EditProfileError {
   None,
-  NoProfileFound
+  NoProfileFound,
 }
 
 const NoProfileFoundError = 'No profile found';
@@ -56,8 +61,8 @@ const EditProfileComponent = () => {
     try {
       const response = await axios.get(`${app.serverUrl()}/profile/v2`, {
         params: {
-          jwt: app.user.jwt
-        }
+          jwt: app.user.jwt,
+        },
       });
 
       setProfile(new Profile(response.data.result.profile));
@@ -66,11 +71,19 @@ const EditProfileComponent = () => {
       setSocials(response.data.result.profile.socials);
       setAvatarUrl(response.data.result.profile.avatar_url);
       setBio(deserializeDelta(response.data.result.profile.bio));
-      backgroundImageRef.current = response.data.result.profile.background_image;
+      backgroundImageRef.current =
+        response.data.result.profile.background_image;
       setAddresses(
         response.data.result.addresses.map((a) => {
           try {
-            return new AddressInfo(a.id, a.address, a.chain, a.keytype, a.wallet_id, a.ghost_address);
+            return new AddressInfo(
+              a.id,
+              a.address,
+              a.chain,
+              a.keytype,
+              a.wallet_id,
+              a.ghost_address
+            );
           } catch (err) {
             console.error(`Could not return AddressInfo: "${err}"`);
             return null;
@@ -78,7 +91,10 @@ const EditProfileComponent = () => {
         })
       );
     } catch (err) {
-      if (err.status === 500 && err.responseJSON?.error === NoProfileFoundError) {
+      if (
+        err.status === 500 &&
+        err.responseJSON?.error === NoProfileFoundError
+      ) {
         setError(EditProfileError.NoProfileFound);
       }
     }
@@ -90,7 +106,7 @@ const EditProfileComponent = () => {
       const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
         profileId: profile.id,
         ...profileUpdate,
-        jwt: app.user.jwt
+        jwt: app.user.jwt,
       });
 
       if (response.data.status === 'Success') {
@@ -114,18 +130,23 @@ const EditProfileComponent = () => {
   const checkForUpdates = () => {
     const profileUpdate: any = {};
 
-    if (!_.isEqual(name, profile?.name) && name !== '') profileUpdate.name = name;
+    if (!_.isEqual(name, profile?.name) && name !== '')
+      profileUpdate.name = name;
 
     if (!_.isEqual(email, profile?.email)) profileUpdate.email = email;
 
     profileUpdate.bio = serializeDelta(bio);
 
-    if (!_.isEqual(avatarUrl, profile?.avatarUrl)) profileUpdate.avatarUrl = avatarUrl;
+    if (!_.isEqual(avatarUrl, profile?.avatarUrl))
+      profileUpdate.avatarUrl = avatarUrl;
 
-    if (!_.isEqual(socials, profile?.socials)) profileUpdate.socials = JSON.stringify(socials);
+    if (!_.isEqual(socials, profile?.socials))
+      profileUpdate.socials = JSON.stringify(socials);
 
     if (!_.isEqual(backgroundImageRef, profile?.backgroundImage))
-      profileUpdate.backgroundImage = JSON.stringify(backgroundImageRef.current);
+      profileUpdate.backgroundImage = JSON.stringify(
+        backgroundImageRef.current
+      );
 
     if (Object.keys(profileUpdate)?.length > 0) {
       updateProfile(profileUpdate);
@@ -158,15 +179,25 @@ const EditProfileComponent = () => {
     // not the best solution because address is not always available
     // should refactor AvatarUpload to make it work with new profiles
     if (addresses?.length > 0) {
-      const oldProfile = new MinimumProfile(addresses[0].chain.name, addresses[0].address);
+      const oldProfile = new MinimumProfile(
+        addresses[0].chain.name,
+        addresses[0].address
+      );
 
-      oldProfile.initialize(name, addresses[0].address, avatarUrl, profile.id, addresses[0].chain.name, null);
+      oldProfile.initialize(
+        name,
+        addresses[0].address,
+        avatarUrl,
+        profile.id,
+        addresses[0].chain.name,
+        null
+      );
 
       setAccount(
         new Account({
           chain: addresses[0].chain,
           address: addresses[0].address,
-          profile: oldProfile
+          profile: oldProfile,
         })
       );
     } else {
@@ -269,7 +300,9 @@ const EditProfileComponent = () => {
                 }}
                 inputClassName={displayNameValid ? '' : 'failure'}
                 manualStatusMessage={displayNameValid ? '' : 'No input'}
-                manualValidationStatus={displayNameValid ? 'success' : 'failure'}
+                manualValidationStatus={
+                  displayNameValid ? 'success' : 'failure'
+                }
               />
               <CWTextInput
                 name="email-form-field"
@@ -290,7 +323,11 @@ const EditProfileComponent = () => {
             </div>
             <div className="bio-section">
               <CWText type="caption">Bio</CWText>
-              <ReactQuillEditor className="editor" contentDelta={bio} setContentDelta={setBio} />
+              <ReactQuillEditor
+                className="editor"
+                contentDelta={bio}
+                setContentDelta={setBio}
+              />
             </div>
             <CWDivider />
             <div className="socials-section">
@@ -303,22 +340,31 @@ const EditProfileComponent = () => {
               />
             </div>
           </CWFormSection>
-          <CWFormSection title="Personalize Your Profile" description="Express yourself through imagery.">
+          <CWFormSection
+            title="Personalize Your Profile"
+            description="Express yourself through imagery."
+          >
             <CWText fontWeight="medium">Image upload</CWText>
             <CWText type="caption" className="description">
               Add a background image.
             </CWText>
             <CWCoverImageUploader
-              uploadCompleteCallback={(url: string, imageBehavior: ImageBehavior) => {
+              uploadCompleteCallback={(
+                url: string,
+                imageBehavior: ImageBehavior
+              ) => {
                 backgroundImageRef.current = {
                   url,
-                  imageBehavior
+                  imageBehavior,
                 };
               }}
-              generatedImageCallback={(url: string, imageBehavior: ImageBehavior) => {
+              generatedImageCallback={(
+                url: string,
+                imageBehavior: ImageBehavior
+              ) => {
                 backgroundImageRef.current = {
                   url,
-                  imageBehavior
+                  imageBehavior,
                 };
               }}
               enableGenerativeAI
@@ -326,13 +372,18 @@ const EditProfileComponent = () => {
               defaultImageBehavior={backgroundImageRef.current?.imageBehavior}
             />
           </CWFormSection>
-          <CWFormSection title="Linked addresses" description="Manage your addresses.">
+          <CWFormSection
+            title="Linked addresses"
+            description="Manage your addresses."
+          >
             <LinkedAddresses
               addresses={addresses}
               profile={profile}
               refreshProfiles={(address: string) => {
                 getProfile();
-                app.user.removeAddress(addresses.find((a) => a.address === address));
+                app.user.removeAddress(
+                  addresses.find((a) => a.address === address)
+                );
               }}
             />
             <CWText type="caption" fontWeight="medium">

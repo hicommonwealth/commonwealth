@@ -1,5 +1,5 @@
-import * as _m0 from "protobufjs/minimal";
-import { Long, isSet } from "../../helpers";
+import * as _m0 from 'protobufjs/minimal';
+import { Long, isSet } from '../../helpers';
 /**
  * App includes the protocol and software version for the application.
  * This information is included in ResponseInfo. The App.Protocol can be
@@ -44,7 +44,7 @@ export interface ConsensusSDKType {
 function createBaseApp(): App {
   return {
     protocol: Long.UZERO,
-    software: ""
+    software: '',
   };
 }
 
@@ -54,7 +54,7 @@ export const App = {
       writer.uint32(8).uint64(message.protocol);
     }
 
-    if (message.software !== "") {
+    if (message.software !== '') {
       writer.uint32(18).string(message.software);
     }
 
@@ -71,7 +71,7 @@ export const App = {
 
       switch (tag >>> 3) {
         case 1:
-          message.protocol = (reader.uint64() as Long);
+          message.protocol = reader.uint64() as Long;
           break;
 
         case 2:
@@ -89,43 +89,51 @@ export const App = {
 
   fromJSON(object: any): App {
     return {
-      protocol: isSet(object.protocol) ? Long.fromValue(object.protocol) : Long.UZERO,
-      software: isSet(object.software) ? String(object.software) : ""
+      protocol: isSet(object.protocol)
+        ? Long.fromValue(object.protocol)
+        : Long.UZERO,
+      software: isSet(object.software) ? String(object.software) : '',
     };
   },
 
   toJSON(message: App): unknown {
     const obj: any = {};
-    message.protocol !== undefined && (obj.protocol = (message.protocol || Long.UZERO).toString());
+    message.protocol !== undefined &&
+      (obj.protocol = (message.protocol || Long.UZERO).toString());
     message.software !== undefined && (obj.software = message.software);
     return obj;
   },
 
   fromPartial(object: Partial<App>): App {
     const message = createBaseApp();
-    message.protocol = object.protocol !== undefined && object.protocol !== null ? Long.fromValue(object.protocol) : Long.UZERO;
-    message.software = object.software ?? "";
+    message.protocol =
+      object.protocol !== undefined && object.protocol !== null
+        ? Long.fromValue(object.protocol)
+        : Long.UZERO;
+    message.software = object.software ?? '';
     return message;
   },
 
   fromSDK(object: AppSDKType): App {
     return {
       protocol: isSet(object.protocol) ? object.protocol : undefined,
-      software: isSet(object.software) ? object.software : undefined
+      software: isSet(object.software) ? object.software : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseConsensus(): Consensus {
   return {
     block: Long.UZERO,
-    app: Long.UZERO
+    app: Long.UZERO,
   };
 }
 
 export const Consensus = {
-  encode(message: Consensus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: Consensus,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (!message.block.isZero()) {
       writer.uint32(8).uint64(message.block);
     }
@@ -147,11 +155,11 @@ export const Consensus = {
 
       switch (tag >>> 3) {
         case 1:
-          message.block = (reader.uint64() as Long);
+          message.block = reader.uint64() as Long;
           break;
 
         case 2:
-          message.app = (reader.uint64() as Long);
+          message.app = reader.uint64() as Long;
           break;
 
         default:
@@ -166,29 +174,36 @@ export const Consensus = {
   fromJSON(object: any): Consensus {
     return {
       block: isSet(object.block) ? Long.fromValue(object.block) : Long.UZERO,
-      app: isSet(object.app) ? Long.fromValue(object.app) : Long.UZERO
+      app: isSet(object.app) ? Long.fromValue(object.app) : Long.UZERO,
     };
   },
 
   toJSON(message: Consensus): unknown {
     const obj: any = {};
-    message.block !== undefined && (obj.block = (message.block || Long.UZERO).toString());
-    message.app !== undefined && (obj.app = (message.app || Long.UZERO).toString());
+    message.block !== undefined &&
+      (obj.block = (message.block || Long.UZERO).toString());
+    message.app !== undefined &&
+      (obj.app = (message.app || Long.UZERO).toString());
     return obj;
   },
 
   fromPartial(object: Partial<Consensus>): Consensus {
     const message = createBaseConsensus();
-    message.block = object.block !== undefined && object.block !== null ? Long.fromValue(object.block) : Long.UZERO;
-    message.app = object.app !== undefined && object.app !== null ? Long.fromValue(object.app) : Long.UZERO;
+    message.block =
+      object.block !== undefined && object.block !== null
+        ? Long.fromValue(object.block)
+        : Long.UZERO;
+    message.app =
+      object.app !== undefined && object.app !== null
+        ? Long.fromValue(object.app)
+        : Long.UZERO;
     return message;
   },
 
   fromSDK(object: ConsensusSDKType): Consensus {
     return {
       block: isSet(object.block) ? object.block : undefined,
-      app: isSet(object.app) ? object.app : undefined
+      app: isSet(object.app) ? object.app : undefined,
     };
-  }
-
+  },
 };
