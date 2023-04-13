@@ -19,8 +19,6 @@ import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
-import { showCanvasVerifyDataModal } from '../../modals/canvas_verify_data_modal';
-import { verify } from '../../../helpers/canvas';
 
 type CommentAuthorProps = {
   comment: CommentType<any>;
