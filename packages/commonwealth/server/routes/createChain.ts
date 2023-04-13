@@ -112,7 +112,7 @@ const createChain = async (
     return next(new AppError(Errors.NoId));
   }
   if (req.body.id === ALL_CHAINS) {
-    return next(new AppError(Errors.ReservedId))
+    return next(new AppError(Errors.ReservedId));
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new AppError(Errors.NoName));

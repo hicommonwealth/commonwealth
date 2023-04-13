@@ -13,7 +13,7 @@ const Errors = {
   UnexpectedError: 'Unexpected error',
   QueryMissing: 'Must enter query to begin searching',
   QueryTooShort: 'Query must be at least 4 characters',
-  NoChains: 'No chains resolved to execute search'
+  NoChains: 'No chains resolved to execute search',
 };
 
 type SearchDiscussionsQuery = {
@@ -28,10 +28,13 @@ type SearchDiscussionsBindOptions = {
   chains?: string[];
   searchTerm?: string;
   limit?: number;
-}
+};
 
-const search = async (models: DB, chains: ChainInstance[], options: SearchDiscussionsQuery) => {
-
+const search = async (
+  models: DB,
+  chains: ChainInstance[],
+  options: SearchDiscussionsQuery
+) => {
   if (chains.length === 0) {
     throw new AppError(Errors.NoChains);
   }
@@ -42,40 +45,45 @@ const search = async (models: DB, chains: ChainInstance[], options: SearchDiscus
     const encodedSearchTerm = encodeURIComponent(options.search);
     const params = {
       chain: {
-        [Op.in]: allChainIds
+        [Op.in]: allChainIds,
       },
       title: {
-        [Op.or]: [{ [Op.iLike]: `%${encodedSearchTerm}%` }, { [Op.iLike]: `%${options.search}%` }]
-      }
+        [Op.or]: [
+          { [Op.iLike]: `%${encodedSearchTerm}%` },
+          { [Op.iLike]: `%${options.search}%` },
+        ],
+      },
     };
 
     const threads = await models.Thread.findAll({
       where: params,
       limit: parseInt(options.results_size, 10) || 20,
       attributes: {
-        exclude: ['body', 'plaintext', 'version_history']
+        exclude: ['body', 'plaintext', 'version_history'],
       },
       include: [
         {
           model: models.Address,
-          as: 'Address'
-        }
-      ]
+          as: 'Address',
+        },
+      ],
     });
     return threads;
   }
 
-  const bind : SearchDiscussionsBindOptions = {
+  const bind: SearchDiscussionsBindOptions = {
     chains: allChainIds,
     searchTerm: options.search,
-    limit: 50 // must be same as SEARCH_PAGE_SIZE on frontend
+    limit: 50, // must be same as SEARCH_PAGE_SIZE on frontend
   };
 
   const sortOption =
-    options.sort === 'Newest' ? '"Threads".created_at DESC' :
-    options.sort === 'Oldest' ? '"Threads".created_at ASC' :
-    'rank DESC';
-  const sort = `ORDER BY ${sortOption}`
+    options.sort === 'Newest'
+      ? '"Threads".created_at DESC'
+      : options.sort === 'Oldest'
+      ? '"Threads".created_at ASC'
+      : 'rank DESC';
+  const sort = `ORDER BY ${sortOption}`;
 
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   const threadsAndComments = await models.sequelize.query(
@@ -102,16 +110,21 @@ const search = async (models: DB, chains: ChainInstance[], options: SearchDiscus
   `,
     {
       bind,
-      type: QueryTypes.SELECT
+      type: QueryTypes.SELECT,
     }
   );
 
   return threadsAndComments;
 };
 
-const searchDiscussions = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const searchDiscussions = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const options = req.query as SearchDiscussionsQuery
+    const options = req.query as SearchDiscussionsQuery;
     if (!options.search) {
       throw new AppError(Errors.QueryMissing);
     }
@@ -127,19 +140,19 @@ const searchDiscussions = async (models: DB, req: Request, res: Response, next: 
         throw new AppError(Errors.NoChains);
       }
 
-      const allChains = await models.Chain.findAll({})
-      const allSearchResults = await search(models, allChains, req.query)
+      const allChains = await models.Chain.findAll({});
+      const allSearchResults = await search(models, allChains, req.query);
 
       return res.json({
         status: 'Success',
-        result: allSearchResults
+        result: allSearchResults,
       });
     }
 
     const threadsAndComments = await search(models, [req.chain], req.query);
     return res.json({
       status: 'Success',
-      result: threadsAndComments
+      result: threadsAndComments,
     });
   } catch (err) {
     console.error(err);

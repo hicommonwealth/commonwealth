@@ -48,7 +48,7 @@ const updateChain = async (
 ) => {
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.id) return next(new AppError(Errors.NoChainId));
-  if (req.body.id === ALL_CHAINS) return next(new AppError(Errors.ReservedId))
+  if (req.body.id === ALL_CHAINS) return next(new AppError(Errors.ReservedId));
   if (req.body.network) return next(new AppError(Errors.CantChangeNetwork));
 
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });

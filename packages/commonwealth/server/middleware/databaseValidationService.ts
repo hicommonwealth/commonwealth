@@ -4,7 +4,7 @@ import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import validateChain from './validateChain';
 
-export const ALL_CHAINS = 'all_chains'
+export const ALL_CHAINS = 'all_chains';
 
 export const Errors = {
   InvalidUser: 'Invalid user',

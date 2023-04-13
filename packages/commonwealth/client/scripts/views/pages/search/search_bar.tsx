@@ -15,7 +15,7 @@ import {
   SearchBarCommentPreviewRow,
   SearchBarCommunityPreviewRow,
   SearchBarMemberPreviewRow,
-  SearchBarThreadPreviewRow
+  SearchBarThreadPreviewRow,
 } from './search_bar_components';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useDebounce } from 'usehooks-ts';
@@ -48,11 +48,14 @@ export const SearchBar = () => {
   const navigate = useCommonNavigate();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Record<string, Array<any>>>({});
+  const [searchResults, setSearchResults] = useState<
+    Record<string, Array<any>>
+  >({});
 
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const showDropdown = Object.keys(searchResults || {}).length > 0 && searchTerm.length > 0;
+  const showDropdown =
+    Object.keys(searchResults || {}).length > 0 && searchTerm.length > 0;
 
   const resetSearchBar = () => {
     setSearchTerm('');
@@ -62,7 +65,7 @@ export const SearchBar = () => {
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: app.activeChainId()
+      chainScope: app.activeChainId(),
     });
 
     goToSearchPage(searchQuery, navigate);
@@ -76,16 +79,21 @@ export const SearchBar = () => {
   const handleGetSearchPreview = async (value: string) => {
     const searchQuery = new SearchQuery(value, {
       isSearchPreview: true,
-      chainScope: app.activeChainId() || 'all_chains'
+      chainScope: app.activeChainId() || 'all_chains',
     });
 
     try {
-      console.log('searchQuery: ', searchQuery)
+      console.log('searchQuery: ', searchQuery);
       await app.search.search(searchQuery);
       const searchResponse = app.search.getByQuery(searchQuery)?.results;
 
       const results = searchResponse
-        ? Object.fromEntries(Object.entries(searchResponse).map(([k, v]) => [k, v.slice(0, NUM_RESULTS_PER_SECTION)]))
+        ? Object.fromEntries(
+            Object.entries(searchResponse).map(([k, v]) => [
+              k,
+              v.slice(0, NUM_RESULTS_PER_SECTION),
+            ])
+          )
         : {};
 
       setSearchResults(results);
@@ -93,7 +101,9 @@ export const SearchBar = () => {
     } catch (err) {
       setSearchResults({});
 
-      notifyError(err.responseJSON?.error || err.responseText || err.toString());
+      notifyError(
+        err.responseJSON?.error || err.responseText || err.toString()
+      );
     }
   };
 
@@ -125,7 +135,7 @@ export const SearchBar = () => {
         </div>
         <input
           className={getClasses<{ isClearable: boolean }>({
-            isClearable: searchTerm?.length > 0
+            isClearable: searchTerm?.length > 0,
           })}
           placeholder="Search Common"
           value={searchTerm}
@@ -151,13 +161,20 @@ export const SearchBar = () => {
                     return (
                       <div className="preview-section" key={k}>
                         <div className="section-header">
-                          <CWText type="caption" className="section-header-text">
+                          <CWText
+                            type="caption"
+                            className="section-header-text"
+                          >
                             Threads
                           </CWText>
                           <CWDivider />
                         </div>
                         {v.map((res, i) => (
-                          <SearchBarThreadPreviewRow searchResult={res} searchTerm={searchTerm} key={i} />
+                          <SearchBarThreadPreviewRow
+                            searchResult={res}
+                            searchTerm={searchTerm}
+                            key={i}
+                          />
                         ))}
                       </div>
                     );
@@ -165,13 +182,20 @@ export const SearchBar = () => {
                     return (
                       <div className="preview-section" key={k}>
                         <div className="section-header">
-                          <CWText type="caption" className="section-header-text">
+                          <CWText
+                            type="caption"
+                            className="section-header-text"
+                          >
                             Comments
                           </CWText>
                           <CWDivider />
                         </div>
                         {v.map((res, i) => (
-                          <SearchBarCommentPreviewRow key={i} searchResult={res} searchTerm={searchTerm} />
+                          <SearchBarCommentPreviewRow
+                            key={i}
+                            searchResult={res}
+                            searchTerm={searchTerm}
+                          />
                         ))}
                       </div>
                     );
@@ -179,13 +203,19 @@ export const SearchBar = () => {
                     return (
                       <div className="preview-section" key={k}>
                         <div className="section-header">
-                          <CWText type="caption" className="section-header-text">
+                          <CWText
+                            type="caption"
+                            className="section-header-text"
+                          >
                             Communities
                           </CWText>
                           <CWDivider />
                         </div>
                         {v.map((res, i) => (
-                          <SearchBarCommunityPreviewRow searchResult={res} key={i} />
+                          <SearchBarCommunityPreviewRow
+                            searchResult={res}
+                            key={i}
+                          />
                         ))}
                       </div>
                     );
@@ -193,13 +223,19 @@ export const SearchBar = () => {
                     return (
                       <div className="preview-section" key={k}>
                         <div className="section-header">
-                          <CWText type="caption" className="section-header-text">
+                          <CWText
+                            type="caption"
+                            className="section-header-text"
+                          >
                             Members
                           </CWText>
                           <CWDivider />
                         </div>
                         {v.map((res, i) => (
-                          <SearchBarMemberPreviewRow searchResult={res} key={i} />
+                          <SearchBarMemberPreviewRow
+                            searchResult={res}
+                            key={i}
+                          />
                         ))}
                       </div>
                     );
