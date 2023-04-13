@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import 'components/comments/comment.scss';
 import type { Account, Comment as CommentType } from 'models';
