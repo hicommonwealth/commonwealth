@@ -26,8 +26,9 @@ class NewProfilesController {
   public constructor() {
     this._unfetched = new Map();
     this._fetchNewProfiles = _.debounce(() => {
+      console.log([...this._unfetched.values()].length);
       this._refreshProfiles(Array.from(this._unfetched.values()));
-    }, 500);
+    }, 200);
   }
 
   public getProfile(chain: string, address: string) {
@@ -92,6 +93,7 @@ class NewProfilesController {
           profile.chain,
           result.lastActive
         );
+        this._unfetched.delete(profile.address);
       } else {
         const resultMap = new Map(result.map(r => [r.address, r]));
         // multiple profiles
@@ -105,6 +107,7 @@ class NewProfilesController {
             profile.chain,
             currentProfile.lastActive
           );
+          this._unfetched.delete(profile.address);
         });
       }
     } catch (e) {
