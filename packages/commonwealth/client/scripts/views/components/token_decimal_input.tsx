@@ -23,12 +23,12 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
   private valueInWei: string;
 
   oninit(vnode: m.Vnode<TokenDecimalInputAttrs>) {
-    const { defaultValueInWei } = vnode.attrs;
+    const { defaultValueInWei, decimals } = vnode.attrs;
 
     this.valueInWei = defaultValueInWei || '0';
-    this.displayValue = this.valueInWei;
-    this.isInputInWei = true;
-    this.switchCaption = 'Using base token value';
+    this.displayValue = weiToTokens(this.valueInWei, decimals);
+    this.isInputInWei = false;
+    this.switchCaption = `Using ${decimals} decimal precision`;
   }
 
   view(vnode: m.Vnode<TokenDecimalInputAttrs>) {

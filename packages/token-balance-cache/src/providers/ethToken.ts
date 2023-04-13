@@ -72,8 +72,7 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
       to: tokenAddress,
       data: calldata,
     });
-
-    (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
+   (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
     return api.eth.abi.decodeParameter('uint256', result).toString();
   }
 }
