@@ -72,25 +72,8 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
       to: tokenAddress,
       data: calldata,
     });
-    const decodedResult = api.eth.abi
-      .decodeParameter('uint256', result)
-      .toString();
 
-    if (contractType == 'erc20') {
-      // We need to dynamically convert erc20 balances wei -> ether/gwei for use in the app
-      const decimal = await api.eth.call({
-        to: tokenAddress,
-        data: '0x313ce567',
-      });
-      (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
-      return api.utils.fromWei(
-        decodedResult,
-        api.eth.abi.decodeParameter('uint8', decimal).toString() == '18'
-          ? 'ether'
-          : 'gwei'
-      );
-    }
     (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
-    return decodedResult;
+    return api.eth.abi.decodeParameter('uint256', result).toString();
   }
 }
