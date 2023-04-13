@@ -83,7 +83,6 @@ export const SearchBar = () => {
     });
 
     try {
-      console.log('searchQuery: ', searchQuery);
       await app.search.search(searchQuery);
       const searchResponse = app.search.getByQuery(searchQuery)?.results;
 
@@ -110,7 +109,7 @@ export const SearchBar = () => {
   // when debounced search term changes, fetch search results
   useEffect(() => {
     clearTimeout(resetTimer);
-    if (debouncedSearchTerm?.length > 3) {
+    if (debouncedSearchTerm?.length >= MIN_SEARCH_TERM_LENGTH) {
       handleGetSearchPreview(debouncedSearchTerm);
     }
   }, [debouncedSearchTerm]);
