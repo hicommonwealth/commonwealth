@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { initAppState } from 'state';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
 import $ from 'jquery';
 import { redraw } from 'mithrilInterop';
@@ -36,8 +36,6 @@ import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
-import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -203,16 +201,8 @@ export const LoginSelectorMenuRight = ({
     /**
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
-    const chainbase = app.chain?.meta?.base;
-    const wallets = app.wallets.availableWallets(chainbase);
-
-    const wallet = wallets.find(
-      (w) =>
-        w instanceof WalletConnectWebWalletController ||
-        w instanceof TerraWalletConnectWebWalletController
-    );
-
-    await wallet.reset();
+    const walletConnectWallet = app.wallets.getByName(WalletId.WalletConnect);
+    await walletConnectWallet.reset();
   };
 
   return (
