@@ -67,6 +67,9 @@ export const modelFromServer = (comment) => {
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
           deleted: true,
+          canvasAction: comment.canvas_action,
+          canvasSession: comment.canvas_session,
+          canvasHash: comment.canvas_hash,
         }
       : {
           chain: comment.chain,
@@ -83,6 +86,9 @@ export const modelFromServer = (comment) => {
           authorChain: comment?.Address?.chain || comment.authorChain,
           lastEdited,
           deleted: false,
+          canvasAction: comment.canvas_action,
+          canvasSession: comment.canvas_session,
+          canvasHash: comment.canvas_hash,
         };
 
   return new Comment(commentParams);
@@ -131,6 +137,14 @@ class CommentsController {
   ) {
     let chainEntity;
     try {
+      // TODO: Create a new type for proposal comments?
+      const { session, action, hash } = await app.sessions.signComment({
+        thread_id: threadId,
+        body: unescapedText,
+        parent_comment_id: parentCommentId,
+      });
+
+      // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         author_chain: app.user.activeAccount.chain.id,
         chain,
@@ -141,6 +155,9 @@ class CommentsController {
         'attachments[]': attachments,
         text: encodeURIComponent(unescapedText),
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       const { result } = res;
       const newComment = modelFromServer(result);
@@ -166,6 +183,11 @@ class CommentsController {
     const newBody = body || comment.text;
     try {
       // TODO: Change to PUT /comment
+      const { session, action, hash } = await app.sessions.signComment({
+        thread_id: comment.threadId,
+        body,
+        parent_comment_id: comment.parentComment,
+      });
       const response = await $.post(`${app.serverUrl()}/editComment`, {
         address: app.user.activeAccount.address,
         author_chain: app.user.activeAccount.chain.id,
@@ -174,6 +196,9 @@ class CommentsController {
         body: encodeURIComponent(newBody),
         'attachments[]': attachments,
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -192,6 +217,9 @@ class CommentsController {
   }
 
   public async delete(comment) {
+    const { session, action, hash } = await app.sessions.signDeleteComment({
+      comment_id: comment.canvasHash,
+    });
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /comment
       $.post(`${app.serverUrl()}/deleteComment`, {
@@ -205,6 +233,9 @@ class CommentsController {
             text: '[deleted]',
             plaintext: '[deleted]',
             versionHistory: [],
+            canvas_action: action,
+            canvas_session: session,
+            canvas_hash: hash,
           });
           const softDeletion = new Comment(revisedComment);
           this._store.remove(existing);

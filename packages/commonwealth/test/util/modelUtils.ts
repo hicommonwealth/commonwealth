@@ -23,7 +23,8 @@ import type { Permission } from '../../server/models/role';
 
 import {
   constructTypedCanvasMessage,
-  TEST_BLOCK_INFO_STRING
+  TEST_BLOCK_INFO_STRING,
+  TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -95,7 +96,8 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       chain_id,
       address,
       sessionWallet.address,
-      TEST_BLOCK_INFO_STRING
+      timestamp,
+      TEST_BLOCK_INFO_BLOCKHASH
     );
     const data = constructTypedCanvasMessage(message);
     const privateKey = keypair.getPrivateKey();
@@ -143,12 +145,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       'ed25519'
     );
     const chain_id = ChainNetwork.Edgeware;
+    const timestamp = 1665083987891;
     const message = constructCanvasMessage(
       'ethereum',
       chain_id,
       address,
       sessionWallet.address,
-      TEST_BLOCK_INFO_STRING
+      timestamp,
+      TEST_BLOCK_INFO_BLOCKHASH
     );
 
     const signature = keyPair.sign(stringToU8a(JSON.stringify(message)));

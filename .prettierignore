@@ -19,3 +19,5 @@ packages/chain-events/.eslintrc.js
 **/eth/types
 **/eth/artifacts
 **/.eslintrc.js
+**/ios/App/App
+

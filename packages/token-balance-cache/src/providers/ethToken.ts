@@ -3,6 +3,9 @@ import { BalanceProvider } from '../types';
 import { BalanceType } from 'common-common/src/types';
 import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';
+import Erc20BalanceProvider from './erc20';
+import Erc721BalanceProvider from './erc721';
+import Erc1155BalanceProvider from './erc1155';
 
 export default class EthTokenBalanceProvider extends BalanceProvider<Web3> {
   public name = 'eth-token';
@@ -33,12 +36,19 @@ export default class EthTokenBalanceProvider extends BalanceProvider<Web3> {
       if (!Web3.utils.isAddress(address)) {
         throw new Error('Invalid address');
       }
-
       const api = await this.getExternalProvider(node);
       const balance = await api.eth.getBalance(address);
       (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
       // use native token if no args provided
       return balance;
+    } else if(contractType == 'erc20'){
+      return new Erc20BalanceProvider().getBalance(node, address, opts);
+    }else if( contractType == 'erc721'){
+      return new Erc721BalanceProvider().getBalance(node, address, opts)
+    }else if(contractType == 'erc1155'){
+      return new Erc1155BalanceProvider().getBalance(node, address, opts);
+    }else{
+      return "0"
     }
   }
 }

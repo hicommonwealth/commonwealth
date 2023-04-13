@@ -166,7 +166,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
     return (
       <div
         className={editorClass}
-        oncreate={async (childVnode) => {
+        onCreate={async (childVnode) => {
           this.$editor = $(childVnode.dom).find('.quill-editor');
           this.editor = new QuillEditor(
             this.$editor,

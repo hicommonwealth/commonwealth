@@ -1,12 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import 'modals/preview_modal.scss';
 
-import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import type { DeltaStatic } from 'quill';
-import { MarkdownFormattedText } from '../components/react_quill_editor/markdown_formatted_text';
+import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
 
 const EmptyState = () => {
   return (
@@ -24,35 +23,16 @@ type PreviewModalProps = {
   title: string;
 };
 
-export const PreviewModal = ({
-  doc,
-  onModalClose,
-  title,
-}: PreviewModalProps) => {
-  const renderedContent = useMemo(() => {
-    if (!doc) {
-      return <EmptyState />;
-    }
-    // render as markdown
-    if (typeof doc === 'string') {
-      if (doc.length === 0) {
-        return <EmptyState />;
-      }
-      return <MarkdownFormattedText doc={doc} />;
-    }
-    if (!doc.ops?.length) {
-      return <EmptyState />;
-    }
-    return <QuillFormattedText doc={doc} />;
-  }, [doc]);
-
+export const PreviewModal = ({ doc, onModalClose, title }: PreviewModalProps) => {
   return (
     <div className="PreviewModal">
       <div className="compact-modal-title">
         <h3>{title ? `Preview: ${title}` : 'Preview'}</h3>
         <CWIconButton iconName="close" onClick={() => onModalClose()} />
       </div>
-      <div className="compact-modal-body">{renderedContent}</div>
+      <div className="compact-modal-body">
+        <QuillRenderer doc={typeof doc === 'string' ? doc : JSON.stringify(doc)} />
+      </div>
     </div>
   );
 };

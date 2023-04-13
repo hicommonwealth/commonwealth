@@ -56,9 +56,9 @@ export async function createRole(models: DB, req: Request, res: Response) {
 
   const result = await models.sequelize.query(
     `INSERT INTO "RoleAssignments" (
-      "address_id", 
-      "community_role_id", 
-      "created_at", 
+      "address_id",
+      "community_role_id",
+      "created_at",
       "updated_at"
     )
     SELECT "Addresses"."user_id", :role_id, NOW(), NOW()
@@ -177,9 +177,9 @@ export async function createPermission(
 
   const result = await models.sequelize.query(
     `INSERT INTO "Permissions" (
-      "community_role_id", 
-      "action", 
-      "created_at", 
+      "community_role_id",
+      "action",
+      "created_at",
       "updated_at"
     )
     SELECT "CommunityRoles"."id", :permission_id, NOW(), NOW()

@@ -20,6 +20,7 @@ type ContractCardProps = {
   id: number;
   address: string;
   templates: Contract['ccts'];
+  onUpdateSuccess: () => void;
 };
 
 type ManageContractTemplateModalData = Omit<
@@ -27,16 +28,19 @@ type ManageContractTemplateModalData = Omit<
   'onModalClose'
 >;
 
-export const ContractCard = ({ address, templates, id }: ContractCardProps) => {
+export const ContractCard = ({
+  address,
+  templates,
+  id,
+  onUpdateSuccess,
+}: ContractCardProps) => {
   const navigate = useCommonNavigate();
 
-  const [
-    manageContractTemplateModalData,
-    setManageContractTemplateModalData,
-  ] = useState<ManageContractTemplateModalData>(null);
+  const [manageContractTemplateModalData, setManageContractTemplateModalData] =
+    useState<ManageContractTemplateModalData>(null);
 
-  const globalTemplatesExist = app.contracts.store.getContractByAddress(address)
-    ?.hasGlobalTemplate;
+  const globalTemplatesExist =
+    app.contracts.store.getContractByAddress(address)?.hasGlobalTemplate;
 
   const handleDeleteContract = () => {
     openConfirmation({
@@ -52,9 +56,14 @@ export const ContractCard = ({ address, templates, id }: ContractCardProps) => {
           label: 'Delete',
           buttonType: 'mini-red',
           onClick: async () => {
-            await app.contracts.deleteCommunityContract({
-              contract_id: id,
-            });
+            try {
+              await app.contracts.deleteCommunityContract({
+                contract_id: id,
+              });
+              onUpdateSuccess();
+            } catch (err) {
+              console.log(err);
+            }
           },
         },
         {
@@ -71,6 +80,7 @@ export const ContractCard = ({ address, templates, id }: ContractCardProps) => {
 
   const handleOpenManageContractTemplateModal = async (
     templateId?: number,
+    cctId?: number,
     template?: any
   ) => {
     const contractTemplates = await app.contracts.getTemplatesForContract(id);
@@ -78,7 +88,7 @@ export const ContractCard = ({ address, templates, id }: ContractCardProps) => {
     setManageContractTemplateModalData({
       contractId: id,
       templateId: templateId,
-      template: template,
+      template: { ...template, id: cctId },
       contractTemplates,
     });
   };
@@ -116,7 +126,9 @@ export const ContractCard = ({ address, templates, id }: ContractCardProps) => {
                     slug={template.cctmd.slug}
                     display={template.cctmd.display_options}
                     cctmd_id={template.cctmd.id}
+                    cct_id={template.id}
                     handleShowModal={handleOpenManageContractTemplateModal}
+                    onUpdateSuccess={onUpdateSuccess}
                   />
                 ))}
               </div>
@@ -158,7 +170,10 @@ export const ContractCard = ({ address, templates, id }: ContractCardProps) => {
               contractTemplates={
                 manageContractTemplateModalData?.contractTemplates
               }
-              onModalClose={() => setManageContractTemplateModalData(null)}
+              onModalClose={() => {
+                setManageContractTemplateModalData(null);
+                onUpdateSuccess();
+              }}
             />
           }
           onClose={() => setManageContractTemplateModalData(null)}

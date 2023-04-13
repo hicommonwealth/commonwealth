@@ -1,14 +1,22 @@
 import type { Signer } from '@polkadot/api/types';
 
-import { web3Enable, } from '@polkadot/extension-dapp';
+import {
+  isWeb3Injected,
+  web3Accounts,
+  web3Enable,
+  web3FromAddress,
+} from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { stringToHex } from '@polkadot/util';
+
+import type { SessionPayload } from '@canvas-js/interfaces';
+
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
-import app from 'state';
 import { addressSwapper } from 'utils';
+
+import type { Account, IWebWallet } from 'models';
+import app from 'state';
 
 class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>
@@ -25,7 +33,7 @@ class PolkadotWebWalletController
   public readonly chain = ChainBase.Substrate;
 
   public get available() {
-    return this.polkadot && this.polkadot.isWeb3Injected;
+    return isWeb3Injected;
   }
 
   public get enabled() {
@@ -63,9 +71,10 @@ class PolkadotWebWalletController
   // ACTIONS
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
-    const message = stringToHex(JSON.stringify(canvasMessage));
+    const canvas = await import('@canvas-js/interfaces');
+    const message = stringToHex(canvas.serializeSessionPayload(canvasMessage));
 
     const signer = await this.getSigner(account.address);
     const payload: SignerPayloadRaw = {
@@ -73,7 +82,8 @@ class PolkadotWebWalletController
       data: message,
       type: 'bytes',
     };
-    return (await signer.signRaw(payload)).signature;
+    const signature = (await signer.signRaw(payload)).signature;
+    return signature;
   }
 
   public async enable() {
@@ -89,7 +99,7 @@ class PolkadotWebWalletController
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account
-      this._accounts = await this.polkadot.polkadotweb3Accounts();
+      this._accounts = await this.polkadot.web3Accounts();
 
       this._enabled = true;
       this._enabling = false;
