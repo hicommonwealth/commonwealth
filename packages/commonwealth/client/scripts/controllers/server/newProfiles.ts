@@ -60,6 +60,7 @@ class NewProfilesController {
   }
 
   private async _refreshProfiles(profiles: Profile[]): Promise<void> {
+    if (profiles.length === 0) return;
     const chunkedProfiles = _.chunk(profiles, 20);
     await Promise.all(
       chunkedProfiles.map(async (chunk): Promise<Profile | Profile[]> => {
