@@ -4,6 +4,8 @@ import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import validateChain from './validateChain';
 
+export const ALL_CHAINS = 'all_chains'
+
 export const Errors = {
   InvalidUser: 'Invalid user',
   InvalidCommunity: 'Invalid community or chain',
@@ -39,6 +41,11 @@ export default class DatabaseValidationService {
   ) => {
     let chain = null;
     let error = null;
+    if (req.query.chain === ALL_CHAINS) {
+      // If chain is all, don't set anything on request object
+      next();
+      return;
+    }
     if (req.method === 'GET') {
       [chain, error] = await validateChain(this.models, req.query);
       if (error) return next(new AppError(error));

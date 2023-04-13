@@ -76,10 +76,11 @@ export const SearchBar = () => {
   const handleGetSearchPreview = async (value: string) => {
     const searchQuery = new SearchQuery(value, {
       isSearchPreview: true,
-      chainScope: app.activeChainId()
+      chainScope: app.activeChainId() || 'all_chains'
     });
 
     try {
+      console.log('searchQuery: ', searchQuery)
       await app.search.search(searchQuery);
       const searchResponse = app.search.getByQuery(searchQuery)?.results;
 

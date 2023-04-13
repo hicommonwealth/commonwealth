@@ -36,6 +36,9 @@ const SearchPage = () => {
 
   const handleSearch = useCallback(async () => {
     try {
+      if (!searchQuery.chainScope) {
+        searchQuery.chainScope = 'all_chains'
+      }
       const response = await app.search.search(searchQuery);
 
       setSearchResults(
@@ -76,6 +79,9 @@ const SearchPage = () => {
 
   const getCaptionScope = () => {
     if (searchQuery.chainScope) {
+      if (searchQuery.chainScope === 'all_chains') {
+        return 'in all communities.'
+      }
       return `in ${capitalize(searchQuery.chainScope)}.`;
     } else if (app.isCustomDomain()) {
       return '';
@@ -119,7 +125,7 @@ const SearchPage = () => {
           <CWText isCentered className="search-results-caption">
             {resultCount} matching '{searchQuery.searchTerm}'{' '}
             {getCaptionScope()}
-            {searchQuery.chainScope && !app.isCustomDomain() && (
+            {searchQuery.chainScope !== 'all_chains' && !app.isCustomDomain() && (
               <a
                 href="#"
                 className="search-all-communities"
