@@ -36,6 +36,8 @@ import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -197,6 +199,22 @@ export const LoginSelectorMenuRight = ({
     localStorage.getItem('dark-mode-state') === 'on'
   );
 
+  const resetWalletConnectSession = async () => {
+    /**
+     * Imp to reset wc session on logout as subsequent login attempts fail
+     */
+    const chainbase = app.chain?.meta?.base;
+    const wallets = app.wallets.availableWallets(chainbase);
+
+    const wallet = wallets.find(
+      (w) =>
+        w instanceof WalletConnectWebWalletController ||
+        w instanceof TerraWalletConnectWebWalletController
+    );
+
+    await wallet.reset();
+  };
+
   return (
     <>
       <div className="LoginSelectorMenu right">
@@ -231,6 +249,8 @@ export const LoginSelectorMenuRight = ({
             $.get(`${app.serverUrl()}/logout`)
               .then(async () => {
                 await initAppState();
+                await resetWalletConnectSession();
+
                 notifySuccess('Logged out');
                 onLogout();
                 setDarkMode(false);
