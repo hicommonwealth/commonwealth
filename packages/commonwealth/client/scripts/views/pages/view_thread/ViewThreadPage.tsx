@@ -32,7 +32,11 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
-import { getCommentSubscription, getReactionSubscription, handleToggleSubscription } from '../discussions/helpers';
+import {
+  getCommentSubscription,
+  getReactionSubscription,
+  handleToggleSubscription,
+} from '../discussions/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -76,10 +80,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
-  const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] = useState(false);
+  const [isEditCollaboratorsModalOpen, setIsEditCollaboratorsModalOpen] =
+    useState(false);
 
   const threadId = identifier.split('-')[0];
-  const threadDoesNotMatch = +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
+  const threadDoesNotMatch =
+    +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
 
   const cancelEditing = () => {
     setIsGloballyEditing(false);
@@ -91,7 +97,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       new Thread({
         ...thread,
         title: newTitle,
-        body: body
+        body: body,
       })
     );
     cancelEditing();
@@ -102,7 +108,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       return;
     }
 
-    const _comments = app.comments.getByThread(thread).filter((c) => c.parentComment === null) || [];
+    const _comments =
+      app.comments
+        .getByThread(thread)
+        .filter((c) => c.parentComment === null) || [];
     setComments(_comments);
   }, [thread]);
 
@@ -115,8 +124,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         pollsStarted: false,
         viewCountStarted: false,
         profilesStarted: false,
-        profilesFinished: false
-      }
+        profilesFinished: false,
+      },
     }));
   }
 
@@ -139,7 +148,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               return {
                 id: r.id,
                 type: 'like',
-                address: r.author
+                address: r.author,
               };
             });
 
@@ -166,8 +175,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         ...prevState,
         [threadId]: {
           ...prevState[threadId],
-          threadReactionsStarted: true
-        }
+          threadReactionsStarted: true,
+        },
       }));
     }
   }, [prefetch, thread, threadId]);
@@ -178,7 +187,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
 
     if (thread && identifier !== `${threadId}-${slugify(thread?.title)}`) {
-      const url = getProposalUrlPath(thread.slug, `${threadId}-${slugify(thread?.title)}`, true);
+      const url = getProposalUrlPath(
+        thread.slug,
+        `${threadId}-${slugify(thread?.title)}`,
+        true
+      );
       navigate(url, { replace: true });
     }
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
@@ -193,7 +206,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         .refresh(thread, app.activeChainId())
         .then(async () => {
           // fetch comments
-          const _comments = app.comments.getByThread(thread).filter((c) => c.parentComment === null);
+          const _comments = app.comments
+            .getByThread(thread)
+            .filter((c) => c.parentComment === null);
           setComments(_comments);
 
           // fetch reactions
@@ -201,13 +216,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             type: 'POST',
             url: `${app.serverUrl()}/reactionsCounts`,
             headers: {
-              'content-type': 'application/json'
+              'content-type': 'application/json',
             },
             data: JSON.stringify({
               proposal_ids: [threadId],
-              comment_ids: app.comments.getByThread(thread).map((comment) => comment.id),
-              active_address: app.user.activeAccount?.address
-            })
+              comment_ids: app.comments
+                .getByThread(thread)
+                .map((comment) => comment.id),
+              active_address: app.user.activeAccount?.address,
+            }),
           });
 
           // app.reactionCounts.deinit()
@@ -215,10 +232,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             const id = app.reactionCounts.store.getIdentifier({
               threadId: rc.thread_id,
               proposalId: rc.proposal_id,
-              commentId: rc.comment_id
+              commentId: rc.comment_id,
             });
 
-            app.reactionCounts.store.add(modelReactionCountFromServer({ ...rc, id }));
+            app.reactionCounts.store.add(
+              modelReactionCountFromServer({ ...rc, id })
+            );
           }
         })
         .catch(() => {
@@ -230,8 +249,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         ...prevState,
         [threadId]: {
           ...prevState[threadId],
-          commentsStarted: true
-        }
+          commentsStarted: true,
+        },
       }));
     }
   }, [prefetch, thread, threadId]);
@@ -271,8 +290,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         ...prevState,
         [threadId]: {
           ...prevState[threadId],
-          pollsStarted: true
-        }
+          pollsStarted: true,
+        },
       }));
     }
   }, [prefetch, thread, thread?.id, threadId]);
@@ -286,7 +305,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (!prefetch[threadId]['viewCountStarted']) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        object_id: thread.id
+        object_id: thread.id,
       })
         .then((response) => {
           if (response.status !== 'Success') {
@@ -305,8 +324,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         ...prevState,
         [threadId]: {
           ...prevState[threadId],
-          viewCountStarted: true
-        }
+          viewCountStarted: true,
+        },
       }));
     }
   }, [prefetch, thread, thread?.id, threadId]);
@@ -330,8 +349,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ...prevState,
             [threadId]: {
               ...prevState[threadId],
-              profilesFinished: true
-            }
+              profilesFinished: true,
+            },
           }));
         }
       });
@@ -340,11 +359,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         ...prevState,
         [threadId]: {
           ...prevState[threadId],
-          profilesStarted: true
-        }
+          profilesStarted: true,
+        },
       }));
     }
-  }, [comments, prefetch, thread, thread?.author, thread?.authorChain, threadId]);
+  }, [
+    comments,
+    prefetch,
+    thread,
+    thread?.author,
+    thread?.authorChain,
+    threadId,
+  ]);
 
   useEffect(() => {
     if (threadDoesNotMatch) {
@@ -364,8 +390,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           ...prevState,
           [threadId]: {
             ...prevState[threadId],
-            commentsStarted: false
-          }
+            commentsStarted: false,
+          },
         }));
       }
     }
@@ -388,7 +414,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return <PageNotFound />;
   }
 
-  if (!app.newProfiles.allLoaded() && !prefetch[threadId]?.['profilesFinished']) {
+  if (
+    !app.newProfiles.allLoaded() &&
+    !prefetch[threadId]?.['profilesFinished']
+  ) {
     return <PageLoading />;
   }
 
@@ -402,34 +431,47 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // merely have access to the body and title
   const { activeAccount } = app.user;
 
-  const isAuthor = activeAccount?.address === thread.author && activeAccount?.chain.id === thread.authorChain;
+  const isAuthor =
+    activeAccount?.address === thread.author &&
+    activeAccount?.chain.id === thread.authorChain;
 
   const isEditor =
     thread.collaborators?.filter((c) => {
-      return c.address === activeAccount?.address && c.chain === activeAccount?.chain.id;
+      return (
+        c.address === activeAccount?.address &&
+        c.chain === activeAccount?.chain.id
+      );
     }).length > 0;
 
   const isAdmin =
     app.roles.isRoleOfCommunity({
       role: 'admin',
-      chain: app.activeChainId()
+      chain: app.activeChainId(),
     }) || app.user.isSiteAdmin;
 
   const isAdminOrMod =
     isAdmin ||
     app.roles.isRoleOfCommunity({
       role: 'moderator',
-      chain: app.activeChainId()
+      chain: app.activeChainId(),
     });
 
-  const isSubscribed = getCommentSubscription(thread)?.isActive && getReactionSubscription(thread)?.isActive;
+  const isSubscribed =
+    getCommentSubscription(thread)?.isActive &&
+    getReactionSubscription(thread)?.isActive;
 
   const showLinkedProposalOptions =
-    thread.snapshotProposal?.length > 0 || thread.chainEntities?.length > 0 || isAuthor || isAdminOrMod;
+    thread.snapshotProposal?.length > 0 ||
+    thread.chainEntities?.length > 0 ||
+    isAuthor ||
+    isAdminOrMod;
 
-  const showLinkedThreadOptions = thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
+  const showLinkedThreadOptions =
+    thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
 
-  const canComment = app.user.activeAccount || (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
+  const canComment =
+    app.user.activeAccount ||
+    (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
 
   const reactionsAndReplyButtons = (
     <div className="thread-footer-row">
@@ -447,12 +489,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const linkedThreadsRelations = linkedThreads.map((t) => ({
       id: '',
       linkedThread: String(t.id),
-      linkingThread: String(thread.id)
+      linkingThread: String(thread.id),
     }));
 
     const updatedThread = new Thread({
       ...thread,
-      linkedThreads: linkedThreadsRelations
+      linkedThreads: linkedThreadsRelations,
     });
 
     setThread(updatedThread);
@@ -467,7 +509,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       ...thread,
       stage,
       chainEntities,
-      snapshotProposal: snapshotProposal[0]?.id
+      snapshotProposal: snapshotProposal[0]?.id,
     } as Thread;
 
     setThread(newThread);
@@ -482,18 +524,24 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               iconLeft: 'write' as const,
               onClick: async (e) => {
                 e.preventDefault();
-                setSavedEdits(localStorage.getItem(`${app.activeChainId()}-edit-thread-${thread.id}-storedText`));
+                setSavedEdits(
+                  localStorage.getItem(
+                    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
+                  )
+                );
 
                 if (savedEdits) {
                   clearEditingLocalStorage(thread.id, ContentType.Thread);
-                  const confirmation = window.confirm('Previous changes found. Restore edits?');
+                  const confirmation = window.confirm(
+                    'Previous changes found. Restore edits?'
+                  );
                   setShouldRestoreEdits(confirmation);
                 }
 
                 setIsGloballyEditing(true);
                 setIsEditingBody(true);
-              }
-            }
+              },
+            },
           ]
         : []),
       ...(hasEditPerms
@@ -503,8 +551,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               iconLeft: 'write' as const,
               onClick: () => {
                 setIsEditCollaboratorsModalOpen(true);
-              }
-            }
+              },
+            },
           ]
         : []),
       ...(isAdminOrMod || isAuthor
@@ -514,8 +562,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               iconLeft: 'write' as const,
               onClick: () => {
                 setIsChangeTopicModalOpen(true);
-              }
-            }
+              },
+            },
           ]
         : []),
       ...(isAuthor || isAdminOrMod
@@ -531,8 +579,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 app.threads.delete(thread).then(() => {
                   navigate('/discussions');
                 });
-              }
-            }
+              },
+            },
           ]
         : []),
       ...(isAuthor || isAdminOrMod
@@ -544,15 +592,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 app.threads
                   .setPrivacy({
                     threadId: thread.id,
-                    readOnly: !thread.readOnly
+                    readOnly: !thread.readOnly,
                   })
                   .then(() => {
                     setIsGloballyEditing(false);
                     setIsEditingBody(false);
                     setRecentlyEdited(true);
                   });
-              }
-            }
+              },
+            },
           ]
         : []),
       ...((isAuthor || isAdminOrMod) && !!app.chain?.meta.snapshot.length
@@ -568,8 +616,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 } else {
                   navigate(`/snapshot/${snapshotSpaces}`);
                 }
-              }
-            }
+              },
+            },
           ]
         : []),
       { type: 'divider' as const },
@@ -585,8 +633,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           });
         },
         label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
-        iconLeft: isSubscribed ? 'unsubscribe' : 'bell'
-      }
+        iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
+      },
     ];
   };
 
@@ -594,7 +642,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     <Sublayout>
       <CWContentPage
         contentBodyLabel="Thread"
-        showSidebar={showLinkedProposalOptions || showLinkedThreadOptions || polls?.length > 0 || isAuthor}
+        showSidebar={
+          showLinkedProposalOptions ||
+          showLinkedThreadOptions ||
+          polls?.length > 0 ||
+          isAuthor
+        }
         title={
           isEditingBody ? (
             <CWTextInput
@@ -611,9 +664,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         createdAt={thread.createdAt}
         viewCount={viewCount}
         readOnly={thread.readOnly}
-        headerComponents={thread.stage !== ThreadStageType.Discussion && <ThreadStage thread={thread} />}
+        headerComponents={
+          thread.stage !== ThreadStageType.Discussion && (
+            <ThreadStage thread={thread} />
+          )
+        }
         subHeader={!!thread.url && <ExternalLink thread={thread} />}
-        actions={app.user.activeAccount && !isGloballyEditing && getActionMenuItems()}
+        actions={
+          app.user.activeAccount && !isGloballyEditing && getActionMenuItems()
+        }
         body={
           <div className="thread-content">
             {isEditingBody ? (
@@ -638,7 +697,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 ) : !isGloballyEditing && canComment && isLoggedIn ? (
                   <>
                     {reactionsAndReplyButtons}
-                    <CreateComment updatedCommentsCallback={updatedCommentsCallback} rootThread={thread} />
+                    <CreateComment
+                      updatedCommentsCallback={updatedCommentsCallback}
+                      rootThread={thread}
+                    />
                   </>
                 ) : null}
               </>
@@ -676,31 +738,43 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                         )}
                       </div>
-                    )
-                  }
+                    ),
+                  },
                 ]
               : []),
-            ...(polls?.length > 0 || (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+            ...(polls?.length > 0 ||
+            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
                   {
                     label: 'Polls',
                     item: (
                       <div className="cards-column">
-                        {[...new Map(polls?.map((poll) => [poll.id, poll])).values()].map((poll: Poll) => {
-                          return <ThreadPollCard poll={poll} key={poll.id} onVote={() => setInitializedPolls(false)} />;
+                        {[
+                          ...new Map(
+                            polls?.map((poll) => [poll.id, poll])
+                          ).values(),
+                        ].map((poll: Poll) => {
+                          return (
+                            <ThreadPollCard
+                              poll={poll}
+                              key={poll.id}
+                              onVote={() => setInitializedPolls(false)}
+                            />
+                          );
                         })}
-                        {isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                          <ThreadPollEditorCard
-                            thread={thread}
-                            threadAlreadyHasPolling={!polls?.length}
-                            onPollCreate={() => setInitializedPolls(false)}
-                          />
-                        )}
+                        {isAuthor &&
+                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                            <ThreadPollEditorCard
+                              thread={thread}
+                              threadAlreadyHasPolling={!polls?.length}
+                              onPollCreate={() => setInitializedPolls(false)}
+                            />
+                          )}
                       </div>
-                    )
-                  }
+                    ),
+                  },
                 ]
-              : [])
+              : []),
           ] as SidebarComponents
         }
       />
