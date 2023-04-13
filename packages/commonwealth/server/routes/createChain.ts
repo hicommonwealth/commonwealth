@@ -26,11 +26,13 @@ import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
+import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
+  ReservedId: 'The id is reserved and cannot be used',
   NoName: 'Must provide name',
   InvalidNameLength: 'Name should not exceed 255',
   NoSymbol: 'Must provide symbol',
@@ -108,6 +110,9 @@ const createChain = async (
   }
   if (!req.body.id || !req.body.id.trim()) {
     return next(new AppError(Errors.NoId));
+  }
+  if (req.body.id === ALL_CHAINS) {
+    return next(new AppError(Errors.ReservedId))
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new AppError(Errors.NoName));
