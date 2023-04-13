@@ -107,8 +107,13 @@ const ManageCommunityPage = () => {
     fetch();
   }, []);
 
-  if (!initialized) return <PageLoading />;
-  if (!isAdmin) return <ErrorPage message={'Must be admin'} />;
+  if (!initialized) {
+    return <PageLoading />;
+  }
+
+  if (!isAdmin) {
+    return <ErrorPage message={'Must be admin'} />;
+  }
 
   return (
     <Sublayout>
