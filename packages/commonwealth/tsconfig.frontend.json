@@ -1,10 +1,10 @@
-
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "jsx": "react"
   },
   "include": [
-    "./client/scripts/views"
+    "./client/scripts/views",
+    "./client/scripts"
   ]
 }
