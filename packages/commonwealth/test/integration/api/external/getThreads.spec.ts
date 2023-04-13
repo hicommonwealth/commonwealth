@@ -2,7 +2,7 @@ import 'chai/register-should';
 import models from 'server/database';
 import chai from 'chai';
 import 'chai/register-should';
-import { req, res } from 'test/unit/unitHelpers';
+import { getReq, res } from 'test/unit/unitHelpers';
 import type { GetThreadsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import 'test/integration/api/external/dbEntityHooks.spec';

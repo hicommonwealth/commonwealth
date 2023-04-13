@@ -16,7 +16,6 @@ import type { RuleAttributes } from '../../../../server/models/rule';
 
 const Op = Sequelize.Op;
 
-/* eslint-disable import/no-mutable-exports */
 export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
@@ -81,6 +80,8 @@ beforeEach(async () => {
           await models.Profile.findOrCreate({
             where: {
               id: -i - 1,
+              profile_name: `testName${-i - 1}`,
+              avatar_url: `testAvatarUrl${-i - 1}`,
               email: `test${i - 1}@gmail.com`,
               user_id: -i - 1,
             },
@@ -171,7 +172,7 @@ beforeEach(async () => {
               address: `testAddress${-i - 1}`,
               chain: 'cmntest',
               verification_token: '',
-              profile_id: -i - 1,
+              profile_id: i < 2 ? -1 : -2,
               verified: moment.now(),
             },
           })
@@ -273,7 +274,7 @@ beforeEach(async () => {
               chain: 'cmntest',
               address_id: -1,
               text: '',
-              thread_id: 'discussion_-1',
+              thread_id: -1,
               plaintext: '',
             },
           })
@@ -292,7 +293,7 @@ beforeEach(async () => {
                 chain: 'cmntest',
                 address_id: -2,
                 text: '',
-                thread_id: 'discussion_-2',
+                thread_id: -2,
                 plaintext: '',
               },
             })

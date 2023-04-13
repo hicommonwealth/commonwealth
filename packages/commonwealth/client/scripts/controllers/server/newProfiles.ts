@@ -1,5 +1,5 @@
+import axios from 'axios';
 import { EventEmitter } from 'events';
-import $ from 'jquery';
 import _ from 'lodash';
 import { MinimumProfile as Profile } from 'models';
 
@@ -64,38 +64,24 @@ class NewProfilesController {
       return;
     }
 
-    const requestData =
-      profiles.length === 1
-        ? {
-          address: profiles[0].address,
-          chain: profiles[0].chain,
-          jwt: app.user.jwt,
-        }
-        : {
-          'address[]': profiles.map((profile) => profile.address),
-          'chain[]': profiles.map((profile) => profile.chain),
-          jwt: app.user.jwt,
-        };
-    try {
-      const { result } = await $.post(
-        `${app.serverUrl()}/getAddressProfile`,
-        requestData
-      );
+    // we can safely fit 20000 addresses in a call before we hit the 1mb limit
+    // addresses*addressSize = 20000*42 = 840000bytes = 0.84mb. As a result chunk in groups of 20000
+    const profileChunks = _.chunk(profiles, 20000);
 
-      // single profile
-      if (profiles.length === 1) {
-        const profile = profiles[0];
-        profile.initialize(
-          result.name,
-          result.address,
-          result.avatarUrl,
-          result.profileId,
-          profile.chain,
-          result.lastActive
+    try {
+      const responses = await Promise.all(profileChunks.map(async profileChunk => {
+        return axios.post(
+          `${app.serverUrl()}/getAddressProfile`,
+          {
+            addresses: profileChunk.map(p => p.address),
+            chains: [...new Set(profileChunk.map(p => p.chain))], // filter out unique chains
+            jwt: app.user.jwt,
+          }
         );
-        this._unfetched.delete(profile.address);
-      } else {
-        const resultMap = new Map(result.map(r => [r.address, r]));
+      }));
+
+      responses.forEach(response => {
+        const resultMap = new Map(response.data.result.map(r => [r.address, r]));
         // multiple profiles
         profiles.forEach((profile) => {
           const currentProfile = resultMap.get(profile.address) as any;
@@ -109,11 +95,19 @@ class NewProfilesController {
           );
           this._unfetched.delete(profile.address);
         });
-      }
+      })
     } catch (e) {
       console.error(e);
     }
+
     this.isFetched.emit('redraw');
+  }
+
+  private calculateChunks() {
+    const limitBytes = 1000000;
+    const addressBytes = 42;
+
+    return (limitBytes - 50) / addressBytes;
   }
 }
 
