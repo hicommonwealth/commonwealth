@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
 import 'components/component_kit/cw_dropdown.scss';
 import { CWText } from './cw_text';

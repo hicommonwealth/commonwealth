@@ -126,7 +126,7 @@ export const deserializeDelta = (str: string): DeltaStatic => {
 };
 
 // countLinesQuill returns the number of text lines for a quill ops array
-export const countLinesQuill = (delta: DeltaStatic) : number => {
+export const countLinesQuill = (delta: DeltaStatic): number => {
   if (!delta || !delta.ops) {
     return 0;
   }
