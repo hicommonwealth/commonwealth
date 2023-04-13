@@ -1,8 +1,14 @@
 /* eslint-disable dot-notation */
 import Sequelize from 'sequelize';
 import type { DB } from '../models';
+import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { AppError } from '../../../common-common/src/errors';
 
 const { Op } = Sequelize;
+
+export const Errors = {
+  InvalidChain: 'Invalid chain',
+};
 
 // the bulkAddress route takes a chain/community (mandatory) and a limit & order (both optional)
 // If a chain is supplied, queried addresses are limited to being on said chain.
@@ -18,7 +24,20 @@ const bulkAddresses = async (models: DB, req, res) => {
 
   if (req.query.limit) options['limit'] = req.query.limit;
 
-  if (req.query.chain) {
+  if (!req.query.chain) {
+    throw new AppError(Errors.InvalidChain);
+  }
+
+  if (req.query.chain === ALL_CHAINS) {
+    const allChains = await models.Chain.findAll({});
+    const allChainIds = allChains.map((chain) => chain.id);
+    options['where'] = {
+      chain: {
+        [Op.in]: allChainIds,
+      },
+    };
+    options['group'] = 'address';
+  } else {
     options['where'] = { chain: req.query.chain };
   }
 

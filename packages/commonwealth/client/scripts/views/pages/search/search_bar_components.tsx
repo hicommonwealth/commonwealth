@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AddressInfo } from 'models';
+import { AddressInfo, ChainInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
@@ -132,25 +132,22 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
   );
 };
 
+type SearchCommunityPreviewProps = {
+  searchResult: ChainInfo;
+};
+
 export const SearchBarCommunityPreviewRow = (
-  props: SearchBarPreviewRowProps
+  props: SearchCommunityPreviewProps
 ) => {
   const { searchResult } = props;
   const navigate = useCommonNavigate();
 
+  const handleClick = () => {
+    navigate(`/${searchResult.id}`, {}, null);
+  };
+
   return (
-    <div
-      className="SearchBarCommunityPreviewRow"
-      onClick={() => {
-        navigate(
-          searchResult.address
-            ? `/${searchResult.address}`
-            : searchResult.id
-            ? `/${searchResult.id}`
-            : '/'
-        );
-      }}
-    >
+    <div className="SearchBarCommunityPreviewRow" onClick={handleClick}>
       <CommunityLabel community={searchResult} />
     </div>
   );
