@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import React, { useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
@@ -287,6 +288,11 @@ export const LoginSelector = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
+
+  useEffect(() => {
+    setIsJoined(!!app.user.activeAccount);
+  }, [])
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
@@ -488,13 +494,14 @@ export const LoginSelector = () => {
     }
   }
 
+  console.log(isJoined);
   return (
     <>
       <div className="LoginSelector">
         {app.chain &&
           !app.chainPreloading &&
           profileLoadComplete &&
-          !app.user.activeAccount && (
+          !isJoined && (
             <div className="join-button-container">
               <CWButton
                 buttonType="tertiary-black"
@@ -503,6 +510,7 @@ export const LoginSelector = () => {
                     setIsTOSModalOpen(true);
                   } else {
                     await performJoinCommunityLinking();
+                    setIsJoined(true);
                   }
                 }}
                 label={
@@ -586,6 +594,7 @@ export const LoginSelector = () => {
             onAccept={async () => {
               await performJoinCommunityLinking();
               setIsTOSModalOpen(false);
+              setIsJoined(true);
             }}
             onModalClose={() => setIsTOSModalOpen(false)}
           />
