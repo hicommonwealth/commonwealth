@@ -107,9 +107,7 @@ export enum ContentType {
 
 export enum ThreadActionType {
   Deletion = 'deletion',
-  Locking = 'locking',
   Pinning = 'pinning',
-  StatusChange = 'statuschange',
   Subscription = 'subscription',
   TopicChange = 'topicchange',
 }

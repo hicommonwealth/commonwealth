@@ -6,7 +6,6 @@ import type { Thread } from 'models';
 import app from 'state';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
 import { notifySuccess } from '../../../controllers/app/notifications';
 import { ThreadActionType } from '../../../../../shared/types';
 
@@ -81,7 +80,6 @@ export const ThreadPreviewMenu = ({
                           setIsLocked(!isReadOnly);
                           setIsReadOnly(!isReadOnly);
                           notifySuccess(isReadOnly ? 'Unlocked!' : 'Locked!');
-                          redraw();
                         });
                     },
                     label: isReadOnly ? 'Unlock thread' : 'Lock thread',
@@ -118,8 +116,6 @@ export const ThreadPreviewMenu = ({
                       );
 
                       if (!confirmed) return;
-
-                      // console.log(first)
 
                       app.threads.delete(thread).then(() => {
                         app.threadUpdateEmitter.emit('threadUpdated', {
