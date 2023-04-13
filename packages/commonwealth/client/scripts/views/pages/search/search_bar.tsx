@@ -136,11 +136,7 @@ export const SearchBar = () => {
           className={getClasses<{ isClearable: boolean }>({
             isClearable: searchTerm?.length > 0,
           })}
-          placeholder={
-            app.activeChainId()
-              ? `Search ${app.activeChainId()}`
-              : 'Search Common'
-          }
+          placeholder={'Search Common'}
           value={searchTerm}
           autoComplete="off"
           onChange={handleInputChange}
