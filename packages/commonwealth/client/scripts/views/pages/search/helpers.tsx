@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import moment from 'moment';
 
 import 'pages/search/index.scss';
@@ -17,6 +17,13 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 
 const getDiscussionResult = (thread, searchTerm, setRoute) => {
+  let title = '';
+  try {
+    title = decodeURIComponent(thread.title);
+  } catch (err) {
+    title = thread.title;
+  }
+
   const proposalId = thread.proposalid;
   const chain = thread.chain;
 
@@ -36,10 +43,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
           {`discussion - ${thread.chain}`}
         </CWText>
         <CWText className="search-results-thread-title" fontWeight="medium">
-          {renderTruncatedHighlights(
-            searchTerm,
-            decodeURIComponent(thread.title)
-          )}
+          {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
