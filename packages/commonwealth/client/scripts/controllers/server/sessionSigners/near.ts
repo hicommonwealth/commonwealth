@@ -9,7 +9,7 @@ import type {
   ActionArgument,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController } from '.';
+import type { ISessionController } from '.';
 
 export class NEARSessionController implements ISessionController {
   private signers: Record<string, KeyPairEd25519> = {};

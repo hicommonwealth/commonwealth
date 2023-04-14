@@ -6,7 +6,7 @@ import { getClasses } from '../component_kit/helpers';
 import { countLinesMarkdown } from './utils';
 import { renderTruncatedHighlights } from './highlighter';
 import removeMarkdown from 'markdown-to-text';
-import { QuillRendererProps } from './quill_renderer';
+import type { QuillRendererProps } from './quill_renderer';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 

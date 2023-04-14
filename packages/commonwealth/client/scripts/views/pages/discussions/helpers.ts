@@ -5,7 +5,7 @@ import moment from 'moment';
 
 import app from 'state';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
-import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {
   const { lastCommentedOn } = thread;

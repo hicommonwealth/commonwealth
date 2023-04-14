@@ -6,9 +6,9 @@ import { getClasses } from '../component_kit/helpers';
 
 import { renderQuillDelta } from './render_quill_delta';
 import { useCommonNavigate } from 'navigation/helpers';
-import { DeltaStatic } from 'quill';
+import type { DeltaStatic } from 'quill';
 import { renderTruncatedHighlights } from './highlighter';
-import { QuillRendererProps } from './quill_renderer';
+import type { QuillRendererProps } from './quill_renderer';
 import { countLinesQuill, getTextFromDelta } from './utils';
 
 type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {

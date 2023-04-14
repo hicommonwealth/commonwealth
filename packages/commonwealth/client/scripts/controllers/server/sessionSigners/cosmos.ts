@@ -14,7 +14,7 @@ import type {
   ActionPayload,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController } from '.';
+import type { ISessionController } from '.';
 
 export const getCosmosSignatureData = async (
   actionPayload: ActionPayload,

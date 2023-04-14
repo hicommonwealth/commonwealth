@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { QuillFormattedText } from './quill_formatted_text';
 import { MarkdownFormattedText } from './markdown_formatted_text';
-import { DeltaStatic } from 'quill';
+import type { DeltaStatic } from 'quill';
 
 export type QuillRendererProps = {
   doc: string;

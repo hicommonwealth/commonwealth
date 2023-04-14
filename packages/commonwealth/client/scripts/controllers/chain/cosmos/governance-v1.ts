@@ -7,11 +7,12 @@ import type {
 } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
+import type {
+  ProposalSDKType,
+  TallyResult} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import {
   DepositParams,
   Proposal,
-  ProposalSDKType,
-  TallyResult,
   VotingParams,
 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any';

@@ -1,5 +1,5 @@
 import { Keyring } from '@polkadot/api';
-import { IKeyringPair } from '@polkadot/types/types';
+import type { IKeyringPair } from '@polkadot/types/types';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { addressSwapper } from '../../../../../shared/utils';
 import type {
@@ -9,7 +9,7 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController } from '.';
+import type { ISessionController } from '.';
 
 export class SubstrateSessionController implements ISessionController {
   keyring: Keyring = new Keyring({ ss58Format: 42 });

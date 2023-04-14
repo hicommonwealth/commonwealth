@@ -8,9 +8,9 @@ import 'components/user/user.scss';
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
 import type { Account } from 'models';
-import { MinimumProfile as Profile } from 'models';
 import { AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
+import MinimumProfile from '../../../models/MinimumProfile';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
@@ -37,7 +37,7 @@ type UserAttrs = {
   popover?: boolean;
   showAddressWithDisplayName?: boolean; // show address inline with the display name
   showRole?: boolean;
-  user: Account | AddressInfo | Profile;
+  user: Account | AddressInfo | MinimumProfile;
 };
 
 export const User = (props: UserAttrs) => {
@@ -78,7 +78,7 @@ export const User = (props: UserAttrs) => {
 
   let account: Account;
 
-  let profile: Profile;
+  let profile: MinimumProfile;
 
   const loggedInUserIsAdmin =
     app.user.isSiteAdmin ||
@@ -123,7 +123,7 @@ export const User = (props: UserAttrs) => {
     role = adminsAndMods.find(
       (r) => r.address === address && r.address_chain === chainId.id
     );
-  } else if (props.user instanceof Profile) {
+  } else if (props.user instanceof MinimumProfile) {
     profile = props.user;
 
     // only load account if it's possible to, using the current chain

@@ -9,7 +9,7 @@ import type {
   Session,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController } from '.';
+import type { ISessionController } from '.';
 
 export class SolanaSessionController implements ISessionController {
   signers: Record<string, solw3.Keypair> = {};

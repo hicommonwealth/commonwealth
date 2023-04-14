@@ -4,14 +4,14 @@ import { Virtuoso } from 'react-virtuoso';
 import 'pages/members.scss';
 
 import app from 'state';
-import type { MinimumProfile as Profile } from 'models';
 import { AccessLevel } from 'models';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
+import type MinimumProfile from '../../models/MinimumProfile';
 import { CWText } from '../components/component_kit/cw_text';
 
 type MemberInfo = {
-  profile: Profile;
+  profile: MinimumProfile;
 };
 
 const MembersPage = () => {

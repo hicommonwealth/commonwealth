@@ -44,7 +44,7 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import type { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export type ThreadPrefetch = {
   [identifier: string]: {

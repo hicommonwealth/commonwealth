@@ -18,7 +18,7 @@ import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import type { LCD } from 'chain-events/src/chains/cosmos/types';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
 import { createLCDClient } from 'common-common/src/cosmos-ts/src/codegen/cosmos/lcd';

@@ -9,7 +9,7 @@ import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 
 import { redraw } from 'mithrilInterop';
-import type { ChainEntity, MinimumProfile as Profile, Topic } from 'models';
+import type { ChainEntity, Topic } from 'models';
 import {
   Attachment,
   NotificationSubscription,
@@ -24,6 +24,7 @@ import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
+import type MinimumProfile from '../../models/MinimumProfile';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -56,7 +57,7 @@ would break the listingStore's careful chronology.
 */
 
 export interface VersionHistory {
-  author?: Profile;
+  author?: MinimumProfile;
   timestamp: moment.Moment;
   body: string;
 }

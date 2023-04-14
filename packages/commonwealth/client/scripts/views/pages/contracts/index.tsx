@@ -9,7 +9,7 @@ import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { ContractCard } from './contract_card';
 import { useCommonNavigate } from 'navigation/helpers';
-import Contract from 'models/Contract';
+import type Contract from 'models/Contract';
 
 const ContractsPage = () => {
   const navigate = useCommonNavigate();

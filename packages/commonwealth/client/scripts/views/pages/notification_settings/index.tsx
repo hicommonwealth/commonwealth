@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 import moment from 'moment';
-import { AddressInfo, NotificationSubscription } from 'models';
+import type { NotificationSubscription } from 'models';
+import { AddressInfo } from 'models';
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';

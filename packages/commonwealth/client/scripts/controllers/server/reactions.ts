@@ -1,5 +1,5 @@
-import type { AbridgedThread, AnyProposal } from 'models';
-import { Comment, Reaction, Thread } from 'models';
+import type { AbridgedThread, AnyProposal , Comment, Thread } from 'models';
+import { Reaction } from 'models';
 
 import { ReactionStore } from 'stores';
 

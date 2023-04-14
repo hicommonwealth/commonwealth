@@ -1,4 +1,5 @@
-import React, { FormEvent, useEffect, useMemo, useState } from 'react';
+import type { FormEvent} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -25,7 +26,7 @@ import {
   createDeltaFromText,
   ReactQuillEditor,
 } from '../../components/react_quill_editor';
-import { DeltaStatic } from 'quill';
+import type { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
 
 type NewSnapshotProposalPageProps = {

@@ -1,6 +1,6 @@
 import type { IChainEventData, SupportedNetwork } from 'chain-events/src';
 import moment from 'moment';
-import { ProfileWithAddress } from '../views/components/component_kit/cw_avatar_group';
+import type { ProfileWithAddress } from '../views/components/component_kit/cw_avatar_group';
 
 class DashboardActivityNotification {
   // Thread and Comment Notifications

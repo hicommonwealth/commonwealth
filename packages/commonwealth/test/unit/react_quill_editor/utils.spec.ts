@@ -1,14 +1,15 @@
 import { assert } from 'chai';
+import type {
+  SerializableDeltaStatic} from 'client/scripts/views/components/react_quill_editor/utils';
 import {
   countLinesMarkdown,
   countLinesQuill,
   createDeltaFromText,
   deserializeDelta,
   getTextFromDelta,
-  SerializableDeltaStatic,
   serializeDelta,
 } from 'client/scripts/views/components/react_quill_editor/utils';
-import { DeltaStatic } from 'quill';
+import type { DeltaStatic } from 'quill';
 
 describe('react quill editor unit tests', () => {
   describe('createDeltaFromText', () => {

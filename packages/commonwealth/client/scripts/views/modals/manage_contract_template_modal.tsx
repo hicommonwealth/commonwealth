@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
+import type {
+  DropdownItemType} from 'views/components/component_kit/cw_dropdown';
 import {
-  CWDropdown,
-  DropdownItemType,
+  CWDropdown
 } from 'views/components/component_kit/cw_dropdown';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWDivider } from 'views/components/component_kit/cw_divider';

@@ -16,10 +16,11 @@ import {
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 
+import type {
+  WalletId} from 'common-common/src/types';
 import {
   ChainBase,
-  NotificationCategories,
-  WalletId,
+  NotificationCategories
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 

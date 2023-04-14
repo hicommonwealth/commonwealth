@@ -1,4 +1,4 @@
-import { IThreadCollaborator } from 'models/Thread';
+import type { IThreadCollaborator } from 'models/Thread';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';

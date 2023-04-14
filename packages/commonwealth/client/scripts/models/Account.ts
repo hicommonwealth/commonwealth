@@ -2,9 +2,8 @@ import type { WalletId } from 'common-common/src/types';
 import { ChainType } from 'common-common/src/types';
 import $ from 'jquery';
 import app from 'state';
-
-import type { MinimumProfile as Profile } from 'models';
 import type ChainInfo from './ChainInfo';
+import type MinimumProfile from './MinimumProfile';
 
 class Account {
   public readonly address: string;
@@ -20,7 +19,7 @@ class Account {
   private _addressId?: number;
   private _walletId?: WalletId;
 
-  private _profile?: Profile;
+  private _profile?: MinimumProfile;
   public get profile() {
     return this._profile;
   }
@@ -47,7 +46,7 @@ class Account {
     validationToken?: string;
     sessionPublicAddress?: string;
     validationBlockInfo?: string;
-    profile?: Profile;
+    profile?: MinimumProfile;
 
     // flags
     ghostAddress?: boolean;

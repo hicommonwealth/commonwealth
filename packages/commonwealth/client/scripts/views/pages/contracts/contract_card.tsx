@@ -12,9 +12,10 @@ import 'pages/contracts/contract_card.scss';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import React, { useState } from 'react';
-import ManageContractTemplateModal, {
+import type {
   ManageContractTemplateModalProps,
 } from 'views/modals/manage_contract_template_modal';
+import ManageContractTemplateModal from 'views/modals/manage_contract_template_modal';
 
 type ContractCardProps = {
   id: number;

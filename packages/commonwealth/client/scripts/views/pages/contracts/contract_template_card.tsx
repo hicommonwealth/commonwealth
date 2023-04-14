@@ -5,9 +5,10 @@ import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import type {
+  ManageContractTemplateModalProps} from 'views/modals/manage_contract_template_modal';
 import {
-  displayOptions,
-  ManageContractTemplateModalProps,
+  displayOptions
 } from 'views/modals/manage_contract_template_modal';
 
 import 'pages/contracts/contract_template_card.scss';

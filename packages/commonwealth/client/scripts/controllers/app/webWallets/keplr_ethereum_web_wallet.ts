@@ -4,7 +4,7 @@ import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
-import { Account, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface

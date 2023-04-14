@@ -80,6 +80,7 @@ module.exports = {
     '@typescript-eslint/no-shadow': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 0,
     'prettier/prettier': 0,
+    '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/no-empty-interface': [
       'error',
       {

@@ -1,4 +1,4 @@
-import { Permission } from 'server/models/role';
+import type { Permission } from 'server/models/role';
 
 class CommunityRole {
   public readonly id: number;
