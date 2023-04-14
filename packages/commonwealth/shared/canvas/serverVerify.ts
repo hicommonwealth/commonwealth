@@ -33,8 +33,9 @@ export const verifyComment = async (canvas_action, canvas_session, canvas_hash, 
   assert(action.payload.call === "comment" &&
     +thread_id === action.payload.callArgs.thread_id &&
     text === action.payload.callArgs.body &&
-    parent_comment_id === (action.payload.callArgs.parent_comment_id ?? undefined),
+    (parent_comment_id || undefined) === (action.payload.callArgs.parent_comment_id ?? undefined),
          "Invalid signed comment");
+
   assert(address === action.payload.from, "Invalid signed comment, origin mismatch");
   // assert(chainBaseToCanvasChain(chain) === action.payload.chain)
 }
@@ -60,12 +61,13 @@ export const verifyReaction = async (canvas_action, canvas_session, canvas_hash,
   const { thread_id, comment_id, proposal_id, address, chain, value } = fields;
   const { action, session } = await verifyUnpack(canvas_action, canvas_session, address);
   assert(value === action.payload.callArgs.value)
+
   assert((action.payload.call === "reactThread" &&
     +thread_id === action.payload.callArgs.thread_id &&
     comment_id === undefined && proposal_id === undefined) ||
     (action.payload.call === "reactComment" &&
       +comment_id === action.payload.callArgs.comment_id &&
-      comment_id === undefined && proposal_id === undefined),
+      thread_id === undefined && proposal_id === undefined),
          "Invalid signed reaction")
   assert(address === action.payload.from, "Invalid signed reaction, origin mismatch")
   // assert(chainBaseToCanvasChain(chain) === action.payload.chain)
