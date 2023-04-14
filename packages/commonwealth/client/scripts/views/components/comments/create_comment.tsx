@@ -64,16 +64,16 @@ export const CreateComment = (props: CreateCommmentProps) => {
       setContentDelta(createDeltaFromText(''));
 
       jumpHighlightComment(res.id);
-    } catch (err) {
-      console.log(err);
-      notifyError(err.message || 'Comment submission failed.');
-      setErrorMsg(err.message);
-    } finally {
-      setSendingComment(false);
 
+      setSendingComment(false);
       if (handleIsReplying) {
         handleIsReplying(false);
       }
+    } catch (err) {
+      console.log(err);
+      notifyError(err.message || 'Comment submission failed.');
+      setSendingComment(false);
+      setErrorMsg(err.message);
     }
   };
 
