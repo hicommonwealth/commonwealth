@@ -4,6 +4,7 @@ import { Topic } from 'models';
 import app from 'state';
 
 import { TopicStore } from 'stores';
+import { ThreadActionType } from '../../../../shared/types';
 
 class TopicsController {
   private _store: TopicStore = new TopicStore();
@@ -101,6 +102,10 @@ class TopicsController {
         this._store.remove(this._store.getById(result.id));
       }
       this._store.add(result);
+      app.threadUpdateEmitter.emit(
+        'threadUpdated',
+        { threadId, action: ThreadActionType.TopicChange }
+      );
       return result;
     } catch (err) {
       console.log('Failed to update topic');
