@@ -11,6 +11,21 @@ import { ComponentType } from './component_kit/types';
 import type { Account } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
+const uploadToS3 = async (file: File, signedUrl: string) => {
+  const options = {
+    headers: {
+      'Content-Type': file.type,
+    },
+  };
+
+  try {
+    await axios.put(signedUrl, file, options);
+  } catch (error) {
+    notifyError('Failed to upload the file to S3');
+    throw error;
+  }
+};
+
 type AvatarUploadStyleProps = {
   size?: 'small' | 'large';
 };
@@ -65,11 +80,10 @@ export const AvatarUpload = ({
         if (response.data.status !== 'Success') throw new Error();
 
         const uploadURL = response.data.result;
-        await fetch(uploadURL, {
-          method: 'put',
-          body: acceptedFiles[0],
-        });
         acceptedFiles[0].uploadURL = uploadURL;
+
+        // Upload the file to S3
+        await uploadToS3(acceptedFiles[0], uploadURL);
 
         if (uploadCompleteCallback) {
           uploadCompleteCallback([acceptedFiles[0]]);
