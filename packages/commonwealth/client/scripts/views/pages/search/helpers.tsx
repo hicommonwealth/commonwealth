@@ -21,7 +21,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const chain = thread.chain;
 
   const handleClick = () => {
-    setRoute(`/${thread.chain}/discussion/${proposalId}`);
+    setRoute(`/discussion/${proposalId}`, {}, thread.chain);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) {
@@ -73,9 +73,7 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
   const chain = comment.chain;
 
   const handleClick = () => {
-    setRoute(
-      `/${comment.chain}/discussion/${proposalId}?comment=${comment.id}`
-    );
+    setRoute(`/discussion/${proposalId}?comment=${comment.id}`, {}, chain);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;
