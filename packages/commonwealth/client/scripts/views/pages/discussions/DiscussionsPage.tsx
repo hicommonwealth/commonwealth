@@ -9,6 +9,7 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
 import { ThreadPreview } from './thread_preview';
+import { ThreadActionType } from '../../../../../shared/types';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -20,6 +21,47 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams, _] = useSearchParams();
   const stageName: string = searchParams.get('stage');
 
+  const handleThreadUpdate = (data: {
+    threadId: number;
+    action: ThreadActionType;
+  }) => {
+    const { threadId, action } = data;
+
+    if (
+      action === ThreadActionType.TopicChange ||
+      action === ThreadActionType.Deletion
+    ) {
+      const updatedThreadList = threads.filter((t) => t.id !== threadId);
+
+      setThreads(updatedThreadList);
+    } else {
+      const pinnedThreads = app.threads.listingStore.getThreads({
+        topicName,
+        stageName,
+        pinned: true,
+      });
+
+      const unpinnedThreads = app.threads.listingStore.getThreads({
+        topicName,
+        stageName,
+        pinned: false,
+      });
+
+      setThreads([...pinnedThreads, ...unpinnedThreads]);
+    }
+  };
+
+  // Event binding for actions that trigger a thread update (e.g. topic or stage change)
+  useEffect(() => {
+    app.threadUpdateEmitter.on('threadUpdated', (data) =>
+      handleThreadUpdate(data)
+    );
+
+    return () => {
+      app.threadUpdateEmitter.off('threadUpdated', handleThreadUpdate);
+    };
+  }, [threads]);
+
   // setup initial threads
   useEffect(() => {
     app.threads
@@ -27,7 +69,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       .then((t) => {
         // Fetch first 20 + unpinned threads
         setThreads(t);
-
         setInitializing(false);
       });
   }, [stageName, topicName]);
