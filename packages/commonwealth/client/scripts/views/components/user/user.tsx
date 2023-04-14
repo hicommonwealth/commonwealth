@@ -33,7 +33,6 @@ type UserAttrs = {
   avatarSize?: number;
   hideAvatar?: boolean;
   linkify?: boolean;
-  onClick?: any;
   popover?: boolean;
   showAddressWithDisplayName?: boolean; // show address inline with the display name
   showRole?: boolean;
@@ -48,7 +47,6 @@ export const User = (props: UserAttrs) => {
     showAddressWithDisplayName,
     user,
     linkify,
-    onClick,
     popover,
     showRole,
   } = props;
@@ -341,7 +339,7 @@ export const User = (props: UserAttrs) => {
       onMouseEnter={popoverProps.handleInteraction}
       onMouseLeave={popoverProps.handleInteraction}
     >
-      <div onClick={onClick}>{userFinal}</div>
+      {userFinal}
       <Popover content={userPopover} {...popoverProps} />
     </div>
   ) : (
