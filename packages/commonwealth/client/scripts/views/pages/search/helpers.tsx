@@ -149,11 +149,10 @@ const getCommunityResult = (community, setRoute) => {
 
 const getMemberResult = (addr) => {
   const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
-  if (addr.name) {
-    profile.initialize(addr.name, null, null, null, null, null);
-  }
 
-  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
+  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) {
+    return null;
+  }
 
   return (
     <div key={profile.id} className="member-result-row">
