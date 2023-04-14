@@ -97,6 +97,11 @@ class ThreadsController {
   }
 
   public numVotingThreads: number;
+  private _resetPagination: boolean;
+
+  public resetPagination() {
+    this._resetPagination = true;
+  }
 
   public getType(primary: string, secondary?: string, tertiary?: string) {
     const result = this._store.getAll().filter((thread) => {
@@ -703,16 +708,15 @@ class ThreadsController {
     }
   };
 
-  public async loadNextPage(
-    options: {
-      topicName?: string;
-      stageName?: string;
-      includePinnedThreads?: boolean;
-    },
-    resetPagination = false
-  ) {
-    if (resetPagination) {
+  public async loadNextPage(options: {
+    topicName?: string;
+    stageName?: string;
+    includePinnedThreads?: boolean;
+  }) {
+    // Used to reset pagination when switching between topics
+    if (this._resetPagination) {
       this.listingStore.clear();
+      this._resetPagination = false;
     }
 
     if (this.listingStore.isDepleted(options)) {
@@ -806,10 +810,12 @@ class ThreadsController {
     }
     this.numVotingThreads = numVotingThreads;
     this._initialized = true;
+    this._resetPagination = true;
   }
 
   public deinit() {
     this._initialized = false;
+    this._resetPagination = true;
     this._store.clear();
     this._listingStore.clear();
   }

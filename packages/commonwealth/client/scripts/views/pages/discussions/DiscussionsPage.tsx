@@ -22,8 +22,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
+    app.threads.resetPagination();
     app.threads
-      .loadNextPage({ topicName, stageName, includePinnedThreads: true }, true)
+      .loadNextPage({ topicName, stageName, includePinnedThreads: true })
       .then((t) => {
         // Fetch first 20 + unpinned threads
         setThreads(t);
