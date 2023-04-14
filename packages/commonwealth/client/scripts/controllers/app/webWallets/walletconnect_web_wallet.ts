@@ -78,6 +78,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async reset() {
     console.log('Attempting to reset WalletConnect');
     if (!this._provider) {
+      // Remove the object that stores the session (needed when refreshed page since initial connection established)
+      localStorage.removeItem('walletconnect');
       return;
     }
     await this._provider.wc.killSession();

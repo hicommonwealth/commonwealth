@@ -2,7 +2,7 @@
 
 import { initAppState } from 'state';
 import ClassComponent from 'class_component';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 import 'components/header/login_selector.scss';
@@ -151,6 +151,14 @@ export class LoginSelectorMenuRight extends ClassComponent {
   view() {
     const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
+    const resetWalletConnectSession = async () => {
+      /**
+       * Imp to reset wc session on logout as subsequent login attempts fail
+       */
+      const walletConnectWallet = app.wallets.getByName(WalletId.WalletConnect);
+      await walletConnectWallet.reset();
+    };
+
     return (
       <div class="LoginSelectorMenu right">
         <div
@@ -195,6 +203,8 @@ export class LoginSelectorMenuRight extends ClassComponent {
             $.get(`${app.serverUrl()}/logout`)
               .then(async () => {
                 await initAppState();
+                await resetWalletConnectSession();
+
                 notifySuccess('Logged out');
                 m.redraw();
               })
