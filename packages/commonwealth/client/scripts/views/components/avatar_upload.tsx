@@ -65,6 +65,10 @@ export const AvatarUpload = ({
         if (response.data.status !== 'Success') throw new Error();
 
         const uploadURL = response.data.result;
+        await fetch(uploadURL, {
+          method: 'put',
+          body: acceptedFiles[0],
+        });
         acceptedFiles[0].uploadURL = uploadURL;
 
         if (uploadCompleteCallback) {
