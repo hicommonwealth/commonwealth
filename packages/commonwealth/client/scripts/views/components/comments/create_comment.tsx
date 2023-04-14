@@ -16,7 +16,11 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
-import { createDeltaFromText, getTextFromDelta, ReactQuillEditor } from '../react_quill_editor';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+  ReactQuillEditor,
+} from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 
 type CreateCommmentProps = {
@@ -28,12 +32,19 @@ type CreateCommmentProps = {
 
 export const CreateComment = (props: CreateCommmentProps) => {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(createDeltaFromText(''));
+  const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(
+    createDeltaFromText('')
+  );
   const [sendingComment, setSendingComment] = React.useState<boolean>(false);
 
   const editorValue = getTextFromDelta(contentDelta);
 
-  const { handleIsReplying, parentCommentId, rootThread, updatedCommentsCallback } = props;
+  const {
+    handleIsReplying,
+    parentCommentId,
+    rootThread,
+    updatedCommentsCallback,
+  } = props;
 
   const author = app.user.activeAccount;
 
@@ -77,16 +88,21 @@ export const CreateComment = (props: CreateCommmentProps) => {
     }
   };
 
-  const activeTopicName = rootThread instanceof Thread ? rootThread?.topic?.name : null;
+  const activeTopicName =
+    rootThread instanceof Thread ? rootThread?.topic?.name : null;
 
   // token balance check if needed
-  const tokenPostingThreshold: BN = TopicGateCheck.getTopicThreshold(activeTopicName);
+  const tokenPostingThreshold: BN =
+    TopicGateCheck.getTopicThreshold(activeTopicName);
 
   const userBalance: BN = TopicGateCheck.getUserBalance();
   const userFailsThreshold =
-    tokenPostingThreshold?.gtn(0) && userBalance?.gtn(0) && userBalance.lt(tokenPostingThreshold);
+    tokenPostingThreshold?.gtn(0) &&
+    userBalance?.gtn(0) &&
+    userBalance.lt(tokenPostingThreshold);
 
-  const disabled = editorValue.length === 0 || sendingComment || userFailsThreshold;
+  const disabled =
+    editorValue.length === 0 || sendingComment || userFailsThreshold;
 
   const decimals = getDecimals(app.chain);
 
@@ -102,29 +118,47 @@ export const CreateComment = (props: CreateCommmentProps) => {
     <div className="CreateComment">
       <div className="attribution-row">
         <div className="attribution-left-content">
-          <CWText type="caption">{parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}</CWText>
+          <CWText type="caption">
+            {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
+          </CWText>
           <CWText type="caption" fontWeight="medium" className="user-link-text">
             <User user={author} hideAvatar linkify />
           </CWText>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
-      <ReactQuillEditor className="editor" contentDelta={contentDelta} setContentDelta={setContentDelta} />
+      <ReactQuillEditor
+        className="editor"
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
+      />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
-          Commenting in {activeTopicName} requires {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
+          Commenting in {activeTopicName} requires{' '}
+          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
           {app.chain.meta.default_symbol}.{' '}
           {userBalance && app.user.activeAccount && (
             <>
-              You have {weiToTokens(userBalance.toString(), decimals)} {app.chain.meta.default_symbol}.
+              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
+              {app.chain.meta.default_symbol}.
             </>
           )}
         </CWText>
       )}
       <div className="form-bottom">
         <div className="form-buttons">
-          {editorValue.length > 0 && <CWButton buttonType="secondary-blue" onClick={cancel} label="Cancel" />}
-          <CWButton disabled={disabled} onClick={handleSubmitComment} label="Submit" />
+          {editorValue.length > 0 && (
+            <CWButton
+              buttonType="secondary-blue"
+              onClick={cancel}
+              label="Cancel"
+            />
+          )}
+          <CWButton
+            disabled={disabled}
+            onClick={handleSubmitComment}
+            label="Submit"
+          />
         </div>
       </div>
     </div>

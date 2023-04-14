@@ -35,24 +35,19 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 
   const newTree = currentTree;
 
-  localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
+    JSON.stringify(newTree);
 };
 
 const AdminSectionComponent = () => {
   const navigate = useCommonNavigate();
 
-  const [
-    isEditTopicThresholdsModalOpen,
-    setIsEditTopicThresholdsModalOpen,
-  ] = React.useState<boolean>(false);
-  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] = React.useState<
-    boolean
-  >(false);
-  const [isNewTopicModalOpen, setIsNewTopicModalOpen] = React.useState<boolean>(
-    false
-  );
+  const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
+    React.useState<boolean>(false);
+  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
+    React.useState<boolean>(false);
+  const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
+    React.useState<boolean>(false);
 
   const adminGroupData: SectionGroupAttrs[] = [
     {

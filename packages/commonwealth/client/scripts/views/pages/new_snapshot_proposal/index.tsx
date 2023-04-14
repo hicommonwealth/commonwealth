@@ -19,7 +19,7 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import type { ThreadForm } from './types';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import { useLocation } from 'react-router';
 import {
   createDeltaFromText,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
@@ -14,7 +14,6 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  createDeltaFromText,
   getTextFromDelta,
   ReactQuillEditor,
 } from '../components/react_quill_editor';

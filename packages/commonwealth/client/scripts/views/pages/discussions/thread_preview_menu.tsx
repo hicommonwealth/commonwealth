@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import React from 'react';
 
 import { redraw } from 'mithrilInterop';
@@ -6,20 +6,23 @@ import type { Thread } from 'models';
 import app from 'state';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
+import { notifySuccess } from '../../../controllers/app/notifications';
+import { ThreadActionType } from '../../../../../shared/types';
 
 type ThreadPreviewMenuProps = {
   thread: Thread;
   setIsChangeTopicModalOpen: Dispatch<SetStateAction<boolean>>;
   setIsUpdateProposalStatusModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsLocked: Dispatch<SetStateAction<boolean>>;
 };
 
 export const ThreadPreviewMenu = ({
   thread,
   setIsChangeTopicModalOpen,
   setIsUpdateProposalStatusModalOpen,
+  setIsLocked,
 }: ThreadPreviewMenuProps) => {
-  const navigate = useCommonNavigate();
+  const [isReadOnly, setIsReadOnly] = useState(thread.readOnly);
 
   const hasAdminPermissions =
     app.user.activeAccount &&
@@ -52,7 +55,10 @@ export const ThreadPreviewMenu = ({
                   {
                     onClick: () => {
                       app.threads.pin({ proposal: thread }).then(() => {
-                        navigate('/discussions');
+                        app.threadUpdateEmitter.emit('threadUpdated', {
+                          threadId: thread.id,
+                          action: ThreadActionType.Pinning,
+                        });
                         redraw();
                       });
                     },
@@ -68,11 +74,15 @@ export const ThreadPreviewMenu = ({
                       app.threads
                         .setPrivacy({
                           threadId: thread.id,
-                          readOnly: !thread.readOnly,
+                          readOnly: !isReadOnly,
                         })
-                        .then(() => redraw());
+                        .then(() => {
+                          setIsLocked(!isReadOnly);
+                          setIsReadOnly(!isReadOnly);
+                          notifySuccess(isReadOnly ? 'Unlocked!' : 'Locked!');
+                        });
                     },
-                    label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
+                    label: isReadOnly ? 'Unlock thread' : 'Lock thread',
                     iconLeft: 'lock' as const,
                   },
                 ]
@@ -108,7 +118,10 @@ export const ThreadPreviewMenu = ({
                       if (!confirmed) return;
 
                       app.threads.delete(thread).then(() => {
-                        navigate('/discussions');
+                        app.threadUpdateEmitter.emit('threadUpdated', {
+                          threadId: thread.id,
+                          action: ThreadActionType.Deletion,
+                        });
                       });
                     },
                     label: 'Delete',

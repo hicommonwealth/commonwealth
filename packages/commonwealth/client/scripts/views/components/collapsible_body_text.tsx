@@ -8,6 +8,8 @@ type CollapsibleProposalBodyProps = {
   proposal: AnyProposal;
 };
 
-export const CollapsibleProposalBody = ({ proposal }: CollapsibleProposalBodyProps) => {
+export const CollapsibleProposalBody = ({
+  proposal,
+}: CollapsibleProposalBodyProps) => {
   return <QuillRenderer doc={proposal.description} cutoffLines={50} />;
 };
