@@ -44,7 +44,7 @@ export const handleToggleSubscription = async (
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription,
   isSubscribed: boolean,
-  setIsSubscribed: Dispatch<SetStateAction<boolean>>,
+  setIsSubscribed?: Dispatch<SetStateAction<boolean>>,
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
@@ -71,7 +71,7 @@ export const handleToggleSubscription = async (
     ]);
     notifySuccess('Subscribed!');
   }
-  setIsSubscribed(!isSubscribed);
+  if (setIsSubscribed) setIsSubscribed(!isSubscribed);
 
   redraw();
 };
