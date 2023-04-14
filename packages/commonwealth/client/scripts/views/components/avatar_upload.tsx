@@ -62,9 +62,13 @@ export const AvatarUpload = ({
             jwt: app.user.jwt,
           }
         );
+        if (response.data.status !== 'Success') throw new Error();
+
+        const uploadURL = response.data.result;
+        acceptedFiles[0].uploadURL = uploadURL;
 
         if (uploadCompleteCallback) {
-          uploadCompleteCallback([response]);
+          uploadCompleteCallback([acceptedFiles[0]]);
         }
       } catch (e) {
         notifyError('Failed to get an S3 signed upload URL');

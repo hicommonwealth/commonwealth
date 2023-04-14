@@ -266,8 +266,8 @@ const EditProfileComponent = () => {
                   account={account}
                   uploadCompleteCallback={(files) => {
                     files.forEach((f) => {
-                      if (!f.data.result) return;
-                      const url = f.data.result.replace(/\?.*/, '').trim();
+                      if (!f.preview) return;
+                      const url = f.preview.replace(/\?.*/, '').trim();
                       setAvatarUrl(url);
                     });
                   }}
