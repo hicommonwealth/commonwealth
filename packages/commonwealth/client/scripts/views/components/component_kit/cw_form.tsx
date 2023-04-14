@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_form.scss';
+import React from 'react';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';

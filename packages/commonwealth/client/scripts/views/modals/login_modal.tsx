@@ -1,36 +1,24 @@
-import React from 'react';
-
-import {
-  chainBasetoCanvasChain,
-  constructCanvasMessage,
-} from 'adapters/shared';
-import _ from 'lodash';
-import app, { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode } from 'mithrilInterop';
 
-import {
-  completeClientLogin,
-  loginWithMagicLink,
-  updateActiveAddresses,
-} from 'controllers/app/login';
+import { completeClientLogin, loginWithMagicLink, updateActiveAddresses, } from 'controllers/app/login';
+
+import { notifyError } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { signSessionWithAccount } from 'controllers/server/sessions';
-
-import { notifyError } from 'controllers/app/notifications';
-import type { Account, IWebWallet } from 'models';
-
-import {
-  breakpointFnValidator,
-  isWindowMediumSmallInclusive,
-} from '../components/component_kit/helpers';
+import _ from 'lodash';
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
+import React from 'react';
+import app, { initAppState } from 'state';
+import { setDarkMode } from '../../helpers';
+import type IWebWallet from '../../models/IWebWallet';
 import type { ProfileRowProps } from '../components/component_kit/cw_profiles_list';
+
+import { breakpointFnValidator, isWindowMediumSmallInclusive, } from '../components/component_kit/helpers';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-import { setDarkMode } from '../../helpers';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;

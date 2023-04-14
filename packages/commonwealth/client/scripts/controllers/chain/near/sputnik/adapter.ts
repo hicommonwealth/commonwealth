@@ -1,5 +1,4 @@
 import Near from 'controllers/chain/near/adapter';
-import type { ChainInfo } from 'models';
 import type { IApp } from 'state';
 import NearSputnikDao from './dao';
 

@@ -1,26 +1,17 @@
-import React from 'react';
-
-import { redraw } from 'mithrilInterop';
-
 import 'components/reaction_button/comment_reaction_button.scss';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import type { ChainInfo, Comment } from 'models';
+
+import { redraw } from 'mithrilInterop';
+import React from 'react';
 
 import app from 'state';
+import { LoginModal } from '../../modals/login_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { Modal } from '../component_kit/cw_modal';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
-import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from '../component_kit/helpers';
-import {
-  fetchReactionsByPost,
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from './helpers';
-import { LoginModal } from '../../modals/login_modal';
-import { Modal } from '../component_kit/cw_modal';
+import { getClasses, isWindowMediumSmallInclusive, } from '../component_kit/helpers';
+import { fetchReactionsByPost, getDisplayedReactorsForPopup, onReactionClick, } from './helpers';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;

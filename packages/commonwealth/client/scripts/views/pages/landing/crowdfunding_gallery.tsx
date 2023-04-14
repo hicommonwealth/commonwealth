@@ -1,10 +1,9 @@
+import 'pages/landing/crowdfunding_gallery.scss';
 import React, { useEffect, useState } from 'react';
 
-import 'pages/landing/crowdfunding_gallery.scss';
-
 import { CWText } from '../../components/component_kit/cw_text';
-import { GalleryCard } from './creators_gallery';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
+import { GalleryCard } from './creators_gallery';
 
 const crowdfundingGalleryText = [
   {

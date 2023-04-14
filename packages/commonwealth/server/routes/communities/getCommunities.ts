@@ -1,14 +1,11 @@
-import type {
-  GetCommunitiesReq,
-  GetCommunitiesResp,
-} from 'common-common/src/api/extApiTypes';
+import type { GetCommunitiesReq, GetCommunitiesResp, } from 'common-common/src/api/extApiTypes';
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
-import { formatPaginationNoSort } from '../../util/queries';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { success, failure } from '../../types';
 import type { DB } from '../../models';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
+import { formatPaginationNoSort } from '../../util/queries';
 
 export const getCommunitiesValidation = [
   oneOf(

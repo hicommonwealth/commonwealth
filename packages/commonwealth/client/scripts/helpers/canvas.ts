@@ -1,9 +1,8 @@
-import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
 
 import { getCosmosSignatureData } from 'controllers/server/sessionSigners/cosmos';
-import { constructTypedCanvasMessage } from '../../../shared/adapters/chain/ethereum/keys';
 import { validationTokenToSignDoc } from '../../../shared/adapters/chain/cosmos/keys';
+import { constructTypedCanvasMessage } from '../../../shared/adapters/chain/ethereum/keys';
 
 // TODO: verify payload is not expired
 export const verify = async ({

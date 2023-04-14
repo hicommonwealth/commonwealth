@@ -1,13 +1,10 @@
-import type {
-  GetTopicsReq,
-  GetTopicsResp,
-} from 'common-common/src/api/extApiTypes';
+import type { GetTopicsReq, GetTopicsResp, } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { success, failure } from '../../types';
 import type { DB } from '../../models';
-import { formatPagination } from '../../util/queries';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
+import { formatPagination } from '../../util/queries';
 
 export const getTopicsValidation = [
   query('community_id').isString().trim(),

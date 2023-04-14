@@ -1,13 +1,12 @@
-import React from 'react';
-
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import type { Thread } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/snapshot/snapshot_space_card.scss';
+import React from 'react';
 import app from 'state';
 import { REDIRECT_ACTIONS } from '.';
+import type Thread from '../../../models/Thread';
 import { CWCard } from '../../components/component_kit/cw_card';
-import { useCommonNavigate } from 'navigation/helpers';
 
 function countActiveProposals(proposals: SnapshotProposal[]): number {
   return proposals.filter((proposal) => proposal.state === 'active').length;

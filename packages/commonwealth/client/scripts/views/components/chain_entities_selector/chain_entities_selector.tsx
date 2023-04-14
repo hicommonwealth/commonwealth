@@ -1,13 +1,12 @@
+import 'components/chain_entities_selector.scss';
+import { chainEntityTypeToProposalName } from 'identifiers';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import 'components/chain_entities_selector.scss';
-import type { ChainEntity } from 'models';
-
 import app from 'state';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { ChainEntitiesSelectorItem } from 'views/components/chain_entities_selector/chain_entities_selector_item';
-import { chainEntityTypeToProposalName } from 'identifiers';
+import { QueryList } from 'views/components/component_kit/cw_query_list';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import type ChainEntity from '../../../models/ChainEntity';
 
 const sortChainEntities = (a: ChainEntity, b: ChainEntity) => {
   if (!a.threadId && b.threadId) {

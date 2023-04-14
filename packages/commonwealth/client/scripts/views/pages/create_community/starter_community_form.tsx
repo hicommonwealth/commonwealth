@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
+
+import 'pages/create_community.scss';
+import React, { useState } from 'react';
 
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 // import { CommunityType } from '.';
-
-import { initAppState } from 'state';
-import { ChainBase, ChainType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
-
-import 'pages/create_community.scss';
-
-import app from 'state';
+import app, { initAppState } from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
@@ -19,12 +17,7 @@ import { baseToNetwork } from '../../../helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { defaultChainRows } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  useChainFormDefaultFields,
-  useChainFormIdFields,
-  useChainFormState,
-} from './hooks';
+import { useChainFormDefaultFields, useChainFormIdFields, useChainFormState, } from './hooks';
 
 export const StarterCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);

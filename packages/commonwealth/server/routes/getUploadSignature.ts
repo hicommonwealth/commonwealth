@@ -1,9 +1,9 @@
+import type { DB } from '../models';
 import AWS from 'aws-sdk';
 import { AppError } from 'common-common/src/errors';
 
 import type { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import type { DB } from '../models';
 
 AWS.config.update({
   signatureVersion: 'v4',

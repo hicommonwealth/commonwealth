@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-
-import { Modal } from 'views/components/component_kit/cw_modal';
 import { uuidv4 } from 'lib/util';
+
+import 'modals/confirmation_modal.scss';
+import React, { useState } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import type { ButtonProps } from 'views/components/component_kit/cw_button';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
-import 'modals/confirmation_modal.scss';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWText } from 'views/components/component_kit/cw_text';
 
 interface ConfirmationModalProps {
   title: string;

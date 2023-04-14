@@ -1,26 +1,19 @@
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { uuidv4 } from 'lib/util';
-import type { ChainInfo, IChainModule, ITXModalData } from 'models';
+import { _DEPRECATED_dangerouslySetRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { ConnectConfig, Near as NearApi } from 'near-api-js';
-import {
-  Account as NearApiAccount,
-  connect as nearConnect,
-  WalletAccount,
-} from 'near-api-js';
+import { Account as NearApiAccount, connect as nearConnect, WalletAccount, } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
-import type {
-  CodeResult,
-  NodeStatusResult,
-} from 'near-api-js/lib/providers/provider';
+import type { CodeResult, NodeStatusResult, } from 'near-api-js/lib/providers/provider';
 import type { Action, FunctionCall } from 'near-api-js/lib/transaction';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
 import { isGroupRole } from './sputnik/types';
-import { redraw, _DEPRECATED_dangerouslySetRoute } from 'mithrilInterop';
 
 export interface IDaoInfo {
   contractId: string;

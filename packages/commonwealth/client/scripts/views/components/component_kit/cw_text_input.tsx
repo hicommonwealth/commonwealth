@@ -1,8 +1,7 @@
-import React from 'react';
+import 'components/component_kit/cw_text_input.scss';
 
 import { redraw } from 'mithrilInterop';
-
-import 'components/component_kit/cw_text_input.scss';
+import React from 'react';
 import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';

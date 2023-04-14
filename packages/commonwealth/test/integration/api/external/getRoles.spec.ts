@@ -1,11 +1,11 @@
-import 'chai/register-should';
 import chai from 'chai';
+import chaiHttp from 'chai-http';
+import 'chai/register-should';
 import type { GetRolesReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
-import { testRoles } from 'test/integration/api/external/dbEntityHooks.spec';
 import type { RoleAttributes } from 'server/models/role';
 import { get } from 'test/integration/api/external/appHook.spec';
-import chaiHttp from 'chai-http';
+import { testRoles } from 'test/integration/api/external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
 

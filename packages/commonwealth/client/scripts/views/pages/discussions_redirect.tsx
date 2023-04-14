@@ -1,9 +1,9 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
 
 import app from 'state';
-import { PageLoading } from './loading';
 import { DefaultPage } from '../../../../../common-common/src/types';
-import { useCommonNavigate } from 'navigation/helpers';
+import { PageLoading } from './loading';
 
 export default function DiscussionsRedirect() {
   const navigate = useCommonNavigate();

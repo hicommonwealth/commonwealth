@@ -1,10 +1,9 @@
-import React from 'react';
-
 import {
   convictions,
   convictionToLocktime,
   convictionToWeight,
 } from 'controllers/chain/substrate/democracy_referendum';
+import React from 'react';
 import { CWDropdown } from '../component_kit/cw_dropdown';
 
 type ConvictionsChooserProps = { callback: (number) => void };

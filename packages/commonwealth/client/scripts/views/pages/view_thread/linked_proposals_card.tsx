@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from 'react';
-
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
-import {
-  chainEntityTypeToProposalName,
-  chainEntityTypeToProposalSlug,
-  getProposalUrlPath,
-} from 'identifiers';
-import type { ChainEntity, Thread, ThreadStage } from 'models';
+import { chainEntityTypeToProposalName, chainEntityTypeToProposalSlug, getProposalUrlPath, } from 'identifiers';
 
 import 'pages/view_thread/linked_proposals_card.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
+import type ChainEntity from '../../../models/ChainEntity';
+import type Thread from '../../../models/Thread';
+import type { ThreadStageType } from '../../../models/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { Modal } from '../../components/component_kit/cw_modal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
-import { Modal } from '../../components/component_kit/cw_modal';
 
 type LinkedProposalProps = {
   chainEntity: ChainEntity;
@@ -44,7 +41,7 @@ const LinkedProposal = (props: LinkedProposalProps) => {
 
 type LinkedProposalsCardProps = {
   onChangeHandler: (
-    stage: ThreadStage,
+    stage: ThreadStageType,
     chainEntities: Array<ChainEntity>,
     snapshotProposal: Array<SnapshotProposal>
   ) => void;

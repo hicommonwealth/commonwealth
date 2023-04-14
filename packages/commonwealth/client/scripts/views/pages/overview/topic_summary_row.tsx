@@ -1,14 +1,14 @@
-import React from 'react';
-
 import { pluralize } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import type { Thread, Topic } from 'models';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/overview/topic_summary_row.scss';
+import React from 'react';
 
 import app from 'state';
 import { slugify } from 'utils';
+import type Thread from '../../../models/Thread';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -19,7 +19,6 @@ import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 // import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;

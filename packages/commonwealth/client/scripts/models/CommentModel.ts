@@ -4,7 +4,7 @@ import type Attachment from './Attachment';
 import type { IUniqueId } from './interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class Comment<T extends IUniqueId> {
+class CommentModel<T extends IUniqueId> {
   [x: string]: any;
 
   public readonly chain: string;
@@ -63,4 +63,4 @@ class Comment<T extends IUniqueId> {
   }
 }
 
-export default Comment;
+export default CommentModel;

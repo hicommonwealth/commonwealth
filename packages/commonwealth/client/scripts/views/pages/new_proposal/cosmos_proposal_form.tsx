@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
-
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -13,7 +13,6 @@ import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { useCommonNavigate } from 'navigation/helpers';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<

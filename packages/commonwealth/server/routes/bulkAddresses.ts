@@ -1,6 +1,6 @@
+import type { DB } from '../models';
 /* eslint-disable dot-notation */
 import Sequelize from 'sequelize';
-import type { DB } from '../models';
 
 const { Op } = Sequelize;
 

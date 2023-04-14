@@ -1,12 +1,9 @@
-import 'chai/register-should';
 import chai from 'chai';
+import 'chai/register-should';
 import type { GetReactionsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
-import {
-  testComments,
-  testReactions,
-} from 'test/integration/api/external/dbEntityHooks.spec';
 import type { ReactionAttributes } from 'server/models/reaction';
+import { testComments, testReactions, } from 'test/integration/api/external/dbEntityHooks.spec';
 import { get } from './appHook.spec';
 
 describe('getReactions Tests', () => {

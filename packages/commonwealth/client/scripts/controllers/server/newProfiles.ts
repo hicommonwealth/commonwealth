@@ -1,6 +1,6 @@
+import { EventEmitter } from 'events';
 import $ from 'jquery';
 import _ from 'lodash';
-import { EventEmitter } from 'events';
 
 import app from 'state';
 import { NewProfileStore } from 'stores';

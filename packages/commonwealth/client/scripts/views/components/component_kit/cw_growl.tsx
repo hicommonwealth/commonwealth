@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_growl.scss';
+import React from 'react';
 
 import { CWCard } from './cw_card';
 import { getClasses } from './helpers';

@@ -1,5 +1,5 @@
-import type { Request, Response } from 'express';
 import type { DB } from '../models';
+import type { Request, Response } from 'express';
 
 export const Errors = {
   NoEntity: 'Cannot find entity',

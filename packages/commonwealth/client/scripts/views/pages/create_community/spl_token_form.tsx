@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
 import type * as solanaWeb3 from '@solana/web3.js';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
+import React, { useState } from 'react';
 
-import app from 'state';
-import { initAppState } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
+import app, { initAppState } from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
@@ -18,12 +17,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { defaultChainRows } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-} from './hooks';
+import { useChainFormDefaultFields, useChainFormIdFields, useChainFormState, } from './hooks';
 
 export const SplTokenForm = () => {
   const [cluster, setCluster] = useState<solanaWeb3.Cluster>('mainnet-beta');

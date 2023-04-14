@@ -1,15 +1,10 @@
-import React, { useMemo } from 'react';
-
-import type {
-  SnapshotProposal,
-  SnapshotProposalVote,
-  SnapshotSpace,
-} from 'helpers/snapshot_utils';
+import type { SnapshotProposal, SnapshotProposalVote, SnapshotSpace, } from 'helpers/snapshot_utils';
 import moment from 'moment';
+import React, { useMemo } from 'react';
+import { Modal } from '../../components/component_kit/cw_modal';
 
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
-import { Modal } from '../../components/component_kit/cw_modal';
 
 type SnapshotProposalCardsProps = {
   activeUserAddress: string;

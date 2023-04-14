@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import _ from 'underscore';
-import moment from 'moment';
-
-import 'modals/poll_editor_modal.scss';
-
-import type { Thread } from 'models';
-
-import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralize } from 'helpers';
+
+import 'modals/poll_editor_modal.scss';
+import moment from 'moment';
+import React, { useState } from 'react';
+
+
+import app from 'state';
+import _ from 'underscore';
 import { getNextPollEndingTime } from 'utils';
+import { SelectList } from 'views/components/component_kit/cw_select_list';
+import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { SelectList } from 'views/components/component_kit/cw_select_list';
 
 const getPollDurationCopy = (
   customDuration: string,

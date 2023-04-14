@@ -1,8 +1,4 @@
-import {
-  EntityEventKind,
-  eventToEntity,
-  SupportedNetwork,
-} from 'chain-events/src';
+import { EntityEventKind, eventToEntity, SupportedNetwork, } from 'chain-events/src';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { QueryTypes } from 'sequelize';
 import models from '../database';

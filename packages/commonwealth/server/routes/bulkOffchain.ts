@@ -1,5 +1,5 @@
+import type { DB } from '../models';
 /* eslint-disable no-async-promise-executor */
-import { Contract } from 'client/scripts/models';
 import { ServerError } from 'common-common/src/errors';
 //
 // The async promise syntax, new Promise(async (resolve, reject) => {}), should usually be avoided
@@ -8,12 +8,11 @@ import { ServerError } from 'common-common/src/errors';
 //
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
+import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { CommunityRoleInstance } from 'server/models/community_role';
-import type { DB } from '../models';
 import type { ChatChannelInstance } from '../models/chat_channel';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
-import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { RuleInstance } from '../models/rule';
 import type { ThreadInstance } from '../models/thread';
 import type { TopicInstance } from '../models/topic';

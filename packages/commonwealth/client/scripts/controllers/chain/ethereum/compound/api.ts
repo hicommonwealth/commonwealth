@@ -1,11 +1,5 @@
-import type { ExternalProvider } from '@ethersproject/providers';
-import type { Web3Provider } from '@ethersproject/providers';
-import type {
-  ERC20VotesComp,
-  GovernorAlpha,
-  GovernorCompatibilityBravo,
-  MPond,
-} from 'common-common/src/eth/types';
+import type { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import type { ERC20VotesComp, GovernorAlpha, GovernorCompatibilityBravo, MPond, } from 'common-common/src/eth/types';
 import {
   ERC20VotesComp__factory,
   GovernorAlpha__factory,

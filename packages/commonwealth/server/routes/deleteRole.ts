@@ -1,7 +1,7 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import Sequelize from 'sequelize';
 import type { ValidateChainParams } from '../middleware/validateChain';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findOneRole } from '../util/roles';

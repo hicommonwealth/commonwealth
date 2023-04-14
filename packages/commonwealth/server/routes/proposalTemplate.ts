@@ -1,8 +1,8 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import type { Request, Response } from 'express';
-import type { DB } from '../models';
-import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
 import type { CommunityContractTemplateMetadataAttributes } from '../models/community_contract_metadata';
+import type { CommunityContractTemplateAttributes } from '../models/community_contract_template';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import validateRoles from '../util/validateRoles';

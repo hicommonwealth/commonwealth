@@ -1,7 +1,7 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { CHAIN_EVENT_SERVICE_SECRET } from '../config';
-import type { DB } from '../models';
 
 export const Errors = {
   NeedChainNodeId: 'Must provide a chain node id to fetch',

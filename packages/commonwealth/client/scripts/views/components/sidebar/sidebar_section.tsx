@@ -1,16 +1,11 @@
-import React from 'react';
-
 import 'components/sidebar/sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
+import React from 'react';
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
-import type {
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-  SubSectionAttrs,
-} from './types';
+import type { SectionGroupAttrs, SidebarSectionAttrs, SubSectionAttrs, } from './types';
 
 const SubSection = (props: SubSectionAttrs) => {
   const { isActive, isUpdated, isVisible, onClick, rightIcon, rowIcon, title } =

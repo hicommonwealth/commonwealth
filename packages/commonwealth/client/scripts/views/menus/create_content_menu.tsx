@@ -1,19 +1,18 @@
-import React from 'react';
+import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 import { redraw } from 'mithrilInterop';
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
-
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import { useCommonNavigate } from 'navigation/helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =

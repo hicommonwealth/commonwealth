@@ -1,20 +1,12 @@
 import type { ApiPromise } from '@polkadot/api';
-import type {
-  BalanceOf,
-  BlockNumber,
-  Permill,
-} from '@polkadot/types/interfaces';
+import type { BalanceOf, BlockNumber, Permill, } from '@polkadot/types/interfaces';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
-import type {
-  ISubstrateTreasuryProposal,
-  SubstrateCoin,
-} from 'adapters/chain/substrate/types';
+import type { ISubstrateTreasuryProposal, SubstrateCoin, } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from 'chain-events/src/types';
-import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import { formatAddressShort } from '../../../../../shared/utils';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import ProposalModule from '../../../models/ProposalModule';
+import type SubstrateAccounts, { SubstrateAccount } from './account';
 import type SubstrateChain from './shared';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
 

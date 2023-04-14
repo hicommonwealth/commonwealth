@@ -1,16 +1,10 @@
 import chai from 'chai';
 import jwt from 'jsonwebtoken';
-import models from 'server/database';
 import { Op } from 'sequelize';
+import models from 'server/database';
 import { JWT_SECRET } from '../../../../server/config';
-import { post, put } from './appHook.spec';
-import {
-  testAddresses,
-  testChains,
-  testComments,
-  testReactions,
-  testUsers,
-} from './dbEntityHooks.spec';
+import { post } from './appHook.spec';
+import { testAddresses, testChains, testReactions, testUsers, } from './dbEntityHooks.spec';
 
 describe('postReactions Tests', () => {
   let jwtToken;

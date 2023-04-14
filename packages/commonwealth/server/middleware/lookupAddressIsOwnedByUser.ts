@@ -1,8 +1,8 @@
+import type { DB } from '../models';
 // Helper function to look up an (address, author_chain) pair of parameters,
 // and check that it's owned by the current user. Only for POST requests.
 
 import { Op } from 'sequelize';
-import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { UserInstance } from '../models/user';
 

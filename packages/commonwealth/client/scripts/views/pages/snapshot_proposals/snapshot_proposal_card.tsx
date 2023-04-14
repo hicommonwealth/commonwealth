@@ -1,15 +1,14 @@
-import React from 'react';
-
 import 'components/proposal_card/index.scss';
 import { formatLastUpdated, formatTimestamp } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 
 import app from 'state';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ProposalTag } from '../../components/proposal_card/proposal_tag';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type SnapshotProposalCardProps = {
   snapshotId: string;

@@ -1,16 +1,15 @@
-import React from 'react';
-
-import { getDecimals } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
+import { getDecimals } from 'helpers';
+
 import 'modals/edit_topic_thresholds_modal.scss';
-import type { Topic } from 'models';
+import React from 'react';
 
 import app from 'state';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWText } from '../components/component_kit/cw_text';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;

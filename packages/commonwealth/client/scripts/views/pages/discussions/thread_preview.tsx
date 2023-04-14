@@ -1,44 +1,31 @@
-import React, { useState, useEffect } from 'react';
-
-import 'pages/discussions/thread_preview.scss';
-import {
-  chainEntityTypeToProposalShortName,
-  getProposalUrlPath,
-} from 'identifiers';
+import { isCommandClick, pluralize } from 'helpers';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { chainEntityTypeToProposalShortName, getProposalUrlPath, } from 'identifiers';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/discussions/thread_preview.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import { slugify } from 'utils';
-import { isCommandClick, pluralize } from 'helpers';
-import { AddressInfo } from 'models';
-import type { Thread } from 'models';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { ChangeTopicModal } from 'views/modals/change_topic_modal';
+import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
+import AddressInfo from '../../../models/AddressInfo';
+import type Thread from '../../../models/Thread';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../../components/component_kit/cw_tag';
-import {
-  getClasses,
-  isWindowSmallInclusive,
-} from '../../components/component_kit/helpers';
+import { CWText } from '../../components/component_kit/cw_text';
+import { getClasses, isWindowSmallInclusive, } from '../../components/component_kit/helpers';
 import { ThreadPreviewReactionButtonBig } from '../../components/reaction_button/ThreadPreviewReactionButtonBig';
 import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
-import {
-  getCommentSubscription,
-  getReactionSubscription,
-  getThreadSubScriptionMenuItem,
-  isHot,
-} from './helpers';
+import { getCommentSubscription, getReactionSubscription, getThreadSubScriptionMenuItem, isHot, } from './helpers';
 import { ThreadPreviewMenu } from './thread_preview_menu';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { ChangeTopicModal } from 'views/modals/change_topic_modal';
-import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 type ThreadPreviewProps = {
   thread: Thread;

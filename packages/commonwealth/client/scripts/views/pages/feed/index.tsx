@@ -1,15 +1,14 @@
+import 'pages/feed/index.scss';
 import React from 'react';
 
-import 'pages/feed/index.scss';
-
 import app from 'state';
-import { DashboardActivityNotification } from 'models';
-import Sublayout from '../../sublayout';
-import { fetchActivity } from '../user_dashboard/helpers';
-import { DashboardViews } from '../user_dashboard';
+import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWText } from '../../components/component_kit/cw_text';
-import ErrorPage from '../error';
 import { Feed } from '../../components/feed';
+import Sublayout from '../../sublayout';
+import ErrorPage from '../error';
+import { DashboardViews } from '../user_dashboard';
+import { fetchActivity } from '../user_dashboard/helpers';
 
 const FeedPage = () => {
   const getGlobalFeed = async () => {

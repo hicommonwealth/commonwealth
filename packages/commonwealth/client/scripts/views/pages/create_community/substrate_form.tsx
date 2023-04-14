@@ -1,28 +1,21 @@
-import React, { useState } from 'react';
-import $ from 'jquery';
-
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
-import 'pages/create_community.scss';
-
-import app from 'state';
-import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
+
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import 'pages/create_community.scss';
+import React, { useState } from 'react';
+
+import app, { initAppState } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { slugify } from 'utils';
 import { InputRow } from 'views/components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { defaultChainRows } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
-} from './hooks';
+import { useChainFormDefaultFields, useChainFormIdFields, useChainFormState, useEthChainFormFields, } from './hooks';
 
 const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "u8", 
 "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", 

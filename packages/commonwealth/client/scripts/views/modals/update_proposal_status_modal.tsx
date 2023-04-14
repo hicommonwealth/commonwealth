@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
-import type { ChainEntity, Thread } from 'models';
-import { ThreadStage } from 'models';
-import { SelectList } from '../components/component_kit/cw_select_list';
+import React, { useState } from 'react';
 
 import app from 'state';
+import type ChainEntity from '../../models/ChainEntity';
+import type Thread from '../../models/Thread';
+import { ThreadStageType } from '../../models/types';
 import { ChainEntitiesSelector } from '../components/chain_entities_selector';
 import { CWButton } from '../components/component_kit/cw_button';
-import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { SelectList } from '../components/component_kit/cw_select_list';
+import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 
 type UpdateProposalStatusModalProps = {
   onChangeHandler: (
-    stage: ThreadStage,
+    stage: ThreadStageType,
     chainEntities?: ChainEntity[],
     snapshotProposal?: SnapshotProposal[]
   ) => void;
@@ -29,7 +29,7 @@ export const UpdateProposalStatusModal = ({
   onModalClose,
   thread,
 }: UpdateProposalStatusModalProps) => {
-  const [tempStage, setTempStage] = useState<ThreadStage>(thread.stage);
+  const [tempStage, setTempStage] = useState<ThreadStageType>(thread.stage);
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<SnapshotProposal>
   >([{ id: thread.snapshotProposal } as SnapshotProposal]);
@@ -45,11 +45,11 @@ export const UpdateProposalStatusModal = ({
 
   const stages = !customStages
     ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
+        ThreadStageType.Discussion,
+        ThreadStageType.ProposalInReview,
+        ThreadStageType.Voting,
+        ThreadStageType.Passed,
+        ThreadStageType.Failed,
       ]
     : parseCustomStages(customStages);
   const showSnapshot = !!app.chain.meta.snapshot?.length;
@@ -95,10 +95,10 @@ export const UpdateProposalStatusModal = ({
 
   const setVotingStage = () => {
     if (
-      tempStage === ThreadStage.Discussion ||
-      tempStage === ThreadStage.ProposalInReview
+      tempStage === ThreadStageType.Discussion ||
+      tempStage === ThreadStageType.ProposalInReview
     ) {
-      setTempStage(ThreadStage.Voting);
+      setTempStage(ThreadStageType.Voting);
     }
   };
 

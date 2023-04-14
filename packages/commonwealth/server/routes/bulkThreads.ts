@@ -1,8 +1,8 @@
+import type { DB } from '../models';
 /* eslint-disable quotes */
 import { ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
-import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
 import { getLastEdited } from '../util/getLastEdited';
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date

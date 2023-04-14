@@ -1,7 +1,7 @@
+import type { DB } from '../models';
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
-import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
 
 export const ChainCommunityErrors = {

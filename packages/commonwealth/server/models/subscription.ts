@@ -1,3 +1,4 @@
+import type { DB } from '../models';
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
 import type {
@@ -7,16 +8,12 @@ import type {
   IPostNotificationData,
   ISnapshotNotificationData,
 } from '../../shared/types';
-import type { DB } from '../models';
 import type { WebhookContent } from '../webhookNotifier';
 import type { ChainAttributes } from './chain';
 import type { CommentAttributes } from './comment';
 import type { NotificationInstance } from './notification';
 import type { NotificationCategoryAttributes } from './notification_category';
-import type {
-  NotificationsReadAttributes,
-  NotificationsReadInstance,
-} from './notifications_read';
+import type { NotificationsReadAttributes, NotificationsReadInstance, } from './notifications_read';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';

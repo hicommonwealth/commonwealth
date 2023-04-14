@@ -4,7 +4,6 @@ import React from 'react';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 // import { ChainBase } from 'common-common/src/types';
 // import { CommunityType } from '.';
-
 import app from 'state';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { InputRow } from 'views/components/metadata_rows';

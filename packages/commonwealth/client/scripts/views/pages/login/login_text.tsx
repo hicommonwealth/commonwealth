@@ -1,12 +1,8 @@
+import 'pages/login/login_text.scss';
 import React from 'react';
 
-import 'pages/login/login_text.scss';
-
 import { CWText } from 'views/components/component_kit/cw_text';
-import {
-  getClasses,
-  isWindowExtraSmall,
-} from 'views/components/component_kit/helpers';
+import { getClasses, isWindowExtraSmall, } from 'views/components/component_kit/helpers';
 
 type LoginTextProps = {
   bodyText: string;

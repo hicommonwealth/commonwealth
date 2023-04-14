@@ -1,12 +1,7 @@
 import { assert } from 'chai';
-import {
-  Action,
-  AccessLevel,
-  PermissionManager,
-  ToCheck,
-} from 'shared/permissions';
-import { aggregatePermissions } from 'shared/utils';
+import { AccessLevel, Action, PermissionManager, ToCheck, } from 'shared/permissions';
 import type { RoleObject } from 'shared/types';
+import { aggregatePermissions } from 'shared/utils';
 
 describe('aggregatePermissions() unit tests', () => {
   let base_permission;

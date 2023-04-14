@@ -1,6 +1,5 @@
 import { assert } from 'chai';
-import type {
-  SerializableDeltaStatic} from 'client/scripts/views/components/react_quill_editor/utils';
+import type { SerializableDeltaStatic } from 'client/scripts/views/components/react_quill_editor/utils';
 import {
   countLinesMarkdown,
   countLinesQuill,

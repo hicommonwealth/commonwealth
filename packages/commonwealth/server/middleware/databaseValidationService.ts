@@ -1,6 +1,6 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import validateChain from './validateChain';
 

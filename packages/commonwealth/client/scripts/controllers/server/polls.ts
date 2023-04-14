@@ -1,9 +1,8 @@
 /* eslint-disable no-restricted-globals */
 import $ from 'jquery';
-import { Poll, Vote } from 'models';
+import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
-import { redraw } from 'mithrilInterop';
 
 import PollStore from 'stores/PollStore';
 

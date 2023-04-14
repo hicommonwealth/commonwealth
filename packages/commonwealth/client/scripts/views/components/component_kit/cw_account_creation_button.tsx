@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_account_creation_button.scss';
+import React from 'react';
 import { CWCard } from './cw_card';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';

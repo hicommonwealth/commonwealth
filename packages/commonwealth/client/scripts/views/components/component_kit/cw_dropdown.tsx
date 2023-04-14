@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-
 import 'components/component_kit/cw_dropdown.scss';
+import React, { useState } from 'react';
 import { CWText } from './cw_text';
 
 import { CWTextInput } from './cw_text_input';

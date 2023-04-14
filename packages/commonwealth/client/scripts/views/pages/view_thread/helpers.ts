@@ -1,8 +1,7 @@
-import { redraw } from 'mithrilInterop';
-import type { Poll } from 'models';
 import moment from 'moment';
 
 import app from 'state';
+import type Poll from '../../../models/Poll';
 
 export const handlePollVote = async (
   poll: Poll,

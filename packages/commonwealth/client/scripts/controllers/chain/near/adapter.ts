@@ -1,8 +1,7 @@
 import type { NearToken } from 'adapters/chain/near/types';
 import { ChainBase } from 'common-common/src/types';
-import type { ChainInfo } from 'models';
-import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
+import IChainAdapter from '../../../models/IChainAdapter';
 import { NearAccounts } from './account';
 import NearChain from './chain';
 

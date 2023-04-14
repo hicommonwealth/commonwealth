@@ -4,12 +4,7 @@ export { CosmosSDKSessionController } from './cosmos';
 export { SolanaSessionController } from './solana';
 export { NEARSessionController } from './near';
 
-import type {
-  Action,
-  Session,
-  SessionPayload,
-  ActionArgument,
-} from '@canvas-js/interfaces';
+import type { Action, ActionArgument, Session, SessionPayload, } from '@canvas-js/interfaces';
 
 export abstract class ISessionController {
   // Get the current user's human-readable session address.

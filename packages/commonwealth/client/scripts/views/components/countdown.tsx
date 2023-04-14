@@ -1,8 +1,7 @@
-import React from 'react';
-import moment from 'moment';
-import { useCountdown } from 'usehooks-ts';
-
 import { blocknumToDuration, formatDuration } from 'helpers';
+import moment from 'moment';
+import React from 'react';
+import { useCountdown } from 'usehooks-ts';
 
 type CountdownProps = {
   duration: number;

@@ -1,27 +1,24 @@
-import React, { useState } from 'react';
-import type { Result } from 'ethers/lib/utils';
+import { parseFunctionsFromABI } from 'abi_utils';
+import { ChainBase } from 'common-common/src/types';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { ethers } from 'ethers';
+import type { Result } from 'ethers/lib/utils';
+import { handleMappingAbiInputs, validateAbiInput, } from 'helpers/abi_form_helpers';
 
 import 'pages/general_contract/index.scss';
+import React, { useState } from 'react';
 
 import app from 'state';
-import type { Contract } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import type { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ChainBase } from 'common-common/src/types';
-import { parseFunctionsFromABI } from 'abi_utils';
-import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
-import {
-  handleMappingAbiInputs,
-  validateAbiInput,
-} from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
+import Sublayout from '../../sublayout';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
+
 type GeneralContractPageProps = {
   contractAddress?: string;
 };

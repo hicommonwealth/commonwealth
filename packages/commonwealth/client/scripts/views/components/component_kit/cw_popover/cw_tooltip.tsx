@@ -1,12 +1,10 @@
-import React from 'react';
-
 import 'components/component_kit/cw_popover/cw_tooltip.scss';
-
-import { Popover, usePopover } from './cw_popover';
-import type { PopoverTriggerProps } from './cw_popover';
+import React from 'react';
 import { CWText } from '../cw_text';
-import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
+import type { PopoverTriggerProps } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
 
 type TooltipProps = {
   content: string | React.ReactNode;

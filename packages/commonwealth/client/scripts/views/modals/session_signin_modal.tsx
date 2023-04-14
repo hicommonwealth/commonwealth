@@ -1,14 +1,12 @@
-import React from 'react';
-import $ from 'jquery';
-import _ from 'underscore';
-
-import 'modals/session_signin_modal.scss';
-
-import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+
+import 'modals/session_signin_modal.scss';
+import React from 'react';
+
+import app from 'state';
+import _ from 'underscore';
+import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
 
 type SessionSigninModalProps = {
   onModalClose: () => void;

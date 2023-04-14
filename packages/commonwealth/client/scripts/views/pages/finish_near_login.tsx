@@ -1,10 +1,6 @@
-import React from 'react';
-import type { NavigateFunction } from 'react-router-dom';
 import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
-import { initAppState } from 'state';
 import BN from 'bn.js';
-import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   completeClientLogin,
@@ -15,20 +11,21 @@ import {
 import type { NearAccount } from 'controllers/chain/near/account';
 import type Near from 'controllers/chain/near/adapter';
 import $ from 'jquery';
+import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
+import { useCommonNavigate } from 'navigation/helpers';
 import type { WalletConnection } from 'near-api-js';
 import { WalletAccount } from 'near-api-js';
 import type { FunctionCallOptions } from 'near-api-js/lib/account';
-
-import app from 'state';
-import { PageLoading } from 'views/pages/loading';
+import React from 'react';
+import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
+import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
+import { Modal } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
-import { Modal } from '../components/component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
 
 // TODO:
 //  - figure out how account switching will work

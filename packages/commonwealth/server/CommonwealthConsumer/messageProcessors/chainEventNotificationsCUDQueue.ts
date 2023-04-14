@@ -1,8 +1,5 @@
 import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import {
-  RascalPublications,
-  RmqCENotificationCUD,
-} from 'common-common/src/rabbitmq/types';
+import { RascalPublications, RmqCENotificationCUD, } from 'common-common/src/rabbitmq/types';
 import { NotificationCategories } from 'common-common/src/types';
 import type { ChainEventNotification } from 'types';
 import type { Logger } from 'typescript-logging';

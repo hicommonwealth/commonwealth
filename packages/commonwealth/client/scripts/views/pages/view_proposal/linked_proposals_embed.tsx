@@ -1,20 +1,17 @@
-import React from 'react';
-
-import 'pages/view_proposal/linked_proposals_embed.scss';
-
 import { ProposalType } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { idToProposal } from 'identifiers';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_proposal/linked_proposals_embed.scss';
+import React from 'react';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import { useCommonNavigate } from 'navigation/helpers';
 
 export type LinkedSubstrateProposal =
   | SubstrateDemocracyProposal

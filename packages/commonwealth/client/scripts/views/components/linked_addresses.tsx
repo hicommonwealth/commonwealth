@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
-
 import 'components/linked_addresses.scss';
-
-import type { AddressInfo, NewProfile as Profile } from 'models';
-import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
-import { Modal } from './component_kit/cw_modal';
-import { CWIconButton } from './component_kit/cw_icon_button';
+import React, { useState } from 'react';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
-import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
+import { CWIconButton } from './component_kit/cw_icon_button';
+import { Modal } from './component_kit/cw_modal';
 import { CWAddressTooltip } from './component_kit/cw_popover/cw_address_tooltip';
+
+import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
+import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
 
 type AddressProps = {
   profile: Profile;

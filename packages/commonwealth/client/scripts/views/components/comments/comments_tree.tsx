@@ -1,11 +1,8 @@
-import React from 'react';
-
 import 'components/comments/comments_tree.scss';
-
-import type { Comment as CommentType } from 'models';
-import { Thread } from 'models';
-
+import React from 'react';
 import app from 'state';
+import type CommentModel from '../../../models/CommentModel';
+import Thread from '../../../models/Thread';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { Comment } from './comment';
 import { CreateComment } from './create_comment';
@@ -14,7 +11,7 @@ import { jumpHighlightComment } from './helpers';
 const MAX_THREAD_LEVEL = 2;
 
 type CommentsTreeAttrs = {
-  comments: Array<CommentType<any>>;
+  comments: Array<CommentModel<any>>;
   thread: Thread;
   setIsGloballyEditing?: (status: boolean) => void;
   updatedCommentsCallback: () => void;
@@ -95,13 +92,13 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
   };
 
   const recursivelyGatherComments = (
-    comments_: CommentType<any>[],
-    parentComment: CommentType<any>,
+    comments_: CommentModel<any>[],
+    parentComment: CommentModel<any>,
     threadLevel: number
   ) => {
     const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
 
-    return comments_.map((comment: CommentType<any>) => {
+    return comments_.map((comment: CommentModel<any>) => {
       const children = app.comments
         .getByThread(thread)
         .filter((c) => c.parentComment === comment.id);

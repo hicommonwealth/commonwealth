@@ -1,15 +1,15 @@
-import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
+import React from 'react';
+import { CWButton } from '../cw_button';
 
 import type { CheckboxType } from '../cw_checkbox';
 import { CWCheckbox } from '../cw_checkbox';
-import { Popover, usePopover } from './cw_popover';
-import { ComponentType } from '../types';
 import { CWText } from '../cw_text';
-import { CWButton } from '../cw_button';
 import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
+import { Popover, usePopover } from './cw_popover';
 
 type FilterMenuProps = {
   filterMenuItems: Array<CheckboxType>;

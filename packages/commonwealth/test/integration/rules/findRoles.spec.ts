@@ -3,12 +3,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import models from 'server/database';
 import type { ChainInstance } from 'server/models/chain';
-import {
-  createDefaultCommunityRoles,
-  createRole,
-  findAllRoles,
-  findOneRole,
-} from 'server/util/roles';
+import { createDefaultCommunityRoles, createRole, findAllRoles, findOneRole, } from 'server/util/roles';
 import * as modelUtils from 'test/util/modelUtils';
 
 describe('findAllRoles and findOneRole tests', () => {

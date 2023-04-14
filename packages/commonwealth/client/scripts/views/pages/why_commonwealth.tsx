@@ -1,11 +1,11 @@
-import React from 'react';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/why_commonwealth.scss';
+import React from 'react';
 import { CWButton } from '../components/component_kit/cw_button';
 
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
-import { useCommonNavigate } from 'navigation/helpers';
 
 const WhyCommonwealthPage = () => {
   const navigate = useCommonNavigate();

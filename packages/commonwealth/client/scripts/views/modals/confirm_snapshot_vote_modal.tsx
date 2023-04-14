@@ -1,19 +1,18 @@
-import React from 'react';
-
-import { redraw } from 'mithrilInterop';
+import { formatNumberShort } from 'adapters/currency';
 
 import { notifyError } from 'controllers/app/notifications';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { castVote } from 'helpers/snapshot_utils';
-import { formatNumberShort } from 'adapters/currency';
-// import { MixpanelSnapshotEvents } from 'analytics/types';
 
+import { redraw } from 'mithrilInterop';
+// import { MixpanelSnapshotEvents } from 'analytics/types';
 import 'modals/confirm_snapshot_vote_modal.scss';
+import React from 'react';
 
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWText } from '../components/component_kit/cw_text';
 
 type ConfirmSnapshotVoteModalProps = {
   id: string;

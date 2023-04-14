@@ -1,7 +1,7 @@
-import React from 'react';
 import ModalUnstyled from '@mui/base/ModalUnstyled';
 
 import 'components/component_kit/cw_modal.scss';
+import React from 'react';
 
 import { getClasses } from './helpers';
 import { ComponentType } from './types';

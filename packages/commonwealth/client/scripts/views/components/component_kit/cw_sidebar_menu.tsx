@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import 'components/component_kit/cw_sidebar_menu.scss';
 
 import { redraw } from 'mithrilInterop';
-
-import 'components/component_kit/cw_sidebar_menu.scss';
-import { AddressInfo } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
 
 import app from 'state';
+import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -13,7 +13,6 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type CWSidebarMenuItemProps = {
   isStarred: boolean;

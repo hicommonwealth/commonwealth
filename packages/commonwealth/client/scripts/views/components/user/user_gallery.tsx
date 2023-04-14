@@ -1,11 +1,9 @@
+import 'components/user/user_gallery.scss';
 import React from 'react';
 
-import 'components/user/user_gallery.scss';
-
-import type { Account, AddressInfo } from 'models';
 import app from 'state';
-import { User } from './user';
 import { AnonymousUser } from './anonymous_user';
+import { User } from './user';
 
 type UserGalleryProps = {
   addressesCount?: number;

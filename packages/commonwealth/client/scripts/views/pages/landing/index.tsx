@@ -1,20 +1,19 @@
-import React from 'react';
+import useForceRerender from 'hooks/useForceRerender';
 
 import 'pages/landing/index.scss';
+import React from 'react';
 
-import type { ChainInfo } from 'models';
 
 import app, { LoginState } from 'state';
-import { Header } from './header';
+import { CWText } from '../../components/component_kit/cw_text';
+import { Footer } from '../../footer';
+import UserDashboard from '../user_dashboard';
+import { Carousel } from './carousel';
 import { CommunitySearch } from './community_search';
 import { CreatorsGallery } from './creators_gallery';
-import { TokenHolders } from './token_holders';
 import { CrowdfundingGallery } from './crowdfunding_gallery';
-import UserDashboard from '../user_dashboard';
-import { Footer } from '../../footer';
-import useForceRerender from 'hooks/useForceRerender';
-import { CWText } from '../../components/component_kit/cw_text';
-import { Carousel } from './carousel';
+import { Header } from './header';
+import { TokenHolders } from './token_holders';
 
 // import { MixpanelPageViewEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';

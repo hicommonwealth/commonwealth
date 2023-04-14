@@ -1,17 +1,17 @@
-import React from 'react';
-import moment from 'moment';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import { pluralize } from 'helpers';
 import _ from 'lodash';
+import moment from 'moment';
 
 import 'pages/notifications/notification_row.scss';
-
-import type { IPostNotificationData } from 'types';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import React from 'react';
 
 import app from 'state';
-import { AddressInfo } from 'models';
-import { pluralize } from 'helpers';
+
+import type { IPostNotificationData } from 'types';
+import { getCommunityUrl, getThreadUrl } from 'utils';
 import { User } from 'views/components/user/user';
-import { getThreadUrl, getCommunityUrl } from 'utils';
+import AddressInfo from '../../../models/AddressInfo';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
 

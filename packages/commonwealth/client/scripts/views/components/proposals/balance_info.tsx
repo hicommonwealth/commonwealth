@@ -1,7 +1,6 @@
-import React from 'react';
-
 import { formatCoin } from 'adapters/currency';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import React from 'react';
 import app from 'state';
 import { CWText } from '../component_kit/cw_text';
 

@@ -1,10 +1,7 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
-import type {
-  CommunityContractAttributes,
-  CommunityContractInstance,
-} from './community_contract';
+import type { CommunityContractAttributes, CommunityContractInstance, } from './community_contract';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ContractAttributes = {

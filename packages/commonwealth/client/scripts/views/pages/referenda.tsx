@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { blockperiodToDuration } from 'helpers';
 
 import 'pages/referenda.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import { CountdownUntilBlock } from 'views/components/countdown';

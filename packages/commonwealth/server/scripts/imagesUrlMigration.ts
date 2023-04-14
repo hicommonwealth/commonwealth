@@ -1,8 +1,8 @@
-import models from '../database';
 import AWS from 'aws-sdk';
-import { Op } from 'sequelize';
 import fs from 'fs';
 import path from 'path';
+import { Op } from 'sequelize';
+import models from '../database';
 
 AWS.config.update({
   signatureVersion: 'v4',

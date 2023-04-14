@@ -1,16 +1,15 @@
-import React from 'react';
-
-import moment from 'moment';
-
 import 'components/component_kit/cw_content_page.scss';
 
 import { pluralize } from 'helpers';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
-import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
+
+import moment from 'moment';
+import React from 'react';
 import { SharePopover } from '../share_popover';
 import { CWCard } from './cw_card';
 import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
+import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { isWindowMediumSmallInclusive } from './helpers';

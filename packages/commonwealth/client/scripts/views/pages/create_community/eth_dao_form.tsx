@@ -1,41 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { isAddress } from 'web3-utils';
+import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
+import AaveApi from 'controllers/chain/ethereum/aave/api';
+import CompoundAPI, { GovernorTokenType, GovernorType, } from 'controllers/chain/ethereum/compound/api';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
+import React, { useEffect, useState } from 'react';
 
-import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-
-import app from 'state';
-import { initAppState } from 'state';
+import app, { initAppState } from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import {
-  defaultChainRows,
-  ethChainRows,
-} from 'views/pages/create_community/chain_input_rows';
+import { defaultChainRows, ethChainRows, } from 'views/pages/create_community/chain_input_rows';
 import type { EthChainFormState } from 'views/pages/create_community/types';
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import { notifyError } from 'controllers/app/notifications';
-import AaveApi from 'controllers/chain/ethereum/aave/api';
-import CompoundAPI, {
-  GovernorTokenType,
-  GovernorType,
-} from 'controllers/chain/ethereum/compound/api';
+import { isAddress } from 'web3-utils';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
-} from './hooks';
+import { useChainFormDefaultFields, useChainFormIdFields, useChainFormState, useEthChainFormFields, } from './hooks';
 
 export const EthDaoForm = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;

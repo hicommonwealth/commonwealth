@@ -1,27 +1,22 @@
-import React from 'react';
-
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { weiToTokens, getDecimals } from 'helpers';
+import { getDecimals, weiToTokens } from 'helpers';
 import type { DeltaStatic } from 'quill';
-import { Thread } from 'models';
+import React from 'react';
 
 import app from 'state';
 import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
+import Thread from '../../../models/Thread';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
-import { jumpHighlightComment } from './helpers';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  ReactQuillEditor,
-} from '../react_quill_editor';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor, } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
+import { jumpHighlightComment } from './helpers';
 
 type CreateCommmentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;

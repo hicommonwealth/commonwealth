@@ -1,11 +1,11 @@
+import type { DB } from '../models';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import type { TypedRequestQuery, TypedResponse } from '../types';
-import type { DB } from '../models';
+import type { ProfileInstance } from '..//models/profile';
 import type { AddressAttributes } from '../models/address';
 import type { CommentAttributes } from '../models/comment';
 import type { ThreadAttributes } from '../models/thread';
-import type { ProfileInstance } from '..//models/profile';
+import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 
 export const Errors = {

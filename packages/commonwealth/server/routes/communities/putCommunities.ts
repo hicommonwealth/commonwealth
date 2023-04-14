@@ -1,17 +1,14 @@
-import { body, validationResult } from 'express-validator';
-import type {
-  PutCommunitiesReq,
-  PutCommunitiesResp,
-} from 'common-common/src/api/extApiTypes';
-import type { NextFunction } from 'express';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
+import type { PutCommunitiesReq, PutCommunitiesResp, } from 'common-common/src/api/extApiTypes';
 import { AppError } from 'common-common/src/errors';
+import type { NextFunction } from 'express';
+import { body, validationResult } from 'express-validator';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
+import { sequelize } from '../../database';
 import type { DB } from '../../models';
 import type { TypedRequest, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { createAddressHelper } from '../../util/createAddressHelper';
 import type { CreateAddressReq } from '../createAddress';
-import { sequelize } from '../../database';
 
 export const Errors = {
   NeedPositiveBalance: 'Must provide address with positive balance',

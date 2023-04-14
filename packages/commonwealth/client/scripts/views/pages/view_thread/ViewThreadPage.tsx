@@ -3,12 +3,11 @@ import { notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
-
-import type { ChainEntity, Comment, Poll, Topic } from 'models';
-import { Thread, ThreadStage as ThreadStageType } from 'models';
 import type { IThreadCollaborator } from 'models/Thread';
+import Thread from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
@@ -20,6 +19,11 @@ import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
+import type ChainEntity from '../../../models/ChainEntity';
+import type CommentModel from '../../../models/CommentModel';
+import type Poll from '../../../models/Poll';
+import type Topic from '../../../models/Topic';
+import { ThreadStageType } from '../../../models/types';
 import { CommentsTree } from '../../components/comments/comments_tree';
 import { CreateComment } from '../../components/comments/create_comment';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
@@ -27,24 +31,19 @@ import type { SidebarComponents } from '../../components/component_kit/cw_conten
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { Modal } from '../../components/component_kit/cw_modal';
+import type { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { ThreadReactionPreviewButtonSmall } from '../../components/reaction_button/ThreadPreviewReactionButtonSmall';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
-import {
-  getCommentSubscription,
-  getReactionSubscription,
-  handleToggleSubscription,
-} from '../discussions/helpers';
+import { getCommentSubscription, getReactionSubscription, handleToggleSubscription, } from '../discussions/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import type { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -65,7 +64,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
 
-  const [comments, setComments] = useState<Array<Comment<Thread>>>([]);
+  const [comments, setComments] = useState<Array<CommentModel<Thread>>>([]);
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [polls, setPolls] = useState<Array<Poll>>([]);

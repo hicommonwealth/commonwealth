@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_mobile_menu.scss';
+import React from 'react';
 
 import app from 'state';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';

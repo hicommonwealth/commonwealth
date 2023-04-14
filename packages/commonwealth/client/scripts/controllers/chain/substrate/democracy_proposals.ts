@@ -1,20 +1,10 @@
 import type { ApiPromise } from '@polkadot/api';
-import type {
-  Balance,
-  BlockNumber,
-  Call,
-  Hash,
-  VoteThreshold,
-} from '@polkadot/types/interfaces';
-import type {
-  ISubstrateDemocracyProposal,
-  SubstrateCoin,
-} from 'adapters/chain/substrate/types';
+import type { Balance, BlockNumber, Call, Hash, VoteThreshold, } from '@polkadot/types/interfaces';
+import type { ISubstrateDemocracyProposal, SubstrateCoin, } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from 'chain-events/src/types';
-import { ProposalModule } from 'models';
 import type { IApp } from 'state';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import ProposalModule from '../../../models/ProposalModule';
+import type SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
 import type SubstrateChain from './shared';
 

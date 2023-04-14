@@ -1,7 +1,7 @@
+import type { DB } from '../models';
 import { ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { uniqBy } from 'lodash';
-import type { DB } from '../models';
 
 const bulkReactions = async (
   models: DB,

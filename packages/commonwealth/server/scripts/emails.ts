@@ -7,10 +7,10 @@ import { capitalize } from 'lodash';
 import { Op } from 'sequelize';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import type {
-  IPostNotificationData,
   IChainEventNotificationData,
   IChatNotification,
   ICommunityNotificationData,
+  IPostNotificationData,
   SnapshotEventType,
   SnapshotNotification,
 } from '../../shared/types';

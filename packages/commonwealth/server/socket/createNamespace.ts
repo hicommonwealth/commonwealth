@@ -1,14 +1,7 @@
 import { addPrefix, factory } from 'common-common/src/logging';
 import type { Server } from 'socket.io';
-import type {
-  ChainEventNotification,
-  SnapshotProposalNotification,
-  WebsocketNamespaces,
-} from '../../shared/types';
-import {
-  WebsocketEngineEvents,
-  WebsocketMessageNames,
-} from '../../shared/types';
+import type { ChainEventNotification, SnapshotProposalNotification, WebsocketNamespaces, } from '../../shared/types';
+import { WebsocketEngineEvents, WebsocketMessageNames, } from '../../shared/types';
 import { authenticate } from './index';
 
 const log = factory.getLogger(addPrefix(__filename));

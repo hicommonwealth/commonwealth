@@ -1,27 +1,20 @@
 import type { EncodeObject } from '@cosmjs/proto-signing';
 
-import type {
-  BankExtension,
-  GovExtension,
-  StakingExtension,
-  StdFee,
-} from '@cosmjs/stargate';
-import type { QueryClient } from '@cosmjs/stargate';
-import type { Event } from '@cosmjs/tendermint-rpc';
-import type { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import type { BankExtension, GovExtension, QueryClient, StakingExtension, StdFee, } from '@cosmjs/stargate';
+import type { Event, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
+import type { LCD } from 'chain-events/src/chains/cosmos/types';
+import { createLCDClient } from 'common-common/src/cosmos-ts/src/codegen/cosmos/lcd';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
 import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import type { LCD } from 'chain-events/src/chains/cosmos/types';
+import type { IChainModule, ITXData, ITXModalData } from '../../../models/interfaces';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
-import { createLCDClient } from 'common-common/src/cosmos-ts/src/codegen/cosmos/lcd';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { isEqual } from 'lodash';
 
 import 'modals/edit_collaborators_modal.scss';
-
-import type { Thread } from 'models';
-import type { IThreadCollaborator } from 'models/Thread';
+import type Thread, { IThreadCollaborator } from 'models/Thread';
+import React, { useEffect, useState } from 'react';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 
 import app from 'state';
-import { User } from '../components/user/user';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { User } from '../components/user/user';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;

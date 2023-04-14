@@ -1,20 +1,20 @@
-import React from 'react';
-import $ from 'jquery';
-
 import 'components/profile/index.scss';
+import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import $ from 'jquery';
+import React from 'react';
 
 import app from 'state';
-import type { Thread } from 'models';
-import { AddressInfo, NewProfile as Profile } from 'models';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-
-import ProfileHeader from './profile_header';
-import type { CommentWithAssociatedThread } from './profile_activity';
-import ProfileActivity from './profile_activity';
-import { CWSpinner } from '../component_kit/cw_spinner';
-import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
+import Profile from '../../../../../server/models/profile';
+import AddressInfo from '../../../models/AddressInfo';
+import type Thread from '../../../models/Thread';
 import { PageNotFound } from '../../pages/404';
 import Sublayout from '../../sublayout';
+import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
+import { CWSpinner } from '../component_kit/cw_spinner';
+import type { CommentWithAssociatedThread } from './profile_activity';
+import ProfileActivity from './profile_activity';
+
+import ProfileHeader from './profile_header';
 
 enum ProfileError {
   None,

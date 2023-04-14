@@ -1,9 +1,8 @@
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-
 import type { SessionPayload } from '@canvas-js/interfaces';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 
 import app from 'state';
+import type IWebWallet from '../../../models/IWebWallet';
 
 type TerraAddress = {
   address: string;

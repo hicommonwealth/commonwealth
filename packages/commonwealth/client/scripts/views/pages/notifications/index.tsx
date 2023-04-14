@@ -1,15 +1,15 @@
+import { byDescendingCreationDate } from 'helpers';
+
+import 'pages/notifications/index.scss';
 import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
-import 'pages/notifications/index.scss';
-
 import app from 'state';
-import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
-import { NotificationRow } from './notification_row';
+import Sublayout from 'views/sublayout';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import { byDescendingCreationDate } from 'helpers';
+import { NotificationRow } from './notification_row';
 
 const NotificationsPage = () => {
   if (!app.isLoggedIn()) {

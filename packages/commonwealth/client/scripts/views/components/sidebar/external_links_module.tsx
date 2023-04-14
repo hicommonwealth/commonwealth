@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/sidebar/external_links_module.scss';
+import React from 'react';
 
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';

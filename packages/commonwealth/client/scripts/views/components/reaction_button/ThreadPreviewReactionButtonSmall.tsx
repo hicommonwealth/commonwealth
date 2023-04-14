@@ -1,18 +1,15 @@
 import 'components/reaction_button/comment_reaction_button.scss';
 
-import type { Thread } from 'models';
 import React, { useState } from 'react';
 
 import app from 'state';
+import type Thread from '../../../models/Thread';
 import { LoginModal } from '../../modals/login_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { Modal } from '../component_kit/cw_modal';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { CWText } from '../component_kit/cw_text';
-import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from '../component_kit/helpers';
+import { getClasses, isWindowMediumSmallInclusive, } from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
 import { useReactionButton } from './UseReactionButton';
 

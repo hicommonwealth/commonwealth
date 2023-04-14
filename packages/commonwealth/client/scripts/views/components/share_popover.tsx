@@ -1,10 +1,9 @@
+import { _DEPRECATED_getRoute } from 'mithrilInterop';
 import React from 'react';
 
-import { _DEPRECATED_getRoute } from 'mithrilInterop';
-
 import { CWIconButton } from './component_kit/cw_icon_button';
-import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import type { PopoverTriggerProps } from './component_kit/cw_popover/cw_popover';
+import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
 type SharePopoverProps = {
   commentId?: number;

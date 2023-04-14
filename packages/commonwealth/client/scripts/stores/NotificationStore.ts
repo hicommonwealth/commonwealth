@@ -1,4 +1,4 @@
-import type { Notification, NotificationSubscription } from '../models';
+import type NotificationSubscription from '../models/NotificationSubscription';
 import IdStore from './IdStore';
 
 class NotificationStore extends IdStore<Notification> {

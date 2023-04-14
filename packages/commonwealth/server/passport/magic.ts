@@ -1,3 +1,4 @@
+import type { DB } from '../models';
 import type { MagicUserMetadata } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
 
@@ -8,7 +9,6 @@ import { Strategy as MagicStrategy } from 'passport-magic';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import { sequelize } from '../database';
 import validateChain from '../middleware/validateChain';
-import type { DB } from '../models';
 import type { ProfileAttributes } from '../models/profile';
 
 import '../types';

@@ -1,20 +1,16 @@
-import React from 'react';
-
 import 'pages/login/login_desktop.scss';
-
-import {
-  CWProfileRow,
-  CWProfilesList,
-} from 'views/components/component_kit/cw_profiles_list';
+import React from 'react';
 import { CWAddress } from 'views/components/component_kit/cw_address';
 import { CWAvatarUsernameInput } from 'views/components/component_kit/cw_avatar_username_input';
 import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+
+import { CWProfileRow, CWProfilesList, } from 'views/components/component_kit/cw_profiles_list';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';

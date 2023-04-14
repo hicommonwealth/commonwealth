@@ -1,11 +1,8 @@
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-} from 'react-router-dom';
+import customDomainRoutes from 'navigation/customDomainRoutes';
+import { createBrowserRouter, createRoutesFromElements, } from 'react-router-dom';
+import commonDomainRoutes from './commonDomainRoutes';
 
 import generalRoutes from './generalRoutes';
-import commonDomainRoutes from './commonDomainRoutes';
-import customDomainRoutes from 'navigation/customDomainRoutes';
 
 const router = (customDomain: string) =>
   createBrowserRouter(

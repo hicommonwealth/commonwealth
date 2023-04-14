@@ -1,12 +1,13 @@
+import { notifyError } from 'controllers/app/notifications';
+import SearchQuery, { SearchScope } from 'models/SearchQuery';
+import { useCommonNavigate } from 'navigation/helpers';
+
+import 'pages/search/search_bar.scss';
 import React, { useEffect, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
-import 'pages/search/search_bar.scss';
-
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import { SearchQuery } from 'models';
-import { SearchScope } from 'models/SearchQuery';
+import { useDebounce } from 'usehooks-ts';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -17,8 +18,6 @@ import {
   SearchBarMemberPreviewRow,
   SearchBarThreadPreviewRow,
 } from './search_bar_components';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useDebounce } from 'usehooks-ts';
 
 const MIN_SEARCH_TERM_LENGTH = 4;
 const NUM_RESULTS_PER_SECTION = 2;

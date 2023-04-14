@@ -1,9 +1,9 @@
-import { render } from 'mithrilInterop';
+import { Browser } from '@capacitor/browser';
 
 import { loadScript } from 'helpers';
-import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
+import { render } from 'mithrilInterop';
 import app from 'state';
-import { Browser } from '@capacitor/browser';
+import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
 
 export const renderQuillDelta = (
   delta,

@@ -3,11 +3,10 @@ import type { Vec } from '@polkadot/types';
 import type { AccountId } from '@polkadot/types/interfaces';
 import type { ISubstrateTreasuryTip } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from 'chain-events/src/types';
-import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import { formatAddressShort } from 'utils';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import ProposalModule from '../../../models/ProposalModule';
+import type SubstrateAccounts, { SubstrateAccount } from './account';
 import type SubstrateChain from './shared';
 import { SubstrateTreasuryTip } from './treasury_tip';
 

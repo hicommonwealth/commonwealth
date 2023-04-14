@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 
 import 'pages/snapshot_proposals.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import { NotificationCategories } from '../../../../../../common-common/src/types';
 import { CardsCollection } from '../../components/cards_collection';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { NotificationCategories } from '../../../../../../common-common/src/types';
 
 type SnapshotProposalsPageProps = {
   topic?: string;

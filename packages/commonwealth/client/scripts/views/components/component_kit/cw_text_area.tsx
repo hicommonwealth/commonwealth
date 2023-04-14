@@ -1,14 +1,13 @@
-import React from 'react';
-
-import { redraw } from 'mithrilInterop';
-
 import 'components/component_kit/cw_text_area.scss';
 
-import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import type { ValidationStatus } from './cw_validation_text';
-import { MessageRow, useTextInputWithValidation } from './cw_text_input';
+import { redraw } from 'mithrilInterop';
+import React from 'react';
 import type { BaseTextInputProps } from './cw_text_input';
+import { MessageRow, useTextInputWithValidation } from './cw_text_input';
+import type { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
+
+import { ComponentType } from './types';
 
 type TextAreaStyleProps = {
   disabled?: boolean;

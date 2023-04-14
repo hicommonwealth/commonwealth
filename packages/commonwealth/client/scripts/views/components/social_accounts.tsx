@@ -1,8 +1,7 @@
-import React from 'react';
+import type { NewProfile as Profile } from 'client/scripts/models';
 
 import 'components/social_accounts.scss';
-
-import type { NewProfile as Profile } from 'client/scripts/models';
+import React from 'react';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import type { IconName } from './component_kit/cw_icons/cw_icon_lookup';
 

@@ -1,20 +1,19 @@
-import React from 'react';
-import { uuidv4 } from 'lib/util';
+import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, DefaultPage } from 'common-common/src/types';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';
+import { uuidv4 } from 'lib/util';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
 import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
+import { PermissionManager } from 'permissions';
+import React from 'react';
 
 import app from 'state';
-import { ChainBase, DefaultPage } from 'common-common/src/types';
-import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import type { ChainInfo, RoleInfo } from 'models';
-import { PermissionManager } from 'permissions';
+import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -23,11 +22,7 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
-import {
-  buildCategoryMap,
-  setChainCategories,
-  setSelectedTags,
-} from './helpers';
+import { buildCategoryMap, setChainCategories, setSelectedTags, } from './helpers';
 import { ManageRoles } from './manage_roles';
 
 type ChainMetadataRowsAttrs = {

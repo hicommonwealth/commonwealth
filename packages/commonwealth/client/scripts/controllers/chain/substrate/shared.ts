@@ -1,22 +1,10 @@
-import { redraw } from 'mithrilInterop';
 import type { SubmittableResult } from '@polkadot/api';
 import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
-import type {
-  ApiOptions,
-  Signer,
-  SubmittableExtrinsic,
-  VoidFn,
-} from '@polkadot/api/types';
+import type { ApiOptions, Signer, SubmittableExtrinsic, VoidFn, } from '@polkadot/api/types';
 import type { u128 } from '@polkadot/types';
 
 import type { Compact } from '@polkadot/types/codec';
-import type {
-  ActiveEraInfo,
-  Call,
-  DispatchError,
-  EraIndex,
-  SessionIndex,
-} from '@polkadot/types/interfaces';
+import type { Call, DispatchError, SessionIndex, } from '@polkadot/types/interfaces';
 import type { CallFunction, InterfaceTypes } from '@polkadot/types/types';
 import { u8aToHex } from '@polkadot/util';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -25,27 +13,17 @@ import { formatCoin } from 'adapters/currency';
 import BN from 'bn.js';
 
 import { SubstrateEvents } from 'chain-events/src';
-import { ChainNetwork } from 'common-common/src/types';
 
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-} from 'controllers/app/notifications';
+import { notifyError, notifyInfo, notifySuccess, } from 'controllers/app/notifications';
 import { EventEmitter } from 'events';
-import type {
-  ChainInfo,
-  IChainModule,
-  ITXData,
-  ITXModalData,
-  NodeInfo,
-} from 'models';
-import { TransactionStatus } from 'models';
+import { redraw } from 'mithrilInterop';
+import type { ChainInfo, IChainModule, ITXData, ITXModalData, NodeInfo, } from 'models';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
+import { TransactionStatus } from '../../../models/types';
 import { chainToEventNetwork } from '../../server/chain_entities';
 import type { SubstrateAccount } from './account';
 

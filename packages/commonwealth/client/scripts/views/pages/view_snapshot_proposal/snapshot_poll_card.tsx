@@ -1,13 +1,9 @@
-import React, { useEffect } from 'react';
-
 import 'components/poll_card.scss';
+import React, { useEffect } from 'react';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 
-import type {
-  PollCardProps,
-  VoteInformation,
-} from '../../components/poll_card';
+import type { PollCardProps, VoteInformation, } from '../../components/poll_card';
 import {
   buildVoteDirectionString,
   CastVoteSection,

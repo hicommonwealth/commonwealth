@@ -1,14 +1,13 @@
-import React from 'react';
-
-import 'pages/login/login_desktop_sidebar.scss';
-
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
-import type { IWebWallet } from 'models';
+import 'pages/login/login_desktop_sidebar.scss';
+import React from 'react';
+
 import app from 'state';
 import { CWAccountCreationButton } from 'views/components/component_kit/cw_account_creation_button';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
+import type IWebWallet from '../../../models/IWebWallet';
 import { LoginText } from './login_text';
 import type { LoginSidebarType } from './types';
 

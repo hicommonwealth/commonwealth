@@ -1,8 +1,7 @@
-import React from 'react';
-
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 
 import 'pages/tip_detail.scss';
+import React from 'react';
 
 import app from 'state';
 import { MarkdownFormattedText } from '../components/quill/markdown_formatted_text';

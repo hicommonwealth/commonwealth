@@ -1,12 +1,9 @@
-import {
-  getRabbitMQConfig,
-  RabbitMQController,
-} from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { getRabbitMQConfig, RabbitMQController, } from 'common-common/src/rabbitmq';
+import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import type { RabbitMQSubscription } from 'common-common/src/serviceConsumer';
 import { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import type { BrokerConfig } from 'rascal';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import Rollbar from 'rollbar';
 import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
 import models from '../database';

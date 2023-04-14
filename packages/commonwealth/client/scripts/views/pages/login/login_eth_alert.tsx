@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'pages/login/login_eth_alert.scss';
+import React from 'react';
 
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';

@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'pages/loading.scss';
+import React from 'react';
 
 import Sublayout from 'views/sublayout';
 import { CWSpinner } from '../components/component_kit/cw_spinner';

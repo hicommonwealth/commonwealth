@@ -1,7 +1,6 @@
 import { ChainBase } from 'common-common/src/types';
-import type { ChainInfo } from 'models';
-import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
+import IChainAdapter from '../../../models/IChainAdapter';
 import type SolanaAccount from './account';
 import SolanaAccounts from './accounts';
 import SolanaChain from './chain';

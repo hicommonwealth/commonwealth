@@ -1,10 +1,10 @@
+import type { SessionPayload } from '@canvas-js/interfaces';
 import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
-import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
 import app from 'state';
+import type IWebWallet from '../../../models/IWebWallet';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface

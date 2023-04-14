@@ -1,11 +1,8 @@
-import type {
-  DeleteReq,
-  OnlyErrorResp,
-} from 'common-common/src/api/extApiTypes';
+import type { DB } from '../models';
+import type { DeleteReq, OnlyErrorResp, } from 'common-common/src/api/extApiTypes';
 import { validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import { filterAddressOwnedByUser } from '../middleware/lookupAddressIsOwnedByUser';
-import type { DB } from '../models';
 import type { ModelStatic } from '../models/types';
 import type { TypedRequest, TypedResponse } from '../types';
 import { failure, success } from '../types';

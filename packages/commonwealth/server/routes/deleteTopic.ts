@@ -1,8 +1,8 @@
+import type { DB } from '../models';
 /* eslint-disable no-restricted-syntax */
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
 import { QueryTypes } from 'sequelize';
-import type { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

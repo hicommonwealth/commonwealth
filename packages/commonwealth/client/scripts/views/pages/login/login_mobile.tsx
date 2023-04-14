@@ -1,21 +1,17 @@
-import React from 'react';
-
 import 'pages/login/login_mobile.scss';
-
-import {
-  CWProfileRow,
-  CWProfilesList,
-} from 'views/components/component_kit/cw_profiles_list';
+import React from 'react';
 import { CWAccountCreationButton } from 'views/components/component_kit/cw_account_creation_button';
 import { CWAddress } from 'views/components/component_kit/cw_address';
 import { CWAvatarUsernameInput } from 'views/components/component_kit/cw_avatar_username_input';
 import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+
+import { CWProfileRow, CWProfilesList, } from 'views/components/component_kit/cw_profiles_list';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowExtraSmall } from 'views/components/component_kit/helpers';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 import { getLoginText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';

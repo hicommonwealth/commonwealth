@@ -1,5 +1,5 @@
-import React from 'react';
 import { findAll } from 'highlight-words-core';
+import React from 'react';
 import smartTruncate from 'smart-truncate';
 
 export const renderTruncatedHighlights = (

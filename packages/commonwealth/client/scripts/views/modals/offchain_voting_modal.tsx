@@ -1,11 +1,9 @@
-import React from 'react';
-
 import 'modals/offchain_voting_modal.scss';
-
-import type { Vote } from 'models';
-import { AddressInfo } from 'models';
-import { User } from '../components/user/user';
+import React from 'react';
+import AddressInfo from '../../models/AddressInfo';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+
+import { User } from '../components/user/user';
 
 type OffchainVotingModalProps = {
   onModalClose: () => void;

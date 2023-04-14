@@ -1,7 +1,6 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
-import { Op } from 'sequelize';
-import type { DB } from '../models';
 
 export const Errors = {
   MutuallyExclusive:

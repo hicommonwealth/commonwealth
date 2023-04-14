@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
 import $ from 'jquery';
 
 import 'pages/manage_community/index.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
-import { AccessLevel, RoleInfo } from 'models';
+import RoleInfo from '../../../models/RoleInfo';
 import Sublayout from '../../sublayout';
 import ErrorPage from '../error';
 import { PageLoading } from '../loading';

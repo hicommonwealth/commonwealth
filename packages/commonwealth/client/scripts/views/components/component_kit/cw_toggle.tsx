@@ -1,11 +1,9 @@
-import React from 'react';
-
 import 'components/component_kit/cw_toggle.scss';
-
-import type { BaseStyleProps } from './types';
-import { getClasses } from './helpers';
-import { ComponentType } from './types';
+import React from 'react';
 import { setDarkMode } from '../../../helpers';
+import { getClasses } from './helpers';
+import type { BaseStyleProps } from './types';
+import { ComponentType } from './types';
 
 export const toggleDarkMode = (on: boolean, stateFn?: Function) => {
   setDarkMode(on);

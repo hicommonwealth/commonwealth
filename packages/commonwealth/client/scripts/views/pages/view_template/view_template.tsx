@@ -1,28 +1,24 @@
-import React from 'react';
-import 'view_template/view_template.scss';
+import { parseFunctionFromABI } from 'abi_utils';
+import type Contract from 'client/scripts/models/Contract';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
+import validateType from 'helpers/validateTypes';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import app from 'state';
+import 'view_template/view_template.scss';
+import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextInput, MessageRow, } from 'views/components/component_kit/cw_text_input';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import Web3 from 'web3';
+import isValidJson from '../../../../../shared/validateJson';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 import Sublayout from '../../sublayout';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
-import isValidJson from '../../../../../shared/validateJson';
-import {
-  CWTextInput,
-  MessageRow,
-} from 'views/components/component_kit/cw_text_input';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWButton } from '../../components/component_kit/cw_button';
-import type Contract from 'client/scripts/models/Contract';
-import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
-import { parseFunctionFromABI } from 'abi_utils';
-import validateType from 'helpers/validateTypes';
-import Web3 from 'web3';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useCallback, useEffect, useState } from 'react';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useParams } from 'react-router-dom';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 
 enum TemplateComponents {
   DIVIDER = 'divider',

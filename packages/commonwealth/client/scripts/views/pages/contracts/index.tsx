@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import type Contract from 'models/Contract';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/contracts/contracts_page.scss';
+import React, { useState } from 'react';
 import app from 'state';
-
-import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWText } from 'views/components/component_kit/cw_text';
+import Sublayout from '../../sublayout';
+
+import { PageLoading } from '../loading';
 import { ContractCard } from './contract_card';
-import { useCommonNavigate } from 'navigation/helpers';
-import type Contract from 'models/Contract';
 
 const ContractsPage = () => {
   const navigate = useCommonNavigate();

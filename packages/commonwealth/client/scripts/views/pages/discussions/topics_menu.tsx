@@ -1,21 +1,17 @@
-import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { _DEPRECATED_getRoute } from 'mithrilInterop';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/discussions/stages_menu.scss';
+import React from 'react';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
-import {
-  Popover,
-  usePopover,
-} from '../../components/component_kit/cw_popover/cw_popover';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { Popover, usePopover, } from '../../components/component_kit/cw_popover/cw_popover';
 import { ThreadsFilterMenuItem } from './stages_menu';
-import { useCommonNavigate } from 'navigation/helpers';
-import type { Topic } from 'models';
 
 type TopicsMenuProps = {
   featuredTopics: Array<Topic>;

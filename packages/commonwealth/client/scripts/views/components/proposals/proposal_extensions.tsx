@@ -1,17 +1,16 @@
-import React from 'react';
-
 import 'components/proposals/proposal_extensions.scss';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import type { AnyProposal } from 'models';
+import React from 'react';
 
 import app from 'state';
 import { BalanceInfo } from 'views/components/proposals/balance_info';
 
 import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
+import type { AnyProposal } from '../../../models/types';
 import { CWText } from '../component_kit/cw_text';
 import { CWTextInput } from '../component_kit/cw_text_input';
 

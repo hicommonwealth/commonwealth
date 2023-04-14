@@ -1,13 +1,11 @@
-import React from 'react';
+import type { ChainCategoryType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import numeral from 'numeral';
 
 import 'pages/communities.scss';
-
-import type { ChainCategoryType } from 'common-common/src/types';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import type { ChainInfo } from 'models';
-import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
+import React from 'react';
 import type { ChainCategoryAttributes } from 'server/models/chain_category';
+import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 
 import app from 'state';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';

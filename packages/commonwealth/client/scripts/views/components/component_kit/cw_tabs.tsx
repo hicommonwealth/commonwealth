@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_tabs.scss';
+import React from 'react';
 import { CWText } from './cw_text';
 
 import { getClasses } from './helpers';

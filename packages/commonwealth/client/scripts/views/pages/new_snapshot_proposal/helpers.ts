@@ -1,10 +1,10 @@
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { createProposal, getSpaceBlockNumber } from 'helpers/snapshot_utils';
-import type { Account } from 'models';
 import app from 'state';
+import Account from '../../../models/Account';
+import { getTextFromDelta } from '../../components/react_quill_editor';
 import type { ThreadForm } from './types';
 import { NewThreadErrors } from './types';
-import { getTextFromDelta } from '../../components/react_quill_editor';
 
 export const createNewProposal = async (
   form: ThreadForm,

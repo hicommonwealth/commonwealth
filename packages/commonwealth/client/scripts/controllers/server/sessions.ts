@@ -1,24 +1,18 @@
-import type { IWebWallet, Account } from 'models';
-import { sessionSigninModal } from 'views/modals/session_signin_modal';
-import { addressSwapper } from 'commonwealth/shared/utils';
-
-import {
-  constructCanvasMessage,
-  chainBaseToCanvasChain,
-  chainBaseToCanvasChainId,
-} from 'adapters/shared';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
+
+import { chainBaseToCanvasChain, chainBaseToCanvasChainId, constructCanvasMessage, } from 'adapters/shared';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
 import app from 'state';
 import { ChainBase } from '../../../../../common-common/src/types';
-import type {
-  ISessionController} from './sessionSigners';
+import type IWebWallet from '../../models/IWebWallet';
+import type { ISessionController } from './sessionSigners';
 import {
-  EthereumSessionController,
-  SubstrateSessionController,
   CosmosSDKSessionController,
-  SolanaSessionController,
+  EthereumSessionController,
   NEARSessionController,
+  SolanaSessionController,
+  SubstrateSessionController,
 } from './sessionSigners';
 
 export async function signSessionWithAccount<T extends { address: string }>(

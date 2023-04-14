@@ -1,10 +1,7 @@
-import { render } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
+import { render } from 'mithrilInterop';
 
-import {
-  CWAvatar,
-  CWJdenticon,
-} from '../views/components/component_kit/cw_avatar';
+import { CWAvatar, CWJdenticon, } from '../views/components/component_kit/cw_avatar';
 
 class MinimumProfile {
   private _name: string;

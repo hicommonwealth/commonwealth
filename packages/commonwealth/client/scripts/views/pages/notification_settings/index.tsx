@@ -1,33 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import { NotificationCategories } from 'common-common/src/types';
+import useForceRerender from 'hooks/useForceRerender';
+import { redraw } from 'mithrilInterop';
 
 import moment from 'moment';
-import type { NotificationSubscription } from 'models';
-import { AddressInfo } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
+import AddressInfo from '../../../models/AddressInfo';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWCard } from '../../components/component_kit/cw_card';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
-import {
-  SubscriptionRowMenu,
-  SubscriptionRowTextContainer,
-} from './helper_components';
+import { SubscriptionRowMenu, SubscriptionRowTextContainer, } from './helper_components';
 import { bundleSubs } from './helpers';
-import { useCommonNavigate } from 'navigation/helpers';
-import useForceRerender from 'hooks/useForceRerender';
-import { redraw } from 'mithrilInterop';
-import { NotificationCategories } from 'common-common/src/types';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',

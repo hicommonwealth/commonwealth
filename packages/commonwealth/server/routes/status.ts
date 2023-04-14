@@ -12,14 +12,13 @@ import type { NotificationCategoryInstance } from 'server/models/notification_ca
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
 import type { EmailNotificationInterval } from 'server/models/user';
-import { JWT_SECRET } from '../config';
+import { ETH_RPC, JWT_SECRET } from '../config';
 import { sequelize } from '../database';
-import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-import { ETH_RPC } from '../config';
+import type { DB } from '../models';
 
 type ThreadCountQueryData = {
   concat: string;

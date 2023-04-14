@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useDropzone } from 'react-dropzone';
 
 import 'components/avatar_upload.scss';
+import { notifyError } from 'controllers/app/notifications';
+import React, { useEffect, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
 
 import app from 'state';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
-import type { Account } from 'models';
-import { notifyError } from 'controllers/app/notifications';
 
 type AvatarUploadStyleProps = {
   size?: 'small' | 'large';

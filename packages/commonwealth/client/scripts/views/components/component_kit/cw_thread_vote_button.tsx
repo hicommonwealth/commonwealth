@@ -1,11 +1,11 @@
-import React from 'react';
+import { formatNumberShort } from 'adapters/currency';
 
 import 'components/component_kit/cw_thread_vote_button.scss';
+import React from 'react';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
-import { formatNumberShort } from 'adapters/currency';
 
 type ThreadVoteButtonProps = {
   updateVoteCount: (newCount: number) => void;

@@ -1,16 +1,15 @@
-import React from 'react';
-
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
 import { link } from 'helpers';
-import { ChainInfo } from 'models';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 
 import app from 'state';
+import ChainInfo from '../../../models/ChainInfo';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();

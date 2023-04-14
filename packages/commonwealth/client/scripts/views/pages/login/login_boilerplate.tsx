@@ -1,10 +1,10 @@
-import React from 'react';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/login/login_boilerplate.scss';
+import React from 'react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type LoginBoilerplateProps = {
   darkMode?: boolean;

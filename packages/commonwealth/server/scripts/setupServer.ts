@@ -1,12 +1,12 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import type { RabbitMQController } from 'common-common/src/rabbitmq';
 import type { Express } from 'express-serve-static-core';
 import http from 'http';
 import type Rollbar from 'rollbar';
 
 import { PORT } from '../config';
-import type { DB } from '../models';
 import { setupWebSocketServer } from '../socket';
-import { factory, formatFilename } from 'common-common/src/logging';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

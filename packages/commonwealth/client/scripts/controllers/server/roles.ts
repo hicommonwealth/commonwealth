@@ -1,17 +1,10 @@
 import $ from 'jquery';
-import app from 'state';
-
-import type { AddressInfo, RoleInfo, ChainInfo } from 'models';
-import { Account } from 'models';
-import { aggregatePermissions } from 'utils';
 import type { Action } from 'permissions';
-import {
-  AccessLevel,
-  PermissionManager,
-  ToCheck,
-  everyonePermissions,
-} from 'permissions';
+import { AccessLevel, everyonePermissions, PermissionManager, ToCheck, } from 'permissions';
+import app from 'state';
 import type { RoleObject } from 'types';
+
+import { aggregatePermissions } from 'utils';
 import type { UserController } from './user';
 
 const getPermissionLevel = (permission: AccessLevel | undefined) => {

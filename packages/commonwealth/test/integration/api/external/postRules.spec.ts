@@ -1,6 +1,6 @@
 import chai from 'chai';
-import models from 'server/database';
 import { Op } from 'sequelize';
+import models from 'server/database';
 import { post } from './appHook.spec';
 import { testChains, testRules } from './dbEntityHooks.spec';
 

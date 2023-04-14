@@ -6,11 +6,7 @@ import { capitalize } from 'lodash';
 import { Op } from 'sequelize';
 import request from 'superagent';
 import { renderQuillDeltaToText, smartTrim, validURL } from '../shared/utils';
-import {
-  DEFAULT_COMMONWEALTH_LOGO,
-  SERVER_URL,
-  SLACK_FEEDBACK_WEBHOOK,
-} from './config';
+import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL, SLACK_FEEDBACK_WEBHOOK, } from './config';
 
 export interface WebhookContent {
   notificationCategory: string;

@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
-
-import { CWText } from 'views/components/component_kit/cw_text';
-import type {
-  DropdownItemType} from 'views/components/component_kit/cw_dropdown';
-import {
-  CWDropdown
-} from 'views/components/component_kit/cw_dropdown';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 
 import 'modals/manage_contract_template_modal.scss';
-import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
+import app from 'state';
+import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import type { DropdownItemType } from 'views/components/component_kit/cw_dropdown';
+import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
+
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 
 export const displayOptions = [
   { value: '2', label: 'In Create Dropdown' },

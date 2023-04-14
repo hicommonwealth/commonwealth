@@ -6,7 +6,7 @@ import type { IUniqueId } from './interfaces';
 import type Poll from './Poll';
 import type { ReactionType } from './Reaction';
 import type Topic from './Topic';
-import type { ThreadKind, ThreadStage } from './types';
+import type { ThreadKind, ThreadStageType } from './types';
 
 export interface LinkedThreadRelation {
   id: string;
@@ -35,7 +35,7 @@ class Thread implements IUniqueId {
   public readonly plaintext: string;
   public readonly pinned: boolean;
   public readonly kind: ThreadKind;
-  public stage: ThreadStage;
+  public stage: ThreadStageType;
   public readonly attachments: Attachment[];
   public readonly readOnly: boolean;
 
@@ -107,7 +107,7 @@ class Thread implements IUniqueId {
     lastCommentedOn: moment.Moment;
     topic: Topic;
     kind: ThreadKind;
-    stage: ThreadStage;
+    stage: ThreadStageType;
     versionHistory: VersionHistory[];
     chain: string;
     readOnly: boolean;

@@ -1,5 +1,5 @@
-import { AppError } from 'common-common/src/errors';
 import type { DB } from '../models';
+import { AppError } from 'common-common/src/errors';
 import type { BanAttributes } from '../models/ban';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';

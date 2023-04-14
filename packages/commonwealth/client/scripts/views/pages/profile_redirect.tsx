@@ -1,11 +1,10 @@
+import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 
-import $ from 'jquery';
-
 import app from 'state';
-import { useCommonNavigate } from 'navigation/helpers';
-import { PageLoading } from './loading';
 import { PageNotFound } from './404';
+import { PageLoading } from './loading';
 
 type ProfileRedirectProps = {
   address: string;

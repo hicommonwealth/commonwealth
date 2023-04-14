@@ -6,12 +6,7 @@ import type { ProposalStore } from '../stores';
 import type Account from './Account';
 import type ChainEvent from './ChainEvent';
 import type { ITXModalData, IUniqueId, IVote } from './interfaces';
-import type {
-  ProposalEndTime,
-  ProposalStatus,
-  VotingType,
-  VotingUnit,
-} from './types';
+import type { ProposalEndTime, ProposalStatus, VotingType, VotingUnit, } from './types';
 
 abstract class Proposal<
   ApiT,

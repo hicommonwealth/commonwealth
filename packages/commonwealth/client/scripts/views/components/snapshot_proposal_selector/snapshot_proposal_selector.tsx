@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
 import 'components/snapshot_proposal_selector.scss';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import app from 'state';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { SnapshotProposalSelectorItem } from 'views/components/snapshot_proposal_selector';
 
 type SnapshotProposalSelectorProps = {

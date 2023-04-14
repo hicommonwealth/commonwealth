@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from 'react';
 import DOMPurify from 'dompurify';
+import removeMarkdown from 'markdown-to-text';
 import { marked } from 'marked';
+import React, { useMemo, useState } from 'react';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
-import { countLinesMarkdown } from './utils';
 import { renderTruncatedHighlights } from './highlighter';
-import removeMarkdown from 'markdown-to-text';
 import type { QuillRendererProps } from './quill_renderer';
+import { countLinesMarkdown } from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 

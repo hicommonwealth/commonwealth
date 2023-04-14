@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-
-import 'pages/new_contract/add_contract_and_abi_form.scss';
-
-import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import app from 'state';
 
 import { useCommonNavigate } from 'navigation/helpers';
+
+import 'pages/new_contract/add_contract_and_abi_form.scss';
+import React, { useState } from 'react';
+import app from 'state';
+import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+
+import { isAddress } from 'web3-utils';
 
 const AddContractAndAbiForm = () => {
   const navigate = useCommonNavigate();

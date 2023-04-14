@@ -1,5 +1,5 @@
-import { APPLICATION_UPDATE_MESSAGE } from 'helpers/constants';
 import { notifyError } from 'controllers/app/notifications';
+import { APPLICATION_UPDATE_MESSAGE } from 'helpers/constants';
 
 const handleWindowError = () => {
   // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded

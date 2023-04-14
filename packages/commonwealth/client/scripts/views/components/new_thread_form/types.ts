@@ -1,4 +1,4 @@
-import type { ThreadKind, Topic } from 'models';
+import type { ThreadKind } from '../../../models/types';
 
 export type NewThreadFormType = {
   threadKind: ThreadKind;

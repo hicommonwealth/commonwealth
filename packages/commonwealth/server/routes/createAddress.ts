@@ -1,9 +1,9 @@
-import type { NextFunction } from 'express';
-import type { WalletId } from 'common-common/src/types';
 import type { DB } from '../models';
+import type { WalletId } from 'common-common/src/types';
+import type { NextFunction } from 'express';
+import type { AddressAttributes } from '../models/address';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import type { AddressAttributes } from '../models/address';
 import { createAddressHelper } from '../util/createAddressHelper';
 
 export const Errors = {

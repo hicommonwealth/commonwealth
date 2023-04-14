@@ -1,11 +1,10 @@
-import React from 'react';
-
 import BN from 'bn.js';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { CWButton } from '../component_kit/cw_button';
 import { GovExplainer } from '../gov_explainer';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type SubstrateProposalStatsProps = { nextLaunchBlock: number };
 

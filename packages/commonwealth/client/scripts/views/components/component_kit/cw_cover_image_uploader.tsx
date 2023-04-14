@@ -1,19 +1,19 @@
-import React from 'react';
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import $ from 'jquery';
 
 import { redraw } from 'mithrilInterop';
+import React from 'react';
 import app from 'state';
-
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWSpinner } from './cw_spinner';
-import { getClasses } from './helpers';
-import { CWTextInput, MessageRow } from './cw_text_input';
-import type { ValidationStatus } from './cw_validation_text';
 import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
-import { CWText } from './cw_text';
+
+import { CWIcon } from './cw_icons/cw_icon';
 import { CWRadioGroup } from './cw_radio_group';
+import { CWSpinner } from './cw_spinner';
+import { CWText } from './cw_text';
+import { CWTextInput, MessageRow } from './cw_text_input';
+import type { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
 
 type CoverImageUploaderProps = {
   headerText?: string;

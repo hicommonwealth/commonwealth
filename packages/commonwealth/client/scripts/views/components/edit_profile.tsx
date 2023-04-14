@@ -1,30 +1,25 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import _ from 'underscore';
-import type { DeltaStatic } from 'quill';
 
 import 'components/edit_profile.scss';
+import { notifyError } from 'controllers/app/notifications';
+import type { DeltaStatic } from 'quill';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import {
-  NewProfile as Profile,
-  Account,
-  AddressInfo,
-  MinimumProfile,
-} from '../../models';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
+import _ from 'underscore';
+import { Account, AddressInfo, MinimumProfile, NewProfile as Profile, } from '../../models';
 import { AvatarUpload } from '../components/avatar_upload';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
-import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/cw_button';
+import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
+import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
-import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
-import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { PageNotFound } from '../pages/404';
 import { LinkedAddresses } from './linked_addresses';
 import { createDeltaFromText, ReactQuillEditor } from './react_quill_editor';

@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import type { NavigateOptions, To } from 'react-router';
+import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
 import { _DEPRECATED_getSearchParams } from 'mithrilInterop';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
+import type { NavigateOptions, To } from 'react-router';
 
-import app from 'state';
-import { initAppState } from 'state';
-import { updateActiveAddresses } from 'controllers/app/login';
+import app, { initAppState } from 'state';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';
-import { useCommonNavigate } from 'navigation/helpers';
 
 // creates address, initializes account, and redirects to main page
 const validate = async (

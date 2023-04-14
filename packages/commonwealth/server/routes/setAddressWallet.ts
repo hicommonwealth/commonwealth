@@ -1,6 +1,6 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import { WalletId } from 'common-common/src/types';
-import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 

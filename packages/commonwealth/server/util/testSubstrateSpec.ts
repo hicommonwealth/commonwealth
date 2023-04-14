@@ -1,8 +1,8 @@
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import { constructSubstrateUrl } from '../../shared/substrate';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

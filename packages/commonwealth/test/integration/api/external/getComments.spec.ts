@@ -1,11 +1,11 @@
-import 'chai/register-should';
 import chai from 'chai';
+import chaiHttp from 'chai-http';
+import 'chai/register-should';
 import type { GetCommentsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
-import { testComments } from 'test/integration/api/external/dbEntityHooks.spec';
 import type { CommentAttributes } from 'server/models/comment';
 import { get } from 'test/integration/api/external/appHook.spec';
-import chaiHttp from 'chai-http';
+import { testComments } from 'test/integration/api/external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
 

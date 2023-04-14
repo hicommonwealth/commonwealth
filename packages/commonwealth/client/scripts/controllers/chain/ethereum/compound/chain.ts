@@ -3,7 +3,6 @@ import BN from 'bn.js';
 import type { ERC20Votes } from 'common-common/src/eth/types';
 import { ContractType } from 'common-common/src/types';
 import type { BigNumber } from 'ethers';
-import type { ChainInfo } from 'models';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI, { GovernorTokenType } from './api';

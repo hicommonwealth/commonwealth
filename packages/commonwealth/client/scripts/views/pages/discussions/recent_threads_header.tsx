@@ -1,23 +1,21 @@
-import React, { useEffect, useState } from 'react';
-
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
-import type { Topic } from 'models';
-import { ThreadStage } from 'models';
+import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/discussions/recent_threads_header.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import { ThreadStageType } from '../../../models/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { StagesMenu } from './stages_menu';
 import { TopicsMenu } from './topics_menu';
-import { useCommonNavigate } from 'navigation/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { EditTopicModal } from 'views/modals/edit_topic_modal';
-import useForceRerender from 'hooks/useForceRerender';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -69,15 +67,15 @@ export const RecentThreadsHeader = ({
 
   const stages = !customStages
     ? [
-        ThreadStage.Discussion,
-        ThreadStage.ProposalInReview,
-        ThreadStage.Voting,
-        ThreadStage.Passed,
-        ThreadStage.Failed,
+        ThreadStageType.Discussion,
+        ThreadStageType.ProposalInReview,
+        ThreadStageType.Voting,
+        ThreadStageType.Passed,
+        ThreadStageType.Failed,
       ]
     : parseCustomStages(customStages);
 
-  const selectedStage = stages.find((s) => s === (stage as ThreadStage));
+  const selectedStage = stages.find((s) => s === (stage as ThreadStageType));
 
   return (
     <div className="RecentThreadsHeader">

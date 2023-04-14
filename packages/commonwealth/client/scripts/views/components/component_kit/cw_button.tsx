@@ -1,13 +1,12 @@
-import React from 'react';
-
 import 'components/component_kit/cw_button.scss';
+import React from 'react';
+import { CWIcon } from './cw_icons/cw_icon';
 
 import type { IconName } from './cw_icons/cw_icon_lookup';
-import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
 import type { BaseStyleProps } from './types';
 import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import { CWText } from './cw_text';
 
 type ButtonType =
   | 'primary-red'

@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
-import { useSearchParams } from 'react-router-dom';
-
 import 'pages/discussions/index.scss';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Virtuoso } from 'react-virtuoso';
 
 import app from '../../../state';
 import Sublayout from '../../sublayout';

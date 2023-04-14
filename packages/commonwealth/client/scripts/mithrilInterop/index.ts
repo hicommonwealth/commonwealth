@@ -8,15 +8,11 @@
  * as we do not want to expose its imports and features until we are prepared to migrate to react.
  */
 
-import type { FunctionComponent, ReactNode } from 'react';
-import { createElement, Component as ReactComponent } from 'react';
-import type {
-  NavigateFunction,
-  Location,
-  NavigateOptions,
-} from 'react-router-dom';
-import { createRoot } from 'react-dom/client';
 import { getScopePrefix } from 'navigation/helpers';
+import type { FunctionComponent, ReactNode } from 'react';
+import { Component as ReactComponent, createElement } from 'react';
+import { createRoot } from 'react-dom/client';
+import type { Location, NavigateFunction, NavigateOptions, } from 'react-router-dom';
 
 // corresponds to Mithril's "Children" type -- RARELY USED
 export type Children = ReactNode | ReactNode[];

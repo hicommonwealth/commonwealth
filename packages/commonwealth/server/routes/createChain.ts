@@ -1,19 +1,13 @@
+import type { DB } from '../models';
 import type { Cluster } from '@solana/web3.js';
 import BN from 'bn.js';
 import { AppError, ServerError } from 'common-common/src/errors';
-import {
-  BalanceType,
-  ChainBase,
-  ChainType,
-  DefaultPage,
-  NotificationCategories,
-} from 'common-common/src/types';
+import { BalanceType, ChainBase, ChainType, DefaultPage, NotificationCategories, } from 'common-common/src/types';
 import type { NextFunction } from 'express';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 // import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
-import type { DB } from '../models';
 
 import type { AddressInstance } from '../models/address';
 import type { ChainAttributes } from '../models/chain';
@@ -22,7 +16,6 @@ import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 // import { mixpanelTrack } from '../util/mixpanelUtil';
-
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';

@@ -1,14 +1,13 @@
-import React, { useState, useMemo } from 'react';
-
 import 'components/quill/quill_formatted_text.scss';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { getClasses } from '../component_kit/helpers';
-
-import { renderQuillDelta } from './render_quill_delta';
 import { useCommonNavigate } from 'navigation/helpers';
 import type { DeltaStatic } from 'quill';
+import React, { useMemo, useState } from 'react';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { getClasses } from '../component_kit/helpers';
 import { renderTruncatedHighlights } from './highlighter';
 import type { QuillRendererProps } from './quill_renderer';
+
+import { renderQuillDelta } from './render_quill_delta';
 import { countLinesQuill, getTextFromDelta } from './utils';
 
 type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {

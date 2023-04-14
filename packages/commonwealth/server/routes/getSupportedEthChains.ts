@@ -1,5 +1,5 @@
-import { Op } from 'sequelize';
 import type { DB } from '../models';
+import { Op } from 'sequelize';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 

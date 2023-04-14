@@ -1,14 +1,12 @@
 /* eslint-disable */
-import React from 'react';
-/* eslint-disable no-useless-escape */
-
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, render, redraw, rootRender } from 'mithrilInterop';
-
 import 'components/quill/markdown_formatted_text.scss';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import { marked } from 'marked';
+/* eslint-disable no-useless-escape */
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw, render, rootRender } from 'mithrilInterop';
+import React from 'react';
 import smartTruncate from 'smart-truncate';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 

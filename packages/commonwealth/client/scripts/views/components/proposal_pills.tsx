@@ -1,9 +1,8 @@
-import React from 'react';
-
 import 'components/proposal_pills.scss';
 
 import { formatTimestamp } from 'helpers';
 import moment from 'moment';
+import React from 'react';
 import { CWText } from './component_kit/cw_text';
 
 type ActiveProposalPillProps = { proposalEnd: number };

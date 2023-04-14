@@ -1,15 +1,15 @@
-import React from 'react';
+import { useCommonNavigate } from 'navigation/helpers';
 
-import type { ChainInfo } from 'models';
 
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
+import React from 'react';
 import type { IEventLabel } from '../../../../../../chain-events/src';
+import type ChainInfo from '../../../models/ChainInfo';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import type { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardChainEventRowProps = {
   blockNumber: number;

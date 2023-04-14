@@ -1,9 +1,9 @@
 import React from 'react';
-import type { Thread } from 'models';
 import app from 'state';
+import { formatAddressShort } from 'utils';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { formatAddressShort } from 'utils';
+import type Thread from '../../../models/Thread';
 
 interface ThreadSelectorItemProps {
   thread: Thread;

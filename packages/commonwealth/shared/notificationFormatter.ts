@@ -1,11 +1,6 @@
 import { NotificationCategories } from 'common-common/src/types';
 import type { IPostNotificationData } from './types';
-import {
-  formatAddressShort,
-  getThreadUrl,
-  renderQuillDeltaToText,
-  smartTrim,
-} from './utils';
+import { formatAddressShort, getThreadUrl, renderQuillDeltaToText, smartTrim, } from './utils';
 
 // forum notification format:
 // raymondz (mae7...) commented on 'Example Thread' in Edgeware

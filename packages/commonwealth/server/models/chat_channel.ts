@@ -1,9 +1,6 @@
 import type { DataTypes, Model } from 'sequelize';
 import * as Sequelize from 'sequelize';
-import type {
-  ChatMessageAttributes,
-  ChatMessageInstance,
-} from './chat_message';
+import type { ChatMessageAttributes, ChatMessageInstance, } from './chat_message';
 import type { RuleAttributes } from './rule';
 import type { ModelStatic } from './types';
 

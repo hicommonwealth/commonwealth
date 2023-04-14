@@ -1,12 +1,11 @@
+import 'components/feed.scss';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
+import type DashboardActivityNotification from '../../models/DashboardActivityNotification';
+import { PageNotFound } from '../pages/404';
 
-import 'components/feed.scss';
-
-import type { DashboardActivityNotification } from 'models';
 
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
-import { PageNotFound } from '../pages/404';
 import { CWSpinner } from './component_kit/cw_spinner';
 
 type FeedProps = {

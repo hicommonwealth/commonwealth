@@ -1,25 +1,20 @@
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-  ProposalType,
-} from 'common-common/src/types';
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { Action, PermissionError } from '../../shared/permissions';
-import { findAllRoles, isAddressPermitted } from '../util/roles';
+import { ChainNetwork, ChainType, NotificationCategories, ProposalType, } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { Action, PermissionError } from '../../shared/permissions';
 import { getThreadUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { sequelize } from '../database';
-import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { parseUserMentions } from '../util/parseUserMentions';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
 import validateTopicThreshold from '../util/validateTopicThreshold';

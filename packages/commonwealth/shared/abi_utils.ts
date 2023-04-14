@@ -1,10 +1,4 @@
-import type {
-  AbiInput,
-  AbiItem,
-  AbiOutput,
-  AbiType,
-  StateMutabilityType,
-} from 'web3-utils/types';
+import type { AbiInput, AbiItem, AbiOutput, AbiType, StateMutabilityType, } from 'web3-utils/types';
 
 export function parseAbiItemsFromABI(
   abi: Array<Record<string, unknown>>

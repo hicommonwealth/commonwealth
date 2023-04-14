@@ -1,14 +1,7 @@
+import type { Action, ActionArgument, ActionPayload, Session, SessionPayload, } from '@canvas-js/interfaces';
 import type * as solw3 from '@solana/web3.js';
 import bs58 from 'bs58';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
-
-import type {
-  Action,
-  ActionArgument,
-  ActionPayload,
-  Session,
-  SessionPayload,
-} from '@canvas-js/interfaces';
 import type { ISessionController } from '.';
 
 export class SolanaSessionController implements ISessionController {

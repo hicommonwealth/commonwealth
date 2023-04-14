@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import { notifyError } from 'controllers/app/notifications';
 
-import type { Poll, Thread } from 'models';
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
+import React, { useState } from 'react';
 
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
+import type Poll from '../../../models/Poll';
+import type Thread from '../../../models/Thread';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { Modal } from '../../components/component_kit/cw_modal';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 import { getPollTimestamp, handlePollVote } from './helpers';
-import { Modal } from '../../components/component_kit/cw_modal';
 
 type ThreadPollEditorCardProps = {
   thread: Thread;

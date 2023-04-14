@@ -1,8 +1,8 @@
+import type { DB } from '../models';
 /* eslint-disable quotes */
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
-import type { DB } from '../models';
 
 const Errors = {
   UnexpectedError: 'Unexpected error',

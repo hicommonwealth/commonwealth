@@ -1,11 +1,11 @@
-import 'chai/register-should';
 import chai from 'chai';
+import chaiHttp from 'chai-http';
+import 'chai/register-should';
 import type { GetRulesReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
-import { testRules } from 'test/integration/api/external/dbEntityHooks.spec';
 import type { RuleAttributes } from 'server/models/rule';
 import { get } from 'test/integration/api/external/appHook.spec';
-import chaiHttp from 'chai-http';
+import { testRules } from 'test/integration/api/external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
 

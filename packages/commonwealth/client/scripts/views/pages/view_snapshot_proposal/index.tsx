@@ -1,5 +1,3 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
 import type {
   Power,
   SnapshotProposal,
@@ -9,16 +7,14 @@ import type {
   VoteResultsData,
 } from 'helpers/snapshot_utils';
 import { getPower, getResults } from 'helpers/snapshot_utils';
-import { AddressInfo } from 'models';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  ActiveProposalPill,
-  ClosedProposalPill,
-} from '../../components/proposal_pills';
+import { ActiveProposalPill, ClosedProposalPill, } from '../../components/proposal_pills';
 import { renderQuillTextBody } from '../../components/react_quill_editor/helpers';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';

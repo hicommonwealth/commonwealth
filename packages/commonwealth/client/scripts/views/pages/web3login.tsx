@@ -1,22 +1,21 @@
-import React from 'react';
-
 import { link } from 'helpers';
-
-import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
+import { isNonEmptyString } from 'helpers/typeGuards';
 import $ from 'jquery';
 
+import { _DEPRECATED_getSearchParams, redraw } from 'mithrilInterop';
+import { useCommonNavigate } from 'navigation/helpers';
+
 import 'pages/web3login.scss';
+import React from 'react';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
+import { Modal } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
 import { PageNotFound } from './404';
 import { PageLoading } from './loading';
-import { isNonEmptyString } from 'helpers/typeGuards';
-import { Modal } from '../components/component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
 
 const Web3LoginPage = () => {
   const navigate = useCommonNavigate();

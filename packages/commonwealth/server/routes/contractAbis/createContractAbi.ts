@@ -1,7 +1,7 @@
 import { AppError } from 'common-common/src/errors';
 import type { DB } from '../../models';
-import type { ContractAbiAttributes } from '../../models/contract_abi';
 import type { ContractAttributes } from '../../models/contract';
+import type { ContractAbiAttributes } from '../../models/contract_abi';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';

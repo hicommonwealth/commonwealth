@@ -1,41 +1,36 @@
-import React, { useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-
-import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { addressSwapper } from 'utils';
-import $ from 'jquery';
-import { redraw } from 'mithrilInterop';
-
-import _ from 'lodash';
 
 import 'components/header/login_selector.scss';
-import {
-  linkExistingAddressToChainOrCommunity,
-  setActiveAccount,
-} from 'controllers/app/login';
+import { linkExistingAddressToChainOrCommunity, setActiveAccount, } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
 import { isSameAccount, pluralize, setDarkMode } from 'helpers';
-import type { Account } from 'models';
-import { AddressInfo, ITokenAdapter } from 'models';
+import useForceRerender from 'hooks/useForceRerender';
+import $ from 'jquery';
 
-import app from 'state';
+import _ from 'lodash';
+import { redraw } from 'mithrilInterop';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
+
+import app, { initAppState } from 'state';
+import { addressSwapper } from 'utils';
 import { User } from 'views/components/user/user';
-import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
+import { LoginModal } from 'views/modals/login_modal';
+import AddressInfo from '../../../models/AddressInfo';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
+import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { Modal } from '../component_kit/cw_modal';
+import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
 import { CWToggle, toggleDarkMode } from '../component_kit/cw_toggle';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { UserBlock } from '../user/user_block';
-import { CWDivider } from '../component_kit/cw_divider';
-import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
-import { Modal } from '../component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
-import useForceRerender from 'hooks/useForceRerender';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',

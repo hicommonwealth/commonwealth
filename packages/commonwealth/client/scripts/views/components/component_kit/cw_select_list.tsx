@@ -1,8 +1,7 @@
+import 'components/component_kit/cw_select_list.scss';
 import React from 'react';
 import type { GroupBase, Props } from 'react-select';
 import Select from 'react-select';
-
-import 'components/component_kit/cw_select_list.scss';
 
 export const SelectList = <
   Option,

@@ -1,13 +1,12 @@
-import React, { useCallback, useState } from 'react';
-
 import 'components/thread_selector.scss';
 import { notifyError } from 'controllers/app/notifications';
-import type { Thread } from 'models';
 import type { SearchParams } from 'models/SearchQuery';
+import React, { useCallback, useState } from 'react';
 import app from 'state';
-import { CWTextInput } from '../component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { ThreadSelectorItem } from 'views/components/thread_selector/thread_selector_item';
+import type Thread from '../../../models/Thread';
+import { CWTextInput } from '../component_kit/cw_text_input';
 
 type ThreadSelectorProps = {
   linkedThreadsToSet: Array<Thread>;

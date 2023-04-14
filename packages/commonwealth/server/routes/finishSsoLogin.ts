@@ -1,13 +1,13 @@
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { DynamicTemplate } from '../../shared/types';
 import { AXIE_SHARED_SECRET } from '../config';
 import { sequelize } from '../database';
-import type { DB } from '../models';
 import type { AddressAttributes } from '../models/address';
 import type { ProfileAttributes } from '../models/profile';
 import type { UserAttributes } from '../models/user';

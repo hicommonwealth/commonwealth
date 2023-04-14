@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
 
 import 'components/proposal_card/index.scss';
@@ -10,15 +8,13 @@ import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democr
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 
 import { blocknumToDuration, formatNumberLong } from 'helpers';
-import {
-  chainEntityTypeToProposalShortName,
-  proposalSlugToChainEntityType,
-} from 'identifiers';
-import type { AnyProposal } from 'models';
-import { ProposalStatus } from 'models';
+import { chainEntityTypeToProposalShortName, proposalSlugToChainEntityType, } from 'identifiers';
 import moment from 'moment';
+import React from 'react';
 
 import { Countdown } from 'views/components/countdown';
+import type { AnyProposal } from '../../../models/types';
+import { ProposalStatus } from '../../../models/types';
 
 export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Passing

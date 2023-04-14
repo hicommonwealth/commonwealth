@@ -1,12 +1,5 @@
-import { expect, assert } from 'chai';
-import {
-  PermissionManager,
-  AccessLevel,
-  Action,
-  Permissions,
-  impliedDenyPermissionsByAction,
-  impliedAllowPermissionsByAction,
-} from 'shared/permissions';
+import { assert } from 'chai';
+import { Action, PermissionManager, } from 'shared/permissions';
 
 describe('PermissionManager', () => {
   let permissionManager: PermissionManager;

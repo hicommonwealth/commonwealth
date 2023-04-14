@@ -1,8 +1,7 @@
-import React from 'react';
-
 import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 
 import 'pages/view_proposal/aave_summary.scss';
+import React from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
 import { AaveInfoRow } from '../../components/proposals/aave_proposal_card_detail';
 

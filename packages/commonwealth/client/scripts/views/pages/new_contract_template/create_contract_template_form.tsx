@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { notifyError } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'new_contract_template/create_contract_template_form.scss';
-
-import { notifyError } from 'controllers/app/notifications';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWText } from 'views/components/component_kit/cw_text';
-import app from 'state';
+import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import isValidJson from '../../../../../shared/validateJson';
-import { useCommonNavigate } from 'navigation/helpers';
 
 const CreateContractTemplateForm = () => {
   const navigate = useCommonNavigate();

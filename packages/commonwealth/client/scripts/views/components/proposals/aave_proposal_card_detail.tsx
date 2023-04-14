@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-
 import 'components/proposals/aave_proposal_card_detail.scss';
 
 import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { User } from '../user/user';
+import React, { useEffect, useState } from 'react';
 import { CWLabel } from '../component_kit/cw_label';
 import { CWText } from '../component_kit/cw_text';
+import { User } from '../user/user';
 
 export const roundVote = (percentage) => {
   return percentage.toFixed(2).split('.0')[0].slice(0, 4);

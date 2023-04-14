@@ -1,27 +1,22 @@
-import React, { Suspense } from 'react';
+import { ChainType } from 'common-common/src/types';
 
-import { ClassComponent, redraw } from 'mithrilInterop';
-import type { ResultNode, ClassComponentRouter } from 'mithrilInterop';
+import { deinitChainOrCommunity, initChain, initNewTokenChain, selectChain, } from 'helpers/chain';
 
 import 'layout.scss';
 
-import {
-  deinitChainOrCommunity,
-  initChain,
-  initNewTokenChain,
-  selectChain,
-} from 'helpers/chain';
+import type { ClassComponentRouter, ResultNode } from 'mithrilInterop';
+import { ClassComponent, redraw } from 'mithrilInterop';
+import withRouter from 'navigation/helpers';
+import React, { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useParams } from 'react-router-dom';
 
 import app from 'state';
 import { PageNotFound } from 'views/pages/404';
+import ErrorPage from 'views/pages/error';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
-import withRouter from 'navigation/helpers';
-import { useParams } from 'react-router-dom';
-import { ChainType } from 'common-common/src/types';
-import { ErrorBoundary } from 'react-error-boundary';
-import ErrorPage from 'views/pages/error';
 
 const LoadingLayout = () => {
   return (

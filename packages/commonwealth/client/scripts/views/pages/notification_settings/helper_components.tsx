@@ -1,11 +1,11 @@
-import React from 'react';
-import type { NavigateOptions, To } from 'react-router';
-
 import { getNotificationUrlPath } from 'identifiers';
-import type { NotificationSubscription } from 'models';
-import { AddressInfo } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/notification_settings/helper_components.scss';
+import React from 'react';
+import type { NavigateOptions, To } from 'react-router';
+import AddressInfo from '../../../models/AddressInfo';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -15,7 +15,6 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/react_quill_editor/helpers';
 import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 
 const getTextRows = (
   subscription: NotificationSubscription,

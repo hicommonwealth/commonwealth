@@ -1,17 +1,16 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { notifyInfo } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/user_dashboard/index.scss';
+import React, { useEffect } from 'react';
 
 import app, { LoginState } from 'state';
-import { notifyInfo } from 'controllers/app/notifications';
-import { DashboardActivityNotification } from 'models';
-import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 import Sublayout from 'views/sublayout';
+import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
-import { useCommonNavigate } from 'navigation/helpers';
-import { Feed } from '../../components/feed';
 
 export enum DashboardViews {
   ForYou = 'For You',

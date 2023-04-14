@@ -1,20 +1,19 @@
-import React, { useEffect } from 'react';
+import BN from 'bn.js';
 
 import type Near from 'controllers/chain/near/adapter';
 import type { IDaoInfo } from 'controllers/chain/near/chain';
 import { formatDuration } from 'helpers';
-
-import BN from 'bn.js';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/sputnikdaos.scss';
+import React, { useEffect } from 'react';
 
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type SputnikDaoRowProps = {
   clickable: boolean;

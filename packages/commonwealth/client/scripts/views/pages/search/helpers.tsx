@@ -1,20 +1,19 @@
-import React from 'react';
+import type { SearchSort } from 'models/SearchQuery';
+import { SearchScope } from 'models/SearchQuery';
 import moment from 'moment';
 
 import 'pages/search/index.scss';
-
-import type { SearchSort } from 'models/SearchQuery';
+import React from 'react';
 import app from 'state';
 import { SearchContentType } from 'types';
-import { SearchScope } from 'models/SearchQuery';
-import { AddressInfo } from 'models';
+import AddressInfo from '../../../models/AddressInfo';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { User } from '../../components/user/user';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { User } from '../../components/user/user';
 
 const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const proposalId = thread.proposalid;

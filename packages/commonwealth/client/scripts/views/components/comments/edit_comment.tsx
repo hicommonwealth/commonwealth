@@ -1,15 +1,13 @@
-import React from 'react';
-
 import 'components/comments/edit_comment.scss';
-import type { Comment } from 'models';
+import type { DeltaStatic } from 'quill';
+import React from 'react';
 
 import app from 'state';
 import { ContentType } from 'types';
 import { CWButton } from '../component_kit/cw_button';
-import { clearEditingLocalStorage } from './helpers';
-import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
+import { clearEditingLocalStorage } from './helpers';
 
 type EditCommentProps = {
   comment: Comment<any>;

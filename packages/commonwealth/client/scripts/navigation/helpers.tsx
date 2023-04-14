@@ -1,11 +1,6 @@
 import React from 'react';
-import type { To, NavigateOptions } from 'react-router-dom';
-import {
-  useParams,
-  useNavigate,
-  useLocation,
-  Navigate as ReactNavigate,
-} from 'react-router-dom';
+import type { NavigateOptions, To } from 'react-router-dom';
+import { Navigate as ReactNavigate, useLocation, useNavigate, useParams, } from 'react-router-dom';
 import app from 'state';
 
 type NavigateWithParamsProps = {

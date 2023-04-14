@@ -1,26 +1,19 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import 'components/react_quill/react_quill_editor.scss';
+import { nextTick } from 'process';
 import type { DeltaOperation } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
+import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
+import app from 'state';
+import { PreviewModal } from '../../modals/preview_modal';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { Modal } from '../component_kit/cw_modal';
+import { CWText } from '../component_kit/cw_text';
 
 import type { SerializableDeltaStatic } from './utils';
 import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
-
-import app from 'state';
-import { CWText } from '../component_kit/cw_text';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { PreviewModal } from '../../modals/preview_modal';
-import { Modal } from '../component_kit/cw_modal';
-
-import 'components/react_quill/react_quill_editor.scss';
-import 'react-quill/dist/quill.snow.css';
-import { nextTick } from 'process';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 

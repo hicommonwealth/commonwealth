@@ -1,14 +1,11 @@
-import Sequelize from 'sequelize';
-import type {
-  GetRolesReq,
-  GetRolesResp,
-} from 'common-common/src/api/extApiTypes';
+import type { GetRolesReq, GetRolesResp, } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { success, failure } from '../../types';
+import Sequelize from 'sequelize';
 import type { DB } from '../../models';
-import { formatPagination } from '../../util/queries';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
+import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 

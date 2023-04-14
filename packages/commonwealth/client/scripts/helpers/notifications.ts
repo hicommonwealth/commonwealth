@@ -1,5 +1,5 @@
 import { NotificationCategories } from 'common-common/src/types';
-import type { Notification, NotificationSubscription } from 'models';
+import type NotificationSubscription from '../models/NotificationSubscription';
 
 export const batchNotifications = (
   n: Notification[],

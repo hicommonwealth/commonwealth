@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_collapsible.scss';
+import React from 'react';
 import { CWIconButton } from './cw_icon_button';
 
 import { ComponentType } from './types';

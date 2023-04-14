@@ -1,8 +1,8 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
 import _ from 'lodash';
 import type { TypedRequestBody, TypedResponse } from '../types';
-import type { DB } from '../models';
 
 export const Errors = {
   NeedAddress: 'Must provide address',

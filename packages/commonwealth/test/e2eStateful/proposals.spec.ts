@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { PORT } from '../../server/config';
 
 test.describe('Community proposals page', () => {

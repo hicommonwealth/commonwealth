@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
+import type { CWEvent } from 'chain-events/src';
+import { Label as ChainEventLabel } from 'chain-events/src';
+import { NotificationCategories } from 'common-common/src/types';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/notifications/notification_row.scss';
-
-import type { NotificationRowProps } from './notification_row';
-import { Label as ChainEventLabel } from 'chain-events/src';
-import type { CWEvent } from 'chain-events/src';
-import { AddressInfo } from 'models';
-import { NotificationCategories } from 'common-common/src/types';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import app from 'state';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { getClasses } from '../../components/component_kit/helpers';
 import { User } from 'views/components/user/user';
+import AddressInfo from '../../../models/AddressInfo';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { getBatchNotificationFields } from './helpers';
+import { getClasses } from '../../components/component_kit/helpers';
 import { UserGallery } from '../../components/user/user_gallery';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useNavigate } from 'react-router';
+import { getBatchNotificationFields } from './helpers';
+
+import type { NotificationRowProps } from './notification_row';
 
 export const ChainEventNotificationRow = (props: NotificationRowProps) => {
   const { notification, onListPage } = props;

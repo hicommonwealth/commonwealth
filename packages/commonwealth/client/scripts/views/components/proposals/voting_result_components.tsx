@@ -1,17 +1,13 @@
-import React from 'react';
-
 import 'components/proposals/voting_result_components.scss';
-import type {
-  CosmosProposal,
-  CosmosVote,
-} from 'controllers/chain/cosmos/proposal';
-import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
+import type { CosmosProposal, CosmosVote, } from 'controllers/chain/cosmos/proposal';
+import type AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import type { NearSputnikVote } from 'controllers/chain/near/sputnik/types';
 import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
+import React from 'react';
+import type { IVote } from '../../../models/interfaces';
+import type { AnyProposal } from '../../../models/types';
 
-import type { AnyProposal, IVote } from 'models';
 import { CWText } from '../component_kit/cw_text';
 import { VoteListing } from './vote_listing';
 

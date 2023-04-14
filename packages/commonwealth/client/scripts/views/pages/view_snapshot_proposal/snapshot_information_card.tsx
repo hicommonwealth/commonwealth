@@ -1,13 +1,12 @@
-import React from 'react';
-
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { capitalize } from 'lodash';
-import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/snapshot/snapshot_information_card.scss';
+import React from 'react';
 
 import app from 'state';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';

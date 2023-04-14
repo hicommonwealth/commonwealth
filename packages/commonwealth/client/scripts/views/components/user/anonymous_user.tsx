@@ -1,9 +1,8 @@
-import React from 'react';
-
-import { render } from 'mithrilInterop';
+import 'components/user/user.scss';
 import jdenticon from 'jdenticon';
 
-import 'components/user/user.scss';
+import { render } from 'mithrilInterop';
+import React from 'react';
 
 type AnonymousUserProps = {
   avatarOnly?: boolean;

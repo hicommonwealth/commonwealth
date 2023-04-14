@@ -1,27 +1,19 @@
-import React, { useState } from 'react';
-
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
 import 'modals/edit_topic_modal.scss';
-import { Topic } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
+import type { DeltaStatic } from 'quill';
+import React, { useState } from 'react';
 
 import app from 'state';
 
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  getTextFromDelta,
-  ReactQuillEditor,
-} from '../components/react_quill_editor';
-import type { DeltaStatic } from 'quill';
-import {
-  deserializeDelta,
-  serializeDelta,
-} from '../components/react_quill_editor/utils';
+import { getTextFromDelta, ReactQuillEditor, } from '../components/react_quill_editor';
+import { deserializeDelta, serializeDelta, } from '../components/react_quill_editor/utils';
 
 type EditTopicModalProps = {
   onModalClose: () => void;

@@ -1,9 +1,9 @@
 import cheerio from 'cheerio';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
-import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
-import { factory, formatFilename } from 'common-common/src/logging';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

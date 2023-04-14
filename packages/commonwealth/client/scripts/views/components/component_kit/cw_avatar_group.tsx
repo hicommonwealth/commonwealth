@@ -1,5 +1,5 @@
-import React from 'react';
 import 'components/component_kit/cw_avatar_group.scss';
+import React from 'react';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { CWAvatar, CWJdenticon } from './cw_avatar';
 import { CWText } from './cw_text';

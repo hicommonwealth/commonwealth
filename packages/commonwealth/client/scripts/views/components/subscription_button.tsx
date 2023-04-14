@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-
 import { NotificationCategories } from 'common-common/src/types';
 import { isNotUndefined } from 'helpers/typeGuards';
+import React, { useState } from 'react';
 
 import app from 'state';
 import { CWButton } from './component_kit/cw_button';

@@ -1,10 +1,8 @@
+import 'pages/members.scss';
 import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
-import 'pages/members.scss';
-
 import app from 'state';
-import { AccessLevel } from 'models';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import type MinimumProfile from '../../models/MinimumProfile';

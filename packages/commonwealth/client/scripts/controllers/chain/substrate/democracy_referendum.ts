@@ -1,24 +1,16 @@
 import type { ApiPromise } from '@polkadot/api';
-import type { Call, Conviction } from '@polkadot/types/interfaces';
-import type {
-  ISubstrateDemocracyReferendum,
-  SubstrateCoin,
-} from 'adapters/chain/substrate/types';
+import type { Conviction } from '@polkadot/types/interfaces';
+import type { ISubstrateDemocracyReferendum, SubstrateCoin, } from 'adapters/chain/substrate/types';
 import { DemocracyThreshold, formatCall } from 'adapters/chain/substrate/types';
 import { Coin } from 'adapters/currency';
 import BN from 'bn.js';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ProposalType } from 'common-common/src/types';
-import type { Account, ChainEntity, ChainEvent, ProposalEndTime } from 'models';
-import {
-  BinaryVote,
-  Proposal,
-  ProposalStatus,
-  VotingType,
-  VotingUnit,
-} from 'models';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import { BinaryVote, Proposal, ProposalStatus, VotingType, VotingUnit, } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
+import type ChainEvent from '../../../models/ChainEvent';
+import type { ProposalEndTime } from '../../../models/types';
+import type SubstrateAccounts, { SubstrateAccount } from './account';
 import type Substrate from './adapter';
 import type SubstrateDemocracy from './democracy';
 import type SubstrateDemocracyProposal from './democracy_proposal';

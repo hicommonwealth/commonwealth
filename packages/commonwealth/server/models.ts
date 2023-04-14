@@ -14,6 +14,8 @@ import type { CollaborationModelStatic } from './models/collaboration';
 import type { CommentModelStatic } from './models/comment';
 import type { CommunityBannerModelStatic } from './models/community_banner';
 import type { CommunityContractModelStatic } from './models/community_contract';
+import type { CommunityContractTemplateMetadataStatic } from './models/community_contract_metadata';
+import type { CommunityContractTemplateStatic } from './models/community_contract_template';
 import type { CommunityRoleModelStatic } from './models/community_role';
 import type { CommunitySnapshotSpaceModelStatic } from './models/community_snapshot_spaces';
 import type { ContractModelStatic } from './models/contract';
@@ -38,15 +40,13 @@ import type { SsoTokenModelStatic } from './models/sso_token';
 import type { StarredCommunityModelStatic } from './models/starred_community';
 import type { SubscriptionModelStatic } from './models/subscription';
 import type { TaggedThreadModelStatic } from './models/tagged_threads';
+import type { TemplateModelStatic } from './models/template';
 import type { ThreadModelStatic } from './models/thread';
 import type { TokenModelStatic } from './models/token';
 import type { TopicModelStatic } from './models/topic';
 import type { UserModelStatic } from './models/user';
 import type { VoteModelStatic } from './models/vote';
 import type { WebhookModelStatic } from './models/webhook';
-import type { CommunityContractTemplateStatic } from './models/community_contract_template';
-import type { CommunityContractTemplateMetadataStatic } from './models/community_contract_metadata';
-import type { TemplateModelStatic } from './models/template';
 
 export type Models = {
   Address: AddressModelStatic;

@@ -1,27 +1,27 @@
-import type { ClassComponent } from 'mithrilInterop';
-import { render } from 'mithrilInterop';
+import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ThreadStage } from 'models';
-import type { IChainAdapter, Account } from 'models';
+import type { ClassComponent } from 'mithrilInterop';
+import { render } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
-import type { Coin } from 'adapters/currency';
+import type IChainAdapter from '../models/IChainAdapter';
+import { ThreadStageType } from '../models/types';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
 }
 
-export function threadStageToLabel(stage: ThreadStage) {
-  if (stage === ThreadStage.Discussion) {
+export function threadStageToLabel(stage: ThreadStageType) {
+  if (stage === ThreadStageType.Discussion) {
     return 'Discussion';
-  } else if (stage === ThreadStage.ProposalInReview) {
+  } else if (stage === ThreadStageType.ProposalInReview) {
     return 'Pre-Voting';
-  } else if (stage === ThreadStage.Voting) {
+  } else if (stage === ThreadStageType.Voting) {
     return 'In Voting';
-  } else if (stage === ThreadStage.Passed) {
+  } else if (stage === ThreadStageType.Passed) {
     return 'Passed';
-  } else if (stage === ThreadStage.Failed) {
+  } else if (stage === ThreadStageType.Failed) {
     return 'Not Passed';
   } else {
     return stage;
@@ -39,7 +39,7 @@ export function parseCustomStages(str) {
   }
   return arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as ThreadStage[];
+    .filter((s) => s) as unknown as ThreadStageType[];
 }
 
 /*

@@ -1,9 +1,9 @@
-import React from 'react';
+import type { ChainInfo } from 'client/scripts/models';
 
 import 'components/component_kit/cw_truncated_address.scss';
+import React from 'react';
 
 import { formatAddressShort } from '../../../helpers';
-import type { ChainInfo } from 'client/scripts/models';
 import { CWCommunityAvatar } from './cw_community_avatar';
 
 type TruncatedAddressProps = {

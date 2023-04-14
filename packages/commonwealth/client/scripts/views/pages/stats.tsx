@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import 'pages/stats.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import ErrorPage from 'views/pages/error';

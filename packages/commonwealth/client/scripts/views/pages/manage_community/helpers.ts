@@ -1,9 +1,8 @@
+import { ChainCategoryType } from 'common-common/src/types';
 import $ from 'jquery';
 
 import { redraw } from 'mithrilInterop';
 import app from 'state';
-import { AccessLevel } from 'models';
-import { ChainCategoryType } from 'common-common/src/types';
 import { buildChainToCategoriesMap } from '../communities';
 
 export const sortAdminsAndModsFirst = (a, b) => {

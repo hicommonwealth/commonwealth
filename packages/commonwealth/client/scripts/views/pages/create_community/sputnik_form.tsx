@@ -1,29 +1,23 @@
-import React, { useState } from 'react';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
 // import type { ConnectConfig } from 'near-api-js';
 // import { connect as nearConnect, keyStores } from 'near-api-js';
 // import type { CodeResult } from 'near-api-js/lib/providers/provider';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
+import React, { useState } from 'react';
 
-import app from 'state';
-import { initAppState } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
+import app, { initAppState } from 'state';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 // import { CommunityType } from '.';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { defaultChainRows } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-} from './hooks';
+import { useChainFormDefaultFields, useChainFormIdFields, useChainFormState, } from './hooks';
 
 export const SputnikForm = () => {
   const [isMainnet, setIsMainnet] = useState(true);

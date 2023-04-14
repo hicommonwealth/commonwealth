@@ -1,7 +1,7 @@
 import JobRunner from 'common-common/src/cacheJobRunner';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import moment from 'moment';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

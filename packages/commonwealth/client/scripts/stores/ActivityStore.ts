@@ -1,7 +1,7 @@
-import type { AbridgedThread } from 'models';
-import { AddressInfo } from 'models';
 import app from 'state';
 import { byAscendingCreationDate } from '../helpers';
+import type AbridgedThread from '../models/AbridgedThread';
+import AddressInfo from '../models/AddressInfo';
 
 export interface IAddressCountAndInfo {
   postCount: number;

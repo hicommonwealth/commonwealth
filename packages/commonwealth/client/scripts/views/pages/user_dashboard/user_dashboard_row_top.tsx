@@ -1,16 +1,15 @@
-import React from 'react';
-
 import { capitalize } from 'lodash';
-import { AddressInfo } from 'models';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/user_dashboard/user_dashboard_row_top.scss';
+import React from 'react';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getCommentPreview } from './helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardRowTopProps = {
   activityData: any;

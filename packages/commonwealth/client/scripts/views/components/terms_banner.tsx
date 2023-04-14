@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'pages/terms_banner.scss';
+import React from 'react';
 
 import app from 'state';
 import { CWBanner } from './component_kit/cw_banner';

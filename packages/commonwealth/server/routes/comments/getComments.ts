@@ -1,7 +1,4 @@
-import type {
-  GetCommentsReq,
-  GetCommentsResp,
-} from 'common-common/src/api/extApiTypes';
+import type { GetCommentsReq, GetCommentsResp, } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
 import Sequelize from 'sequelize';
 import type { DB } from '../../models';

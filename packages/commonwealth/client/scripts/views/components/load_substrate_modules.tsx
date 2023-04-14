@@ -1,11 +1,10 @@
-import React from 'react';
-
 import { ChainBase } from 'common-common/src/types';
-import type { ProposalModule } from 'models';
+import React from 'react';
 
 import app from 'state';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+import type ProposalModule from '../../models/ProposalModule';
 
 export const loadSubstrateModules = (
   name: string,

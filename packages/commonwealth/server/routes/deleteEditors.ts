@@ -1,8 +1,8 @@
-import type { IThreadCollaborator } from 'models/Thread';
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
+import type { IThreadCollaborator } from 'models/Thread';
 import { Op } from 'sequelize';
-import type { DB } from '../models';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',

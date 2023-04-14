@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
@@ -7,11 +5,12 @@ import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal'
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
 import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import type { AnyProposal } from 'models';
-import { VotingType } from 'models';
+import React from 'react';
 
 import app from 'state';
 import Web3 from 'web3-utils';
+import type { AnyProposal } from '../../../models/types';
+import { VotingType } from '../../../models/types';
 import {
   AaveVotingResult,
   CompletedProposalVotingResult,

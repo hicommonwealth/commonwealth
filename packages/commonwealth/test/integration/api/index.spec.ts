@@ -9,8 +9,8 @@ import { constructCanvasMessage } from 'shared/adapters/shared';
 import app, { resetDatabase } from '../../../server-test';
 import {
   constructTypedCanvasMessage,
-  TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
+  TEST_BLOCK_INFO_STRING,
 } from '../../../shared/adapters/chain/ethereum/keys';
 import * as modelUtils from '../../util/modelUtils';
 

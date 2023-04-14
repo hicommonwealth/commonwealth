@@ -1,8 +1,7 @@
+import 'components/component_kit/cw_avatar.scss';
 import React from 'react';
 
 import Jdenticon from 'react-jdenticon';
-
-import 'components/component_kit/cw_avatar.scss';
 
 import { ComponentType } from './types';
 

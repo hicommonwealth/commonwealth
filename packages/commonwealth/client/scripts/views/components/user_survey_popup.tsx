@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/user_survey_popup.scss';
+import React from 'react';
 import app from 'state';
 
 import { CWButton } from './component_kit/cw_button';

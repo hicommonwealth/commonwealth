@@ -1,23 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { notifyError } from 'controllers/app/notifications';
+import { pluralize } from 'helpers';
 import { capitalize } from 'lodash';
 
-import 'pages/search/index.scss';
-
 import type { SearchScope } from 'models/SearchQuery';
-import { SearchSort } from 'models/SearchQuery';
+import SearchQuery, { SearchSort } from 'models/SearchQuery';
+import { useCommonNavigate } from 'navigation/helpers';
+
+import 'pages/search/index.scss';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import app from 'state';
-import { pluralize } from 'helpers';
-import { SearchQuery } from 'models';
-import { notifyError } from 'controllers/app/notifications';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWText } from '../../components/component_kit/cw_text';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { useCommonNavigate } from 'navigation/helpers';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
 import { getListing } from './helpers';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query

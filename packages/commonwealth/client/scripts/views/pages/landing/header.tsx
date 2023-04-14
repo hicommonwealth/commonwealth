@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/landing/header.scss';
+import React, { useEffect, useState } from 'react';
 
 import { LoginModal } from 'views/modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
-import { Modal } from '../../components/component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { Modal } from '../../components/component_kit/cw_modal';
+import { CWText } from '../../components/component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 type HeaderProps = {
   onLogin: () => void;

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-
-import 'components/profile/profile_activity.scss';
-
-import type Thread from 'client/scripts/models/Thread';
-import type Comment from 'client/scripts/models/Comment';
 import type AddressInfo from 'client/scripts/models/AddressInfo';
 import type { IUniqueId } from 'client/scripts/models/interfaces';
+
+import type Thread from 'client/scripts/models/Thread';
+
+import 'components/profile/profile_activity.scss';
+import React, { useState } from 'react';
+import type CommentModel from '../../../models/CommentModel';
 import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
 import ProfileActivityContent from './profile_activity_content';
 
@@ -16,7 +16,7 @@ enum ProfileActivityType {
   Threads,
 }
 
-export type CommentWithAssociatedThread = Comment<IUniqueId> & {
+export type CommentWithAssociatedThread = CommentModel<IUniqueId> & {
   thread: Thread;
 };
 

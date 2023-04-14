@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'pages/landing/token_holders.scss';
+import React from 'react';
 
 import { CWText } from '../../components/component_kit/cw_text';
 

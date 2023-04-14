@@ -1,17 +1,13 @@
+import type { SessionPayload } from '@canvas-js/interfaces';
 import { bech32 } from 'bech32';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 
-import type { Account, IWebWallet } from 'models';
 import app from 'state';
 import type Web3 from 'web3';
 
-import type {
-  provider,
-  TransactionConfig,
-  RLPEncodedTransaction,
-} from 'web3-core';
-import type { SessionPayload } from '@canvas-js/interfaces';
+import type { provider, RLPEncodedTransaction, TransactionConfig, } from 'web3-core';
+import type IWebWallet from '../../../models/IWebWallet';
 
 declare let window: any;
 

@@ -1,17 +1,16 @@
-import React from 'react';
-
 import type { CWEvent } from 'chain-events/src';
 import { Label as ChainEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
-import type { DashboardActivityNotification } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
+import React from 'react';
 import app from 'state';
+import type DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { getClasses } from '../../components/component_kit/helpers';
 import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
 import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
 import { UserDashboardRowTop } from './user_dashboard_row_top';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardRowProps = {
   notification: DashboardActivityNotification;

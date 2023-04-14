@@ -1,10 +1,10 @@
 declare let window: any;
 
-import bs58 from 'bs58';
 import type { SessionPayload } from '@canvas-js/interfaces';
+import bs58 from 'bs58';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
+import type IWebWallet from '../../../models/IWebWallet';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS

@@ -1,12 +1,11 @@
+import 'modals/change_topic_modal.scss';
 import React, { useState } from 'react';
 
-import 'modals/change_topic_modal.scss';
-import type { Thread, Topic } from 'models';
-
 import app from 'state';
+import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
-import { TopicSelector } from '../components/topic_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { TopicSelector } from '../components/topic_selector';
 
 type ChangeTopicModalProps = {
   onChangeHandler: (topic: Topic) => void;

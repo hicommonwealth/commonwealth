@@ -1,21 +1,20 @@
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-
 import 'components/sidebar/index.scss';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
+import { useCommonNavigate } from '../../../navigation/helpers';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
 import { AdminSection } from './admin_section';
 import { DiscussionSection } from './discussion_section';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { ExternalLinksModule } from './external_links_module';
 import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWText } from '../component_kit/cw_text';
-import { useCommonNavigate } from '../../../navigation/helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export type SidebarMenuName =
   | 'default'

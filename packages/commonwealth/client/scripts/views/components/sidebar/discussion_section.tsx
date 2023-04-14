@@ -1,21 +1,13 @@
-import React from 'react';
-
-import {
-  _DEPRECATED_getRoute,
-  _DEPRECATED_getSearchParams,
-} from 'mithrilInterop';
-
 import 'components/sidebar/index.scss';
+
+import { _DEPRECATED_getRoute, _DEPRECATED_getSearchParams, } from 'mithrilInterop';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 import app from 'state';
 import { handleRedirectClicks } from '../../../helpers';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
-import type {
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-  ToggleTree,
-} from './types';
-import { useCommonNavigate } from 'navigation/helpers';
+import type { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree, } from './types';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(

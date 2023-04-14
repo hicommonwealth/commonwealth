@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
-
 import 'components/reaction_button/thread_preview_reaction_button.scss';
+import React, { useState } from 'react';
 
-import type { Thread } from 'models';
 
 import app from 'state';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
-import { Modal } from '../component_kit/cw_modal';
+import type Thread from '../../../models/Thread';
 import { LoginModal } from '../../modals/login_modal';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { Modal } from '../component_kit/cw_modal';
+import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { getDisplayedReactorsForPopup, onReactionClick } from './helpers';
 import { useReactionButton } from './UseReactionButton';
 
 type ThreadPreviewReactionButtonProps = {

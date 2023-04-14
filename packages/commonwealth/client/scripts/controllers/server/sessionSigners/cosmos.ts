@@ -1,19 +1,6 @@
+import type { Action, ActionArgument, ActionPayload, Session, SessionPayload, } from '@canvas-js/interfaces';
+import type { AminoMsg, Secp256k1Wallet, StdFee, StdSignDoc, } from '@cosmjs/amino';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
-import type {
-  AminoMsg,
-  StdSignDoc,
-  StdFee,
-  Secp256k1Wallet,
-} from '@cosmjs/amino';
-import type { Secp256k1 } from '@cosmjs/crypto';
-
-import type {
-  Action,
-  Session,
-  ActionArgument,
-  ActionPayload,
-  SessionPayload,
-} from '@canvas-js/interfaces';
 import type { ISessionController } from '.';
 
 export const getCosmosSignatureData = async (

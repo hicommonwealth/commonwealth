@@ -1,4 +1,3 @@
-import type { AddressInfo } from 'models';
 import type { AccessLevel } from 'permissions';
 
 class RoleInfo {

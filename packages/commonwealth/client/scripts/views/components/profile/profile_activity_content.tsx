@@ -1,9 +1,9 @@
+import type Thread from 'client/scripts/models/Thread';
 import React from 'react';
 
 import { CWText } from '../component_kit/cw_text';
-import type Thread from 'client/scripts/models/Thread';
-import NewProfileActivityRow from './profile_activity_row';
 import type { CommentWithAssociatedThread } from './profile_activity';
+import NewProfileActivityRow from './profile_activity_row';
 
 enum ProfileActivityType {
   Addresses,

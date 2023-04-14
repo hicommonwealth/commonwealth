@@ -1,21 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import smartTruncate from 'smart-truncate';
-
-import 'pages/manage_community/webhooks_form.scss';
-
-import type { Webhook } from 'models';
-
-import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { link, pluralize } from 'helpers';
+import { useCommonNavigate } from 'navigation/helpers';
+
+import 'pages/manage_community/webhooks_form.scss';
+import React, { useEffect, useMemo, useState } from 'react';
+import smartTruncate from 'smart-truncate';
+
+
+import app from 'state';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { Modal } from '../../components/component_kit/cw_modal';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { Modal } from '../../components/component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
 
 export const WebhooksForm = () => {
   const navigate = useCommonNavigate();

@@ -1,6 +1,9 @@
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 
 import 'sublayout_header.scss';
+import { HelpMenuPopover } from 'views/menus/help_menu';
 
 import app from '../state';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
@@ -11,9 +14,6 @@ import { LoginSelector } from './components/header/login_selector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
-import { useCommonNavigate } from 'navigation/helpers';
-import { HelpMenuPopover } from 'views/menus/help_menu';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 type SublayoutHeaderProps = {
   hideSearch?: boolean;

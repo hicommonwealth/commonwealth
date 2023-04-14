@@ -1,5 +1,6 @@
 import sgMail from '@sendgrid/mail';
 import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
@@ -7,7 +8,6 @@ import Sequelize from 'sequelize';
 import { DynamicTemplate } from '../../shared/types';
 import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
 import type { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

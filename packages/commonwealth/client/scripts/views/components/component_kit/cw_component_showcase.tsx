@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-
 import 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWWalletOptionRow } from './cw_wallet_option_row';
+import React, { useState } from 'react';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import { AvatarUpload } from '../avatar_upload';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
@@ -11,35 +11,34 @@ import { CWButton } from './cw_button';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
+import { CWCollapsible } from './cw_collapsible';
+import { CWContentPageCard } from './cw_content_page';
+import { CWCoverImageUploader } from './cw_cover_image_uploader';
+import { CWDropdown } from './cw_dropdown';
 import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
+import { Modal } from './cw_modal';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
+import { CWFilterMenu } from './cw_popover/cw_filter_menu';
+import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWProgressBar } from './cw_progress_bar';
+import type { RadioButtonType } from './cw_radio_button';
+import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
+import { CWSpinner } from './cw_spinner';
 import { CWTab, CWTabBar } from './cw_tabs';
+import { CWTag } from './cw_tag';
+import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle, toggleDarkMode } from './cw_toggle';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
-import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { CWCollapsible } from './cw_collapsible';
-import { CWTag } from './cw_tag';
-import { CWSpinner } from './cw_spinner';
-import { CWDropdown } from './cw_dropdown';
-import { CWRadioButton } from './cw_radio_button';
-import type { RadioButtonType } from './cw_radio_button';
-import { CWContentPageCard } from './cw_content_page';
-import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import { CWCoverImageUploader } from './cw_cover_image_uploader';
-import { Modal } from './cw_modal';
 import type { ValidationStatus } from './cw_validation_text';
-import { AvatarUpload } from '../avatar_upload';
-import { openConfirmation } from 'views/modals/confirmation_modal';
+import { CWWalletOptionRow } from './cw_wallet_option_row';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {

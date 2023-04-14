@@ -1,9 +1,3 @@
-import React, { useState } from 'react';
-
-import 'modals/webhook_settings_modal.scss';
-
-import type { Webhook } from 'models';
-
 import { NotificationCategories } from 'common-common/src/types';
 import {
   DydxChainNotificationTypes,
@@ -12,10 +6,13 @@ import {
   KusamaChainNotificationTypes,
   PolkadotChainNotificationTypes,
 } from 'helpers/chain_notification_types';
+
+import 'modals/webhook_settings_modal.scss';
+import React, { useState } from 'react';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWText } from '../components/component_kit/cw_text';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;

@@ -1,18 +1,18 @@
-import React from 'react';
-
-import moment from 'moment';
+import type Thread from 'client/scripts/models/Thread';
 
 import 'components/profile/profile_activity_row.scss';
 
-import app from 'state';
-import type Thread from 'client/scripts/models/Thread';
+import moment from 'moment';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
-import { CWText } from '../component_kit/cw_text';
+import React from 'react';
+
+import app from 'state';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from '../component_kit/cw_tag';
+import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../react_quill_editor/helpers';
 import type { CommentWithAssociatedThread } from './profile_activity';
-import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../component_kit/cw_icon_button';
 
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;

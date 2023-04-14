@@ -1,3 +1,5 @@
+import { SupportedNetwork } from 'chain-events/src';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
@@ -10,16 +12,11 @@ import type {
   SnapshotNotification,
 } from '../../shared/types';
 import { SERVER_URL } from '../config';
-import type { DB } from '../models';
 import type { NotificationInstance } from '../models/notification';
-import {
-  createImmediateNotificationEmailObject,
-  sendImmediateNotificationEmail,
-} from '../scripts/emails';
+import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail, } from '../scripts/emails';
 import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { SupportedNetwork } from 'chain-events/src';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,13 +1,12 @@
-import React from 'react';
-
 import 'components/component_kit/cw_popover/cw_address_tooltip.scss';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import React from 'react';
 import { CWIconButton } from '../cw_icon_button';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
-import { Popover, usePopover } from './cw_popover';
 import type { PopoverTriggerProps } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
 
 type AddressTooltipProps = {
   address: string;

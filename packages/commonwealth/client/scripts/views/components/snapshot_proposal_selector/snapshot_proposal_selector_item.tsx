@@ -1,8 +1,9 @@
-import React from 'react';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import React from 'react';
+import smartTruncate from 'smart-truncate';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { CWText } from '../component_kit/cw_text';
-import smartTruncate from 'smart-truncate';
+
 interface SnapshotProposalSelectorItemProps {
   snapshot: SnapshotProposal;
   isSelected: boolean;

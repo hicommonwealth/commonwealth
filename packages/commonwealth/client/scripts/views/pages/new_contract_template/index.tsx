@@ -1,15 +1,14 @@
-import React from 'react';
-import 'new_contract_template/new_contract_template_page.scss';
-import app from 'state';
-
 import { ChainBase } from 'common-common/src/types';
-import CreateContractTemplateForm from './create_contract_template_form';
+import 'new_contract_template/new_contract_template_page.scss';
+import React from 'react';
+import app from 'state';
+import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWText } from 'views/components/component_kit/cw_text';
+import Sublayout from '../../sublayout';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import CreateContractTemplateForm from './create_contract_template_form';
 
 const NewContractTemplatePage = () => {
   if (!app.contracts || !app.chain) {

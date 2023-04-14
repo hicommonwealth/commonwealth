@@ -1,6 +1,6 @@
-import React from 'react';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';
+import React from 'react';
 import app from 'state';
 import type MinimumProfile from '../../models/MinimumProfile';
 import { CWButton } from '../components/component_kit/cw_button';

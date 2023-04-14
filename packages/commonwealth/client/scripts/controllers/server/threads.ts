@@ -5,25 +5,18 @@ import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { EventEmitter } from 'events';
 import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
-
 import { redraw } from 'mithrilInterop';
-import type { ChainEntity, Topic } from 'models';
-import {
-  Attachment,
-  NotificationSubscription,
-  Poll,
-  Thread,
-  ThreadStage,
-} from 'models';
+import { Attachment, NotificationSubscription, Poll, Thread, ThreadStage, } from 'models';
 import moment from 'moment';
 import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { EventEmitter } from 'events';
+import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
 
 export const INITIAL_PAGE_SIZE = 10;

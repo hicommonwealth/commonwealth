@@ -1,26 +1,20 @@
-import React from 'react';
-import { capitalize } from 'lodash';
-
 import 'components/new_thread_form.scss';
+import { notifyError } from 'controllers/app/notifications';
 
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { notifyError } from 'controllers/app/notifications';
-import { ThreadKind, ThreadStage } from 'models';
-import app from 'state';
 import { detectURL } from 'helpers/threads';
+import { capitalize } from 'lodash';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
+import app from 'state';
+import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
-import { useCommonNavigate } from 'navigation/helpers';
-
-import {
-  useNewThreadForm,
-  useAuthorName,
-  checkNewThreadErrors,
-  updateTopicList,
-} from './helpers';
+import { ThreadKind } from '../../../models/types';
 import { ReactQuillEditor } from '../react_quill_editor';
+
+import { checkNewThreadErrors, updateTopicList, useAuthorName, useNewThreadForm, } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();

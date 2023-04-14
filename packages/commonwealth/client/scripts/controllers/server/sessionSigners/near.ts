@@ -1,14 +1,7 @@
+import type { Action, ActionArgument, ActionPayload, Session, SessionPayload, } from '@canvas-js/interfaces';
 import bs58 from 'bs58';
-import { KeyPairEd25519 } from 'near-api-js/lib/utils';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
-
-import type {
-  Action,
-  ActionPayload,
-  Session,
-  ActionArgument,
-  SessionPayload,
-} from '@canvas-js/interfaces';
+import { KeyPairEd25519 } from 'near-api-js/lib/utils';
 import type { ISessionController } from '.';
 
 export class NEARSessionController implements ISessionController {

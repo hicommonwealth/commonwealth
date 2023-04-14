@@ -1,3 +1,4 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DataTypes, Sequelize } from 'sequelize';
 import { DATABASE_URI } from './config';
 
@@ -16,6 +17,8 @@ import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';
 import CommunityBannerFactory from './models/community_banner';
 import CommunityContractFactory from './models/community_contract';
+import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
+import CommunityContractTemplateFactory from './models/community_contract_template';
 import CommunityRoleFactory from './models/community_role';
 import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
 import ContractFactory from './models/contract';
@@ -40,16 +43,13 @@ import SsoTokenFactory from './models/sso_token';
 import StarredCommunityFactory from './models/starred_community';
 import SubscriptionFactory from './models/subscription';
 import TaggedThreadFactory from './models/tagged_threads';
+import TemplateFactory from './models/template';
 import ThreadFactory from './models/thread';
 import TokenFactory from './models/token';
 import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
-import CommunityContractTemplateFactory from './models/community_contract_template';
-import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
-import TemplateFactory from './models/template';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

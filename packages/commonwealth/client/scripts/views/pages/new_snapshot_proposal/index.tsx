@@ -1,13 +1,16 @@
-import type { FormEvent} from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
-
-import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
+
+import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/new_snapshot_proposal.scss';
+import type { DeltaStatic } from 'quill';
+import type { FormEvent } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -16,18 +19,12 @@ import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { createDeltaFromText, ReactQuillEditor, } from '../../components/react_quill_editor';
 
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
-import type { ThreadForm } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useLocation } from 'react-router';
-import {
-  createDeltaFromText,
-  ReactQuillEditor,
-} from '../../components/react_quill_editor';
-import type { DeltaStatic } from 'quill';
 import { createNewProposal } from './helpers';
+import type { ThreadForm } from './types';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;

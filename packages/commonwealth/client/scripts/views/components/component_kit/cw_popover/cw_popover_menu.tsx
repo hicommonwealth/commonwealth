@@ -1,20 +1,15 @@
-import React from 'react';
-
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
-
-import { ComponentType } from '../types';
-import type {
-  DefaultMenuItem,
-  DividerMenuItem,
-  HeaderMenuItem,
-} from '../types';
-import { getClasses } from '../helpers';
+import React from 'react';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
-import { Popover, usePopover } from './cw_popover';
+import { getClasses } from '../helpers';
+
+import type { DefaultMenuItem, DividerMenuItem, HeaderMenuItem, } from '../types';
+import { ComponentType } from '../types';
 import type { PopoverTriggerProps } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
 
 export type PopoverMenuItem =
   | DividerMenuItem

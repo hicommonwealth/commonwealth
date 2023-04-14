@@ -1,19 +1,18 @@
-import React from 'react';
-
 import { NotificationCategories } from 'common-common/src/types';
+import useForceRerender from 'hooks/useForceRerender';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
+import React from 'react';
 
 import app from 'state';
-import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
+import NotificationSubscription from '../../../models/NotificationSubscription';
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { subscribeToThread } from './helpers';
-import type { NotificationSubscription } from 'client/scripts/models';
-import useForceRerender from 'hooks/useForceRerender';
 
 type UserDashboardRowBottomProps = {
   commentCount: number;

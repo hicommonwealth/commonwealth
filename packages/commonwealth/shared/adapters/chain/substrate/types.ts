@@ -3,7 +3,7 @@ import type { Call } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import type BN from 'bn.js';
 import { Coin } from '../../currency';
-import type { ICompletable, IIdentifiable } from '../../shared';
+import type { IIdentifiable } from '../../shared';
 
 export function formatCall(
   c: Call | { section: string; method: string; args: string[] }

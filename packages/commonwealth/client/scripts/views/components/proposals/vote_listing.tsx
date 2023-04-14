@@ -1,19 +1,18 @@
-import React from 'react';
-
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
 
 import 'components/proposals/vote_listing.scss';
 import { CosmosVote } from 'controllers/chain/cosmos/proposal';
-import AaveProposal, {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
+import AaveProposal, { AaveProposalVote, } from 'controllers/chain/ethereum/aave/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
-import type { AnyProposal, IVote } from 'models';
-import { BinaryVote, DepositVote, VotingUnit } from 'models';
+import React from 'react';
 
 import app from 'state';
+import type { IVote } from '../../../models/interfaces';
+import type { AnyProposal } from '../../../models/types';
+import { VotingUnit } from '../../../models/types';
+import { BinaryVote, DepositVote } from '../../../models/votes';
 import { User } from '../../components/user/user';
 import { CWText } from '../component_kit/cw_text';
 

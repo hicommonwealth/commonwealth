@@ -1,33 +1,27 @@
-import {
-  recoverTypedSignature,
-  SignTypedDataVersion,
-} from '@metamask/eth-sig-util';
+import { recoverTypedSignature, SignTypedDataVersion, } from '@metamask/eth-sig-util';
 import type { KeyringOptions } from '@polkadot/keyring/types';
 import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-import {
-  ChainBase,
-  NotificationCategories,
-  WalletId,
-} from 'common-common/src/types';
+
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, NotificationCategories, WalletId, } from 'common-common/src/types';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
-import { addressSwapper } from '../../shared/utils';
 import {
   chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
   constructCanvasMessage,
 } from '../../shared/adapters/shared';
+import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
 
-import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const sortedStringify = configureStableStringify({

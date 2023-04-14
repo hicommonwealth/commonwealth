@@ -1,5 +1,5 @@
-import { redraw } from 'mithrilInterop';
 import { isBoolean, isNotNil } from 'helpers/typeGuards';
+import { redraw } from 'mithrilInterop';
 
 import breakpoints from 'mixins/breakpoints.scss';
 

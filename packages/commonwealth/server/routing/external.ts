@@ -1,51 +1,28 @@
 import type {
-  // PostProfilesReq,
   PostReactionsReq,
   PostRolesReq,
   PostRulesReq,
   PostTopicsReq,
   PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
-import express from 'express';
-import type { DB } from '../models';
-import {
-  getComments,
-  getCommentsValidation,
-} from '../routes/comments/getComments';
-import getCommunities, {
-  getCommunitiesValidation,
-} from '../routes/communities/getCommunities';
-import getProfiles, {
-  getProfilesValidation,
-} from '../routes/profiles/getProfiles';
-import getReactions, {
-  getReactionsValidation,
-} from '../routes/reactions/getReactions';
-import { getThreads, getThreadsValidation } from '../routes/threads/getThreads';
 import type { Express } from 'express';
+import express from 'express';
 import type Router from 'express/lib/router/index';
 import passport from 'passport';
 import type { TokenBalanceCache } from 'token-balance-cache/src';
 import { addEntities } from '../routes/addEntities';
-import {
-  putCommunities,
-  putCommunitiesValidation,
-} from '../routes/communities/putCommunities';
+import { getComments, getCommentsValidation, } from '../routes/comments/getComments';
+import getCommunities, { getCommunitiesValidation, } from '../routes/communities/getCommunities';
+import { putCommunities, putCommunitiesValidation, } from '../routes/communities/putCommunities';
 import { deleteEntities } from '../routes/deleteEntities';
-import {
-  getBalanceProviders,
-  getBalanceProvidersValidation,
-} from '../routes/getBalanceProviders';
-import {
-  getChainNodes,
-  getChainNodesValidation,
-} from '../routes/getChainNodes';
-import {
-  getTokenBalance,
-  getTokenBalanceValidation,
-} from '../routes/getTokenBalance';
+import { getBalanceProviders, getBalanceProvidersValidation, } from '../routes/getBalanceProviders';
+import { getChainNodes, getChainNodesValidation, } from '../routes/getChainNodes';
+import { getTokenBalance, getTokenBalanceValidation, } from '../routes/getTokenBalance';
+import getProfiles, { getProfilesValidation, } from '../routes/profiles/getProfiles';
+import getReactions, { getReactionsValidation, } from '../routes/reactions/getReactions';
 import { getRoles, getRolesValidation } from '../routes/roles/getRoles';
 import { getRules, getRulesValidation } from '../routes/rulesext/getRules';
+import { getThreads, getThreadsValidation } from '../routes/threads/getThreads';
 import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
 import type { TypedRequest } from '../types';
 import {
@@ -56,6 +33,7 @@ import {
   postTopicsValidation,
   putCommentsValidation,
 } from '../util/helperValidations';
+import type { DB } from '../models';
 
 // contains external routes
 export function addExternalRoutes(

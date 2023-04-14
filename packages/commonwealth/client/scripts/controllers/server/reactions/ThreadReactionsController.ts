@@ -1,6 +1,5 @@
 import axios from 'axios';
-import type { AssociatedReaction } from '../../../models/Thread';
-import type Thread from '../../../models/Thread';
+import type Thread, { AssociatedReaction } from '../../../models/Thread';
 import app from '../../../state';
 
 class ThreadReactionsController {

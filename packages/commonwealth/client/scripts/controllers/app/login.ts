@@ -1,17 +1,17 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { initAppState } from 'state';
 import type { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
 import { redraw } from 'mithrilInterop';
-import type { BlockInfo, ChainInfo } from 'models';
-import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';
 import moment from 'moment';
-import app from 'state';
+import app, { initAppState } from 'state';
+import AddressInfo from '../../models/AddressInfo';
+import ITokenAdapter from '../../models/ITokenAdapter';
+import SocialAccount from '../../models/SocialAccount';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,

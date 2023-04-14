@@ -1,17 +1,15 @@
-import React from 'react';
-import $ from 'jquery';
-
 import { notifyError } from 'controllers/app/notifications';
-import type { RoleInfo } from 'models';
-import { AddressInfo } from 'models';
+import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/manage_community/manage_roles.scss';
+import React from 'react';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type ManageRoleRowProps = {
   label: string;

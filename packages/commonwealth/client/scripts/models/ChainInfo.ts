@@ -1,17 +1,14 @@
-import { render } from 'mithrilInterop';
-import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import app from 'state';
-import { RoleInfo, AccessLevel } from 'models';
 import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
-import type NodeInfo from './NodeInfo';
+import $ from 'jquery';
+import { render } from 'mithrilInterop';
+import app from 'state';
 
-import {
-  CWAvatar,
-  CWJdenticon,
-} from '../views/components/component_kit/cw_avatar';
+import { CWAvatar, CWJdenticon, } from '../views/components/component_kit/cw_avatar';
 import type CommunityRole from './CommunityRole';
+import type NodeInfo from './NodeInfo';
+import RoleInfo from './RoleInfo';
 
 class ChainInfo {
   public readonly id: string;

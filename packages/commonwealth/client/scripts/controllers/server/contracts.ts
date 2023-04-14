@@ -1,9 +1,8 @@
-import $ from 'jquery';
-import type { Response } from 'express';
-import { ContractsStore } from 'stores';
-import { Contract } from 'models';
-import app from 'state';
 import type { BalanceType, ContractType } from 'common-common/src/types';
+import type { Response } from 'express';
+import $ from 'jquery';
+import app from 'state';
+import { ContractsStore } from 'stores';
 
 type AddCommunityContractTemplateAttributes = {
   slug: string;

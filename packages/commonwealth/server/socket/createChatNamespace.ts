@@ -1,20 +1,13 @@
 import { addPrefix, factory } from 'common-common/src/logging';
 import type { RedisCache } from 'common-common/src/redisCache';
-import {
-  NotificationCategories,
-  RedisNamespaces,
-} from 'common-common/src/types';
+import { NotificationCategories, RedisNamespaces, } from 'common-common/src/types';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import type { Server } from 'socket.io';
-import {
-  WebsocketEngineEvents,
-  WebsocketMessageNames,
-  WebsocketNamespaces,
-} from '../../shared/types';
-import type { DB } from '../models';
+import { WebsocketEngineEvents, WebsocketMessageNames, WebsocketNamespaces, } from '../../shared/types';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
+import type { DB } from '../models';
 
 const log = factory.getLogger(addPrefix(__filename));
 

@@ -1,6 +1,6 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import fetch from 'node-fetch';
 import type { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

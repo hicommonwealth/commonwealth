@@ -1,9 +1,8 @@
+import 'modals/preview_modal.scss';
+import type { DeltaStatic } from 'quill';
 import React from 'react';
 
-import 'modals/preview_modal.scss';
-
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import type { DeltaStatic } from 'quill';
 import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
 
 type PreviewModalProps = {

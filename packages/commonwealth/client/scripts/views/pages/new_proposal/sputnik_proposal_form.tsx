@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-
 import { notifyError } from 'controllers/app/notifications';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
+import React, { useState } from 'react';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';

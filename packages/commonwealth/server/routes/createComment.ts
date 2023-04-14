@@ -1,24 +1,15 @@
+import type { DB } from '../models';
 import sgMail from '@sendgrid/mail';
 import { AppError, ServerError } from 'common-common/src/errors';
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-  ProposalType,
-} from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainNetwork, ChainType, NotificationCategories, ProposalType, } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
-import {
-  getThreadUrl,
-  getThreadUrlWithoutObject,
-  renderQuillDeltaToText,
-} from '../../shared/utils';
+import { getThreadUrl, getThreadUrlWithoutObject, renderQuillDeltaToText, } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
-import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { mixpanelTrack } from '../util/mixpanelUtil';

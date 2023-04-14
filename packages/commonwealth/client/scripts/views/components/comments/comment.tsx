@@ -1,27 +1,26 @@
-import React from 'react';
-
 import 'components/comments/comment.scss';
-import type { Account, Comment as CommentType } from 'models';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import moment from 'moment';
+import React from 'react';
 
 import app from 'state';
 import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
+import type CommentModel from '../../../models/CommentModel';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
+import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
 import { SharePopover } from '../share_popover';
+import { AnonymousUser } from '../user/anonymous_user';
 import { User } from '../user/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
-import { AnonymousUser } from '../user/anonymous_user';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 
 type CommentAuthorProps = {
-  comment: CommentType<any>;
+  comment: CommentModel<any>;
 };
 
 const CommentAuthor = (props: CommentAuthorProps) => {
@@ -48,7 +47,7 @@ const CommentAuthor = (props: CommentAuthorProps) => {
 };
 
 type CommentProps = {
-  comment: CommentType<any>;
+  comment: CommentModel<any>;
   handleIsReplying: (isReplying: boolean, id?: number) => void;
   isGloballyEditing?: boolean;
   isLast: boolean;

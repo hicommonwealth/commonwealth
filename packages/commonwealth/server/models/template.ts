@@ -1,6 +1,5 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { SnapshotSpaceAttributes } from './snapshot_spaces';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type TemplateAttributes = {

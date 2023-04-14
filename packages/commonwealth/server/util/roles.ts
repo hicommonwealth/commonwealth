@@ -1,19 +1,14 @@
-import type { Transaction, FindOptions } from 'sequelize';
+import type { FindOptions, Transaction } from 'sequelize';
 import { Op } from 'sequelize';
-import { aggregatePermissions } from '../../shared/utils';
 import type { Action } from '../../shared/permissions';
-import {
-  PermissionManager,
-  PermissionError,
-  ToCheck,
-  everyonePermissions,
-} from '../../shared/permissions';
-import type { DB } from '../models';
+import { everyonePermissions, PermissionError, PermissionManager, ToCheck, } from '../../shared/permissions';
+import type { RoleObject } from '../../shared/types';
+import { aggregatePermissions } from '../../shared/utils';
+import type { AddressInstance } from '../models/address';
 import type { CommunityRoleAttributes } from '../models/community_role';
 import type { Permission } from '../models/role';
 import type { RoleAssignmentAttributes } from '../models/role_assignment';
-import type { AddressInstance } from '../models/address';
-import type { RoleObject } from '../../shared/types';
+import type { DB } from '../models';
 
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   chain_id: string;

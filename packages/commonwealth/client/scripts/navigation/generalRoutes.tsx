@@ -1,5 +1,5 @@
-import { Route } from 'react-router-dom';
 import React, { lazy } from 'react';
+import { Route } from 'react-router-dom';
 import { withLayout } from 'views/layout';
 
 const TermsPage = lazy(() => import('views/pages/terms'));

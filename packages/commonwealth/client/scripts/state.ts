@@ -1,9 +1,10 @@
+import { updateActiveUser } from 'controllers/app/login';
 import ChainEntityController from 'controllers/server/chain_entities';
 import DiscordController from 'controllers/server/discord';
 import { WebSocketController } from 'controllers/server/socket';
 import { EventEmitter } from 'events';
-import type { IChainAdapter } from 'models';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import $ from 'jquery';
+import { redraw } from 'mithrilInterop';
 import type { ChainCategoryAttributes } from 'server/models/chain_category';
 import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 import { ChainStore, NodeStore } from 'stores';
@@ -13,8 +14,8 @@ import SnapshotController from './controllers/chain/snapshot';
 import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
-import PollsController from './controllers/server/polls';
 import NewProfilesController from './controllers/server/newProfiles';
+import PollsController from './controllers/server/polls';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ReactionsController from './controllers/server/reactions';
 import ThreadReactionsController from './controllers/server/reactions/ThreadReactionsController';
@@ -25,11 +26,12 @@ import ThreadsController from './controllers/server/threads';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
 import TopicsController from './controllers/server/topics';
 import { UserController } from './controllers/server/user';
+import ChainInfo from './models/ChainInfo';
+import type IChainAdapter from './models/IChainAdapter';
+import NodeInfo from './models/NodeInfo';
+import NotificationCategory from './models/NotificationCategory';
 import type { MobileMenuName } from './views/app_mobile_menus';
 import type { SidebarMenuName } from './views/components/sidebar';
-import $ from 'jquery';
-import { updateActiveUser } from 'controllers/app/login';
-import { redraw } from 'mithrilInterop';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',

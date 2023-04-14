@@ -1,6 +1,6 @@
+import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { Navigate } from 'navigation/helpers';
 import { withLayout } from 'views/layout';
 
 const LandingPage = lazy(() => import('views/pages/landing'));

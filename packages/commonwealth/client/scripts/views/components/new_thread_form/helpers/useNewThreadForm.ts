@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import type { DeltaStatic } from 'quill';
+import { useState } from 'react';
+import { ThreadKind } from '../../../../models/types';
 
-import type { Topic } from 'models';
-import { ThreadKind } from 'models';
 import { getTextFromDelta } from '../../react_quill_editor';
 
 const useNewThreadForm = (authorName: string, hasTopics: boolean) => {

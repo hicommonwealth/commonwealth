@@ -1,13 +1,9 @@
-import type {
-  TypedRequestBody,
-  TypedRequestQuery,
-  TypedResponse,
-} from 'server/types';
-import { success } from '../types';
-import type { DB } from '../models';
+import type { TypedRequestBody, TypedRequestQuery, TypedResponse, } from 'server/types';
 import { AppError } from '../../../common-common/src/errors';
 import isValidJson from '../../shared/validateJson';
+import { success } from '../types';
 import validateRoles from '../util/validateRoles';
+import type { DB } from '../models';
 
 type CreateTemplateAndMetadataReq = {
   contract_id: string;

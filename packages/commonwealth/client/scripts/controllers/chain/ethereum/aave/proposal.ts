@@ -5,26 +5,24 @@ import BN from 'bn.js';
 import bs58 from 'bs58';
 import { AaveTypes } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
+import { EventEmitter } from 'events';
 import { blocknumToTime } from 'helpers';
 import $ from 'jquery';
-import { EventEmitter } from 'events';
 
-import type {
-  ChainEntity,
-  ChainEvent,
-  ITXModalData,
-  IVote,
-  ProposalEndTime,
-} from 'models';
-import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import moment from 'moment';
 import Web3 from 'web3-utils';
+import type ChainEntity from '../../../../models/ChainEntity';
+import type ChainEvent from '../../../../models/ChainEvent';
+import type { ITXModalData, IVote } from '../../../../models/interfaces';
+import Proposal from '../../../../models/Proposal';
+import type { ProposalEndTime } from '../../../../models/types';
+import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
-
 import type AaveAPI from './api';
 import type { AaveExecutor } from './api';
+
 import type AaveChain from './chain';
 import type AaveGovernance from './governance';
 

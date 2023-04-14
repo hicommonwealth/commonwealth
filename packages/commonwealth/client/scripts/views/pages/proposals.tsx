@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
-
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import type { ProposalModule } from 'models';
 
 import 'pages/proposals.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
@@ -17,13 +15,11 @@ import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
+import type ProposalModule from '../../models/ProposalModule';
 import { CardsCollection } from '../components/cards_collection';
 import { getStatusText } from '../components/proposal_card/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
-import {
-  CompoundProposalStats,
-  SubstrateProposalStats,
-} from '../components/proposals/proposals_explainers';
+import { CompoundProposalStats, SubstrateProposalStats, } from '../components/proposals/proposals_explainers';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {

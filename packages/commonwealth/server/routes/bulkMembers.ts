@@ -1,8 +1,9 @@
-import Sequelize from 'sequelize';
-const { Op } = Sequelize;
 import type { DB } from '../models';
 import type { Request, Response } from 'express';
+import Sequelize from 'sequelize';
 import { findAllRoles } from '../util/roles';
+
+const { Op } = Sequelize;
 
 const bulkMembers = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;

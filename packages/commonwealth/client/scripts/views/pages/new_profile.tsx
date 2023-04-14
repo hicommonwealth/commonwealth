@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'pages/new_profile.scss';
+import React from 'react';
 
 import ProfileComponent from '../components/profile';
 

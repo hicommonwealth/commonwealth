@@ -1,8 +1,8 @@
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import assert from 'assert';
-import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import type { IAccountsModule } from '../../../models/interfaces';
 import EthereumAccount from './account';
 import type EthereumChain from './chain';
 

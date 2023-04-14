@@ -1,15 +1,15 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import passport from 'passport';
-import session from 'express-session';
-import { SESSION_SECRET } from 'server/config';
-import models from 'server/database';
-import SessionSequelizeStore from 'connect-session-sequelize';
-import { addExternalRoutes } from 'server/routing/external';
-import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
+import SessionSequelizeStore from 'connect-session-sequelize';
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import session from 'express-session';
+import passport from 'passport';
+import { SESSION_SECRET } from 'server/config';
+import models from 'server/database';
+import { addExternalRoutes } from 'server/routing/external';
+import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);

@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
-import { useInterval } from 'usehooks-ts';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/landing/carousel.scss';
+import React, { useState } from 'react';
+import { useInterval } from 'usehooks-ts';
+import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { CWText } from '../../components/component_kit/cw_text';
 
 import type { Chain } from './index';
-
-import { useCommonNavigate } from 'navigation/helpers';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 
 type CarouselProps = {
   chains: Array<Chain>;

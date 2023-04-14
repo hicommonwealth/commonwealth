@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_wallet_option_row.scss';
+import React from 'react';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
 import type { CustomIconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';

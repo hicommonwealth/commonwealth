@@ -1,8 +1,8 @@
+import type { DB } from '../models';
 import { StatsDController } from 'common-common/src/statsd';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 import { JWT_SECRET } from '../config';
-import type { DB } from '../models';
 import '../types';
 import { initMagicAuth } from './magic';
 import { initSocialAccountAuth } from './socialAccount';

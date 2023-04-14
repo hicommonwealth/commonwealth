@@ -1,21 +1,18 @@
-import React from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { threadStageToLabel } from 'helpers';
-import { ThreadStage } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/discussions/stages_menu.scss';
+import React from 'react';
 
 import app from 'state';
+import { ThreadStageType } from '../../../models/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import {
-  Popover,
-  usePopover,
-} from '../../components/component_kit/cw_popover/cw_popover';
+import { Popover, usePopover, } from '../../components/component_kit/cw_popover/cw_popover';
 import { getClasses } from '../../components/component_kit/helpers';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadsFilterMenuItemProps = {
   iconRight?: React.ReactNode;
@@ -43,9 +40,9 @@ export const ThreadsFilterMenuItem = (props: ThreadsFilterMenuItemProps) => {
 };
 
 type StagesMenuProps = {
-  selectedStage: ThreadStage;
+  selectedStage: ThreadStageType;
   stage: string;
-  stages: Array<ThreadStage>;
+  stages: Array<ThreadStageType>;
 };
 
 export const StagesMenu = (props: StagesMenuProps) => {
@@ -90,7 +87,7 @@ export const StagesMenu = (props: StagesMenuProps) => {
                   }}
                   label={`
                     ${threadStageToLabel(targetStage)} ${
-                    targetStage === ThreadStage.Voting
+                    targetStage === ThreadStageType.Voting
                       ? app.threads.numVotingThreads
                       : ''
                   }`}

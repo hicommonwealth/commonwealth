@@ -1,6 +1,6 @@
+import type { DB } from '../models';
 import { StatsDController } from 'common-common/src/statsd';
 import type { Request, Response } from 'express';
-import type { DB } from '../models';
 
 const logout = async (models: DB, req: Request, res: Response) => {
   // Passport has a race condition where req.logout resolves too

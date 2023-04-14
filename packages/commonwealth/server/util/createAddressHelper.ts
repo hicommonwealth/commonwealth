@@ -1,16 +1,16 @@
-import crypto from 'crypto';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { bech32 } from 'bech32';
-import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { createRole, findOneRole } from './roles';
-import { mixpanelTrack } from './mixpanelUtil';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import crypto from 'crypto';
+import type { NextFunction } from 'express';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import type { UserInstance } from '../models/user';
-import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import type { UserInstance } from '../models/user';
 import { Errors } from '../routes/createAddress';
+import { mixpanelTrack } from './mixpanelUtil';
+import { createRole, findOneRole } from './roles';
+import type { DB } from '../models';
 
 type CreateAddressReq = {
   address: string;

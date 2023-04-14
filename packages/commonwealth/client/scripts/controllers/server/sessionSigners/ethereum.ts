@@ -1,11 +1,5 @@
+import type { Action, ActionArgument, ActionPayload, Session, SessionPayload, } from '@canvas-js/interfaces';
 import { ethers, utils } from 'ethers';
-import type {
-  Action,
-  ActionArgument,
-  ActionPayload,
-  Session,
-  SessionPayload,
-} from '@canvas-js/interfaces';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import type { ISessionController } from '.';
 

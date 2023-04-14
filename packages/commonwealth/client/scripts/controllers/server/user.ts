@@ -1,19 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { EventEmitter } from 'events';
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import $ from 'jquery';
-import { EventEmitter } from 'events';
 
-import type {
-  Account,
-  AddressInfo,
-  ChainInfo,
-  SocialAccount,
-  StarredCommunity,
-} from 'models';
+import type { Account, AddressInfo, ChainInfo, SocialAccount, StarredCommunity, } from 'models';
 import app from 'state';
-import DraftsController from './drafts';
 import { notifyError } from '../app/notifications';
+import DraftsController from './drafts';
 
 // eslint-disable-next-line
 import NotificationsController from './notifications';

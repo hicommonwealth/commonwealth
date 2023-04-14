@@ -1,6 +1,5 @@
-import React from 'react';
-
 import 'components/component_kit/cw_spinner.scss';
+import React from 'react';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconSize } from './cw_icons/types';
 

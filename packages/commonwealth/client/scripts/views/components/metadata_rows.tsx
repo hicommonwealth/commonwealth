@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { CWLabel } from './component_kit/cw_label';
+import type { RadioButtonType } from './component_kit/cw_radio_button';
+import { CWRadioGroup } from './component_kit/cw_radio_group';
 import { CWText } from './component_kit/cw_text';
 import { CWTextArea } from './component_kit/cw_text_area';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWToggle } from './component_kit/cw_toggle';
-import { CWRadioGroup } from './component_kit/cw_radio_group';
-import type { RadioButtonType } from './component_kit/cw_radio_button';
 
 type InputRowProps = {
   disabled?: boolean;

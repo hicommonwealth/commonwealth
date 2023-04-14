@@ -1,26 +1,18 @@
-import { redraw } from 'mithrilInterop';
-
 import { formatCoin } from 'adapters/currency';
 import { CompoundTypes } from 'chain-events/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
-import AaveProposal, {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
-import CompoundProposal, {
-  BravoVote,
-  CompoundProposalVote,
-} from 'controllers/chain/ethereum/compound/proposal';
+import AaveProposal, { AaveProposalVote, } from 'controllers/chain/ethereum/aave/proposal';
+import CompoundProposal, { BravoVote, CompoundProposalVote, } from 'controllers/chain/ethereum/compound/proposal';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import {
-  NearSputnikProposalStatus,
-  NearSputnikVoteString,
-} from 'controllers/chain/near/sputnik/types';
+import { NearSputnikProposalStatus, NearSputnikVoteString, } from 'controllers/chain/near/sputnik/types';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import type { AnyProposal, IVote } from 'models';
-import { ProposalStatus, VotingUnit } from 'models';
+import { redraw } from 'mithrilInterop';
 
 import app from 'state';
+import type { IVote } from '../../../models/interfaces';
+import type { AnyProposal } from '../../../models/types';
+import { ProposalStatus, VotingUnit } from '../../../models/types';
 
 export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
   const balancesCache = {};

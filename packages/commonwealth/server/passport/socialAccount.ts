@@ -1,3 +1,4 @@
+import type { DB } from '../models';
 import { NotificationCategories } from 'common-common/src/types';
 import type { Request } from 'express';
 import passport from 'passport';
@@ -12,7 +13,6 @@ import {
   GITHUB_CLIENT_SECRET,
   GITHUB_OAUTH_CALLBACK,
 } from '../config';
-import type { DB } from '../models';
 
 import '../types';
 

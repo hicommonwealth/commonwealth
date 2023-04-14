@@ -1,6 +1,6 @@
 import BN from 'bn.js';
-import { ITokenAdapter } from 'models';
 import app from 'state';
+import ITokenAdapter from '../../../models/ITokenAdapter';
 
 export default class TopicGateCheck {
   public static isGatedTopic(topicName: string): boolean {

@@ -1,15 +1,9 @@
+import type { Action, ActionArgument, ActionPayload, Session, SessionPayload, } from '@canvas-js/interfaces';
 import { Keyring } from '@polkadot/api';
 import type { IKeyringPair } from '@polkadot/types/types';
 import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
-import { addressSwapper } from '../../../../../shared/utils';
-import type {
-  Action,
-  ActionPayload,
-  ActionArgument,
-  Session,
-  SessionPayload,
-} from '@canvas-js/interfaces';
 import type { ISessionController } from '.';
+import { addressSwapper } from '../../../../../shared/utils';
 
 export class SubstrateSessionController implements ISessionController {
   keyring: Keyring = new Keyring({ ss58Format: 42 });

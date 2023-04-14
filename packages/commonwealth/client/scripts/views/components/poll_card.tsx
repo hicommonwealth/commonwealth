@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-
 import 'components/poll_card.scss';
+import React, { useState } from 'react';
 
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { Modal } from './component_kit/cw_modal';
 import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
-import { Modal } from './component_kit/cw_modal';
 
 const LIVE_PREVIEW_MAX = 3;
 const ENDED_PREVIEW_MAX = 1;

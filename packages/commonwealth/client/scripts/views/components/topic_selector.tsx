@@ -1,8 +1,7 @@
+import 'components/topic_selector.scss';
 import React from 'react';
-import type { Topic } from 'models';
 
 import { SelectList } from 'views/components/component_kit/cw_select_list';
-import 'components/topic_selector.scss';
 
 interface TopicSelectorProps {
   defaultTopic: Topic;

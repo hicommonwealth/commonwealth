@@ -1,13 +1,13 @@
-import React from 'react';
-
-import type { Thread } from 'models';
-import 'pages/view_thread/edit_body.scss';
 import { notifySuccess } from 'controllers/app/notifications';
+
+import 'pages/view_thread/edit_body.scss';
+import type { DeltaStatic } from 'quill';
+import React from 'react';
 import app from 'state';
 import { ContentType } from 'types';
+import type Thread from '../../../models/Thread';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
-import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 

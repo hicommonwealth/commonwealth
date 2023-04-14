@@ -4,12 +4,7 @@ import type { IApp } from 'state';
 import { ProposalStore } from '../stores';
 import type ChainEntity from './ChainEntity';
 import type ChainEvent from './ChainEvent';
-import type {
-  IAccountsModule,
-  IChainModule,
-  ITXModalData,
-  IVote,
-} from './interfaces';
+import type { IAccountsModule, IChainModule, ITXModalData, IVote, } from './interfaces';
 import type Proposal from './Proposal';
 import StorageModule from './StorageModule';
 

@@ -1,7 +1,7 @@
 import type { ChainBase, WalletId } from 'common-common/src/types';
 import $ from 'jquery';
-import type { Account, IWebWallet } from 'models';
 import app from 'state';
+import type IWebWallet from '../../models/IWebWallet';
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';

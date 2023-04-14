@@ -1,8 +1,8 @@
-import { formatAddressShort } from '../../shared/utils';
-import { SENDGRID_API_KEY } from '../config';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { DynamicTemplate } from '../../shared/types';
+import { formatAddressShort } from '../../shared/utils';
+import { SENDGRID_API_KEY } from '../config';
 import models from '../database';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

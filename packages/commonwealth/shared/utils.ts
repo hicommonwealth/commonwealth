@@ -1,15 +1,7 @@
 import { isHex, isU8a } from '@polkadot/util';
-import {
-  checkAddress,
-  decodeAddress,
-  encodeAddress,
-} from '@polkadot/util-crypto';
+import { checkAddress, decodeAddress, encodeAddress, } from '@polkadot/util-crypto';
 import { ProposalType } from 'common-common/src/types';
-import {
-  AccessLevel,
-  everyonePermissions,
-  PermissionManager,
-} from './permissions';
+import { AccessLevel, everyonePermissions, PermissionManager, } from './permissions';
 import type { RoleObject } from './types';
 
 export const getNextPollEndingTime = (now) => {

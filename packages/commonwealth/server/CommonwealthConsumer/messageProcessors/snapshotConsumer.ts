@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { StatsDController } from 'common-common/src/statsd';
+import { NotificationCategories } from 'common-common/src/types';
 import type { Logger } from 'typescript-logging';
-import emitNotifications from '../../util/emitNotifications';
 import type { SnapshotNotification } from '../../../shared/types';
 import { SnapshotEventType } from '../../../shared/types';
-import { NotificationCategories } from 'common-common/src/types';
 import type { DB } from '../../models';
+import emitNotifications from '../../util/emitNotifications';
 
 export async function processSnapshotMessage(
   this: { models: DB; log: Logger },

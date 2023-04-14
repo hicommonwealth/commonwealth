@@ -1,15 +1,14 @@
-import React from 'react';
-
 import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
 import $ from 'jquery';
-import type { NotificationSubscription } from 'models';
+import React from 'react';
 
 import app from 'state';
 import { DashboardViews } from '.';
-import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
 import { MarkdownFormattedText } from '../../components/react_quill_editor/markdown_formatted_text';
+import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
 
 export const getCommentPreview = (commentText) => {
   // TODO Graham 6-5-22: Duplicate with notification_row.ts? See relevant note there

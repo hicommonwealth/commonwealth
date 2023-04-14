@@ -1,185 +1,176 @@
+import { StatsDController } from 'common-common/src/statsd';
+import type { Express } from 'express';
 import express from 'express';
 import passport from 'passport';
-import type { Express } from 'express';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { StatsDController } from 'common-common/src/statsd';
-
-import domain from '../routes/domain';
-import status from '../routes/status';
-import createAddress from '../routes/createAddress';
-import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
-import verifyAddress from '../routes/verifyAddress';
-import deleteAddress from '../routes/deleteAddress';
-import getAddressStatus from '../routes/getAddressStatus';
-import getAddressProfile from '../routes/getAddressProfile';
-import selectChain from '../routes/selectChain';
-import startEmailLogin from '../routes/startEmailLogin';
-import finishEmailLogin from '../routes/finishEmailLogin';
-import finishOAuthLogin from '../routes/finishOAuthLogin';
-import startOAuthLogin from '../routes/startOAuthLogin';
-import createComment from '../routes/createComment';
-import editComment from '../routes/editComment';
-import deleteComment from '../routes/deleteComment';
-import viewComments from '../routes/viewComments';
-import bulkComments from '../routes/bulkComments';
-import createReaction from '../routes/createReaction';
-import deleteReaction from '../routes/deleteReaction';
-import viewReactions from '../routes/viewReactions';
-import bulkReactions from '../routes/bulkReactions';
-import reactionsCounts from '../routes/reactionsCounts';
-import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
-import starCommunity from '../routes/starCommunity';
-import createChain from '../routes/createChain';
-import createContract from '../routes/contracts/createContract';
-import viewCount from '../routes/viewCount';
-import updateEmail from '../routes/updateEmail';
-import updateBanner from '../routes/updateBanner';
-import communityStats from '../routes/communityStats';
-import {
-  fetchEtherscanContract,
-  fetchEtherscanContractAbi,
-} from '../routes/etherscanAPI';
-import createContractAbi from '../routes/contractAbis/createContractAbi';
-
-import viewSubscriptions from '../routes/subscription/viewSubscriptions';
-import createSubscription from '../routes/subscription/createSubscription';
-import deleteSubscription from '../routes/subscription/deleteSubscription';
-import enableSubscriptions from '../routes/subscription/enableSubscriptions';
-import disableSubscriptions from '../routes/subscription/disableSubscriptions';
-import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
-import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
-import viewNotifications, {
-  NotificationCategories,
-} from '../routes/viewNotifications';
-import viewUserActivity from '../routes/viewUserActivity';
-import viewGlobalActivity from '../routes/viewGlobalActivity';
-import markNotificationsRead from '../routes/markNotificationsRead';
-import clearReadNotifications from '../routes/clearReadNotifications';
-import clearNotifications from '../routes/clearNotifications';
-import bulkMembers from '../routes/bulkMembers';
+import * as controllers from '../controller';
+import type DatabaseValidationService from '../middleware/databaseValidationService';
+import activeThreads from '../routes/activeThreads';
+import addEditors from '../routes/addEditors';
+import authCallback from '../routes/authCallback';
+import banAddress from '../routes/banAddress';
 import bulkAddresses from '../routes/bulkAddresses';
-import upgradeMember from '../routes/upgradeMember';
-import deleteSocialAccount from '../routes/deleteSocialAccount';
-import getProfileNew from '../routes/getNewProfile';
+import bulkBalances from '../routes/bulkBalances';
+import bulkComments from '../routes/bulkComments';
+import bulkMembers from '../routes/bulkMembers';
+import bulkOffchain from '../routes/bulkOffchain';
+import bulkReactions from '../routes/bulkReactions';
+import bulkThreads from '../routes/bulkThreads';
+import bulkTopics from '../routes/bulkTopics';
+import createChatChannel from '../routes/chat/createChatChannel';
+import deleteChatCategory from '../routes/chat/deleteChatCategory';
+import deleteChatChannel from '../routes/chat/deleteChatChannel';
+import editChatCategory from '../routes/chat/editChatCategory';
+import editChatChannel from '../routes/chat/editChatChannel';
+import getChatChannel from '../routes/chat/getChatChannel';
+import getChatMessages from '../routes/chat/getChatMessages';
+import clearNotifications from '../routes/clearNotifications';
+import clearReadNotifications from '../routes/clearReadNotifications';
+import communityStats from '../routes/communityStats';
+import createContractAbi from '../routes/contractAbis/createContractAbi';
+import createContract from '../routes/contracts/createContract';
+import createAddress from '../routes/createAddress';
+import createChain from '../routes/createChain';
+import createComment from '../routes/createComment';
+import createDiscordBotConfig from '../routes/createDiscordBotConfig';
+import createPoll from '../routes/createPoll';
+import createReaction from '../routes/createReaction';
 
 import createRole from '../routes/createRole';
-import deleteRole from '../routes/deleteRole';
-import setDefaultRole from '../routes/setDefaultRole';
-
-import getUploadSignature from '../routes/getUploadSignature';
-import activeThreads from '../routes/activeThreads';
 import createThread from '../routes/createThread';
-import editThread from '../routes/editThread';
-import createPoll from '../routes/createPoll';
-import getPolls from '../routes/getPolls';
-import deletePoll from '../routes/deletePoll';
-import updateThreadStage from '../routes/updateThreadStage';
-import updateThreadPrivacy from '../routes/updateThreadPrivacy';
-import updateThreadPinned from '../routes/updateThreadPinned';
-import updateThreadLinkedChainEntities from '../routes/updateThreadLinkedChainEntities';
-import updateThreadLinkedSnapshotProposal from '../routes/updateThreadLinkedSnapshotProposal';
-import updateVote from '../routes/updateVote';
-import viewVotes from '../routes/viewVotes';
-import fetchEntityTitle from '../routes/fetchEntityTitle';
-import fetchThreadForSnapshot from '../routes/fetchThreadForSnapshot';
-import updateChainEntityTitle from '../routes/updateChainEntityTitle';
-import updateLinkedThreads from '../routes/updateLinkedThreads';
-import deleteThread from '../routes/deleteThread';
-import addEditors from '../routes/addEditors';
+import createTopic from '../routes/createTopic';
+import deleteAddress from '../routes/deleteAddress';
+import deleteChain from '../routes/deleteChain';
+import deleteComment from '../routes/deleteComment';
 import deleteEditors from '../routes/deleteEditors';
-import bulkThreads from '../routes/bulkThreads';
-import getThreadsOld from '../routes/getThreads';
-import searchDiscussions from '../routes/searchDiscussions';
-import searchComments from '../routes/searchComments';
+import deletePoll from '../routes/deletePoll';
+import deleteReaction from '../routes/deleteReaction';
+import deleteRole from '../routes/deleteRole';
+import deleteSocialAccount from '../routes/deleteSocialAccount';
+import deleteThread from '../routes/deleteThread';
+import deleteTopic from '../routes/deleteTopic';
+
+import domain from '../routes/domain';
 import createDraft from '../routes/drafts/createDraft';
 import deleteDraft from '../routes/drafts/deleteDraft';
 import editDraft from '../routes/drafts/editDraft';
 import getDrafts from '../routes/drafts/getDrafts';
-import deleteChain from '../routes/deleteChain';
-import updateChain from '../routes/updateChain';
-import updateProfileNew from '../routes/updateNewProfile';
-import writeUserSetting from '../routes/writeUserSetting';
-import sendFeedback from '../routes/sendFeedback';
-import logout from '../routes/logout';
-import createTopic from '../routes/createTopic';
-import updateTopic from '../routes/updateTopic';
-import orderTopics from '../routes/orderTopics';
+import editComment from '../routes/editComment';
+import editSubstrateSpec from '../routes/editSubstrateSpec';
+import editThread from '../routes/editThread';
 import editTopic from '../routes/editTopic';
-import deleteTopic from '../routes/deleteTopic';
-import bulkTopics from '../routes/bulkTopics';
-import bulkOffchain from '../routes/bulkOffchain';
-import setTopicThreshold from '../routes/setTopicThreshold';
-import getChatMessages from '../routes/chat/getChatMessages';
-import getChatChannel from '../routes/chat/getChatChannel';
-import createChatChannel from '../routes/chat/createChatChannel';
-import deleteChatChannel from '../routes/chat/deleteChatChannel';
-import deleteChatCategory from '../routes/chat/deleteChatCategory';
-import editChatChannel from '../routes/chat/editChatChannel';
-import editChatCategory from '../routes/chat/editChatCategory';
+import { fetchEtherscanContract, fetchEtherscanContractAbi, } from '../routes/etherscanAPI';
+import fetchEntityTitle from '../routes/fetchEntityTitle';
+import fetchThreadForSnapshot from '../routes/fetchThreadForSnapshot';
+import finishEmailLogin from '../routes/finishEmailLogin';
+import finishOAuthLogin from '../routes/finishOAuthLogin';
+import finishSsoLogin from '../routes/finishSsoLogin';
+import generateImage from '../routes/generateImage';
+import getAddressProfile from '../routes/getAddressProfile';
+import getAddressStatus from '../routes/getAddressStatus';
+import getBannedAddresses from '../routes/getBannedAddresses';
+import { getChain } from '../routes/getChain';
+import { getChainContracts } from '../routes/getChainContracts';
+import { getChainEventServiceData } from '../routes/getChainEventServiceData';
+import { getChainNode } from '../routes/getChainNode';
+import getDiscordChannels from '../routes/getDiscordChannels';
+import getEntityMeta from '../routes/getEntityMeta';
+import getProfileNew from '../routes/getNewProfile';
+import getPolls from '../routes/getPolls';
+import getSnapshotProposal from '../routes/getSnapshotProposal';
+import { getSubscribedChains } from '../routes/getSubscribedChains';
+import getSupportedEthChains from '../routes/getSupportedEthChains';
+import getThreadsOld from '../routes/getThreads';
+import getTokenForum from '../routes/getTokenForum';
+import { getTokensFromLists } from '../routes/getTokensFromLists';
+
+import getUploadSignature from '../routes/getUploadSignature';
+import ipfsPin from '../routes/ipfsPin';
+import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
+import logout from '../routes/logout';
+import markNotificationsRead from '../routes/markNotificationsRead';
+import orderTopics from '../routes/orderTopics';
+
+import {
+  createCommunityContractTemplateAndMetadata,
+  deleteCommunityContractTemplate,
+  deleteCommunityContractTemplateMetadata,
+  getCommunityContractTemplate,
+  getCommunityContractTemplateMetadata,
+  updateCommunityContractTemplate,
+  updateCommunityContractTemplateMetadata,
+} from '../routes/proposalTemplate';
+import reactionsCounts from '../routes/reactionsCounts';
 
 import createRule from '../routes/rules/createRule';
 import deleteRule from '../routes/rules/deleteRule';
 import getRuleTypes from '../routes/rules/getRuleTypes';
-
-import createWebhook from '../routes/webhooks/createWebhook';
-import updateWebhook from '../routes/webhooks/updateWebhook';
-import deleteWebhook from '../routes/webhooks/deleteWebhook';
-import getWebhooks from '../routes/webhooks/getWebhooks';
-import type ViewCountCache from '../util/viewCountCache';
-import updateChainCategory from '../routes/updateChainCategory';
-import updateChainCustomDomain from '../routes/updateChainCustomDomain';
-import updateChainPriority from '../routes/updateChainPriority';
+import searchComments from '../routes/searchComments';
+import searchDiscussions from '../routes/searchDiscussions';
+import selectChain from '../routes/selectChain';
+import sendFeedback from '../routes/sendFeedback';
+import setAddressWallet from '../routes/setAddressWallet';
+import setDefaultRole from '../routes/setDefaultRole';
+import setDiscordBotConfig from '../routes/setDiscordBotConfig';
+import setProjectChain from '../routes/setProjectChain';
+import setTopicThreshold from '../routes/setTopicThreshold';
+import { sendMessage } from '../routes/snapshotAPI';
+import starCommunity from '../routes/starCommunity';
+import startEmailLogin from '../routes/startEmailLogin';
+import startOAuthLogin from '../routes/startOAuthLogin';
 
 import startSsoLogin from '../routes/startSsoLogin';
-import finishSsoLogin from '../routes/finishSsoLogin';
-import getEntityMeta from '../routes/getEntityMeta';
-import { getTokensFromLists } from '../routes/getTokensFromLists';
-import getTokenForum from '../routes/getTokenForum';
-import tokenBalance from '../routes/tokenBalance';
-import bulkBalances from '../routes/bulkBalances';
-import getSupportedEthChains from '../routes/getSupportedEthChains';
-import editSubstrateSpec from '../routes/editSubstrateSpec';
-import updateAddress from '../routes/updateAddress';
-import type { DB } from '../models';
-import { sendMessage } from '../routes/snapshotAPI';
-import ipfsPin from '../routes/ipfsPin';
-import setAddressWallet from '../routes/setAddressWallet';
-import setProjectChain from '../routes/setProjectChain';
-import type RuleCache from '../util/rules/ruleCache';
-import banAddress from '../routes/banAddress';
-import getBannedAddresses from '../routes/getBannedAddresses';
-import type BanCache from '../util/banCheckCache';
-import authCallback from '../routes/authCallback';
-import viewChainIcons from '../routes/viewChainIcons';
+import status from '../routes/status';
+import createSubscription from '../routes/subscription/createSubscription';
+import deleteSubscription from '../routes/subscription/deleteSubscription';
+import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
+import disableSubscriptions from '../routes/subscription/disableSubscriptions';
+import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
+import enableSubscriptions from '../routes/subscription/enableSubscriptions';
 
-import { addExternalRoutes } from './external';
-import generateImage from '../routes/generateImage';
-import { getChainEventServiceData } from '../routes/getChainEventServiceData';
-import { getChain } from '../routes/getChain';
-import { getChainNode } from '../routes/getChainNode';
-import { getChainContracts } from '../routes/getChainContracts';
-import { getSubscribedChains } from '../routes/getSubscribedChains';
-import type GlobalActivityCache from '../util/globalActivityCache';
-import type DatabaseValidationService from '../middleware/databaseValidationService';
-import createDiscordBotConfig from '../routes/createDiscordBotConfig';
-import setDiscordBotConfig from '../routes/setDiscordBotConfig';
-import getDiscordChannels from '../routes/getDiscordChannels';
-import getSnapshotProposal from '../routes/getSnapshotProposal';
-
-import {
-  createCommunityContractTemplateAndMetadata,
-  getCommunityContractTemplate,
-  updateCommunityContractTemplate,
-  deleteCommunityContractTemplate,
-  getCommunityContractTemplateMetadata,
-  updateCommunityContractTemplateMetadata,
-  deleteCommunityContractTemplateMetadata,
-} from '../routes/proposalTemplate';
+import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import { createTemplate, getTemplates } from '../routes/templates';
+import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
+import tokenBalance from '../routes/tokenBalance';
+import updateAddress from '../routes/updateAddress';
+import updateBanner from '../routes/updateBanner';
+import updateChain from '../routes/updateChain';
+import updateChainCategory from '../routes/updateChainCategory';
+import updateChainCustomDomain from '../routes/updateChainCustomDomain';
+import updateChainEntityTitle from '../routes/updateChainEntityTitle';
+import updateChainPriority from '../routes/updateChainPriority';
+import updateEmail from '../routes/updateEmail';
+import updateLinkedThreads from '../routes/updateLinkedThreads';
+import updateProfileNew from '../routes/updateNewProfile';
+import updateThreadLinkedChainEntities from '../routes/updateThreadLinkedChainEntities';
+import updateThreadLinkedSnapshotProposal from '../routes/updateThreadLinkedSnapshotProposal';
+import updateThreadPinned from '../routes/updateThreadPinned';
+import updateThreadPrivacy from '../routes/updateThreadPrivacy';
+import updateThreadStage from '../routes/updateThreadStage';
+import updateTopic from '../routes/updateTopic';
+import updateVote from '../routes/updateVote';
+import upgradeMember from '../routes/upgradeMember';
+import verifyAddress from '../routes/verifyAddress';
+import viewChainIcons from '../routes/viewChainIcons';
+import viewComments from '../routes/viewComments';
+import viewCount from '../routes/viewCount';
+import viewGlobalActivity from '../routes/viewGlobalActivity';
+import viewNotifications, { NotificationCategories, } from '../routes/viewNotifications';
+import viewReactions from '../routes/viewReactions';
+import viewUserActivity from '../routes/viewUserActivity';
+import viewVotes from '../routes/viewVotes';
 
-import { addSwagger } from './addSwagger';
-import * as controllers from '../controller';
+import createWebhook from '../routes/webhooks/createWebhook';
+import deleteWebhook from '../routes/webhooks/deleteWebhook';
+import getWebhooks from '../routes/webhooks/getWebhooks';
+import updateWebhook from '../routes/webhooks/updateWebhook';
+import writeUserSetting from '../routes/writeUserSetting';
+import type BanCache from '../util/banCheckCache';
+import type GlobalActivityCache from '../util/globalActivityCache';
+import type RuleCache from '../util/rules/ruleCache';
+import type ViewCountCache from '../util/viewCountCache';
+import type { DB } from '../models';
 
 function setupRouter(
   endpoint: string,

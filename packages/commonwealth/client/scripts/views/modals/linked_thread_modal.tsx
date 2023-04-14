@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import { notifyError } from 'controllers/app/notifications';
 
 import 'modals/linked_thread_modal.scss';
+import React, { useState } from 'react';
+import app from 'state';
 
-import type { Thread } from 'models';
 import { ThreadSelector } from 'views/components/thread_selector';
+import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];

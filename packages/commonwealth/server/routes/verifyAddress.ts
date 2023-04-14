@@ -1,47 +1,20 @@
-import { Op } from 'sequelize';
-import { bech32 } from 'bech32';
-import bs58 from 'bs58';
-import { configure as configureStableStringify } from 'safe-stable-stringify';
-
-import type { KeyringOptions } from '@polkadot/keyring/types';
-import { hexToU8a, stringToHex } from '@polkadot/util';
-import type { KeypairType } from '@polkadot/util-crypto/types';
-import * as ethUtil from 'ethereumjs-util';
-
-import {
-  recoverTypedSignature,
-  SignTypedDataVersion,
-} from '@metamask/eth-sig-util';
-
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 
-import type {
-  WalletId} from 'common-common/src/types';
-import {
-  ChainBase,
-  NotificationCategories
-} from 'common-common/src/types';
+import type { WalletId } from 'common-common/src/types';
+import { ChainBase, NotificationCategories } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
-
-import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
-import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
+import { configure as configureStableStringify } from 'safe-stable-stringify';
+import { Op } from 'sequelize';
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
-import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import verifySignature from '../util/verifySignature';
-import {
-  chainBaseToCanvasChain,
-  chainBaseToCanvasChainId,
-  constructCanvasMessage,
-} from '../../shared/adapters/shared';
-
-import type { SessionPayload } from '@canvas-js/interfaces';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

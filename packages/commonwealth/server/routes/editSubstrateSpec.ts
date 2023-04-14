@@ -1,7 +1,7 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import { ChainBase } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';

@@ -1,13 +1,10 @@
+import type { DB } from '../models';
 import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
-import type { DB } from '../models';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ChainAttributes, ChainInstance } from './chain';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type {
-  SocialAccountAttributes,
-  SocialAccountInstance,
-} from './social_account';
+import type { SocialAccountAttributes, SocialAccountInstance, } from './social_account';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'week' | 'never';

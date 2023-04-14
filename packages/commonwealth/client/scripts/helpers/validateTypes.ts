@@ -1,5 +1,5 @@
-import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 import { isAddress } from 'web3-utils';
+import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
 enum FormType {
   AddressRef = 'address-ref',

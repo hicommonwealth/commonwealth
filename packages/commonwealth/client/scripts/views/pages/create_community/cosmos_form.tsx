@@ -1,27 +1,20 @@
-import React, { useState } from 'react';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 
 // import { MixpanelCommunityCreationEvent } from 'analytics/types';
 // import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
 import 'pages/create_community.scss';
+import React, { useState } from 'react';
 
-import { initAppState } from 'state';
-import { ChainBase, ChainType } from 'common-common/src/types';
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import app from 'state';
+import app, { initAppState } from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { IdRow, InputRow } from '../../components/metadata_rows';
 import { defaultChainRows } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
-} from './hooks';
+import { useChainFormDefaultFields, useChainFormIdFields, useChainFormState, useEthChainFormFields, } from './hooks';
 
 export const CosmosForm = () => {
   const [bech32Prefix, setBech32Prefix] = useState('');

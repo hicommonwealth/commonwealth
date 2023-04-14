@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-
-import 'sublayout.scss';
+import useForceRerender from 'hooks/useForceRerender';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
+
+import 'sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
 import { AppMobileMenus } from './app_mobile_menus';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { SublayoutHeader } from './sublayout_header';
-import useForceRerender from 'hooks/useForceRerender';
 
 type SublayoutProps = {
   hideFooter?: boolean;

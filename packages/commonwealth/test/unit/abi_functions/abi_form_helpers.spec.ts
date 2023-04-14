@@ -1,10 +1,5 @@
-import { assert, expect } from 'chai';
-import {
-  handleMappingAbiInputs,
-  processAbiInputsToDataTypes,
-  validateAbiInput,
-} from '../../../client/scripts/helpers/abi_form_helpers';
-import { BigNumber, ethers } from 'ethers';
+import { assert } from 'chai';
+import { handleMappingAbiInputs, validateAbiInput, } from '../../../client/scripts/helpers/abi_form_helpers';
 
 describe('validateAbiInput() unit tests', () => {
   it('should validate correct address args', () => {

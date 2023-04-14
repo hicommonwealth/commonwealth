@@ -1,11 +1,11 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import 'index.scss';
 
 import 'normalize.css'; // reset
-import 'shared.scss';
-import 'index.scss';
-import '../../static/fonts/fonts.css';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import 'react-toastify/dist/ReactToastify.css';
+import 'shared.scss';
+import '../../static/fonts/fonts.css';
 
 import App from './app';
 

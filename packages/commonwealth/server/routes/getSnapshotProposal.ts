@@ -1,5 +1,5 @@
-import type { Response } from 'express';
 import type { DB } from '../models';
+import type { Response } from 'express';
 import type { TypedRequestQuery } from '../types';
 import fetchNewSnapshotProposal from '../util/fetchSnapshot';
 

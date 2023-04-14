@@ -1,25 +1,20 @@
-import React, { useEffect } from 'react';
-
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 
 import 'modals/new_topic_modal.scss';
+import { useCommonNavigate } from 'navigation/helpers';
+import type { DeltaStatic } from 'quill';
+import React, { useEffect } from 'react';
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { useCommonNavigate } from 'navigation/helpers';
-import type { DeltaStatic } from 'quill';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  ReactQuillEditor,
-} from '../components/react_quill_editor';
+import { createDeltaFromText, getTextFromDelta, ReactQuillEditor, } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
 
 type NewTopicModalProps = {

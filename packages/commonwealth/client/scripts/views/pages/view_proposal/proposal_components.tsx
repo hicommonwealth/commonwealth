@@ -1,21 +1,13 @@
-import React from 'react';
-
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import 'pages/view_proposal/proposal_components.scss';
+import React from 'react';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  getStatusClass,
-  getStatusText,
-} from '../../components/proposal_card/helpers';
+import { getStatusClass, getStatusText, } from '../../components/proposal_card/helpers';
 import { cancelProposal } from '../../components/proposals/helpers';
-import {
-  BlockExplorerLink,
-  ThreadLink,
-  VotingInterfaceLink,
-} from './proposal_header_links';
+import { BlockExplorerLink, ThreadLink, VotingInterfaceLink, } from './proposal_header_links';
 
 type BaseCancelButtonProps = {
   onModalClose?: () => void;

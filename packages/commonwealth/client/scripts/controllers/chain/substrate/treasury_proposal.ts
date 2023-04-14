@@ -1,21 +1,11 @@
 import type { ApiPromise } from '@polkadot/api';
-import type {
-  ISubstrateTreasuryProposal,
-  SubstrateCoin,
-} from 'adapters/chain/substrate/types';
+import type { ISubstrateTreasuryProposal, SubstrateCoin, } from 'adapters/chain/substrate/types';
 import { formatCoin } from 'adapters/currency';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
-import type {
-  BinaryVote,
-  ChainEntity,
-  ChainEvent,
-  ITXModalData,
-  ProposalEndTime,
-} from 'models';
-import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
-import type SubstrateAccounts from './account';
-import type { SubstrateAccount } from './account';
+import type { BinaryVote, ChainEntity, ChainEvent, ITXModalData, ProposalEndTime, } from 'models';
+import { ProposalStatus, VotingType, VotingUnit } from '../../../models/types';
+import type SubstrateAccounts, { SubstrateAccount } from './account';
 import type SubstrateChain from './shared';
 import type SubstrateTreasury from './treasury';
 

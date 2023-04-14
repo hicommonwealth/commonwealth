@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
 
-import type { Thread, Topic } from 'models';
 
 import 'pages/overview/index.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
+import type Thread from '../../../models/Thread';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -13,8 +15,6 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './topic_summary_row';
-import { useCommonNavigate } from 'navigation/helpers';
-import useForceRerender from 'hooks/useForceRerender';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();

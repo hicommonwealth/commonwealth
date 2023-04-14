@@ -1,25 +1,20 @@
-import React, { useEffect, useState } from 'react';
-
 import { ChainNetwork, ProposalType } from 'common-common/src/types';
-import {
-  chainToProposalSlug,
-  proposalSlugToClass,
-  proposalSlugToFriendlyName,
-} from 'identifiers';
-import type { ProposalModule } from 'models';
+import useForceRerender from 'hooks/useForceRerender';
+import { chainToProposalSlug, proposalSlugToClass, proposalSlugToFriendlyName, } from 'identifiers';
 
 import 'pages/new_proposal/index.scss';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
+import type ProposalModule from '../../../models/ProposalModule';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';
 import { AaveProposalForm } from './aave_proposal_form';
 import { CompoundProposalForm } from './compound_proposal_form';
 import { CosmosProposalForm } from './cosmos_proposal_form';
 import { SputnikProposalForm } from './sputnik_proposal_form';
-import useForceRerender from 'hooks/useForceRerender';
 
 type NewProposalPageProps = {
   type: ProposalType;

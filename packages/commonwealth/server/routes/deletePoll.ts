@@ -1,12 +1,10 @@
-import { AppError, ServerError } from 'common-common/src/errors';
-import moment from 'moment';
-import { getNextPollEndingTime } from '../../shared/utils';
 import type { DB } from '../models';
-import { findOneRole } from '../util/roles';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { Op } from 'sequelize';
 import type { ValidateChainParams } from '../middleware/validateChain';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { Op } from 'sequelize';
+import { findOneRole } from '../util/roles';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',

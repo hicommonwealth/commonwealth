@@ -15,7 +15,7 @@ export enum ThreadKind {
 }
 
 // TODO: this list should be shared with the server
-export enum ThreadStage {
+export enum ThreadStageType {
   Discussion = 'discussion',
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',

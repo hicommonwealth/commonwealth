@@ -1,18 +1,17 @@
-import React from 'react';
-
-import { AddressInfo } from 'models';
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/search/search_bar_components.scss';
+import React from 'react';
 
 import app from 'state';
+import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import { User } from '../../components/user/user';
-import { useCommonNavigate } from 'navigation/helpers';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { User } from '../../components/user/user';
 
 type SearchChipProps = {
   isActive: boolean;

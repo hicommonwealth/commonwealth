@@ -1,6 +1,7 @@
 import { byAscendingCreationDate } from '../helpers';
-import type { AnyProposal } from '../models';
-import { AbridgedThread, Comment, Proposal, Reaction, Thread } from '../models';
+import AbridgedThread from '../models/AbridgedThread';
+import Thread from '../models/Thread';
+import type { AnyProposal } from '../models/types';
 import IdStore from './IdStore';
 
 class ReactionStore extends IdStore<Reaction> {

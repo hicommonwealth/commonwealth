@@ -1,20 +1,16 @@
-import React from 'react';
+import { handleRedirectClicks } from 'helpers';
 
 import { _DEPRECATED_getRoute } from 'mithrilInterop';
-import { handleRedirectClicks } from 'helpers';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 import app from 'state';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
+import { Modal } from '../component_kit/cw_modal';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
-import type {
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-  ToggleTree,
-} from './types';
-import { Modal } from '../component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
+import type { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree, } from './types';
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(

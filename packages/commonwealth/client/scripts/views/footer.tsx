@@ -1,9 +1,8 @@
+import 'footer.scss';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 
-import 'footer.scss';
-
 import { isNotUndefined } from '../helpers/typeGuards';
-import { useCommonNavigate } from 'navigation/helpers';
 
 const footercontents = [
   { text: 'About', redirectTo: '/whyCommonwealth' },

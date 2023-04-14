@@ -1,38 +1,29 @@
-import React, { useEffect, useState } from 'react';
-
 import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
-import AaveProposal, {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
+import AaveProposal, { AaveProposalVote, } from 'controllers/chain/ethereum/aave/proposal';
 import type EthereumAccount from 'controllers/chain/ethereum/account';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
-import CompoundProposal, {
-  BravoVote,
-  CompoundProposalVote,
-} from 'controllers/chain/ethereum/compound/proposal';
+import CompoundProposal, { BravoVote, CompoundProposalVote, } from 'controllers/chain/ethereum/compound/proposal';
 import type { NearAccount } from 'controllers/chain/near/account';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import {
-  NearSputnikVote,
-  NearSputnikVoteString,
-} from 'controllers/chain/near/sputnik/types';
-import type { AnyProposal } from 'models';
-import { VotingType } from 'models';
+import { NearSputnikVote, NearSputnikVoteString, } from 'controllers/chain/near/sputnik/types';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import React, { useEffect, useState } from 'react';
 
-import app, { LoginState } from 'state';
+import app from 'state';
+import type { AnyProposal } from '../../../models/types';
+import { VotingType } from '../../../models/types';
 
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 
 type CannotVoteProps = { label: string };
 

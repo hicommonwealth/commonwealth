@@ -1,8 +1,4 @@
-import {
-  AaveTypes,
-  CompoundTypes,
-  SubstrateTypes,
-} from 'chain-events/src/types';
+import { AaveTypes, CompoundTypes, SubstrateTypes, } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts

@@ -1,23 +1,20 @@
-import React, { useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'components/header/notifications_menu.scss';
+import { byDescendingCreationDate } from 'helpers';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
+import { Virtuoso } from 'react-virtuoso';
 
 import app from 'state';
-import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWButton } from '../components/component_kit/cw_button';
-import {
-  Popover,
-  usePopover,
-} from '../components/component_kit/cw_popover/cw_popover';
 import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
+import { Popover, usePopover, } from '../components/component_kit/cw_popover/cw_popover';
 import { CWText } from '../components/component_kit/cw_text';
-import { useCommonNavigate } from 'navigation/helpers';
-import { NotificationRow } from '../pages/notifications/notification_row';
 import { isWindowSmallInclusive } from '../components/component_kit/helpers';
-import { byDescendingCreationDate } from 'helpers';
+import { NotificationRow } from '../pages/notifications/notification_row';
 
 export const NotificationsMenu = () => {
   const navigate = useCommonNavigate();

@@ -2,29 +2,29 @@
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
 import type BN from 'bn.js';
 import chai from 'chai';
 import 'chai/register-should';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { BalanceType, ChainNetwork } from 'common-common/src/types';
+import { PermissionManager } from 'commonwealth/shared/permissions';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
+import { constructCanvasMessage } from 'shared/adapters/shared';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
-import { constructCanvasMessage } from 'shared/adapters/shared';
-import { PermissionManager } from 'commonwealth/shared/permissions';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { Permission } from '../../server/models/role';
 
 import {
   constructTypedCanvasMessage,
-  TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
+  TEST_BLOCK_INFO_STRING,
 } from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));

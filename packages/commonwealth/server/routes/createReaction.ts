@@ -1,17 +1,13 @@
+import type { DB } from '../models';
 /* eslint-disable prefer-const */
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-} from 'common-common/src/types';
+import { ChainNetwork, ChainType, NotificationCategories, } from 'common-common/src/types';
 /* eslint-disable dot-notation */
 import type { NextFunction, Request, Response } from 'express';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getThreadUrl } from '../../shared/utils';
-import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 import { mixpanelTrack } from '../util/mixpanelUtil';

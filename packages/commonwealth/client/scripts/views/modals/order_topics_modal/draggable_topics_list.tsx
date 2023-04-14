@@ -1,12 +1,11 @@
+import { StrictModeDroppable } from 'lib/react-beautiful-dnd';
 import React, { useEffect, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
 import type { DraggableProvided } from 'react-beautiful-dnd';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
-import { StrictModeDroppable } from 'lib/react-beautiful-dnd';
-
-import type { Topic } from 'models';
-import { CWText } from 'views/components/component_kit/cw_text';
+import { Virtuoso } from 'react-virtuoso';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+
+import { CWText } from 'views/components/component_kit/cw_text';
 
 const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
   const result = Array.from(list);

@@ -1,8 +1,8 @@
-import { Route } from 'react-router-dom';
+import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
+import { Route } from 'react-router-dom';
 
 import { withLayout } from 'views/layout';
-import { Navigate } from 'navigation/helpers';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 

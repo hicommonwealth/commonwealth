@@ -1,10 +1,7 @@
-import 'chai/register-should';
 import chai from 'chai';
+import 'chai/register-should';
 import type { GetProfilesReq } from 'common-common/src/api/extApiTypes';
-import {
-  testAddresses,
-  testProfiles,
-} from 'test/integration/api/external/dbEntityHooks.spec';
+import { testAddresses, testProfiles, } from 'test/integration/api/external/dbEntityHooks.spec';
 import { get } from './appHook.spec';
 
 describe('getProfiles Tests', () => {

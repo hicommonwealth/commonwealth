@@ -1,8 +1,8 @@
-import React from 'react';
 import { PopperUnstyled } from '@mui/base';
 import type { Placement } from '@popperjs/core/lib';
 
 import { uuidv4 } from 'lib/util';
+import React from 'react';
 
 export type AnchorType = HTMLElement | SVGSVGElement;
 

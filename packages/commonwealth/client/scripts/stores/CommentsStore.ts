@@ -1,6 +1,5 @@
 import { byAscendingCreationDate } from '../helpers';
-import type { AbridgedThread } from '../models';
-import type { Comment } from '../models';
+import type AbridgedThread from '../models/AbridgedThread';
 import type Thread from '../models/Thread';
 import IdStore from './IdStore';
 

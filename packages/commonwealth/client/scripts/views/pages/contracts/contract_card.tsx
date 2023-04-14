@@ -1,21 +1,19 @@
-import { CWText } from 'views/components/component_kit/cw_text';
+import { useCommonNavigate } from 'navigation/helpers';
+
+import 'pages/contracts/contract_card.scss';
+import React, { useState } from 'react';
+
+import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { ContractTemplateCard } from './contract_template_card';
-import type { Contract } from '../../../models';
-
-import app from 'state';
-
-import 'pages/contracts/contract_card.scss';
-import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import React, { useState } from 'react';
-import type {
-  ManageContractTemplateModalProps,
-} from 'views/modals/manage_contract_template_modal';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import type { ManageContractTemplateModalProps, } from 'views/modals/manage_contract_template_modal';
 import ManageContractTemplateModal from 'views/modals/manage_contract_template_modal';
+import type { Contract } from '../../../models';
+import { ContractTemplateCard } from './contract_template_card';
 
 type ContractCardProps = {
   id: number;

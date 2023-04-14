@@ -1,8 +1,8 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
 import { CHAIN_EVENT_SERVICE_SECRET } from '../config';
-import type { DB } from '../models';
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',

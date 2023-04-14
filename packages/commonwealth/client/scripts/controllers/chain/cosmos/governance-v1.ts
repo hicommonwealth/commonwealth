@@ -1,33 +1,26 @@
 import type { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
-import type {
-  CosmosProposalState,
-  ICosmosProposal,
-  ICosmosProposalTally,
-} from 'controllers/chain/cosmos/types';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
-import type {
-  ProposalSDKType,
-  TallyResult} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import type { ProposalSDKType, TallyResult } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import {
   DepositParams,
   Proposal,
+  ProposalStatus,
   VotingParams,
 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any';
-import { ProposalStatus } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
+import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
+import type { CosmosProposalState, ICosmosProposal, ICosmosProposalTally, } from 'controllers/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
+import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 
-import type { ITXModalData } from 'models';
-import { ProposalModule } from 'models';
 import moment from 'moment';
+import type { ITXModalData } from '../../../models/interfaces';
+import ProposalModule from '../../../models/ProposalModule';
 import type CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
-import type CosmosChain from './chain';
-import type { CosmosApiType } from './chain';
+import type CosmosChain, { CosmosApiType } from './chain';
 import { CosmosProposal } from './proposal';
-import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 
 /** This file is a copy of controllers/chain/cosmos/governance.ts, modified for
  * gov module version v1. This is considered a patch to make sure v1-enabled chains

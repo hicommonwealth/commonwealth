@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from 'react';
-
 import { ProposalType } from 'common-common/src/types';
 
 import 'components/proposal_card/index.scss';
@@ -8,21 +6,17 @@ import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democr
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { isNotNil } from 'helpers/typeGuards';
 import { getProposalUrlPath } from 'identifiers';
-import type { AnyProposal } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import { slugify } from 'utils';
+import type { AnyProposal } from '../../../models/types';
 import { CWCard } from '../component_kit/cw_card';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
-import {
-  getPrimaryTagText,
-  getSecondaryTagText,
-  getStatusClass,
-  getStatusText,
-} from './helpers';
+import { getPrimaryTagText, getSecondaryTagText, getStatusClass, getStatusText, } from './helpers';
 import { ProposalTag } from './proposal_tag';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;

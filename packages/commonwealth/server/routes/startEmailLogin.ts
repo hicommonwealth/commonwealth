@@ -1,19 +1,20 @@
-import moment from 'moment';
-import type { Request, Response, NextFunction } from 'express';
-import {
-  SENDGRID_API_KEY,
-  LOGIN_RATE_LIMIT_MINS,
-  LOGIN_RATE_LIMIT_TRIES,
-  MAGIC_SUPPORTED_BASES,
-  MAGIC_DEFAULT_CHAIN,
-} from '../config';
-import { DynamicTemplate } from '../../shared/types';
+import type { DB } from '../models';
+import sgMail from '@sendgrid/mail';
+import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import { DynamicTemplate } from '../../shared/types';
+import {
+  LOGIN_RATE_LIMIT_MINS,
+  LOGIN_RATE_LIMIT_TRIES,
+  MAGIC_DEFAULT_CHAIN,
+  MAGIC_SUPPORTED_BASES,
+  SENDGRID_API_KEY,
+} from '../config';
 import validateChain from '../middleware/validateChain';
-import type { DB } from '../models';
-import { AppError } from 'common-common/src/errors';
-import sgMail from '@sendgrid/mail';
+
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
 

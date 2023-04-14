@@ -1,16 +1,10 @@
-import type {
-  ExternalProvider,
-  JsonRpcSigner,
-  Provider,
-  Web3Provider,
-} from '@ethersproject/providers';
+import type { ExternalProvider, JsonRpcSigner, Provider, Web3Provider, } from '@ethersproject/providers';
 import { ChainBase } from 'common-common/src/types';
 import type WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import type { Contract } from 'ethers';
 import { ethers } from 'ethers';
-import type { Account } from 'models';
 
 export type ContractFactoryT<ContractT> = (
   address: string,

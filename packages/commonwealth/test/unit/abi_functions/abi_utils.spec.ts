@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import {
   parseAbiItemsFromABI,
   parseEventFromABI,
@@ -7,7 +7,6 @@ import {
   parseFunctionsFromABI,
   parseWriteFunctionsFromABI,
 } from '../../../shared/abi_utils';
-import { BigNumber, ethers } from 'ethers';
 
 describe('parseAbiItemsFromABI() unit tests', () => {
   it('should properly parse abi items from abi', () => {

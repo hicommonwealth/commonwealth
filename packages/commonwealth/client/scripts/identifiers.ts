@@ -1,11 +1,7 @@
 import type { IChainEntityKind } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import type {
-  ChainInfo,
-  NotificationSubscription,
-  ProposalModule,
-} from 'models';
+import type { ChainInfo, NotificationSubscription, ProposalModule, } from 'models';
 import type { ProposalStore } from 'stores';
 import { requiresTypeSlug, slugify } from 'utils';
 import type ThreadsController from './controllers/server/threads';

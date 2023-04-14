@@ -1,6 +1,6 @@
-import type { IAccountsModule } from 'models';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import type { IAccountsModule } from '../../../models/interfaces';
 
 import SolanaAccount from './account';
 import type SolanaChain from './chain';

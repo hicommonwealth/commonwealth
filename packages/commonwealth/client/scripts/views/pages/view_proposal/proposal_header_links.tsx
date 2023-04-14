@@ -1,13 +1,12 @@
-import React from 'react';
-
-import 'pages/view_proposal/proposal_header_links.scss';
-
 import { ProposalType } from 'common-common/src/types';
 import { externalLink, extractDomain, link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import type { AnyProposal } from 'models';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { useCommonNavigate } from 'navigation/helpers';
+
+import 'pages/view_proposal/proposal_header_links.scss';
+import React from 'react';
+import type { AnyProposal } from '../../../models/types';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type ProposalHeaderLinkProps = {
   proposal: AnyProposal;

@@ -1,7 +1,4 @@
-import type {
-  GetBalanceProvidersReq,
-  GetBalanceProvidersResp,
-} from 'common-common/src/api/extApiTypes';
+import type { GetBalanceProvidersReq, GetBalanceProvidersResp, } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
 import type { DB } from 'server/models';
 import type { TokenBalanceCache } from 'token-balance-cache/src';

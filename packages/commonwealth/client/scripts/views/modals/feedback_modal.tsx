@@ -1,16 +1,16 @@
-import React from 'react';
-
-import { redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
+import { redraw } from 'mithrilInterop';
+
 import 'modals/feedback_modal.scss';
+import React from 'react';
 
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 type FeedbackModalProps = {
   onModalClose: () => void;

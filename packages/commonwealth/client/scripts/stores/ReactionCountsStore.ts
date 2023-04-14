@@ -1,7 +1,11 @@
-import type { AnyProposal, Reaction } from 'models';
-import { AbridgedThread, Comment, Proposal, Thread } from 'models';
 import type ReactionCount from 'models/ReactionCount';
 import IdStore from 'stores/IdStore';
+import AbridgedThread from '../models/AbridgedThread';
+import type CommentModel from '../models/CommentModel';
+import Proposal from '../models/Proposal';
+import type Reaction from '../models/Reaction';
+import Thread from '../models/Thread';
+import type { AnyProposal } from '../models/types';
 
 class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   private _storeRC: { [identifier: string]: ReactionCount<any> } = {};
@@ -42,7 +46,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   }
 
   public getByPost(
-    post: Thread | AbridgedThread | AnyProposal | Comment<any>
+    post: Thread | AbridgedThread | AnyProposal | CommentModel<any>
   ): ReactionCount<any> {
     const identifier = this.getPostIdentifier(post);
     return this._storeRC[identifier] || null;
@@ -57,7 +61,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   }
 
   public getPostIdentifier(
-    rxnOrPost: Reaction | Thread | AbridgedThread | AnyProposal | Comment<any>
+    rxnOrPost: Reaction | Thread | AbridgedThread | AnyProposal | CommentModel<any>
   ) {
     if (rxnOrPost instanceof Thread || rxnOrPost instanceof AbridgedThread) {
       return `discussion-${rxnOrPost.id}`;

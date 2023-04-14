@@ -1,10 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
-import type {
-  CommunityRoleAttributes,
-  CommunityRoleInstance,
-} from './community_role';
+import type { CommunityRoleAttributes, CommunityRoleInstance, } from './community_role';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type RoleAssignmentAttributes = {

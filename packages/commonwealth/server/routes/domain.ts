@@ -1,5 +1,5 @@
-import type { Request, Response } from 'express';
 import type { DB } from '../models';
+import type { Request, Response } from 'express';
 
 const domain = async (models: DB, req: Request, res: Response) => {
   const hostname = req.headers['x-forwarded-host'] || req.hostname;

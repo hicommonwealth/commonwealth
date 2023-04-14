@@ -1,10 +1,7 @@
-import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
 import BN from 'bn.js';
-import {
-  tokenBalanceCache,
-  tokenProvider,
-} from 'test/integration/api/external/cacheHooks.spec';
 import chai from 'chai';
+import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
+import { tokenBalanceCache, tokenProvider, } from 'test/integration/api/external/cacheHooks.spec';
 import { get } from './appHook.spec';
 
 describe('getTokenBalance Tests', async () => {

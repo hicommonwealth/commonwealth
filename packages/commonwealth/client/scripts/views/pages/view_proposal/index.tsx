@@ -1,26 +1,24 @@
-import React from 'react';
-
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent } from 'mithrilInterop';
-
-import app from 'state';
-import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import {
-  chainToProposalSlug,
-  getProposalUrlPath,
-  idToProposal,
-  proposalSlugToClass,
-} from 'identifiers';
-import type { AnyProposal, ProposalModule } from 'models';
-import { Account } from 'models';
+import { chainToProposalSlug, getProposalUrlPath, idToProposal, proposalSlugToClass, } from 'identifiers';
+
+import type { ResultNode } from 'mithrilInterop';
+import { ClassComponent } from 'mithrilInterop';
+import withRouter from 'navigation/helpers';
+import React from 'react';
+
+import app from 'state';
 
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
+import Account from '../../../models/Account';
+import type ProposalModule from '../../../models/ProposalModule';
+import type { AnyProposal } from '../../../models/types';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
@@ -31,8 +29,6 @@ import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
-import withRouter from 'navigation/helpers';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 
 type ProposalPrefetch = {
   [identifier: string]: {

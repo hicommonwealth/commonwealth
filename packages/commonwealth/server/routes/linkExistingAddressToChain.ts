@@ -1,14 +1,14 @@
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase } from 'common-common/src/types';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
 import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import type { DB } from '../models';
-import { createRole, findOneRole } from '../util/roles';
-import { factory, formatFilename } from 'common-common/src/logging';
 import assertAddressOwnership from '../util/assertAddressOwnership';
+import { createRole, findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 

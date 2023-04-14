@@ -1,32 +1,25 @@
-import React, { useEffect } from 'react';
-import { isAddress } from 'web3-utils';
-import { providers } from 'ethers';
-import $ from 'jquery';
-
-// import { MixpanelCommunityCreationEvent } from 'analytics/types';
-// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
-import 'pages/create_community.scss';
-
-import app from 'state';
-import { initAppState } from 'state';
 import { IERC721Metadata__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { providers } from 'ethers';
+import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
+
+// import { MixpanelCommunityCreationEvent } from 'analytics/types';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import 'pages/create_community.scss';
+import React, { useEffect } from 'react';
+
+import app, { initAppState } from 'state';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
+import { isAddress } from 'web3-utils';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { defaultChainRows, ethChainRows } from './chain_input_rows';
+import { useChainFormDefaultFields, useChainFormIdFields, useChainFormState, useEthChainFormFields, } from './hooks';
 import type { EthChainFormState } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
-import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
-} from './hooks';
 
 export const ERC721Form = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;

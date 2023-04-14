@@ -1,16 +1,16 @@
-import React from 'react';
+import { ChainBase } from 'common-common/src/types';
 
 import 'pages/new_contract/new_contract_page.scss';
+import React from 'react';
 
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import AddContractAndAbiForm from './add_contract_and_abi_form';
+import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWText } from 'views/components/component_kit/cw_text';
+import Sublayout from '../../sublayout';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
+import AddContractAndAbiForm from './add_contract_and_abi_form';
 
 const NewContractPage = () => {
   // Payable functions are not supported in this implementation

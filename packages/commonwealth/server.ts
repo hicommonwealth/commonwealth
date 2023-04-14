@@ -1,8 +1,6 @@
 import bodyParser from 'body-parser';
-import {
-  getRabbitMQConfig,
-  RabbitMQController,
-} from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { getRabbitMQConfig, RabbitMQController, } from 'common-common/src/rabbitmq';
 import { StatsDController } from 'common-common/src/statsd';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -18,15 +16,12 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import * as v8 from 'v8';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
-import {
-  RABBITMQ_URI,
-  ROLLBAR_SERVER_TOKEN,
-  SESSION_SECRET,
-} from './server/config';
+import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN, SESSION_SECRET, } from './server/config';
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
@@ -47,8 +42,6 @@ import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
-import * as v8 from 'v8';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack

@@ -1,23 +1,22 @@
 /* eslint-disable no-script-url */
-import React, { useEffect } from 'react';
-
-import { link } from 'helpers';
+import { ChainBase } from 'common-common/src/types';
 
 import 'components/user/user.scss';
 
+import { link } from 'helpers';
+import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect } from 'react';
+
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import type { Account } from 'models';
-import { AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
+import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
-import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
+import { CWButton } from '../component_kit/cw_button';
+import { Modal } from '../component_kit/cw_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
-import { Modal } from '../component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
-import useForceRerender from 'hooks/useForceRerender';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length

@@ -1,17 +1,11 @@
-import 'chai/register-should';
-import models from 'server/database';
 import chai from 'chai';
 import 'chai/register-should';
-import { req, res } from 'test/unit/unitHelpers';
 import type { GetThreadsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
-import 'test/integration/api/external/dbEntityHooks.spec';
-import {
-  testComments,
-  testThreads,
-} from 'test/integration/api/external/dbEntityHooks.spec';
 import type { ThreadAttributes } from 'server/models/thread';
 import { get } from 'test/integration/api/external/appHook.spec';
+import 'test/integration/api/external/dbEntityHooks.spec';
+import { testComments, testThreads, } from 'test/integration/api/external/dbEntityHooks.spec';
 
 describe('getThreads Tests', () => {
   it('should return threads with specified community_id correctly', async () => {

@@ -1,7 +1,4 @@
-import type {
-  Chain as CanvasChain,
-  SessionPayload,
-} from '@canvas-js/interfaces';
+import type { Chain as CanvasChain, SessionPayload, } from '@canvas-js/interfaces';
 import { ChainBase } from 'common-common/src/types';
 
 /// An object with an identifier.

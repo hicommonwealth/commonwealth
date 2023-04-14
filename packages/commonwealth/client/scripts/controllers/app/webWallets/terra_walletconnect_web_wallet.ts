@@ -1,12 +1,9 @@
-import type {
-  ConnectedWallet,
-  WalletController,
-} from '@terra-money/wallet-controller';
 import type { SessionPayload } from '@canvas-js/interfaces';
+import type { ConnectedWallet, WalletController, } from '@terra-money/wallet-controller';
 
-import type { Account, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
+import type IWebWallet from '../../../models/IWebWallet';
 
 // TODO: ensure this only opens on mobile
 

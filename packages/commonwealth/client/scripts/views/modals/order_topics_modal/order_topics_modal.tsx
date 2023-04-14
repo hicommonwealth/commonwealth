@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import { notifyError } from 'controllers/app/notifications';
 
 import 'modals/order_topics_modal.scss';
-
-import { notifyError } from 'controllers/app/notifications';
-import type { Topic } from 'models';
+import React, { useState } from 'react';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
