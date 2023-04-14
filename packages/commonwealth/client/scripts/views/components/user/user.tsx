@@ -33,7 +33,7 @@ type UserAttrs = {
   avatarSize?: number;
   hideAvatar?: boolean;
   linkify?: boolean;
-  onclick?: any;
+  onClick?: any;
   popover?: boolean;
   showAddressWithDisplayName?: boolean; // show address inline with the display name
   showRole?: boolean;
@@ -48,6 +48,7 @@ export const User = (props: UserAttrs) => {
     showAddressWithDisplayName,
     user,
     linkify,
+    onClick,
     popover,
     showRole,
   } = props;
@@ -163,6 +164,10 @@ export const User = (props: UserAttrs) => {
     </>
   );
 
+  const handleClick = () => {
+    navigate(`/profile/id/${profile.id}`, {}, null);
+  };
+
   const userFinal = avatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
       {!profile
@@ -206,7 +211,7 @@ export const User = (props: UserAttrs) => {
                 )}
                 {getRoleTags(false)}
               </>,
-              () => navigate(`/profile/id/${profile.id}`, {}, null)
+              handleClick
             )
           ) : (
             <a className="user-display-name username">
@@ -286,7 +291,7 @@ export const User = (props: UserAttrs) => {
                   </div>
                 </React.Fragment>
               ),
-              () => navigate(`/profile/id/${profile.id}`, {}, null)
+              () => handleClick
             )}
         </div>
         {profile?.address && (
@@ -336,7 +341,7 @@ export const User = (props: UserAttrs) => {
       onMouseEnter={popoverProps.handleInteraction}
       onMouseLeave={popoverProps.handleInteraction}
     >
-      {userFinal}
+      <div onClick={onClick}>{userFinal}</div>
       <Popover content={userPopover} {...popoverProps} />
     </div>
   ) : (
