@@ -1,9 +1,5 @@
 import React from 'react';
 
-import {
-  chainBasetoCanvasChain,
-  constructCanvasMessage,
-} from 'adapters/shared';
 import _ from 'lodash';
 import app, { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
