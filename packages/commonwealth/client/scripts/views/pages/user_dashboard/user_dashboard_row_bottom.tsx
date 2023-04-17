@@ -28,13 +28,13 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const forceRerender = useForceRerender();
 
   const setSubscription = async (
-    threadId: string,
+    subThreadId: string,
     bothActive: boolean,
     commentSubscription: NotificationSubscription,
     reactionSubscription: NotificationSubscription
   ) => {
     await subscribeToThread(
-      threadId,
+      subThreadId,
       bothActive,
       commentSubscription,
       reactionSubscription

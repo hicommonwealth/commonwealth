@@ -16,7 +16,7 @@
     "format-check": "prettier --check .",
     "format": "prettier --write .",
     "lint": "./scripts/lint-new-work.sh",
-    "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.ts'",
+    "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
     "lint-branch": "./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*"
   },
