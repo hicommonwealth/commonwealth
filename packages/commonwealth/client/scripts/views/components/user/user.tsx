@@ -33,6 +33,7 @@ type UserAttrs = {
   avatarSize?: number;
   hideAvatar?: boolean;
   linkify?: boolean;
+  onClick?: (e: any) => void;
   popover?: boolean;
   showAddressWithDisplayName?: boolean; // show address inline with the display name
   showRole?: boolean;
@@ -47,6 +48,7 @@ export const User = (props: UserAttrs) => {
     showAddressWithDisplayName,
     user,
     linkify,
+    onClick,
     popover,
     showRole,
   } = props;
@@ -162,8 +164,12 @@ export const User = (props: UserAttrs) => {
     </>
   );
 
-  const handleClick = () => {
-    navigate(`/profile/id/${profile.id}`, {}, null);
+  const handleClick = (e: any) => {
+    if (onClick) {
+      onClick(e);
+    } else {
+      navigate(`/profile/id/${profile.id}`, {}, null);
+    }
   };
 
   const userFinal = avatarOnly ? (
@@ -289,7 +295,7 @@ export const User = (props: UserAttrs) => {
                   </div>
                 </React.Fragment>
               ),
-              () => handleClick
+              handleClick
             )}
         </div>
         {profile?.address && (
