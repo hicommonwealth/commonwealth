@@ -3,6 +3,7 @@ import React, { lazy } from 'react';
 
 import { withLayout } from 'views/layout';
 import { Navigate } from 'navigation/helpers';
+import { featureFlags } from 'helpers/feature-flags';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 
@@ -209,39 +210,43 @@ const customDomainRoutes = () => {
     // DISCUSSIONS END
 
     // CONTRACTS
-    <Route
-      path="/contracts"
-      element={withLayout(ContractsPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />,
-    <Route
-      path="/new/contract"
-      element={withLayout(NewContractPage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />,
-    <Route
-      path="/new/contract_template/:contract_id"
-      element={withLayout(NewContractTemplatePage, {
-        scoped: true,
-        deferChain: true,
-      })}
-    />,
-    <Route
-      path="/contract/:contractAddress"
-      element={withLayout(GeneralContractPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
-      path="/:contract_address/:slug"
-      element={withLayout(ViewTemplatePage, {
-        scoped: true,
-      })}
-    />,
+    ...(featureFlags.proposalTemplates
+      ? [
+          <Route
+            path="/contracts"
+            element={withLayout(ContractsPage, {
+              scoped: true,
+              deferChain: true,
+            })}
+          />,
+          <Route
+            path="/new/contract"
+            element={withLayout(NewContractPage, {
+              scoped: true,
+              deferChain: true,
+            })}
+          />,
+          <Route
+            path="/new/contract_template/:contract_id"
+            element={withLayout(NewContractTemplatePage, {
+              scoped: true,
+              deferChain: true,
+            })}
+          />,
+          <Route
+            path="/contract/:contractAddress"
+            element={withLayout(GeneralContractPage, {
+              scoped: true,
+            })}
+          />,
+          <Route
+            path="/:contract_address/:slug"
+            element={withLayout(ViewTemplatePage, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     // CONTRACTS END
 
     // TREASURY
