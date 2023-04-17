@@ -14,8 +14,8 @@
 FROM golang:1.19-alpine AS build-env
 
 # Install minimum necessary dependencies
-ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3
-RUN apk add --no-cache $PACKAGES
+ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3 py3-pip build-base
+RUN apk add --no-cache $PACKAGES && apk add --update ca-certificates 
 
 # Set working directory for the build
 WORKDIR /go/src/github.com/cosmos
@@ -26,17 +26,12 @@ RUN curl -sSL https://github.com/cosmos/cosmos-sdk/archive/refs/tags/v0.46.11.ta
 
 WORKDIR /go/src/github.com/cosmos/cosmos-sdk
 # Build the binary
-RUN make build-linux
+# Copy over binaries from the build-env
+RUN make build-linux \
+    && cp /go/src/github.com/cosmos/cosmos-sdk/build/simd /usr/bin/simd
 
-# Final image
-FROM alpine:edge
-
-# Install ca-certificates
-RUN apk add --update ca-certificates && apk add curl
 WORKDIR /root
 
-# Copy over binaries from the build-env
-COPY --from=build-env /go/src/github.com/cosmos/cosmos-sdk/build/simd /usr/bin/simd
 # ADD https://simd-binary.s3.amazonaws.com/simd /usr/bin/simd
 # COPY simd /usr/bin/simd
 

@@ -12,6 +12,6 @@ PORT=5050
 IMAGE_NAME=heroku-bin-csdk
 
 cd $SCRIPT_DIR
-docker build -t ${IMAGE_NAME} -f Dockerfile.local --no-cache .
+docker build -t ${IMAGE_NAME} -f Dockerfile --no-cache .
 docker run -p 5050:5050 -e PORT=${PORT} ${IMAGE_NAME}
   
