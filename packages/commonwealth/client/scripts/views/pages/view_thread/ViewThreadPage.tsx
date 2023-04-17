@@ -1,5 +1,5 @@
 import { ProposalType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
@@ -20,7 +20,6 @@ import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { CollapsibleThreadBody } from '../../components/collapsible_body_text';
 import { CommentsTree } from '../../components/comments/comments_tree';
 import { CreateComment } from '../../components/comments/create_comment';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
@@ -44,6 +43,8 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -158,7 +159,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         notifyError('Thread not found');
         setThreadFetchFailed(true);
       });
-  }, [thread, threadId]);
+  }, [threadId]);
 
   useEffect(() => {
     if (!thread) {
@@ -252,7 +253,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         },
       }));
     }
-  }, [prefetch, thread, threadId, threadId]);
+  }, [prefetch, thread, threadId]);
 
   useEffect(() => {
     if (!initializedComments) {
@@ -379,7 +380,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [threadDoesNotMatch]);
 
   useEffect(() => {
-    if (comments?.length > 0) {
+    if (thread?.id && comments?.length > 0) {
       const mismatchedComments = comments.filter((c) => {
         return c.threadId !== thread.id;
       });
@@ -394,7 +395,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }));
       }
     }
-  }, [comments, threadId, threadId]);
+  }, [comments, thread, threadId]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -514,7 +515,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setThread(newThread);
   };
 
-  const getActionMenuItems = () => {
+  const getActionMenuItems = (): PopoverMenuItem[] => {
     return [
       ...(hasEditPerms && !thread.readOnly
         ? [
@@ -597,6 +598,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     setIsGloballyEditing(false);
                     setIsEditingBody(false);
                     setRecentlyEdited(true);
+                    notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
                   });
               },
             },
@@ -688,7 +690,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               </>
             ) : (
               <>
-                <CollapsibleThreadBody thread={thread} />
+                <QuillRenderer doc={thread.body} cutoffLines={50} />
                 {thread.readOnly ? (
                   <CWText type="h5" className="callout-text">
                     Commenting is disabled because this post has been locked.

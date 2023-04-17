@@ -57,7 +57,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             items.push({
               label: `New ${cct.cctmd.nickname}`,
               iconLeft: 'star',
-              onclick: () =>
+              onClick: () =>
                 navigate(`/${contract.address}/${slugWithSlashRemoved}`),
             });
           }

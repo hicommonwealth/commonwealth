@@ -13,7 +13,7 @@ import { pluralize } from 'helpers';
 import { User } from 'views/components/user/user';
 import { getThreadUrl, getCommunityUrl } from 'utils';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
-import { QuillFormattedText } from '../../components/quill/quill_formatted_text';
+import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
 
 const jumpHighlightNotification = (
   commentId,

@@ -22,8 +22,11 @@ type ContractTemplateCardProps = {
   slug: string;
   display: string;
   cctmd_id: number;
+  cct_id: number;
+  onUpdateSuccess: () => void;
   handleShowModal: (
     templateId: number,
+    cct_id: number,
     template: Omit<ManageContractTemplateModalProps['template'], 'id' | 'title'>
   ) => void;
 };
@@ -49,11 +52,13 @@ export const ContractTemplateCard = ({
   contractId,
   cctmd_id,
   id: templateId,
+  cct_id,
   handleShowModal,
+  onUpdateSuccess,
   ...templateInfo
 }: ContractTemplateCardProps) => {
   const handleEditTemplate = async () => {
-    handleShowModal(contractId, templateInfo);
+    handleShowModal(templateId, cct_id, templateInfo);
   };
 
   const handleDeleteTemplate = () => {
@@ -75,6 +80,7 @@ export const ContractTemplateCard = ({
               template_id: templateId,
               cctmd_id,
             });
+            onUpdateSuccess();
           },
         },
         {

@@ -1,9 +1,10 @@
 declare let window: any;
 
+import bs58 from 'bs58';
+import type { SessionPayload } from '@canvas-js/interfaces';
+
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
-import app from 'state';
+import { Account, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -33,7 +34,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   }
 
   public getChainId() {
-    return app.chain?.id || this.defaultNetwork;
+    return 'mainnet';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,19 +44,17 @@ class PhantomWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
+    const canvas = await import('@canvas-js/interfaces');
     const encodedMessage = new TextEncoder().encode(
-      JSON.stringify(canvasMessage)
+      canvas.serializeSessionPayload(canvasMessage)
     );
     const { signature } = await window.solana.signMessage(
       encodedMessage,
       'utf8'
     );
-    const signedMessage = Buffer.from(signature as Uint8Array).toString(
-      'base64'
-    );
-    return signedMessage;
+    return bs58.encode(signature as Uint8Array);
   }
 
   // ACTIONS
@@ -68,7 +67,10 @@ class PhantomWebWalletController implements IWebWallet<string> {
     }
     try {
       const resp = await window.solana.connect();
-      const key = (await resp.publicKey()).toString();
+      const key =
+        typeof resp.publicKey === 'function'
+          ? (await resp.publicKey()).toString()
+          : resp.publicKey.toString();
       this._accounts = [key];
       this._enabling = false;
       this._enabled = true;

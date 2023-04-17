@@ -21,7 +21,6 @@ import { Account } from 'models';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
@@ -33,6 +32,7 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import withRouter from 'navigation/helpers';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -153,7 +153,9 @@ class ViewProposalPageComponent extends ClassComponent<ViewProposalPageAttrs> {
           `${proposalId}-${slugify(this.proposal.title)}`,
           true
         ),
-        { replace: true }
+        {
+          replace: true,
+        }
       );
     }
 

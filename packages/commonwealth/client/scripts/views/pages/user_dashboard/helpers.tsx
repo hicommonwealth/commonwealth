@@ -7,9 +7,9 @@ import $ from 'jquery';
 import type { NotificationSubscription } from 'models';
 
 import app from 'state';
-import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
-import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { DashboardViews } from '.';
+import { QuillFormattedText } from '../../components/react_quill_editor/quill_formatted_text';
+import { MarkdownFormattedText } from '../../components/react_quill_editor/markdown_formatted_text';
 
 export const getCommentPreview = (commentText) => {
   // TODO Graham 6-5-22: Duplicate with notification_row.ts? See relevant note there
@@ -32,9 +32,7 @@ export const getCommentPreview = (commentText) => {
       doc = doc.replace(match[0], match[1]);
     });
 
-    decodedCommentText = (
-      <MarkdownFormattedText doc={doc.slice(0, 140)} collapse />
-    );
+    decodedCommentText = <MarkdownFormattedText doc={doc.slice(0, 140)} />;
   }
 
   return decodedCommentText;

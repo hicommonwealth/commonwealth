@@ -49,7 +49,7 @@ rendered on the listing—and receiving the next page worth of threads (typicall
 
 When a user navigates to a proposal page that has not been fetched through these bulk calls,
 the proposal component calls the controller fetchThread fn, which fetches an individual thread
-by an id, then returns it after addinig it to threads.store. These threads are *not* added
+by an id, then returns it after adding it to threads.store. These threads are *not* added
 to the listingStore, since they do not belong in the listing component, and their presence
 would break the listingStore's careful chronology.
 
@@ -141,6 +141,9 @@ class ThreadsController {
       last_commented_on,
       linked_threads,
       numberOfComments,
+      canvasAction,
+      canvasSession,
+      canvasHash,
     } = thread;
 
     let { reactionIds, reactionType, addressesReacted } = thread;
@@ -255,6 +258,9 @@ class ThreadsController {
       reactionIds,
       reactionType,
       addressesReacted,
+      canvasAction,
+      canvasSession,
+      canvasHash,
     });
 
     ThreadsController.Instance.store.add(t);
@@ -276,6 +282,17 @@ class ThreadsController {
   ) {
     try {
       // TODO: Change to POST /thread
+      const {
+        action = null,
+        session = null,
+        hash = null,
+      } = await app.sessions.signThread({
+        community: chainId,
+        title,
+        body,
+        link: url,
+        topic: topic.id,
+      });
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
@@ -291,6 +308,9 @@ class ThreadsController {
         url,
         readOnly,
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       const result = this.modelFromServer(response.result);
 
@@ -322,6 +342,8 @@ class ThreadsController {
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
+          : err.message
+          ? err.message
           : 'Failed to create thread'
       );
     }
@@ -336,6 +358,18 @@ class ThreadsController {
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
+    const {
+      action = null,
+      session = null,
+      hash = null,
+    } = await app.sessions.signThread({
+      community: app.activeChainId(),
+      title: newTitle,
+      body: newBody,
+      link: url,
+      topic: proposal.topic.id,
+    });
+
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
@@ -352,6 +386,9 @@ class ThreadsController {
         url,
         'attachments[]': attachments,
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       },
       success: (response) => {
         const result = this.modelFromServer(response.result);
@@ -416,6 +453,7 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
+        app.threadUpdateEmitter.emit('threadUpdated', {});
         return result;
       },
       error: (err) => {

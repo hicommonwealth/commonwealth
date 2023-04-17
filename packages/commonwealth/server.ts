@@ -71,6 +71,7 @@ async function main() {
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+  const NO_RULE_CACHE = process.env.NO_RULE_CACHE === 'true';
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
@@ -261,12 +262,12 @@ async function main() {
   }
 
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  await ruleCache.start();
+  if (!NO_RULE_CACHE) await ruleCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 
-  // TODO: should we await this? it will block server startup -- but not a big deal locally
-  if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
+  // initialize async to avoid blocking startup
+  if (!NO_GLOBAL_ACTIVITY_CACHE) globalActivityCache.start();
 
   // Declare Validation Middleware Service
   // middleware to use for all requests
@@ -299,5 +300,5 @@ async function main() {
   setupServer(app, rollbar, models, rabbitMQController);
 }
 
-main();
+main().catch((e) => console.log(e));
 export default app;

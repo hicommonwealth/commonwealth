@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { redraw } from 'mithrilInterop';
 
@@ -15,8 +15,13 @@ import type { MenuItem } from './types';
 import { ComponentType } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 
-export const CWSidebarMenuItem = (props: MenuItem) => {
+type CWSidebarMenuItemProps = {
+  isStarred?: boolean;
+} & MenuItem;
+
+export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
+  const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
 
   if (props.type === 'default') {
     const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
@@ -79,14 +84,11 @@ export const CWSidebarMenuItem = (props: MenuItem) => {
               }
             />
             <div
-              className={
-                app.communities.isStarred(item.id)
-                  ? 'star-filled'
-                  : 'star-empty'
-              }
+              className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await app.communities.setStarred(item.id);
+                setIsStarred((prevState) => !prevState);
                 redraw();
               }}
             />
@@ -123,9 +125,23 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             </CWText>
           </div>
         )}
-        {menuItems.map((item, i) => (
-          <CWSidebarMenuItem key={i} type={item.type || 'default'} {...item} />
-        ))}
+        {menuItems.map((item, i) => {
+          const itemProps = {
+            ...item,
+            isStarred:
+              item.type === 'community'
+                ? app.communities.isStarred(item.community.id)
+                : false,
+          };
+
+          return (
+            <CWSidebarMenuItem
+              key={i}
+              type={item.type || 'default'}
+              {...itemProps}
+            />
+          );
+        })}
       </div>
       <div className="sidebar-bottom">
         {[

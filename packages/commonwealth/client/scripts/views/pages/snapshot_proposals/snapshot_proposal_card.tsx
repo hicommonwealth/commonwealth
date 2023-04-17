@@ -20,8 +20,7 @@ export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
   const { proposal, snapshotId } = props;
   const navigate = useCommonNavigate();
 
-  const symbol = app.snapshot.space.symbol.toLowerCase();
-  const proposalLink = `/${symbol}/snapshot/${snapshotId}/${proposal.id}`;
+  const proposalLink = `/snapshot/${snapshotId}/${proposal.id}`;
 
   const time = moment(+proposal.end * 1000);
   const now = moment();
@@ -36,7 +35,8 @@ export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
         e.stopPropagation();
         e.preventDefault();
         if (app.chain) {
-          localStorage[`${app.activeChainId()}-proposals-scrollY`] = window.scrollY;
+          localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+            window.scrollY;
           navigate(proposalLink);
         } else {
           navigate(proposalLink);
@@ -44,13 +44,19 @@ export const SnapshotProposalCard = (props: SnapshotProposalCardProps) => {
       }}
     >
       <div className="proposal-card-metadata">
-        <ProposalTag label={`${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(proposal.ipfs.length - 6)}`} />
+        <ProposalTag
+          label={`${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(
+            proposal.ipfs.length - 6
+          )}`}
+        />
         <CWText title={proposal.title} fontWeight="semiBold" noWrap>
           {proposal.title}
         </CWText>
       </div>
       <CWText>
-        {now > time ? `Ended ${formatLastUpdated(time)}` : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`}
+        {now > time
+          ? `Ended ${formatLastUpdated(time)}`
+          : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`}
       </CWText>
     </CWCard>
   );

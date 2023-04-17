@@ -40,6 +40,16 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.COSMOS_GOV_V1': JSON.stringify(process.env.COSMOS_GOV_V1),
     }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
+        process.env.FLAG_COMMUNITY_HOMEPAGE
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
+          process.env.FLAG_PROPOSAL_TEMPLATES
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {
@@ -145,6 +155,7 @@ module.exports = {
       vm: require.resolve('vm-browserify'),
       path: require.resolve('path-browserify'),
       stream: require.resolve('stream-browserify'),
+      zlib: require.resolve('browserify-zlib'),
     },
   },
   module: {

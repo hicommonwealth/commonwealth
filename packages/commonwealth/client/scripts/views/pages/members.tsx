@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
 import 'pages/members.scss';
@@ -16,6 +16,7 @@ type MemberInfo = {
 
 const MembersPage = () => {
   const [membersList, setMembersList] = React.useState<Array<MemberInfo>>([]);
+  const [customScrollParent, setCustomScrollParent] = useState(null);
 
   const activeInfo = app.chain.meta;
 
@@ -43,16 +44,17 @@ const MembersPage = () => {
     };
 
     fetch();
-  }, []);
+  }, [activeInfo]);
 
   return (
     <Sublayout>
-      <div className="MembersPage">
+      <div className="MembersPage" ref={setCustomScrollParent}>
         <CWText type="h3" fontWeight="medium">
           Members ({membersList.length})
         </CWText>
         <Virtuoso
           data={membersList}
+          customScrollParent={customScrollParent}
           itemContent={(index, profileInfo) => {
             return (
               <div className="member-row" key={index}>

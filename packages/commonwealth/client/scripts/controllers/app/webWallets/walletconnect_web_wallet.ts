@@ -3,10 +3,11 @@ import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import type { Account, BlockInfo, ChainInfo, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import type Web3 from 'web3';
+
 import { hexToNumber } from 'web3-utils';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -45,7 +46,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return this._chainInfo.node?.ethChainId || 1;
+    return this._chainInfo.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -64,9 +65,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    sessionPayload: SessionPayload
   ): Promise<string> {
-    const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
+    const typedCanvasMessage = constructTypedCanvasMessage(sessionPayload);
     const signature = await this._provider.wc.signTypedData([
       account.address,
       JSON.stringify(typedCanvasMessage),
@@ -77,6 +78,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async reset() {
     console.log('Attempting to reset WalletConnect');
     if (!this._provider) {
+      // Remove the object that stores the session (needed when refreshed page since initial connection established)
+      localStorage.removeItem('walletconnect');
       return;
     }
     await this._provider.wc.killSession();
@@ -118,6 +121,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     await this.initAccountsChanged();
     this._enabled = true;
     this._enabling = false;
+    console.log('WalletConnect enabled');
     // } catch (error) {
     //   this._enabling = false;
     //   throw new Error(`Failed to enable WalletConnect: ${error.message}`);

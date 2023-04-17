@@ -27,11 +27,7 @@ import type { ImageBehavior } from '../components/component_kit/cw_cover_image_u
 import { CWCoverImageUploader } from '../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from '../pages/404';
 import { LinkedAddresses } from './linked_addresses';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  ReactQuillEditor,
-} from './react_quill_editor';
+import { createDeltaFromText, ReactQuillEditor } from './react_quill_editor';
 import { deserializeDelta, serializeDelta } from './react_quill_editor/utils';
 
 enum EditProfileError {
@@ -270,8 +266,8 @@ const EditProfileComponent = () => {
                   account={account}
                   uploadCompleteCallback={(files) => {
                     files.forEach((f) => {
-                      if (!f.data.result) return;
-                      const url = f.data.result.replace(/\?.*/, '').trim();
+                      if (!f.uploadURL) return;
+                      const url = f.uploadURL.replace(/\?.*/, '').trim();
                       setAvatarUrl(url);
                     });
                   }}

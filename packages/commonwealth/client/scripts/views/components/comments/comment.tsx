@@ -11,7 +11,6 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
-import { renderQuillTextBody } from '../quill/helpers';
 import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
 import { SharePopover } from '../share_popover';
 import { User } from '../user/user';
@@ -94,8 +93,7 @@ export const Comment = (props: CommentProps) => {
       chain: app.activeChainId(),
     });
 
-  const canReply =
-    !isLast && !isLocked && isLoggedIn && app.user.activeAccount;
+  const canReply = !isLast && !isLocked && isLoggedIn && app.user.activeAccount;
 
   const canEditAndDelete =
     !isLocked &&
@@ -105,6 +103,32 @@ export const Comment = (props: CommentProps) => {
     await app.comments.delete(comment);
     updatedCommentsCallback();
   };
+
+  // if (!this.verificationChecked) {
+  //   this.verificationChecked = true;
+  //   try {
+  //     const session = JSON.parse(comment.canvasSession);
+  //     const action = JSON.parse(comment.canvasAction);
+  //     const actionSignerAddress = session?.payload?.sessionAddress;
+  //     if (
+  //       !comment.canvasSession ||
+  //       !comment.canvasAction ||
+  //       !actionSignerAddress
+  //     )
+  //       return;
+  //     verify({ session })
+  //       .then((result) => (this.verifiedSession = true))
+  //       .catch((err) => console.log('Could not verify session'))
+  //       .finally(() => m.redraw());
+  //     verify({ action, actionSignerAddress })
+  //       .then((result) => (this.verifiedAction = true))
+  //       .catch((err) => console.log('Could not verify action'))
+  //       .finally(() => m.redraw());
+  //   } catch (err) {
+  //     console.log('Unexpected error while verifying action/session');
+  //     return;
+  //   }
+  // }
 
   return (
     <div className={`Comment comment-${comment.id}`}>
@@ -163,6 +187,16 @@ export const Comment = (props: CommentProps) => {
                       </CWText>
                     </div>
                   )}
+                  {/* this.verifiedAction && this.verifiedSession && (
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="verification-icon"
+                onclick={() => showCanvasVerifyDataModal(comment)}
+              >
+                <CWIcon iconName="checkCircle" iconSize="xs" />
+              </CWText>
+            ) */}
                 </div>
                 <div className="menu-buttons-right">
                   <SharePopover commentId={comment.id} />

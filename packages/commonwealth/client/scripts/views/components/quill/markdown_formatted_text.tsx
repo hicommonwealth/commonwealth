@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 /* eslint-disable no-useless-escape */
 
@@ -12,7 +13,7 @@ import smartTruncate from 'smart-truncate';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 import { getClasses } from '../component_kit/helpers';
-import { countLinesMarkdown } from './helpers';
+import { countLinesMarkdown } from '../react_quill_editor/utils';
 
 const renderer = new marked.Renderer();
 
@@ -33,6 +34,7 @@ type MarkdownFormattedTextAttrs = {
   cutoffLines?: number;
 };
 
+// TODO: Replace usages of this component with react_quill_editor/MarkdownFormattedText
 export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextAttrs> {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;

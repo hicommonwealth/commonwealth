@@ -309,6 +309,9 @@ const resetServer = (debug = false): Promise<void> => {
         object_id: `user-${drew.id}`,
         is_active: true,
       });
+      await models.SnapshotSpace.create({
+        snapshot_space: 'test space',
+      });
       await models.SnapshotProposal.create({
         id: '1',
         title: 'Test Snapshot Proposal',

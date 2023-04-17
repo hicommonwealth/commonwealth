@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
 import 'pages/search/search_bar.scss';
@@ -18,6 +18,12 @@ import {
   SearchBarThreadPreviewRow,
 } from './search_bar_components';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useDebounce } from 'usehooks-ts';
+
+const MIN_SEARCH_TERM_LENGTH = 4;
+const NUM_RESULTS_PER_SECTION = 2;
+
+let resetTimer = null;
 
 const goToSearchPage = (
   query: SearchQuery,
@@ -28,8 +34,9 @@ const goToSearchPage = (
     return;
   }
 
-  if (query.searchTerm.length < 4) {
-    notifyError('Query must be at least 4 characters');
+  if (query.searchTerm.length < MIN_SEARCH_TERM_LENGTH) {
+    notifyError(`Query must be at least ${MIN_SEARCH_TERM_LENGTH} characters`);
+    return;
   }
 
   app.search.addToHistory(query);
@@ -38,31 +45,36 @@ const goToSearchPage = (
 };
 
 export const SearchBar = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [searchResults, setSearchResults] =
-    useState<Record<string, Array<any>>>();
-  const [searchTerm, setSearchTerm] = useState('');
-
   const navigate = useCommonNavigate();
 
-  // const historyList = app.search.getHistory().map((previousQuery) => (
-  //   <div
-  //     className="history-row"
-  //     onClick={() => {
-  //       searchTerm = previousQuery.searchTerm;
-  //       getSearchPreview(previousQuery, this);
-  //     }}
-  //   >
-  //     {previousQuery.searchTerm}
-  //     <CWIconButton
-  //       iconName="close"
-  //       onClick={(e) => {
-  //         e.stopPropagation();
-  //         app.search.removeFromHistory(previousQuery);
-  //       }}
-  //     />
-  //   </div>
-  // ));
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<
+    Record<string, Array<any>>
+  >({});
+
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+
+  const showDropdown =
+    Object.keys(searchResults || {}).length > 0 && searchTerm.length > 0;
+
+  const resetSearchBar = () => {
+    setSearchTerm('');
+    setSearchResults({});
+  };
+
+  const handleGoToSearchPage = () => {
+    const searchQuery = new SearchQuery(searchTerm, {
+      isSearchPreview: false,
+      chainScope: app.activeChainId(),
+    });
+
+    goToSearchPage(searchQuery, navigate);
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value?.toLowerCase();
+    setSearchTerm(value);
+  };
 
   const handleGetSearchPreview = async (value: string) => {
     const searchQuery = new SearchQuery(value, {
@@ -76,7 +88,10 @@ export const SearchBar = () => {
 
       const results = searchResponse
         ? Object.fromEntries(
-            Object.entries(searchResponse).map(([k, v]) => [k, v.slice(0, 2)])
+            Object.entries(searchResponse).map(([k, v]) => [
+              k,
+              v.slice(0, NUM_RESULTS_PER_SECTION),
+            ])
           )
         : {};
 
@@ -91,30 +106,28 @@ export const SearchBar = () => {
     }
   };
 
-  const handleGoToSearchPage = () => {
-    if (searchTerm?.length < 4) {
-      return;
+  // when debounced search term changes, fetch search results
+  useEffect(() => {
+    clearTimeout(resetTimer);
+    if (debouncedSearchTerm?.length > 3) {
+      handleGetSearchPreview(debouncedSearchTerm);
     }
-
-    const searchQuery = new SearchQuery(searchTerm, {
-      isSearchPreview: false,
-      chainScope: app.activeChainId(),
-    });
-
-    goToSearchPage(searchQuery, navigate);
-  };
-
-  const handleInputChange = (e) => {
-    const value = e.target.value?.toLowerCase();
-    setSearchTerm(value);
-
-    if (value?.length > 3) {
-      handleGetSearchPreview(value);
-    }
-  };
+  }, [debouncedSearchTerm]);
 
   return (
-    <div className="SearchBar">
+    <div
+      className="SearchBar"
+      onBlur={() => {
+        // give time for child click events to
+        // fire before resetting the search bar
+        if (!resetTimer) {
+          resetTimer = setTimeout(() => {
+            resetSearchBar();
+            resetTimer = null;
+          }, 300);
+        }
+      }}
+    >
       <div className="search-and-icon-container">
         <div className="search-icon">
           <CWIconButton iconName="search" onClick={handleGoToSearchPage} />
@@ -126,8 +139,6 @@ export const SearchBar = () => {
           placeholder="Search Common"
           value={searchTerm}
           autoComplete="off"
-          onFocus={() => setShowDropdown(true)}
-          onBlur={() => setShowDropdown(false)}
           onChange={handleInputChange}
           onKeyUp={(e) => {
             if (e.key === 'Enter') {
@@ -140,7 +151,7 @@ export const SearchBar = () => {
             <CWIconButton iconName="close" onClick={() => setSearchTerm('')} />
           </div>
         )}
-        {searchResults && showDropdown && (
+        {showDropdown && (
           <div className="search-results-dropdown">
             {Object.values(searchResults).flat(1).length > 0 ? (
               <div className="previews-section">
@@ -237,18 +248,6 @@ export const SearchBar = () => {
                 No Results
               </CWText>
             )}
-            {/* {historyList.length > 0 && (
-                <div className="history-section">
-                  <CWText
-                    type="caption"
-                    fontWeight="medium"
-                    className="search-history-header"
-                  >
-                    Search History
-                  </CWText>
-                  {historyList}
-                </div>
-              )} */}
           </div>
         )}
       </div>

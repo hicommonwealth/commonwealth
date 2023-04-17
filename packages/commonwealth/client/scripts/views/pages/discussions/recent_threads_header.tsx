@@ -17,6 +17,7 @@ import { TopicsMenu } from './topics_menu';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import useForceRerender from 'hooks/useForceRerender';
 
 type RecentThreadsHeaderProps = {
   stage: string;
@@ -31,6 +32,7 @@ export const RecentThreadsHeader = ({
 }: RecentThreadsHeaderProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
+  const forceRerender = useForceRerender();
 
   const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
     isWindowExtraSmall(window.innerWidth)
@@ -42,11 +44,13 @@ export const RecentThreadsHeader = ({
     };
 
     window.addEventListener('resize', onResize);
+    app.loginStateEmitter.on('redraw', forceRerender);
 
     return () => {
       window.removeEventListener('resize', onResize);
+      app.loginStateEmitter.off('redraw', forceRerender);
     };
-  }, []);
+  }, [forceRerender]);
 
   const { stagesEnabled, customStages } = app.chain?.meta || {};
 
@@ -98,6 +102,7 @@ export const RecentThreadsHeader = ({
                   onClick={() => {
                     navigate('/new/discussion');
                   }}
+                  disabled={!app.user.activeAccount}
                 />
               ) : (
                 <CWButton
@@ -107,6 +112,7 @@ export const RecentThreadsHeader = ({
                   onClick={() => {
                     navigate('/new/discussion');
                   }}
+                  disabled={!app.user.activeAccount}
                 />
               )}
             </div>

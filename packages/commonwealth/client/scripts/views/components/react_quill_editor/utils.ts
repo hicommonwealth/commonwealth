@@ -9,7 +9,7 @@ export const createDeltaFromText = (
   return {
     ops: [
       {
-        insert: str,
+        insert: str || '',
       },
     ],
     ___isMarkdown: !!isMarkdown,
@@ -95,13 +95,6 @@ export const uploadFileToS3 = async (
   }
 };
 
-// countLinesMarkdown returns the number of lines for the text
-export const countLinesMarkdown = (text: string): number => {
-  return text.split('\n').length - 1;
-};
-
-// -----
-
 export type SerializableDeltaStatic = DeltaStatic & {
   ___isMarkdown?: boolean;
 };
@@ -116,6 +109,10 @@ export const serializeDelta = (delta: DeltaStatic): string => {
 // parseDelta converts a string to a delta object for state
 export const deserializeDelta = (str: string): DeltaStatic => {
   try {
+    if (typeof str !== 'string') {
+      // empty richtext delta
+      return createDeltaFromText('', false);
+    }
     // is richtext delta object
     const delta: DeltaStatic = JSON.parse(str);
     if (!delta.ops) {
@@ -126,4 +123,30 @@ export const deserializeDelta = (str: string): DeltaStatic => {
     // otherwise, it's plain text markdown
     return createDeltaFromText(str, true);
   }
+};
+
+// countLinesQuill returns the number of text lines for a quill ops array
+export const countLinesQuill = (delta: DeltaStatic): number => {
+  if (!delta || !delta.ops) {
+    return 0;
+  }
+
+  let count = 0;
+
+  for (const op of delta.ops) {
+    if (typeof op.insert === 'string') {
+      try {
+        count += op.insert.split('\n').length - 1;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+
+  return count;
+};
+
+// countLinesMarkdown returns the number of lines for the text
+export const countLinesMarkdown = (text: string): number => {
+  return text.split('\n').length - 1;
 };

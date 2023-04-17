@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import type { DeltaOperation, DeltaStatic } from 'quill';
+import type { DeltaOperation } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import ReactQuill, { Quill } from 'react-quill';
 
@@ -209,9 +209,16 @@ const ReactQuillEditor = ({
 
   // when initialized, update markdown state to match content type
   useEffect(() => {
+    if (!editorRef.current) {
+      return;
+    }
     setIsMarkdownEnabled(!!contentDelta?.___isMarkdown);
+    // sometimes a force refresh is needed to render the editor
+    setTimeout(() => {
+      refreshQuillComponent();
+    }, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [editorRef]);
 
   // if markdown is disabled, hide toolbar buttons
   const toolbar = useMemo(() => {

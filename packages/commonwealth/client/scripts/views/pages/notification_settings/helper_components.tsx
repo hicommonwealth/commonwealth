@@ -12,7 +12,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import { renderQuillTextBody } from '../../components/quill/helpers';
+import { renderQuillTextBody } from '../../components/react_quill_editor/helpers';
 import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
 import { useCommonNavigate } from 'navigation/helpers';

@@ -1,3 +1,4 @@
+import React from 'react';
 import 'view_template/view_template.scss';
 import app from 'state';
 
@@ -80,14 +81,18 @@ const ViewTemplatePage = () => {
           return t.id === templateMetadata.templateId;
         });
 
+        let parsedJSON;
         try {
-          setJson(JSON.parse(template.template));
-          setTemplateError(!isValidJson(json));
+          parsedJSON = JSON.parse(template.template);
+          setJson(parsedJSON);
+          setTemplateError(!isValidJson(parsedJSON));
         } catch (err) {
           console.log('err', err);
         }
 
-        for (const field of json.form_fields) {
+        console.log('parsedJSON', parsedJSON);
+
+        for (const field of parsedJSON.form_fields) {
           switch (Object.keys(field)[0]) {
             case TemplateComponents.INPUT:
               setFormState((prevState) => {
@@ -109,23 +114,23 @@ const ViewTemplatePage = () => {
             case TemplateComponents.FUNCTIONFORM:
               setFormState((prevState) => {
                 const newState = { ...prevState };
-                newState[
-                  field.function.field_ref
-                ] = field.function.tx_forms.map((method) => {
-                  // Create a Data structure for each calldata's method params from form
-                  const form = {};
-                  // Store appropriate ordering of params
-                  form['paramRefs'] = method.paramRefs;
-                  form['abi'] = method.functionABI;
-                  for (const nested_field of method.form) {
-                    if (
-                      Object.keys(nested_field)[0] === TemplateComponents.INPUT
-                    ) {
-                      form[nested_field.field_ref] = null;
+                newState[field.function.field_ref] =
+                  field.function.tx_forms.map((method) => {
+                    // Create a Data structure for each calldata's method params from form
+                    const form = {};
+                    // Store appropriate ordering of params
+                    form['paramRefs'] = method.paramRefs;
+                    form['abi'] = method.functionABI;
+                    for (const nested_field of method.form) {
+                      if (
+                        Object.keys(nested_field)[0] ===
+                        TemplateComponents.INPUT
+                      ) {
+                        form[nested_field.field_ref] = null;
+                      }
                     }
-                  }
-                  return form;
-                });
+                    return form;
+                  });
 
                 return newState; // return the new state object
               });
@@ -142,7 +147,7 @@ const ViewTemplatePage = () => {
 
   useEffect(() => {
     loadData();
-  }, [loadData]);
+  }, []);
 
   const formatFunctionArgs = () => {
     const { tx_template } = json;
@@ -345,6 +350,10 @@ const ViewTemplatePage = () => {
       ],
     });
   };
+
+  if (!json) {
+    return;
+  }
 
   return (
     <Sublayout>

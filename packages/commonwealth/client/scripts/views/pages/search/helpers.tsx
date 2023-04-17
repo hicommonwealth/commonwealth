@@ -13,6 +13,8 @@ import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 
 const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const proposalId = thread.proposalid;
@@ -33,7 +35,12 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
           {`discussion - ${thread.chain}`}
         </CWText>
-        <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
+        <CWText className="search-results-thread-title" fontWeight="medium">
+          {renderTruncatedHighlights(
+            searchTerm,
+            decodeURIComponent(thread.title)
+          )}
+        </CWText>
         <div className="search-results-thread-subtitle">
           <User
             user={
@@ -50,10 +57,11 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
           </CWText>
         </div>
         <CWText noWrap>
-          {/* {renderQuillTextBody(thread.body, {
-            hideFormatting: true,
-            searchTerm,
-          })} */}
+          <QuillRenderer
+            hideFormatting={true}
+            doc={thread.body}
+            searchTerm={searchTerm}
+          />
         </CWText>
       </div>
     </div>
@@ -70,18 +78,22 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
     <div
       key={comment.id}
       className="search-result-row"
-      onClick={() =>
-        setRoute(`/discussion/${proposalId}`)
-      }
+      onClick={() => {
+        const path = `/discussion/${proposalId}`;
+        setRoute(path);
+      }}
     >
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontWeight="medium">{`comment - ${
           comment.chain || comment.community
         }`}</CWText>
-        {/* <div className="search-results-thread-title">
-          {decodeURIComponent(comment.title)}
-        </div> */}
+        <CWText className="search-results-thread-title">
+          {renderTruncatedHighlights(
+            searchTerm,
+            decodeURIComponent(comment.title)
+          )}
+        </CWText>
         <div className="search-results-thread-subtitle">
           <User
             user={
@@ -98,10 +110,12 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
           </CWText>
         </div>
         <CWText noWrap>
-          {/* {renderQuillTextBody(comment.text, {
-            hideFormatting: true,
-            searchTerm,
-          })} */}
+          <QuillRenderer
+            hideFormatting={true}
+            doc={comment.text}
+            searchTerm={searchTerm}
+          />
+          ;
         </CWText>
       </div>
     </div>

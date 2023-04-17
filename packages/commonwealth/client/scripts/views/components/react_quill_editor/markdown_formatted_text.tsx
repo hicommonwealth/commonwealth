@@ -1,9 +1,12 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 import { countLinesMarkdown } from './utils';
+import { renderTruncatedHighlights } from './highlighter';
+import removeMarkdown from 'markdown-to-text';
+import { QuillRendererProps } from './quill_renderer';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -23,35 +26,37 @@ marked.setOptions({
   xhtml: true,
 });
 
-type MarkdownFormattedTextProps = {
-  collapse?: boolean;
+type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
-  hideFormatting?: boolean;
-  openLinksInNewTab?: boolean;
-  searchTerm?: string;
-  cutoffLines?: number;
 };
 
 export const MarkdownFormattedText = ({
-  collapse,
   doc,
   hideFormatting,
   searchTerm,
   cutoffLines,
 }: MarkdownFormattedTextProps) => {
-  const isTruncated = cutoffLines > 0 && cutoffLines < countLinesMarkdown(doc);
+  const [userExpand, setUserExpand] = useState<boolean>(false);
+
+  const isTruncated: boolean = useMemo(() => {
+    if (userExpand) {
+      return false;
+    }
+    return cutoffLines && cutoffLines < countLinesMarkdown(doc);
+  }, [userExpand, cutoffLines, doc]);
 
   const truncatedDoc = useMemo(() => {
     if (isTruncated) {
-      return doc.slice(0, doc.split('\n', cutoffLines).join('\n').length);
+      const numChars = doc.split('\n', cutoffLines).join('\n').length;
+      return doc.slice(0, numChars);
     }
     return doc;
   }, [cutoffLines, doc, isTruncated]);
 
-  const unsanitizedHTML = marked.parse(truncatedDoc.toString());
+  const unsanitizedHTML = marked.parse(truncatedDoc);
 
   const sanitizedHTML: string = useMemo(() => {
-    return hideFormatting
+    return hideFormatting || searchTerm
       ? DOMPurify.sanitize(unsanitizedHTML, {
           ALLOWED_TAGS: ['a'],
           ADD_ATTR: ['target'],
@@ -60,21 +65,35 @@ export const MarkdownFormattedText = ({
           USE_PROFILES: { html: true },
           ADD_ATTR: ['target'],
         });
-  }, [hideFormatting, unsanitizedHTML]);
+  }, [hideFormatting, searchTerm, unsanitizedHTML]);
 
-  const toggleDisplay = () => {
-    console.log('toggleDisplay');
-  };
+  // finalDoc is the rendered content which may include search term highlights
+  const finalDoc = useMemo(() => {
+    // if no search term, just render the doc normally
+    if (!searchTerm) {
+      return <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></div>;
+    }
+
+    // get text from doc and replace new lines with spaces
+    const docText = removeMarkdown(doc).replace(/\n/g, ' ').replace(/\+/g, ' ');
+
+    const textWithHighlights = renderTruncatedHighlights(searchTerm, docText);
+
+    // wrap all elements in span to avoid container-based positioning
+    return <span>{textWithHighlights}</span>;
+  }, [doc, sanitizedHTML, searchTerm]);
+
+  const toggleDisplay = () => setUserExpand(!userExpand);
 
   return (
     <>
       <div
         className={getClasses<{ collapsed?: boolean }>(
-          { collapsed: !!collapse },
+          { collapsed: isTruncated },
           'MarkdownFormattedText'
         )}
       >
-        <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></div>
+        {finalDoc}
       </div>
       {isTruncated && (
         <div className="show-more-button-wrapper">

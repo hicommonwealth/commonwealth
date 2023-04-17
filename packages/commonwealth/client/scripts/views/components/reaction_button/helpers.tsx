@@ -71,7 +71,7 @@ export const fetchReactionsByPost = async (post: Post) => {
 export const onReactionClick = (
   e: React.MouseEvent<HTMLDivElement>,
   hasReacted: boolean,
-  dislike: () => void,
+  dislike: (userAddress: string) => void,
   like: (chain: ChainInfo, chainId: string, userAddress: string) => void
 ) => {
   const { address: userAddress, chain } = app.user.activeAccount;
@@ -80,7 +80,7 @@ export const onReactionClick = (
   const chainId = app.activeChainId();
 
   if (hasReacted) {
-    dislike();
+    dislike(userAddress);
   } else {
     like(chain, chainId, userAddress);
   }

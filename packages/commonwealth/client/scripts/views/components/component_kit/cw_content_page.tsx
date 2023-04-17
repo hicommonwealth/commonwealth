@@ -85,6 +85,7 @@ export const CWContentPage = (props: ContentPageProps) => {
     return () => {
       window.removeEventListener('resize', onResize);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const mainBody = (

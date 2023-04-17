@@ -1,15 +1,14 @@
-import React from 'react';
-
 import { pluralize } from 'helpers';
 import type { ChainInfo } from 'models';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
+import React from 'react';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type CommunityPreviewCardProps = {
   chain: ChainInfo;
