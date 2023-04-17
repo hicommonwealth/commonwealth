@@ -24,6 +24,7 @@ import {
   setSelectedTags,
 } from './helpers';
 import { ManageRoles } from './manage_roles';
+import { featureFlags } from 'helpers/feature-flags';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -309,24 +310,27 @@ export const ChainMetadataRows = ({
             : "Don't show progress on threads"
         }
       />
-      <ToggleRow
-        title="Homepage"
-        defaultValue={hasHomepage}
-        onToggle={() => {
-          setHasHomepage((prevHasHomepage) => {
-            if (!prevHasHomepage) {
-              setDefaultPage(DefaultPage.Homepage);
-            }
-            return !prevHasHomepage;
-          });
-        }}
-        caption={(checked) =>
-          checked
-            ? 'Enable homepage feature for this community'
-            : 'Disable homepage feature for this community'
-        }
-      />
-      {hasHomepage ? (
+
+      {featureFlags.communityHomepage && (
+        <ToggleRow
+          title="Homepage"
+          defaultValue={hasHomepage}
+          onToggle={() => {
+            setHasHomepage((prevHasHomepage) => {
+              if (!prevHasHomepage) {
+                setDefaultPage(DefaultPage.Homepage);
+              }
+              return !prevHasHomepage;
+            });
+          }}
+          caption={(checked) =>
+            checked
+              ? 'Enable homepage feature for this community'
+              : 'Disable homepage feature for this community'
+          }
+        />
+      )}
+      {featureFlags.communityHomepage && hasHomepage ? (
         <SelectRow
           title="Default Page"
           options={[

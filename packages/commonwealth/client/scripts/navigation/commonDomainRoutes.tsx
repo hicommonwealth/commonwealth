@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { Navigate } from 'navigation/helpers';
 import { withLayout } from 'views/layout';
+import { featureFlags } from 'helpers/feature-flags';
 
 const LandingPage = lazy(() => import('views/pages/landing'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
@@ -273,49 +274,57 @@ const commonDomainsRoutes = () => [
       scoped: true,
     })}
   />,
-  <Route
-    path="/:scope/feed"
-    element={withLayout(FeedPage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
+  ...(featureFlags.communityHomepage
+    ? [
+        <Route
+          path="/:scope/feed"
+          element={withLayout(FeedPage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+      ]
+    : []),
   // DISCUSSIONS END
 
   // CONTRACTS
-  <Route
-    path="/:scope/contracts"
-    element={withLayout(ContractsPage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
-  <Route
-    path="/:scope/new/contract"
-    element={withLayout(NewContractPage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
-  <Route
-    path="/:scope/new/contract_template/:contract_id"
-    element={withLayout(NewContractTemplatePage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
-  <Route
-    path="/:scope/contract/:contractAddress"
-    element={withLayout(GeneralContractPage, {
-      scoped: true,
-    })}
-  />,
-  <Route
-    path="/:scope/:contract_address/:slug"
-    element={withLayout(ViewTemplatePage, {
-      scoped: true,
-    })}
-  />,
+  ...(featureFlags.proposalTemplates
+    ? [
+        <Route
+          path="/:scope/contracts"
+          element={withLayout(ContractsPage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+        <Route
+          path="/:scope/new/contract"
+          element={withLayout(NewContractPage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+        <Route
+          path="/:scope/new/contract_template/:contract_id"
+          element={withLayout(NewContractTemplatePage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+        <Route
+          path="/:scope/contract/:contractAddress"
+          element={withLayout(GeneralContractPage, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          path="/:scope/:contract_address/:slug"
+          element={withLayout(ViewTemplatePage, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   // CONTRACTS END
 
   // TREASURY
