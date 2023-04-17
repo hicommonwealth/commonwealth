@@ -87,26 +87,33 @@ class SessionsController {
   // Get a session address. Generate one and cache in localStorage if none exists.
   public getOrCreateAddress(
     chainBase: ChainBase,
-    chainId: string
+    chainId: string,
+    fromAddress: string
   ): Promise<string> {
-    return this.getSessionController(chainBase).getOrCreateAddress(chainId);
+    return this.getSessionController(chainBase).getOrCreateAddress(chainId, fromAddress);
   }
 
   // Provide authentication for a session address, by presenting a signed SessionPayload.
   public authSession(
     chainBase: ChainBase,
     chainId: string,
+    fromAddress: string,
     payload: SessionPayload,
     signature: string
   ) {
     return this.getSessionController(chainBase).authSession(
       chainId,
+      fromAddress,
       payload,
       signature
     );
   }
 
   // Sign an arbitrary action, using context from the last authSession() call.
+  //
+  // The signing methods are stateful, which simplifies implementation greatly
+  // because we always request an authSession immediately before signing.
+  // The user should never be able to switch accounts in the intervening time.
   private async sign(
     call: string,
     args: Record<string, ActionArgument>
