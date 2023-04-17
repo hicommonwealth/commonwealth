@@ -28,13 +28,13 @@ jobs:
           - 5432:5432
       chain:
         image: trufflesuite/ganache
-        options: --fork --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8
         ports:
           - 8545:8545
       evm_test_app:
         image: irowan/common_chain_tests
         ports:
          - 3000:3000
+        options: --link chain
       
     steps:
       - name: Checkout
