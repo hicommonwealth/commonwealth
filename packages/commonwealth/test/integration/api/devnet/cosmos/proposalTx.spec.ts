@@ -15,9 +15,7 @@ import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any
 
 const mnemonic =
   'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought';
-// const rpcUrl = `http://ec2-35-173-213-72.compute-1.amazonaws.com:26657`;
 const rpcUrl = `http://localhost:8080/cosmosAPI/csdk`;
-// const lcdUrl = `http://ec2-35-173-213-72.compute-1.amazonaws.com:1317`;
 const lcdUrl = `http://localhost:8080/cosmosLCD/csdk`;
 const DEFAULT_FEE: StdFee = {
   gas: '180000',
