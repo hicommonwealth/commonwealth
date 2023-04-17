@@ -28,7 +28,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const chain = thread.chain;
 
   const handleClick = () => {
-    setRoute(`/${thread.chain}/discussion/${proposalId}`);
+    setRoute(`/discussion/${proposalId}`, {}, thread.chain);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) {
@@ -77,9 +77,7 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
   const chain = comment.chain;
 
   const handleClick = () => {
-    setRoute(
-      `/${comment.chain}/discussion/${proposalId}?comment=${comment.id}`
-    );
+    setRoute(`/discussion/${proposalId}?comment=${comment.id}`, {}, chain);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;
@@ -151,16 +149,19 @@ const getCommunityResult = (community, setRoute) => {
   );
 };
 
-const getMemberResult = (addr) => {
+const getMemberResult = (addr, setRoute) => {
   const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
-  if (addr.name) {
-    profile.initialize(addr.name, null, null, null, null, null);
+
+  const handleClick = () => {
+    setRoute(`/profile/id/${profile.id}`, {}, null);
+  };
+
+  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) {
+    return null;
   }
 
-  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
-
   return (
-    <div key={profile.id} className="member-result-row">
+    <div key={profile.id} className="member-result-row" onClick={handleClick}>
       <User
         user={profile}
         showRole
@@ -186,7 +187,7 @@ export const getListing = (
       return res.searchType === SearchScope.Threads
         ? getDiscussionResult(res, searchTerm, setRoute)
         : res.searchType === SearchScope.Members
-        ? getMemberResult(res)
+        ? getMemberResult(res, setRoute)
         : res.searchType === SearchScope.Communities
         ? getCommunityResult(res, setRoute)
         : res.searchType === SearchScope.Replies

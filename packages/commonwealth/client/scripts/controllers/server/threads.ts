@@ -49,7 +49,7 @@ rendered on the listing—and receiving the next page worth of threads (typicall
 
 When a user navigates to a proposal page that has not been fetched through these bulk calls,
 the proposal component calls the controller fetchThread fn, which fetches an individual thread
-by an id, then returns it after addinig it to threads.store. These threads are *not* added
+by an id, then returns it after adding it to threads.store. These threads are *not* added
 to the listingStore, since they do not belong in the listing component, and their presence
 would break the listingStore's careful chronology.
 
@@ -453,6 +453,7 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
+        app.threadUpdateEmitter.emit('threadUpdated', {});
         return result;
       },
       error: (err) => {

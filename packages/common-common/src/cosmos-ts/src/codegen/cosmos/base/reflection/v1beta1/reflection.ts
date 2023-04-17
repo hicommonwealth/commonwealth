@@ -1,5 +1,5 @@
-import * as _m0 from "protobufjs/minimal";
-import { isSet } from "../../../../helpers";
+import * as _m0 from 'protobufjs/minimal';
+import { isSet } from '../../../../helpers';
 /** ListAllInterfacesRequest is the request type of the ListAllInterfaces RPC. */
 
 export interface ListAllInterfacesRequest {}
@@ -58,11 +58,17 @@ function createBaseListAllInterfacesRequest(): ListAllInterfacesRequest {
 }
 
 export const ListAllInterfacesRequest = {
-  encode(_: ListAllInterfacesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    _: ListAllInterfacesRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListAllInterfacesRequest {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ListAllInterfacesRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListAllInterfacesRequest();
@@ -96,18 +102,20 @@ export const ListAllInterfacesRequest = {
 
   fromSDK(_: ListAllInterfacesRequestSDKType): ListAllInterfacesRequest {
     return {};
-  }
-
+  },
 };
 
 function createBaseListAllInterfacesResponse(): ListAllInterfacesResponse {
   return {
-    interfaceNames: []
+    interfaceNames: [],
   };
 }
 
 export const ListAllInterfacesResponse = {
-  encode(message: ListAllInterfacesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: ListAllInterfacesResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     for (const v of message.interfaceNames) {
       writer.uint32(10).string(v!);
     }
@@ -115,7 +123,10 @@ export const ListAllInterfacesResponse = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListAllInterfacesResponse {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ListAllInterfacesResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListAllInterfacesResponse();
@@ -139,7 +150,9 @@ export const ListAllInterfacesResponse = {
 
   fromJSON(object: any): ListAllInterfacesResponse {
     return {
-      interfaceNames: Array.isArray(object?.interfaceNames) ? object.interfaceNames.map((e: any) => String(e)) : []
+      interfaceNames: Array.isArray(object?.interfaceNames)
+        ? object.interfaceNames.map((e: any) => String(e))
+        : [],
     };
   },
 
@@ -147,7 +160,7 @@ export const ListAllInterfacesResponse = {
     const obj: any = {};
 
     if (message.interfaceNames) {
-      obj.interfaceNames = message.interfaceNames.map(e => e);
+      obj.interfaceNames = message.interfaceNames.map((e) => e);
     } else {
       obj.interfaceNames = [];
     }
@@ -155,36 +168,45 @@ export const ListAllInterfacesResponse = {
     return obj;
   },
 
-  fromPartial(object: Partial<ListAllInterfacesResponse>): ListAllInterfacesResponse {
+  fromPartial(
+    object: Partial<ListAllInterfacesResponse>
+  ): ListAllInterfacesResponse {
     const message = createBaseListAllInterfacesResponse();
-    message.interfaceNames = object.interfaceNames?.map(e => e) || [];
+    message.interfaceNames = object.interfaceNames?.map((e) => e) || [];
     return message;
   },
 
   fromSDK(object: ListAllInterfacesResponseSDKType): ListAllInterfacesResponse {
     return {
-      interfaceNames: Array.isArray(object?.interface_names) ? object.interface_names.map((e: any) => e) : []
+      interfaceNames: Array.isArray(object?.interface_names)
+        ? object.interface_names.map((e: any) => e)
+        : [],
     };
-  }
-
+  },
 };
 
 function createBaseListImplementationsRequest(): ListImplementationsRequest {
   return {
-    interfaceName: ""
+    interfaceName: '',
   };
 }
 
 export const ListImplementationsRequest = {
-  encode(message: ListImplementationsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.interfaceName !== "") {
+  encode(
+    message: ListImplementationsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.interfaceName !== '') {
       writer.uint32(10).string(message.interfaceName);
     }
 
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListImplementationsRequest {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ListImplementationsRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListImplementationsRequest();
@@ -208,38 +230,49 @@ export const ListImplementationsRequest = {
 
   fromJSON(object: any): ListImplementationsRequest {
     return {
-      interfaceName: isSet(object.interfaceName) ? String(object.interfaceName) : ""
+      interfaceName: isSet(object.interfaceName)
+        ? String(object.interfaceName)
+        : '',
     };
   },
 
   toJSON(message: ListImplementationsRequest): unknown {
     const obj: any = {};
-    message.interfaceName !== undefined && (obj.interfaceName = message.interfaceName);
+    message.interfaceName !== undefined &&
+      (obj.interfaceName = message.interfaceName);
     return obj;
   },
 
-  fromPartial(object: Partial<ListImplementationsRequest>): ListImplementationsRequest {
+  fromPartial(
+    object: Partial<ListImplementationsRequest>
+  ): ListImplementationsRequest {
     const message = createBaseListImplementationsRequest();
-    message.interfaceName = object.interfaceName ?? "";
+    message.interfaceName = object.interfaceName ?? '';
     return message;
   },
 
-  fromSDK(object: ListImplementationsRequestSDKType): ListImplementationsRequest {
+  fromSDK(
+    object: ListImplementationsRequestSDKType
+  ): ListImplementationsRequest {
     return {
-      interfaceName: isSet(object.interface_name) ? object.interface_name : undefined
+      interfaceName: isSet(object.interface_name)
+        ? object.interface_name
+        : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseListImplementationsResponse(): ListImplementationsResponse {
   return {
-    implementationMessageNames: []
+    implementationMessageNames: [],
   };
 }
 
 export const ListImplementationsResponse = {
-  encode(message: ListImplementationsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: ListImplementationsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     for (const v of message.implementationMessageNames) {
       writer.uint32(10).string(v!);
     }
@@ -247,7 +280,10 @@ export const ListImplementationsResponse = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ListImplementationsResponse {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ListImplementationsResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListImplementationsResponse();
@@ -271,7 +307,11 @@ export const ListImplementationsResponse = {
 
   fromJSON(object: any): ListImplementationsResponse {
     return {
-      implementationMessageNames: Array.isArray(object?.implementationMessageNames) ? object.implementationMessageNames.map((e: any) => String(e)) : []
+      implementationMessageNames: Array.isArray(
+        object?.implementationMessageNames
+      )
+        ? object.implementationMessageNames.map((e: any) => String(e))
+        : [],
     };
   },
 
@@ -279,7 +319,9 @@ export const ListImplementationsResponse = {
     const obj: any = {};
 
     if (message.implementationMessageNames) {
-      obj.implementationMessageNames = message.implementationMessageNames.map(e => e);
+      obj.implementationMessageNames = message.implementationMessageNames.map(
+        (e) => e
+      );
     } else {
       obj.implementationMessageNames = [];
     }
@@ -287,16 +329,24 @@ export const ListImplementationsResponse = {
     return obj;
   },
 
-  fromPartial(object: Partial<ListImplementationsResponse>): ListImplementationsResponse {
+  fromPartial(
+    object: Partial<ListImplementationsResponse>
+  ): ListImplementationsResponse {
     const message = createBaseListImplementationsResponse();
-    message.implementationMessageNames = object.implementationMessageNames?.map(e => e) || [];
+    message.implementationMessageNames =
+      object.implementationMessageNames?.map((e) => e) || [];
     return message;
   },
 
-  fromSDK(object: ListImplementationsResponseSDKType): ListImplementationsResponse {
+  fromSDK(
+    object: ListImplementationsResponseSDKType
+  ): ListImplementationsResponse {
     return {
-      implementationMessageNames: Array.isArray(object?.implementation_message_names) ? object.implementation_message_names.map((e: any) => e) : []
+      implementationMessageNames: Array.isArray(
+        object?.implementation_message_names
+      )
+        ? object.implementation_message_names.map((e: any) => e)
+        : [],
     };
-  }
-
+  },
 };

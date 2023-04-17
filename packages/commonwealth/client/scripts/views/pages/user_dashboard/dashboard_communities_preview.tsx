@@ -41,7 +41,7 @@ const CommunityPreviewCard = (props: CommunityPreviewCardProps) => {
       }}
     >
       <div className="card-top">
-        <CWCommunityAvatar community={chain}/>
+        <CWCommunityAvatar community={chain} />
         <CWText type="h4" fontWeight="medium">
           {chain.name}
         </CWText>
@@ -84,7 +84,7 @@ export const DashboardCommunitiesPreview = () => {
       return threadCountB - threadCountA;
     })
     .map((chain, i) => {
-      return <CommunityPreviewCard key={i} chain={chain}/>;
+      return <CommunityPreviewCard key={i} chain={chain} />;
     });
 
   return (

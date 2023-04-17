@@ -112,15 +112,5 @@ export default class SearchQuery implements SearchParams {
       SearchScope.Communities,
       SearchScope.Members,
     ];
-    // return this.searchScope[0] === SearchScope.All
-    //   ? this.chainScope
-    //     ? [SearchScope.Threads, SearchScope.Replies]
-    //     : [
-    //         SearchScope.Threads,
-    //         SearchScope.Replies,
-    //         SearchScope.Communities,
-    //         SearchScope.Members,
-    //       ]
-    //   : this.searchScope;
   }
 }

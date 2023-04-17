@@ -47,6 +47,7 @@ type SearchBarPreviewRowProps = {
     address: string;
     address_chain: string;
     proposalid: string;
+    profile_id?: string;
     title: string;
     body?: string;
     text?: string;
@@ -156,9 +157,14 @@ export const SearchBarCommunityPreviewRow = (
 
 export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
   const { searchResult } = props;
+  const navigate = useCommonNavigate();
+
+  const handleClick = () => {
+    navigate(`/profile/id/${searchResult.profile_id}`, {}, null);
+  };
 
   return (
-    <div className="SearchBarMemberPreviewRow">
+    <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
       <User
         user={app.newProfiles.getProfile(
           searchResult.chain,

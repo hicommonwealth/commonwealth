@@ -198,10 +198,7 @@ export class ChainTesting {
    * @param proposalId
    * @param govType type of governor. 'compound' || 'aave
    */
-  public async executeProposal(
-    proposalId: string,
-    govType = 'compound'
-  ) {
+  public async executeProposal(proposalId: string, govType = 'compound') {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
       `${this.host}/gov/${govType}/execute`,
@@ -225,10 +222,7 @@ export class ChainTesting {
    * @param govType type of governor. 'compound' || 'aave
    * @returns JSON data of proposal
    */
-  public async getProposalDetails(
-    proposalId: string,
-    govType = 'compound'
-  ) {
+  public async getProposalDetails(proposalId: string, govType = 'compound') {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
       `${this.host}/gov/${govType}/proposalDetails`,
