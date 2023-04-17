@@ -44,8 +44,8 @@ export const CWFilterMenu = (props: FilterMenuProps) => {
               </CWText>
               {filterMenuItems.map((item, i) => {
                 const isChecked =
-                  selectedItems.find((i) => {
-                    return i === item.value;
+                  selectedItems.find((itemToCheck) => {
+                    return itemToCheck === item.value;
                   }) !== undefined;
 
                 return (

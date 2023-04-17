@@ -43,7 +43,7 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
 
       if (commentId) jumpHighlightComment(Number(commentId));
     }
-  }, []);
+  }, [comments?.length, highlightedComment]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
