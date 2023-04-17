@@ -10,7 +10,7 @@ if [ ! -d $SCRIPT_DIR/cosmos-sdk ];
     then
         echo "cosmos-sdk folder does not exist, downloading cosmos-sdk"
         cd $SCRIPT_DIR
-        wget -qO- https://github.com/cosmos/cosmos-sdk/archive/refs/tags/v0.46.11.tar.gz | tar -xz 
+        curl -sSL https://github.com/cosmos/cosmos-sdk/archive/refs/tags/v0.46.11.tar.gz | tar -xz
         mv $SCRIPT_DIR/cosmos-sdk-0.46.11 $SCRIPT_DIR/cosmos-sdk
     else
         echo "cosmos-sdk folder exists, skipping wget"

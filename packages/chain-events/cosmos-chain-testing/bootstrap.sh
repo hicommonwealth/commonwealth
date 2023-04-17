@@ -12,12 +12,8 @@ CSDK_CHAIN_ID="testnet"
 apk add dasel
 apk add nginx
 cp /root/nginx.conf /etc/nginx
-PORT=${PORT:=8080}
+PORT=${PORT:=5050}
 sed -i "s/listen\ 80;/listen\ ${PORT};/" /etc/nginx/nginx.conf
-
-#build simd binary
-# make build
-# cd build
 
 simd init csdk-local --chain-id $CSDK_CHAIN_ID
 simd config keyring-backend test
