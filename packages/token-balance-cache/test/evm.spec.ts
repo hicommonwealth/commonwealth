@@ -27,6 +27,7 @@ describe('EVM Token BP unit tests', () => {
       let amt = 10;
       const accounts = await testSDK.getAccounts()
       const token = "0x92D6C1e31e14520e676a687F0a93788B716BEff5"
+      console.log(accounts)
       await testSDK.getErc20(token, accounts[0],amt.toString());
       const balance = await tbc.getBalancesForAddresses(1, [accounts[0]], 'eth-token', {contractType: 'erc20', tokenAddress: token});
       amt *= 1e18;
