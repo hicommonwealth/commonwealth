@@ -121,7 +121,7 @@ jobs:
         run: yarn --ignore-engines
         
       - name: Start EVM Testnet
-        run: docker run -d --pull missing --name chain  --network $(docker network ls -q) --network-alias chain -p 8545:8545  -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8 
+        run: docker run -d --pull missing --name chain --network $(docker network ls -q) --network-alias chain -p 8545:8545 -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache:latest --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8 
       
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
