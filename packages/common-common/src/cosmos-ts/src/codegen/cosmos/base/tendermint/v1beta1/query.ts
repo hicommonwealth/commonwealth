@@ -1,10 +1,15 @@
-import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../query/v1beta1/pagination";
-import { Any, AnySDKType } from "../../../../google/protobuf/any";
-import { BlockID, BlockIDSDKType } from "../../../../tendermint/types/types";
-import { Block, BlockSDKType } from "../../../../tendermint/types/block";
-import { NodeInfo, NodeInfoSDKType } from "../../../../tendermint/p2p/types";
-import * as _m0 from "protobufjs/minimal";
-import { Long, isSet } from "../../../../helpers";
+import {
+  PageRequest,
+  PageRequestSDKType,
+  PageResponse,
+  PageResponseSDKType,
+} from '../../query/v1beta1/pagination';
+import { Any, AnySDKType } from '../../../../google/protobuf/any';
+import { BlockID, BlockIDSDKType } from '../../../../tendermint/types/types';
+import { Block, BlockSDKType } from '../../../../tendermint/types/block';
+import { NodeInfo, NodeInfoSDKType } from '../../../../tendermint/p2p/types';
+import * as _m0 from 'protobufjs/minimal';
+import { Long, isSet } from '../../../../helpers';
 /** GetValidatorSetByHeightRequest is the request type for the Query/GetValidatorSetByHeight RPC method. */
 
 export interface GetValidatorSetByHeightRequest {
@@ -215,12 +220,15 @@ export interface ModuleSDKType {
 function createBaseGetValidatorSetByHeightRequest(): GetValidatorSetByHeightRequest {
   return {
     height: Long.ZERO,
-    pagination: undefined
+    pagination: undefined,
   };
 }
 
 export const GetValidatorSetByHeightRequest = {
-  encode(message: GetValidatorSetByHeightRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetValidatorSetByHeightRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (!message.height.isZero()) {
       writer.uint32(8).int64(message.height);
     }
@@ -232,7 +240,10 @@ export const GetValidatorSetByHeightRequest = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetValidatorSetByHeightRequest {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GetValidatorSetByHeightRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetValidatorSetByHeightRequest();
@@ -242,7 +253,7 @@ export const GetValidatorSetByHeightRequest = {
 
       switch (tag >>> 3) {
         case 1:
-          message.height = (reader.int64() as Long);
+          message.height = reader.int64() as Long;
           break;
 
         case 2:
@@ -261,43 +272,63 @@ export const GetValidatorSetByHeightRequest = {
   fromJSON(object: any): GetValidatorSetByHeightRequest {
     return {
       height: isSet(object.height) ? Long.fromValue(object.height) : Long.ZERO,
-      pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined
+      pagination: isSet(object.pagination)
+        ? PageRequest.fromJSON(object.pagination)
+        : undefined,
     };
   },
 
   toJSON(message: GetValidatorSetByHeightRequest): unknown {
     const obj: any = {};
-    message.height !== undefined && (obj.height = (message.height || Long.ZERO).toString());
-    message.pagination !== undefined && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    message.height !== undefined &&
+      (obj.height = (message.height || Long.ZERO).toString());
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
     return obj;
   },
 
-  fromPartial(object: Partial<GetValidatorSetByHeightRequest>): GetValidatorSetByHeightRequest {
+  fromPartial(
+    object: Partial<GetValidatorSetByHeightRequest>
+  ): GetValidatorSetByHeightRequest {
     const message = createBaseGetValidatorSetByHeightRequest();
-    message.height = object.height !== undefined && object.height !== null ? Long.fromValue(object.height) : Long.ZERO;
-    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.height =
+      object.height !== undefined && object.height !== null
+        ? Long.fromValue(object.height)
+        : Long.ZERO;
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? PageRequest.fromPartial(object.pagination)
+        : undefined;
     return message;
   },
 
-  fromSDK(object: GetValidatorSetByHeightRequestSDKType): GetValidatorSetByHeightRequest {
+  fromSDK(
+    object: GetValidatorSetByHeightRequestSDKType
+  ): GetValidatorSetByHeightRequest {
     return {
       height: isSet(object.height) ? object.height : undefined,
-      pagination: isSet(object.pagination) ? PageRequest.fromSDK(object.pagination) : undefined
+      pagination: isSet(object.pagination)
+        ? PageRequest.fromSDK(object.pagination)
+        : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseGetValidatorSetByHeightResponse(): GetValidatorSetByHeightResponse {
   return {
     blockHeight: Long.ZERO,
     validators: [],
-    pagination: undefined
+    pagination: undefined,
   };
 }
 
 export const GetValidatorSetByHeightResponse = {
-  encode(message: GetValidatorSetByHeightResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetValidatorSetByHeightResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (!message.blockHeight.isZero()) {
       writer.uint32(8).int64(message.blockHeight);
     }
@@ -307,13 +338,19 @@ export const GetValidatorSetByHeightResponse = {
     }
 
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(26).fork()
+      ).ldelim();
     }
 
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetValidatorSetByHeightResponse {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GetValidatorSetByHeightResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetValidatorSetByHeightResponse();
@@ -323,7 +360,7 @@ export const GetValidatorSetByHeightResponse = {
 
       switch (tag >>> 3) {
         case 1:
-          message.blockHeight = (reader.int64() as Long);
+          message.blockHeight = reader.int64() as Long;
           break;
 
         case 2:
@@ -345,52 +382,81 @@ export const GetValidatorSetByHeightResponse = {
 
   fromJSON(object: any): GetValidatorSetByHeightResponse {
     return {
-      blockHeight: isSet(object.blockHeight) ? Long.fromValue(object.blockHeight) : Long.ZERO,
-      validators: Array.isArray(object?.validators) ? object.validators.map((e: any) => Validator.fromJSON(e)) : [],
-      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined
+      blockHeight: isSet(object.blockHeight)
+        ? Long.fromValue(object.blockHeight)
+        : Long.ZERO,
+      validators: Array.isArray(object?.validators)
+        ? object.validators.map((e: any) => Validator.fromJSON(e))
+        : [],
+      pagination: isSet(object.pagination)
+        ? PageResponse.fromJSON(object.pagination)
+        : undefined,
     };
   },
 
   toJSON(message: GetValidatorSetByHeightResponse): unknown {
     const obj: any = {};
-    message.blockHeight !== undefined && (obj.blockHeight = (message.blockHeight || Long.ZERO).toString());
+    message.blockHeight !== undefined &&
+      (obj.blockHeight = (message.blockHeight || Long.ZERO).toString());
 
     if (message.validators) {
-      obj.validators = message.validators.map(e => e ? Validator.toJSON(e) : undefined);
+      obj.validators = message.validators.map((e) =>
+        e ? Validator.toJSON(e) : undefined
+      );
     } else {
       obj.validators = [];
     }
 
-    message.pagination !== undefined && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
     return obj;
   },
 
-  fromPartial(object: Partial<GetValidatorSetByHeightResponse>): GetValidatorSetByHeightResponse {
+  fromPartial(
+    object: Partial<GetValidatorSetByHeightResponse>
+  ): GetValidatorSetByHeightResponse {
     const message = createBaseGetValidatorSetByHeightResponse();
-    message.blockHeight = object.blockHeight !== undefined && object.blockHeight !== null ? Long.fromValue(object.blockHeight) : Long.ZERO;
-    message.validators = object.validators?.map(e => Validator.fromPartial(e)) || [];
-    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.blockHeight =
+      object.blockHeight !== undefined && object.blockHeight !== null
+        ? Long.fromValue(object.blockHeight)
+        : Long.ZERO;
+    message.validators =
+      object.validators?.map((e) => Validator.fromPartial(e)) || [];
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? PageResponse.fromPartial(object.pagination)
+        : undefined;
     return message;
   },
 
-  fromSDK(object: GetValidatorSetByHeightResponseSDKType): GetValidatorSetByHeightResponse {
+  fromSDK(
+    object: GetValidatorSetByHeightResponseSDKType
+  ): GetValidatorSetByHeightResponse {
     return {
       blockHeight: isSet(object.block_height) ? object.block_height : undefined,
-      validators: Array.isArray(object?.validators) ? object.validators.map((e: any) => Validator.fromSDK(e)) : [],
-      pagination: isSet(object.pagination) ? PageResponse.fromSDK(object.pagination) : undefined
+      validators: Array.isArray(object?.validators)
+        ? object.validators.map((e: any) => Validator.fromSDK(e))
+        : [],
+      pagination: isSet(object.pagination)
+        ? PageResponse.fromSDK(object.pagination)
+        : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseGetLatestValidatorSetRequest(): GetLatestValidatorSetRequest {
   return {
-    pagination: undefined
+    pagination: undefined,
   };
 }
 
 export const GetLatestValidatorSetRequest = {
-  encode(message: GetLatestValidatorSetRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetLatestValidatorSetRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
     }
@@ -398,7 +464,10 @@ export const GetLatestValidatorSetRequest = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetLatestValidatorSetRequest {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GetLatestValidatorSetRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetLatestValidatorSetRequest();
@@ -422,40 +491,56 @@ export const GetLatestValidatorSetRequest = {
 
   fromJSON(object: any): GetLatestValidatorSetRequest {
     return {
-      pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined
+      pagination: isSet(object.pagination)
+        ? PageRequest.fromJSON(object.pagination)
+        : undefined,
     };
   },
 
   toJSON(message: GetLatestValidatorSetRequest): unknown {
     const obj: any = {};
-    message.pagination !== undefined && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
     return obj;
   },
 
-  fromPartial(object: Partial<GetLatestValidatorSetRequest>): GetLatestValidatorSetRequest {
+  fromPartial(
+    object: Partial<GetLatestValidatorSetRequest>
+  ): GetLatestValidatorSetRequest {
     const message = createBaseGetLatestValidatorSetRequest();
-    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? PageRequest.fromPartial(object.pagination)
+        : undefined;
     return message;
   },
 
-  fromSDK(object: GetLatestValidatorSetRequestSDKType): GetLatestValidatorSetRequest {
+  fromSDK(
+    object: GetLatestValidatorSetRequestSDKType
+  ): GetLatestValidatorSetRequest {
     return {
-      pagination: isSet(object.pagination) ? PageRequest.fromSDK(object.pagination) : undefined
+      pagination: isSet(object.pagination)
+        ? PageRequest.fromSDK(object.pagination)
+        : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseGetLatestValidatorSetResponse(): GetLatestValidatorSetResponse {
   return {
     blockHeight: Long.ZERO,
     validators: [],
-    pagination: undefined
+    pagination: undefined,
   };
 }
 
 export const GetLatestValidatorSetResponse = {
-  encode(message: GetLatestValidatorSetResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetLatestValidatorSetResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (!message.blockHeight.isZero()) {
       writer.uint32(8).int64(message.blockHeight);
     }
@@ -465,13 +550,19 @@ export const GetLatestValidatorSetResponse = {
     }
 
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(26).fork()
+      ).ldelim();
     }
 
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetLatestValidatorSetResponse {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GetLatestValidatorSetResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetLatestValidatorSetResponse();
@@ -481,7 +572,7 @@ export const GetLatestValidatorSetResponse = {
 
       switch (tag >>> 3) {
         case 1:
-          message.blockHeight = (reader.int64() as Long);
+          message.blockHeight = reader.int64() as Long;
           break;
 
         case 2:
@@ -503,56 +594,85 @@ export const GetLatestValidatorSetResponse = {
 
   fromJSON(object: any): GetLatestValidatorSetResponse {
     return {
-      blockHeight: isSet(object.blockHeight) ? Long.fromValue(object.blockHeight) : Long.ZERO,
-      validators: Array.isArray(object?.validators) ? object.validators.map((e: any) => Validator.fromJSON(e)) : [],
-      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined
+      blockHeight: isSet(object.blockHeight)
+        ? Long.fromValue(object.blockHeight)
+        : Long.ZERO,
+      validators: Array.isArray(object?.validators)
+        ? object.validators.map((e: any) => Validator.fromJSON(e))
+        : [],
+      pagination: isSet(object.pagination)
+        ? PageResponse.fromJSON(object.pagination)
+        : undefined,
     };
   },
 
   toJSON(message: GetLatestValidatorSetResponse): unknown {
     const obj: any = {};
-    message.blockHeight !== undefined && (obj.blockHeight = (message.blockHeight || Long.ZERO).toString());
+    message.blockHeight !== undefined &&
+      (obj.blockHeight = (message.blockHeight || Long.ZERO).toString());
 
     if (message.validators) {
-      obj.validators = message.validators.map(e => e ? Validator.toJSON(e) : undefined);
+      obj.validators = message.validators.map((e) =>
+        e ? Validator.toJSON(e) : undefined
+      );
     } else {
       obj.validators = [];
     }
 
-    message.pagination !== undefined && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
     return obj;
   },
 
-  fromPartial(object: Partial<GetLatestValidatorSetResponse>): GetLatestValidatorSetResponse {
+  fromPartial(
+    object: Partial<GetLatestValidatorSetResponse>
+  ): GetLatestValidatorSetResponse {
     const message = createBaseGetLatestValidatorSetResponse();
-    message.blockHeight = object.blockHeight !== undefined && object.blockHeight !== null ? Long.fromValue(object.blockHeight) : Long.ZERO;
-    message.validators = object.validators?.map(e => Validator.fromPartial(e)) || [];
-    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.blockHeight =
+      object.blockHeight !== undefined && object.blockHeight !== null
+        ? Long.fromValue(object.blockHeight)
+        : Long.ZERO;
+    message.validators =
+      object.validators?.map((e) => Validator.fromPartial(e)) || [];
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? PageResponse.fromPartial(object.pagination)
+        : undefined;
     return message;
   },
 
-  fromSDK(object: GetLatestValidatorSetResponseSDKType): GetLatestValidatorSetResponse {
+  fromSDK(
+    object: GetLatestValidatorSetResponseSDKType
+  ): GetLatestValidatorSetResponse {
     return {
       blockHeight: isSet(object.block_height) ? object.block_height : undefined,
-      validators: Array.isArray(object?.validators) ? object.validators.map((e: any) => Validator.fromSDK(e)) : [],
-      pagination: isSet(object.pagination) ? PageResponse.fromSDK(object.pagination) : undefined
+      validators: Array.isArray(object?.validators)
+        ? object.validators.map((e: any) => Validator.fromSDK(e))
+        : [],
+      pagination: isSet(object.pagination)
+        ? PageResponse.fromSDK(object.pagination)
+        : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseValidator(): Validator {
   return {
-    address: "",
+    address: '',
     pubKey: undefined,
     votingPower: Long.ZERO,
-    proposerPriority: Long.ZERO
+    proposerPriority: Long.ZERO,
   };
 }
 
 export const Validator = {
-  encode(message: Validator, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.address !== "") {
+  encode(
+    message: Validator,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.address !== '') {
       writer.uint32(10).string(message.address);
     }
 
@@ -589,11 +709,11 @@ export const Validator = {
           break;
 
         case 3:
-          message.votingPower = (reader.int64() as Long);
+          message.votingPower = reader.int64() as Long;
           break;
 
         case 4:
-          message.proposerPriority = (reader.int64() as Long);
+          message.proposerPriority = reader.int64() as Long;
           break;
 
         default:
@@ -607,28 +727,46 @@ export const Validator = {
 
   fromJSON(object: any): Validator {
     return {
-      address: isSet(object.address) ? String(object.address) : "",
+      address: isSet(object.address) ? String(object.address) : '',
       pubKey: isSet(object.pubKey) ? Any.fromJSON(object.pubKey) : undefined,
-      votingPower: isSet(object.votingPower) ? Long.fromValue(object.votingPower) : Long.ZERO,
-      proposerPriority: isSet(object.proposerPriority) ? Long.fromValue(object.proposerPriority) : Long.ZERO
+      votingPower: isSet(object.votingPower)
+        ? Long.fromValue(object.votingPower)
+        : Long.ZERO,
+      proposerPriority: isSet(object.proposerPriority)
+        ? Long.fromValue(object.proposerPriority)
+        : Long.ZERO,
     };
   },
 
   toJSON(message: Validator): unknown {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
-    message.pubKey !== undefined && (obj.pubKey = message.pubKey ? Any.toJSON(message.pubKey) : undefined);
-    message.votingPower !== undefined && (obj.votingPower = (message.votingPower || Long.ZERO).toString());
-    message.proposerPriority !== undefined && (obj.proposerPriority = (message.proposerPriority || Long.ZERO).toString());
+    message.pubKey !== undefined &&
+      (obj.pubKey = message.pubKey ? Any.toJSON(message.pubKey) : undefined);
+    message.votingPower !== undefined &&
+      (obj.votingPower = (message.votingPower || Long.ZERO).toString());
+    message.proposerPriority !== undefined &&
+      (obj.proposerPriority = (
+        message.proposerPriority || Long.ZERO
+      ).toString());
     return obj;
   },
 
   fromPartial(object: Partial<Validator>): Validator {
     const message = createBaseValidator();
-    message.address = object.address ?? "";
-    message.pubKey = object.pubKey !== undefined && object.pubKey !== null ? Any.fromPartial(object.pubKey) : undefined;
-    message.votingPower = object.votingPower !== undefined && object.votingPower !== null ? Long.fromValue(object.votingPower) : Long.ZERO;
-    message.proposerPriority = object.proposerPriority !== undefined && object.proposerPriority !== null ? Long.fromValue(object.proposerPriority) : Long.ZERO;
+    message.address = object.address ?? '';
+    message.pubKey =
+      object.pubKey !== undefined && object.pubKey !== null
+        ? Any.fromPartial(object.pubKey)
+        : undefined;
+    message.votingPower =
+      object.votingPower !== undefined && object.votingPower !== null
+        ? Long.fromValue(object.votingPower)
+        : Long.ZERO;
+    message.proposerPriority =
+      object.proposerPriority !== undefined && object.proposerPriority !== null
+        ? Long.fromValue(object.proposerPriority)
+        : Long.ZERO;
     return message;
   },
 
@@ -637,20 +775,24 @@ export const Validator = {
       address: isSet(object.address) ? object.address : undefined,
       pubKey: isSet(object.pub_key) ? Any.fromSDK(object.pub_key) : undefined,
       votingPower: isSet(object.voting_power) ? object.voting_power : undefined,
-      proposerPriority: isSet(object.proposer_priority) ? object.proposer_priority : undefined
+      proposerPriority: isSet(object.proposer_priority)
+        ? object.proposer_priority
+        : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseGetBlockByHeightRequest(): GetBlockByHeightRequest {
   return {
-    height: Long.ZERO
+    height: Long.ZERO,
   };
 }
 
 export const GetBlockByHeightRequest = {
-  encode(message: GetBlockByHeightRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetBlockByHeightRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (!message.height.isZero()) {
       writer.uint32(8).int64(message.height);
     }
@@ -658,7 +800,10 @@ export const GetBlockByHeightRequest = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetBlockByHeightRequest {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GetBlockByHeightRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetBlockByHeightRequest();
@@ -668,7 +813,7 @@ export const GetBlockByHeightRequest = {
 
       switch (tag >>> 3) {
         case 1:
-          message.height = (reader.int64() as Long);
+          message.height = reader.int64() as Long;
           break;
 
         default:
@@ -682,39 +827,47 @@ export const GetBlockByHeightRequest = {
 
   fromJSON(object: any): GetBlockByHeightRequest {
     return {
-      height: isSet(object.height) ? Long.fromValue(object.height) : Long.ZERO
+      height: isSet(object.height) ? Long.fromValue(object.height) : Long.ZERO,
     };
   },
 
   toJSON(message: GetBlockByHeightRequest): unknown {
     const obj: any = {};
-    message.height !== undefined && (obj.height = (message.height || Long.ZERO).toString());
+    message.height !== undefined &&
+      (obj.height = (message.height || Long.ZERO).toString());
     return obj;
   },
 
-  fromPartial(object: Partial<GetBlockByHeightRequest>): GetBlockByHeightRequest {
+  fromPartial(
+    object: Partial<GetBlockByHeightRequest>
+  ): GetBlockByHeightRequest {
     const message = createBaseGetBlockByHeightRequest();
-    message.height = object.height !== undefined && object.height !== null ? Long.fromValue(object.height) : Long.ZERO;
+    message.height =
+      object.height !== undefined && object.height !== null
+        ? Long.fromValue(object.height)
+        : Long.ZERO;
     return message;
   },
 
   fromSDK(object: GetBlockByHeightRequestSDKType): GetBlockByHeightRequest {
     return {
-      height: isSet(object.height) ? object.height : undefined
+      height: isSet(object.height) ? object.height : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseGetBlockByHeightResponse(): GetBlockByHeightResponse {
   return {
     blockId: undefined,
-    block: undefined
+    block: undefined,
   };
 }
 
 export const GetBlockByHeightResponse = {
-  encode(message: GetBlockByHeightResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetBlockByHeightResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.blockId !== undefined) {
       BlockID.encode(message.blockId, writer.uint32(10).fork()).ldelim();
     }
@@ -726,7 +879,10 @@ export const GetBlockByHeightResponse = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetBlockByHeightResponse {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GetBlockByHeightResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetBlockByHeightResponse();
@@ -754,32 +910,47 @@ export const GetBlockByHeightResponse = {
 
   fromJSON(object: any): GetBlockByHeightResponse {
     return {
-      blockId: isSet(object.blockId) ? BlockID.fromJSON(object.blockId) : undefined,
-      block: isSet(object.block) ? Block.fromJSON(object.block) : undefined
+      blockId: isSet(object.blockId)
+        ? BlockID.fromJSON(object.blockId)
+        : undefined,
+      block: isSet(object.block) ? Block.fromJSON(object.block) : undefined,
     };
   },
 
   toJSON(message: GetBlockByHeightResponse): unknown {
     const obj: any = {};
-    message.blockId !== undefined && (obj.blockId = message.blockId ? BlockID.toJSON(message.blockId) : undefined);
-    message.block !== undefined && (obj.block = message.block ? Block.toJSON(message.block) : undefined);
+    message.blockId !== undefined &&
+      (obj.blockId = message.blockId
+        ? BlockID.toJSON(message.blockId)
+        : undefined);
+    message.block !== undefined &&
+      (obj.block = message.block ? Block.toJSON(message.block) : undefined);
     return obj;
   },
 
-  fromPartial(object: Partial<GetBlockByHeightResponse>): GetBlockByHeightResponse {
+  fromPartial(
+    object: Partial<GetBlockByHeightResponse>
+  ): GetBlockByHeightResponse {
     const message = createBaseGetBlockByHeightResponse();
-    message.blockId = object.blockId !== undefined && object.blockId !== null ? BlockID.fromPartial(object.blockId) : undefined;
-    message.block = object.block !== undefined && object.block !== null ? Block.fromPartial(object.block) : undefined;
+    message.blockId =
+      object.blockId !== undefined && object.blockId !== null
+        ? BlockID.fromPartial(object.blockId)
+        : undefined;
+    message.block =
+      object.block !== undefined && object.block !== null
+        ? Block.fromPartial(object.block)
+        : undefined;
     return message;
   },
 
   fromSDK(object: GetBlockByHeightResponseSDKType): GetBlockByHeightResponse {
     return {
-      blockId: isSet(object.block_id) ? BlockID.fromSDK(object.block_id) : undefined,
-      block: isSet(object.block) ? Block.fromSDK(object.block) : undefined
+      blockId: isSet(object.block_id)
+        ? BlockID.fromSDK(object.block_id)
+        : undefined,
+      block: isSet(object.block) ? Block.fromSDK(object.block) : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseGetLatestBlockRequest(): GetLatestBlockRequest {
@@ -787,11 +958,17 @@ function createBaseGetLatestBlockRequest(): GetLatestBlockRequest {
 }
 
 export const GetLatestBlockRequest = {
-  encode(_: GetLatestBlockRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    _: GetLatestBlockRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetLatestBlockRequest {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GetLatestBlockRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetLatestBlockRequest();
@@ -825,19 +1002,21 @@ export const GetLatestBlockRequest = {
 
   fromSDK(_: GetLatestBlockRequestSDKType): GetLatestBlockRequest {
     return {};
-  }
-
+  },
 };
 
 function createBaseGetLatestBlockResponse(): GetLatestBlockResponse {
   return {
     blockId: undefined,
-    block: undefined
+    block: undefined,
   };
 }
 
 export const GetLatestBlockResponse = {
-  encode(message: GetLatestBlockResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetLatestBlockResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.blockId !== undefined) {
       BlockID.encode(message.blockId, writer.uint32(10).fork()).ldelim();
     }
@@ -849,7 +1028,10 @@ export const GetLatestBlockResponse = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetLatestBlockResponse {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): GetLatestBlockResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetLatestBlockResponse();
@@ -877,32 +1059,45 @@ export const GetLatestBlockResponse = {
 
   fromJSON(object: any): GetLatestBlockResponse {
     return {
-      blockId: isSet(object.blockId) ? BlockID.fromJSON(object.blockId) : undefined,
-      block: isSet(object.block) ? Block.fromJSON(object.block) : undefined
+      blockId: isSet(object.blockId)
+        ? BlockID.fromJSON(object.blockId)
+        : undefined,
+      block: isSet(object.block) ? Block.fromJSON(object.block) : undefined,
     };
   },
 
   toJSON(message: GetLatestBlockResponse): unknown {
     const obj: any = {};
-    message.blockId !== undefined && (obj.blockId = message.blockId ? BlockID.toJSON(message.blockId) : undefined);
-    message.block !== undefined && (obj.block = message.block ? Block.toJSON(message.block) : undefined);
+    message.blockId !== undefined &&
+      (obj.blockId = message.blockId
+        ? BlockID.toJSON(message.blockId)
+        : undefined);
+    message.block !== undefined &&
+      (obj.block = message.block ? Block.toJSON(message.block) : undefined);
     return obj;
   },
 
   fromPartial(object: Partial<GetLatestBlockResponse>): GetLatestBlockResponse {
     const message = createBaseGetLatestBlockResponse();
-    message.blockId = object.blockId !== undefined && object.blockId !== null ? BlockID.fromPartial(object.blockId) : undefined;
-    message.block = object.block !== undefined && object.block !== null ? Block.fromPartial(object.block) : undefined;
+    message.blockId =
+      object.blockId !== undefined && object.blockId !== null
+        ? BlockID.fromPartial(object.blockId)
+        : undefined;
+    message.block =
+      object.block !== undefined && object.block !== null
+        ? Block.fromPartial(object.block)
+        : undefined;
     return message;
   },
 
   fromSDK(object: GetLatestBlockResponseSDKType): GetLatestBlockResponse {
     return {
-      blockId: isSet(object.block_id) ? BlockID.fromSDK(object.block_id) : undefined,
-      block: isSet(object.block) ? Block.fromSDK(object.block) : undefined
+      blockId: isSet(object.block_id)
+        ? BlockID.fromSDK(object.block_id)
+        : undefined,
+      block: isSet(object.block) ? Block.fromSDK(object.block) : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseGetSyncingRequest(): GetSyncingRequest {
@@ -910,7 +1105,10 @@ function createBaseGetSyncingRequest(): GetSyncingRequest {
 }
 
 export const GetSyncingRequest = {
-  encode(_: GetSyncingRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    _: GetSyncingRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     return writer;
   },
 
@@ -948,18 +1146,20 @@ export const GetSyncingRequest = {
 
   fromSDK(_: GetSyncingRequestSDKType): GetSyncingRequest {
     return {};
-  }
-
+  },
 };
 
 function createBaseGetSyncingResponse(): GetSyncingResponse {
   return {
-    syncing: false
+    syncing: false,
   };
 }
 
 export const GetSyncingResponse = {
-  encode(message: GetSyncingResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetSyncingResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.syncing === true) {
       writer.uint32(8).bool(message.syncing);
     }
@@ -991,7 +1191,7 @@ export const GetSyncingResponse = {
 
   fromJSON(object: any): GetSyncingResponse {
     return {
-      syncing: isSet(object.syncing) ? Boolean(object.syncing) : false
+      syncing: isSet(object.syncing) ? Boolean(object.syncing) : false,
     };
   },
 
@@ -1009,10 +1209,9 @@ export const GetSyncingResponse = {
 
   fromSDK(object: GetSyncingResponseSDKType): GetSyncingResponse {
     return {
-      syncing: isSet(object.syncing) ? object.syncing : undefined
+      syncing: isSet(object.syncing) ? object.syncing : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseGetNodeInfoRequest(): GetNodeInfoRequest {
@@ -1020,7 +1219,10 @@ function createBaseGetNodeInfoRequest(): GetNodeInfoRequest {
 }
 
 export const GetNodeInfoRequest = {
-  encode(_: GetNodeInfoRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    _: GetNodeInfoRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     return writer;
   },
 
@@ -1058,25 +1260,30 @@ export const GetNodeInfoRequest = {
 
   fromSDK(_: GetNodeInfoRequestSDKType): GetNodeInfoRequest {
     return {};
-  }
-
+  },
 };
 
 function createBaseGetNodeInfoResponse(): GetNodeInfoResponse {
   return {
     nodeInfo: undefined,
-    applicationVersion: undefined
+    applicationVersion: undefined,
   };
 }
 
 export const GetNodeInfoResponse = {
-  encode(message: GetNodeInfoResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: GetNodeInfoResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.nodeInfo !== undefined) {
       NodeInfo.encode(message.nodeInfo, writer.uint32(10).fork()).ldelim();
     }
 
     if (message.applicationVersion !== undefined) {
-      VersionInfo.encode(message.applicationVersion, writer.uint32(18).fork()).ldelim();
+      VersionInfo.encode(
+        message.applicationVersion,
+        writer.uint32(18).fork()
+      ).ldelim();
     }
 
     return writer;
@@ -1096,7 +1303,10 @@ export const GetNodeInfoResponse = {
           break;
 
         case 2:
-          message.applicationVersion = VersionInfo.decode(reader, reader.uint32());
+          message.applicationVersion = VersionInfo.decode(
+            reader,
+            reader.uint32()
+          );
           break;
 
         default:
@@ -1110,70 +1320,93 @@ export const GetNodeInfoResponse = {
 
   fromJSON(object: any): GetNodeInfoResponse {
     return {
-      nodeInfo: isSet(object.nodeInfo) ? NodeInfo.fromJSON(object.nodeInfo) : undefined,
-      applicationVersion: isSet(object.applicationVersion) ? VersionInfo.fromJSON(object.applicationVersion) : undefined
+      nodeInfo: isSet(object.nodeInfo)
+        ? NodeInfo.fromJSON(object.nodeInfo)
+        : undefined,
+      applicationVersion: isSet(object.applicationVersion)
+        ? VersionInfo.fromJSON(object.applicationVersion)
+        : undefined,
     };
   },
 
   toJSON(message: GetNodeInfoResponse): unknown {
     const obj: any = {};
-    message.nodeInfo !== undefined && (obj.nodeInfo = message.nodeInfo ? NodeInfo.toJSON(message.nodeInfo) : undefined);
-    message.applicationVersion !== undefined && (obj.applicationVersion = message.applicationVersion ? VersionInfo.toJSON(message.applicationVersion) : undefined);
+    message.nodeInfo !== undefined &&
+      (obj.nodeInfo = message.nodeInfo
+        ? NodeInfo.toJSON(message.nodeInfo)
+        : undefined);
+    message.applicationVersion !== undefined &&
+      (obj.applicationVersion = message.applicationVersion
+        ? VersionInfo.toJSON(message.applicationVersion)
+        : undefined);
     return obj;
   },
 
   fromPartial(object: Partial<GetNodeInfoResponse>): GetNodeInfoResponse {
     const message = createBaseGetNodeInfoResponse();
-    message.nodeInfo = object.nodeInfo !== undefined && object.nodeInfo !== null ? NodeInfo.fromPartial(object.nodeInfo) : undefined;
-    message.applicationVersion = object.applicationVersion !== undefined && object.applicationVersion !== null ? VersionInfo.fromPartial(object.applicationVersion) : undefined;
+    message.nodeInfo =
+      object.nodeInfo !== undefined && object.nodeInfo !== null
+        ? NodeInfo.fromPartial(object.nodeInfo)
+        : undefined;
+    message.applicationVersion =
+      object.applicationVersion !== undefined &&
+      object.applicationVersion !== null
+        ? VersionInfo.fromPartial(object.applicationVersion)
+        : undefined;
     return message;
   },
 
   fromSDK(object: GetNodeInfoResponseSDKType): GetNodeInfoResponse {
     return {
-      nodeInfo: isSet(object.node_info) ? NodeInfo.fromSDK(object.node_info) : undefined,
-      applicationVersion: isSet(object.application_version) ? VersionInfo.fromSDK(object.application_version) : undefined
+      nodeInfo: isSet(object.node_info)
+        ? NodeInfo.fromSDK(object.node_info)
+        : undefined,
+      applicationVersion: isSet(object.application_version)
+        ? VersionInfo.fromSDK(object.application_version)
+        : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseVersionInfo(): VersionInfo {
   return {
-    name: "",
-    appName: "",
-    version: "",
-    gitCommit: "",
-    buildTags: "",
-    goVersion: "",
+    name: '',
+    appName: '',
+    version: '',
+    gitCommit: '',
+    buildTags: '',
+    goVersion: '',
     buildDeps: [],
-    cosmosSdkVersion: ""
+    cosmosSdkVersion: '',
   };
 }
 
 export const VersionInfo = {
-  encode(message: VersionInfo, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.name !== "") {
+  encode(
+    message: VersionInfo,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.name !== '') {
       writer.uint32(10).string(message.name);
     }
 
-    if (message.appName !== "") {
+    if (message.appName !== '') {
       writer.uint32(18).string(message.appName);
     }
 
-    if (message.version !== "") {
+    if (message.version !== '') {
       writer.uint32(26).string(message.version);
     }
 
-    if (message.gitCommit !== "") {
+    if (message.gitCommit !== '') {
       writer.uint32(34).string(message.gitCommit);
     }
 
-    if (message.buildTags !== "") {
+    if (message.buildTags !== '') {
       writer.uint32(42).string(message.buildTags);
     }
 
-    if (message.goVersion !== "") {
+    if (message.goVersion !== '') {
       writer.uint32(50).string(message.goVersion);
     }
 
@@ -1181,7 +1414,7 @@ export const VersionInfo = {
       Module.encode(v!, writer.uint32(58).fork()).ldelim();
     }
 
-    if (message.cosmosSdkVersion !== "") {
+    if (message.cosmosSdkVersion !== '') {
       writer.uint32(66).string(message.cosmosSdkVersion);
     }
 
@@ -1240,14 +1473,18 @@ export const VersionInfo = {
 
   fromJSON(object: any): VersionInfo {
     return {
-      name: isSet(object.name) ? String(object.name) : "",
-      appName: isSet(object.appName) ? String(object.appName) : "",
-      version: isSet(object.version) ? String(object.version) : "",
-      gitCommit: isSet(object.gitCommit) ? String(object.gitCommit) : "",
-      buildTags: isSet(object.buildTags) ? String(object.buildTags) : "",
-      goVersion: isSet(object.goVersion) ? String(object.goVersion) : "",
-      buildDeps: Array.isArray(object?.buildDeps) ? object.buildDeps.map((e: any) => Module.fromJSON(e)) : [],
-      cosmosSdkVersion: isSet(object.cosmosSdkVersion) ? String(object.cosmosSdkVersion) : ""
+      name: isSet(object.name) ? String(object.name) : '',
+      appName: isSet(object.appName) ? String(object.appName) : '',
+      version: isSet(object.version) ? String(object.version) : '',
+      gitCommit: isSet(object.gitCommit) ? String(object.gitCommit) : '',
+      buildTags: isSet(object.buildTags) ? String(object.buildTags) : '',
+      goVersion: isSet(object.goVersion) ? String(object.goVersion) : '',
+      buildDeps: Array.isArray(object?.buildDeps)
+        ? object.buildDeps.map((e: any) => Module.fromJSON(e))
+        : [],
+      cosmosSdkVersion: isSet(object.cosmosSdkVersion)
+        ? String(object.cosmosSdkVersion)
+        : '',
     };
   },
 
@@ -1261,25 +1498,29 @@ export const VersionInfo = {
     message.goVersion !== undefined && (obj.goVersion = message.goVersion);
 
     if (message.buildDeps) {
-      obj.buildDeps = message.buildDeps.map(e => e ? Module.toJSON(e) : undefined);
+      obj.buildDeps = message.buildDeps.map((e) =>
+        e ? Module.toJSON(e) : undefined
+      );
     } else {
       obj.buildDeps = [];
     }
 
-    message.cosmosSdkVersion !== undefined && (obj.cosmosSdkVersion = message.cosmosSdkVersion);
+    message.cosmosSdkVersion !== undefined &&
+      (obj.cosmosSdkVersion = message.cosmosSdkVersion);
     return obj;
   },
 
   fromPartial(object: Partial<VersionInfo>): VersionInfo {
     const message = createBaseVersionInfo();
-    message.name = object.name ?? "";
-    message.appName = object.appName ?? "";
-    message.version = object.version ?? "";
-    message.gitCommit = object.gitCommit ?? "";
-    message.buildTags = object.buildTags ?? "";
-    message.goVersion = object.goVersion ?? "";
-    message.buildDeps = object.buildDeps?.map(e => Module.fromPartial(e)) || [];
-    message.cosmosSdkVersion = object.cosmosSdkVersion ?? "";
+    message.name = object.name ?? '';
+    message.appName = object.appName ?? '';
+    message.version = object.version ?? '';
+    message.gitCommit = object.gitCommit ?? '';
+    message.buildTags = object.buildTags ?? '';
+    message.goVersion = object.goVersion ?? '';
+    message.buildDeps =
+      object.buildDeps?.map((e) => Module.fromPartial(e)) || [];
+    message.cosmosSdkVersion = object.cosmosSdkVersion ?? '';
     return message;
   },
 
@@ -1291,32 +1532,38 @@ export const VersionInfo = {
       gitCommit: isSet(object.git_commit) ? object.git_commit : undefined,
       buildTags: isSet(object.build_tags) ? object.build_tags : undefined,
       goVersion: isSet(object.go_version) ? object.go_version : undefined,
-      buildDeps: Array.isArray(object?.build_deps) ? object.build_deps.map((e: any) => Module.fromSDK(e)) : [],
-      cosmosSdkVersion: isSet(object.cosmos_sdk_version) ? object.cosmos_sdk_version : undefined
+      buildDeps: Array.isArray(object?.build_deps)
+        ? object.build_deps.map((e: any) => Module.fromSDK(e))
+        : [],
+      cosmosSdkVersion: isSet(object.cosmos_sdk_version)
+        ? object.cosmos_sdk_version
+        : undefined,
     };
-  }
-
+  },
 };
 
 function createBaseModule(): Module {
   return {
-    path: "",
-    version: "",
-    sum: ""
+    path: '',
+    version: '',
+    sum: '',
   };
 }
 
 export const Module = {
-  encode(message: Module, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.path !== "") {
+  encode(
+    message: Module,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.path !== '') {
       writer.uint32(10).string(message.path);
     }
 
-    if (message.version !== "") {
+    if (message.version !== '') {
       writer.uint32(18).string(message.version);
     }
 
-    if (message.sum !== "") {
+    if (message.sum !== '') {
       writer.uint32(26).string(message.sum);
     }
 
@@ -1355,9 +1602,9 @@ export const Module = {
 
   fromJSON(object: any): Module {
     return {
-      path: isSet(object.path) ? String(object.path) : "",
-      version: isSet(object.version) ? String(object.version) : "",
-      sum: isSet(object.sum) ? String(object.sum) : ""
+      path: isSet(object.path) ? String(object.path) : '',
+      version: isSet(object.version) ? String(object.version) : '',
+      sum: isSet(object.sum) ? String(object.sum) : '',
     };
   },
 
@@ -1371,9 +1618,9 @@ export const Module = {
 
   fromPartial(object: Partial<Module>): Module {
     const message = createBaseModule();
-    message.path = object.path ?? "";
-    message.version = object.version ?? "";
-    message.sum = object.sum ?? "";
+    message.path = object.path ?? '';
+    message.version = object.version ?? '';
+    message.sum = object.sum ?? '';
     return message;
   },
 
@@ -1381,8 +1628,7 @@ export const Module = {
     return {
       path: isSet(object.path) ? object.path : undefined,
       version: isSet(object.version) ? object.version : undefined,
-      sum: isSet(object.sum) ? object.sum : undefined
+      sum: isSet(object.sum) ? object.sum : undefined,
     };
-  }
-
+  },
 };

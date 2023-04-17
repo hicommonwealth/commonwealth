@@ -13,7 +13,7 @@ type FeedProps = {
   noFeedMessage: string;
   defaultCount?: number;
   onFetchedDataCallback?: (data: any) => DashboardActivityNotification;
-  customScrollParent: HTMLElement;
+  customScrollParent?: HTMLElement;
 };
 
 const DEFAULT_COUNT = 10;
@@ -23,7 +23,7 @@ export const Feed = ({
   fetchData,
   noFeedMessage,
   onFetchedDataCallback,
-  customScrollParent
+  customScrollParent,
 }: FeedProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
