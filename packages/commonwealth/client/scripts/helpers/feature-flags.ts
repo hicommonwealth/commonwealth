@@ -1,5 +1,3 @@
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-
 export const featureFlags = {
-  proposalTemplates: !IS_PRODUCTION,
+  proposalTemplates: process.env.FLAG_PROPOSAL_TEMPLATES === 'true',
 };
