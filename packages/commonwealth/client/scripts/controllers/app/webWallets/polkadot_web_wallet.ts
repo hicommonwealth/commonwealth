@@ -10,7 +10,7 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 
 import app from 'state';
 import { addressSwapper } from 'utils';
-import Account from '../../../models/Account';
+import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
 class PolkadotWebWalletController

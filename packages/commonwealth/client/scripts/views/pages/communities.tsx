@@ -8,7 +8,7 @@ import type { ChainCategoryAttributes } from 'server/models/chain_category';
 import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 
 import app from 'state';
-import ChainInfo from '../../models/ChainInfo';
+import type ChainInfo from '../../models/ChainInfo';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';

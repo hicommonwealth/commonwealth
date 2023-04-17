@@ -1,4 +1,4 @@
-import ChainInfo from './ChainInfo';
+import type ChainInfo from './ChainInfo';
 
 class Webhook {
   public readonly id: number;

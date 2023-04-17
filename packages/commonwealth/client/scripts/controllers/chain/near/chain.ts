@@ -10,7 +10,7 @@ import type { CodeResult, NodeStatusResult, } from 'near-api-js/lib/providers/pr
 import type { Action, FunctionCall } from 'near-api-js/lib/transaction';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import ChainInfo from '../../../models/ChainInfo';
+import type ChainInfo from '../../../models/ChainInfo';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type { NearAccount, NearAccounts } from './account';
 import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';

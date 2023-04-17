@@ -5,7 +5,7 @@ import type { ClassComponent } from 'mithrilInterop';
 import { render } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
-import Account from '../models/Account';
+import type Account from '../models/Account';
 import type IChainAdapter from '../models/IChainAdapter';
 import { ThreadStageType } from '../models/types';
 

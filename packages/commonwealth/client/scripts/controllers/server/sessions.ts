@@ -5,7 +5,7 @@ import { addressSwapper } from 'commonwealth/shared/utils';
 
 import app from 'state';
 import { ChainBase } from '../../../../../common-common/src/types';
-import Account from '../../models/Account';
+import type Account from '../../models/Account';
 import type IWebWallet from '../../models/IWebWallet';
 import type { ISessionController } from './sessionSigners';
 import {

@@ -7,7 +7,7 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import type { provider, RLPEncodedTransaction, TransactionConfig, } from 'web3-core';
-import Account from '../../../models/Account';
+import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
 declare let window: any;

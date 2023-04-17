@@ -5,7 +5,7 @@ import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import ChainInfo from '../../../models/ChainInfo';
+import type ChainInfo from '../../../models/ChainInfo';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type SolanaAccount from './account';
 

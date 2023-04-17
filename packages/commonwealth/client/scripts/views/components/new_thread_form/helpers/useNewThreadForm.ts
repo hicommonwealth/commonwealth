@@ -1,6 +1,6 @@
 import type { DeltaStatic } from 'quill';
 import { useState } from 'react';
-import Topic from '../../../../models/Topic';
+import type Topic from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
 
 import { getTextFromDelta } from '../../react_quill_editor';

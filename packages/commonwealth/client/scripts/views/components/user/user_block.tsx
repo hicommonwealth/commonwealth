@@ -5,7 +5,7 @@ import { capitalize } from 'lodash';
 import React from 'react';
 
 import app from 'state';
-import Account from '../../../models/Account';
+import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';

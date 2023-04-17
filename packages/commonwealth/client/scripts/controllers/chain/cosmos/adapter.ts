@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 import type { IApp } from 'state';
-import ChainInfo from '../../../models/ChainInfo';
+import type ChainInfo from '../../../models/ChainInfo';
 import IChainAdapter from '../../../models/IChainAdapter';
 import type ITokenAdapter from '../../../models/ITokenAdapter';
 import type CosmosAccount from './account';

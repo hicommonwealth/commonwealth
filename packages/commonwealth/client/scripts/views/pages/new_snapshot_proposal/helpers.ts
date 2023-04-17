@@ -1,7 +1,7 @@
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { createProposal, getSpaceBlockNumber } from 'helpers/snapshot_utils';
 import app from 'state';
-import Account from '../../../models/Account';
+import type Account from '../../../models/Account';
 import { getTextFromDelta } from '../../components/react_quill_editor';
 import type { ThreadForm } from './types';
 import { NewThreadErrors } from './types';

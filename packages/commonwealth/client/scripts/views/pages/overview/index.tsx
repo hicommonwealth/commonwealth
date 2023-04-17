@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import type Thread from '../../../models/Thread';
-import Topic from '../../../models/Topic';
+import type Topic from '../../../models/Topic';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';

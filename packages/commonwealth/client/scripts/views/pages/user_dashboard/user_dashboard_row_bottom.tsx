@@ -5,7 +5,7 @@ import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 import React from 'react';
 
 import app from 'state';
-import NotificationSubscription from '../../../models/NotificationSubscription';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
 import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';

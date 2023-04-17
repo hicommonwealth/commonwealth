@@ -18,7 +18,7 @@ import { addressSwapper } from 'utils';
 import { User } from 'views/components/user/user';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { LoginModal } from 'views/modals/login_modal';
-import Account from '../../../models/Account';
+import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import ITokenAdapter from '../../../models/ITokenAdapter';
 import { SelectAddressModal } from '../../modals/select_address_modal';

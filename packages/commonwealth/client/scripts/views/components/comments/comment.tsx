@@ -6,7 +6,7 @@ import React from 'react';
 import app from 'state';
 import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
-import Account from '../../../models/Account';
+import type Account from '../../../models/Account';
 import type CommentModel from '../../../models/CommentModel';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';

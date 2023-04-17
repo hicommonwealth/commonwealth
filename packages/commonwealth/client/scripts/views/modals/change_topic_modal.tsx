@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import app from 'state';
 import type Thread from '../../models/Thread';
-import Topic from '../../models/Topic';
+import type Topic from '../../models/Topic';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { TopicSelector } from '../components/topic_selector';

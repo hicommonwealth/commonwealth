@@ -4,7 +4,7 @@ import React from 'react';
 
 import app from 'state';
 import { ContentType } from 'types';
-import CommentModel from '../../../models/CommentModel';
+import type CommentModel from '../../../models/CommentModel';
 import { CWButton } from '../component_kit/cw_button';
 import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';

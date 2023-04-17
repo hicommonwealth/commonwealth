@@ -5,8 +5,8 @@ import { redraw } from 'mithrilInterop';
 import React from 'react';
 
 import app from 'state';
-import ChainInfo from '../../../models/ChainInfo';
-import CommentModel from '../../../models/CommentModel';
+import type ChainInfo from '../../../models/ChainInfo';
+import type CommentModel from '../../../models/CommentModel';
 import { LoginModal } from '../../modals/login_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { Modal } from '../component_kit/cw_modal';

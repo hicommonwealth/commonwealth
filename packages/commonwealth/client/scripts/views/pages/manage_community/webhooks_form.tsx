@@ -10,7 +10,7 @@ import smartTruncate from 'smart-truncate';
 
 import app from 'state';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
-import Webhook from '../../../models/Webhook';
+import type Webhook from '../../../models/Webhook';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { Modal } from '../../components/component_kit/cw_modal';

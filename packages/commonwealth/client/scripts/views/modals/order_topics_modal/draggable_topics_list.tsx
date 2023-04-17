@@ -6,7 +6,7 @@ import { Virtuoso } from 'react-virtuoso';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 import { CWText } from 'views/components/component_kit/cw_text';
-import Topic from '../../../models/Topic';
+import type Topic from '../../../models/Topic';
 
 const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
   const result = Array.from(list);

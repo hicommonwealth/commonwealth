@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import Topic from '../../../models/Topic';
+import type Topic from '../../../models/Topic';
 
 import DraggableTopicsList from './draggable_topics_list';
 
