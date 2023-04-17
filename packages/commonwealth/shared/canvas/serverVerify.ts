@@ -23,7 +23,7 @@ const verifyUnpack = async (canvas_action, canvas_session, address) => {
     verify({ action, actionSignerAddress: action.session }),
     verify({ session })
   ]);
-  // assert(verifiedAction === true, "Invalid signed action (signature)");
+  assert(verifiedAction === true, "Invalid signed action (signature)");
   assert(verifiedSession === true, "Invalid signed session (signature)");
   assert(action.session === session.payload.sessionAddress, "Invalid action/session pair");
   return { action, session };

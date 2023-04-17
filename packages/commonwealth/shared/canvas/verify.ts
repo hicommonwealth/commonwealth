@@ -2,7 +2,7 @@ import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
 import { import_ } from "@brillout/import"
 
-import { constructTypedCanvasMessage } from '../adapters/chain/ethereum/keys';
+import { constructTypedActionPayload, constructTypedCanvasMessage } from '../adapters/chain/ethereum/keys';
 import { getCosmosSessionSignatureData, getCosmosActionSignatureData } from '../adapters/chain/cosmos/keys';
 
 // Direct import works on the client but fails on the server because of ESM incompatibility
@@ -53,12 +53,12 @@ export const verify = async ({
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
       const canvasEthereum = await importChainEthereum();
-      const [domain, types, value] =
-        canvasEthereum.getActionSignatureData(actionPayload);
+      const { domain, types, message } = constructTypedActionPayload(actionPayload);
+      delete types.EIP712Domain;
       const recoveredAddr = ethersUtils.verifyTypedData(
         domain,
         types,
-        value,
+        message,
         signature
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();

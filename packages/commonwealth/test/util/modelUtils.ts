@@ -17,7 +17,6 @@ import { BalanceProvider } from 'token-balance-cache/src/index';
 import { PermissionManager } from '../../shared/permissions';
 
 import { createCanvasSessionPayload, CANVAS_APPNAME } from 'canvas';
-import { constructTypedActionPayload } from 'adapters/chain/ethereum/keys';
 
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
@@ -27,6 +26,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import type { Permission } from '../../server/models/role';
 
 import {
+  constructTypedActionPayload,
   constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
@@ -135,6 +135,10 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email, session, sign: (actionPayload: ActionPayload) => {
+      console.log(sessionWallet.address)
+      console.log(actionPayload)
+      const { types, primaryType, domain, message } = constructTypedActionPayload(actionPayload)
+      console.log(">>> signing:", domain, types, message)
       const signature = signTypedData({
         privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
         data: constructTypedActionPayload(actionPayload),
@@ -249,10 +253,6 @@ export const createThread = async (args: ThreadArgs) => {
   const actionPayload: ActionPayload = {
     app: session.payload.app,
     appName: CANVAS_APPNAME,
-    from: session.payload.from,
-    timestamp: Date.now(),
-    chain: "ethereum",
-    chainId: "1",
     block: session.payload.block,
     call: "thread",
     callArgs: {
@@ -261,7 +261,11 @@ export const createThread = async (args: ThreadArgs) => {
       body: encodeURIComponent(body),
       link: url || '',
       topic: topicId || '',
-    }
+    },
+    chain: "ethereum",
+    chainId: "1",
+    from: session.payload.from,
+    timestamp: Date.now(),
   };
   const action: Action = {
     type: 'action',
@@ -272,7 +276,6 @@ export const createThread = async (args: ThreadArgs) => {
   const canvas_session = sortedStringify(session)
   const canvas_action = sortedStringify(action)
   const canvas_hash = '' // getActionHash(action)
-  // TODO
 
   const res = await chai.request
     .agent(app)
@@ -315,17 +318,17 @@ export const createComment = async (args: CommentArgs) => {
   const actionPayload: ActionPayload = {
     app: session.payload.app,
     appName: CANVAS_APPNAME,
-    from: session.payload.from,
-    timestamp: Date.now(),
-    chain: "ethereum",
-    chainId: "1",
     block: session.payload.block,
     call: "comment",
     callArgs: {
       body: text,
       thread_id,
       parent_comment_id: parentCommentId
-    }
+    },
+    chain: "ethereum",
+    chainId: "1",
+    from: session.payload.from,
+    timestamp: Date.now(),
   };
   const action: Action = {
     type: 'action',
@@ -403,13 +406,13 @@ export const createReaction = async (args: CreateReactionArgs) => {
   const actionPayload: ActionPayload = {
     app: session.payload.app,
     appName: CANVAS_APPNAME,
-    from: session.payload.from,
-    timestamp: Date.now(),
-    chain: "ethereum",
-    chainId: "1",
     block: session.payload.block,
     call: "reactComment",
-    callArgs: { comment_id, value: reaction }
+    callArgs: { comment_id, value: reaction },
+    chain: "ethereum",
+    chainId: "1",
+    from: session.payload.from,
+    timestamp: Date.now(),
   };
   const action: Action = {
     type: 'action',
