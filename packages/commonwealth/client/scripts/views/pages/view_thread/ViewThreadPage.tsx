@@ -380,7 +380,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [threadDoesNotMatch]);
 
   useEffect(() => {
-    if (comments?.length > 0) {
+    if (thread?.id && comments?.length > 0) {
       const mismatchedComments = comments.filter((c) => {
         return c.threadId !== thread.id;
       });
@@ -395,7 +395,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }));
       }
     }
-  }, [comments, thread?.id, threadId]);
+  }, [comments, thread, threadId]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
