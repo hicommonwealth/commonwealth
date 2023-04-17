@@ -126,7 +126,11 @@ const ProposalsPage = () => {
     !activeCompoundProposals?.length &&
     !activeAaveProposals?.length &&
     !activeSputnikProposals?.length
-      ? [<div className="no-proposals">No active proposals</div>]
+      ? [
+          <div key={'no-active'} className="no-proposals">
+            No active proposals
+          </div>,
+        ]
       : (activeDemocracyProposals || [])
           .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
           .concat(
@@ -201,7 +205,11 @@ const ProposalsPage = () => {
     !inactiveCompoundProposals?.length &&
     !inactiveAaveProposals?.length &&
     !inactiveSputnikProposals?.length
-      ? [<div className="no-proposals">No past proposals</div>]
+      ? [
+          <div key={'no-inactive'} className="no-proposals">
+            No past proposals
+          </div>,
+        ]
       : (inactiveDemocracyProposals || [])
           .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
           .concat(

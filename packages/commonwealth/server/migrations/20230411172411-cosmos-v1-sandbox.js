@@ -7,8 +7,8 @@ module.exports = {
         `
         INSERT INTO "ChainNodes" (name, url, alt_wallet_url, balance_type, bech32) VALUES (
           'cosmos sdk devnet',
-          'http://ec2-35-173-213-72.compute-1.amazonaws.com:26657',
-          'http://ec2-35-173-213-72.compute-1.amazonaws.com:1317',
+          'https://ec2-35-173-213-72.compute-1.amazonaws.com/rpc',
+          'https://ec2-35-173-213-72.compute-1.amazonaws.com/lcd',
           'cosmos',
           'cosmos'
         );
