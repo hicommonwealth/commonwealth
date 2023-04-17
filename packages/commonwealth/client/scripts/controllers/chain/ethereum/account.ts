@@ -1,6 +1,7 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
 import type { IApp } from 'state';
+import Account from '../../../models/Account';
 import type EthereumAccounts from './accounts';
 import EthereumChain from './chain';
 

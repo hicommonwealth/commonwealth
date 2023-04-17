@@ -6,6 +6,7 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import type { IApp } from 'state';
+import type ChainInfo from '../../../models/ChainInfo';
 import IChainAdapter from '../../../models/IChainAdapter';
 import SubstrateChain from './shared';
 import SubstrateTreasuryTips from './treasury_tips';

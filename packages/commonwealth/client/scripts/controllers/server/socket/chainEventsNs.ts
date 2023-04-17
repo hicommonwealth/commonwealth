@@ -2,6 +2,7 @@ import type { Socket } from 'socket.io-client';
 import app from 'state';
 import type { ChainEventNotification } from 'types';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
+import Notification from '../../../models/Notification';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 export class ChainEventsNamespace {

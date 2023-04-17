@@ -6,7 +6,8 @@ import { SubstrateTypes } from 'chain-events/src/types';
 import type { IApp } from 'state';
 import { formatAddressShort } from 'utils';
 import ProposalModule from '../../../models/ProposalModule';
-import type SubstrateAccounts, { SubstrateAccount } from './account';
+import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import type SubstrateChain from './shared';
 import { SubstrateTreasuryTip } from './treasury_tip';
 

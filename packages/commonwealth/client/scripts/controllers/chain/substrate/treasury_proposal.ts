@@ -3,9 +3,15 @@ import type { ISubstrateTreasuryProposal, SubstrateCoin, } from 'adapters/chain/
 import { formatCoin } from 'adapters/currency';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
-import type { BinaryVote, ChainEntity, ChainEvent, ITXModalData, ProposalEndTime, } from 'models';
+import type ChainEntity from '../../../models/ChainEntity';
+import type ChainEvent from '../../../models/ChainEvent';
+import type { ITXModalData } from '../../../models/interfaces';
+import Proposal from '../../../models/Proposal';
+import type { ProposalEndTime} from '../../../models/types';
 import { ProposalStatus, VotingType, VotingUnit } from '../../../models/types';
-import type SubstrateAccounts, { SubstrateAccount } from './account';
+import type { BinaryVote } from '../../../models/votes';
+import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import type SubstrateChain from './shared';
 import type SubstrateTreasury from './treasury';
 

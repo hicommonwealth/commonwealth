@@ -8,6 +8,8 @@ import ReactionCount from 'models/ReactionCount';
 import app from 'state';
 
 import { ReactionCountsStore } from 'stores';
+import CommentModel from '../../models/CommentModel';
+import Proposal from '../../models/Proposal';
 import Thread from '../../models/Thread';
 import type { AnyProposal } from '../../models/types';
 
@@ -51,9 +53,9 @@ class ReactionCountController {
         })
       : post instanceof Proposal
       ? {}
-      : post instanceof Comment
+      : post instanceof CommentModel
       ? await app.sessions.signCommentReaction({
-          comment_id: (post as Comment<any>).id,
+          comment_id: (post as CommentModel<any>).id,
           like,
         })
       : {};
@@ -80,8 +82,8 @@ class ReactionCountController {
         options['proposal_id']
       );
       options['chain_entity_id'] = chainEntity?.id;
-    } else if (post instanceof Comment) {
-      options['comment_id'] = (post as Comment<any>).id;
+    } else if (post instanceof CommentModel) {
+      options['comment_id'] = (post as CommentModel<any>).id;
     }
     try {
       const response = await $.post(

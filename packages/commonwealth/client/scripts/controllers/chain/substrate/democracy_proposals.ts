@@ -4,7 +4,8 @@ import type { ISubstrateDemocracyProposal, SubstrateCoin, } from 'adapters/chain
 import { SubstrateTypes } from 'chain-events/src/types';
 import type { IApp } from 'state';
 import ProposalModule from '../../../models/ProposalModule';
-import type SubstrateAccounts, { SubstrateAccount } from './account';
+import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
 import type SubstrateChain from './shared';
 

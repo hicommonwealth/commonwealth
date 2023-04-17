@@ -5,6 +5,8 @@ import moment from 'moment';
 import app from 'state';
 
 import PollStore from 'stores/PollStore';
+import Poll from '../../models/Poll';
+import Vote from '../../models/Vote';
 
 export const modelFromServer = (poll) => {
   const {

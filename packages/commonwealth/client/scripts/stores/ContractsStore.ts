@@ -1,3 +1,4 @@
+import type Contract from '../models/Contract';
 import IdStore from './IdStore';
 
 // Models a store of all the contracts

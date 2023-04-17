@@ -7,6 +7,7 @@ import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 
 import type { IApp } from 'state';
+import type ChainInfo from '../../../../models/ChainInfo';
 import IChainAdapter from '../../../../models/IChainAdapter';
 import CompoundChain from './chain';
 import CompoundGovernance from './governance';

@@ -19,7 +19,8 @@ import type { ITXModalData } from '../../../models/interfaces';
 import ProposalModule from '../../../models/ProposalModule';
 import type CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
-import type CosmosChain, { CosmosApiType } from './chain';
+import type CosmosChain from './chain';
+import type { CosmosApiType } from './chain';
 import { CosmosProposal } from './proposal';
 
 /** This file is a copy of controllers/chain/cosmos/governance.ts, modified for

@@ -9,15 +9,20 @@ import { EventEmitter } from 'events';
 import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
 import { redraw } from 'mithrilInterop';
-import { Attachment, NotificationSubscription, Poll, Thread, ThreadStage, } from 'models';
 import moment from 'moment';
 import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
+import Attachment from '../../models/Attachment';
 import type ChainEntity from '../../models/ChainEntity';
 import type MinimumProfile from '../../models/MinimumProfile';
+import NotificationSubscription from '../../models/NotificationSubscription';
+import Poll from '../../models/Poll';
+import Thread from '../../models/Thread';
+import type Topic from '../../models/Topic';
+import { ThreadStageType } from '../../models/types';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -309,7 +314,7 @@ class ThreadsController {
       const result = this.modelFromServer(response.result);
 
       // Update stage counts
-      if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
+      if (result.stage === ThreadStageType.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
       this._listingStore.add(result);
@@ -387,8 +392,8 @@ class ThreadsController {
       success: (response) => {
         const result = this.modelFromServer(response.result);
         // Update counters
-        if (proposal.stage === ThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
+        if (proposal.stage === ThreadStageType.Voting) this.numVotingThreads--;
+        if (result.stage === ThreadStageType.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
@@ -429,7 +434,7 @@ class ThreadsController {
     });
   }
 
-  public async setStage(args: { threadId: number; stage: ThreadStage }) {
+  public async setStage(args: { threadId: number; stage: ThreadStageType }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadStage`,
       type: 'POST',
@@ -442,8 +447,8 @@ class ThreadsController {
       success: (response) => {
         const result = this.modelFromServer(response.result);
         // Update counters
-        if (args.stage === ThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
+        if (args.stage === ThreadStageType.Voting) this.numVotingThreads--;
+        if (result.stage === ThreadStageType.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);

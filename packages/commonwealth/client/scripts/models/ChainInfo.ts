@@ -4,6 +4,7 @@ import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 import { render } from 'mithrilInterop';
 import app from 'state';
+import { AccessLevel } from '../../../shared/permissions';
 
 import { CWAvatar, CWJdenticon, } from '../views/components/component_kit/cw_avatar';
 import type CommunityRole from './CommunityRole';

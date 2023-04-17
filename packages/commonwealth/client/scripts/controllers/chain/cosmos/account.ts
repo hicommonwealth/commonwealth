@@ -3,6 +3,7 @@ import CosmosChain from 'controllers/chain/cosmos/chain';
 import type { CosmosToken } from 'controllers/chain/cosmos/types';
 import _ from 'lodash';
 import type { IApp } from 'state';
+import Account from '../../../models/Account';
 import type CosmosAccounts from './accounts';
 
 export default class CosmosAccount extends Account {

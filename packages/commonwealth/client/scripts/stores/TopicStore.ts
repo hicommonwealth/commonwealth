@@ -1,4 +1,5 @@
 import { byAscendingCreationDate } from '../helpers';
+import type Topic from '../models/Topic';
 import IdStore from './IdStore';
 
 // TODO: Differentiate between topics associated with a chain, and topics associated with a community

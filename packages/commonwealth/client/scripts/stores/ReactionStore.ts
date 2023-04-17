@@ -1,5 +1,8 @@
 import { byAscendingCreationDate } from '../helpers';
 import AbridgedThread from '../models/AbridgedThread';
+import type CommentModel from '../models/CommentModel';
+import Proposal from '../models/Proposal';
+import Reaction from '../models/Reaction';
 import Thread from '../models/Thread';
 import type { AnyProposal } from '../models/types';
 import IdStore from './IdStore';
@@ -56,14 +59,14 @@ class ReactionStore extends IdStore<Reaction> {
   }
 
   public getByPost(
-    post: Thread | AbridgedThread | AnyProposal | Comment<any>
+    post: Thread | AbridgedThread | AnyProposal | CommentModel<any>
   ): Array<Reaction> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
   public getPostIdentifier(
-    rxnOrPost: Reaction | Thread | AbridgedThread | AnyProposal | Comment<any>
+    rxnOrPost: Reaction | Thread | AbridgedThread | AnyProposal | CommentModel<any>
   ) {
     if (rxnOrPost instanceof Reaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;

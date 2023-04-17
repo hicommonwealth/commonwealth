@@ -12,13 +12,16 @@ import type {
   QueryTallyResultResponse,
   QueryVotesResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import { DepositVote, Proposal, ProposalStatus, VotingType, VotingUnit, } from 'models';
 import moment from 'moment';
 import type { ITXModalData, IVote } from '../../../models/interfaces';
+import Proposal from '../../../models/Proposal';
+import { ProposalStatus, VotingType, VotingUnit } from '../../../models/types';
 import type { ProposalEndTime } from '../../../models/types';
+import { DepositVote } from '../../../models/votes';
 import CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
-import type CosmosChain, { CosmosApiType } from './chain';
+import type CosmosChain from './chain';
+import type { CosmosApiType } from './chain';
 import type CosmosGovernance from './governance';
 import { marshalTally } from './governance';
 import type CosmosGovernanceV1 from './governance-v1';

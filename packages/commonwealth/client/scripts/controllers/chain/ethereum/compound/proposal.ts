@@ -12,8 +12,12 @@ import { utils } from 'ethers';
 import { blocknumToTime } from 'helpers';
 import { capitalize } from 'lodash';
 
-import type { ChainEntity, ChainEvent, ITXModalData, IVote, ProposalEndTime, } from 'models';
 import moment from 'moment';
+import type ChainEntity from '../../../../models/ChainEntity';
+import type ChainEvent from '../../../../models/ChainEvent';
+import type { ITXModalData, IVote } from '../../../../models/interfaces';
+import Proposal from '../../../../models/Proposal';
+import type { ProposalEndTime} from '../../../../models/types';
 import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';

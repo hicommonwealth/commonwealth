@@ -3,6 +3,7 @@ import { ContractType } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/adapter';
 import $ from 'jquery';
 import type { IApp } from 'state';
+import ChainInfo from '../../../models/ChainInfo';
 import type ITokenAdapter from '../../../models/ITokenAdapter';
 
 export default class Token extends Ethereum implements ITokenAdapter {

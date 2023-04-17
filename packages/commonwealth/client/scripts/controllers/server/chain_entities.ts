@@ -9,6 +9,7 @@ import app from 'state';
 import { proposalSlugToChainEntityType } from '../../identifiers';
 import ChainEntity from '../../models/ChainEntity';
 import ChainEvent from '../../models/ChainEvent';
+import type ChainInfo from '../../models/ChainInfo';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;

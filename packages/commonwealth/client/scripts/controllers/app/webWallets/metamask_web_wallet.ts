@@ -12,6 +12,8 @@ import type Web3 from 'web3';
 
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
+import type Account from '../../../models/Account';
+import BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';
 
 class MetamaskWebWalletController implements IWebWallet<string> {

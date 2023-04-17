@@ -12,6 +12,7 @@ import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
+import ChainInfo from '../../../models/ChainInfo';
 import type { IChainModule, ITXData, ITXModalData } from '../../../models/interfaces';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';

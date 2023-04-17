@@ -4,6 +4,7 @@ import { ChainBase, ContractType } from 'common-common/src/types';
 import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import type { IApp } from 'state';
+import ChainInfo from '../../../../models/ChainInfo';
 import IChainAdapter from '../../../../models/IChainAdapter';
 import CommonwealthAPI from './api';
 

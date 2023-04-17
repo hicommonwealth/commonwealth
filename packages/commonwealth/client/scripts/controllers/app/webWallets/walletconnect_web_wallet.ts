@@ -7,6 +7,9 @@ import app from 'state';
 import type Web3 from 'web3';
 
 import { hexToNumber } from 'web3-utils';
+import type Account from '../../../models/Account';
+import BlockInfo from '../../../models/BlockInfo';
+import type ChainInfo from '../../../models/ChainInfo';
 import type IWebWallet from '../../../models/IWebWallet';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {

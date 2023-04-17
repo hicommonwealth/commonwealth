@@ -9,7 +9,10 @@ import $ from 'jquery';
 import { redraw } from 'mithrilInterop';
 import moment from 'moment';
 import app, { initAppState } from 'state';
+import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
+import type BlockInfo from '../../models/BlockInfo';
+import type ChainInfo from '../../models/ChainInfo';
 import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
 

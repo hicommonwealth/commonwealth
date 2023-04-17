@@ -1,6 +1,9 @@
 import { ReactionStore } from 'stores';
 import type AbridgedThread from '../../models/AbridgedThread';
+import CommentModel from '../../models/CommentModel';
+import Reaction from '../../models/Reaction';
 import type Thread from '../../models/Thread';
+import type { AnyProposal } from '../../models/types';
 
 export const modelFromServer = (reaction) => {
   return new Reaction({
@@ -26,7 +29,7 @@ class ReactionsController {
     return this._store;
   }
 
-  public getByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>) {
+  public getByPost(post: Thread | AbridgedThread | AnyProposal | CommentModel<any>) {
     return this._store.getByPost(post);
   }
 

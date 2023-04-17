@@ -3,6 +3,7 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of Ronin login

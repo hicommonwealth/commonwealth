@@ -6,6 +6,8 @@ import 'pages/manage_community/upgrade_roles_form.scss';
 import React, { useState } from 'react';
 
 import app from 'state';
+import { AccessLevel } from '../../../../../shared/permissions';
+import type RoleInfo from '../../../models/RoleInfo';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 

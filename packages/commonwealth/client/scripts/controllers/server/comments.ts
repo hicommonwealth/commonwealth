@@ -7,6 +7,8 @@ import moment from 'moment';
 import app from 'state';
 import { CommentsStore } from 'stores';
 import type AbridgedThread from '../../models/AbridgedThread';
+import Attachment from '../../models/Attachment';
+import CommentModel from '../../models/CommentModel';
 import type { IUniqueId } from '../../models/interfaces';
 import type Thread from '../../models/Thread';
 import { updateLastVisited } from '../app/login';
@@ -91,7 +93,7 @@ export const modelFromServer = (comment) => {
           canvasHash: comment.canvas_hash,
         };
 
-  return new Comment(commentParams);
+  return new CommentModel(commentParams);
 };
 
 class CommentsController {
@@ -176,7 +178,7 @@ class CommentsController {
   }
 
   public async edit(
-    comment: Comment<any>,
+    comment: CommentModel<any>,
     body: string,
     attachments?: string[]
   ) {
@@ -237,7 +239,7 @@ class CommentsController {
             canvas_session: session,
             canvas_hash: hash,
           });
-          const softDeletion = new Comment(revisedComment);
+          const softDeletion = new CommentModel(revisedComment);
           this._store.remove(existing);
           this._store.add(softDeletion);
           resolve(result);

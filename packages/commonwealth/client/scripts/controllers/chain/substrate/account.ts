@@ -6,6 +6,7 @@ import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import Account from '../../../models/Account';
 import type { IAccountsModule } from '../../../models/interfaces';
 import SubstrateChain from './shared';
 

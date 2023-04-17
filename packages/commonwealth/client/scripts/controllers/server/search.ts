@@ -3,10 +3,9 @@ import moment from 'moment';
 import app from 'state';
 import SearchStore from 'stores/SearchStore';
 import { SearchContentType } from 'types';
-import type { Thread } from '../../models';
-import { SearchQuery } from '../../models';
 import type { SearchParams } from '../../models/SearchQuery';
-import { SearchScope } from '../../models/SearchQuery';
+import SearchQuery, { SearchScope } from '../../models/SearchQuery';
+import type Thread from '../../models/Thread';
 
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query

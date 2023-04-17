@@ -1,14 +1,15 @@
 import { byAscendingCreationDate } from '../helpers';
 import type AbridgedThread from '../models/AbridgedThread';
+import type CommentModel from '../models/CommentModel';
 import type Thread from '../models/Thread';
 import IdStore from './IdStore';
 
-class CommentsStore extends IdStore<Comment<any>> {
-  private _storeAuthor: { [address: string]: Array<Comment<any>> } = {};
+class CommentsStore extends IdStore<CommentModel<any>> {
+  private _storeAuthor: { [address: string]: Array<CommentModel<any>> } = {};
 
-  private _storeProposal: { [identifier: string]: Array<Comment<any>> } = {};
+  private _storeProposal: { [identifier: string]: Array<CommentModel<any>> } = {};
 
-  public add(comment: Comment<any>) {
+  public add(comment: CommentModel<any>) {
     // TODO: Remove this once we start enforcing an ordering in stores
     super.add(comment);
     this.getAll().sort(byAscendingCreationDate);
@@ -25,7 +26,7 @@ class CommentsStore extends IdStore<Comment<any>> {
     return this;
   }
 
-  public remove(comment: Comment<any>) {
+  public remove(comment: CommentModel<any>) {
     super.remove(comment);
 
     const authorIndex = this._storeAuthor[comment.author].indexOf(comment);
@@ -64,15 +65,15 @@ class CommentsStore extends IdStore<Comment<any>> {
     return this;
   }
 
-  public getById(id: number): Comment<any> {
+  public getById(id: number): CommentModel<any> {
     return this._store.find((c) => c.id === id);
   }
 
-  public getByAuthor(address: string): Array<Comment<any>> {
+  public getByAuthor(address: string): Array<CommentModel<any>> {
     return this._storeAuthor[address] || [];
   }
 
-  public getByThread(thread: Thread | AbridgedThread): Array<Comment<any>> {
+  public getByThread(thread: Thread | AbridgedThread): Array<CommentModel<any>> {
     return this._storeProposal[thread.id] || [];
   }
 

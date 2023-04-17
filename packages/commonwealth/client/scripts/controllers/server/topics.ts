@@ -3,6 +3,7 @@ import $ from 'jquery';
 import app from 'state';
 
 import { TopicStore } from 'stores';
+import Topic from '../../models/Topic';
 
 class TopicsController {
   private _store: TopicStore = new TopicStore();

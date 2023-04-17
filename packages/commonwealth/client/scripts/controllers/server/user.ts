@@ -4,8 +4,12 @@ import { EventEmitter } from 'events';
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import $ from 'jquery';
 
-import type { Account, AddressInfo, ChainInfo, SocialAccount, StarredCommunity, } from 'models';
 import app from 'state';
+import Account from '../../models/Account';
+import AddressInfo from '../../models/AddressInfo';
+import ChainInfo from '../../models/ChainInfo';
+import SocialAccount from '../../models/SocialAccount';
+import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
 import DraftsController from './drafts';
 

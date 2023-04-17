@@ -3,6 +3,7 @@ import type { ConnectedWallet, WalletController, } from '@terra-money/wallet-con
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
+import type Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
 // TODO: ensure this only opens on mobile

@@ -4,6 +4,7 @@ import { Account as NearJsAccount, keyStores } from 'near-api-js';
 import type { AccountView } from 'near-api-js/lib/providers/provider';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
+import Account from '../../../models/Account';
 import type { IAccountsModule } from '../../../models/interfaces';
 import type NearChain from './chain';
 

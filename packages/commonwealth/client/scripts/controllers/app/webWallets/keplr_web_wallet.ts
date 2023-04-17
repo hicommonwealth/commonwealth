@@ -4,6 +4,7 @@ import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
+import Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 
 declare global {

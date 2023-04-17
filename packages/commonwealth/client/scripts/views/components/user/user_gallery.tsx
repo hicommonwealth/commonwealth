@@ -2,6 +2,8 @@ import 'components/user/user_gallery.scss';
 import React from 'react';
 
 import app from 'state';
+import type Account from '../../../models/Account';
+import type AddressInfo from '../../../models/AddressInfo';
 import { AnonymousUser } from './anonymous_user';
 import { User } from './user';
 

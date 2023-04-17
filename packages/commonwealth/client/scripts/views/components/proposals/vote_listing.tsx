@@ -13,7 +13,7 @@ import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { VotingUnit } from '../../../models/types';
 import { BinaryVote, DepositVote } from '../../../models/votes';
-import { User } from '../../components/user/user';
+import { User } from '../user/user';
 import { CWText } from '../component_kit/cw_text';
 
 const getBalance = (vote: IVote<any>) => {

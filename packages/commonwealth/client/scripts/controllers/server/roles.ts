@@ -5,6 +5,10 @@ import app from 'state';
 import type { RoleObject } from 'types';
 
 import { aggregatePermissions } from 'utils';
+import Account from '../../models/Account';
+import type AddressInfo from '../../models/AddressInfo';
+import type ChainInfo from '../../models/ChainInfo';
+import type RoleInfo from '../../models/RoleInfo';
 import type { UserController } from './user';
 
 const getPermissionLevel = (permission: AccessLevel | undefined) => {

@@ -8,6 +8,7 @@ import type NearChain from 'controllers/chain/near/chain';
 import moment from 'moment';
 import type { Near as NearApi } from 'near-api-js';
 import type { ITXModalData } from '../../../../models/interfaces';
+import Proposal from '../../../../models/Proposal';
 import type { ProposalEndTime } from '../../../../models/types';
 import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
 import type NearSputnikDao from './dao';

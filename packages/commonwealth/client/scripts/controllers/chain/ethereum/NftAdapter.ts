@@ -7,6 +7,7 @@ import { ContractType } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/adapter';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 import type { IApp } from 'state';
+import type ChainInfo from '../../../models/ChainInfo';
 import type ITokenAdapter from '../../../models/ITokenAdapter';
 
 class NftApi extends ContractApi<ERC721> {}
