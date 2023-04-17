@@ -9,7 +9,7 @@ export const createDeltaFromText = (
   return {
     ops: [
       {
-        insert: str,
+        insert: str || '',
       },
     ],
     ___isMarkdown: !!isMarkdown,
@@ -109,6 +109,10 @@ export const serializeDelta = (delta: DeltaStatic): string => {
 // parseDelta converts a string to a delta object for state
 export const deserializeDelta = (str: string): DeltaStatic => {
   try {
+    if (typeof str !== 'string') {
+      // empty richtext delta
+      return createDeltaFromText('', false);
+    }
     // is richtext delta object
     const delta: DeltaStatic = JSON.parse(str);
     if (!delta.ops) {
@@ -122,7 +126,7 @@ export const deserializeDelta = (str: string): DeltaStatic => {
 };
 
 // countLinesQuill returns the number of text lines for a quill ops array
-export const countLinesQuill = (delta: DeltaStatic) : number => {
+export const countLinesQuill = (delta: DeltaStatic): number => {
   if (!delta || !delta.ops) {
     return 0;
   }

@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { Navigate } from 'navigation/helpers';
 import { withLayout } from 'views/layout';
+import { featureFlags } from 'helpers/feature-flags';
 
 const LandingPage = lazy(() => import('views/pages/landing'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
@@ -18,8 +19,8 @@ const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
-const NotificationSettingsPage = lazy(() =>
-  import('views/pages/notification_settings')
+const NotificationSettingsPage = lazy(
+  () => import('views/pages/notification_settings')
 );
 
 const ReferendaPage = lazy(() => import('views/pages/referenda'));
@@ -27,44 +28,44 @@ const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
-const DiscussionsPage = lazy(() =>
-  import('views/pages/discussions/DiscussionsPage')
+const DiscussionsPage = lazy(
+  () => import('views/pages/discussions/DiscussionsPage')
 );
-const ViewThreadPage = lazy(() =>
-  import('../views/pages/view_thread/ViewThreadPage')
+const ViewThreadPage = lazy(
+  () => import('../views/pages/view_thread/ViewThreadPage')
 );
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
-const DiscussionsRedirectPage = lazy(() =>
-  import('views/pages/discussions_redirect')
+const DiscussionsRedirectPage = lazy(
+  () => import('views/pages/discussions_redirect')
 );
 const FeedPage = lazy(() => import('views/pages/feed'));
 
 const ContractsPage = lazy(() => import('views/pages/contracts'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
 const GeneralContractPage = lazy(() => import('views/pages/general_contract'));
-const NewContractTemplatePage = lazy(() =>
-  import('views/pages/new_contract_template')
+const NewContractTemplatePage = lazy(
+  () => import('views/pages/new_contract_template')
 );
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
 const TreasuryPage = lazy(() => import('views/pages/treasury'));
 const TipsPage = lazy(() => import('views/pages/tips'));
 
-const ManageCommunityPage = lazy(() =>
-  import('views/pages/manage_community/ManageCommunityPage')
+const ManageCommunityPage = lazy(
+  () => import('views/pages/manage_community/ManageCommunityPage')
 );
 const AnalyticsPage = lazy(() => import('views/pages/stats'));
-const SnapshotProposalPage = lazy(() =>
-  import('views/pages/snapshot_proposals')
+const SnapshotProposalPage = lazy(
+  () => import('views/pages/snapshot_proposals')
 );
-const ViewMultipleSnapshotsPage = lazy(() =>
-  import('views/pages/view_multiple_snapshot_spaces')
+const ViewMultipleSnapshotsPage = lazy(
+  () => import('views/pages/view_multiple_snapshot_spaces')
 );
-const ViewSnapshotsProposalPage = lazy(() =>
-  import('views/pages/view_snapshot_proposal')
+const ViewSnapshotsProposalPage = lazy(
+  () => import('views/pages/view_snapshot_proposal')
 );
-const NewSnapshotProposalPage = lazy(() =>
-  import('views/pages/new_snapshot_proposal')
+const NewSnapshotProposalPage = lazy(
+  () => import('views/pages/new_snapshot_proposal')
 );
 
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
@@ -273,49 +274,57 @@ const commonDomainsRoutes = () => [
       scoped: true,
     })}
   />,
-  <Route
-    path="/:scope/feed"
-    element={withLayout(FeedPage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
+  ...(featureFlags.communityHomepage
+    ? [
+        <Route
+          path="/:scope/feed"
+          element={withLayout(FeedPage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+      ]
+    : []),
   // DISCUSSIONS END
 
   // CONTRACTS
-  <Route
-    path="/:scope/contracts"
-    element={withLayout(ContractsPage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
-  <Route
-    path="/:scope/new/contract"
-    element={withLayout(NewContractPage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
-  <Route
-    path="/:scope/new/contract_template/:contract_id"
-    element={withLayout(NewContractTemplatePage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
-  <Route
-    path="/:scope/contract/:contractAddress"
-    element={withLayout(GeneralContractPage, {
-      scoped: true,
-    })}
-  />,
-  <Route
-    path="/:scope/:contract_address/:slug"
-    element={withLayout(ViewTemplatePage, {
-      scoped: true,
-    })}
-  />,
+  ...(featureFlags.proposalTemplates
+    ? [
+        <Route
+          path="/:scope/contracts"
+          element={withLayout(ContractsPage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+        <Route
+          path="/:scope/new/contract"
+          element={withLayout(NewContractPage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+        <Route
+          path="/:scope/new/contract_template/:contract_id"
+          element={withLayout(NewContractTemplatePage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+        <Route
+          path="/:scope/contract/:contractAddress"
+          element={withLayout(GeneralContractPage, {
+            scoped: true,
+          })}
+        />,
+        <Route
+          path="/:scope/:contract_address/:slug"
+          element={withLayout(ViewTemplatePage, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   // CONTRACTS END
 
   // TREASURY

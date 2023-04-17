@@ -58,7 +58,7 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
             }}
             accountVerifiedCallback={() => onModalClose()}
             linking={false}
-            hideConnectAnotherWayLink={true}
+            hasNoWalletsLink={false}
             showResetWalletConnect={wcEnabled}
           />
         </div>
@@ -67,6 +67,7 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
   );
 };
 
+/* TODO: uncomment when shipping
 export const sessionSigninModal = () => {
   return new Promise<void>((resolve, reject) => {
     app.modals.create({
@@ -77,3 +78,4 @@ export const sessionSigninModal = () => {
     });
   });
 };
+*/

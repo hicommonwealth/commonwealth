@@ -14,6 +14,7 @@ type FeedProps = {
   noFeedMessage: string;
   defaultCount?: number;
   onFetchedDataCallback?: (data: any) => DashboardActivityNotification;
+  customScrollParent?: HTMLElement;
 };
 
 const DEFAULT_COUNT = 10;
@@ -23,6 +24,7 @@ export const Feed = ({
   fetchData,
   noFeedMessage,
   onFetchedDataCallback,
+  customScrollParent,
 }: FeedProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
@@ -77,6 +79,7 @@ export const Feed = ({
   return (
     <div className="Feed">
       <Virtuoso
+        customScrollParent={customScrollParent}
         totalCount={currentCount}
         endReached={loadMore}
         style={{ height: '100%' }}

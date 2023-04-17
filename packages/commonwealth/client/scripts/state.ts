@@ -66,6 +66,7 @@ export interface IApp {
   threadReactions: ThreadReactionsController;
   reactionCounts: ReactionCountsController;
   polls: PollsController;
+  threadUpdateEmitter: EventEmitter;
 
   // Search
   search: SearchController;
@@ -162,6 +163,7 @@ const app: IApp = {
   threadReactions: new ThreadReactionsController(),
   reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
+  threadUpdateEmitter: new EventEmitter(),
 
   // Community
   communities: new CommunitiesController(),

@@ -30,9 +30,9 @@ class ThreadReactionsController {
       action = null,
       hash = null,
     } = await app.sessions.signThreadReaction({
-          thread_id: thread.id,
-          like,
-        });
+      thread_id: thread.id,
+      like,
+    });
 
     const options = {
       author_chain: app.user.activeAccount.chain.id,
@@ -72,8 +72,8 @@ class ThreadReactionsController {
       action = null,
       hash = null,
     } = await app.sessions.signDeleteThreadReaction({
-          thread_id: thread.id,
-        });
+      thread_id: thread.id,
+    });
 
     await axios.post(`${app.serverUrl()}/deleteReaction`, {
       jwt: app.user.jwt,
