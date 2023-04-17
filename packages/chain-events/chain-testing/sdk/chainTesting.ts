@@ -5,18 +5,29 @@ import {
   chainGetEth,
   erc20BalanceReq,
   erc20Transfer,
-  erc721Approve,
   govCompCreate,
   govCompGetVotes,
   govCompProposalId,
   govCompVote,
 } from '../src/types';
+import { ERC721 } from './nft';
 
 export class ChainTesting {
   host: string;
   header = {
     headers: {
       'Content-Type': 'application/json',
+    },
+  };
+
+  contractAddrs = {
+    compound: {
+      governance: '0xc0Da02939E1441F497fd74F78cE7Decb17B66529',
+      token: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
+    },
+    aave: {
+      governance: '0xEC568fffba86c094cf06b22134B23074DFE2252c',
+      token: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
     },
   };
 
@@ -280,96 +291,13 @@ export class ChainTesting {
     );
   }
 
-  // ERC721
   /**
-   * Transfer a specific ERC721 token ID
-   * @param nftAddress ERC721 Contract Address
-   * @param tokenId NFT token ID
-   * @param to transfer to
-   * @param from transfer from: optional if using acct Index
-   * @param accountIndex transfer from: optional if using from
+   * Deploys an ERC721 and produces a reuseable object to interact with it
+   * @returns ERC721 Object
    */
-  public async transferERC721(
-    nftAddress: string,
-    tokenId: string,
-    to: string,
-    from?: string,
-    accountIndex?: number
-  ) {
-    const request: erc721Approve = {
-      nftAddress,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/transfer`,
-      JSON.stringify(request),
-      this.header
-    );
-    return response.data;
-  }
-
-  /**
-   * Approve a single ERC721 for use
-   * @param nftAddress ERC721 Contract Address
-   * @param tokenId NFT token ID
-   * @param to the operator to approve to
-   * @param from from acct(owner): optional if using acct Index
-   * @param accountIndex from acct index(owner): optional if using from
-   */
-  public async approveERC721(
-    nftAddress: string,
-    tokenId: string,
-    to: string,
-    from?: string,
-    accountIndex?: number
-  ) {
-    const request: erc721Approve = {
-      nftAddress,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-      all: false,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/approve`,
-      JSON.stringify(request),
-      this.header
-    );
-    return response.data;
-  }
-  /**
-   * Approve all holdings for use
-   * @param nftAddress ERC721 Contract Address
-   * @param tokenId NFT token ID
-   * @param to the operator to approve to
-   * @param from from acct(owner): optional if using acct Index
-   * @param accountIndex from acct index(owner): optional if using from
-   */
-  public async approveAllERC721(
-    nftAddress: string,
-    tokenId: string,
-    to: string,
-    from?: string,
-    accountIndex?: number
-  ) {
-    const request: erc721Approve = {
-      nftAddress,
-      tokenId,
-      to,
-      from,
-      accountIndex,
-      all: true,
-    };
-    const response = await axios.post(
-      `${this.host}/erc721/approve`,
-      JSON.stringify(request),
-      this.header
-    );
-    return response.data;
+  public async deployNFT(): Promise<ERC721> {
+    const response = await axios.get(`${this.host}/erc721/deploy`);
+    return new ERC721(this.host, this.header, response.data['contractAddress']);
   }
 
   //RPC
