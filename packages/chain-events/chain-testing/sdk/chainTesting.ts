@@ -89,6 +89,7 @@ export class ChainTesting {
   public async getErc20(tokenAddress: string, to: string, amount: string) {
     const fromBank = true;
     const request: erc20Transfer = { tokenAddress, to, amount, fromBank };
+    console.log(JSON.stringify(request))
     const response = await axios.post(
       `${this.host}/erc20/transfer`,
       JSON.stringify(request),
