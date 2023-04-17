@@ -60,7 +60,7 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
             {moment(thread.created_at).fromNow()}
           </CWText>
         </div>
-        <CWText noWrap>
+        <CWText>
           <QuillRenderer
             hideFormatting={true}
             doc={thread.body}
@@ -110,7 +110,7 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
             {moment(comment.created_at).fromNow()}
           </CWText>
         </div>
-        <CWText noWrap>
+        <CWText>
           <QuillRenderer
             hideFormatting={true}
             doc={comment.text}
