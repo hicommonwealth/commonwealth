@@ -72,7 +72,7 @@ export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
       statAction={
         <CWButton
           buttonType="primary-blue"
-          onClick={() => navigate('/new/proposal')}
+          onClick={() => navigate('/new/proposal', { deferChain: false })}
           label="New proposal"
         />
       }

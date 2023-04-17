@@ -161,13 +161,14 @@ const customDomainRoutes = () => {
       path="/new/proposal/:type"
       element={withLayout(NewProposalPage, {
         scoped: true,
+        deferChain: false,
       })}
     />,
     <Route
       path="/new/proposal"
       element={withLayout(NewProposalPage, {
         scoped: true,
-        deferChain: true,
+        deferChain: false,
       })}
     />,
     // GOVERNANCE END

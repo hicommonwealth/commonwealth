@@ -94,7 +94,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New On-Chain Proposal',
-            onClick: () => navigate('/new/proposal'),
+            onClick: () => navigate('/new/proposal', { deferChain: false }),
             iconLeft: 'star',
           },
         ]
@@ -105,7 +105,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New Sputnik proposal',
-            onClick: () => navigate('/new/proposal'),
+            onClick: () => navigate('/new/proposal', { deferChain: false }),
             iconLeft: 'democraticProposal',
           },
         ]
@@ -119,6 +119,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             onClick: () =>
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
+                deferChain: false,
               }),
             iconLeft: 'treasuryProposal',
           },
@@ -127,6 +128,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             onClick: () =>
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateDemocracyProposal,
+                deferChain: false,
               }),
             iconLeft: 'democraticProposal',
           },
@@ -135,6 +137,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             onClick: () =>
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
+                deferChain: false,
               }),
             iconLeft: 'jar',
           },

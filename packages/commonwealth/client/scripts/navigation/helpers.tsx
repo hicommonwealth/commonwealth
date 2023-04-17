@@ -12,6 +12,8 @@ type NavigateWithParamsProps = {
   to: string | ((params: Record<string, string | undefined>) => string);
 };
 
+type CommonNavigateOptions = NavigateOptions & { deferChain: boolean };
+
 export const Navigate = ({ to }: NavigateWithParamsProps) => {
   const params = useParams();
   const navigateTo = typeof to === 'string' ? to : to(params);
@@ -56,7 +58,7 @@ export const useCommonNavigate = () => {
    *  To navigate without prefix whatsoever, the null has to be passed.
    *  navigate("/privacy", {}, null)
    */
-  return (url: To, options?: NavigateOptions, prefix?: null | string) => {
+  return (url: To, options?: CommonNavigateOptions, prefix?: null | string) => {
     if (prefix && prefix.startsWith('/')) {
       console.warn('Prefix should not start with slash character!');
     }
