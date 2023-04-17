@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { notifySuccess } from 'controllers/app/notifications';
 import { redraw } from 'mithrilInterop';
 import moment from 'moment';

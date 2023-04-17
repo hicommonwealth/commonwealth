@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
+import useForceRerender from '../../../hooks/useForceRerender';
 import RoleInfo from '../../../models/RoleInfo';
 import Sublayout from '../../sublayout';
 import ErrorPage from '../error';

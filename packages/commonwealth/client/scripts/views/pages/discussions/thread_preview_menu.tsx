@@ -1,8 +1,9 @@
 import { redraw } from 'mithrilInterop';
-import { useCommonNavigate } from 'navigation/helpers';
 import type { Dispatch, SetStateAction } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 import app from 'state';
+import { ThreadActionType } from '../../../../../shared/types';
+import { notifySuccess } from '../../../controllers/app/notifications';
 import type Thread from '../../../models/Thread';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';

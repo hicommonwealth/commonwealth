@@ -1,15 +1,11 @@
-import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
+import axios from 'axios';
 import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import $ from 'jquery';
 import { uuidv4 } from 'lib/util';
-
-import type { ResultNode } from 'mithrilInterop';
-import { ClassComponent, redraw } from 'mithrilInterop';
+import { redraw } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
-import { PermissionManager } from 'permissions';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import app from 'state';
 import { AvatarUpload } from 'views/components/avatar_upload';

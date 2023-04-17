@@ -1,8 +1,4 @@
 import { ChainBase } from 'common-common/src/types';
-import React from 'react';
-
-import _ from 'lodash';
-import app, { initAppState } from 'state';
 
 import { completeClientLogin, loginWithMagicLink, updateActiveAddresses, } from 'controllers/app/login';
 

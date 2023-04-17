@@ -1,6 +1,4 @@
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-import { EventEmitter } from 'events';
-import React, { useState, useEffect } from 'react';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 
 import 'components/header/login_selector.scss';
