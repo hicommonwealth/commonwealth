@@ -9,7 +9,7 @@ async function mockNodesProvider(): Promise<IChainNode[]> {
     return [
       {
         id: 1,
-        url: 'http://chain:8545',
+        url: 'http://127.0.0.1:8545',
         eth_chain_id: 5555,
         balance_type: BalanceType.Ethereum,
         name: 'eth-token',
@@ -19,7 +19,7 @@ async function mockNodesProvider(): Promise<IChainNode[]> {
 const providers = [new evmBalanceProvider()]
 const tbc = new TokenBalanceCache(0, 0, providers, mockNodesProvider);
 
-const testSDK = new ChainTesting("http://evm_test_app:3000");
+const testSDK = new ChainTesting("http://127.0.0.1:3000");
 
 describe('EVM Token BP unit tests', () => {
     it('should return correct ERC20 balance', async () => {
