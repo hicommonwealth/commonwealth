@@ -113,7 +113,7 @@ describe('Token Forum tests', () => {
       thread_id: res.result.id,
       session: userSession.session,
       sign: userSession.sign,
-  });
+    });
 
     expect(cRes.status).to.equal('Success');
     expect(cRes.result).to.not.be.null;
@@ -184,7 +184,8 @@ describe('Token Forum tests', () => {
       jwt: adminJWT,
       session: adminSession.session,
       sign: adminSession.sign,
-  });
+    });
+
     expect(res.status).to.equal('Success');
     expect(res.result).to.not.be.null;
     expect(res.result.title).to.equal(encodeURIComponent(title));

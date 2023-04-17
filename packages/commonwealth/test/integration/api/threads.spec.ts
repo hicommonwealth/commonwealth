@@ -437,7 +437,7 @@ describe('Thread Tests', () => {
         jwt: userJWT,
         text: markdownComment.text,
         thread_id: thread.id,
-        parentCommentId: `${parentId}`,
+        parentCommentId: parentId,
         session: userSession.session,
         sign: userSession.sign,
       });

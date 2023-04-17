@@ -191,7 +191,13 @@ const createComment = async (
     // check always passes if the comment text isn't a Quill document
   }
 
-  await verifyComment(canvas_action, canvas_session, canvas_hash, { thread_id, text: decodeURIComponent(text), address: author.address, chain: chain.id, parent_comment_id: parent_id ?? parseInt(parent_id, 10) });
+  await verifyComment(canvas_action, canvas_session, canvas_hash, {
+    thread_id: parseInt(thread_id, 10),
+    text,
+    address: author.address,
+    chain: chain.id,
+    parent_comment_id: parent_id ? parseInt(parent_id, 10) : null
+  });
 
   // New comments get an empty version history initialized, which is passed
   // the comment's first version, formatted on the backend with timestamps

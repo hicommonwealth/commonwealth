@@ -227,8 +227,6 @@ const createThread = async (
   } = req.body;
   let { topic_id } = req.body;
 
-  await verifyThread(canvas_action, canvas_session, canvas_hash, { title, body, address: author.address, community: chain.id, topic: topic_id });
-
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
       return next(new AppError(Errors.DiscussionMissingTitle));
@@ -301,6 +299,15 @@ const createThread = async (
     canvas_session,
     canvas_hash,
   };
+
+  // Some topics will be null because they were created after the thread was initialized.
+  await verifyThread(canvas_action, canvas_session, canvas_hash, {
+    title,
+    body,
+    address: author.address,
+    community: chain.id,
+    topic: topic_id ?? null,
+  });
 
   // begin essential database changes within transaction
   const finalThread = await sequelize.transaction(async (transaction) => {

@@ -66,7 +66,14 @@ const createReaction = async (
     return next(new AppError(Errors.NoReaction));
   }
 
-  await verifyReaction(canvas_action, canvas_session, canvas_hash, { thread_id, comment_id, proposal_id, address: author.address, chain: chain.id, value: reaction });
+  await verifyReaction(canvas_action, canvas_session, canvas_hash, {
+    thread_id: thread_id ?? parseInt(thread_id, 10),
+    comment_id: comment_id ?? parseInt(comment_id, 10),
+    proposal_id,
+    address: author.address,
+    chain: chain.id,
+    value: reaction
+  });
 
   let thread;
   if (thread_id) {
