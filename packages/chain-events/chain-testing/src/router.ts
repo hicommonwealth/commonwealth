@@ -6,7 +6,12 @@ import {
   getETH,
 } from './routes/chain';
 import { approve, getBalance, getTokens, transfer } from './routes/erc20';
-import { approve721, transfer721 } from './routes/erc721';
+import {
+  approve721,
+  deploy721,
+  mintBurn721,
+  transfer721,
+} from './routes/erc721';
 import {
   cancelProposal,
   castVote,
@@ -55,6 +60,8 @@ function setupRouter(): Router {
 
   router.post('/erc721/approve', approve721);
   router.post('/erc721/transfer', transfer721);
+  router.get('/erc721/deploy', deploy721);
+  router.post('/erc721/mintBurn', mintBurn721);
 
   return router;
 }

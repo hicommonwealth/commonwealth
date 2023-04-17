@@ -2,12 +2,8 @@ const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = merge(common, {
-  entry: {
-    app: 'app.ts',
-  },
   mode: 'production',
   stats: 'errors-only',
   bail: true,

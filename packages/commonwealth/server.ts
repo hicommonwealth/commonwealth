@@ -300,5 +300,5 @@ async function main() {
   setupServer(app, rollbar, models, rabbitMQController);
 }
 
-main().catch(e => console.log(e));
+main().catch((e) => console.log(e));
 export default app;

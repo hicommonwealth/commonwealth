@@ -2,11 +2,14 @@ import React from 'react';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
-export const renderTruncatedHighlights = (searchTerm: string, docText: string) => {
+export const renderTruncatedHighlights = (
+  searchTerm: string,
+  docText: string
+) => {
   // extract highlighted text
   const chunks = findAll({
     searchWords: [searchTerm.trim()],
-    textToHighlight: docText
+    textToHighlight: docText,
   });
 
   // convert chunks to rendered components

@@ -110,7 +110,7 @@ export const CosmosProposalForm = () => {
               title,
               description,
               recipient,
-              payoutAmount
+              payoutAmount.toString(),
             );
           } else {
             throw new Error('Unknown Cosmos proposal type.');

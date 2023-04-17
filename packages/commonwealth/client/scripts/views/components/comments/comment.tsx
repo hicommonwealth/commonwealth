@@ -19,8 +19,6 @@ import { clearEditingLocalStorage } from './helpers';
 import { AnonymousUser } from '../user/anonymous_user';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
-import { showCanvasVerifyDataModal } from '../../modals/canvas_verify_data_modal';
-import { verify } from '../../../helpers/canvas';
 
 type CommentAuthorProps = {
   comment: CommentType<any>;
@@ -32,14 +30,21 @@ const CommentAuthor = (props: CommentAuthorProps) => {
   // Check for accounts on forums that originally signed up on a different base chain,
   // Render them as anonymous as the forum is unable to support them.
   if (app.chain.meta.type === ChainType.Offchain) {
-    if (comment.authorChain !== app.chain.id && comment.authorChain !== app.chain.base) {
+    if (
+      comment.authorChain !== app.chain.id &&
+      comment.authorChain !== app.chain.base
+    ) {
       return <AnonymousUser distinguishingKey={comment.author} />;
     }
   }
 
   const author: Account = app.chain.accounts.get(comment.author);
 
-  return comment.deleted ? <span>[deleted]</span> : <User avatarSize={24} user={author} popover linkify />;
+  return comment.deleted ? (
+    <span>[deleted]</span>
+  ) : (
+    <User avatarSize={24} user={author} popover linkify />
+  );
 };
 
 type CommentProps = {
@@ -54,11 +59,20 @@ type CommentProps = {
 };
 
 export const Comment = (props: CommentProps) => {
-  const { comment, handleIsReplying, isLast, isLocked, setIsGloballyEditing, threadLevel, updatedCommentsCallback } =
-    props;
+  const {
+    comment,
+    handleIsReplying,
+    isLast,
+    isLocked,
+    setIsGloballyEditing,
+    threadLevel,
+    updatedCommentsCallback,
+  } = props;
 
-  const [isEditingComment, setIsEditingComment] = React.useState<boolean>(false);
-  const [shouldRestoreEdits, setShouldRestoreEdits] = React.useState<boolean>(false);
+  const [isEditingComment, setIsEditingComment] =
+    React.useState<boolean>(false);
+  const [shouldRestoreEdits, setShouldRestoreEdits] =
+    React.useState<boolean>(false);
   const [savedEdits, setSavedEdits] = React.useState<string>('');
 
   const { isLoggedIn } = useUserLoggedIn();
@@ -72,16 +86,18 @@ export const Comment = (props: CommentProps) => {
     app.user.isSiteAdmin ||
     app.roles.isRoleOfCommunity({
       role: 'admin',
-      chain: app.activeChainId()
+      chain: app.activeChainId(),
     }) ||
     app.roles.isRoleOfCommunity({
       role: 'moderator',
-      chain: app.activeChainId()
+      chain: app.activeChainId(),
     });
 
   const canReply = !isLast && !isLocked && isLoggedIn && app.user.activeAccount;
 
-  const canEditAndDelete = !isLocked && (comment.author === app.user.activeAccount?.address || isAdminOrMod);
+  const canEditAndDelete =
+    !isLocked &&
+    (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
   const deleteComment = async () => {
     await app.comments.delete(comment);
@@ -132,7 +148,12 @@ export const Comment = (props: CommentProps) => {
           {/* <CWText type="caption" className="published-text">
               published on
             </CWText> */}
-          <CWText key={comment.id} type="caption" fontWeight="medium" className="published-text">
+          <CWText
+            key={comment.id}
+            type="caption"
+            fontWeight="medium"
+            className="published-text"
+          >
             {moment(comment.createdAt).format('l')}
           </CWText>
         </div>
@@ -182,7 +203,11 @@ export const Comment = (props: CommentProps) => {
                   {canEditAndDelete && (
                     <PopoverMenu
                       renderTrigger={(onclick) => (
-                        <CWIconButton iconName="dotsVertical" iconSize="small" onClick={onclick} />
+                        <CWIconButton
+                          iconName="dotsVertical"
+                          iconSize="small"
+                          onClick={onclick}
+                        />
                       )}
                       menuItems={[
                         {
@@ -191,23 +216,32 @@ export const Comment = (props: CommentProps) => {
                           onClick: async (e) => {
                             e.preventDefault();
                             setSavedEdits(
-                              localStorage.getItem(`${app.activeChainId()}-edit-comment-${comment.id}-storedText`)
+                              localStorage.getItem(
+                                `${app.activeChainId()}-edit-comment-${
+                                  comment.id
+                                }-storedText`
+                              )
                             );
                             if (savedEdits) {
-                              clearEditingLocalStorage(comment.id, ContentType.Comment);
+                              clearEditingLocalStorage(
+                                comment.id,
+                                ContentType.Comment
+                              );
 
-                              const confirmationResult = window.confirm('Previous changes found. Restore edits?');
+                              const confirmationResult = window.confirm(
+                                'Previous changes found. Restore edits?'
+                              );
 
                               setShouldRestoreEdits(confirmationResult);
                             }
                             handleSetIsEditingComment(true);
-                          }
+                          },
                         },
                         {
                           label: 'Delete',
                           iconLeft: 'trash',
-                          onClick: deleteComment
-                        }
+                          onClick: deleteComment,
+                        },
                       ]}
                     />
                   )}

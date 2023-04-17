@@ -72,9 +72,11 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
     };
   }, []);
 
-  const isSubscribed =
+  const [isSubscribed, setIsSubscribed] = useState(
     getCommentSubscription(thread)?.isActive &&
-    getReactionSubscription(thread)?.isActive;
+      getReactionSubscription(thread)?.isActive
+  );
+  const [isLocked, setIsLocked] = useState(thread.readOnly);
 
   const hasAdminPermissions =
     app.user.activeAccount &&
@@ -141,7 +143,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
-              {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
+              {isLocked && <CWIcon iconName="lock" iconSize="small" />}
             </div>
             <div className="top-row-icons">
               {isHot(thread) && <div className="flame" />}
@@ -219,7 +221,9 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                 }}
               >
                 <PopoverMenu
-                  menuItems={[getThreadSubScriptionMenuItem(thread)]}
+                  menuItems={[
+                    getThreadSubScriptionMenuItem(thread, setIsSubscribed),
+                  ]}
                   renderTrigger={(onclick) => (
                     <CWIconButton
                       iconName={isSubscribed ? 'unsubscribe' : 'bell'}
@@ -236,6 +240,7 @@ export const ThreadPreview = ({ thread }: ThreadPreviewProps) => {
                   setIsUpdateProposalStatusModalOpen={
                     setIsUpdateProposalStatusModalOpen
                   }
+                  setIsLocked={setIsLocked}
                 />
               )}
             </div>
