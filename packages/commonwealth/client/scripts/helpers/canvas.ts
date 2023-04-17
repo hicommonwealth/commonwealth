@@ -1,7 +1,7 @@
 import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
 
-import { getEIP712SignableSession } from '../../../shared/adapters/chain/ethereum/keys';
+import { getEIP712SignableAction, getEIP712SignableSession } from '../../../shared/adapters/chain/ethereum/keys';
 import { getADR036SignableAction, getADR036SignableSession } from '../../../shared/adapters/chain/cosmos/keys';
 
 // TODO: verify payload is not expired
@@ -30,12 +30,13 @@ export const verify = async ({
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
       const canvasEthereum = await import('@canvas-js/chain-ethereum');
-      const [domain, types, value] =
-        canvasEthereum.getAction(actionPayload);
+      const { domain, types, message } =
+        getEIP712SignableAction(actionPayload);
+      // vs. const [domain, types, value] = canvasEthereum.getAction(actionPayload);
       const recoveredAddr = ethersUtils.verifyTypedData(
-        domain,
+        domain as any,
         types,
-        value,
+        message,
         signature
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();

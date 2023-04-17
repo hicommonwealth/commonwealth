@@ -90,11 +90,18 @@ export const showSessionSigninModal = () => {
 
   root = createRoot(target);
 
-  return new Promise((resolve) => {
-    root.render(<SessionSigninModal onVerified={() => {
-      resolve();
-      root.unmount();
-      target.remove();
-    }} />);
+  return new Promise<void>((resolve, reject) => {
+    root.render(<SessionSigninModal
+                onVerified={() => {
+                  resolve();
+                  root.unmount();
+                  target.remove();
+                }}
+                onClose={() => {
+                  reject();
+                  root.unmount();
+                  target.remove();
+                }}
+      />);
   });
 };

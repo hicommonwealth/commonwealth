@@ -17,7 +17,7 @@ import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 
 import { getEIP712SignableSession } from '../../shared/adapters/chain/ethereum/keys';
-import { getCosmosSessionSignatureData } from '../../shared/adapters/chain/cosmos/keys';
+import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
 import { addressSwapper } from '../../shared/utils';
 import {
   chainBaseToCanvasChain,
@@ -217,7 +217,7 @@ const verifySessionSignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const generatedSignDoc = await getCosmosSessionSignatureData(
+          const generatedSignDoc = await getADR036SignableSession(
             Buffer.from(sortedStringify(canvasSessionPayload)),
             generatedAddress
           );

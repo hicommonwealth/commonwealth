@@ -56,7 +56,7 @@ export const verify = async ({
       const { domain, types, message } = getEIP712SignableAction(actionPayload);
       delete types.EIP712Domain;
       const recoveredAddr = ethersUtils.verifyTypedData(
-        domain,
+        domain as any, // domain.salt has incompatible type
         types,
         message,
         signature
