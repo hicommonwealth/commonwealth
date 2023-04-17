@@ -8,7 +8,10 @@ import { useNavigate } from 'react-router-dom';
 
 import app from 'state';
 import _ from 'underscore';
-import { Account, AddressInfo, MinimumProfile, NewProfile as Profile, } from '../../models';
+import Account from '../../models/Account';
+import AddressInfo from '../../models/AddressInfo';
+import MinimumProfile from '../../models/MinimumProfile';
+import NewProfile from '../../models/NewProfile';
 import { AvatarUpload } from '../components/avatar_upload';
 import { CWButton } from '../components/component_kit/cw_button';
 import type { ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
@@ -43,7 +46,7 @@ const EditProfileComponent = () => {
   const [error, setError] = useState<EditProfileError>(EditProfileError.None);
   const [loading, setLoading] = useState(true);
   const [socials, setSocials] = useState<string[]>();
-  const [profile, setProfile] = useState<Profile>();
+  const [profile, setProfile] = useState<NewProfile>();
   const [name, setName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState();
   const [bio, setBio] = React.useState<DeltaStatic>(createDeltaFromText(''));
@@ -60,7 +63,7 @@ const EditProfileComponent = () => {
         },
       });
 
-      setProfile(new Profile(response.data.result.profile));
+      setProfile(new NewProfile(response.data.result.profile));
       setName(response.data.result.profile.profile_name || '');
       setEmail(response.data.result.profile.email || '');
       setSocials(response.data.result.profile.socials);

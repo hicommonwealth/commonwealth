@@ -1,3 +1,4 @@
+import Account from '../../../models/Account';
 import type IWebWallet from '../../../models/IWebWallet';
 import type { ProfileRowProps } from '../../components/component_kit/cw_profiles_list';
 

@@ -16,6 +16,7 @@ import { redraw } from 'mithrilInterop';
 import React from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
+import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import type IWebWallet from '../../../models/IWebWallet';
 

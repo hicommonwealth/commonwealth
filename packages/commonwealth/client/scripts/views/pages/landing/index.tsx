@@ -5,6 +5,7 @@ import React from 'react';
 
 
 import app, { LoginState } from 'state';
+import ChainInfo from '../../../models/ChainInfo';
 import { CWText } from '../../components/component_kit/cw_text';
 import { Footer } from '../../footer';
 import UserDashboard from '../user_dashboard';

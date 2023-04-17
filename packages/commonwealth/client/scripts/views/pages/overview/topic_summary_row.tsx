@@ -9,6 +9,7 @@ import React from 'react';
 import app from 'state';
 import { slugify } from 'utils';
 import type Thread from '../../../models/Thread';
+import Topic from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';

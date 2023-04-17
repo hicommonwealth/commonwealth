@@ -8,6 +8,7 @@ import React from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';
+import RoleInfo from '../../../models/RoleInfo';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
 

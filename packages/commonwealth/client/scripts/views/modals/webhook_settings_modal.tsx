@@ -9,6 +9,7 @@ import {
 
 import 'modals/webhook_settings_modal.scss';
 import React, { useState } from 'react';
+import Webhook from '../../models/Webhook';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';

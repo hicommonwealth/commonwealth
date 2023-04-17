@@ -1,5 +1,6 @@
 import 'pages/manage_community/admin_panel_tabs.scss';
 import React from 'react';
+import RoleInfo from '../../../models/RoleInfo';
 
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { UpgradeRolesForm } from './upgrade_roles_form';

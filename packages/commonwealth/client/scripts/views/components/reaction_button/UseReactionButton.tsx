@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import TopicGateCheck from '../../../controllers/chain/ethereum/gatedTopic';
-import type { ChainInfo, Thread } from '../../../models/index';
+import ChainInfo from '../../../models/ChainInfo';
+import Thread from '../../../models/Thread';
 import app from '../../../state';
 
 export const useReactionButton = (thread: Thread, setReactors) => {

@@ -5,6 +5,8 @@ import { redraw } from 'mithrilInterop';
 import React from 'react';
 
 import app from 'state';
+import ChainInfo from '../../../models/ChainInfo';
+import CommentModel from '../../../models/CommentModel';
 import { LoginModal } from '../../modals/login_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { Modal } from '../component_kit/cw_modal';
@@ -14,7 +16,7 @@ import { getClasses, isWindowMediumSmallInclusive, } from '../component_kit/help
 import { fetchReactionsByPost, getDisplayedReactorsForPopup, onReactionClick, } from './helpers';
 
 type CommentReactionButtonProps = {
-  comment: Comment<any>;
+  comment: CommentModel<any>;
 };
 
 export const CommentReactionButton = (props: CommentReactionButtonProps) => {

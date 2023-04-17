@@ -1,4 +1,5 @@
 import type { AccessLevel } from 'permissions';
+import AddressInfo from './AddressInfo';
 
 class RoleInfo {
   public readonly id: number;

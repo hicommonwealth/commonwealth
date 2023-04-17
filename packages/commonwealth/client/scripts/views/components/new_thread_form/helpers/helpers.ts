@@ -2,6 +2,7 @@ import { notifyError } from 'controllers/app/notifications';
 import topics from 'controllers/server/topics';
 import app from 'state';
 import type IChainAdapter from '../../../../models/IChainAdapter';
+import Topic from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';

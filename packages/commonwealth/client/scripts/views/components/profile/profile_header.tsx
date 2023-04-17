@@ -1,17 +1,16 @@
-import type { NewProfile as Profile } from 'client/scripts/models';
-
 import 'components/profile/profile_header.scss';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import jdenticon from 'jdenticon';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import type NewProfile from '../../../models/NewProfile';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../react_quill_editor/helpers';
 import { SocialAccounts } from '../social_accounts';
 
 type ProfileHeaderProps = {
-  profile: Profile;
+  profile: NewProfile;
   isOwner: boolean;
 };
 

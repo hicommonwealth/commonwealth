@@ -1,4 +1,3 @@
-import type { AddressInfo, NewProfile as Profile } from 'client/scripts/models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import jdenticon from 'jdenticon';
 import $ from 'jquery';
@@ -7,13 +6,15 @@ import 'modals/delete_address_modal.scss';
 import React from 'react';
 
 import app from 'state';
+import type AddressInfo from '../../models/AddressInfo';
+import type NewProfile from '../../models/NewProfile';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
 
 type DeleteAddressModalAttrs = {
-  profile: Profile;
+  profile: NewProfile;
   addresses: AddressInfo[];
   address: string;
   chain: string;

@@ -11,7 +11,8 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { TopicSelector } from 'views/components/topic_selector';
-import { ThreadKind } from '../../../models/types';
+import { ThreadKind, ThreadStageType } from '../../../models/types';
+import { ThreadStage } from '../../pages/view_thread/thread_components';
 import { ReactQuillEditor } from '../react_quill_editor';
 
 import { checkNewThreadErrors, updateTopicList, useAuthorName, useNewThreadForm, } from './helpers';
@@ -77,7 +78,7 @@ export const NewThreadForm = () => {
       const result = await app.threads.create(
         author.address,
         threadKind,
-        ThreadStage.Discussion,
+        ThreadStageType.Discussion,
         app.activeChainId(),
         threadTitle,
         threadTopic,

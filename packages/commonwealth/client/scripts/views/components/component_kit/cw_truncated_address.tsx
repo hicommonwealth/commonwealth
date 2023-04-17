@@ -1,4 +1,4 @@
-import type { ChainInfo } from 'client/scripts/models';
+import type ChainInfo from 'client/scripts/models/ChainInfo';
 
 import 'components/component_kit/cw_truncated_address.scss';
 import React from 'react';

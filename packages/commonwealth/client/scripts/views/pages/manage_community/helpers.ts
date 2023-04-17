@@ -3,6 +3,7 @@ import $ from 'jquery';
 
 import { redraw } from 'mithrilInterop';
 import app from 'state';
+import { AccessLevel } from '../../../../../shared/permissions';
 import { buildChainToCategoriesMap } from '../communities';
 
 export const sortAdminsAndModsFirst = (a, b) => {

@@ -12,7 +12,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type { ManageContractTemplateModalProps, } from 'views/modals/manage_contract_template_modal';
 import ManageContractTemplateModal from 'views/modals/manage_contract_template_modal';
-import type { Contract } from '../../../models';
+import type Contract from '../../../models/Contract';
 import { ContractTemplateCard } from './contract_template_card';
 
 type ContractCardProps = {

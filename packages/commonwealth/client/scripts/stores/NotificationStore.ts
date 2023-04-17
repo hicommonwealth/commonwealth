@@ -1,3 +1,4 @@
+import Notification from '../models/Notification';
 import type NotificationSubscription from '../models/NotificationSubscription';
 import IdStore from './IdStore';
 

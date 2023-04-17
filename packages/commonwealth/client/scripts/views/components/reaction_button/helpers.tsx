@@ -5,6 +5,8 @@ import React from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';
+import type ChainInfo from '../../../models/ChainInfo';
+import type CommentModel from '../../../models/CommentModel';
 import Thread from '../../../models/Thread';
 import { CWText } from '../component_kit/cw_text';
 
@@ -14,7 +16,7 @@ type ReactorProps = {
   reactors: string[];
 };
 
-type Post = Thread | Comment<any>;
+type Post = Thread | CommentModel<any>;
 
 export const getDisplayedReactorsForPopup = ({
   reactors = [],
@@ -56,7 +58,7 @@ export const fetchReactionsByPost = async (post: Post) => {
   if (post instanceof Thread) {
     thread_id = (post as Thread).id;
   } else {
-    comment_id = (post as Comment<any>).id;
+    comment_id = (post as CommentModel<any>).id;
   }
 
   const { result = [] } = await $.get(`${app.serverUrl()}/bulkReactions`, {

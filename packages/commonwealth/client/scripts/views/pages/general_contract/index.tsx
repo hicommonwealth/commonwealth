@@ -15,6 +15,7 @@ import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import type { AbiInput, AbiItem, AbiOutput } from 'web3-utils/types';
+import Contract from '../../../models/Contract';
 import Sublayout from '../../sublayout';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';

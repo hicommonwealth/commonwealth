@@ -11,6 +11,8 @@ import React from 'react';
 
 import app from 'state';
 import { formatAddressShort } from '../../../../shared/utils';
+import Account from '../../models/Account';
+import RoleInfo from '../../models/RoleInfo';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';

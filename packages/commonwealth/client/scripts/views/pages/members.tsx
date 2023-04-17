@@ -5,6 +5,7 @@ import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
+import { AccessLevel } from '../../../../shared/permissions';
 import type MinimumProfile from '../../models/MinimumProfile';
 import { CWText } from '../components/component_kit/cw_text';
 

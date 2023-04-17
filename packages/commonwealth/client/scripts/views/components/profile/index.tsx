@@ -6,6 +6,7 @@ import React from 'react';
 import app from 'state';
 import Profile from '../../../../../server/models/profile';
 import AddressInfo from '../../../models/AddressInfo';
+import NewProfile from '../../../models/NewProfile';
 import type Thread from '../../../models/Thread';
 import { PageNotFound } from '../../pages/404';
 import Sublayout from '../../sublayout';
@@ -34,7 +35,7 @@ const ProfileComponent = (props: ProfileProps) => {
   );
   const [error, setError] = React.useState<ProfileError>(ProfileError.None);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [profile, setProfile] = React.useState<Profile>();
+  const [profile, setProfile] = React.useState<NewProfile>();
   const [threads, setThreads] = React.useState<Thread[]>([]);
   const [isOwner, setIsOwner] = React.useState<boolean>();
 
@@ -46,7 +47,7 @@ const ProfileComponent = (props: ProfileProps) => {
         jwt: app.user.jwt,
       });
 
-      setProfile(new Profile(result.profile));
+      setProfile(new NewProfile(result.profile));
       setThreads(result.threads.map((t) => app.threads.modelFromServer(t)));
       const responseComments = result.comments.map((c) =>
         modelCommentFromServer(c)

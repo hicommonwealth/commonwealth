@@ -7,6 +7,7 @@ import 'pages/discussions/stages_menu.scss';
 import React from 'react';
 
 import app from 'state';
+import Topic from '../../../models/Topic';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';

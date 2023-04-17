@@ -10,6 +10,7 @@ import React, { useEffect } from 'react';
 
 import app from 'state';
 import { formatAddressShort } from '../../../../../shared/utils';
+import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { BanUserModal } from '../../modals/ban_user_modal';

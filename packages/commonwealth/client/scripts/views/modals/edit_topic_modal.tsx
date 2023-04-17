@@ -6,6 +6,7 @@ import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
 
 import app from 'state';
+import Topic from '../../models/Topic';
 
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';

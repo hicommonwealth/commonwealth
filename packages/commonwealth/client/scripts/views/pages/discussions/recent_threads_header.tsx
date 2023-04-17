@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
+import Topic from '../../../models/Topic';
 import { ThreadStageType } from '../../../models/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';

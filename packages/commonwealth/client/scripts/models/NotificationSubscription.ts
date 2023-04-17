@@ -2,17 +2,19 @@ import { modelFromServer as modelCommentFromServer } from 'controllers/server/co
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
-import type { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
 import app from '../state';
+import type ChainInfo from './ChainInfo';
+import type CommentModel from './CommentModel';
 import type { IUniqueId } from './interfaces';
+import Thread from './Thread';
 
 class NotificationSubscription {
   public readonly category: string;
   public readonly objectId: string;
   public readonly createdAt: moment.Moment;
   public readonly Chain: ChainInfo;
-  public readonly Comment: CommentT<IUniqueId>;
-  public readonly Thread: ThreadT;
+  public readonly Comment: CommentModel<IUniqueId>;
+  public readonly Thread: Thread;
 
   public readonly id?: number;
   public readonly chainEntityId?: any;
@@ -56,8 +58,8 @@ class NotificationSubscription {
     createdAt,
     immediateEmail,
     Chain?,
-    comment?: CommentT<IUniqueId>,
-    thread?: ThreadT
+    comment?: CommentModel<IUniqueId>,
+    thread?: Thread
   ) {
     this.id = id;
     this.category = category;
@@ -95,10 +97,10 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     immediate_email,
     Chain,
     Comment,
-    Thread,
   } = subscription;
+  const thread = subscription.Thread;
 
-  let modeledThread: ThreadT;
+  let modeledThread: Thread;
 
   if (Thread) {
     try {
@@ -108,7 +110,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     }
   }
 
-  let modeledComment: CommentT<IUniqueId>;
+  let modeledComment: CommentModel<IUniqueId>;
 
   if (Comment) {
     try {

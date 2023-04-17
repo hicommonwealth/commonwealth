@@ -3,11 +3,11 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { isEqual } from 'lodash';
 
 import 'modals/edit_collaborators_modal.scss';
-import type Thread, { IThreadCollaborator } from 'models/Thread';
 import React, { useEffect, useState } from 'react';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 
 import app from 'state';
+import Thread, { IThreadCollaborator } from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
