@@ -16,7 +16,7 @@ import {
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 
-import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
+import { getEIP712SignableSession } from '../../shared/adapters/chain/ethereum/keys';
 import { getCosmosSessionSignatureData } from '../../shared/adapters/chain/cosmos/keys';
 import { addressSwapper } from '../../shared/utils';
 import {
@@ -253,7 +253,7 @@ const verifySessionSignature = async (
     // ethereum address handling
     //
     try {
-      const typedCanvasMessage = constructTypedCanvasMessage(canvasSessionPayload);
+      const typedCanvasMessage = getEIP712SignableSession(canvasSessionPayload);
 
       if (addressModel.block_info !== sessionBlockInfo) {
         throw new Error(

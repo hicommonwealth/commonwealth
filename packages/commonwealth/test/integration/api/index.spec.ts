@@ -8,7 +8,7 @@ import { ethers } from 'ethers';
 import { createCanvasSessionPayload } from 'canvas';
 import app, { resetDatabase } from '../../../server-test';
 import {
-  constructTypedCanvasMessage,
+  getEIP712SignableSession,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../../shared/adapters/chain/ethereum/keys';
@@ -80,7 +80,7 @@ describe('API Tests', () => {
         timestamp,
         TEST_BLOCK_INFO_BLOCKHASH
       );
-      const data = constructTypedCanvasMessage(message);
+      const data = getEIP712SignableSession(message);
       const privateKey = keypair.getPrivateKey();
       const signature = signTypedData({
         privateKey,

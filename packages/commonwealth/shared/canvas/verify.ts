@@ -2,8 +2,8 @@ import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
 import { import_ } from "@brillout/import"
 
-import { constructTypedActionPayload, constructTypedCanvasMessage } from '../adapters/chain/ethereum/keys';
-import { getCosmosSessionSignatureData, getCosmosActionSignatureData } from '../adapters/chain/cosmos/keys';
+import { getEIP712SignableAction, getEIP712SignableSession } from '../adapters/chain/ethereum/keys';
+import { getADR036SignableSession, getADR036SignableAction } from '../adapters/chain/cosmos/keys';
 
 // Direct import works on the client but fails on the server because of ESM incompatibility
 // If it fails, fall back to a patched async `import` call in @brillout/import
@@ -53,7 +53,7 @@ export const verify = async ({
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
       const canvasEthereum = await importChainEthereum();
-      const { domain, types, message } = constructTypedActionPayload(actionPayload);
+      const { domain, types, message } = getEIP712SignableAction(actionPayload);
       delete types.EIP712Domain;
       const recoveredAddr = ethersUtils.verifyTypedData(
         domain,
@@ -65,7 +65,7 @@ export const verify = async ({
     } else {
       const ethSigUtil = await import('@metamask/eth-sig-util');
       const { types, domain, message } =
-        constructTypedCanvasMessage(sessionPayload);
+        getEIP712SignableSession(sessionPayload);
       const recoveredAddr = ethSigUtil.recoverTypedSignature({
         data: { types, domain, message, primaryType: 'Message' as const },
         signature,
@@ -142,7 +142,7 @@ export const verify = async ({
     }
     // verify cosmos signature (base64)
     if (action) {
-      const signDocPayload = await getCosmosActionSignatureData(
+      const signDocPayload = await getADR036SignableAction(
         actionPayload,
         actionSignerAddress
       );
@@ -169,7 +169,7 @@ export const verify = async ({
       );
     } else {
       const canvas = await importCanvas();
-      const signDocPayload = await getCosmosSessionSignatureData(
+      const signDocPayload = await getADR036SignableSession(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
         payload.from
       );

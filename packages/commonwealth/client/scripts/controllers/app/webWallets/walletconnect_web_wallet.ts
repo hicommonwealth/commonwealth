@@ -1,5 +1,5 @@
 import type WalletConnectProvider from '@walletconnect/web3-provider';
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
+import { getEIP712SignableSession } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import type { Account, BlockInfo, ChainInfo, IWebWallet } from 'models';
@@ -67,7 +67,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     account: Account,
     sessionPayload: SessionPayload
   ): Promise<string> {
-    const typedCanvasMessage = constructTypedCanvasMessage(sessionPayload);
+    const typedCanvasMessage = getEIP712SignableSession(sessionPayload);
     const signature = await this._provider.wc.signTypedData([
       account.address,
       JSON.stringify(typedCanvasMessage),

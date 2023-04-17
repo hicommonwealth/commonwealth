@@ -13,7 +13,7 @@ import type { SessionPayload } from '@canvas-js/interfaces';
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
+import { getEIP712SignableSession } from 'adapters/chain/ethereum/keys';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -76,7 +76,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     account: Account,
     sessionPayload: SessionPayload
   ): Promise<string> {
-    const typedCanvasMessage = await constructTypedCanvasMessage(
+    const typedCanvasMessage = await getEIP712SignableSession(
       sessionPayload
     );
     const signature = await this._web3.givenProvider.request({

@@ -14,7 +14,7 @@ export const TEST_BLOCK_INFO_STRING =
 export const TEST_BLOCK_INFO_BLOCKHASH =
   '0x0f927bde6fb00940895178da0d32948714ea6e76f6374f03ffbbd7e0787e15bf';
 
-export const constructTypedCanvasMessage = (
+export const getEIP712SignableSession = (
   message: SessionPayload
 ): TypedMessage<MessageTypes> => {
   // canvas implements ethers.js eip712 types, but
@@ -43,7 +43,7 @@ export const constructTypedCanvasMessage = (
   return { types, primaryType: 'Message', domain, message };
 };
 
-export const constructTypedActionPayload = (
+export const getEIP712SignableAction = (
   message: ActionPayload
 ): TypedMessage<MessageTypes> => {
   // canvas implements ethers.js eip712 types, but

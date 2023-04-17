@@ -6,7 +6,7 @@ import type {
   ActionPayload,
 } from '@canvas-js/interfaces';
 
-export const getCosmosActionSignatureData = async (
+export const getADR036SignableAction = async (
   actionPayload: ActionPayload,
   address: string
 ): Promise<StdSignDoc> => {
@@ -38,7 +38,7 @@ export const getCosmosActionSignatureData = async (
   return signDoc;
 };
 
-export const getCosmosSessionSignatureData = async (
+export const getADR036SignableSession = async (
   token: Uint8Array,
   address: string
 ): Promise<StdSignDoc> => {

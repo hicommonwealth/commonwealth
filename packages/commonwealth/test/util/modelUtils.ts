@@ -26,8 +26,8 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import type { Permission } from '../../server/models/role';
 
 import {
-  constructTypedActionPayload,
-  constructTypedCanvasMessage,
+  getEIP712SignableAction,
+  getEIP712SignableSession,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../shared/adapters/chain/ethereum/keys';
@@ -110,7 +110,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     );
     const signature = signTypedData({
       privateKey: keypair.getPrivateKey(),
-      data: constructTypedCanvasMessage(sessionPayload),
+      data: getEIP712SignableSession(sessionPayload),
       version: SignTypedDataVersion.V4,
     });
     const session: Session = {
@@ -135,10 +135,10 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email, session, sign: (actionPayload: ActionPayload) => {
-      const { types, primaryType, domain, message } = constructTypedActionPayload(actionPayload)
+      const { types, primaryType, domain, message } = getEIP712SignableAction(actionPayload)
       const signature = signTypedData({
         privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
-        data: constructTypedActionPayload(actionPayload),
+        data: getEIP712SignableAction(actionPayload),
         version: SignTypedDataVersion.V4,
       });
       return signature;
