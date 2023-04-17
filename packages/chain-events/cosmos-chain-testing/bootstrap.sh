@@ -10,6 +10,10 @@ COW_MNEMONIC="ignore medal pitch lesson catch stadium victory jewel first stairs
 CSDK_CHAIN_ID="testnet"
 
 apk add dasel
+apk add nginx
+cp /root/nginx.conf /etc/nginx
+PORT=${PORT:=8080}
+sed -i "s/listen\ 80;/listen\ ${PORT};/" /etc/nginx/nginx.conf
 
 #build simd binary
 # make build
@@ -47,6 +51,10 @@ dasel put -r toml -t string -f $CONFIG_FOLDER/config.toml -v "PUT" '.rpc.cors_al
 dasel put -r toml -t bool -f $CONFIG_FOLDER/app.toml -v "true" '.api.swagger'
 dasel put -r toml -t bool -f $CONFIG_FOLDER/app.toml -v "true" '.api.enabled-unsafe-cors'
 
+# 
+echo "starting nginx"
+nginx
+
 # Start chain and immediately move it to the background
 echo "Starting up csdk node..."
 simd start --api.enable true &
@@ -56,3 +64,5 @@ sleep 3
 # wait again on the regen node process so it can be terminated with ctrl+C
 echo "Node started & state inialized!"
 wait $CSDK_PID
+# echo "starting nginx"
+# nginx -g 'daemon off;'
