@@ -1,9 +1,8 @@
 import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
 
-import { getCosmosSignatureData } from 'controllers/server/sessionSigners/cosmos';
 import { getEIP712SignableSession } from '../../../shared/adapters/chain/ethereum/keys';
-import { getCosmosSessionSignatureData } from '../../../shared/adapters/chain/cosmos/keys';
+import { getADR036SignableAction, getADR036SignableSession } from '../../../shared/adapters/chain/cosmos/keys';
 
 // TODO: verify payload is not expired
 export const verify = async ({
@@ -32,7 +31,7 @@ export const verify = async ({
       const ethersUtils = (await import('ethers')).utils;
       const canvasEthereum = await import('@canvas-js/chain-ethereum');
       const [domain, types, value] =
-        canvasEthereum.getActionSignatureData(actionPayload);
+        canvasEthereum.getAction(actionPayload);
       const recoveredAddr = ethersUtils.verifyTypedData(
         domain,
         types,
@@ -120,7 +119,7 @@ export const verify = async ({
     }
     // verify cosmos signature (base64)
     if (action) {
-      const signDocPayload = await getCosmosSignatureData(
+      const signDocPayload = await getADR036SignableAction(
         actionPayload,
         actionSignerAddress
       );
@@ -147,7 +146,7 @@ export const verify = async ({
       );
     } else {
       const canvas = await import('@canvas-js/interfaces');
-      const signDocPayload = await getCosmosSessionSignatureData(
+      const signDocPayload = await getADR036SignableSession(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
         payload.from
       );

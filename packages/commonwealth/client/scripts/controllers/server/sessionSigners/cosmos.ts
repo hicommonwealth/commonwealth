@@ -15,38 +15,7 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-
-export const getCosmosSignatureData = async (
-  actionPayload: ActionPayload,
-  address: string
-): Promise<StdSignDoc> => {
-  const accountNumber = 0;
-  const sequence = 0;
-  const chainId = '';
-  const fee: StdFee = {
-    gas: '0',
-    amount: [],
-  };
-  const memo = '';
-
-  const jsonTx: AminoMsg = {
-    type: 'sign/MsgSignData',
-    value: {
-      signer: address,
-      data: JSON.stringify(actionPayload),
-    },
-  };
-  const cosm = await import('@cosmjs/amino');
-  const signDoc = cosm.makeSignDoc(
-    [jsonTx],
-    fee,
-    chainId,
-    memo,
-    accountNumber,
-    sequence
-  );
-  return signDoc;
-};
+import { getADR036SignableAction } from 'adapters/chain/cosmos/keys';
 
 export class CosmosSDKSessionController implements ISessionController {
   signers: Record<
@@ -185,7 +154,7 @@ export class CosmosSDKSessionController implements ISessionController {
     const cosmCrypto = await import('@cosmjs/crypto');
 
     // don't use signAmino, use Secp256k1.createSignature to get an ExtendedSecp256k1Signature
-    const signDoc = await getCosmosSignatureData(actionPayload, address);
+    const signDoc = await getADR036SignableAction(actionPayload, address);
     const signDocDigest = new cosmCrypto.Sha256(
       cosm.serializeSignDoc(signDoc)
     ).digest();
