@@ -15,12 +15,12 @@ import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
 type CWSidebarMenuItemProps = {
-  isStarred: boolean;
+  isStarred?: boolean;
 } & MenuItem;
 
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
-  const [isStarred, setIsStarred] = useState<boolean>(props.isStarred);
+  const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
 
   if (props.type === 'default') {
     const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =

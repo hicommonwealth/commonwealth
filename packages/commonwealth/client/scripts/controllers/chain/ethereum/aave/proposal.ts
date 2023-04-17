@@ -38,7 +38,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
   }
 
   public format(): string {
-    return `${formatNumberLong(+Web3.fromWei(this.power))} ${
+    return `${formatNumberLong(+Web3.fromWei(this.power.toString()))} ${
       this.account.chain.default_symbol
     }`;
   }
@@ -310,7 +310,7 @@ export default class AaveProposal extends Proposal<
       console.error(
         'Failed to fetch total voting supply at proposal start block, using hardcoded value.'
       );
-      this._votingSupplyAtStart = Web3.toWei(new BN(1_000_000_000), 'ether');
+      this._votingSupplyAtStart = new BN(Web3.toWei(Number(1_000_000_000).toString(), 'ether'));
     }
 
     this._minVotingPowerNeeded = this._votingSupplyAtStart

@@ -1,5 +1,5 @@
 import { ProposalType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
@@ -379,7 +379,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [threadDoesNotMatch]);
 
   useEffect(() => {
-    if (comments?.length > 0) {
+    if (thread?.id && comments?.length > 0) {
       const mismatchedComments = comments.filter((c) => {
         return c.threadId !== thread.id;
       });
@@ -394,7 +394,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }));
       }
     }
-  }, [comments, thread.id, threadId]);
+  }, [comments, thread, threadId]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -597,6 +597,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     setIsGloballyEditing(false);
                     setIsEditingBody(false);
                     setRecentlyEdited(true);
+                    notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
                   });
               },
             },

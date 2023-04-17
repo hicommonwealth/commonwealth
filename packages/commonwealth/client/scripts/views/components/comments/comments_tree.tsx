@@ -38,8 +38,6 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
         ? window.location.search.replace('?comment=', '')
         : null;
 
-      console.log({ commentId });
-
       if (commentId) jumpHighlightComment(Number(commentId));
     }
   }, []);

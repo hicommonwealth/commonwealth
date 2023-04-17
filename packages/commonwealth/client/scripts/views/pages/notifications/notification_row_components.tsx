@@ -19,7 +19,7 @@ import { getBatchNotificationFields } from './helpers';
 
 import type { NotificationRowProps } from './notification_row';
 
-export const ChainEventNotificationRow = (props: NotificationRowProps) => {
+export const ChainEventNotificationRow = (props: Omit<NotificationRowProps, 'allRead'>) => {
   const { notification, onListPage } = props;
 
   const navigate = useCommonNavigate();

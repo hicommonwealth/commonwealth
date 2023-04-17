@@ -52,7 +52,7 @@ const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
         e.preventDefault();
         e.stopPropagation();
       }}
-      onmousedown={(e) => {
+      onMouseDown={(e) => {
         e.preventDefault();
         e.stopPropagation();
       }}

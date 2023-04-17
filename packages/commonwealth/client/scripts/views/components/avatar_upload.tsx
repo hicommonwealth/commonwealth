@@ -11,6 +11,21 @@ import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
 
+const uploadToS3 = async (file: File, signedUrl: string) => {
+  const options = {
+    headers: {
+      'Content-Type': file.type,
+    },
+  };
+
+  try {
+    await axios.put(signedUrl, file, options);
+  } catch (error) {
+    notifyError('Failed to upload the file to S3');
+    throw error;
+  }
+};
+
 type AvatarUploadStyleProps = {
   size?: 'small' | 'large';
 };
@@ -62,9 +77,16 @@ export const AvatarUpload = ({
             jwt: app.user.jwt,
           }
         );
+        if (response.data.status !== 'Success') throw new Error();
+
+        const uploadURL = response.data.result;
+        acceptedFiles[0].uploadURL = uploadURL;
+
+        // Upload the file to S3
+        await uploadToS3(acceptedFiles[0], uploadURL);
 
         if (uploadCompleteCallback) {
-          uploadCompleteCallback([response]);
+          uploadCompleteCallback([acceptedFiles[0]]);
         }
       } catch (e) {
         notifyError('Failed to get an S3 signed upload URL');
