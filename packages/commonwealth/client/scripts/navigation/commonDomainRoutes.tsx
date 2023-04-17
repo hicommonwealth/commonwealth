@@ -274,13 +274,17 @@ const commonDomainsRoutes = () => [
       scoped: true,
     })}
   />,
-  <Route
-    path="/:scope/feed"
-    element={withLayout(FeedPage, {
-      scoped: true,
-      deferChain: true,
-    })}
-  />,
+  ...(featureFlags.communityHomepage
+    ? [
+        <Route
+          path="/:scope/feed"
+          element={withLayout(FeedPage, {
+            scoped: true,
+            deferChain: true,
+          })}
+        />,
+      ]
+    : []),
   // DISCUSSIONS END
 
   // CONTRACTS
