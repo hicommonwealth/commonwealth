@@ -15,6 +15,7 @@ import type {
 } from './types';
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
+import { featureFlags } from 'helpers/feature-flags';
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
@@ -92,28 +93,32 @@ const AdminSectionComponent = () => {
         );
       },
     },
-    {
-      title: 'Contracts',
-      containsChildren: false,
-      displayData: null,
-      hasDefaultToggle: false,
-      isActive: _DEPRECATED_getRoute().includes('/contracts'),
-      isVisible: true,
-      isUpdated: false,
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
+    ...(featureFlags.proposalTemplates
+      ? [
+          {
+            title: 'Contracts',
+            containsChildren: false,
+            displayData: null,
+            hasDefaultToggle: false,
+            isActive: _DEPRECATED_getRoute().includes('/contracts'),
+            isVisible: true,
+            isUpdated: false,
+            onClick: (e, toggle: boolean) => {
+              e.preventDefault();
 
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/contracts`,
-          app.activeChainId(),
-          () => {
-            setAdminToggleTree(`children.contracts.toggledState`, toggle);
-          }
-        );
-      },
-    },
+              handleRedirectClicks(
+                navigate,
+                e,
+                `/contracts`,
+                app.activeChainId(),
+                () => {
+                  setAdminToggleTree(`children.contracts.toggledState`, toggle);
+                }
+              );
+            },
+          },
+        ]
+      : []),
     {
       title: 'New topic',
       isActive: isNewTopicModalOpen,
