@@ -135,10 +135,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email, session, sign: (actionPayload: ActionPayload) => {
-      console.log(sessionWallet.address)
-      console.log(actionPayload)
       const { types, primaryType, domain, message } = constructTypedActionPayload(actionPayload)
-      console.log(">>> signing:", domain, types, message)
       const signature = signTypedData({
         privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
         data: constructTypedActionPayload(actionPayload),
