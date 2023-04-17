@@ -22,7 +22,6 @@ if [ -d $SCRIPT_DIR/cosmos-sdk ];
         cp $SCRIPT_DIR/bootstrap.sh $SCRIPT_DIR/cosmos-sdk
         cp $SCRIPT_DIR/nginx.conf $SCRIPT_DIR/cosmos-sdk
         cp $SCRIPT_DIR/docker-compose.yml $SCRIPT_DIR/cosmos-sdk
-        cp $SCRIPT_DIR/Dockerfile.web $SCRIPT_DIR/cosmos-sdk
     else
         echo "cosmos-sdk folder does not exist,please download source, exiting"
 fi
@@ -33,5 +32,5 @@ if [ $DEPLOY_ENV = "heroku" ];
         echo "DEPLOY_ENV is set to heroku, skipping docker-compose"
     else
         echo "DEPLOY_ENV is not set to heroku, running docker-compose"
-        docker-compose up -d
+        docker-compose up
 fi

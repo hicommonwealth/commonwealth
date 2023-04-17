@@ -44,7 +44,8 @@
     "dump-db-empty": "pg_dump $(heroku config:get DATABASE_URL -a chain-events) --exclude-table-data=\"public.\\\"ChainEntities\\\"\" --exclude-table-data=\"public.\\\"ChainEventTypes\\\"\" --exclude-table-data=\"public.\\\"ChainEvents\\\"\" --verbose --no-privileges --no-owner -f latest.dump",
     "migrate-events": "NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) ts-node --project tsconfig.json scripts/migrateChainEntities.ts run-as-script",
     "cosmos:run": "chmod u+x cosmos-chain-testing/start.sh && ./cosmos-chain-testing/start.sh",
-    "cosmos:stop": "chmod u+x cosmos-chain-testing/stop.sh && ./cosmos-chain-testing/stop.sh"
+    "cosmos:stop": "chmod u+x cosmos-chain-testing/stop.sh && ./cosmos-chain-testing/stop.sh",
+    "cosmos:deploy": "chmod u+x cosmos-chain-testing/deploy.sh && ./cosmos-chain-testing/deploy.sh"
   },
   "engines": {
     "node": "18.x"

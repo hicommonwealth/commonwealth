@@ -10,21 +10,6 @@
 # > docker run -it -p 26657:26657 -p 26656:26656 -v ~/.simappcli:/root/.simapp simapp simd keys add foo
 # > docker run -it -p 26657:26657 -p 26656:26656 -v ~/.simappcli:/root/.simapp simapp simd keys list
 # TODO: demo connecting rest-server (or is this in server now?)
-FROM golang:1.19-alpine AS build-env
-
-# Install minimum necessary dependencies
-ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3
-RUN apk add --no-cache $PACKAGES
-
-# Set working directory for the build
-WORKDIR /go/src/github.com/cosmos/cosmos-sdk
-
-# Add source files
-COPY . .
-
-# install simapp, remove packages
-RUN make build-linux
-
 
 # Final image
 FROM alpine:edge
@@ -34,12 +19,13 @@ RUN apk add --update ca-certificates
 WORKDIR /root
 
 # Copy over binaries from the build-env
-COPY --from=build-env /go/src/github.com/cosmos/cosmos-sdk/build/simd /usr/bin/simd
+ADD https://simd-binary.s3.amazonaws.com/simd /usr/bin/simd
+# COPY simd /usr/bin/simd
 
 EXPOSE ${PORT}
-COPY ./bootstrap.sh bootstrap.sh
-COPY ./nginx.conf nginx.conf
-RUN chmod +x bootstrap.sh
+COPY bootstrap.sh bootstrap.sh
+COPY nginx.conf nginx.conf
+RUN chmod +x bootstrap.sh && chmod +x /usr/bin/simd
 
 # Run simd by default, omit entrypoint to ease using container with simcli
 CMD ["sh", "-c", "sh ./bootstrap.sh"]
