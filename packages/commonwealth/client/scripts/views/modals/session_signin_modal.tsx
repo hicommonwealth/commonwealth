@@ -69,6 +69,7 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
             }}
             accountVerifiedCallback={() => onVerified()}
             linking={false}
+            hasNoWalletsLink={false}
             showResetWalletConnect={wcEnabled}
           />
         </div>
