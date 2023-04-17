@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 
 import app from 'state';
 import { PageLoading } from './loading';
-import { DefaultPage } from '../../../../../common-common/src/types';
+import { DefaultPage } from 'common-common/src/types';
 import { useCommonNavigate } from 'navigation/helpers';
+import { featureFlags } from 'helpers/feature-flags';
 
 export default function DiscussionsRedirect() {
   const navigate = useCommonNavigate();
@@ -14,7 +15,7 @@ export default function DiscussionsRedirect() {
     const { defaultPage, defaultOverview, hasHomepage } = app.chain.meta;
     let view;
 
-    if (hasHomepage) {
+    if (featureFlags.communityHomepage && hasHomepage) {
       view = defaultPage;
     } else {
       view = defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions;
