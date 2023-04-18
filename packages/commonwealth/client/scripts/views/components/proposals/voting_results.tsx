@@ -131,7 +131,7 @@ export const VotingResults = (props: VotingResultsProps) => {
       const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
 
       const getPct = (n: BN) => {
-        if (voteTotal?.isZero()) return '0';
+        if (voteTotal.isZero()) return '0';
         return (n.muln(10_000).div(voteTotal)?.toNumber() / 100).toFixed(2);
       };
 
