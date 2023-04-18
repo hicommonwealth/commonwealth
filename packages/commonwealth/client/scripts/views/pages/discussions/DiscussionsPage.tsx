@@ -64,6 +64,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
+    app.threads.resetPagination();
     app.threads
       .loadNextPage({ topicName, stageName, includePinnedThreads: true })
       .then((t) => {

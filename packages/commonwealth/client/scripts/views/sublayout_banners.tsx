@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import app from 'state';
-import { isNonEmptyString } from '../helpers/typeGuards';
+import { isNonEmptyString } from 'helpers/typeGuards';
 import type { ChainInfo } from '../models';
 import { ITokenAdapter } from '../models';
 import {
@@ -14,22 +14,28 @@ type SublayoutBannersProps = {
   banner?: string;
   chain: ChainInfo;
   terms?: string;
-  tosStatus?: string;
-  bannerStatus?: string;
 };
 
-export const SublayoutBanners = (props: SublayoutBannersProps) => {
-  const { banner, chain, terms, tosStatus, bannerStatus } = props;
+export const SublayoutBanners = ({
+  banner,
+  chain,
+  terms,
+}: SublayoutBannersProps) => {
+  const bannerLocalStorageId = `${app.activeChainId()}-banner`;
+
+  const [bannerStatus, setBannerStatus] = useState(
+    localStorage.getItem(bannerLocalStorageId)
+  );
+
+  const handleDismissBanner = () => {
+    setBannerStatus('off');
+    localStorage.setItem(bannerLocalStorageId, 'off');
+  };
 
   return (
     <>
       {banner && bannerStatus !== 'off' && (
-        <CWMessageBanner
-          bannerContent={banner}
-          onClose={() =>
-            localStorage.setItem(`${app.activeChainId()}-banner`, 'off')
-          }
-        />
+        <CWMessageBanner bannerContent={banner} onClose={handleDismissBanner} />
       )}
       {app.isLoggedIn() &&
         ITokenAdapter.instanceOf(app.chain) &&
@@ -38,9 +44,7 @@ export const SublayoutBanners = (props: SublayoutBannersProps) => {
             bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
           />
         )}
-      {isNonEmptyString(terms) && tosStatus !== 'off' && (
-        <TermsBanner terms={terms} />
-      )}
+      {isNonEmptyString(terms) && <TermsBanner terms={terms} />}
     </>
   );
 };
