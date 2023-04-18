@@ -4,9 +4,9 @@ This creates a sandbox Cosmos SDK devnet node, which is a companion to the `http
 
 ## Setup 
 
-The easiest way to access the tool is to run `yarn cosmos:testnet` this will create a docker deployment with two endpoints. The following networking configuration is as follows:
-1. RPD - `0.0.0.0:26657`
-2. LCD (REST API) - `0.0.0.0:1337`
+The easiest way to access the tool is to run `yarn cosmos:build` this will create a docker deployment with two endpoints. The following networking configuration is as follows:
+1. RPC - `localhost:5050/rpc`
+2. LCD (REST API) - `localhost:5050/lcd/`
 
 ## Testing
 
