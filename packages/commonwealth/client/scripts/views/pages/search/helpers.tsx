@@ -132,9 +132,9 @@ const getCommunityResult = (community, setRoute) => {
 
   const handleClick = () => {
     if (params.community) {
-      setRoute(params.community.id ? `/${params.community.id}` : '/');
+      setRoute(params.community.id ? `/${params.community.id}` : '/', {}, null);
     } else {
-      setRoute(community.id ? `/${community.id}` : '/');
+      setRoute(community.id ? `/${community.id}` : '/', {}, null);
     }
   };
 

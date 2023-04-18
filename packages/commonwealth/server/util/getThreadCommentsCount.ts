@@ -27,7 +27,7 @@ const getThreadsWithCommentCount = async ({
 
   return threads.map((thread) => {
     const numberOfComment = commentsCount.find(
-      (el) => el.thread_id === `${thread.kind}_${thread.id}`
+      (el) => el.thread_id === thread.id
     );
 
     return {

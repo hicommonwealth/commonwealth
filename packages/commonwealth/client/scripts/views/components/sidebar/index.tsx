@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 
 import 'components/sidebar/index.scss';
@@ -14,8 +14,9 @@ import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
-import { useCommonNavigate } from '../../../navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { featureFlags } from 'helpers/feature-flags';
 
 export type SidebarMenuName =
   | 'default'
@@ -50,7 +51,7 @@ export const Sidebar = () => {
           {app.chain && (
             <div className="community-menu">
               {showAdmin && <AdminSection />}
-              {app.chain.meta.hasHomepage && (
+              {featureFlags.communityHomepage && app.chain.meta.hasHomepage && (
                 <div
                   className={onHomeRoute ? 'home-button active' : 'home-button'}
                   onClick={() => navigate('/feed')}
