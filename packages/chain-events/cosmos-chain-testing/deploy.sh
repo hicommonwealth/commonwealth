@@ -9,9 +9,8 @@ export DEPLOY_ENV=heroku
 # sh ${SCRIPT_DIR}/start.sh
 
 PORT=5050
-IMAGE_NAME=heroku-bin-csdk
+IMAGE_NAME=heroku-csdk
 
 cd $SCRIPT_DIR
-docker build -t ${IMAGE_NAME} -f Dockerfile --no-cache .
+docker build -t ${IMAGE_NAME} -f Dockerfile .
 docker run -p 5050:5050 -e PORT=${PORT} ${IMAGE_NAME}
-  

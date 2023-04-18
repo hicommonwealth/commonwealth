@@ -24,25 +24,25 @@ simd gentx cow 7000000000stake --chain-id testnet
 simd collect-gentxs
 # Update gov module
 
-dasel put string -r json  -f $GENESIS -v '600s' '.app_state.gov.voting_params.voting_period'
-dasel put string -r json  -f $GENESIS -v '100000' '.app_state.gov.deposit_params.min_deposit.[0].amount'
+dasel put -t string -r json  -f $GENESIS -v '600s' '.app_state.gov.voting_params.voting_period'
+dasel put -t string -r json  -f $GENESIS -v '100000' '.app_state.gov.deposit_params.min_deposit.[0].amount'
 # expose the LCD
-dasel put bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.enable'
+dasel put -t bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.enable'
 
 # Expose the rpc
-dasel put string -r toml  -f $CONFIG_FOLDER/config.toml -v "tcp://0.0.0.0:26657" '.rpc.laddr'
+dasel put -t string -r toml  -f $CONFIG_FOLDER/config.toml -v "tcp://0.0.0.0:26657" '.rpc.laddr'
 
 # Enable cors on RPC
-dasel put string -r toml  -f $CONFIG_FOLDER/config.toml -v "*" '.rpc.cors_allowed_origins.[]'
-dasel put string -r toml  -f $CONFIG_FOLDER/config.toml -v "Accept-Encoding" '.rpc.cors_allowed_headers.[]'
-dasel put string -r toml  -f $CONFIG_FOLDER/config.toml -v "DELETE" '.rpc.cors_allowed_methods.[]'
-dasel put string -r toml  -f $CONFIG_FOLDER/config.toml -v "OPTIONS" '.rpc.cors_allowed_methods.[]'
-dasel put string -r toml  -f $CONFIG_FOLDER/config.toml -v "PATCH" '.rpc.cors_allowed_methods.[]'
-dasel put string -r toml  -f $CONFIG_FOLDER/config.toml -v "PUT" '.rpc.cors_allowed_methods.[]'
+dasel put -t string -r toml  -f $CONFIG_FOLDER/config.toml -v "*" '.rpc.cors_allowed_origins.[]'
+dasel put -t string -r toml  -f $CONFIG_FOLDER/config.toml -v "Accept-Encoding" '.rpc.cors_allowed_headers.[]'
+dasel put -t string -r toml  -f $CONFIG_FOLDER/config.toml -v "DELETE" '.rpc.cors_allowed_methods.[]'
+dasel put -t string -r toml  -f $CONFIG_FOLDER/config.toml -v "OPTIONS" '.rpc.cors_allowed_methods.[]'
+dasel put -t string -r toml  -f $CONFIG_FOLDER/config.toml -v "PATCH" '.rpc.cors_allowed_methods.[]'
+dasel put -t string -r toml  -f $CONFIG_FOLDER/config.toml -v "PUT" '.rpc.cors_allowed_methods.[]'
 
 # Enable unsafe cors and swagger on the api
-dasel put bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.swagger'
-dasel put bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.enabled-unsafe-cors'
+dasel put -t bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.swagger'
+dasel put -t bool -r toml  -f $CONFIG_FOLDER/app.toml -v "true" '.api.enabled-unsafe-cors'
 
 # check if need to run nginx
 if [ "$ENABLE_PROXY" = "1" ]; then

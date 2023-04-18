@@ -15,17 +15,18 @@
 FROM alpine:edge
 
 # Install ca-certificates
-RUN apk add --update ca-certificates
+RUN apk add dasel nginx && apk add --update ca-certificates
 WORKDIR /root
 
+ENV ENABLE_PROXY 1
 # Copy over binaries from the build-env
 # ADD https://simd-binary.s3.amazonaws.com/simd /usr/bin/simd
 COPY simd /usr/bin/simd
 
 EXPOSE ${PORT}
-COPY bootstrap.sh bootstrap.sh
-COPY nginx.conf nginx.conf
-RUN chmod +x bootstrap.sh && chmod +x /usr/bin/simd
+COPY bootstrap-local.sh bootstrap.sh
+COPY nginx.conf /etc/nginx/nginx.conf
+RUN chmod +x bootstrap.sh && chmod +x /usr/bin/simd && mkdir -p /run/nginx && sed -i "s/listen\ 80;/listen\ ${PORT:=5050};/" /etc/nginx/nginx.conf
 
 # Run simd by default, omit entrypoint to ease using container with simcli
 CMD ["sh", "-c", "sh ./bootstrap.sh"]
