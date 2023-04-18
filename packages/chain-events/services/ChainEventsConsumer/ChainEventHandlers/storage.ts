@@ -3,7 +3,6 @@
  */
 import { addPrefix, factory } from 'common-common/src/logging';
 import type { RabbitMQController } from 'common-common/src/rabbitmq';
-import { RascalPublications } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
 import { StatsDController } from 'common-common/src/statsd';
@@ -12,7 +11,11 @@ import type { DB } from '../../database/database';
 import type { ChainEventInstance } from '../../database/models/chain_event';
 
 import type { CWEvent, IChainEventKind } from 'chain-events/src';
-import { IEventHandler } from 'chain-events/src';
+import {
+  EntityEventKind,
+  eventToEntity,
+  IEventHandler,
+} from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
 
 export interface StorageFilterConfig {
@@ -58,6 +61,16 @@ export default class extends IEventHandler {
   }
 
   private async _shouldSkip(event: CWEvent): Promise<boolean> {
+    // filter out all events that won't have an associated entity in the db
+    const [kind, type] = eventToEntity(event.network, event.data.kind);
+    if (
+      type !== EntityEventKind.Create &&
+      type !== EntityEventKind.Update &&
+      type !== EntityEventKind.Vote &&
+      type !== EntityEventKind.Complete
+    ) {
+      return true;
+    }
     return !!this._filterConfig.excludedEvents?.includes(event.data.kind);
   }
 
