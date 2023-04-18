@@ -21,6 +21,8 @@ type SearchCommentsQuery = {
   search?: string;
   chain?: string;
   sort?: string;
+  page?: string;
+  page_size?: string;
 };
 
 type SearchCommentsBindOptions = {
@@ -52,8 +54,8 @@ const search = async (
   }
 
   const { sql: paginationSort, bind: paginationBind } = buildPaginationSql({
-    limit: 50,
-    page: 1,
+    limit: parseInt(options.page_size, 10) || 10,
+    page: parseInt(options.page, 10) || 1,
     orderBy: sortOptions.column,
     orderDirection: sortOptions.direction,
   });

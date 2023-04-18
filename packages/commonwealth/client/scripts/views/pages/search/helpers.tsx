@@ -182,19 +182,19 @@ export const getListing = (
 ) => {
   if (Object.keys(results).length === 0 || !results[searchType]) return [];
 
-  const tabScopedResults = results[searchType]
-    .map((res) => {
-      return res.searchType === SearchScope.Threads
-        ? getDiscussionResult(res, searchTerm, setRoute)
-        : res.searchType === SearchScope.Members
-        ? getMemberResult(res, setRoute)
-        : res.searchType === SearchScope.Communities
-        ? getCommunityResult(res, setRoute)
-        : res.searchType === SearchScope.Replies
-        ? getCommentResult(res, searchTerm, setRoute)
-        : null;
-    })
-    .slice(0, 50);
+  const tabScopedResults = results[searchType].map((res) => {
+    return res.searchType === SearchScope.Threads ? (
+      getDiscussionResult(res, searchTerm, setRoute)
+    ) : res.searchType === SearchScope.Members ? (
+      getMemberResult(res, setRoute)
+    ) : res.searchType === SearchScope.Communities ? (
+      getCommunityResult(res, setRoute)
+    ) : res.searchType === SearchScope.Replies ? (
+      getCommentResult(res, searchTerm, setRoute)
+    ) : (
+      <>ERROR</>
+    );
+  });
 
   return tabScopedResults;
 };

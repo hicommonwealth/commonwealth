@@ -5,12 +5,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { capitalize } from 'lodash';
+import { NavigateOptions, useSearchParams } from 'react-router-dom';
+import { capitalize, debounce, uniqBy } from 'lodash';
 
 import 'pages/search/index.scss';
 
-import type { SearchScope } from 'models/SearchQuery';
+import { SearchScope } from 'models/SearchQuery';
 import { SearchSort } from 'models/SearchQuery';
 
 import app from 'state';
@@ -25,74 +25,125 @@ import type { DropdownItemType } from '../../components/component_kit/cw_dropdow
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { useCommonNavigate } from 'navigation/helpers';
 import { getListing } from './helpers';
-
-const SEARCH_PAGE_SIZE = 50;
+import QueryString from 'qs';
 
 const SearchPage = () => {
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
   const [searchResults, setSearchResults] = useState({});
+  const [page, setPage] = useState<number>(1);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [page, setPage] = useState(1);
 
   const searchQuery = useMemo(
     () => SearchQuery.fromUrlParams(Object.fromEntries(searchParams.entries())),
     [searchParams]
   );
-  const [activeTab, setActiveTab] = useState<SearchScope>(
-    searchQuery.getSearchScope()[0]
-  );
+
+  const activeTab = useMemo(() => {
+    return (
+      (QueryString.parse(window.location.search.replace('?', ''))[
+        'tab'
+      ] as SearchScope) || SearchScope.Threads
+    );
+  }, []);
+
+  const setActiveTab = (newTab: SearchScope) => {
+    navigate(`/search?${searchQuery.toUrlParams()}&tab=${newTab}`, {
+      replace: true,
+    } as NavigateOptions);
+  };
+
+  const debouncedSetPage = useCallback(debounce(setPage, 200), []);
+
   const bottomEl = useRef(null);
 
+  // when tab or query is updated, load first page
   const handleSearch = useCallback(async () => {
     try {
+      setPage(1);
       if (!searchQuery.chainScope) {
         searchQuery.chainScope = 'all_chains';
       }
       const response = await app.search.search(searchQuery);
-
-      console.log({ response });
-
-      setSearchResults(
-        Object.fromEntries(
-          Object.entries(response.results).map(([k, v]) => [
-            k,
-            v.slice(0, SEARCH_PAGE_SIZE),
-          ])
-        )
-      );
+      setSearchResults(response.results);
     } catch (err) {
       setSearchResults({});
       notifyError(
         err.responseJSON?.error || err.responseText || err.toString()
       );
     }
-  }, [searchQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, searchQuery]);
 
   useEffect(() => {
     handleSearch();
   }, [handleSearch]);
 
-  console.log({ searchResults });
-
-  // when page updates, load results for page
-  useCallback(async () => {
+  // when scroll page changes, append new results
+  const handleLoadNextPage = useCallback(async () => {
     try {
+      if (page <= 1) {
+        return;
+      }
+      setIsLoadingPage(true);
+      const results = await app.search.searchPaginated(
+        searchQuery,
+        activeTab,
+        page,
+        10
+      );
+      setSearchResults((oldSearchResults) => {
+        const newResults = (oldSearchResults[activeTab] || []).concat(results);
+        return {
+          ...oldSearchResults,
+          [activeTab]: uniqBy(
+            newResults,
+            (result: any) => result.id || result.proposalid
+          ),
+        };
+      });
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoadingPage(false);
     }
-  }, [page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, searchQuery]);
 
-  const tabScopedListing = getListing(
-    searchResults,
+  useEffect(() => {
+    handleLoadNextPage();
+  }, [handleLoadNextPage]);
+
+  const tabScopedListing = useMemo(() => {
+    // deduplicate results
+    const dedupedResults = {
+      ...searchResults,
+      [SearchScope.Threads]: uniqBy(
+        (searchResults as any).Threads,
+        (t: any) => t.proposalid
+      ),
+      [SearchScope.Replies]: uniqBy(
+        (searchResults as any).Replies,
+        (r: any) => r.id
+      ),
+    };
+    return getListing(
+      dedupedResults,
+      searchQuery.searchTerm,
+      searchQuery.sort,
+      activeTab as SearchScope,
+      navigate
+    );
+  }, [
+    activeTab,
+    navigate,
     searchQuery.searchTerm,
     searchQuery.sort,
-    activeTab as SearchScope,
-    navigate
-  );
+    searchResults,
+  ]);
 
   const resultCount =
-    tabScopedListing.length === SEARCH_PAGE_SIZE
+    tabScopedListing.length >= 10
       ? `${tabScopedListing.length}+ ${pluralize(
           2,
           activeTab.toLowerCase()
@@ -117,7 +168,9 @@ const SearchPage = () => {
       Object.fromEntries(searchParams.entries())
     );
     newSearchQuery.sort = SearchSort[option.value];
-    navigate(`/search?${newSearchQuery.toUrlParams()}`);
+    navigate(`/search?${newSearchQuery.toUrlParams()}&tab=${activeTab}`, {
+      replace: true,
+    } as NavigateOptions);
   };
 
   const handleSearchAllCommunities = () => {
@@ -125,17 +178,17 @@ const SearchPage = () => {
       Object.fromEntries(searchParams.entries())
     );
     newSearchQuery.chainScope = undefined;
-    navigate(`/search?${newSearchQuery.toUrlParams()}`);
+    navigate(`/search?${newSearchQuery.toUrlParams()}&tab=${activeTab}`);
   };
 
   const handleScroll = () => {
-    if (bottomEl.current) {
+    if (!isLoadingPage && bottomEl.current) {
       const offset = 0;
       const top = bottomEl.current.getBoundingClientRect().top;
       const isInViewport =
         top + offset >= 0 && top - offset <= window.innerHeight;
       if (isInViewport) {
-        setPage(page + 1);
+        debouncedSetPage(page + 1);
       }
     }
   };

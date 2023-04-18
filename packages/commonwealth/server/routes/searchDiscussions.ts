@@ -24,8 +24,9 @@ type SearchDiscussionsQuery = {
   search?: string;
   thread_title_only?: 'true' | 'false';
   chain?: string;
-  results_size?: string;
   sort?: string;
+  page?: string;
+  page_size?: string;
 };
 
 type SearchDiscussionsBindOptions = PaginationSqlBind & {
@@ -54,7 +55,7 @@ const search = async (
 
     const threads = await models.Thread.findAll({
       where: params,
-      limit: parseInt(options.results_size, 10) || 20,
+      limit: parseInt(options.page_size, 10) || 20,
       attributes: {
         exclude: ['body', 'plaintext', 'version_history'],
       },
@@ -87,8 +88,8 @@ const search = async (
   }
 
   const { sql: paginationSort, bind: paginationBind } = buildPaginationSql({
-    limit: 50,
-    page: 1,
+    limit: parseInt(options.page_size, 10) || 10,
+    page: parseInt(options.page, 10) || 1,
     orderBy: sortOptions.column,
     orderDirection: sortOptions.direction,
   });

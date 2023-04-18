@@ -19,8 +19,7 @@ export interface SearchParams {
   isSearchPreview?: boolean;
   searchScope?: Array<SearchScope>;
   sort?: SearchSort;
-  resultSize?: number;
-  page?: number;
+  pageSize?: number;
 }
 
 export default class SearchQuery implements SearchParams {
@@ -29,7 +28,6 @@ export default class SearchQuery implements SearchParams {
   public isSearchPreview?: boolean;
   public searchScope: Array<SearchScope>;
   public sort: SearchSort;
-  public page: number;
 
   constructor(searchTerm = '', params?: SearchParams) {
     this.searchTerm = <Lowercase<string>>searchTerm.toLowerCase();
@@ -37,7 +35,6 @@ export default class SearchQuery implements SearchParams {
     this.chainScope = params?.chainScope;
     this.isSearchPreview = !!params?.isSearchPreview;
     this.sort = params?.sort || SearchSort.Best;
-    this.page = params?.page || 1;
   }
 
   public toEncodedString() {
@@ -45,8 +42,7 @@ export default class SearchQuery implements SearchParams {
       this.searchTerm.trim().replace(/\s+/g, '%20') +
       (this.chainScope ? ` chainScope=${this.chainScope}` : '') +
       (this.isSearchPreview ? ` isSearchPreview=${this.isSearchPreview}` : '') +
-      (this.sort ? ` sort=${this.sort}` : '') +
-      (this.page ? ` page=${this.page}` : '');
+      (this.sort ? ` sort=${this.sort}` : '');
 
     for (const scope in this.searchScope) {
       if (
@@ -106,7 +102,6 @@ export default class SearchQuery implements SearchParams {
     sq.isSearchPreview = url['preview'] === 'true';
     sq.sort = url['sort'] || SearchSort.Best;
     sq.searchScope = url['scope'] || [SearchScope.All];
-    sq.page = url['page'] || '1';
     return sq;
   }
 
