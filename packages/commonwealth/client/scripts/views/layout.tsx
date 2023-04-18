@@ -133,14 +133,21 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       }
     }
 
+    /**
+     * When we have set the community/chain as active when visiting a page and deferred the chain load,
+     * and then visit a page (with link - not directly) that requires chain to be loaded, then we need to
+     * explicitly load the chain here.
+     */
+    const hasScopeWithActiveAndNonInitChain =
+      scope &&
+      scope === app.activeChainId() &&
+      scope !== this.loadingScope &&
+      app.chain &&
+      !app.chain.loaded;
+
     if (
       (scope && this.deferred && !deferChain) ||
-      (scope &&
-        scope === app.activeChainId() &&
-        scope !== this.loadingScope &&
-        app.chain &&
-        !app.chain.loaded &&
-        !deferChain)
+      (hasScopeWithActiveAndNonInitChain && !deferChain)
     ) {
       this.deferred = false;
       this.loadingChain = true;
