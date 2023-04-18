@@ -149,7 +149,7 @@ export class EthereumSessionController implements ISessionController {
     delete types.EIP712Domain;
     const signature = await actionSigner._signTypedData(domain, types, message);
     const recoveredAddr = utils.verifyTypedData(
-      domain,
+      domain as any,
       types,
       message,
       signature
