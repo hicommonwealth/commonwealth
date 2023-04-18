@@ -67,8 +67,8 @@ const createReaction = async (
   }
 
   await verifyReaction(canvas_action, canvas_session, canvas_hash, {
-    thread_id: thread_id ?? parseInt(thread_id, 10),
-    comment_id: comment_id ?? parseInt(comment_id, 10),
+    thread_id: thread_id ? parseInt(thread_id, 10) : undefined,
+    comment_id: comment_id ? parseInt(comment_id, 10) : undefined,
     proposal_id,
     address: author.address,
     chain: chain.id,

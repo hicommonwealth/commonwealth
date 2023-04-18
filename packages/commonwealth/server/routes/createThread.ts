@@ -306,7 +306,7 @@ const createThread = async (
     body,
     address: author.address,
     community: chain.id,
-    topic: topic_id ?? null,
+    topic: topic_id ? parseInt(topic_id, 10) : null,
   });
 
   // begin essential database changes within transaction

@@ -62,9 +62,9 @@ export const verifyReaction = async (canvas_action, canvas_session, canvas_hash,
   if (canvas_action === undefined && canvas_session === undefined && canvas_hash === undefined) return;
   const { thread_id, comment_id, proposal_id, address, chain, value } = fields;
   const { action, session } = await verifyUnpack(canvas_action, canvas_session, address);
-  assertMatches(action.payload.call, "reactThread", "reaction", "call")
   assert(
-    (thread_id === action.payload.callArgs.thread_id &&
+    (action.payload.call === "reactThread" &&
+      thread_id === action.payload.callArgs.thread_id &&
       comment_id === undefined && proposal_id === undefined) ||
       (action.payload.call === "reactComment" &&
         comment_id === action.payload.callArgs.comment_id &&

@@ -166,7 +166,7 @@ class SessionsController {
     const { session, action, hash } = await this.sign(address, 'thread', {
       community: community || '',
       title,
-      body,
+      body: encodeURIComponent(body),
       link: link || '',
       topic: topic || '',
     });
@@ -183,7 +183,7 @@ class SessionsController {
   public async signComment(address: string, { thread_id, body, parent_comment_id }) {
     const { session, action, hash } = await this.sign(address, 'comment', {
       thread_id,
-      body,
+      body: encodeURIComponent(body),
       parent_comment_id,
     });
     return { session, action, hash };

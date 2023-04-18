@@ -7,6 +7,7 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { verify as verifyCanvasSessionSignature } from 'canvas';
+import { getEIP712SignableAction } from 'adapters/chain/ethereum/keys';
 import { ISessionController } from '.';
 
 export class EthereumSessionController implements ISessionController {
@@ -141,14 +142,16 @@ export class EthereumSessionController implements ISessionController {
       callArgs,
     };
 
-    const canvasEthereum = await import('@canvas-js/chain-ethereum');
-    const [domain, types, value] =
-      canvasEthereum.getActionSignatureData(actionPayload);
-    const signature = await actionSigner._signTypedData(domain, types, value);
+    // const canvasEthereum = await import('@canvas-js/chain-ethereum');
+    // const [domain, types, value] =
+    //   canvasEthereum.getActionSignatureData(actionPayload);
+    const { domain, types, message } = getEIP712SignableAction(actionPayload);
+    delete types.EIP712Domain;
+    const signature = await actionSigner._signTypedData(domain, types, message);
     const recoveredAddr = utils.verifyTypedData(
       domain,
       types,
-      value,
+      message,
       signature
     );
     const valid = recoveredAddr === this.signers[chainId][fromAddress].address;
