@@ -66,6 +66,9 @@ jobs:
           PORT: 8080
           USES_DOCKER_PGSQL: true
 
+      - name: Run Devnet tests
+        run: yarn --cwd packages/commonwealth test-devnet
+
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
@@ -135,12 +138,6 @@ jobs:
         run: yarn --cwd packages/commonwealth test-api
         env:
           NO_CLIENT: true
-
-      - name: Run Devnet tests
-        run: yarn --cwd packages/commonwealth test-devnet
-        env:
-          PORT: 8080
-          USES_DOCKER_PGSQL: true
 
       - name: Typecheck
         run: yarn --cwd packages/commonwealth check-types
