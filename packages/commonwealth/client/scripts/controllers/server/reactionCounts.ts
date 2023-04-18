@@ -45,14 +45,14 @@ class ReactionCountController {
       action = null,
       hash = null,
     } = post instanceof Thread
-      ? await app.sessions.signThreadReaction({
+      ? await app.sessions.signThreadReaction(address, {
           thread_id: (post as Thread).id,
           like,
         })
       : post instanceof Proposal
       ? {}
       : post instanceof Comment
-      ? await app.sessions.signCommentReaction({
+      ? await app.sessions.signCommentReaction(address, {
           comment_id: (post as Comment<any>).id,
           like,
         })
@@ -127,13 +127,13 @@ class ReactionCountController {
       action = null,
       hash = null,
     } = reaction.thread_id
-      ? await app.sessions.signDeleteThreadReaction({
+      ? await app.sessions.signDeleteThreadReaction(app.user.activeAccount.address, {
           thread_id: reaction.canvas_hash,
         })
       : reaction.proposal_id
       ? {}
       : reaction.comment_id
-      ? await app.sessions.signDeleteCommentReaction({
+      ? await app.sessions.signDeleteCommentReaction(app.user.activeAccount.address, {
           comment_id: reaction.canvas_hash,
         })
       : {};

@@ -224,6 +224,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         app.sessions.authSession(
           app.chain.base,
           chainId,
+          account.address,
           sessionPayload,
           signature
         );

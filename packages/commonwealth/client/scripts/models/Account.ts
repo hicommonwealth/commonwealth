@@ -132,7 +132,8 @@ class Account {
       wallet_id: this.walletId,
       session_public_address: await app.sessions.getOrCreateAddress(
         this.chain.base,
-        chainId.toString()
+        chainId.toString(),
+        this.address
       ),
       session_timestamp: timestamp,
       session_block_data: this.validationBlockInfo,

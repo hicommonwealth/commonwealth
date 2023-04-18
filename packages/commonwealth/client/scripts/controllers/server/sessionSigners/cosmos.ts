@@ -16,35 +16,37 @@ import type {
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
 import { getADR036SignableAction } from 'adapters/chain/cosmos/keys';
+import { fromDuration } from '../../../../../../common-common/src/cosmos-ts/src/codegen/helpers';
 
 export class CosmosSDKSessionController implements ISessionController {
   signers: Record<
     string,
-    { signer: Secp256k1Wallet; bech32Address: string; privkey: string }
+    Record<string, { signer: Secp256k1Wallet; bech32Address: string; privkey: string }>
   > = {};
   private auths: Record<
     number,
-    { payload: SessionPayload; signature: string }
+    Record<string, { payload: SessionPayload; signature: string }>
   > = {};
 
-  getAddress(chainId: string): string {
-    return this.signers[chainId]?.bech32Address;
+  getAddress(chainId: string, fromAddress: string): string {
+    return this.signers[chainId][fromAddress]?.bech32Address;
   }
 
-  async hasAuthenticatedSession(chainId: string): Promise<boolean> {
-    await this.getOrCreateSigner(chainId);
+  async hasAuthenticatedSession(chainId: string, fromAddress: string): Promise<boolean> {
+    await this.getOrCreateSigner(chainId, fromAddress);
     return (
-      this.signers[chainId] !== undefined && this.auths[chainId] !== undefined
+      this.signers[chainId][fromAddress] !== undefined && this.auths[chainId][fromAddress] !== undefined
     );
   }
 
-  async getOrCreateAddress(chainId: string): Promise<string> {
-    await this.getOrCreateSigner(chainId);
-    return this.signers[chainId]?.bech32Address;
+  async getOrCreateAddress(chainId: string, fromAddress: string): Promise<string> {
+    await this.getOrCreateSigner(chainId, fromAddress);
+    return this.signers[chainId][fromAddress]?.bech32Address;
   }
 
   async authSession(
     chainId: string,
+    fromAddress: string,
     payload: SessionPayload,
     signature: string
   ) {
@@ -54,26 +56,29 @@ export class CosmosSDKSessionController implements ISessionController {
     if (!valid) {
       throw new Error("Invalid signature");
     }
-    if (payload.sessionAddress !== this.getAddress(chainId)) {
+    if (payload.sessionAddress !== this.getAddress(chainId, fromAddress)) {
       throw new Error(
         `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
-          chainId
+          chainId, fromAddress
         )}`
       );
     }
-    this.auths[chainId] = { payload, signature };
+    this.auths[chainId][fromAddress] = { payload, signature };
 
     const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-auth`;
-    localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId]));
+    localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
   }
 
-  private async getOrCreateSigner(chainId: string): Promise<{
+  private async getOrCreateSigner(chainId: string, fromAddress: string): Promise<{
     signer: Secp256k1Wallet;
     bech32Address: string;
     privkey: string;
   }> {
-    if (this.signers[chainId] !== undefined) {
-      return this.signers[chainId];
+    this.auths[chainId] = this.auths[chainId] ?? {}
+    this.signers[chainId] = this.signers[chainId] ?? {}
+
+    if (this.signers[chainId][fromAddress] !== undefined) {
+      return this.signers[chainId][fromAddress];
     }
     const cosm = await import('@cosmjs/amino');
     const cosmCrypto = await import('@cosmjs/crypto');
@@ -88,7 +93,7 @@ export class CosmosSDKSessionController implements ISessionController {
       );
       const accounts = await signer.getAccounts();
       const address = accounts[0].address;
-      this.signers[chainId] = { signer, privkey, bech32Address: address };
+      this.signers[chainId][fromAddress] = { signer, privkey, bech32Address: address };
 
       const auth = localStorage.getItem(authStorageKey);
       if (auth !== null) {
@@ -101,14 +106,14 @@ export class CosmosSDKSessionController implements ISessionController {
         });
         if (!valid) throw new Error();
 
-        if (payload.sessionAddress === this.getAddress(chainId)) {
+        if (payload.sessionAddress === this.getAddress(chainId, fromAddress)) {
           console.log(
             'Restored authenticated session:',
-            this.getAddress(chainId)
+            this.getAddress(chainId, fromAddress)
           );
-          this.auths[chainId] = { payload, signature };
+          this.auths[chainId][fromAddress] = { payload, signature };
         } else {
-          console.log('Restored logged-out session:', this.getAddress(chainId));
+          console.log('Restored logged-out session:', this.getAddress(chainId, fromAddress));
         }
       }
     } catch (err) {
@@ -121,21 +126,25 @@ export class CosmosSDKSessionController implements ISessionController {
       const signer = await cosm.Secp256k1Wallet.fromKey(privkeyBytes);
       const accounts = await signer.getAccounts();
       const address = accounts[0].address;
-      this.signers[chainId] = { signer, privkey, bech32Address: address };
-      delete this.auths[chainId];
+      this.signers[chainId][fromAddress] = { signer, privkey, bech32Address: address };
+      delete this.auths[chainId][fromAddress];
       localStorage.setItem(storageKey, JSON.stringify({ privkey }));
     }
-    return this.signers[chainId];
+    return this.signers[chainId][fromAddress];
   }
 
   async sign(
     chainId: string,
+    fromAddress: string,
     call: string,
     callArgs: Record<string, ActionArgument>
   ): Promise<{ session: Session; action: Action; hash: string }> {
-    const { signer, privkey, bech32Address: address } = this.signers[chainId];
-    const sessionPayload: SessionPayload = this.auths[chainId]?.payload;
-    const sessionSignature: string = this.auths[chainId]?.signature;
+    this.auths[chainId] = this.auths[chainId] ?? {}
+    this.signers[chainId] = this.signers[chainId] ?? {}
+
+    const { signer, privkey, bech32Address: address } = this.signers[chainId][fromAddress];
+    const sessionPayload: SessionPayload = this.auths[chainId][fromAddress]?.payload;
+    const sessionSignature: string = this.auths[chainId][fromAddress]?.signature;
     // TODO: verify payload is not expired
 
     const actionPayload: ActionPayload = {

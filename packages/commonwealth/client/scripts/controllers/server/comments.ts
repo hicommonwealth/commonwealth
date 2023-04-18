@@ -138,7 +138,7 @@ class CommentsController {
     let chainEntity;
     try {
       // TODO: Create a new type for proposal comments?
-      const { session, action, hash } = await app.sessions.signComment({
+      const { session, action, hash } = await app.sessions.signComment(address, {
         thread_id: threadId,
         body: unescapedText,
         parent_comment_id: parentCommentId,
@@ -183,7 +183,7 @@ class CommentsController {
     const newBody = body || comment.text;
     try {
       // TODO: Change to PUT /comment
-      const { session, action, hash } = await app.sessions.signComment({
+      const { session, action, hash } = await app.sessions.signComment(app.user.activeAccount.address, {
         thread_id: comment.threadId,
         body,
         parent_comment_id: comment.parentComment,
@@ -217,7 +217,7 @@ class CommentsController {
   }
 
   public async delete(comment) {
-    const { session, action, hash } = await app.sessions.signDeleteComment({
+    const { session, action, hash } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
       comment_id: comment.canvasHash,
     });
     return new Promise((resolve, reject) => {

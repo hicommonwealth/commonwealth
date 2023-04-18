@@ -89,7 +89,8 @@ const FinishNearLogin = () => {
       const chainId = 'mainnet';
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
-        chainId
+        chainId,
+        acct.address
       );
 
       // We do not add blockInfo for NEAR
@@ -127,7 +128,7 @@ const FinishNearLogin = () => {
 
       app.sessions
         .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, canvasSessionPayload, signature);
+        .authSession(chainId, acct.address, canvasSessionPayload, signature);
 
       if (!app.isLoggedIn()) {
         await initAppState();

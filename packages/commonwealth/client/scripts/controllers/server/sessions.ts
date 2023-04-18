@@ -38,7 +38,8 @@ export async function signSessionWithAccount<T extends { address: string }>(
   const canvasChainId = chainBaseToCanvasChainId(wallet.chain, idOrPrefix);
   const sessionPublicAddress = await app.sessions.getOrCreateAddress(
     wallet.chain,
-    canvasChainId
+    canvasChainId,
+    account.address,
   );
 
   const canvasSessionPayload = createCanvasSessionPayload(
@@ -115,6 +116,7 @@ class SessionsController {
   // because we always request an authSession immediately before signing.
   // The user should never be able to switch accounts in the intervening time.
   private async sign(
+    address: string,
     call: string,
     args: Record<string, ActionArgument>
   ): Promise<{ session: string; action: string; hash: string }> {
@@ -134,7 +136,8 @@ class SessionsController {
 
     // Load any past session
     const hasAuthenticatedSession = await controller.hasAuthenticatedSession(
-      chainId
+      chainId,
+      address,
     );
 
     if (!hasAuthenticatedSession) {
@@ -146,6 +149,7 @@ class SessionsController {
 
     const { session, action, hash } = await controller.sign(
       chainId,
+      address,
       call,
       args
     );
@@ -158,8 +162,8 @@ class SessionsController {
   }
 
   // Public signer methods
-  public async signThread({ community, title, body, link, topic }) {
-    const { session, action, hash } = await this.sign('thread', {
+  public async signThread(address: string, { community, title, body, link, topic }) {
+    const { session, action, hash } = await this.sign(address, 'thread', {
       community: community || '',
       title,
       body,
@@ -169,15 +173,15 @@ class SessionsController {
     return { session, action, hash };
   }
 
-  public async signDeleteThread({ thread_id }) {
-    const { session, action, hash } = await this.sign('deleteThread', {
+  public async signDeleteThread(address: string, { thread_id }) {
+    const { session, action, hash } = await this.sign(address, 'deleteThread', {
       thread_id,
     });
     return { session, action, hash };
   }
 
-  public async signComment({ thread_id, body, parent_comment_id }) {
-    const { session, action, hash } = await this.sign('comment', {
+  public async signComment(address: string, { thread_id, body, parent_comment_id }) {
+    const { session, action, hash } = await this.sign(address, 'comment', {
       thread_id,
       body,
       parent_comment_id,
@@ -185,40 +189,40 @@ class SessionsController {
     return { session, action, hash };
   }
 
-  public async signDeleteComment({ comment_id }) {
-    const { session, action, hash } = await this.sign('deleteComment', {
+  public async signDeleteComment(address: string, { comment_id }) {
+    const { session, action, hash } = await this.sign(address, 'deleteComment', {
       comment_id,
     });
     return { session, action, hash };
   }
 
-  public async signThreadReaction({ thread_id, like }) {
+  public async signThreadReaction(address: string, { thread_id, like }) {
     const value = like ? 'like' : 'dislike';
-    const { session, action, hash } = await this.sign('reactThread', {
+    const { session, action, hash } = await this.sign(address, 'reactThread', {
       thread_id,
       value,
     });
     return { session, action, hash };
   }
 
-  public async signDeleteThreadReaction({ thread_id }) {
-    const { session, action, hash } = await this.sign('unreactThread', {
+  public async signDeleteThreadReaction(address: string, { thread_id }) {
+    const { session, action, hash } = await this.sign(address, 'unreactThread', {
       thread_id,
     });
     return { session, action, hash };
   }
 
-  public async signCommentReaction({ comment_id, like }) {
+  public async signCommentReaction(address: string, { comment_id, like }) {
     const value = like ? 'like' : 'dislike';
-    const { session, action, hash } = await this.sign('reactComment', {
+    const { session, action, hash } = await this.sign(address, 'reactComment', {
       comment_id,
       value,
     });
     return { session, action, hash };
   }
 
-  public async signDeleteCommentReaction({ comment_id }) {
-    const { session, action, hash } = await this.sign('unreactComment', {
+  public async signDeleteCommentReaction(address: string, { comment_id }) {
+    const { session, action, hash } = await this.sign(address, 'unreactComment', {
       comment_id,
     });
     return { session, action, hash };

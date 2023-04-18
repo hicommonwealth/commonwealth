@@ -173,7 +173,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
     const timestamp = +new Date();
     const sessionAddress = await app.sessions.getOrCreateAddress(
       wallet.chain,
-      wallet.getChainId().toString()
+      wallet.getChainId().toString(),
+      address
     );
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
     const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
@@ -200,6 +201,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
     await app.sessions.authSession(
       wallet.chain,
       chainId,
+      account.address,
       sessionPayload,
       signature
     );
@@ -243,7 +245,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
     try {
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         wallet.chain,
-        wallet.getChainId().toString()
+        wallet.getChainId().toString(),
+        address
       );
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
       const validationBlockInfo =

@@ -286,7 +286,7 @@ class ThreadsController {
         action = null,
         session = null,
         hash = null,
-      } = await app.sessions.signThread({
+      } = await app.sessions.signThread(address, {
         community: chainId,
         title,
         body,
@@ -362,7 +362,7 @@ class ThreadsController {
       action = null,
       session = null,
       hash = null,
-    } = await app.sessions.signThread({
+    } = await app.sessions.signThread(app.user.activeAccount.address, {
       community: app.activeChainId(),
       title: newTitle,
       body: newBody,
