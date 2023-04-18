@@ -1,7 +1,7 @@
 import React from 'react';
 
 import app from 'state';
-import { isNonEmptyString } from '../helpers/typeGuards';
+import { isNonEmptyString } from 'helpers/typeGuards';
 import type { ChainInfo } from '../models';
 import { ITokenAdapter } from '../models';
 import {
@@ -14,13 +14,15 @@ type SublayoutBannersProps = {
   banner?: string;
   chain: ChainInfo;
   terms?: string;
-  tosStatus?: string;
   bannerStatus?: string;
 };
 
-export const SublayoutBanners = (props: SublayoutBannersProps) => {
-  const { banner, chain, terms, tosStatus, bannerStatus } = props;
-
+export const SublayoutBanners = ({
+  banner,
+  chain,
+  terms,
+  bannerStatus,
+}: SublayoutBannersProps) => {
   return (
     <>
       {banner && bannerStatus !== 'off' && (
@@ -38,9 +40,7 @@ export const SublayoutBanners = (props: SublayoutBannersProps) => {
             bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
           />
         )}
-      {isNonEmptyString(terms) && tosStatus !== 'off' && (
-        <TermsBanner terms={terms} />
-      )}
+      {isNonEmptyString(terms) && <TermsBanner terms={terms} />}
     </>
   );
 };
