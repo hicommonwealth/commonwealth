@@ -194,7 +194,6 @@
 
     li::before {
       width: 1.4em;
-      padding-right: 10px;
       position: relative;
       padding-right: 11px;
     }
@@ -298,7 +297,6 @@
 // mixin for collapsing large text blocks to <200px in height
 @mixin collapsible {
   &.collapsed {
-    white-space: nowrap;
     overflow: hidden;
     display: block;
     text-overflow: ellipsis;

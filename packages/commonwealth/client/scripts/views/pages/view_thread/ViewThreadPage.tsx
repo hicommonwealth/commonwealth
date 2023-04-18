@@ -12,7 +12,7 @@ import type { IThreadCollaborator } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import app from 'state';
 import { ContentType } from 'types';
@@ -189,7 +189,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (thread && identifier !== `${threadId}-${slugify(thread?.title)}`) {
       const url = getProposalUrlPath(
         thread.slug,
-        `${threadId}-${slugify(thread?.title)}`,
+        `${threadId}-${slugify(thread?.title)}${window.location.search}`,
         true
       );
       navigate(url, { replace: true });
