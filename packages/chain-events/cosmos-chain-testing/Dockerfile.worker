@@ -1,0 +1,30 @@
+FROM golang:1.19-alpine AS build-env
+
+# Install minimum necessary dependencies
+ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3 py3-pip build-base
+RUN apk add --no-cache $PACKAGES && apk add --update ca-certificates 
+
+# Set working directory for the build
+WORKDIR /go/src/github.com/cosmos
+
+# Add source files
+RUN curl -sSL https://github.com/cosmos/cosmos-sdk/archive/refs/tags/v0.46.11.tar.gz | tar -xz \
+&& mv cosmos-sdk-0.46.11 cosmos-sdk
+
+WORKDIR /go/src/github.com/cosmos/cosmos-sdk
+# Build the binary
+# Copy over binaries from the build-env
+RUN make build \
+    && cp /go/src/github.com/cosmos/cosmos-sdk/build/simd /usr/bin/simd
+
+WORKDIR /root
+
+# ADD https://simd-binary.s3.amazonaws.com/simd /usr/bin/simd
+# COPY simd /usr/bin/simd
+
+EXPOSE 26657 1317
+COPY bootstrap.sh bootstrap.sh
+RUN chmod +x bootstrap.sh && chmod +x /usr/bin/simd
+
+# Run simd by default, omit entrypoint to ease using container with simcli
+CMD ["sh", "-c", "sh ./bootstrap.sh"]
