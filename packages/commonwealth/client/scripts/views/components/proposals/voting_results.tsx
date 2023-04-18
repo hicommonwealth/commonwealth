@@ -118,7 +118,7 @@ export const VotingResults = (props: VotingResultsProps) => {
         no,
         abstain,
         noWithVeto,
-      } = (proposal as CosmosProposal)?.data?.state?.tally;
+      } = (proposal as CosmosProposal).data.state.tally;
 
       // TODO: move this marshalling into controller
       const formatCurrency = (n: BN) => {
