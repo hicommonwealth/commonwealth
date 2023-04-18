@@ -54,7 +54,7 @@ export class SolanaSessionController implements ISessionController {
     }
     this.auths[chainId][fromAddress] = { payload, signature };
 
-    const authStorageKey = `CW_SESSIONS-solana-${chainId}-auth`;
+    const authStorageKey = `CW_SESSIONS-solana-${chainId}-${fromAddress}-auth`;
     localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
   }
 
@@ -66,7 +66,7 @@ export class SolanaSessionController implements ISessionController {
     if (this.signers[chainId][fromAddress] !== undefined) {
       return this.signers[chainId][fromAddress];
     }
-    const storageKey = `CW_SESSIONS-solana-${chainId}`;
+    const storageKey = `CW_SESSIONS-solana-${chainId}-${fromAddress}`;
     try {
       const storage = localStorage.getItem(storageKey);
       const { privateKey }: { privateKey: string } = JSON.parse(storage);
@@ -74,7 +74,7 @@ export class SolanaSessionController implements ISessionController {
         bs58.decode(privateKey)
       );
 
-      const authStorageKey = `CW_SESSIONS-solana-${chainId}-auth`;
+      const authStorageKey = `CW_SESSIONS-solana-${chainId}-${fromAddress}-auth`;
       const auth = localStorage.getItem(authStorageKey);
       if (auth !== null) {
         const {

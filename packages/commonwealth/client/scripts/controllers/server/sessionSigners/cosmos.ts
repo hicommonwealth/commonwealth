@@ -65,7 +65,7 @@ export class CosmosSDKSessionController implements ISessionController {
     }
     this.auths[chainId][fromAddress] = { payload, signature };
 
-    const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-auth`;
+    const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-${fromAddress}-auth`;
     localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
   }
 
@@ -83,8 +83,8 @@ export class CosmosSDKSessionController implements ISessionController {
     const cosm = await import('@cosmjs/amino');
     const cosmCrypto = await import('@cosmjs/crypto');
 
-    const storageKey = `CW_SESSIONS-cosmos-${chainId}`;
-    const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-auth`;
+    const storageKey = `CW_SESSIONS-cosmos-${chainId}-${fromAddress}`;
+    const authStorageKey = `CW_SESSIONS-cosmos-${chainId}-${fromAddress}-auth`;
     try {
       const storage = localStorage.getItem(storageKey);
       const { privkey } = JSON.parse(storage);

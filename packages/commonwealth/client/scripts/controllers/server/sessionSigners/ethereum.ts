@@ -55,7 +55,7 @@ export class EthereumSessionController implements ISessionController {
 
     this.auths[chainId][fromAddress] = { payload, signature };
 
-    const authStorageKey = `CW_SESSIONS-eth-${chainId}-auth`;
+    const authStorageKey = `CW_SESSIONS-eth-${chainId}-${fromAddress}-auth`;
     localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
   }
 
@@ -66,8 +66,8 @@ export class EthereumSessionController implements ISessionController {
     if (this.signers[chainId][fromAddress] !== undefined) {
       return this.signers[chainId][fromAddress];
     }
-    const storageKey = `CW_SESSIONS-eth-${chainId}`; // TODO: fromAddress
-    const authStorageKey = `CW_SESSIONS-eth-${chainId}-auth`; // TODO: fromAddress
+    const storageKey = `CW_SESSIONS-eth-${chainId}-${fromAddress}`; // TODO: fromAddress
+    const authStorageKey = `CW_SESSIONS-eth-${chainId}-${fromAddress}-auth`; // TODO: fromAddress
     try {
       // Get an unauthenticated signer from localStorage.
       const storage = localStorage.getItem(storageKey);

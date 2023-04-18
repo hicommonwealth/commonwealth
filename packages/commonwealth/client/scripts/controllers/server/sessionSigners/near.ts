@@ -54,7 +54,7 @@ export class NEARSessionController implements ISessionController {
     }
     this.auths[chainId][fromAddress] = { payload, signature };
 
-    const authStorageKey = `CW_SESSIONS-near-${chainId}-auth`;
+    const authStorageKey = `CW_SESSIONS-near-${chainId}-${fromAddress}-auth`;
     localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
   }
 
@@ -65,8 +65,8 @@ export class NEARSessionController implements ISessionController {
     if (this.signers[chainId][fromAddress] !== undefined) {
       return this.signers[chainId][fromAddress];
     }
-    const storageKey = `CW_SESSIONS-near-${chainId}`;
-    const authStorageKey = `CW_SESSIONS-near-${chainId}-auth`;
+    const storageKey = `CW_SESSIONS-near-${chainId}-${fromAddress}`;
+    const authStorageKey = `CW_SESSIONS-near-${chainId}-${fromAddress}-auth`;
     // TODO: test session restoration on NEAR
     try {
       const nearApiUtils = await import('near-api-js/lib/utils');

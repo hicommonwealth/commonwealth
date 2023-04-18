@@ -61,7 +61,7 @@ export class SubstrateSessionController implements ISessionController {
     }
     this.auths[chainId][fromAddress] = { payload, signature };
 
-    const authStorageKey = `CW_SESSIONS-substrate-${chainId}-auth`;
+    const authStorageKey = `CW_SESSIONS-substrate-${chainId}-${fromAddress}-auth`;
     localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId][fromAddress]));
   }
 
@@ -72,8 +72,8 @@ export class SubstrateSessionController implements ISessionController {
     if (this.signers[chainId][fromAddress] !== undefined) {
       return this.signers[chainId][fromAddress].pair;
     }
-    const storageKey = `CW_SESSIONS-substrate-${chainId}`;
-    const authStorageKey = `CW_SESSIONS-substrate-${chainId}-auth`;
+    const storageKey = `CW_SESSIONS-substrate-${chainId}-${fromAddress}`;
+    const authStorageKey = `CW_SESSIONS-substrate-${chainId}-${fromAddress}-auth`;
     try {
       const storage = localStorage.getItem(storageKey);
       const { privateKey } = JSON.parse(storage);
