@@ -103,7 +103,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 <RecentThreadsHeader
                   topic={topicName}
                   stage={stageName}
-                  totalThreadCount={threads.length}
+                  totalThreadCount={threads ? threads.length : 0}
                 />
               </div>
             );
