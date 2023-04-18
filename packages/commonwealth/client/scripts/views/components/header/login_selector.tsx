@@ -302,7 +302,7 @@ export const LoginSelector = () => {
 
   useEffect(() => {
     setIsJoined(!!app.user.activeAccount);
-  }, [])
+  }, []);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
@@ -508,33 +508,30 @@ export const LoginSelector = () => {
   return (
     <>
       <div className="LoginSelector">
-        {app.chain &&
-          !app.chainPreloading &&
-          profileLoadComplete &&
-          !isJoined && (
-            <div className="join-button-container">
-              <CWButton
-                buttonType="tertiary-black"
-                onClick={async () => {
-                  if (hasTermsOfService) {
-                    setIsTOSModalOpen(true);
-                  } else {
-                    await performJoinCommunityLinking();
-                    setIsJoined(true);
-                  }
-                }}
-                label={
-                  sameBaseAddressesRemoveDuplicates.length === 0
-                    ? `No ${
-                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                        ''
-                      } address`
-                    : 'Join'
+        {app.chain && !app.chainPreloading && profileLoadComplete && !isJoined && (
+          <div className="join-button-container">
+            <CWButton
+              buttonType="tertiary-black"
+              onClick={async () => {
+                if (hasTermsOfService) {
+                  setIsTOSModalOpen(true);
+                } else {
+                  await performJoinCommunityLinking();
+                  setIsJoined(true);
                 }
-              />
-            </div>
-          )}
+              }}
+              label={
+                sameBaseAddressesRemoveDuplicates.length === 0
+                  ? `No ${
+                      CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                      CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                      ''
+                    } address`
+                  : 'Join'
+              }
+            />
+          </div>
+        )}
         {profileLoadComplete && (
           <ClickAwayListener
             onClickAway={() => {

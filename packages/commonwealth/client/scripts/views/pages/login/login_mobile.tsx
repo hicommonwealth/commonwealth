@@ -56,6 +56,7 @@ export const LoginMobile = ({
 
   const [signerAccount, setSignerAccount] = useState<Account>(null);
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
+  const [isLinkingOnMobile, setIsLinkingOnMobile] = useState<boolean>(false);
 
   return (
     <div className="LoginMobile">
@@ -88,19 +89,27 @@ export const LoginMobile = ({
             linking={false}
             setSignerAccount={setSignerAccount}
             setIsNewlyCreated={setIsNewlyCreated}
+            setIsLinkingOnMobile={setIsLinkingOnMobile}
           />
         )}
 
         {bodyType === 'redirectToSign' && (
           <div className="inner-body-container">
             <CWButton
-              label="Redirect to Sign in Wallet"
+              label="Sign with Wallet"
               onClick={() => {
                 // TODO: Handle link account case (third param here)
-                console.log('okayyy im here');
-                accountVerifiedCallback(signerAccount, isNewlyCreated, false);
+                accountVerifiedCallback(
+                  signerAccount,
+                  isNewlyCreated,
+                  isLinkingOnMobile
+                );
               }}
             />
+            <CWText fontType="caption" className="CaptionText">
+              Please wait for a signature request to appear. This can sometimes
+              take several seconds.
+            </CWText>
           </div>
         )}
 
@@ -117,6 +126,7 @@ export const LoginMobile = ({
             showResetWalletConnect={showResetWalletConnect}
             linking
             isMobile
+            setIsLinkingOnMobile={setIsLinkingOnMobile}
           />
         )}
 

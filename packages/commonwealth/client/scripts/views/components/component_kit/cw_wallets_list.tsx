@@ -141,6 +141,7 @@ type WalletsListProps = {
   isMobile?: boolean;
   setSignerAccount?: (account: Account) => void;
   setIsNewlyCreated?: (isNewlyCreated: boolean) => void;
+  setIsLinkingOnMobile?: (isLinkingOnMobile: boolean) => void;
   setBodyType?: (bodyType: string) => void;
   accountVerifiedCallback?: (
     account: Account,
@@ -163,6 +164,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
     setSignerAccount,
     setIsNewlyCreated,
     setSelectedWallet,
+    setIsLinkingOnMobile,
     accountVerifiedCallback,
     setBodyType,
     linking,
@@ -214,6 +216,15 @@ export const CWWalletsList = (props: WalletsListProps) => {
 
     // ensure false for newlyCreated / linking vars on revalidate
     accountVerifiedCallback(account, false, false);
+    if (isMobile) {
+      if (setSignerAccount) setSignerAccount(account);
+      if (setIsNewlyCreated) setIsNewlyCreated(false);
+      if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
+      setBodyType('redirectToSign');
+      return;
+    } else {
+      accountVerifiedCallback(account, false, false);
+    }
   }
 
   async function handleNormalWalletLogin(
@@ -266,6 +277,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
       if (isMobile) {
         if (setSignerAccount) setSignerAccount(signerAccount);
         if (setIsNewlyCreated) setIsNewlyCreated(newlyCreated);
+        if (setIsLinkingOnMobile) setIsLinkingOnMobile(linking);
         setBodyType('redirectToSign');
         return;
       } else {
