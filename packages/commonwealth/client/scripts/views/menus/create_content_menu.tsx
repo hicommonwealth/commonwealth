@@ -94,7 +94,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New On-Chain Proposal',
-            onClick: () => navigate('/new/proposal', { deferChain: false }),
+            onClick: () => navigate('/new/proposal'),
             iconLeft: 'star',
           },
         ]
@@ -105,7 +105,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New Sputnik proposal',
-            onClick: () => navigate('/new/proposal', { deferChain: false }),
+            onClick: () => navigate('/new/proposal'),
             iconLeft: 'democraticProposal',
           },
         ]
