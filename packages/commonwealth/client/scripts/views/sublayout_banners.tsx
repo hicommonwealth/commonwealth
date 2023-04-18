@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import app from 'state';
 import { isNonEmptyString } from 'helpers/typeGuards';
@@ -14,24 +14,28 @@ type SublayoutBannersProps = {
   banner?: string;
   chain: ChainInfo;
   terms?: string;
-  bannerStatus?: string;
 };
 
 export const SublayoutBanners = ({
   banner,
   chain,
   terms,
-  bannerStatus,
 }: SublayoutBannersProps) => {
+  const bannerLocalStorageId = `${app.activeChainId()}-banner`;
+
+  const [bannerStatus, setBannerStatus] = useState(
+    localStorage.getItem(bannerLocalStorageId)
+  );
+
+  const handleDismissBanner = () => {
+    setBannerStatus('off');
+    localStorage.setItem(bannerLocalStorageId, 'off');
+  };
+
   return (
     <>
       {banner && bannerStatus !== 'off' && (
-        <CWMessageBanner
-          bannerContent={banner}
-          onClose={() =>
-            localStorage.setItem(`${app.activeChainId()}-banner`, 'off')
-          }
-        />
+        <CWMessageBanner bannerContent={banner} onClose={handleDismissBanner} />
       )}
       {app.isLoggedIn() &&
         ITokenAdapter.instanceOf(app.chain) &&

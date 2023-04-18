@@ -11,7 +11,7 @@ type TermsBannerProps = { terms: string };
 export const TermsBanner = ({ terms }: TermsBannerProps) => {
   const localStorageId = `${app.activeChainId()}-tos`;
 
-  const [isVisible, setIsVisible] = useState(() =>
+  const [isVisible, setIsVisible] = useState(
     localStorage.getItem(localStorageId)
   );
 
