@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import 'pages/login/login_mobile.scss';
+import app from 'state';
+import { isMobile } from 'react-device-detect';
 
 import {
   CWProfileRow,
@@ -22,6 +24,9 @@ import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
 import type { LoginProps } from './types';
+import { Account } from 'models';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 export const LoginMobile = ({
   address,
@@ -53,9 +58,28 @@ export const LoginMobile = ({
   const hasCreationButtons = bodyType === 'selectAccountType';
   const { headerText, bodyText } = getLoginText(bodyType);
 
+  const [signerAccount, setSignerAccount] = useState<Account>(null);
+  const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
+  const [isLinkingOnMobile, setIsLinkingOnMobile] = useState<boolean>(false);
+
   return (
     <div className="LoginMobile">
-      <CWIconButton iconName="close" onClick={() => onModalClose()} />
+      <CWIconButton
+        iconName="close"
+        onClick={async () => {
+          if (bodyType === 'redirectToSign' && !app.user.activeAccount) {
+            // Reset WC if we quit the login flow before signing in
+            const wallet = wallets.find(
+              (w) =>
+                w instanceof WalletConnectWebWalletController ||
+                w instanceof TerraWalletConnectWebWalletController
+            );
+
+            await wallet.reset();
+          }
+          onModalClose();
+        }}
+      />
       {bodyType === 'ethWalletList' && <LoginEthAlert />}
       <div className={bodyType}>
         <LoginText headerText={headerText} bodyText={bodyText} isMobile />
@@ -80,7 +104,32 @@ export const LoginMobile = ({
             setBodyType={setBodyType}
             accountVerifiedCallback={accountVerifiedCallback}
             showResetWalletConnect={showResetWalletConnect}
+            isMobile={isMobile}
+            linking={false}
+            setSignerAccount={setSignerAccount}
+            setIsNewlyCreated={setIsNewlyCreated}
+            setIsLinkingOnMobile={setIsLinkingOnMobile}
           />
+        )}
+
+        {bodyType === 'redirectToSign' && (
+          <div className="inner-body-container">
+            <CWButton
+              label="Sign with Wallet"
+              onClick={() => {
+                // TODO: Handle link account case (third param here)
+                accountVerifiedCallback(
+                  signerAccount,
+                  isNewlyCreated,
+                  isLinkingOnMobile
+                );
+              }}
+            />
+            <CWText type="caption" className="CaptionText">
+              Please wait for a signature request to appear. This can sometimes
+              take several seconds.
+            </CWText>
+          </div>
         )}
 
         {bodyType === 'selectPrevious' && (
@@ -95,6 +144,8 @@ export const LoginMobile = ({
             accountVerifiedCallback={accountVerifiedCallback}
             showResetWalletConnect={showResetWalletConnect}
             linking
+            isMobile={isMobile}
+            setIsLinkingOnMobile={setIsLinkingOnMobile}
           />
         )}
 
