@@ -61,10 +61,6 @@
       .published-text.Text {
         color: $neutral-500;
       }
-      .verification-icon {
-        color: $neutral-500;
-        margin-top: 2px;
-      }
     }
 
     .comment-footer {
@@ -106,6 +102,16 @@
             .menu-buttons-text.Text {
               color: $neutral-800;
             }
+          }
+        }
+
+        .verification-icon {
+          color: $neutral-500;
+          margin-left: -1px;
+          margin-top: 2px;
+          path {
+            stroke: #9f9da1;
+            stroke-width: 1.25px;
           }
         }
       }

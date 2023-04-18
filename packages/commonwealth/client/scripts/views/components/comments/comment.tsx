@@ -203,7 +203,7 @@ export const Comment = (props: CommentProps) => {
                 className="verification-icon"
                 onClick={() => setIsCanvasVerifyDataModalVisible(true)}
                   >
-                  <CWIcon iconName="checkCircle" iconSize="xs" />
+                  <CWIcon iconName="check" iconSize="sm" />
                   </CWText>
               )}
                 </div>
