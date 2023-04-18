@@ -15,4 +15,10 @@ Once you have a testnet running in docker, you can:
         - 'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse
           scrap clutch cup daughter bench length sell goose deliver critic favorite thought'
     - run the tests in `packages/commonwealth/test/integration/api/external/proposalTx.spec.ts`
+
+## Live node
+
+See [wiki](https://github.com/hicommonwealth/commonwealth/wiki/Devnet)
+-  https://cosmos-devnet.herokuapp.com/rpc
+-  https://cosmos-devnet.herokuapp.com/lcd/
     
