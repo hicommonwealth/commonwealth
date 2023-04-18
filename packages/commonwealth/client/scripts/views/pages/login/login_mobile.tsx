@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import 'pages/login/login_mobile.scss';
 import app from 'state';
+import { isMobile } from 'react-device-detect';
 
 import {
   CWProfileRow,
@@ -103,7 +104,7 @@ export const LoginMobile = ({
             setBodyType={setBodyType}
             accountVerifiedCallback={accountVerifiedCallback}
             showResetWalletConnect={showResetWalletConnect}
-            isMobile
+            isMobile={isMobile}
             linking={false}
             setSignerAccount={setSignerAccount}
             setIsNewlyCreated={setIsNewlyCreated}
@@ -143,7 +144,7 @@ export const LoginMobile = ({
             accountVerifiedCallback={accountVerifiedCallback}
             showResetWalletConnect={showResetWalletConnect}
             linking
-            isMobile
+            isMobile={isMobile}
             setIsLinkingOnMobile={setIsLinkingOnMobile}
           />
         )}
