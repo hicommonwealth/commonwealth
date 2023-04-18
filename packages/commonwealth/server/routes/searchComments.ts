@@ -68,7 +68,7 @@ const search = async (
     bind.chain = chain.id;
   }
 
-  const chainWhere = bind.chain ? '"Comments".chain = ANY($chains) AND' : '';
+  const chainWhere = bind.chain ? '"Comments".chain = $chain AND' : '';
 
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   const comments = await models.sequelize.query(
