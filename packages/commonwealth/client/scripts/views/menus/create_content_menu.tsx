@@ -126,10 +126,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           {
             label: 'New democracy proposal',
             onClick: () =>
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateDemocracyProposal,
-                deferChain: false,
-              }),
+              navigate(
+                `/new/proposal/${ProposalType.SubstrateTreasuryProposal}`
+              ),
             iconLeft: 'democraticProposal',
           },
           {
