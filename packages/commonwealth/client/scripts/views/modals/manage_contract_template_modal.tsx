@@ -149,7 +149,7 @@ const ManageContractTemplateModal = ({
   };
 
   const isEditMode = !!templateId;
-  const modalTitle = isEditMode ? 'Edit Template Metadata' : 'Connect Template';
+  const modalTitle = isEditMode ? 'Edit Action' : 'Enable Action';
   const modalSubtitle = 'Select a template';
   const confirmButtonLabel = isEditMode ? 'Save' : 'Add';
 
@@ -171,9 +171,11 @@ const ManageContractTemplateModal = ({
 
   return (
     <div className="ManageContractTemplateModal">
-      <CWText type="h4">{modalTitle}</CWText>
+      <CWText type="h4" fontWeight="bold">
+        {modalTitle}
+      </CWText>
       {!isEditMode && (
-        <CWText type="b1" className="subtitle">
+        <CWText type="h5" className="subtitle" fontWeight="medium">
           {modalSubtitle}
         </CWText>
       )}
@@ -216,7 +218,7 @@ const ManageContractTemplateModal = ({
           </CWText>
         )}
         <CWDivider className="divider" />
-        <CWText type="b1" className="subtitle">
+        <CWText type="h5" className="subtitle" fontWeight="medium">
           Set metadata for template instance
         </CWText>
         <CWText type="caption" fontWeight="medium" className="input-label">

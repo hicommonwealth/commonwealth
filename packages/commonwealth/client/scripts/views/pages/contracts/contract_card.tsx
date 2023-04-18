@@ -113,7 +113,7 @@ export const ContractCard = ({
           {templates?.length ? (
             <>
               <CWText type="caption" className="label">
-                Templates
+                Actions
               </CWText>
               <div className="templates-container">
                 {templates.map((template) => (
@@ -144,7 +144,7 @@ export const ContractCard = ({
             <CWButton
               className="add-template-btn"
               buttonType="tertiary-black"
-              label="Connect Template"
+              label="Enable Action"
               iconLeft="plus"
               onClick={() => handleOpenManageContractTemplateModal()}
             />
