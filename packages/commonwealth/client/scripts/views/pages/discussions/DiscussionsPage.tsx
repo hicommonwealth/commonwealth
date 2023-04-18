@@ -64,6 +64,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
+    app.threads.resetPagination();
     app.threads
       .loadNextPage({ topicName, stageName, includePinnedThreads: true })
       .then((t) => {
@@ -103,7 +104,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 <RecentThreadsHeader
                   topic={topicName}
                   stage={stageName}
-                  totalThreadCount={threads.length}
+                  totalThreadCount={threads ? threads.length : 0}
                 />
               </div>
             );

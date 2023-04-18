@@ -122,6 +122,12 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
   );
 };
 
+/**
+ *  This function sets the route to go to the search result (i.e. a community).
+ *  At this point the route is /:scope/search where :scope is the current community id.
+ *  The route should be set to /<community-id>, so null should be passed instead of a prefix,
+ *  as defined in the useCommonNavigate hook and the getScopePrefix helper function.
+ */
 const getCommunityResult = (community, setRoute) => {
   const params =
     community.SearchContentType === SearchContentType.Token
