@@ -104,6 +104,12 @@
     }
   }
 
+  .redirectToSign {
+    width: 328px;
+
+    @include innerBodyStyles;
+  }
+
   .selectAccountType {
     width: 328px;
 

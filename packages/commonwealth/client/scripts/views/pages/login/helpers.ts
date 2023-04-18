@@ -48,5 +48,10 @@ export const getLoginText = (bodyType: LoginBodyType) => {
       bodyText:
         'An Ethereum based wallet is needed to connect to this community.',
     };
+  } else if (bodyType === 'redirectToSign') {
+    return {
+      headerText: 'Redirect to wallet for signature',
+      bodyText: 'Please wait while we redirect you to sign in.',
+    };
   }
 };

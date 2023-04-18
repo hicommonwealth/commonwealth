@@ -143,17 +143,17 @@ async function main() {
     });
 
     // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
-    app.use(
-      redirectToHTTPS(
-        [
-          /localhost:(\d{4})/,
-          /127.0.0.1:(\d{4})/,
-          /192.168.1.(\d{1,3}):(\d{4})/,
-        ],
-        [],
-        301
-      )
-    );
+    // app.use(
+    //   redirectToHTTPS(
+    //     [
+    //       /localhost:(\d{4})/,
+    //       /127.0.0.1:(\d{4})/,
+    //       /192.168.1.(\d{1,3}):(\d{4})/,
+    //     ],
+    //     [],
+    //     301
+    //   )
+    // );
 
     // dynamic compression settings used
     app.use(compression());

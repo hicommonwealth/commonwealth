@@ -138,6 +138,9 @@ type WalletsListProps = {
   showResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
+  isMobile?: boolean;
+  setSignerAccount?: (account: Account) => void;
+  setIsNewlyCreated?: (isNewlyCreated: boolean) => void;
   setBodyType?: (bodyType: string) => void;
   accountVerifiedCallback?: (
     account: Account,
@@ -156,8 +159,12 @@ export const CWWalletsList = (props: WalletsListProps) => {
     showResetWalletConnect,
     hasNoWalletsLink = true,
     wallets,
+    isMobile = false,
+    setSignerAccount,
+    setIsNewlyCreated,
     setSelectedWallet,
     accountVerifiedCallback,
+    setBodyType,
     linking,
     useSessionKeyLoginFlow,
   } = props;
@@ -255,7 +262,15 @@ export const CWWalletsList = (props: WalletsListProps) => {
           sessionPublicAddress,
           validationBlockInfo
         );
-      accountVerifiedCallback(signerAccount, newlyCreated, linking);
+
+      if (isMobile) {
+        if (setSignerAccount) setSignerAccount(signerAccount);
+        if (setIsNewlyCreated) setIsNewlyCreated(newlyCreated);
+        setBodyType('redirectToSign');
+        return;
+      } else {
+        accountVerifiedCallback(signerAccount, newlyCreated, linking);
+      }
     } catch (err) {
       console.log(err);
     }

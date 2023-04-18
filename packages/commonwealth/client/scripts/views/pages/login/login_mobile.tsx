@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import 'pages/login/login_mobile.scss';
 
@@ -22,6 +22,7 @@ import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
 import type { LoginProps } from './types';
+import { Account } from 'models';
 
 export const LoginMobile = ({
   address,
@@ -53,6 +54,9 @@ export const LoginMobile = ({
   const hasCreationButtons = bodyType === 'selectAccountType';
   const { headerText, bodyText } = getLoginText(bodyType);
 
+  const [signerAccount, setSignerAccount] = useState<Account>(null);
+  const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
+
   return (
     <div className="LoginMobile">
       <CWIconButton iconName="close" onClick={() => onModalClose()} />
@@ -80,7 +84,24 @@ export const LoginMobile = ({
             setBodyType={setBodyType}
             accountVerifiedCallback={accountVerifiedCallback}
             showResetWalletConnect={showResetWalletConnect}
+            isMobile
+            linking={false}
+            setSignerAccount={setSignerAccount}
+            setIsNewlyCreated={setIsNewlyCreated}
           />
+        )}
+
+        {bodyType === 'redirectToSign' && (
+          <div className="inner-body-container">
+            <CWButton
+              label="Redirect to Sign in Wallet"
+              onClick={() => {
+                // TODO: Handle link account case (third param here)
+                console.log('okayyy im here');
+                accountVerifiedCallback(signerAccount, isNewlyCreated, false);
+              }}
+            />
+          </div>
         )}
 
         {bodyType === 'selectPrevious' && (
@@ -95,6 +116,7 @@ export const LoginMobile = ({
             accountVerifiedCallback={accountVerifiedCallback}
             showResetWalletConnect={showResetWalletConnect}
             linking
+            isMobile
           />
         )}
 

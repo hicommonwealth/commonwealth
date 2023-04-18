@@ -397,6 +397,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         }}
         setBodyType={(bodyType: LoginBodyType) => {
           this.bodyType = bodyType;
+          redraw();
         }}
         handleSetAvatar={(a) => {
           this.avatarUrl = a;
