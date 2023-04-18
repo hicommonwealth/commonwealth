@@ -26,6 +26,28 @@ const validateChain = async (
     },
     include: [
       {
+        model: models.ChainNode,
+        required: true,
+      },
+    ],
+  });
+  // searching for chain that doesn't exist
+  if (chain_id && !chain) return [null, ChainCommunityErrors.ChainDNE];
+  return [chain, null];
+};
+
+const validateChainWithTopics = async (
+  models: DB,
+  params: ValidateChainParams
+): Promise<[ChainInstance, string]> => {
+  const chain_id = params.chain || params.chain_id;
+  if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
+  const chain = await models.Chain.findOne({
+    where: {
+      id: chain_id,
+    },
+    include: [
+      {
         model: models.Topic,
         as: 'topics',
         required: false,
