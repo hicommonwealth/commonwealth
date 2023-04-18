@@ -123,37 +123,9 @@ describe('Proposal Tests', () => {
 
       chai.assert.equal(proposalsAfter.length, beforeCount + 1);
     });
-    it('votes YES on an active proposal', async () => {
-      await waitOneBlock();
-      const lcd = await setupLCD();
-      const { signerAddress } = await setupSigner();
-
-      const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
-        proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
-        voter: '',
-        depositor: '',
-      });
-
-      chai.assert.isDefined(activeProposals);
-      chai.assert.isAtLeast(activeProposals.length, 1);
-      const proposal = activeProposals[0];
-
-      const msg = encodeMsgVote(
-        signerAddress,
-        proposal.id,
-        VoteOption.VOTE_OPTION_YES
-      );
-      const resp = await sendTx(msg);
-
-      chai.assert.isDefined(resp.transactionHash);
-      chai.assert.isDefined(resp.rawLog);
-      chai.assert.isTrue(resp.rawLog.includes('VOTE_OPTION_YES'));
-      chai.assert.isFalse(resp.rawLog.includes('VOTE_OPTION_NO'));
-    });
     it('votes NO on an active proposal', async () => {
       const lcd = await setupLCD();
       const { signerAddress } = await setupSigner();
-      await waitOneBlock();
 
       const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
         proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
@@ -203,10 +175,9 @@ describe('Proposal Tests', () => {
       chai.assert.isFalse(resp.rawLog.includes('VOTE_OPTION_YES'));
     });
     it('votes ABSTAIN on an active proposal', async () => {
-      await waitOneBlock();
-
       const lcd = await setupLCD();
       const { signerAddress } = await setupSigner();
+
       const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
         proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
         voter: '',
@@ -227,6 +198,33 @@ describe('Proposal Tests', () => {
       chai.assert.isDefined(resp.rawLog);
       chai.assert.isTrue(resp.rawLog.includes('VOTE_OPTION_ABSTAIN'));
       chai.assert.isFalse(resp.rawLog.includes('VOTE_OPTION_YES'));
+    });
+    it('votes YES on an active proposal', async () => {
+      await waitOneBlock();
+      const lcd = await setupLCD();
+      const { signerAddress } = await setupSigner();
+
+      const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
+        proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
+        voter: '',
+        depositor: '',
+      });
+
+      chai.assert.isDefined(activeProposals);
+      chai.assert.isAtLeast(activeProposals.length, 1);
+      const proposal = activeProposals[0];
+
+      const msg = encodeMsgVote(
+        signerAddress,
+        proposal.id,
+        VoteOption.VOTE_OPTION_YES
+      );
+      const resp = await sendTx(msg);
+
+      chai.assert.isDefined(resp.transactionHash);
+      chai.assert.isDefined(resp.rawLog);
+      chai.assert.isTrue(resp.rawLog.includes('VOTE_OPTION_YES'));
+      chai.assert.isFalse(resp.rawLog.includes('VOTE_OPTION_NO'));
     });
   });
 });

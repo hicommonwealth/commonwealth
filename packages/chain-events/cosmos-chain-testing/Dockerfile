@@ -40,7 +40,7 @@ EXPOSE ${PORT}
 EXPOSE 5050
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY bootstrap.sh  bootstrap.sh
-RUN chmod +x bootstrap.sh && chmod +x /usr/bin/simd && mkdir -p /run/nginx && sed -i "s/listen\ 80;/listen\ ${PORT:=5050};/" /etc/nginx/nginx.conf
+RUN chmod +x bootstrap.sh && chmod +x /usr/bin/simd && mkdir -p /run/nginx
 
 # Run simd by default, omit entrypoint to ease using container with simcli
 CMD ["sh", "-c", "sh ./bootstrap.sh"]

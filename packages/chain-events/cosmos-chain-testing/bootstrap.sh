@@ -11,6 +11,8 @@ GENESIS=$CONFIG_FOLDER/genesis.json
 COW_MNEMONIC="ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought"
 CSDK_CHAIN_ID="testnet"
 
+PORT=${PORT:=5050}
+sed -i "s/listen\ 80;/listen\ ${PORT:=5050};/" /etc/nginx/nginx.conf
 
 simd init csdk-local --chain-id $CSDK_CHAIN_ID
 simd config keyring-backend test
