@@ -26,7 +26,6 @@ class NewProfilesController {
   public constructor() {
     this._unfetched = new Map();
     this._fetchNewProfiles = _.debounce(() => {
-      console.log([...this._unfetched.values()].length);
       this._refreshProfiles(Array.from(this._unfetched.values()));
     }, 200);
   }
