@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import 'pages/login/login_mobile.scss';
+import app from 'state';
 
 import {
   CWProfileRow,
@@ -23,6 +24,8 @@ import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
 import type { LoginProps } from './types';
 import { Account } from 'models';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 export const LoginMobile = ({
   address,
@@ -60,7 +63,22 @@ export const LoginMobile = ({
 
   return (
     <div className="LoginMobile">
-      <CWIconButton iconName="close" onClick={() => onModalClose()} />
+      <CWIconButton
+        iconName="close"
+        onClick={async () => {
+          if (bodyType === 'redirectToSign' && !app.user.activeAccount) {
+            // Reset WC if we quit the login flow before signing in
+            const wallet = wallets.find(
+              (w) =>
+                w instanceof WalletConnectWebWalletController ||
+                w instanceof TerraWalletConnectWebWalletController
+            );
+
+            await wallet.reset();
+          }
+          onModalClose();
+        }}
+      />
       {bodyType === 'ethWalletList' && <LoginEthAlert />}
       <div className={bodyType}>
         <LoginText headerText={headerText} bodyText={bodyText} isMobile />
