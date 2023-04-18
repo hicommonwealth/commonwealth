@@ -58,8 +58,6 @@ const Sublayout = ({
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
-  const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
   const showSidebar = app.sidebarToggled || !isWindowSmall;
 
   return (
@@ -69,13 +67,7 @@ const Sublayout = ({
         <div className="sidebar-and-body-container">
           {showSidebar && <Sidebar />}
           <div className="body-and-sticky-headers-container">
-            <SublayoutBanners
-              banner={banner}
-              chain={chain}
-              terms={terms}
-              tosStatus={tosStatus}
-              bannerStatus={bannerStatus}
-            />
+            <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
             {isWindowSmallInclusive && app.mobileMenu ? (
               <AppMobileMenus />
