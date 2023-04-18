@@ -141,10 +141,19 @@ class SessionsController {
     );
 
     if (!hasAuthenticatedSession) {
-      await showSessionSigninModal().catch((err) => {
-        console.log('Login failed');
+      const { account, newlyCreated, linked } = await showSessionSigninModal().catch(() => {
+        const err = new Error();
+        err.responseJSON = { error: 'Login canceled' };
         throw err;
       });
+
+      // The user may have signed using a different account
+      const sessionReauthed = await controller.hasAuthenticatedSession(chainId, address);
+      if (!sessionReauthed) {
+        const err = new Error();
+        err.responseJSON = { error: `Message signed with ${account.address}. Switch to this account to continue` };
+        throw err;
+      }
     }
 
     const { session, action, hash } = await controller.sign(

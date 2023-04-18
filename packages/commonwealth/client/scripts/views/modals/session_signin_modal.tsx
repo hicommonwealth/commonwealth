@@ -11,6 +11,7 @@ import { openConfirmation } from './confirmation_modal';
 
 import 'modals/session_signin_modal.scss';
 
+import type { Account } from 'models';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
@@ -19,7 +20,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 
 type SessionSigninModalProps = {
   onClose: () => void;
-  onVerified: () => void;
+  onVerified: (account: Account, newlyCreated: boolean, linked: boolean) => void;
 };
 
 export const SessionSigninModal = (props: SessionSigninModalProps) => {
@@ -67,7 +68,9 @@ export const SessionSigninModal = (props: SessionSigninModalProps) => {
             setSelectedWallet={(wallet) => {
               /* do nothing */
             }}
-            accountVerifiedCallback={() => onVerified()}
+            accountVerifiedCallback={(account, newlyCreated, linked) => {
+              onVerified(account, newlyCreated, linked)
+            }}
             linking={false}
             hasNoWalletsLink={false}
             showResetWalletConnect={wcEnabled}
@@ -90,10 +93,10 @@ export const showSessionSigninModal = () => {
 
   root = createRoot(target);
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<{ account: Account, newlyCreated: boolean, linked: boolean }>((resolve, reject) => {
     root.render(<SessionSigninModal
-                onVerified={() => {
-                  resolve();
+                onVerified={(account: Account, newlyCreated: boolean, linked: boolean) => {
+                  resolve({ account, newlyCreated, linked });
                   root.unmount();
                   target.remove();
                 }}
