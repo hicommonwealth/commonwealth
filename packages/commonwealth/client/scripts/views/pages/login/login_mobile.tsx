@@ -125,7 +125,7 @@ export const LoginMobile = ({
                 );
               }}
             />
-            <CWText fontType="caption" className="CaptionText">
+            <CWText fontStyle="caption" className="CaptionText">
               Please wait for a signature request to appear. This can sometimes
               take several seconds.
             </CWText>
