@@ -97,7 +97,7 @@ export class SolanaSessionController implements ISessionController {
         }
       }
     } catch (err) {
-      console.log('Could not restore previous session', err);
+      console.log('Could not restore previous session');
       this.signers[chainId][fromAddress] = solw3.Keypair.generate();
       delete this.auths[chainId][fromAddress];
       const privateKey = bs58.encode(this.signers[chainId][fromAddress].secretKey);

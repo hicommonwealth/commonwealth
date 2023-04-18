@@ -104,7 +104,7 @@ export class SubstrateSessionController implements ISessionController {
       }
     } catch (err) {
       const polkadotUtilCrypto = await import('@polkadot/util-crypto');
-      console.log('Could not restore previous session', err);
+      console.log('Could not restore previous session');
       const mnemonic = polkadotUtilCrypto.mnemonicGenerate();
       const pair = this.keyring.addFromMnemonic(mnemonic);
       this.signers[chainId][fromAddress] = { pair, privateKey: mnemonic };

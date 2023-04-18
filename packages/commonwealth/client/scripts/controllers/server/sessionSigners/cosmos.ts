@@ -117,7 +117,7 @@ export class CosmosSDKSessionController implements ISessionController {
         }
       }
     } catch (err) {
-      console.log('Could not restore previous session', err);
+      console.log('Could not restore previous session');
       // Use same configuration for generating private keys as @cosmjs/amino Secp256k1HdWallet
       const entropyLength = 4 * Math.floor((11 * 24) / 33);
       const privkeyBytes = cosmCrypto.Random.getBytes(entropyLength);

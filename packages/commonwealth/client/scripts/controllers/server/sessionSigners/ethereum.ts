@@ -100,7 +100,7 @@ export class EthereumSessionController implements ISessionController {
         }
       }
     } catch (err) {
-      console.log('Could not restore previous session', err);
+      console.log('Could not restore previous session');
       // Generate a new unauthenticated signer, and save to localStorage.
       this.signers[chainId][fromAddress] = ethers.Wallet.createRandom();
       delete this.auths[chainId][fromAddress];
