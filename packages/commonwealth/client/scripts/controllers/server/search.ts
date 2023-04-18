@@ -8,6 +8,13 @@ import { SearchQuery } from '../../models';
 import type { SearchParams } from '../../models/SearchQuery';
 import { SearchScope } from '../../models/SearchQuery';
 
+export enum SearchTab {
+  Threads = 'Threads',
+  Replies = 'Replies',
+  Communities = 'Communities',
+  Members = 'Members',
+}
+
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 const SEARCH_HISTORY_KEY = 'COMMONWEALTH_SEARCH_HISTORY';
@@ -109,20 +116,36 @@ class SearchController {
     return searchCache;
   }
 
+  public async searchPaginated(
+    searchTerm: string,
+    tab: SearchTab,
+    page?: number
+  ) {
+    return this.searchDiscussions(searchQuery, page);
+  }
+
   private searchDiscussions = async (
     searchTerm: string,
-    params: SearchParams
+    params: SearchParams,
+    page?: number
   ) => {
     const { resultSize, chainScope, communityScope, sort } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
+      const queryParams = {
         chain: chainScope,
         community: communityScope,
         cutoff_date: null, // cutoffDate.toISOString(),
         search: searchTerm,
         results_size: resultSize,
         sort,
-      });
+      };
+      if (page) {
+        queryParams['page'] = page;
+      }
+      const response = await $.get(
+        `${app.serverUrl()}/searchDiscussions`,
+        queryParams
+      );
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }

@@ -5,6 +5,7 @@ import { QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import { ChainInstance } from '../models/chain';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { buildPaginationSql } from '../../server/util/queries';
 
 const MIN_SEARCH_QUERY_LENGTH = 4;
 
@@ -33,21 +34,37 @@ const search = async (
   chain: ChainInstance | null,
   options: SearchCommentsQuery
 ) => {
+  // sort by rank by default
+  let sortOptions: {
+    column: string;
+    direction: 'ASC' | 'DESC';
+  } = {
+    column: 'rank',
+    direction: 'DESC',
+  };
+  switch ((options.sort || '').toLowerCase()) {
+    case 'newest':
+      sortOptions = { column: '"Comments".created_at', direction: 'DESC' };
+      break;
+    case 'oldest':
+      sortOptions = { column: '"Comments".created_at', direction: 'ASC' };
+      break;
+  }
+
+  const { sql: paginationSort, bind: paginationBind } = buildPaginationSql({
+    limit: 50,
+    page: 1,
+    orderBy: sortOptions.column,
+    orderDirection: sortOptions.direction,
+  });
+
   const bind: SearchCommentsBindOptions = {
     searchTerm: options.search,
-    limit: 50, // must be same as SEARCH_PAGE_SIZE on frontend
+    ...paginationBind,
   };
   if (chain) {
     bind.chain = chain.id;
   }
-
-  const sortOption =
-    options.sort === 'Newest'
-      ? '"Comments".created_at DESC'
-      : options.sort === 'Oldest'
-      ? '"Comments".created_at ASC'
-      : 'rank DESC';
-  const sort = `ORDER BY ${sortOption}`;
 
   const chainWhere = bind.chain ? '"Comments".chain = ANY($chains) AND' : '';
 
@@ -74,7 +91,7 @@ const search = async (
         ${chainWhere}
         "Comments".deleted_at IS NULL AND
         query @@ "Comments"._search
-      ${sort} LIMIT $limit
+      ${paginationSort}
     `,
     {
       bind,

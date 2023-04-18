@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { capitalize } from 'lodash';
 
@@ -20,12 +26,15 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { useCommonNavigate } from 'navigation/helpers';
 import { getListing } from './helpers';
 
-const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
+const SEARCH_PAGE_SIZE = 50;
 
 const SearchPage = () => {
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
   const [searchResults, setSearchResults] = useState({});
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const [page, setPage] = useState(1);
+
   const searchQuery = useMemo(
     () => SearchQuery.fromUrlParams(Object.fromEntries(searchParams.entries())),
     [searchParams]
@@ -33,6 +42,7 @@ const SearchPage = () => {
   const [activeTab, setActiveTab] = useState<SearchScope>(
     searchQuery.getSearchScope()[0]
   );
+  const bottomEl = useRef(null);
 
   const handleSearch = useCallback(async () => {
     try {
@@ -40,6 +50,8 @@ const SearchPage = () => {
         searchQuery.chainScope = 'all_chains';
       }
       const response = await app.search.search(searchQuery);
+
+      console.log({ response });
 
       setSearchResults(
         Object.fromEntries(
@@ -60,6 +72,16 @@ const SearchPage = () => {
   useEffect(() => {
     handleSearch();
   }, [handleSearch]);
+
+  console.log({ searchResults });
+
+  // when page updates, load results for page
+  useCallback(async () => {
+    try {
+    } catch (err) {
+      console.error(err);
+    }
+  }, [page]);
 
   const tabScopedListing = getListing(
     searchResults,
@@ -106,10 +128,22 @@ const SearchPage = () => {
     navigate(`/search?${newSearchQuery.toUrlParams()}`);
   };
 
+  const handleScroll = () => {
+    if (bottomEl.current) {
+      const offset = 0;
+      const top = bottomEl.current.getBoundingClientRect().top;
+      const isInViewport =
+        top + offset >= 0 && top - offset <= window.innerHeight;
+      if (isInViewport) {
+        setPage(page + 1);
+      }
+    }
+  };
+
   return !app.search.getByQuery(searchQuery)?.loaded ? (
     <PageLoading />
   ) : (
-    <Sublayout>
+    <Sublayout onScroll={handleScroll}>
       <div className="SearchPage">
         <div className="search-results">
           <CWTabBar>
@@ -135,24 +169,28 @@ const SearchPage = () => {
               </a>
             )}
           </CWText>
-          {tabScopedListing.length > 0 && activeTab === 'Threads' && (
-            <div className="search-results-filters">
-              <CWText type="h5">Sort By:</CWText>
-              <CWDropdown
-                label=""
-                onSelect={handleSortChange}
-                initialValue={{
-                  label: searchQuery.sort,
-                  value: searchQuery.sort,
-                }}
-                options={Object.keys(SearchSort).map((k) => ({
-                  label: k,
-                  value: k,
-                }))}
-              />
-            </div>
-          )}
-          <div className="search-results-list">{tabScopedListing}</div>
+          {tabScopedListing.length > 0 &&
+            ['Threads', 'Replies'].includes(activeTab) && (
+              <div className="search-results-filters">
+                <CWText type="h5">Sort By:</CWText>
+                <CWDropdown
+                  label=""
+                  onSelect={handleSortChange}
+                  initialValue={{
+                    label: searchQuery.sort,
+                    value: searchQuery.sort,
+                  }}
+                  options={Object.keys(SearchSort).map((k) => ({
+                    label: k,
+                    value: k,
+                  }))}
+                />
+              </div>
+            )}
+          <div className="search-results-list">
+            {tabScopedListing}
+            <div ref={bottomEl}></div>
+          </div>
         </div>
       </div>
     </Sublayout>
