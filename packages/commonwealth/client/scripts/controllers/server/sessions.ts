@@ -143,7 +143,7 @@ class SessionsController {
     if (!hasAuthenticatedSession) {
       const { account, newlyCreated, linked } = await showSessionSigninModal().catch(() => {
         const err = new Error();
-        err.responseJSON = { error: 'Login canceled' };
+        (err as any).responseJSON = { error: 'Login canceled' };
         throw err;
       });
 
@@ -151,7 +151,7 @@ class SessionsController {
       const sessionReauthed = await controller.hasAuthenticatedSession(chainId, address);
       if (!sessionReauthed) {
         const err = new Error();
-        err.responseJSON = { error: `Message signed with ${account.address}. Switch to this account to continue` };
+        (err as any).responseJSON = { error: `Message signed with ${account.address}. Switch to this account to continue` };
         throw err;
       }
     }
