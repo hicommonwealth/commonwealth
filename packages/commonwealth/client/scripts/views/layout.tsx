@@ -120,8 +120,13 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
         this.loadingChain = true;
         selectChain(scopeMatchesChain, deferChain)
           .then((response) => {
-            if (!deferChain && response) initChain().then(() => this.redraw());
-            else this.redraw();
+            if (!deferChain && response) {
+              initChain().then(() => {
+                this.redraw();
+              });
+            } else {
+              this.redraw();
+            }
           })
           .finally(() => (this.loadingChain = false));
         return <LoadingLayout />;
