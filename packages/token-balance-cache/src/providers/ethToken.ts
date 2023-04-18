@@ -41,14 +41,14 @@ export default class EthTokenBalanceProvider extends BalanceProvider<Web3> {
       (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
       // use native token if no args provided
       return balance;
-    } else if(contractType == 'erc20'){
+    } else if (contractType == 'erc20') {
       return new Erc20BalanceProvider().getBalance(node, address, opts);
-    }else if( contractType == 'erc721'){
-      return new Erc721BalanceProvider().getBalance(node, address, opts)
-    }else if(contractType == 'erc1155'){
+    } else if (contractType == 'erc721') {
+      return new Erc721BalanceProvider().getBalance(node, address, opts);
+    } else if (contractType == 'erc1155') {
       return new Erc1155BalanceProvider().getBalance(node, address, opts);
-    }else{
-      return "0"
+    } else {
+      return '0';
     }
   }
 }

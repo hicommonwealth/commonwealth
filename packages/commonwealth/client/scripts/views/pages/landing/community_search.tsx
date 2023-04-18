@@ -52,6 +52,7 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
     if (debouncedValue.length > 0) {
       search();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue]);
 
   return (

@@ -10,10 +10,12 @@ import type { ChainAttributes } from '../models/chain';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findOneRole } from '../util/roles';
+import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   NoChainId: 'Must provide chain ID',
+  ReservedId: 'The id is reserved and cannot be used',
   CantChangeNetwork: 'Cannot change chain network',
   NotAdmin: 'Not an admin',
   NoChainFound: 'Chain not found',
@@ -46,6 +48,7 @@ const updateChain = async (
 ) => {
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.id) return next(new AppError(Errors.NoChainId));
+  if (req.body.id === ALL_CHAINS) return next(new AppError(Errors.ReservedId));
   if (req.body.network) return next(new AppError(Errors.CantChangeNetwork));
 
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });

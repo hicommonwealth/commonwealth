@@ -16,7 +16,12 @@ type MarkdownDocInfo = { format: 'markdown'; content: string };
 type UnknownDocInfo = { format: 'unknown'; content: null };
 type DocInfo = RichTextDocInfo | MarkdownDocInfo | UnknownDocInfo;
 
-export const QuillRenderer = ({ doc, searchTerm, hideFormatting, cutoffLines }: QuillRendererProps) => {
+export const QuillRenderer = ({
+  doc,
+  searchTerm,
+  hideFormatting,
+  cutoffLines,
+}: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
     try {
@@ -32,18 +37,18 @@ export const QuillRenderer = ({ doc, searchTerm, hideFormatting, cutoffLines }: 
         console.error('parsed doc as JSON but has no ops');
         return {
           format: 'unknown',
-          content: null
+          content: null,
         } as UnknownDocInfo;
       }
       return {
         format: 'richtext',
-        content: delta
+        content: delta,
       } as RichTextDocInfo;
     } catch (err) {
       // otherwise it's a markdown string
       return {
         format: 'markdown',
-        content: decodedText
+        content: decodedText,
       } as MarkdownDocInfo;
     }
   }, [doc]);

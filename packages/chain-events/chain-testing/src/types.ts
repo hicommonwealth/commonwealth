@@ -57,8 +57,15 @@ export interface chainGetEth {
 export interface erc721Approve {
   nftAddress: string;
   tokenId: string;
-  to: string;
+  to: number;
   all?: boolean;
   accountIndex?: number;
   from?: string;
+}
+
+export interface erc721MintBurn {
+  nftAddress: string;
+  tokenId: string;
+  to: number;
+  mint: boolean;
 }

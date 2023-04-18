@@ -20,26 +20,48 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const proposalId = thread.proposalid;
   const chain = thread.chain;
 
+  const handleClick = () => {
+    setRoute(`/discussion/${proposalId}`, {}, thread.chain);
+  };
+
   if (app.isCustomDomain() && app.customDomainId() !== chain) {
     return;
   }
 
   return (
-    <div key={proposalId} className="search-result-row" onClick={() => setRoute(`/discussion/${proposalId}`)}>
+    <div key={proposalId} className="search-result-row" onClick={handleClick}>
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
           {`discussion - ${thread.chain}`}
         </CWText>
         <CWText className="search-results-thread-title" fontWeight="medium">
-          {renderTruncatedHighlights(searchTerm, decodeURIComponent(thread.title))}
+          {renderTruncatedHighlights(
+            searchTerm,
+            decodeURIComponent(thread.title)
+          )}
         </CWText>
         <div className="search-results-thread-subtitle">
-          <User user={new AddressInfo(thread.address_id, thread.address, thread.address_chain, null)} />
-          <CWText className="created-at">{moment(thread.created_at).fromNow()}</CWText>
+          <User
+            user={
+              new AddressInfo(
+                thread.address_id,
+                thread.address,
+                thread.address_chain,
+                null
+              )
+            }
+          />
+          <CWText className="created-at">
+            {moment(thread.created_at).fromNow()}
+          </CWText>
         </div>
         <CWText noWrap>
-          <QuillRenderer hideFormatting={true} doc={thread.body} searchTerm={searchTerm} />
+          <QuillRenderer
+            hideFormatting={true}
+            doc={thread.body}
+            searchTerm={searchTerm}
+          />
         </CWText>
       </div>
     </div>
@@ -50,29 +72,46 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
   const proposalId = comment.proposalid;
   const chain = comment.chain;
 
+  const handleClick = () => {
+    setRoute(`/discussion/${proposalId}?comment=${comment.id}`, {}, chain);
+  };
+
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;
 
   return (
-    <div
-      key={comment.id}
-      className="search-result-row"
-      onClick={() => {
-        const path = `/discussion/${proposalId}`;
-        setRoute(path);
-      }}
-    >
+    <div key={comment.id} className="search-result-row" onClick={handleClick}>
       <CWIcon iconName="feedback" />
       <div className="inner-container">
-        <CWText fontWeight="medium">{`comment - ${comment.chain || comment.community}`}</CWText>
+        <CWText fontWeight="medium">{`comment - ${
+          comment.chain || comment.community
+        }`}</CWText>
         <CWText className="search-results-thread-title">
-          {renderTruncatedHighlights(searchTerm, decodeURIComponent(comment.title))}
+          {renderTruncatedHighlights(
+            searchTerm,
+            decodeURIComponent(comment.title)
+          )}
         </CWText>
         <div className="search-results-thread-subtitle">
-          <User user={new AddressInfo(comment.address_id, comment.address, comment.address_chain, null)} />
-          <CWText className="created-at">{moment(comment.created_at).fromNow()}</CWText>
+          <User
+            user={
+              new AddressInfo(
+                comment.address_id,
+                comment.address,
+                comment.address_chain,
+                null
+              )
+            }
+          />
+          <CWText className="created-at">
+            {moment(comment.created_at).fromNow()}
+          </CWText>
         </div>
         <CWText noWrap>
-          <QuillRenderer hideFormatting={true} doc={comment.text} searchTerm={searchTerm} />;
+          <QuillRenderer
+            hideFormatting={true}
+            doc={comment.text}
+            searchTerm={searchTerm}
+          />
         </CWText>
       </div>
     </div>
@@ -87,32 +126,45 @@ const getCommunityResult = (community, setRoute) => {
       ? { community }
       : null;
 
-  const onSelect = () => {
+  const handleClick = () => {
     if (params.community) {
-      setRoute(params.community.id ? `/${params.community.id}` : '/');
+      setRoute(params.community.id ? `/${params.community.id}` : '/', {}, null);
     } else {
-      setRoute(community.id ? `/${community.id}` : '/');
+      setRoute(community.id ? `/${community.id}` : '/', {}, null);
     }
   };
 
   return (
-    <div key={community?.id} className="community-result-row" onClick={onSelect}>
+    <div
+      key={community?.id}
+      className="community-result-row"
+      onClick={handleClick}
+    >
       <CommunityLabel {...params} />
     </div>
   );
 };
 
-const getMemberResult = (addr) => {
+const getMemberResult = (addr, setRoute) => {
   const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
-  if (addr.name) {
-    profile.initialize(addr.name, null, null, null, null, null);
+
+  const handleClick = () => {
+    setRoute(`/profile/id/${profile.id}`, {}, null);
+  };
+
+  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) {
+    return null;
   }
 
-  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
-
   return (
-    <div key={profile.id} className="member-result-row">
-      <User user={profile} showRole linkify avatarSize={32} showAddressWithDisplayName />
+    <div key={profile.id} className="member-result-row" onClick={handleClick}>
+      <User
+        user={profile}
+        showRole
+        linkify
+        avatarSize={32}
+        showAddressWithDisplayName
+      />
     </div>
   );
 };
@@ -131,7 +183,7 @@ export const getListing = (
       return res.searchType === SearchScope.Threads
         ? getDiscussionResult(res, searchTerm, setRoute)
         : res.searchType === SearchScope.Members
-        ? getMemberResult(res)
+        ? getMemberResult(res, setRoute)
         : res.searchType === SearchScope.Communities
         ? getCommunityResult(res, setRoute)
         : res.searchType === SearchScope.Replies
