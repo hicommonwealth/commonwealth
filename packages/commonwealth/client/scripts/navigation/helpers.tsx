@@ -12,7 +12,7 @@ type NavigateWithParamsProps = {
   to: string | ((params: Record<string, string | undefined>) => string);
 };
 
-type CommonNavigateOptions = NavigateOptions & { deferChain: boolean };
+type CommonNavigateOptions = NavigateOptions & { deferChain?: boolean };
 
 export const Navigate = ({ to }: NavigateWithParamsProps) => {
   const params = useParams();
