@@ -9,6 +9,7 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 import DraggableTopicsList from './draggable_topics_list';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type OrderTopicsModalProps = {
   onModalClose: () => void;
@@ -19,6 +20,8 @@ const getSortedTopics = (): Topic[] => {
     .getByCommunity(app.chain.id)
     .filter((topic) => topic.featuredInSidebar)
     .map((topic) => ({ ...topic } as Topic));
+
+  if (!topics.length) return [];
 
   if (!topics[0].order) {
     return topics
@@ -53,7 +56,11 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
       </div>
       <div className="compact-modal-body">
         <div className="featured-topic-list">
-          <DraggableTopicsList topics={topics} setTopics={setTopics} />
+          {topics.length ? (
+            <DraggableTopicsList topics={topics} setTopics={setTopics} />
+          ) : (
+            <CWText>No Topics to Reorder</CWText>
+          )}
         </div>
         <CWButton onClick={handleSave} label="Save" />
       </div>

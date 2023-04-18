@@ -13,9 +13,11 @@ type BannerProps = {
   onClose?: () => void;
 };
 
-export const CWBanner = (props: BannerProps) => {
-  const { bannerContent, className, onClose } = props;
-
+export const CWBanner = ({
+  bannerContent,
+  className,
+  onClose,
+}: BannerProps) => {
   return (
     <div
       className={getClasses<{ className?: string }>(
@@ -29,9 +31,11 @@ export const CWBanner = (props: BannerProps) => {
   );
 };
 
-export const CWMessageBanner = (props: BannerProps) => {
-  const { bannerContent, className, onClose } = props;
-
+export const CWMessageBanner = ({
+  bannerContent,
+  className,
+  onClose,
+}: BannerProps) => {
   return (
     <div
       className={getClasses<{ className?: string }>(
