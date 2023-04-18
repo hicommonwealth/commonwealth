@@ -15,7 +15,7 @@
     "stylelint": "stylelint client/styles/*",
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "lint": "./scripts/lint-new-work.sh",
-    "lint-all": "eslint client/\\**/*.ts server/\\**/*.ts",
+    "lint-all": "eslint client/\\**/*.{ts,tsx} server/\\**/*.ts",
     "lint-branch": "./scripts/lint-branch.sh",
     "listen": "RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts",
     "load-tokens": "ts-node --project tsconfig.json server/scripts/loadDatabaseFromTokenLists.ts",

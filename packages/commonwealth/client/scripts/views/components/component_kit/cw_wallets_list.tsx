@@ -207,9 +207,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
     );
     console.log('Started new session for', wallet.chain, chainId);
 
-    const newlyCreated = false;
-    const linking = false;
-    accountVerifiedCallback(account, newlyCreated, linking);
+    // ensure false for newlyCreated / linking vars on revalidate
+    accountVerifiedCallback(account, false, false);
   }
 
   async function handleNormalWalletLogin(

@@ -20,16 +20,16 @@ const getDiscussionResult = (thread, searchTerm, setRoute) => {
   const proposalId = thread.proposalid;
   const chain = thread.chain;
 
+  const handleClick = () => {
+    setRoute(`/discussion/${proposalId}`, {}, thread.chain);
+  };
+
   if (app.isCustomDomain() && app.customDomainId() !== chain) {
     return;
   }
 
   return (
-    <div
-      key={proposalId}
-      className="search-result-row"
-      onClick={() => setRoute(`/discussion/${proposalId}`)}
-    >
+    <div key={proposalId} className="search-result-row" onClick={handleClick}>
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
@@ -72,17 +72,14 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
   const proposalId = comment.proposalid;
   const chain = comment.chain;
 
+  const handleClick = () => {
+    setRoute(`/discussion/${proposalId}?comment=${comment.id}`, {}, chain);
+  };
+
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;
 
   return (
-    <div
-      key={comment.id}
-      className="search-result-row"
-      onClick={() => {
-        const path = `/discussion/${proposalId}`;
-        setRoute(path);
-      }}
-    >
+    <div key={comment.id} className="search-result-row" onClick={handleClick}>
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontWeight="medium">{`comment - ${
@@ -115,7 +112,6 @@ const getCommentResult = (comment, searchTerm, setRoute) => {
             doc={comment.text}
             searchTerm={searchTerm}
           />
-          ;
         </CWText>
       </div>
     </div>
@@ -130,11 +126,11 @@ const getCommunityResult = (community, setRoute) => {
       ? { community }
       : null;
 
-  const onSelect = () => {
+  const handleClick = () => {
     if (params.community) {
-      setRoute(params.community.id ? `/${params.community.id}` : '/');
+      setRoute(params.community.id ? `/${params.community.id}` : '/', {}, null);
     } else {
-      setRoute(community.id ? `/${community.id}` : '/');
+      setRoute(community.id ? `/${community.id}` : '/', {}, null);
     }
   };
 
@@ -142,23 +138,26 @@ const getCommunityResult = (community, setRoute) => {
     <div
       key={community?.id}
       className="community-result-row"
-      onClick={onSelect}
+      onClick={handleClick}
     >
       <CommunityLabel {...params} />
     </div>
   );
 };
 
-const getMemberResult = (addr) => {
+const getMemberResult = (addr, setRoute) => {
   const profile: Profile = app.newProfiles.getProfile(addr.chain, addr.address);
-  if (addr.name) {
-    profile.initialize(addr.name, null, null, null, null, null);
+
+  const handleClick = () => {
+    setRoute(`/profile/id/${profile.id}`, {}, null);
+  };
+
+  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) {
+    return null;
   }
 
-  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
-
   return (
-    <div key={profile.id} className="member-result-row">
+    <div key={profile.id} className="member-result-row" onClick={handleClick}>
       <User
         user={profile}
         showRole
@@ -184,7 +183,7 @@ export const getListing = (
       return res.searchType === SearchScope.Threads
         ? getDiscussionResult(res, searchTerm, setRoute)
         : res.searchType === SearchScope.Members
-        ? getMemberResult(res)
+        ? getMemberResult(res, setRoute)
         : res.searchType === SearchScope.Communities
         ? getCommunityResult(res, setRoute)
         : res.searchType === SearchScope.Replies

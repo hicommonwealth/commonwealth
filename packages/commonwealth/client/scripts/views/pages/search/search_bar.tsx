@@ -79,7 +79,7 @@ export const SearchBar = () => {
   const handleGetSearchPreview = async (value: string) => {
     const searchQuery = new SearchQuery(value, {
       isSearchPreview: true,
-      chainScope: app.activeChainId(),
+      chainScope: app.activeChainId() || 'all_chains',
     });
 
     try {
@@ -109,7 +109,7 @@ export const SearchBar = () => {
   // when debounced search term changes, fetch search results
   useEffect(() => {
     clearTimeout(resetTimer);
-    if (debouncedSearchTerm?.length > 3) {
+    if (debouncedSearchTerm?.length >= MIN_SEARCH_TERM_LENGTH) {
       handleGetSearchPreview(debouncedSearchTerm);
     }
   }, [debouncedSearchTerm]);
@@ -136,7 +136,7 @@ export const SearchBar = () => {
           className={getClasses<{ isClearable: boolean }>({
             isClearable: searchTerm?.length > 0,
           })}
-          placeholder="Search Common"
+          placeholder={'Search Common'}
           value={searchTerm}
           autoComplete="off"
           onChange={handleInputChange}
