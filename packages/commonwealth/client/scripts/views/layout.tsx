@@ -133,11 +133,22 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       }
     }
 
-    if (scope && this.deferred && !deferChain) {
+    if (
+      (scope && this.deferred && !deferChain) ||
+      (scope &&
+        scope === app.activeChainId() &&
+        scope !== this.loadingScope &&
+        app.chain &&
+        !app.chain.loaded &&
+        !deferChain)
+    ) {
       this.deferred = false;
-      initChain().then(() => {
-        this.redraw();
-      });
+      this.loadingChain = true;
+      initChain()
+        .then(() => {
+          this.redraw();
+        })
+        .finally(() => (this.loadingChain = false));
       return <LoadingLayout />;
     }
 
