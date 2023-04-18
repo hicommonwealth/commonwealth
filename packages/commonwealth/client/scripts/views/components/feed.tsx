@@ -87,13 +87,6 @@ export const Feed = ({
         itemContent={(i) => {
           return <UserDashboardRow key={i} notification={data[i]}/>;
         }}
-        components={{
-          Footer: () => {
-            if (false) {
-              return <FormattedCWSpinner size="xl"/>;
-            }
-          }
-        }}
       />
     </div>
   );
