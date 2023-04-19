@@ -1,4 +1,3 @@
-import type { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
 import type {
   CosmosProposalState,
@@ -22,7 +21,7 @@ import type CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
 import type CosmosChain from './chain';
 import type { CosmosApiType } from './chain';
-import { CosmosProposal } from './proposal';
+import { CosmosProposalV1 } from './proposal-v1';
 import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { encodeMsgSubmitProposal } from './helpers';
 
@@ -59,7 +58,7 @@ const isCompleted = (status: string): boolean => {
   return status === 'Passed' || status === 'Rejected' || status === 'Failed';
 };
 
-export const marshalTally = (
+export const marshalTallyV1 = (
   tally: TallyResultSDKType
 ): ICosmosProposalTally => {
   if (!tally) return null;
@@ -74,7 +73,7 @@ export const marshalTally = (
 class CosmosGovernanceV1 extends ProposalModule<
   CosmosApiType,
   ICosmosProposal,
-  CosmosProposal
+  CosmosProposalV1
 > {
   private _votingPeriodS: number;
   private _yesThreshold: number;
@@ -192,12 +191,12 @@ class CosmosGovernanceV1 extends ProposalModule<
               : new BN(0),
           depositors: [],
           voters: [],
-          tally: p.final_tally_result && marshalTally(p.final_tally_result),
+          tally: p.final_tally_result && marshalTallyV1(p.final_tally_result),
         },
       };
     };
 
-    let cosmosProposals: CosmosProposal[] = [];
+    let cosmosProposals: CosmosProposalV1[] = [];
     try {
       if (!proposalId) {
         const {
@@ -240,13 +239,15 @@ class CosmosGovernanceV1 extends ProposalModule<
           ?.map((p) => propToIProposal(p))
           .filter((p) => !!p)
           .sort((p1, p2) => +p2.identifier - +p1.identifier)
-          .map((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
+          .map(
+            (p) => new CosmosProposalV1(this._Chain, this._Accounts, this, p)
+          );
       } else {
         const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
           proposalId: numberToLong(proposalId),
         });
         cosmosProposals = [
-          new CosmosProposal(
+          new CosmosProposalV1(
             this._Chain,
             this._Accounts,
             this,
