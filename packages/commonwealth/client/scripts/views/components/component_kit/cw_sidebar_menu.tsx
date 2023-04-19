@@ -13,7 +13,7 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 
 type CWSidebarMenuItemProps = {
   isStarred?: boolean;
@@ -65,7 +65,11 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           app.sidebarToggled = false;
           app.sidebarMenu = 'default';
           app.sidebarRedraw.emit('redraw');
-          navigate(item.id ? `/${item.id}` : '/', {}, null);
+          navigateToCommunity({
+            navigate,
+            path: '/',
+            chain: item.id,
+          });
         }}
       >
         <CommunityLabel community={item} />

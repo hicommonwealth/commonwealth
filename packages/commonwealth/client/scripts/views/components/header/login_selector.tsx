@@ -301,7 +301,7 @@ export const LoginSelector = () => {
 
   useEffect(() => {
     setIsJoined(!!app.user.activeAccount);
-  }, []);
+  }, [app.user.activeAccount]);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
