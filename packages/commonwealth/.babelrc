@@ -1,5 +1,6 @@
 {
   "presets": [
+    "@babel/preset-typescript",
     [
       "@babel/preset-env",
       {
@@ -15,17 +16,12 @@
     [
       "@babel/plugin-transform-react-jsx",
       {
-        "pragma": "jsx",
-        "pragmaFrag": "React.Fragment"
+        "runtime": "automatic"
       }
     ],
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-async-generator-functions"
-  ],
-  "env": {
-    "test": {
-      "plugins": ["@babel/plugin-transform-modules-commonjs"]
-    }
-  }
+    "@babel/plugin-proposal-async-generator-functions",
+    "@babel/plugin-syntax-flow"
+  ]
 }
