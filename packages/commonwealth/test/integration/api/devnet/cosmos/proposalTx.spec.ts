@@ -126,6 +126,7 @@ describe('Proposal Tests', () => {
     it('votes NO on an active proposal', async () => {
       const lcd = await setupLCD();
       const { signerAddress } = await setupSigner();
+      await waitOneBlock();
 
       const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
         proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
@@ -177,6 +178,7 @@ describe('Proposal Tests', () => {
     it('votes ABSTAIN on an active proposal', async () => {
       const lcd = await setupLCD();
       const { signerAddress } = await setupSigner();
+      await waitOneBlock();
 
       const { proposals: activeProposals } = await lcd.cosmos.gov.v1.proposals({
         proposalStatus: ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
