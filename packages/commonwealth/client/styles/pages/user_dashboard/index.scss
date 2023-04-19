@@ -8,7 +8,9 @@
   width: auto;
   z-index: 0;
   @media (min-width: 1200px) {
-    margin-right: 25%;
+    /* CommunityPreviewCard 392px width +
+       DashboardCommunitiesPreview 50px right edge */
+    margin-right: 442px;
   }
 
   @include contentPadding;
