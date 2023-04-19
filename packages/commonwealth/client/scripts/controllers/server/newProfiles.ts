@@ -101,6 +101,10 @@ class NewProfilesController {
             const currentProfile = result.find(
               (r) => r.address === profile.address
             );
+            return {profile, currentProfile}
+          }).filter(({profile, currentProfile}) => {
+            return currentProfile !== undefined;
+          }).map(({profile, currentProfile}) => {
             profile.initialize(
               currentProfile.name,
               currentProfile.address,
