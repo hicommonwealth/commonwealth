@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events';
 import React, { useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
@@ -504,7 +503,6 @@ export const LoginSelector = () => {
     }
   }
 
-  console.log(isJoined);
   return (
     <>
       <div className="LoginSelector">
