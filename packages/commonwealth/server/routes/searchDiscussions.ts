@@ -6,6 +6,10 @@ import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import { ChainInstance } from '../models/chain';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import {
+  PaginationSqlBind,
+  buildPaginationSql,
+} from '../../server/util/queries';
 
 const MIN_SEARCH_QUERY_LENGTH = 4;
 
@@ -20,14 +24,14 @@ type SearchDiscussionsQuery = {
   search?: string;
   thread_title_only?: 'true' | 'false';
   chain?: string;
-  results_size?: string;
   sort?: string;
+  page?: string;
+  page_size?: string;
 };
 
-type SearchDiscussionsBindOptions = {
+type SearchDiscussionsBindOptions = PaginationSqlBind & {
   chain?: string;
   searchTerm?: string;
-  limit?: number;
 };
 
 const search = async (
@@ -51,7 +55,7 @@ const search = async (
 
     const threads = await models.Thread.findAll({
       where: params,
-      limit: parseInt(options.results_size, 10) || 20,
+      limit: parseInt(options.page_size, 10) || 20,
       attributes: {
         exclude: ['body', 'plaintext', 'version_history'],
       },
@@ -66,21 +70,37 @@ const search = async (
     return threads;
   }
 
+  // sort by rank by default
+  let sortOptions: {
+    column: string;
+    direction: 'ASC' | 'DESC';
+  } = {
+    column: 'rank',
+    direction: 'DESC',
+  };
+  switch ((options.sort || '').toLowerCase()) {
+    case 'newest':
+      sortOptions = { column: '"Threads".created_at', direction: 'DESC' };
+      break;
+    case 'oldest':
+      sortOptions = { column: '"Threads".created_at', direction: 'ASC' };
+      break;
+  }
+
+  const { sql: paginationSort, bind: paginationBind } = buildPaginationSql({
+    limit: parseInt(options.page_size, 10) || 10,
+    page: parseInt(options.page, 10) || 1,
+    orderBy: sortOptions.column,
+    orderDirection: sortOptions.direction,
+  });
+
   const bind: SearchDiscussionsBindOptions = {
     searchTerm: options.search,
-    limit: 50, // must be same as SEARCH_PAGE_SIZE on frontend
+    ...paginationBind,
   };
   if (chain) {
     bind.chain = chain.id;
   }
-
-  const sortOption =
-    options.sort === 'Newest'
-      ? '"Threads".created_at DESC'
-      : options.sort === 'Oldest'
-      ? '"Threads".created_at ASC'
-      : 'rank DESC';
-  const sort = `ORDER BY ${sortOption}`;
 
   const chainWhere = bind.chain ? '"Threads".chain = $chain AND' : '';
 
@@ -104,7 +124,7 @@ const search = async (
         ${chainWhere}
         "Threads".deleted_at IS NULL AND
         query @@ "Threads"._search
-      ${sort} LIMIT $limit
+      ${paginationSort}
   `,
     {
       bind,

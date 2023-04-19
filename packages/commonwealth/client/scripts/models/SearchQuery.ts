@@ -19,7 +19,7 @@ export interface SearchParams {
   isSearchPreview?: boolean;
   searchScope?: Array<SearchScope>;
   sort?: SearchSort;
-  resultSize?: number;
+  pageSize?: number;
 }
 
 export default class SearchQuery implements SearchParams {
