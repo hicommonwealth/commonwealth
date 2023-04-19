@@ -180,6 +180,7 @@ import { createTemplate, getTemplates } from '../routes/templates';
 
 import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
+import updateThreadLinkedProposal from 'server/routes/updateThreadLinkedProposal';
 
 function setupRouter(
   endpoint: string,
@@ -361,7 +362,13 @@ function setupRouter(
     databaseValidationService.validateChain,
     updateThreadLinkedSnapshotProposal.bind(this, models)
   );
-
+  router.post(
+    '/updateThreadLinkedProposal',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
+    updateThreadLinkedProposal.bind(this, models)
+  );
+  
   router.post(
     '/updateVote',
     passport.authenticate('jwt', { session: false }),

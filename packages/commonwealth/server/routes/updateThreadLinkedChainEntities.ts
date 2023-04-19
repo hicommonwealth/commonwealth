@@ -1,6 +1,7 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
+import { link, linkSource } from '../models/thread';
 import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
@@ -56,6 +57,7 @@ const updateThreadLinkedChainEntities = async (
   const entitiesToClear = existingChainEntities.filter(
     (ce) => chain_entity_ids.indexOf(ce.id) === -1
   );
+  
   for (let i = 0; i < entitiesToClear.length; i++) {
     entitiesToClear[i].thread_id = null;
     await entitiesToClear[i].save();
@@ -71,13 +73,29 @@ const updateThreadLinkedChainEntities = async (
       id: { [Op.in]: entityIdsToSet },
     },
   });
+
+  let links: link[] = []
   for (let i = 0; i < entitiesToSet.length; i++) {
     if (entitiesToSet[i].thread_id) {
       return next(new AppError(Errors.ChainEntityAlreadyHasThread));
     }
+    links.push({'source': linkSource.ChainEventsProposal, 'identifier': entitiesToSet[i].ce_id.toString()})
     entitiesToSet[i].thread_id = thread_id;
     await entitiesToSet[i].save();
   }
+
+  if(!thread.links){
+    thread.links = links
+  }else{
+    // Remove links no longer linked
+    thread.links = thread.links.filter(item => {
+      return !(item.source === linkSource.ChainEventsProposal
+         && entitiesToClear.map(item => item.ce_id.toString()).includes(item.identifier));
+    });
+    //add new links
+    thread.links.concat(links)
+  }
+  await thread.save();
 
   const finalThread = await models.Thread.findOne({
     where: { id: thread_id },

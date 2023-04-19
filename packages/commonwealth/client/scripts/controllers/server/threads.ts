@@ -592,6 +592,39 @@ class ThreadsController {
     });
   }
 
+  public async setLinkedCosmosProposal(args: {
+    threadId: number;
+    ids: string[];
+  }) {
+    await $.ajax({
+      url: `${app.serverUrl()}/updateThreadLinkedProposal`,
+      type: 'POST',
+      data: {
+        chain: app.activeChainId(),
+        thread_id: args.threadId,
+        source: Array.from({ length: args.ids.length }, () => 'cosmos_proposal'),
+        ids: args.ids,
+        jwt: app.user.jwt,
+      },
+      success: () => {
+        const thread = this._store.getByIdentifier(args.threadId);
+        if (!thread) return;
+        return thread;
+      },
+      error: (err) => {
+        notifyError(
+          `Could not update Cosmos Linked Proposal: ${err.responseJSON.error}`
+        );
+        console.error('Failed to update linked cosmos proposal');
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Failed to update linked proposals'
+        );
+      },
+    });
+  }
+
   public async addLinkedThread(
     linkingThreadId: number,
     linkedThreadId: number
