@@ -52,7 +52,7 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
     }
 
     let calldata;
-    if (contractType == 'erc20' || 'erc721') {
+    if (contractType == 'erc20' || contractType == 'erc721') {
       validateOpts(address, opts);
       // function selector + calldata
       const data = api.eth.abi
@@ -72,7 +72,7 @@ export default class evmBalanceProvider extends BalanceProvider<Web3> {
       to: tokenAddress,
       data: calldata,
     });
-   (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
+    (api.currentProvider as WebsocketProvider).disconnect(1000, 'finished');
     return api.eth.abi.decodeParameter('uint256', result).toString();
   }
 }
