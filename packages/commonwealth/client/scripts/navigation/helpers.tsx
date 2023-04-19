@@ -8,6 +8,8 @@ import {
 } from 'react-router-dom';
 import app from 'state';
 
+const PROD_URL = 'https://commonwealth.im';
+
 type NavigateWithParamsProps = {
   to: string | ((params: Record<string, string | undefined>) => string);
 };
@@ -76,6 +78,40 @@ const withRouter = (Component) => {
 
     return <Component {...props} router={{ location, navigate, params }} />;
   };
+};
+
+interface NavigateToCommunityProps {
+  navigate: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string
+  ) => void;
+  path: string;
+  chain: string;
+}
+
+// This helper wraps the logic to properly navigate to community depending
+// on presence of custom domain vs common domain.
+// In case of custom domain, other community is opened in new tab and
+// current community is open without prefix.
+// In case of common domain, both other and current community are opened
+// in the same tab with proper prefix.
+export const navigateToCommunity = ({
+  navigate,
+  path,
+  chain,
+}: NavigateToCommunityProps) => {
+  const isExternalLink = chain !== app.customDomainId();
+
+  if (!app.isCustomDomain()) {
+    navigate(path, {}, chain);
+  } else {
+    if (isExternalLink) {
+      window.open(`${PROD_URL}/${chain}${path}`);
+    } else {
+      navigate(path);
+    }
+  }
 };
 
 export default withRouter;
