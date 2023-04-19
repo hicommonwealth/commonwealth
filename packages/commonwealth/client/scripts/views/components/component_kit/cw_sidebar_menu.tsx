@@ -123,7 +123,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
       <div className="sidebar-top">
         {menuHeader && (
           <div className="sidebar-menu-header" onClick={menuHeader.onClick}>
-            <CWIcon iconName="chevronLeft" />
+            <CWIcon className="sidebar-icon" iconName="close" />
             <CWText type="h5" fontWeight="medium">
               {menuHeader.label}
             </CWText>

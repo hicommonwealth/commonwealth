@@ -52,6 +52,14 @@
         margin-right: 12px;
       }
     }
+
+    .sidebar-icon {
+      transition: transform 0.2s ease-in-out;
+
+      &:hover {
+        transform: scale(1.3);
+      }
+    }
   }
 
   .sidebar-bottom {
