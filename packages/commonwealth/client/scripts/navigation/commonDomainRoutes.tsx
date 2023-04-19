@@ -201,28 +201,25 @@ const commonDomainsRoutes = () => [
     path="/:scope/proposal/:type/:identifier"
     element={withLayout(ViewProposalPage, {
       scoped: true,
-      deferChain: false,
     })}
   />,
   <Route
     path="/:scope/proposal/:identifier"
     element={withLayout(ViewProposalPage, {
       scoped: true,
-      deferChain: false,
     })}
   />,
   <Route
     path="/:scope/new/proposal/:type"
     element={withLayout(NewProposalPage, {
       scoped: true,
-      deferChain: false,
     })}
   />,
   <Route
     path="/:scope/new/proposal"
     element={withLayout(NewProposalPage, {
       scoped: true,
-      deferChain: false,
+      deferChain: true,
     })}
   />,
   <Route
