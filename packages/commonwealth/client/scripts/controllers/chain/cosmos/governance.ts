@@ -1,4 +1,3 @@
-import type { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
 import type {
   CosmosProposalState,
@@ -24,6 +23,7 @@ import type CosmosAccounts from './accounts';
 import type CosmosChain from './chain';
 import type { CosmosApiType } from './chain';
 import { CosmosProposal } from './proposal';
+import { encodeMsgSubmitProposal } from './helpers';
 
 const stateEnumToString = (status: ProposalStatus): CosmosProposalState => {
   switch (status) {
@@ -169,8 +169,10 @@ class CosmosGovernance extends ProposalModule<
       let nextKey = pagination.nextKey;
       while (nextKey.length > 0) {
         console.log(nextKey);
-        const { proposals: addlProposals, pagination: nextPage } =
-          await this._Chain.api.gov.proposals(0, '', '', nextKey);
+        const {
+          proposals: addlProposals,
+          pagination: nextPage,
+        } = await this._Chain.api.gov.proposals(0, '', '', nextKey);
         proposals.push(...addlProposals);
         nextKey = nextPage.nextKey;
       }
@@ -241,14 +243,11 @@ class CosmosGovernance extends ProposalModule<
     initialDeposit: CosmosToken,
     content: Any
   ): Promise<number> {
-    const msg: MsgSubmitProposalEncodeObject = {
-      typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
-      value: {
-        initialDeposit: [initialDeposit.toCoinObject()],
-        proposer: sender.address,
-        content,
-      },
-    };
+    const msg = encodeMsgSubmitProposal(
+      sender.address,
+      initialDeposit,
+      content
+    );
 
     // fetch completed proposal from returned events
     const events = await this._Chain.sendTx(sender, msg);

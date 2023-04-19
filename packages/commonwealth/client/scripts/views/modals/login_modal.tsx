@@ -304,6 +304,13 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           );
         }
         await logInWithAccount(this.primaryAccount, false);
+        // Important: when we first create an account and verify it, the user id
+        // is initially null from api (reloading the page will update it), to correct
+        // it we need to get the id from api
+        await app.newProfiles.updateProfileForAccount(
+          this.primaryAccount.profile.address,
+          {}
+        );
       } catch (e) {
         console.log(e);
         notifyError('Failed to create account. Please try again.');

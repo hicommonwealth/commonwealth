@@ -22,6 +22,7 @@ import { LCD } from 'chain-events/src/chains/cosmos/types';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
 import { createLCDClient } from 'common-common/src/cosmos-ts/src/codegen/cosmos/lcd';
+import { getSigningClient } from './helpers';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -149,7 +150,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       await wallet.enable();
     }
     const cosm = await import('@cosmjs/stargate');
-    const client = await cosm.SigningStargateClient.connectWithSigner(
+    const client = await getSigningClient(
       this._app.chain.meta.node.url,
       wallet.offlineSigner
     );

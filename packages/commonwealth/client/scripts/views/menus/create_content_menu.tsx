@@ -119,16 +119,15 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             onClick: () =>
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
-                deferChain: false,
               }),
             iconLeft: 'treasuryProposal',
           },
           {
             label: 'New democracy proposal',
             onClick: () =>
-              navigate(
-                `/new/proposal/${ProposalType.SubstrateTreasuryProposal}`
-              ),
+              navigate('/new/proposal/:type', {
+                type: ProposalType.SubstrateDemocracyProposal,
+              }),
             iconLeft: 'democraticProposal',
           },
           {
@@ -136,7 +135,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             onClick: () =>
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
-                deferChain: false,
               }),
             iconLeft: 'jar',
           },
