@@ -104,6 +104,21 @@
     }
   }
 
+  .redirectToSign {
+    width: 328px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .CaptionText {
+      margin-top: 32px;
+      color: $neutral-300;
+      text-align: center;
+    }
+
+    @include innerBodyStyles;
+  }
+
   .selectAccountType {
     width: 328px;
 

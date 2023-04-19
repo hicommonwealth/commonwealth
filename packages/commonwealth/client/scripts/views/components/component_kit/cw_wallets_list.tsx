@@ -138,6 +138,10 @@ type WalletsListProps = {
   showResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
+  isMobile?: boolean;
+  setSignerAccount?: (account: Account) => void;
+  setIsNewlyCreated?: (isNewlyCreated: boolean) => void;
+  setIsLinkingOnMobile?: (isLinkingOnMobile: boolean) => void;
   setBodyType?: (bodyType: string) => void;
   accountVerifiedCallback?: (
     account: Account,
@@ -156,8 +160,13 @@ export const CWWalletsList = (props: WalletsListProps) => {
     showResetWalletConnect,
     hasNoWalletsLink = true,
     wallets,
+    isMobile = false,
+    setSignerAccount,
+    setIsNewlyCreated,
     setSelectedWallet,
+    setIsLinkingOnMobile,
     accountVerifiedCallback,
+    setBodyType,
     linking,
     useSessionKeyLoginFlow,
   } = props;
@@ -207,6 +216,15 @@ export const CWWalletsList = (props: WalletsListProps) => {
 
     // ensure false for newlyCreated / linking vars on revalidate
     accountVerifiedCallback(account, false, false);
+    if (isMobile) {
+      if (setSignerAccount) setSignerAccount(account);
+      if (setIsNewlyCreated) setIsNewlyCreated(false);
+      if (setIsLinkingOnMobile) setIsLinkingOnMobile(false);
+      setBodyType('redirectToSign');
+      return;
+    } else {
+      accountVerifiedCallback(account, false, false);
+    }
   }
 
   async function handleNormalWalletLogin(
@@ -255,7 +273,16 @@ export const CWWalletsList = (props: WalletsListProps) => {
           sessionPublicAddress,
           validationBlockInfo
         );
-      accountVerifiedCallback(signerAccount, newlyCreated, linking);
+
+      if (isMobile) {
+        if (setSignerAccount) setSignerAccount(signerAccount);
+        if (setIsNewlyCreated) setIsNewlyCreated(newlyCreated);
+        if (setIsLinkingOnMobile) setIsLinkingOnMobile(linking);
+        setBodyType('redirectToSign');
+        return;
+      } else {
+        accountVerifiedCallback(signerAccount, newlyCreated, linking);
+      }
     } catch (err) {
       console.log(err);
     }
