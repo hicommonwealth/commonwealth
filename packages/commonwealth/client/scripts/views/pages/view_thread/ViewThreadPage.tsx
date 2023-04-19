@@ -600,6 +600,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     setRecentlyEdited(true);
                     notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
                   });
+                setThread(
+                  new Thread({ ...thread, readOnly: !thread.readOnly })
+                );
               },
             },
           ]
