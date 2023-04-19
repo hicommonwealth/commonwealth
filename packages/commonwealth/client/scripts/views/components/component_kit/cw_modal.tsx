@@ -28,7 +28,12 @@ export const Modal = (props: {
   const { content, isFullScreen, onClose, open, className } = props;
 
   return (
-    <ModalUnstyled open={open} onClose={onClose} slots={{ backdrop: Backdrop }}>
+    <ModalUnstyled
+      open={open}
+      onClose={onClose}
+      slots={{ backdrop: Backdrop }}
+      disableEnforceFocus
+    >
       <div
         className={`${getClasses<{ isFullScreen?: boolean }>(
           { isFullScreen },
