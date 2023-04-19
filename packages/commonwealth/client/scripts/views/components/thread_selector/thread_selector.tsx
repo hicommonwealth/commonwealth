@@ -50,7 +50,7 @@ export const ThreadSelector = ({
         setLoading(true);
         const params: SearchParams = {
           chainScope: app.activeChainId(),
-          resultSize: 20,
+          pageSize: 20,
         };
 
         app.search

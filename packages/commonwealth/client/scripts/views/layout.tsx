@@ -57,6 +57,7 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
   private deferred: boolean;
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
+  private loadingChain = false;
 
   view(vnode: ResultNode<LayoutAttrs>) {
     const { scope, deferChain, router } = vnode.attrs;
@@ -89,7 +90,7 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       );
     }
 
-    if (!app.loginStatusLoaded()) {
+    if (!app.loginStatusLoaded() || this.loadingChain) {
       // Wait for /api/status to return with the user's login status
       return <LoadingLayout />;
     }
@@ -116,24 +117,45 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       this.loadingScope = scope;
       if (scopeMatchesChain) {
         this.deferred = deferChain;
-        selectChain(scopeMatchesChain, deferChain).then((response) => {
-          if (!deferChain && response) {
-            initChain().then(() => {
+        this.loadingChain = true;
+        selectChain(scopeMatchesChain, deferChain)
+          .then((response) => {
+            if (!deferChain && response) {
+              initChain().then(() => {
+                this.redraw();
+              });
+            } else {
               this.redraw();
-            });
-          } else {
-            this.redraw();
-          }
-        });
+            }
+          })
+          .finally(() => (this.loadingChain = false));
         return <LoadingLayout />;
       }
     }
 
-    if (scope && this.deferred && !deferChain) {
+    /**
+     * When we have set the community/chain as active when visiting a page and deferred the chain load,
+     * and then visit a page (with link - not directly) that requires chain to be loaded, then we need to
+     * explicitly load the chain here.
+     */
+    const hasScopeWithActiveAndNonInitChain =
+      scope &&
+      scope === app.activeChainId() &&
+      scope !== this.loadingScope &&
+      app.chain &&
+      !app.chain.loaded;
+
+    if (
+      (scope && this.deferred && !deferChain) ||
+      (hasScopeWithActiveAndNonInitChain && !deferChain)
+    ) {
       this.deferred = false;
-      initChain().then(() => {
-        this.redraw();
-      });
+      this.loadingChain = true;
+      initChain()
+        .then(() => {
+          this.redraw();
+        })
+        .finally(() => (this.loadingChain = false));
       return <LoadingLayout />;
     }
 

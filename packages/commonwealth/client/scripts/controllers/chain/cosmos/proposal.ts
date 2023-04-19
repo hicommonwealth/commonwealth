@@ -31,6 +31,7 @@ import type { CosmosApiType } from './chain';
 import type CosmosGovernance from './governance';
 import { marshalTally } from './governance';
 import type CosmosGovernanceV1 from './governance-v1';
+import { encodeMsgVote } from './helpers';
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
   if (typeof voteOption === 'number') {
@@ -315,15 +316,12 @@ export class CosmosProposal extends Proposal<
     if (this.status !== 'VotingPeriod') {
       throw new Error('proposal not in voting period');
     }
-    const cosm = await import('@cosmjs/stargate/build/queries/utils');
-    const msg: MsgVoteEncodeObject = {
-      typeUrl: '/cosmos.gov.v1beta1.MsgVote',
-      value: {
-        proposalId: cosm.longify(this.data.identifier),
-        voter: vote.account.address,
-        option: vote.option,
-      },
-    };
+    const msg = encodeMsgVote(
+      vote.account.address,
+      this.data.identifier,
+      vote.option
+    );
+
     await this._Chain.sendTx(vote.account, msg);
     this.addOrUpdateVote(vote);
   }
