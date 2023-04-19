@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import 'pages/discussions/index.scss';
 
 import app from '../../../state';
+import { FormattedCWSpinner } from '../../components/component_kit/cw_spinner';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { RecentThreadsHeader } from './recent_threads_header';
@@ -19,6 +20,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
   const [initializing, setInitializing] = useState(true);
   const [searchParams, _] = useSearchParams();
+  const [endReached, setEndReached] = useState(true);
   const stageName: string = searchParams.get('stage');
 
   const handleThreadUpdate = (data: {
@@ -75,9 +77,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
+    setEndReached(false);
     const newThreads = await app.threads.loadNextPage({ topicName, stageName });
     // If no new threads (we reached the end)
     if (!newThreads) {
+      setEndReached(true);
       return;
     }
 
@@ -109,6 +113,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               </div>
             );
           },
+          Footer: () => {
+            if (!endReached) {
+              return <FormattedCWSpinner size='xl'/>
+            }
+          }
         }}
       />
     </Sublayout>
