@@ -57,7 +57,7 @@ const updateThreadLinkedChainEntities = async (
   const entitiesToClear = existingChainEntities.filter(
     (ce) => chain_entity_ids.indexOf(ce.id) === -1
   );
-  
+
   for (let i = 0; i < entitiesToClear.length; i++) {
     entitiesToClear[i].thread_id = null;
     await entitiesToClear[i].save();
@@ -74,7 +74,7 @@ const updateThreadLinkedChainEntities = async (
     },
   });
 
-  let links: link[] = []
+  const links: link[] = []
   for (let i = 0; i < entitiesToSet.length; i++) {
     if (entitiesToSet[i].thread_id) {
       return next(new AppError(Errors.ChainEntityAlreadyHasThread));
@@ -88,9 +88,9 @@ const updateThreadLinkedChainEntities = async (
     thread.links = links
   }else{
     // Remove links no longer linked
-    thread.links = thread.links.filter(item => {
-      return !(item.source === linkSource.ChainEventsProposal
-         && entitiesToClear.map(item => item.ce_id.toString()).includes(item.identifier));
+    thread.links = thread.links.filter(link => {
+      return !(link.source === linkSource.ChainEventsProposal
+         && entitiesToClear.map(ent => ent.ce_id.toString()).includes(link.identifier));
     });
     //add new links
     thread.links.concat(links)

@@ -13,6 +13,9 @@ import { ChainEntitiesSelector } from '../components/chain_entities_selector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import Cosmos from 'client/scripts/controllers/chain/cosmos/adapter';
+import { ChainBase } from '../../../../../common-common/src/types';
+import { ICosmosProposal } from 'client/scripts/controllers/chain/cosmos/types';
 
 type UpdateProposalStatusModalProps = {
   onChangeHandler: (
@@ -36,6 +39,11 @@ export const UpdateProposalStatusModal = ({
   const [tempChainEntities, setTempChainEntities] = useState<
     Array<ChainEntity>
   >(thread.chainEntities || []);
+  let tempChainProposals;
+  if(app.chain.base === ChainBase.CosmosSDK){
+    tempChainProposals = (app.chain as Cosmos).governance.store.getAll()[0].identifier
+    console.log(tempChainProposals)
+  }
 
   if (!app.chain?.meta) {
     return;
