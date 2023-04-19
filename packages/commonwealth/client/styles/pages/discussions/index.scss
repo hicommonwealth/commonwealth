@@ -8,8 +8,9 @@ $size: 48px;
   flex-direction: column;
   width: 100%;
 
-  .no-threads-text.Text {
+  .no-threads-text {
     color: $neutral-500;
+    margin-left: 40px;
   }
 
   .RecentThreads {
