@@ -181,6 +181,8 @@ import { createTemplate, getTemplates } from '../routes/templates';
 import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
 import updateThreadLinkedProposal from '../routes/updateThreadLinkedProposal';
+import fetchThreadsForProposals from '../routes/fetchThreadsForProposal';
+import fetchLinksForThread from '../routes/fetchLinksForThread';
 
 function setupRouter(
   endpoint: string,
@@ -386,6 +388,16 @@ function setupRouter(
   router.get(
     '/fetchThreadForSnapshot',
     fetchThreadForSnapshot.bind(this, models)
+  );
+
+  router.get(
+    '/fetchThreadsForProposal',
+    fetchThreadsForProposals.bind(this, models)
+  );
+
+  router.get(
+    '/fetchLinksForThread',
+    fetchLinksForThread.bind(this, models)
   );
 
   router.post(
