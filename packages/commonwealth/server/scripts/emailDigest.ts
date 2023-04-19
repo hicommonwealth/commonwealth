@@ -56,7 +56,7 @@ export const getTopThreads = async (
         t.created_at AS created_at
       FROM 
         "Threads" t
-        LEFT JOIN "Comments" c ON t.id = CAST(substring(c.root_id from '[0-9]+$') AS INTEGER)
+        LEFT JOIN "Comments" c ON t.id = c.thread_id
         LEFT JOIN "Reactions" r ON t.id = r.thread_id
         INNER JOIN "Addresses" a ON t.address_id = a.id
       WHERE 
@@ -131,7 +131,7 @@ const getCommunityActivityScore = async (
           0.3 * COUNT(DISTINCT r.id) AS activity_score
         FROM 
           "Threads" t
-          LEFT JOIN "Comments" c ON t.id = CAST(substring(c.root_id from '[0-9]+$') AS INTEGER)
+          LEFT JOIN "Comments" c ON t.id = c.thread_id
           LEFT JOIN "Reactions" r ON t.id = r.thread_id
         WHERE 
           t.chain='${communityId}' AND
