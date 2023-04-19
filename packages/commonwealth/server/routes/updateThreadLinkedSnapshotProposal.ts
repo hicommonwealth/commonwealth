@@ -1,6 +1,7 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
+import { linkSource } from '../models/thread';
 import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
@@ -63,6 +64,12 @@ const updateThreadLinkedSnapshotProposal = async (
   // link snapshot proposal
   if (req.body.snapshot_proposal) {
     thread.snapshot_proposal = req.body.snapshot_proposal;
+    const link = {source: linkSource.Snapshot, identifier: req.body.snapshot_proposal}
+    if(thread.links){
+      thread.links.push(link)
+    } else {
+      thread.links = [link]
+    }
   } else {
     thread.snapshot_proposal = '';
   }

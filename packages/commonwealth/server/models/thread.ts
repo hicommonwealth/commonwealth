@@ -8,6 +8,17 @@ import type { LinkedThreadAttributes } from './linked_thread';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 
+export enum linkSource {
+  Snapshot = 'snapshot',
+  CosmosProposal = 'cosmos_proposal',
+  ChainEventsProposal = 'ce_proposal'
+}
+
+export type link = {
+  source: linkSource;
+  identifier: string;
+}
+
 export type ThreadAttributes = {
   address_id: number;
   title: string;
@@ -21,6 +32,7 @@ export type ThreadAttributes = {
   pinned?: boolean;
   chain: string;
   view_count: number;
+  links: link[] | null;
 
   read_only?: boolean;
   version_history?: string[];
@@ -95,6 +107,7 @@ export default (
         allowNull: false,
       },
       snapshot_proposal: { type: dataTypes.STRING(48), allowNull: true },
+      links: {type: dataTypes.JSONB, allowNull: true},
 
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
