@@ -4,7 +4,10 @@
       "@babel/preset-env",
       {
         "useBuiltIns": "usage",
-        "corejs": "3.22"
+        "corejs": "3.22",
+        "targets": {
+          "node": "current"
+        }
       }
     ]
   ],
@@ -19,5 +22,10 @@
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-async-generator-functions"
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+    }
+  }
 }

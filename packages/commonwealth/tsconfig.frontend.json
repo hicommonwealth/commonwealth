@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "jsx": "react",
+    "outDir": "./build",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "paths": {
+      "common-common": ["../../packages/common-common"],
+      "common-common/*": ["../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"],
+      "token-balance-cache": ["../../packages/token-balance-cache"],
+      "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
+      "*": ["./*", "shared/*", "client/scripts/*"]
+    }
+  },
+  "include": [
+    "./client",
+    "./client/scripts",
+    "./shared",
+    "./test",
+    "./globals.d.ts",
+    "./server",
+    "./server.ts",
+    "./scripts"
+  ],
+}
