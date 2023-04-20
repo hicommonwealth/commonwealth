@@ -157,6 +157,7 @@ class ContractsController {
       display_name: string;
       display_options: string;
       enabled_by: string;
+      created_at: Date;
     };
     isNewCCT: boolean;
     template_id?: number;

@@ -93,8 +93,6 @@ export const ContractCard = ({
     });
   };
 
-  console.log(templates);
-
   return (
     <>
       <CWCard fullWidth className="ContractCard">
@@ -127,6 +125,8 @@ export const ContractCard = ({
                     nickname={template.cctmd.nickname}
                     slug={template.cctmd.slug}
                     display={template.cctmd.display_options}
+                    enabledBy={template.cctmd.enabled_by}
+                    enabledAt={template.cctmd.created_at}
                     cctmd_id={template.cctmd.id}
                     cct_id={template.id}
                     handleShowModal={handleOpenManageContractTemplateModal}
