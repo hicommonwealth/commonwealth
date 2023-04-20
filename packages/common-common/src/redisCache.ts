@@ -120,7 +120,8 @@ export class RedisCache {
   public async setKey(
     namespace: RedisNamespaces,
     key: string,
-    value: string
+    value: string,
+    duration:  number = 0 // no ttl   
   ): Promise<boolean> {
     if (!this.initialized) {
       log.error(
@@ -131,7 +132,11 @@ export class RedisCache {
     const finalKey = namespace + '_' + key;
 
     try {
-      await this.client.set(finalKey, value);
+      if(duration>0) {
+        await this.client.set(finalKey, value, 'EX', duration);
+      } else {
+        await this.client.set(finalKey, value);
+      }
     } catch (e) {
       log.error(
         `An error occurred while setting the following key value pair '${finalKey}: ${value}'`,

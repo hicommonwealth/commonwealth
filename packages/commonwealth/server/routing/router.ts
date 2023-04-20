@@ -4,6 +4,7 @@ import type { Express } from 'express';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
+import { cacheDecorator } from 'common-common/src/cacheDecorator';
 
 import domain from '../routes/domain';
 import status from '../routes/status';
@@ -214,7 +215,7 @@ function setupRouter(
     updateAddress.bind(this, models)
   );
   router.get('/domain', domain.bind(this, models));
-  router.get('/status', status.bind(this, models));
+  router.get('/status', cacheDecorator.cache(60), status.bind(this, models));
   router.post(
     '/ipfsPin',
     passport.authenticate('jwt', { session: false }),
