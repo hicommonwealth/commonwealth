@@ -188,11 +188,11 @@ const bulkThreads = async (
         type: QueryTypes.SELECT,
       });
 
-      const res = await models.sequelize.query(baseQuery(true), {
+      const counts = await models.sequelize.query(baseQuery(true), {
         bind,
         type: QueryTypes.SELECT,
       });
-      numTotalThreads = parseInt((res[0] as { count: string }).count);
+      numTotalThreads = parseInt((counts[0] as { count: string }).count);
     } catch (e) {
       console.log(e);
       return next(new ServerError('Could not fetch threads'));
