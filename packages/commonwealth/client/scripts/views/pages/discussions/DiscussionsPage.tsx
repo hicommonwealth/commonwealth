@@ -69,9 +69,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     app.threads.resetPagination();
     app.threads
       .loadNextPage({ topicName, stageName, includePinnedThreads: true })
-      .then(({ threads, totalResults }) => {
+      .then(({ threads: t, totalResults }) => {
         // Fetch first 20 + unpinned threads
-        setThreads(threads);
+        setThreads(t);
         !totalThreads && setTotalThreads(totalResults);
         setInitializing(false);
       });
