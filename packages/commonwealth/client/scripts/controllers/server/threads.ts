@@ -24,6 +24,7 @@ import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
+import { link, linkSource } from 'server/models/thread';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -516,7 +517,90 @@ class ThreadsController {
       },
     });
   }
+  /**
+   * Add a set of links to a Thread
+   * @param args 
+   * @returns updated Thread
+   */
+  public async addLinks (args: {
+    threadId: number;
+    links: link[];
+  }): Promise<Thread>{
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/linking/addThreadLink`,
+      type: 'POST',
+      data: {
+        thread_id: args.threadId,
+        links: args.links,
+        jwt: app.user.jwt,
+      }})
+    // Resolve response to a thread object
+    return response
+  }
 
+  /**
+   * Deletes a set of Links
+   * @param args 
+   * @returns updated Thread
+   */
+  public async deleteLinks (args: {
+    threadId: number;
+    links: link[];
+  }): Promise<Thread> {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/linking/deleteLinks`,
+      type: 'POST',
+      data: {
+        thread_id: args.threadId,
+        links: args.links,
+        jwt: app.user.jwt,
+      }})
+    return response
+  }
+
+  /**
+   * Gets all links or filtered by linkType for a thread id
+   * @param args 
+   * @returns list of resolved links using adapters + link object
+   */
+  public async getLinksForThread (args: {
+    threadId: number,
+    linkType?: linkSource
+  }): Promise<string[]>
+  {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/linking/getLinks`,
+      type: 'POST',
+      data: {
+        thread_id: args.threadId,
+        source: args.linkType,
+        jwt: app.user.jwt,
+      }})
+    // This may need to include an adapter that resolves response as an actual link
+    return response
+  }
+
+  /**
+   * gets all threads associated with a link(ie all threads linked to 1 proposal)
+   * @param args 
+   * @returns A list of resolved thread objects 
+   */
+  public async getThreadsForLink (args: {
+    link: link
+  }): Promise<Thread[]>
+  {
+    const response = await $.ajax({
+      url: `${app.serverUrl()}/linking/getLinks`,
+      type: 'POST',
+      data: {
+        link: args.link,
+        jwt: app.user.jwt,
+      }})
+    // Resolve Thread ids list in response to Thread 
+    return response
+  }
+
+  //PROPOSAL LINKING TODO: Remove this + reimplement in above fns
   public async setLinkedSnapshotProposal(args: {
     threadId: number;
     snapshotProposal: string;
@@ -550,6 +634,7 @@ class ThreadsController {
     });
   }
 
+  //PROPOSAL LINKING TODO: Remove this + reimplement in above fns
   public async setLinkedChainEntities(args: {
     threadId: number;
     entities: ChainEntity[];
@@ -592,6 +677,7 @@ class ThreadsController {
     });
   }
 
+  //PROPOSAL LINKING TODO: Remove this + reimplement in above fns
   public async addLinkedThread(
     linkingThreadId: number,
     linkedThreadId: number
@@ -633,6 +719,7 @@ class ThreadsController {
     this.modelFromServer(response.result);
   }
 
+  //PROPOSAL LINKING TODO: Remove this + reimplement in above fns
   public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
     const response = await $.ajax({
       url: `${app.serverUrl()}/fetchThreadForSnapshot`,

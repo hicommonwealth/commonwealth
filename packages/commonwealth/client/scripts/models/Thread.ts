@@ -1,5 +1,6 @@
 import { ProposalType } from 'common-common/src/types';
 import type moment from 'moment';
+import { link } from 'server/models/thread';
 import type { VersionHistory } from '../controllers/server/threads';
 import type Attachment from './Attachment';
 import type { IUniqueId } from './interfaces';
@@ -61,6 +62,7 @@ class Thread implements IUniqueId {
   public snapshotProposal: string;
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
+  public links: link[];
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
