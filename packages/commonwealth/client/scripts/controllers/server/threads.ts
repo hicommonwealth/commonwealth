@@ -745,7 +745,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads } = response.result;
+    const { threads, numTotalThreads } = response.result;
     // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
@@ -790,7 +790,7 @@ class ThreadsController {
       this.listingStore.depleteListing(options);
     }
 
-    return modeledThreads;
+    return { threads: modeledThreads, totalResults: numTotalThreads };
   }
 
   public initialize(initialThreads = [], numVotingThreads, reset) {

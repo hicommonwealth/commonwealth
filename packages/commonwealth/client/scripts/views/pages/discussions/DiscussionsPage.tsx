@@ -18,6 +18,7 @@ type DiscussionsPageProps = {
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [threads, setThreads] = useState([]);
+  const [totalThreads, setTotalThreads] = useState(0);
   const [initializing, setInitializing] = useState(true);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
@@ -68,22 +69,24 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     app.threads.resetPagination();
     app.threads
       .loadNextPage({ topicName, stageName, includePinnedThreads: true })
-      .then((t) => {
+      .then(({ threads, totalResults }) => {
         // Fetch first 20 + unpinned threads
-        setThreads(t);
+        setThreads(threads);
+        !totalThreads && setTotalThreads(totalResults);
         setInitializing(false);
       });
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
-    const newThreads = await app.threads.loadNextPage({ topicName, stageName });
+    const response = await app.threads.loadNextPage({ topicName, stageName });
     // If no new threads (we reached the end)
-    if (!newThreads) {
+    if (!response) {
       return;
     }
 
-    return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
-  }, [stageName, topicName]);
+    !totalThreads && setTotalThreads(response.totalResults);
+    return setThreads((oldThreads) => [...oldThreads, ...response.threads]);
+  }, [stageName, topicName, totalThreads]);
 
   if (initializing) {
     return <PageLoading />;
@@ -110,7 +113,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 <RecentThreadsHeader
                   topic={topicName}
                   stage={stageName}
-                  totalThreadCount={threads ? threads.length : 0}
+                  totalThreadCount={threads ? totalThreads : 0}
                 />
               );
             },
