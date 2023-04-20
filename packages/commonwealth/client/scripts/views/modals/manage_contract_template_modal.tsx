@@ -149,8 +149,8 @@ const ManageContractTemplateModal = ({
   };
 
   const isEditMode = !!templateId;
-  const modalTitle = isEditMode ? 'Edit Action' : 'Enable Action';
-  const modalSubtitle = 'Select a template';
+  const modalTitle = isEditMode ? 'Edit action' : 'Enable action';
+  const modalSubtitle = 'Select an action template';
   const confirmButtonLabel = isEditMode ? 'Save' : 'Add';
 
   // disable if at least one input is not filled
@@ -163,7 +163,7 @@ const ManageContractTemplateModal = ({
 
   const initialTemplateName = isEditMode
     ? templateOptions.find((option) => +option.value === form.templateId)
-    : { label: 'Select template type ', value: '' };
+    : { label: 'Select action template', value: '' };
 
   const initialDisplayOption = isEditMode
     ? displayOptions.find((option) => option.value === form.displayOption)
@@ -184,14 +184,14 @@ const ManageContractTemplateModal = ({
         {!isEditMode ? (
           <>
             <CWText type="caption" fontWeight="medium" className="input-label">
-              Template
+              Action template
             </CWText>
             <CWDropdown
               {...(isEditMode
                 ? { containerClassName: 'disabled-dropdown' }
                 : {})}
               initialValue={initialTemplateName}
-              label="Choose a template to base your proposal on"
+              label="Choose an action template to enable this action for your community"
               options={templateOptions}
               onSelect={handleSelectTemplate}
             />
@@ -201,7 +201,7 @@ const ManageContractTemplateModal = ({
             containerClassName="input-label"
             disabled
             value={initialTemplateName.label}
-            label="Template"
+            label="Action template"
           />
         )}
         {!isEditMode && (
@@ -213,7 +213,7 @@ const ManageContractTemplateModal = ({
               className="cta"
               onClick={handleCreateNewTemplate}
             >
-              Create a New Template
+              Create a new action template
             </CWText>
           </CWText>
         )}
@@ -236,12 +236,12 @@ const ManageContractTemplateModal = ({
           }}
         />
         <CWText type="caption" fontWeight="medium" className="input-label">
-          Nickname
+          Action details
         </CWText>
         <CWTextInput
-          label="Give your template instance a name that your community can easily identify"
+          label="Describe what your community can do with this action template"
           value={form.nickname}
-          placeholder="Enter nickname"
+          placeholder="Enter description"
           onInput={(e) => {
             setForm((prevState) => ({
               ...prevState,
@@ -253,7 +253,7 @@ const ManageContractTemplateModal = ({
           Slug
         </CWText>
         <CWTextInput
-          label="Last part of the URL address that serves as a unique identifier of this template"
+          label="Provide a unique identifier for your action template's URL address"
           value={form.slug}
           placeholder="/placeholder-is-display-name-without-spaces"
           onInput={(e) => {
@@ -264,7 +264,7 @@ const ManageContractTemplateModal = ({
           }}
         />
         <CWText type="caption" fontWeight="medium" className="input-label">
-          Display Option
+          Display option
         </CWText>
         <CWDropdown
           label="Choose where to display template"
