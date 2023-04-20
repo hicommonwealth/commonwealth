@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
@@ -20,13 +20,23 @@ import {
   YesNoAbstainVetoVotingResult,
   YesNoRejectVotingResult,
 } from './voting_result_components';
+import useForceRerender from 'hooks/useForceRerender';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
+  const forceRerender = useForceRerender();
 
   const votes = proposal.getVotes();
+
+  useEffect(() => {
+    app.proposalEmitter.on('redraw', forceRerender);
+
+    return () => {
+      app.proposalEmitter.removeAllListeners();
+    };
+  }, [forceRerender]);
 
   // TODO: fix up this function for cosmos votes
   if (
