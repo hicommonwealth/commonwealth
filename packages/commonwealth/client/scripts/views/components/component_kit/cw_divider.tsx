@@ -11,12 +11,12 @@ type DividerProps = {
 };
 
 export const CWDivider = (props: DividerProps) => {
-  const { isVertical } = props;
+  const { isVertical, className } = props;
 
   return (
     <div
       className={getClasses<DividerProps>(
-        { isVertical },
+        { isVertical, className },
         ComponentType.Divider
       )}
     />

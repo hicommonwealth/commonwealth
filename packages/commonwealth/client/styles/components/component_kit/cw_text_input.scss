@@ -80,5 +80,9 @@
     .text-input-right-onClick-icon {
       @include iconPositionStyles;
     }
+
+    ::placeholder {
+      color: $neutral-500;
+    }
   }
 }
