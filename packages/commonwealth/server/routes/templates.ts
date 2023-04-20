@@ -27,7 +27,6 @@ export async function createTemplate(
   res: TypedResponse<CreateTemplateAndMetadataResp>
 ) {
   const { contract_id, name, template, chain_id, description } = req.body;
-  console.log('description backend: ', description);
 
   const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
   if (!isAdmin) throw new AppError('Must be admin');
