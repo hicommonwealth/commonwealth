@@ -325,10 +325,12 @@ class ContractsController {
     name,
     template,
     contract_id,
+    description,
   }: {
     name: string;
     template: string;
     contract_id: string;
+    description: string;
   }) {
     try {
       await $.post(`${app.serverUrl()}/contract/template`, {
@@ -337,6 +339,7 @@ class ContractsController {
         name,
         template,
         contract_id,
+        description,
       });
 
       const contract = this._store.getById(contract_id);
