@@ -11,7 +11,7 @@ Discussions and governance for blockchain networks.
 ```bash
 brew install node yarn postgresql
 brew services start postgresql
-psql -h localhost postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth SUPERUSER;"
+psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth SUPERUSER;"
 psql postgres -h 127.0.0.1 -U commonwealth -c "CREATE DATABASE commonwealth;"
 ```
 
@@ -39,19 +39,6 @@ the RabbitMQ Management plugin MUST be enabled: https://www.rabbitmq.com/managem
 
 For more information on RabbitMQ setup/debugging refer to the ce-rabbitmq-plugin repo found here:
 https://github.com/hicommonwealth/ce-rabbitmq-plugin
-
-**Docker Compose**
-Optionally, use docker compose to start both local copy of postgres & rabbitmq. Make sure docker is running.
-
-```
-# docker-compose without postgres
-docker-compose up -d #to start
-# docker-compose with postgres
-docker-compose up --scale compose-db=1 -d
-
-
-docker-compose down #to stop
-```
 
 **nvm**
 
@@ -123,13 +110,6 @@ Make sure you have python installed in your Rosetta Terminal path.
 See [link](https://stackoverflow.com/questions/71468590/env-python-no-such-file-or-directory-when-building-app-with-xcode).
 You need to be able to call `python` in the terminal.
 
-Optionally, create & activate python 3.9 as virtual environment
-```bash
-pipenv --python 3.9
-pipenv shell
-python --version #verify its python 3.9
-```
-
 ## Environment Variables
 
 You should create a `.env` file at the `package/commonwealth` level
@@ -176,7 +156,7 @@ pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --excl
 
 npx sequelize db:drop
 npx sequelize db:create
-psql -h localhost -d commonwealth -U commonwealth -f latest.dump
+psql -d commonwealth -U commonwealth -f latest.dump
 ```
 
 To access the production DB:
@@ -215,8 +195,8 @@ heroku pg:psql -a <APP_NAME>
 \COPY (<QUERY>) TO '<LOCAL_PATH><FILENAME>.csv' WITH (delimiter ',', format CSV);
 # exit the remote server and log in to local instance
 exit
-psql -h localhost -d commonwealth -U commonwealth
-# load the local .csv to the local database 
+psql -d commonwealth -U commonwealth
+# load the local .csv to the local database
 # example: \COPY "ChainEvents" FROM '/var/www/html/commonwealth/ChainEvents.csv' CSV;
 \COPY "<TABLE_NAME>" FROM '<LOCAL_PATH><FILENAME>.csv' CSV;
 

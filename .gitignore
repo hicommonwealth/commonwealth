@@ -10,7 +10,4 @@ node_modules/
 **/.DS_Store
 
 # compose
-postgres-data*
-redis-data*
-rabbitmq-data*
 compose-draft
