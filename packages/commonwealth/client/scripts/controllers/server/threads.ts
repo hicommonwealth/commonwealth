@@ -653,7 +653,7 @@ class ThreadsController {
   ): Promise<Thread[]> {
     const params = {
       chain: app.activeChainId(),
-      ids,
+      ids: ids.filter(Boolean),
     };
     const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/getThreads`, params),
