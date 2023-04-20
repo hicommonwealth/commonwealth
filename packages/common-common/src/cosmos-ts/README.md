@@ -57,14 +57,14 @@ telescope({
       typingsFormat: {
         useDeepPartial: false,
         useExact: false,
-        timestamp: 'timestamp',
-        duration: 'duration',
+        timestamp: 'date',
+        duration: 'string',
       },
       methods: {
-        toJSON: true,
-        fromJSON: true,
-        fromSDK: true,
-        toSdk: true,
+        toJSON: false,
+        fromJSON: false,
+        fromSDK: false,
+        toSDK: false,
       },
     },
     aminoEncoding: {

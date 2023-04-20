@@ -10,6 +10,7 @@ export type LoginSidebarType =
 export type LoginBodyType =
   | 'allSet'
   | 'connectWithEmail'
+  | 'redirectToSign'
   | 'ethWalletList'
   | 'selectAccountType'
   | 'selectPrevious'

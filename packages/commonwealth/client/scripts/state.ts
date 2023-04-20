@@ -68,6 +68,9 @@ export interface IApp {
   polls: PollsController;
   threadUpdateEmitter: EventEmitter;
 
+  // Proposals
+  proposalEmitter: EventEmitter;
+
   // Search
   search: SearchController;
   searchAddressCache: any;
@@ -164,6 +167,9 @@ const app: IApp = {
   reactionCounts: new ReactionCountsController(),
   polls: new PollsController(),
   threadUpdateEmitter: new EventEmitter(),
+
+  // Proposals
+  proposalEmitter: new EventEmitter(),
 
   // Community
   communities: new CommunitiesController(),
@@ -272,10 +278,9 @@ export async function initAppState(
           });
 
         app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories =
-          data.result.notificationCategories.map((json) =>
-            NotificationCategory.fromJSON(json)
-          );
+        app.config.notificationCategories = data.result.notificationCategories.map(
+          (json) => NotificationCategory.fromJSON(json)
+        );
         app.config.chainCategories = data.result.chainCategories;
         app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 

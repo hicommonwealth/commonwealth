@@ -273,7 +273,7 @@ beforeEach(async () => {
               chain: 'cmntest',
               address_id: -1,
               text: '',
-              thread_id: 'discussion_-1',
+              thread_id: '-1',
               plaintext: '',
             },
           })
@@ -292,7 +292,7 @@ beforeEach(async () => {
                 chain: 'cmntest',
                 address_id: -2,
                 text: '',
-                thread_id: 'discussion_-2',
+                thread_id: '-2',
                 plaintext: '',
               },
             })

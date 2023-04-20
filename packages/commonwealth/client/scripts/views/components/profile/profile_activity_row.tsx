@@ -6,7 +6,10 @@ import 'components/profile/profile_activity_row.scss';
 
 import app from 'state';
 import type Thread from 'client/scripts/models/Thread';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import withRouter, {
+  navigateToCommunity,
+  useCommonNavigate,
+} from 'navigation/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/cw_tag';
 import { renderQuillTextBody } from '../react_quill_editor/helpers';
@@ -17,8 +20,6 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
 };
-
-const PROD_URL = 'https://commonwealth.im';
 
 const ProfileActivityRow = (props: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
@@ -45,30 +46,16 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
     <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
   );
 
-  const handleClickLink = (path) => {
-    const isExternalLink = chain !== app.customDomainId();
-
-    if (!app.isCustomDomain()) {
-      navigate(path, {}, chain);
-    } else {
-      if (isExternalLink) {
-        window.open(`${PROD_URL}/${chain}${path}`);
-      } else {
-        navigate(path);
-      }
-    }
-  };
-
   return (
     <div className="ProfileActivityRow">
       <div className="chain-info">
-        <img src={iconUrl} />
+        <img src={iconUrl} alt="chain-logo" />
         <CWText fontWeight="semiBold" className="link">
           <a
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleClickLink(`/discussions`);
+              navigateToCommunity({ navigate, path: `/discussions`, chain });
             }}
           >
             {chain}
@@ -94,7 +81,11 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleClickLink(`/discussion/${id}`);
+                navigateToCommunity({
+                  navigate,
+                  path: `/discussion/${id}`,
+                  chain,
+                });
               }}
             >
               {title}
@@ -104,9 +95,11 @@ const ProfileActivityRow = (props: ProfileActivityRowProps) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleClickLink(
-                  `/discussion/${comment.thread?.id}?comment=${comment.id}`
-                );
+                navigateToCommunity({
+                  navigate,
+                  path: `/discussion/${comment.thread?.id}?comment=${comment.id}`,
+                  chain,
+                });
               }}
             >
               {decodedTitle}
