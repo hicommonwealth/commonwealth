@@ -180,6 +180,7 @@ import { createTemplate, getTemplates } from '../routes/templates';
 
 import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
+import { getThreadsValidation } from '../util/helperValidations';
 
 function setupRouter(
   endpoint: string,
@@ -485,6 +486,7 @@ function setupRouter(
   );
   router.get(
     '/getThreads',
+    getThreadsValidation,
     databaseValidationService.validateChain,
     getThreadsOld.bind(this, models)
   );

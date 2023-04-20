@@ -2,8 +2,15 @@ import { ServerError } from 'common-common/src/errors';
 import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
+import { validationResult } from 'express-validator';
+import { failure } from '../types';
 
 const getThreads = async (models: DB, req: Request, res: Response) => {
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return failure(res.status(400), errors);
+  }
+
   const chain = req.chain;
 
   let threads;

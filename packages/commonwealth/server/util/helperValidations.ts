@@ -78,3 +78,15 @@ export const postRulesValidation = [
   body('rules.*.updated_at').not().exists(),
   body('rules.*.deleted_at').not().exists(),
 ];
+
+export const getThreadsValidation = [
+  query('ids')
+    .toArray()
+    .custom((value) => {
+      if (!value.every(Number.isInteger)) {
+        throw new Error('Ids must be integers');
+      }
+
+      return true;
+    }),
+];
