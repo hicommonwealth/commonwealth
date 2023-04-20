@@ -8,6 +8,10 @@ export type CommunityContractTemplateMetadataAttributes = {
   nickname: string;
   display_name: string;
   display_options: string;
+  enabled_by?: string;
+
+  created_at?: Date;
+  updated_at?: Date;
 };
 
 export type CommunityContractTemplateMetadataInstance =
@@ -34,11 +38,14 @@ export default (
       nickname: { type: dataTypes.STRING, allowNull: false },
       display_name: { type: dataTypes.STRING, allowNull: false },
       display_options: { type: dataTypes.STRING, allowNull: false },
+      enabled_by: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'CommunityContractTemplateMetadata',
       underscored: true,
-      timestamps: false,
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: false,
     }
   );
 

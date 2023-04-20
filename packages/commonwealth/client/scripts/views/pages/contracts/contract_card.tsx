@@ -93,6 +93,8 @@ export const ContractCard = ({
     });
   };
 
+  console.log(templates);
+
   return (
     <>
       <CWCard fullWidth className="ContractCard">
