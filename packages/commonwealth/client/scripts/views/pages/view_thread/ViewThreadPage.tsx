@@ -542,6 +542,46 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     });
   };
 
+  const handleEditThread = async (e) => {
+    e.preventDefault();
+    const editsToSave = localStorage.getItem(
+      `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
+    );
+
+    if (editsToSave) {
+      clearEditingLocalStorage(thread.id, ContentType.Thread);
+
+      setSavedEdits(editsToSave || '');
+
+      openConfirmation({
+        title: 'Info',
+        description: <>Previous changes found. Restore edits?</>,
+        buttons: [
+          {
+            label: 'Restore',
+            buttonType: 'mini-black',
+            onClick: () => {
+              setShouldRestoreEdits(true);
+              setIsGloballyEditing(true);
+              setIsEditingBody(true);
+            },
+          },
+          {
+            label: 'Cancel',
+            buttonType: 'mini-white',
+            onClick: () => {
+              setIsGloballyEditing(true);
+              setIsEditingBody(true);
+            },
+          },
+        ],
+      });
+    } else {
+      setIsGloballyEditing(true);
+      setIsEditingBody(true);
+    }
+  };
+
   const getActionMenuItems = (): PopoverMenuItem[] => {
     return [
       ...(hasEditPerms && !thread.readOnly
@@ -549,25 +589,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Edit',
               iconLeft: 'write' as const,
-              onClick: async (e) => {
-                e.preventDefault();
-                setSavedEdits(
-                  localStorage.getItem(
-                    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
-                  )
-                );
-
-                if (savedEdits) {
-                  clearEditingLocalStorage(thread.id, ContentType.Thread);
-                  const confirmation = window.confirm(
-                    'Previous changes found. Restore edits?'
-                  );
-                  setShouldRestoreEdits(confirmation);
-                }
-
-                setIsGloballyEditing(true);
-                setIsEditingBody(true);
-              },
+              onClick: handleEditThread,
             },
           ]
         : []),

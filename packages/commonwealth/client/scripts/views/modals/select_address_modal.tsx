@@ -18,6 +18,7 @@ import { CWText } from '../components/component_kit/cw_text';
 import { UserBlock } from '../components/user/user_block';
 import { getClasses } from '../components/component_kit/helpers';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type SelectAddressModalProps = {
   onModalClose: () => void;
@@ -81,34 +82,42 @@ export const SelectAddressModal = (props: SelectAddressModalProps) => {
       (a) => a.address === account.address && a.chain.id === account.chain.id
     );
 
-    // confirm
-    const confirmed = window.confirm('Remove this address from the community?');
-
-    if (!confirmed) {
-      setIsLoading(false);
-      redraw();
-      return;
-    }
-
-    app.roles
-      .deleteRole({
-        address: addressInfo,
-        chain: app.activeChainId(),
-      })
-      .then(() => {
-        setIsLoading(false);
-        redraw();
-        setSelectedIndex(null);
-        // unset activeAccount, or set it to the next activeAccount
-        if (isSameAccount(app.user.activeAccount, account)) {
-          app.user.ephemerallySetActiveAccount(null);
-        }
-      })
-      .catch((err: any) => {
-        setIsLoading(false);
-        redraw();
-        notifyError(err.responseJSON.error);
-      });
+    openConfirmation({
+      title: 'Warning',
+      description: <>Remove this address from the community?</>,
+      buttons: [
+        {
+          label: 'Remove',
+          buttonType: 'mini-red',
+          onClick: () => {
+            app.roles
+              .deleteRole({
+                address: addressInfo,
+                chain: app.activeChainId(),
+              })
+              .then(() => {
+                setIsLoading(false);
+                setSelectedIndex(null);
+                // unset activeAccount, or set it to the next activeAccount
+                if (isSameAccount(app.user.activeAccount, account)) {
+                  app.user.ephemerallySetActiveAccount(null);
+                }
+              })
+              .catch((err: any) => {
+                setIsLoading(false);
+                notifyError(err.responseJSON.error);
+              });
+          },
+        },
+        {
+          label: 'No',
+          buttonType: 'mini-white',
+          onClick: () => {
+            setIsLoading(false);
+          },
+        },
+      ],
+    });
   };
 
   const chainbase = app.chain ? app.chain?.meta?.base : ChainBase.Ethereum;
