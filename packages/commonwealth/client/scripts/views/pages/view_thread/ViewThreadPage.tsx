@@ -12,7 +12,7 @@ import type { IThreadCollaborator } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import app from 'state';
 import { ContentType } from 'types';
@@ -45,6 +45,7 @@ import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -515,6 +516,32 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setThread(newThread);
   };
 
+  const handleDeleteThread = () => {
+    openConfirmation({
+      title: 'Delete Thread',
+      description: <>Delete this entire thread?</>,
+      buttons: [
+        {
+          label: 'Delete',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              app.threads.delete(thread).then(() => {
+                navigate('/discussions');
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'mini-black',
+        },
+      ],
+    });
+  };
+
   const getActionMenuItems = (): PopoverMenuItem[] => {
     return [
       ...(hasEditPerms && !thread.readOnly
@@ -571,15 +598,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             {
               label: 'Delete',
               iconLeft: 'trash' as const,
-              onClick: async () => {
-                const confirmed = window.confirm('Delete this entire thread?');
-
-                if (!confirmed) return;
-
-                app.threads.delete(thread).then(() => {
-                  navigate('/discussions');
-                });
-              },
+              onClick: handleDeleteThread,
             },
           ]
         : []),
