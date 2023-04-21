@@ -20,14 +20,14 @@
     }
   }
 
-  .contract-group {
+  .label-group {
     display: flex;
     flex-direction: row;
     margin-top: 16px;
     align-items: center;
     justify-content: center;
 
-    .group-label {
+    .group-title {
       color: $neutral-600;
       width: 120px;
     }

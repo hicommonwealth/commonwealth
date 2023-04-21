@@ -107,8 +107,8 @@ export const ContractCard = ({
             onClick={handleDeleteContract}
           />
         </div>
-        <div className="contract-group">
-          <CWText className="group-label" type="b2">
+        <div className="label-group">
+          <CWText className="group-title" type="b2">
             Address
           </CWText>
           <CWText className="address" type="b2">
