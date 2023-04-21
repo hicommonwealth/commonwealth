@@ -1,8 +1,10 @@
 @import '../../shared';
 
 .ContractCard {
+  padding: 28px 32px;
+
   .label {
-    color: $neutral-600;
+    color: $neutral-800;
     margin-bottom: 8px;
   }
 
@@ -12,19 +14,32 @@
     align-items: end;
     justify-content: space-between;
 
-    .address {
-      word-break: break-word;
-    }
-
     .delete-icon {
       margin-left: 20px;
       cursor: pointer;
     }
   }
 
+  .contract-group {
+    display: flex;
+    flex-direction: row;
+    margin-top: 16px;
+    align-items: center;
+    justify-content: center;
+
+    .group-label {
+      color: $neutral-600;
+      width: 120px;
+    }
+
+    .address {
+      word-break: break-word;
+    }
+  }
+
   .templates {
     width: 100%;
-    margin-top: 44px;
+    margin-top: 24px;
 
     .no-templates-container {
       min-height: 56px;
