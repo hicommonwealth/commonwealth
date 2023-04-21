@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type {
   SnapshotProposal,
@@ -67,13 +67,14 @@ export const SnapshotPollCardContainer = (
     moment(+proposal.start * 1000) <= moment() &&
     moment(+proposal.end * 1000) > moment();
 
-  const userVote =
+  const [userVote, setUserVote] = useState(
     proposal.choices[
       votes.find((vote) => {
         return vote.voter === activeUserAddress;
       })?.choice - 1
-    ];
-  const hasVoted = userVote !== undefined;
+    ]
+  );
+  const [hasVoted, setHasVoted] = useState(userVote !== undefined);
 
   const voteErrorText = !validatedAgainstStrategies
     ? VotingError.NOT_VALIDATED
@@ -104,6 +105,12 @@ export const SnapshotPollCardContainer = (
     return voteInfo;
   }, [proposal, votes]);
 
+  useEffect(() => {
+    if (choice) {
+      setIsModalOpen(true);
+    }
+  }, [choice]);
+
   return (
     <>
       <SnapshotPollCard
@@ -116,12 +123,8 @@ export const SnapshotPollCardContainer = (
         tokenSymbol={space.symbol}
         totalVoteCount={totals.sumOfResultsBalance}
         voteInformation={voteInformation}
-        onSnapshotVoteCast={(_choice, _callback) => {
+        onSnapshotVoteCast={(_choice) => {
           setChoice(_choice);
-          setCallback(_callback);
-          if (choice && callback) {
-            setIsModalOpen(true);
-          }
         }}
         onVoteCast={() => {
           setIsModalOpen(false);
@@ -140,7 +143,10 @@ export const SnapshotPollCardContainer = (
             totalScore={totalScore}
             scores={scores}
             snapshot={proposal.snapshot}
-            successCallback={callback}
+            successCallback={() => {
+              setHasVoted(true);
+              setUserVote(choice);
+            }}
             onModalClose={() => setIsModalOpen(false)}
           />
         }

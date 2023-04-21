@@ -91,7 +91,7 @@ export const ConfirmSnapshotVoteModal = (
                 space: space.id,
                 proposal: id,
                 type: 'single-choice',
-                choice: selectedChoice + 1,
+                choice: parseInt(selectedChoice) + 1,
                 metadata: JSON.stringify({}),
               };
 
@@ -99,7 +99,6 @@ export const ConfirmSnapshotVoteModal = (
                 castVote(author.address, votePayload).then(() => {
                   onModalClose();
                   successCallback();
-                  redraw();
                 });
                 // mixpanelBrowserTrack({
                 //   event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
