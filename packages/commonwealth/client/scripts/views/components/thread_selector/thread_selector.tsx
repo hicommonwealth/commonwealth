@@ -48,7 +48,7 @@ export const ThreadSelector = ({
     const inputTimeoutRef = setTimeout(async () => {
       if (target.value?.trim().length > 4) {
         setLoading(true);
-        const inputValue = target.value;
+        const inputValue = target.value.trim();
         const params: SearchParams = {
           chainScope: app.activeChainId(),
           pageSize: 20,
