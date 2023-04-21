@@ -135,7 +135,8 @@ export enum BalanceType {
 
 export enum RedisNamespaces {
   Chat_Socket = 'chat_socket',
-  Route_Response = 'route_response'
+  Route_Response = 'route_response',
+  Test_Redis = 'test_redis',
 }
 
 export interface ISnapshotNotification {

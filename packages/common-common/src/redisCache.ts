@@ -133,7 +133,9 @@ export class RedisCache {
 
     try {
       if(duration>0) {
-        await this.client.set(finalKey, value, 'EX', duration);
+        await this.client.set(finalKey, value, {
+          EX: duration
+        });
       } else {
         await this.client.set(finalKey, value);
       }
@@ -234,4 +236,13 @@ export class RedisCache {
     this.initialized = false;
     return true;
   }
+
+  /**
+   * Check if redis is initialized
+   * @returns boolean
+   */
+  public isInitialized(): boolean {
+    return this.initialized;
+  }
+
 }

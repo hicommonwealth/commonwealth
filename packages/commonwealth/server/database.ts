@@ -60,10 +60,6 @@ export const sequelize = new Sequelize(DATABASE_URI, {
     process.env.NODE_ENV === 'test'
       ? false
       : (msg) => {
-          console.log(msg);
-          if(msg.endsWith('WHERE "Chain"."active" = true;')) {
-            console.log('here');
-          }
           log.trace(msg);
         },
   dialectOptions:
