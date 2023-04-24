@@ -28,10 +28,13 @@ const updateTopic = async (
     return next(new AppError(UpdateTopicErrors.NoTopic));
 
   const userAddresses = await req.user.getAddresses();
-  const userAddress = userAddresses.find(
-    (a) => !!a.verified && a.address === req.body.address
-  );
-  if (!userAddress) return next(new AppError(UpdateTopicErrors.InvalidAddr));
+  const userAddressIds = userAddresses
+    .filter((a) => !!a.verified)
+    .map((a) => a.id);
+
+  if (userAddressIds.length === 0) {
+    return next(new AppError(UpdateTopicErrors.InvalidAddr));
+  }
 
   const thread = await models.Thread.findOne({
     where: {
@@ -41,17 +44,18 @@ const updateTopic = async (
 
   const roles: any[] = await findAllRoles(
     models,
-    { where: { address_id: userAddress.id } },
+    { where: { address_id: { [Op.in]: userAddressIds } } },
     thread.chain,
     ['admin', 'moderator']
   );
+
   const isAdminOrMod = roles.length > 0;
 
   if (!isAdminOrMod) {
     const isAuthor = await models.Thread.findOne({
       where: {
         id: req.body.thread_id,
-        address_id: { [Op.in]: userAddresses.map((addr) => addr.id) },
+        address_id: { [Op.in]: userAddressIds },
       },
     });
 
