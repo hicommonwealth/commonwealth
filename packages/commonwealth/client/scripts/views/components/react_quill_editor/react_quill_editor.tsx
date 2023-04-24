@@ -23,6 +23,7 @@ import { Modal } from '../component_kit/cw_modal';
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
 import { nextTick } from 'process';
+import { MinimumProfile } from '../../../../../client/scripts/models';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
@@ -257,30 +258,20 @@ const ReactQuillEditor = ({
         text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
       const beforeText = text.slice(0, cursorIdx - mentionLength);
       const afterText = text.slice(cursorIdx).replace(/\n$/, '');
-      if (isMarkdownEnabled) {
-        const fullText = `${beforeText}[@${item.name}](${
-          item.link
-        }) ${afterText.replace(/^ /, '')}`;
-        editor.setText(fullText);
-        // editor.setSelection(
-        //   fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0)
-        // );
-      } else {
-        const delta = new Delta()
-          .retain(beforeText.length)
-          .delete(mentionLength)
-          .insert(`@${item.name}`, { link: item.link });
-        if (!afterText.startsWith(' ')) delta.insert(' ');
-        editor.updateContents(delta);
-        editor.setSelection(
-          editor.getLength() -
-            afterText.length -
-            (afterText.startsWith(' ') ? 0 : 1),
-          0
-        );
-      }
+      const delta = new Delta()
+        .retain(beforeText.length)
+        .delete(mentionLength)
+        .insert(`@${item.name}`, { link: item.link });
+      if (!afterText.startsWith(' ')) delta.insert(' ');
+      editor.updateContents(delta);
+      editor.setSelection(
+        editor.getLength() -
+          afterText.length -
+          (afterText.startsWith(' ') ? 0 : 1),
+        0
+      );
     },
-    [isMarkdownEnabled, lastSelectionRef]
+    [lastSelectionRef]
   );
 
   const mention = useMemo(() => {
@@ -327,10 +318,17 @@ const ReactQuillEditor = ({
             );
             const node = document.createElement('div');
 
-            const avatar = document.createElement('img');
-            (avatar as HTMLImageElement).src = profile.avatarUrl;
-            avatar.className = 'ql-mention-avatar';
-            node.appendChild(avatar);
+            let avatar;
+            if (profile.avatarUrl) {
+              avatar = document.createElement('img');
+              (avatar as HTMLImageElement).src = profile.avatarUrl;
+              avatar.className = 'ql-mention-avatar';
+              node.appendChild(avatar);
+            } else {
+              avatar = document.createElement('div');
+              avatar.className = 'ql-mention-avatar';
+              avatar.innerHTML = MinimumProfile.getSVGAvatar(addr.address, 20);
+            }
 
             const nameSpan = document.createElement('span');
             nameSpan.innerText = addr.name;
