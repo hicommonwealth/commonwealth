@@ -269,7 +269,6 @@ const ReactQuillEditor = ({
       const text = editor.getText();
       const lastSelection = lastSelectionRef.current;
       if (!lastSelection) {
-        console.log('no selection');
         return;
       }
       const cursorIdx = lastSelection.index;
