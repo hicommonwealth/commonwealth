@@ -121,7 +121,7 @@ export class RedisCache {
     namespace: RedisNamespaces,
     key: string,
     value: string,
-    duration:  number = 0 // no ttl   
+    duration = 0 // no ttl   
   ): Promise<boolean> {
     if (!this.initialized) {
       log.error(
@@ -245,4 +245,32 @@ export class RedisCache {
     return this.initialized;
   }
 
+  /**
+   * delete redis key by namespace and key
+   * @returns boolean
+   */
+  public async deleteNamespaceKeys(
+    namespace: RedisNamespaces,
+    maxResults?: number
+  ): Promise<{ [key: string]: string } | boolean> {
+    try {
+      const data = this.getNamespaceKeys(namespace, maxResults);
+      if (data) {
+        for (const key in data) {
+          try {
+            const resp = await this.client.del(key);
+            console.log(resp);
+            console.log(`Deleted ${key}`)
+          } catch (err) {
+            console.log(`error deleting key ${key}`)
+            console.log(err);
+          }
+        }
+      }
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
 }

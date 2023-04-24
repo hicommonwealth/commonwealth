@@ -7,7 +7,7 @@ import { StatsDController } from 'common-common/src/statsd';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
 
 import domain from '../routes/domain';
-import status from '../routes/status';
+import { status, statusBroken } from '../routes/status';
 import createAddress from '../routes/createAddress';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
 import verifyAddress from '../routes/verifyAddress';
@@ -216,6 +216,11 @@ function setupRouter(
   );
   router.get('/domain', domain.bind(this, models));
   router.get('/status', cacheDecorator.cache(60), status.bind(this, models));
+  router.get(
+    '/statusBroken',
+    cacheDecorator.cache(100),
+    statusBroken.bind(this, models)
+  );
   router.post(
     '/ipfsPin',
     passport.authenticate('jwt', { session: false }),
