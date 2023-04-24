@@ -23,6 +23,7 @@ type SnapshotProposalCardsProps = {
   validatedAgainstStrategies: boolean;
   fetchedPower: boolean;
   totalScore: number;
+  loadVotes: () => Promise<void>;
 };
 
 const enum VotingError {
@@ -56,11 +57,11 @@ export const SnapshotPollCardContainer = (
     validatedAgainstStrategies,
     fetchedPower,
     totalScore,
+    loadVotes,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [choice, setChoice] = React.useState<string>();
-  const [callback, setCallback] = React.useState<() => any>();
 
   const isActive =
     proposal &&
@@ -123,10 +124,10 @@ export const SnapshotPollCardContainer = (
         tokenSymbol={space.symbol}
         totalVoteCount={totals.sumOfResultsBalance}
         voteInformation={voteInformation}
-        onSnapshotVoteCast={(_choice) => {
+        onSnapshotVoteCast={async (_choice) => {
           setChoice(_choice);
         }}
-        onVoteCast={() => {
+        onVoteCast={async () => {
           setIsModalOpen(false);
         }}
         incrementalVoteCast={totalScore}
@@ -143,7 +144,8 @@ export const SnapshotPollCardContainer = (
             totalScore={totalScore}
             scores={scores}
             snapshot={proposal.snapshot}
-            successCallback={() => {
+            successCallback={async () => {
+              await loadVotes();
               setHasVoted(true);
               setUserVote(choice);
             }}

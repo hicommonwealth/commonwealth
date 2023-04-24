@@ -172,6 +172,7 @@ export const ViewProposalPage = ({
                 totalScore={totalScore}
                 validatedAgainstStrategies={validatedAgainstStrategies}
                 votes={votes}
+                loadVotes={async () => loadVotes(snapshotId, identifier)}
               />
             ),
           },

@@ -96,7 +96,8 @@ export const ConfirmSnapshotVoteModal = (
               };
 
               try {
-                castVote(author.address, votePayload).then(() => {
+                castVote(author.address, votePayload).then(async () => {
+                  await app.snapshot.refreshProposals();
                   onModalClose();
                   successCallback();
                 });
