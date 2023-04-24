@@ -5,9 +5,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import type { DeltaOperation } from 'quill';
+import type { DeltaOperation, RangeStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import ReactQuill, { Quill } from 'react-quill';
+import QuillMention from 'quill-mention';
+import moment from 'moment';
 
 import type { SerializableDeltaStatic } from './utils';
 import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
@@ -36,6 +38,7 @@ const LoadingIndicator = () => {
 
 const Delta = Quill.import('delta');
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
+Quill.register('modules/mention', QuillMention);
 
 type ReactQuillEditorProps = {
   className?: string;
@@ -59,6 +62,10 @@ const ReactQuillEditor = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isMarkdownEnabled, setIsMarkdownEnabled] = useState<boolean>(false);
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
+
+  // ref is used to prevent rerenders when selection
+  // is changed, since rerenders bug out the editor
+  const lastSelectionRef = useRef<RangeStatic | null>(null);
 
   // refreshQuillComponent unmounts and remounts the
   // React Quill component, as this is the only way
@@ -232,6 +239,139 @@ const ReactQuillEditor = ({
     ]);
   }, [isMarkdownEnabled]);
 
+  const selectMention = useCallback(
+    (item: QuillMention) => {
+      const editor = editorRef.current?.getEditor();
+      if (!editor) {
+        return;
+      }
+      if (item.link === '#' && item.name === '') return;
+      const text = editor.getText();
+      const lastSelection = lastSelectionRef.current;
+      if (!lastSelection) {
+        console.log('no selection');
+        return;
+      }
+      const cursorIdx = lastSelection.index;
+      const mentionLength =
+        text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
+      const beforeText = text.slice(0, cursorIdx - mentionLength);
+      const afterText = text.slice(cursorIdx).replace(/\n$/, '');
+      if (isMarkdownEnabled) {
+        const fullText = `${beforeText}[@${item.name}](${
+          item.link
+        }) ${afterText.replace(/^ /, '')}`;
+        editor.setText(fullText);
+        // editor.setSelection(
+        //   fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0)
+        // );
+      } else {
+        const delta = new Delta()
+          .retain(beforeText.length)
+          .delete(mentionLength)
+          .insert(`@${item.name}`, { link: item.link });
+        if (!afterText.startsWith(' ')) delta.insert(' ');
+        editor.updateContents(delta);
+        editor.setSelection(
+          editor.getLength() -
+            afterText.length -
+            (afterText.startsWith(' ') ? 0 : 1),
+          0
+        );
+      }
+    },
+    [isMarkdownEnabled, lastSelectionRef]
+  );
+
+  const mention = useMemo(() => {
+    return {
+      allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.]*$/,
+      mentionDenotationChars: ['@'],
+      dataAttributes: ['name', 'link', 'component'],
+      renderItem: (item) => item.component,
+      onSelect: selectMention,
+      source: async (
+        searchTerm: string,
+        renderList: (
+          formattedMatches: QuillMention,
+          searchTerm: string
+        ) => null,
+        mentionChar: string
+      ) => {
+        if (mentionChar !== '@') return;
+
+        let members = [];
+        let formattedMatches;
+        if (searchTerm.length === 0) {
+          const node = document.createElement('div');
+          const tip = document.createElement('span');
+          tip.innerText = 'Type to tag a member';
+          node.appendChild(tip);
+          formattedMatches = [
+            {
+              link: '#',
+              name: '',
+              component: node.outerHTML,
+            },
+          ];
+          renderList(formattedMatches, searchTerm);
+        } else if (searchTerm.length > 0) {
+          members = await app.search.searchMentionableAddresses(searchTerm, {
+            pageSize: 10,
+            chainScope: app.activeChainId(),
+          });
+          formattedMatches = members.map((addr) => {
+            const profile = app.newProfiles.getProfile(
+              addr.chain,
+              addr.address
+            );
+            const node = document.createElement('div');
+
+            const avatar = document.createElement('img');
+            (avatar as HTMLImageElement).src = profile.avatarUrl;
+            avatar.className = 'ql-mention-avatar';
+            node.appendChild(avatar);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.innerText = addr.name;
+            nameSpan.className = 'ql-mention-name';
+
+            const addrSpan = document.createElement('span');
+            addrSpan.innerText =
+              addr.chain === 'near'
+                ? addr.address
+                : `${addr.address.slice(0, 6)}...`;
+            addrSpan.className = 'ql-mention-addr';
+
+            const lastActiveSpan = document.createElement('span');
+            lastActiveSpan.innerText = profile.lastActive
+              ? `Last active ${moment(profile.lastActive).fromNow()}`
+              : null;
+            lastActiveSpan.className = 'ql-mention-la';
+
+            const textWrap = document.createElement('div');
+            textWrap.className = 'ql-mention-text-wrap';
+
+            node.appendChild(avatar);
+            textWrap.appendChild(nameSpan);
+            textWrap.appendChild(addrSpan);
+            textWrap.appendChild(lastActiveSpan);
+            node.appendChild(textWrap);
+
+            return {
+              link: `/${addr.chain}/account/${addr.address}`,
+              name: addr.name,
+              component: node.outerHTML,
+            };
+          });
+        }
+        renderList(formattedMatches, searchTerm);
+      },
+      isolateChar: true,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="QuillEditorWrapper">
       {isUploading && <LoadingIndicator />}
@@ -291,6 +431,12 @@ const ReactQuillEditor = ({
           theme="snow"
           value={contentDelta}
           onChange={handleChange}
+          onChangeSelection={(selection: RangeStatic) => {
+            if (!selection) {
+              return;
+            }
+            lastSelectionRef.current = selection;
+          }}
           modules={{
             toolbar,
             imageDropAndPaste: {
@@ -299,6 +445,7 @@ const ReactQuillEditor = ({
             clipboard: {
               matchers: clipboardMatchers,
             },
+            mention,
           }}
         />
       )}
