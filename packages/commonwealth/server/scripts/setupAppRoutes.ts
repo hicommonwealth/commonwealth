@@ -1,9 +1,9 @@
 import cheerio from 'cheerio';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -133,6 +133,47 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image);
   });
 
+  const renderThread = async (
+    scope: string,
+    threadId: string,
+    res,
+    chain?: ChainInstance
+  ) => {
+    chain = chain || (await models.Chain.findOne({ where: { id: scope } }));
+
+    // Retrieve discussions
+    const thread = await models.Thread.findOne({
+      where: { id: threadId },
+      include: [
+        {
+          model: models.Chain,
+        },
+        {
+          model: models.Address,
+          as: 'Address',
+        },
+      ],
+    });
+
+    const title = thread ? decodeTitle(thread.title) : '';
+    const description = thread ? thread.plaintext : '';
+    const image = chain
+      ? `https://commonwealth.im${chain.icon_url}`
+      : DEFAULT_COMMONWEALTH_LOGO;
+
+    let author;
+    try {
+      const profile = await models.Profile.findOne({
+        where: { id: thread.Address.id },
+      });
+      author = profile.profile_name;
+    } catch (e) {
+      author = '';
+    }
+
+    renderWithMetaTags(res, title, description, author, image);
+  };
+
   const renderProposal = async (
     scope: string,
     proposalType: string,
@@ -141,46 +182,15 @@ const setupAppRoutes = (
     chain?: ChainInstance
   ) => {
     // Retrieve title, description, and author from the database
-    let title, description, author, image;
     chain = chain || (await models.Chain.findOne({ where: { id: scope } }));
 
-    if (proposalType === 'discussion' && proposalId !== null) {
-      // Retrieve discussions
-      const proposal = await models.Thread.findOne({
-        where: { id: proposalId },
-        include: [
-          {
-            model: models.Chain,
-          },
-          {
-            model: models.Address,
-            as: 'Address',
-          },
-        ],
-      });
+    const title = chain ? chain.name : 'Commonwealth';
+    const description = '';
+    const image = chain
+      ? `https://commonwealth.im${chain.icon_url}`
+      : DEFAULT_COMMONWEALTH_LOGO;
+    const author = '';
 
-      title = proposal ? decodeTitle(proposal.title) : '';
-
-      description = proposal ? proposal.plaintext : '';
-      image = chain
-        ? `https://commonwealth.im${chain.icon_url}`
-        : DEFAULT_COMMONWEALTH_LOGO;
-      try {
-        const profile = await models.Profile.findOne({
-          where: { id: proposal.Address.id },
-        });
-        author = profile.profile_name;
-      } catch (e) {
-        author = '';
-      }
-    } else {
-      title = chain ? chain.name : 'Commonwealth';
-      description = '';
-      image = chain
-        ? `https://commonwealth.im${chain.icon_url}`
-        : DEFAULT_COMMONWEALTH_LOGO;
-      author = '';
-    }
     renderWithMetaTags(res, title, description, author, image);
   };
 
@@ -193,9 +203,8 @@ const setupAppRoutes = (
 
   app.get('/:scope/discussion/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const proposalType = ProposalType.Thread;
-    const proposalId = req.params.identifier.split('-')[0];
-    await renderProposal(scope, proposalType, proposalId, res);
+    const threadId = req.params.identifier.split('-')[0];
+    await renderThread(scope, threadId, res);
   });
 
   app.get('/:scope/proposal/:identifier', async (req, res) => {
