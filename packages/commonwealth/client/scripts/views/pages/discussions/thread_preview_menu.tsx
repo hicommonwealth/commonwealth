@@ -8,6 +8,7 @@ import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popove
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { notifySuccess } from '../../../controllers/app/notifications';
 import { ThreadActionType } from '../../../../../shared/types';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 type ThreadPreviewMenuProps = {
   thread: Thread;
@@ -37,6 +38,35 @@ export const ThreadPreviewMenu = ({
 
   const isAuthor =
     app.user.activeAccount && thread.author === app.user.activeAccount.address;
+
+  const handleDeleteThread = () => {
+    openConfirmation({
+      title: 'Delete Thread',
+      description: <>Delete this entire thread?</>,
+      buttons: [
+        {
+          label: 'Delete',
+          buttonType: 'mini-red',
+          onClick: async () => {
+            try {
+              app.threads.delete(thread).then(() => {
+                app.threadUpdateEmitter.emit('threadUpdated', {
+                  threadId: thread.id,
+                  action: ThreadActionType.Deletion,
+                });
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+        {
+          label: 'Cancel',
+          buttonType: 'mini-black',
+        },
+      ],
+    });
+  };
 
   return (
     <React.Fragment>
@@ -110,20 +140,7 @@ export const ThreadPreviewMenu = ({
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onClick: async () => {
-                      const confirmed = window.confirm(
-                        'Delete this entire thread?'
-                      );
-
-                      if (!confirmed) return;
-
-                      app.threads.delete(thread).then(() => {
-                        app.threadUpdateEmitter.emit('threadUpdated', {
-                          threadId: thread.id,
-                          action: ThreadActionType.Deletion,
-                        });
-                      });
-                    },
+                    onClick: handleDeleteThread,
                     label: 'Delete',
                     iconLeft: 'trash' as const,
                   },

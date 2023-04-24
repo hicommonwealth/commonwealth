@@ -46,6 +46,13 @@ class GqlLazyLoader {
       symbol
       private
       network
+      validation {
+        params
+      }
+      voting {
+        period
+        delay
+      }
       filters {
         minScore
         onlyMembers
@@ -162,6 +169,15 @@ export interface SnapshotSpace {
   symbol: string;
   private: boolean;
   network: string;
+  validation: {
+    params: {
+      minScore: number;
+    };
+  };
+  voting: {
+    period: number;
+    delay: number;
+  };
   filters: {
     minScore: number;
     onlyMembers: boolean;
