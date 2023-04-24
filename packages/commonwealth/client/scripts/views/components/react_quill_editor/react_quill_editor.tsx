@@ -309,8 +309,7 @@ const ReactQuillEditor = ({
       ) => {
         if (mentionChar !== '@') return;
 
-        let members = [];
-        let formattedMatches;
+        let formattedMatches = [];
         if (searchTerm.length === 0) {
           const node = document.createElement('div');
           const tip = document.createElement('span');
@@ -323,12 +322,14 @@ const ReactQuillEditor = ({
               component: node.outerHTML,
             },
           ];
-          renderList(formattedMatches, searchTerm);
         } else if (searchTerm.length > 0) {
-          members = await app.search.searchMentionableAddresses(searchTerm, {
-            pageSize: 10,
-            chainScope: app.activeChainId(),
-          });
+          const members = await app.search.searchMentionableAddresses(
+            searchTerm,
+            {
+              pageSize: 10,
+              chainScope: app.activeChainId(),
+            }
+          );
           formattedMatches = members.map((addr) => {
             const profile = app.newProfiles.getProfile(
               addr.chain,
