@@ -24,7 +24,7 @@ import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
-import { link, linkSource } from 'server/models/thread';
+import { Link, LinkSource } from 'server/models/thread';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -524,7 +524,7 @@ class ThreadsController {
    */
   public async addLinks (args: {
     threadId: number;
-    links: link[];
+    links: Link[];
   }): Promise<Thread>{
     const response = await $.ajax({
       url: `${app.serverUrl()}/linking/addThreadLink`,
@@ -545,7 +545,7 @@ class ThreadsController {
    */
   public async deleteLinks (args: {
     threadId: number;
-    links: link[];
+    links: Link[];
   }): Promise<Thread> {
     const response = await $.ajax({
       url: `${app.serverUrl()}/linking/deleteLinks`,
@@ -565,7 +565,7 @@ class ThreadsController {
    */
   public async getLinksForThread (args: {
     threadId: number,
-    linkType?: linkSource
+    linkType?: LinkSource
   }): Promise<string[]>
   {
     const response = await $.ajax({
@@ -586,7 +586,7 @@ class ThreadsController {
    * @returns A list of resolved thread objects 
    */
   public async getThreadsForLink (args: {
-    link: link
+    link: Link
   }): Promise<Thread[]>
   {
     const response = await $.ajax({

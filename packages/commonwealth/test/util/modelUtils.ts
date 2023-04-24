@@ -26,6 +26,7 @@ import {
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../shared/adapters/chain/ethereum/keys';
+import { Link, LinkSource } from 'server/models/thread';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -231,6 +232,43 @@ export const createThread = async (args: ThreadArgs) => {
       readOnly: readOnly || false,
       jwt,
     });
+  return res.body;
+};
+
+type createDeleteLinkArgs = {
+  thread_id: number;
+  links: Link[];
+  jwt: any;
+};
+export const createLink = async (args: createDeleteLinkArgs) => {
+  const res = await chai.request
+    .agent(app)
+    .post('/api/linking/addThreadLinks')
+    .set('Accept', 'application/json')
+    .send(args);
+  return res.body;
+};
+
+export const deleteLink = async (args: createDeleteLinkArgs) => {
+  const res = await chai.request
+    .agent(app)
+    .delete('/api/linking/deleteLinks')
+    .set('Accept', 'application/json')
+    .send(args);
+  return res.body;
+};
+
+type getLinksArgs = {
+  thread_id?: number;
+  linkType?: LinkSource;
+  link?: Link;
+};
+export const getLinks = async (args: getLinksArgs) => {
+  const res = await chai.request
+    .agent(app)
+    .post('/api/linking/getLinks')
+    .set('Accept', 'application/json')
+    .send(args);
   return res.body;
 };
 

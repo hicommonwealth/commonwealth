@@ -180,9 +180,9 @@ import { createTemplate, getTemplates } from '../routes/templates';
 
 import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
-import addThreadLink from 'server/routes/linking/addThreadLinks';
-import deleteThreadLinks from 'server/routes/linking/deleteThreadLinks';
-import getLinks from 'server/routes/linking/getLinks';
+import addThreadLink from '../routes/linking/addThreadLinks';
+import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
+import getLinks from '../routes/linking/getLinks';
 
 function setupRouter(
   endpoint: string,
@@ -962,7 +962,7 @@ function setupRouter(
     addThreadLink.bind(this, models)
   );
 
-  router.post(
+  router.delete(
     '/linking/deleteLinks',
     passport.authenticate('jwt', { session: false }),
     deleteThreadLinks.bind(this, models)
@@ -973,7 +973,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     getLinks.bind(this, models)
   );
-
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));

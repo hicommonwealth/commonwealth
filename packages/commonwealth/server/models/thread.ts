@@ -8,17 +8,17 @@ import type { LinkedThreadAttributes } from './linked_thread';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 
-export enum linkSource {
+export enum LinkSource {
   Snapshot = 'snapshot',
   Proposal = 'proposal',
   Thread = 'thread',
-  Web = 'web'
+  Web = 'web',
 }
 
-export type link = {
-  source: linkSource;
+export type Link = {
+  source: LinkSource;
   identifier: string;
-}
+};
 
 export type ThreadAttributes = {
   address_id: number;
@@ -33,7 +33,7 @@ export type ThreadAttributes = {
   pinned?: boolean;
   chain: string;
   view_count: number;
-  links: link[] | null;
+  links: Link[] | null;
 
   read_only?: boolean;
   version_history?: string[];
@@ -108,7 +108,7 @@ export default (
         allowNull: false,
       },
       snapshot_proposal: { type: dataTypes.STRING(48), allowNull: true },
-      inks: {type: dataTypes.JSONB, allowNull: true},
+      links: { type: dataTypes.JSONB, allowNull: true },
 
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
