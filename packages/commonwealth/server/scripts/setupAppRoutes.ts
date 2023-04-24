@@ -176,8 +176,6 @@ const setupAppRoutes = (
 
   const renderProposal = async (
     scope: string,
-    proposalType: string,
-    proposalId: string,
     res,
     chain?: ChainInstance
   ) => {
@@ -196,38 +194,35 @@ const setupAppRoutes = (
 
   app.get('/:scope/proposal/:type/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const proposalType = req.params.type;
-    const proposalId = req.params.identifier.split('-')[0];
-    await renderProposal(scope, proposalType, proposalId, res);
+    await renderProposal(scope, res);
   });
 
   app.get('/:scope/discussion/:identifier', async (req, res) => {
     const scope = req.params.scope;
     const threadId = req.params.identifier.split('-')[0];
+    if (isNaN(threadId)){
+      return; // don't render because thread ID needs to be a number
+    }
     await renderThread(scope, threadId, res);
   });
 
   app.get('/:scope/proposal/:identifier', async (req, res) => {
     const scope = req.params.scope;
-    const proposalId = req.params.identifier.split('-')[0];
     const chain = await models.Chain.findOne({ where: { id: scope } });
 
-    // derive proposal type from scope if possible
-    let proposalType;
-    if (chain?.base === ChainBase.CosmosSDK) {
-      proposalType = ProposalType.CosmosProposal;
-    } else if (chain?.network === ChainNetwork.Sputnik) {
-      proposalType = ProposalType.SputnikProposal;
-    } else if (chain?.network === ChainNetwork.Compound) {
-      proposalType = ProposalType.CompoundProposal;
-    } else if (chain?.network === ChainNetwork.Aave) {
-      proposalType = ProposalType.AaveProposal;
-    } else {
+    const proposalTypes = new Set([
+      ChainBase.CosmosSDK,
+      ChainNetwork.Sputnik,
+      ChainNetwork.Compound,
+      ChainNetwork.Aave
+    ]);
+
+    if (!proposalTypes.has(chain?.base)) {
       renderWithMetaTags(res, '', '', '', null);
       return;
     }
 
-    await renderProposal(scope, proposalType, proposalId, res, chain);
+    await renderProposal(scope, res, chain);
   });
 
   app.get('*', (req, res) => {
