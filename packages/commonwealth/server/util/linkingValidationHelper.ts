@@ -18,8 +18,7 @@ export const isAuthorOrAdmin = async (
   models: DB,
   address: AddressInstance[],
   address_id: number,
-  chain: string,
-  next: NextFunction
+  chain: string
 ) => {
   const userOwnedAddressIds = address
     .filter((addr) => !!addr.verified)
@@ -32,9 +31,12 @@ export const isAuthorOrAdmin = async (
       chain,
       ['admin', 'moderator']
     );
+    if (roles.length === 0) return false;
     const role = roles.find((r) => {
       return r.chain_id === chain;
     });
-    if (!role) return next(new AppError(Errors.NotAdminOrOwner));
+    if (!role) return false;
+  } else {
+    return true;
   }
 };

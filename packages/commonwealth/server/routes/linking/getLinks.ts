@@ -18,6 +18,9 @@ const getLinks = async (
   }: { thread_id?: number; linkType: LinkSource; link?: Link } = req.body;
   let links;
   let threads;
+  if (!link && !thread_id) {
+    return next(new AppError(Errors.InvalidParameter));
+  }
   if (thread_id) {
     const thread = await models.Thread.findOne({
       where: {
@@ -45,8 +48,6 @@ const getLinks = async (
             return { id: thr.id, title: thr.title };
           })
         : [];
-  } else {
-    return next(new AppError(Errors.InvalidParameter));
   }
 
   return res.json({

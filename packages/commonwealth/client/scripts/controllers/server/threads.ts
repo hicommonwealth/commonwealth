@@ -519,13 +519,13 @@ class ThreadsController {
   }
   /**
    * Add a set of links to a Thread
-   * @param args 
+   * @param args
    * @returns updated Thread
    */
-  public async addLinks (args: {
+  public async addLinks(args: {
     threadId: number;
     links: Link[];
-  }): Promise<Thread>{
+  }): Promise<Thread> {
     const response = await $.ajax({
       url: `${app.serverUrl()}/linking/addThreadLink`,
       type: 'POST',
@@ -533,17 +533,18 @@ class ThreadsController {
         thread_id: args.threadId,
         links: args.links,
         jwt: app.user.jwt,
-      }})
+      },
+    });
     // Resolve response to a thread object
-    return response
+    return response;
   }
 
   /**
    * Deletes a set of Links
-   * @param args 
+   * @param args
    * @returns updated Thread
    */
-  public async deleteLinks (args: {
+  public async deleteLinks(args: {
     threadId: number;
     links: Link[];
   }): Promise<Thread> {
@@ -554,20 +555,20 @@ class ThreadsController {
         thread_id: args.threadId,
         links: args.links,
         jwt: app.user.jwt,
-      }})
-    return response
+      },
+    });
+    return response;
   }
 
   /**
    * Gets all links or filtered by linkType for a thread id
-   * @param args 
+   * @param args
    * @returns list of resolved links using adapters + link object
    */
-  public async getLinksForThread (args: {
-    threadId: number,
-    linkType?: LinkSource
-  }): Promise<string[]>
-  {
+  public async getLinksForThread(args: {
+    threadId: number;
+    linkType?: LinkSource;
+  }): Promise<string[]> {
     const response = await $.ajax({
       url: `${app.serverUrl()}/linking/getLinks`,
       type: 'POST',
@@ -575,29 +576,28 @@ class ThreadsController {
         thread_id: args.threadId,
         source: args.linkType,
         jwt: app.user.jwt,
-      }})
+      },
+    });
     // This may need to include an adapter that resolves response as an actual link
-    return response
+    return response;
   }
 
   /**
    * gets all threads associated with a link(ie all threads linked to 1 proposal)
-   * @param args 
-   * @returns A list of resolved thread objects 
+   * @param args
+   * @returns A list of resolved thread objects
    */
-  public async getThreadsForLink (args: {
-    link: Link
-  }): Promise<Thread[]>
-  {
+  public async getThreadsForLink(args: { link: Link }): Promise<Thread[]> {
     const response = await $.ajax({
       url: `${app.serverUrl()}/linking/getLinks`,
       type: 'POST',
       data: {
         link: args.link,
         jwt: app.user.jwt,
-      }})
-    // Resolve Thread ids list in response to Thread 
-    return response
+      },
+    });
+    // Resolve Thread ids list in response to Thread
+    return response;
   }
 
   //PROPOSAL LINKING TODO: Remove this + reimplement in above fns

@@ -12,7 +12,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Linking Tests', () => {
-  const chain = 'test_chain';
+  const chain = 'ethereum';
 
   const title = 'test title';
   const body = 'test body';
@@ -58,29 +58,33 @@ describe('Linking Tests', () => {
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
-    thread1 = await modelUtils.createThread({
-      address: userAddress,
-      kind,
-      stage,
-      chainId: chain,
-      title,
-      topicName,
-      topicId,
-      body,
-      jwt: userJWT,
-    });
+    thread1 = (
+      await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        stage,
+        chainId: chain,
+        title,
+        topicName,
+        topicId,
+        body,
+        jwt: userJWT,
+      })
+    ).result;
 
-    thread2 = await modelUtils.createThread({
-      address: adminAddress,
-      kind,
-      stage,
-      chainId: chain,
-      title,
-      topicName,
-      topicId,
-      body,
-      jwt: userJWT,
-    });
+    thread2 = (
+      await modelUtils.createThread({
+        address: adminAddress,
+        kind,
+        stage,
+        chainId: chain,
+        title,
+        topicName,
+        topicId,
+        body,
+        jwt: adminJWT,
+      })
+    ).result;
   });
 
   describe('/linking/addThreadLinks', () => {
@@ -93,7 +97,7 @@ describe('Linking Tests', () => {
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
       expect(result.result.links[0].source).to.equal(link1.source.toString());
-      expect(result.result.links[0].source).to.equal(link1.identifier);
+      expect(result.result.links[0].identifier).to.equal(link1.identifier);
     });
     it('should add multiple links to existing links', async () => {
       const result = await modelUtils.createLink({
@@ -121,13 +125,6 @@ describe('Linking Tests', () => {
       expect(result.error).to.be.equal(Errors.LinksExist);
     });
     it('should access control adding links', async () => {
-      const result = await modelUtils.createLink({
-        jwt: adminJWT,
-        thread_id: thread2.id,
-        links: [link3],
-      });
-      expect(result.status).to.equal('Success');
-      expect(result.result).to.not.be.null;
       const result2 = await modelUtils.createLink({
         jwt: userJWT,
         thread_id: thread2.id,
@@ -136,6 +133,13 @@ describe('Linking Tests', () => {
       expect(result2).to.not.be.null;
       expect(result2.error).to.not.be.null;
       expect(result2.error).to.be.equal(Errors.NotAdminOrOwner);
+      const result = await modelUtils.createLink({
+        jwt: adminJWT,
+        thread_id: thread2.id,
+        links: [link3],
+      });
+      expect(result.status).to.equal('Success');
+      expect(result.result).to.not.be.null;
     });
     it('should filter duplicate links and add new', async () => {
       const result = await modelUtils.createLink({
@@ -153,7 +157,10 @@ describe('Linking Tests', () => {
 
   describe('/linking/getLinks', () => {
     it('Can get all links for thread', async () => {
-      const result = await modelUtils.getLinks({ thread_id: thread1.id });
+      const result = await modelUtils.getLinks({
+        thread_id: thread1.id,
+        jwt: userJWT,
+      });
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
       expect(result.result.links[0].source).to.equal(link1.source.toString());
@@ -167,6 +174,7 @@ describe('Linking Tests', () => {
       const result = await modelUtils.getLinks({
         thread_id: thread1.id,
         linkType: LinkSource.Snapshot,
+        jwt: userJWT,
       });
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
@@ -174,12 +182,16 @@ describe('Linking Tests', () => {
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
     });
     it('Can get all threads linked to a link', async () => {
-      const result = await modelUtils.getLinks({ link: link3 });
+      const result = await modelUtils.getLinks({ link: link3, jwt: userJWT });
       expect(result.status).to.equal('Success');
       expect(result.result).to.not.be.null;
-      expect(result.result.links.length).to.equal(2);
-      expect(result.result.links).to.contain(thread1.id);
-      expect(result.result.links).to.contain(thread2.id);
+      expect(result.result.threads.length).to.equal(2);
+      expect(result.result.threads.map((item) => item.id)).to.contain(
+        thread1.id
+      );
+      expect(result.result.threads.map((item) => item.id)).to.contain(
+        thread2.id
+      );
     });
   });
 

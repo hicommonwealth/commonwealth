@@ -18,13 +18,13 @@ const deleteThreadLinks = async (
   });
   if (!thread) return next(new AppError(Errors.NoThread));
 
-  await isAuthorOrAdmin(
+  const isAuth = await isAuthorOrAdmin(
     models,
     await req.user.getAddresses(),
     thread.address_id,
-    thread.chain,
-    next
+    thread.chain
   );
+  if (!isAuth) return next(new AppError(Errors.NotAdminOrOwner));
 
   const filteredLinks = thread.links.filter((link) => {
     return !links.some(

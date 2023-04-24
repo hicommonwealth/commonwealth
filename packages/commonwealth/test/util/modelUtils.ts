@@ -262,7 +262,9 @@ type getLinksArgs = {
   thread_id?: number;
   linkType?: LinkSource;
   link?: Link;
+  jwt: any;
 };
+
 export const getLinks = async (args: getLinksArgs) => {
   const res = await chai.request
     .agent(app)

@@ -20,13 +20,13 @@ const addThreadLink = async (
   });
   if (!thread) return next(new AppError(Errors.NoThread));
 
-  await isAuthorOrAdmin(
+  const isAuth = await isAuthorOrAdmin(
     models,
     await req.user.getAddresses(),
     thread.address_id,
-    thread.chain,
-    next
+    thread.chain
   );
+  if (!isAuth) return next(new AppError(Errors.NotAdminOrOwner));
 
   if (thread.links) {
     const filteredLinks = links.filter((link) => {
