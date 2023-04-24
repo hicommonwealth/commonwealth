@@ -38,7 +38,7 @@ interface InfoOrder {
 
 const infosOrder: InfoOrder[] = [
   { key: 'displayName', label: 'Display Name' },
-  { key: 'nickname', label: 'Nickname' },
+  { key: 'nickname', label: 'Enable action' },
   { key: 'slug', label: 'Slug' },
   { key: 'display', label: 'Display' },
 ];

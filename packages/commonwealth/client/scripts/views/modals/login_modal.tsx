@@ -1,9 +1,5 @@
 import React from 'react';
 
-import {
-  chainBasetoCanvasChain,
-  constructCanvasMessage,
-} from 'adapters/shared';
 import _ from 'lodash';
 import app, { initAppState } from 'state';
 import { ChainBase } from 'common-common/src/types';
@@ -307,6 +303,13 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
           );
         }
         await logInWithAccount(this.primaryAccount, false);
+        // Important: when we first create an account and verify it, the user id
+        // is initially null from api (reloading the page will update it), to correct
+        // it we need to get the id from api
+        await app.newProfiles.updateProfileForAccount(
+          this.primaryAccount.profile.address,
+          {}
+        );
       } catch (e) {
         console.log(e);
         notifyError('Failed to create account. Please try again.');

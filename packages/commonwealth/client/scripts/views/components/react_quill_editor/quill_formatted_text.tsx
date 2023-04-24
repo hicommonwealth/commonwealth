@@ -20,7 +20,7 @@ export const QuillFormattedText = ({
   hideFormatting,
   cutoffLines,
   openLinksInNewTab,
-  searchTerm
+  searchTerm,
 }: QuillFormattedTextProps) => {
   const navigate = useCommonNavigate();
 
@@ -36,7 +36,7 @@ export const QuillFormattedText = ({
   const truncatedDoc: DeltaStatic = useMemo(() => {
     if (isTruncated) {
       return {
-        ops: [...doc.ops.slice(0, cutoffLines)]
+        ops: [...doc.ops.slice(0, cutoffLines)],
       } as DeltaStatic;
     }
     return doc;
@@ -46,11 +46,19 @@ export const QuillFormattedText = ({
   const finalDoc = useMemo(() => {
     // if no search term, just render the doc normally
     if (!searchTerm) {
-      return renderQuillDelta(truncatedDoc, hideFormatting, false, openLinksInNewTab, navigate);
+      return renderQuillDelta(
+        truncatedDoc,
+        hideFormatting,
+        false,
+        openLinksInNewTab,
+        navigate
+      );
     }
 
     // get text from doc and replace new lines with spaces
-    const docText = getTextFromDelta(truncatedDoc).replace(/\n/g, ' ').replace(/\+/g, ' ');
+    const docText = getTextFromDelta(truncatedDoc)
+      .replace(/\n/g, ' ')
+      .replace(/\+/g, ' ');
 
     const textWithHighlights = renderTruncatedHighlights(searchTerm, docText);
 
@@ -62,7 +70,12 @@ export const QuillFormattedText = ({
 
   return (
     <>
-      <div className={getClasses<{ collapsed?: boolean }>({ collapsed: isTruncated }, 'MarkdownFormattedText')}>
+      <div
+        className={getClasses<{ collapsed?: boolean }>(
+          { collapsed: isTruncated },
+          'MarkdownFormattedText'
+        )}
+      >
         {finalDoc}
       </div>
       {isTruncated && (

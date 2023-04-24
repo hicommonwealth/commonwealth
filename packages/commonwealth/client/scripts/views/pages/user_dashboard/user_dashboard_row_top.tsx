@@ -59,7 +59,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       }
       linkify
       avatarSize={16}
-      onclick={(e: any) => {
+      onClick={(e: any) => {
         e.preventDefault();
         e.stopPropagation();
         navigate(`/${author_chain}/account/${author_address}`);

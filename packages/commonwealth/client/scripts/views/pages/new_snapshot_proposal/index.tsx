@@ -1,6 +1,5 @@
 import React, { FormEvent, useEffect, useMemo, useState } from 'react';
 
-import { parsePathname } from 'mithrilInterop';
 import moment from 'moment';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type { SnapshotSpace } from 'helpers/snapshot_utils';
@@ -20,7 +19,7 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import type { ThreadForm } from './types';
-import withRouter, { useCommonNavigate } from 'navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import { useLocation } from 'react-router';
 import {
   createDeltaFromText,
@@ -151,19 +150,19 @@ export const NewSnapshotProposalPageComponent = ({
       (member) => member.toLowerCase() === author.address.toLowerCase()
     );
 
-  const hasMinScore = userScore >= space.filters?.minScore;
+  const minScoreFromSpace =
+    space.validation?.params.minScore ?? space.filters?.minScore; // Fall back to filters
+
+  const hasMinScore = userScore >= minScoreFromSpace;
 
   const showScoreWarning =
-    space.filters?.minScore > 0 &&
-    !hasMinScore &&
-    !isMember &&
-    userScore !== null;
+    minScoreFromSpace > 0 && !hasMinScore && !isMember && userScore !== null;
 
   const isValid =
     !!space &&
     (!space.filters?.onlyMembers || (space.filters?.onlyMembers && isMember)) &&
-    (space.filters?.minScore === 0 ||
-      (space.filters?.minScore > 0 && userScore > space.filters?.minScore) ||
+    (minScoreFromSpace === 0 ||
+      (minScoreFromSpace > 0 && userScore > minScoreFromSpace) ||
       isMember);
 
   return (
@@ -238,29 +237,6 @@ export const NewSnapshotProposalPageComponent = ({
             });
           }}
         />
-        <div className="date-range">
-          <CWLabel label="Date Range" />
-          <CWRadioGroup
-            name="period"
-            options={[{ value: '4d', label: '4-day' }]}
-            toggledOption="4d"
-            onChange={(e: FormEvent<HTMLInputElement>) => {
-              const values: Partial<ThreadForm> = {
-                range: e.currentTarget.value,
-                start: new Date().getTime(),
-              };
-
-              if (form.range === '4d') {
-                form.end = moment().add(4, 'days').toDate().getTime();
-              }
-
-              setForm({
-                ...form,
-                ...values,
-              });
-            }}
-          />
-        </div>
         <ReactQuillEditor
           contentDelta={contentDelta}
           setContentDelta={setContentDelta}

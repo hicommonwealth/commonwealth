@@ -6,6 +6,8 @@ import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
+import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/proposal-v1';
 import type { ProposalModule } from 'models';
 
 import 'pages/proposals.scss';
@@ -96,6 +98,7 @@ const ProposalsPage = () => {
     app.chain.base === ChainBase.CosmosSDK &&
     (app.chain as Cosmos).governance.store
       .getAll()
+      .map((p) => p as CosmosProposal | CosmosProposalV1)
       .filter((p) => !p.completed)
       .sort((a, b) => +b.identifier - +a.identifier);
 
@@ -126,7 +129,11 @@ const ProposalsPage = () => {
     !activeCompoundProposals?.length &&
     !activeAaveProposals?.length &&
     !activeSputnikProposals?.length
-      ? [<div className="no-proposals">No active proposals</div>]
+      ? [
+          <div key={'no-active'} className="no-proposals">
+            No active proposals
+          </div>,
+        ]
       : (activeDemocracyProposals || [])
           .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
           .concat(
@@ -171,6 +178,7 @@ const ProposalsPage = () => {
     app.chain.base === ChainBase.CosmosSDK &&
     (app.chain as Cosmos).governance.store
       .getAll()
+      .map((p) => p as CosmosProposal | CosmosProposalV1)
       .filter((p) => p.completed)
       .sort((a, b) => +b.identifier - +a.identifier);
 
@@ -201,7 +209,11 @@ const ProposalsPage = () => {
     !inactiveCompoundProposals?.length &&
     !inactiveAaveProposals?.length &&
     !inactiveSputnikProposals?.length
-      ? [<div className="no-proposals">No past proposals</div>]
+      ? [
+          <div key={'no-inactive'} className="no-proposals">
+            No past proposals
+          </div>,
+        ]
       : (inactiveDemocracyProposals || [])
           .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
           .concat(

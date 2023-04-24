@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import 'components/token_decimal_input.scss';
 
@@ -19,13 +19,29 @@ export const TokenDecimalInput = (props: TokenDecimalInputProps) => {
   const [displayValue, setDisplayValue] = React.useState<string>(
     defaultValueInWei || '0'
   );
-  const [isInputInWei, setIsInputInWei] = React.useState<boolean>(true);
+  const [isInputInWei, setIsInputInWei] = React.useState<boolean>(false);
   const [caption, setCaption] = React.useState<string>(
-    'Using base token value'
+    `Using ${decimals} decimal precision`
   );
   const [valueInWei, setValueInWei] = React.useState<string>(
     defaultValueInWei || '0'
   );
+
+  useEffect(() => {
+    if (isInputInWei) {
+      setCaption('Using base token value');
+      // token -> wei
+      setDisplayValue(tokensToWei(displayValue, decimals));
+    } else {
+      setCaption(`Using ${decimals} decimal precision`);
+      // wei -> token
+      setDisplayValue(weiToTokens(displayValue, decimals));
+    }
+  }, [isInputInWei]);
+
+  useEffect(() => {
+    onInputChange(valueInWei);
+  }, [valueInWei]);
 
   return (
     <div className="TokenDecimalInput">
@@ -48,10 +64,10 @@ export const TokenDecimalInput = (props: TokenDecimalInputProps) => {
 
             try {
               setValueInWei(
-                isInputInWei ? inputNumber : tokensToWei(inputNumber, decimals)
+                isInputInWei || !inputNumber
+                  ? inputNumber
+                  : tokensToWei(inputNumber, decimals)
               );
-
-              onInputChange(valueInWei);
             } catch (err) {
               console.log(`Input conversion failed: ${v.target.value}`);
             }
@@ -63,19 +79,10 @@ export const TokenDecimalInput = (props: TokenDecimalInputProps) => {
       {decimals > 0 && (
         <div className="token-settings">
           <CWToggle
+            disabled={!displayValue}
             checked={!isInputInWei}
             onChange={() => {
               setIsInputInWei(!isInputInWei);
-
-              if (isInputInWei) {
-                setCaption('Using base token value');
-                // token -> wei
-                setDisplayValue(tokensToWei(displayValue, decimals));
-              } else {
-                setCaption(`Using ${decimals} decimal precision`);
-                // wei -> token
-                setDisplayValue(weiToTokens(displayValue, decimals));
-              }
             }}
           />
           <CWText type="caption" className="toggle-caption-text">

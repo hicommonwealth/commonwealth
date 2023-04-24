@@ -57,7 +57,14 @@ const createComment = async (
 
   const author = req.address;
 
-  const { parent_id, thread_id, text, canvas_action, canvas_session, canvas_hash } = req.body;
+  const {
+    parent_id,
+    thread_id,
+    text,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
 
   if (!thread_id) {
     return next(new AppError(Errors.MissingRootId));
@@ -316,7 +323,7 @@ const createComment = async (
   emitNotifications(
     models,
     NotificationCategories.NewComment,
-    thread_id,
+    `discussion_${thread_id}`,
     {
       created_at: new Date(),
       thread_id: thread_id,

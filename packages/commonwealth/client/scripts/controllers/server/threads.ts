@@ -49,7 +49,7 @@ rendered on the listing—and receiving the next page worth of threads (typicall
 
 When a user navigates to a proposal page that has not been fetched through these bulk calls,
 the proposal component calls the controller fetchThread fn, which fetches an individual thread
-by an id, then returns it after addinig it to threads.store. These threads are *not* added
+by an id, then returns it after adding it to threads.store. These threads are *not* added
 to the listingStore, since they do not belong in the listing component, and their presence
 would break the listingStore's careful chronology.
 
@@ -97,6 +97,11 @@ class ThreadsController {
   }
 
   public numVotingThreads: number;
+  private _resetPagination: boolean;
+
+  public resetPagination() {
+    this._resetPagination = true;
+  }
 
   public getType(primary: string, secondary?: string, tertiary?: string) {
     const result = this._store.getAll().filter((thread) => {
@@ -453,6 +458,7 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
+        app.threadUpdateEmitter.emit('threadUpdated', {});
         return result;
       },
       error: (err) => {
@@ -708,6 +714,12 @@ class ThreadsController {
     stageName?: string;
     includePinnedThreads?: boolean;
   }) {
+    // Used to reset pagination when switching between topics
+    if (this._resetPagination) {
+      this.listingStore.clear();
+      this._resetPagination = false;
+    }
+
     if (this.listingStore.isDepleted(options)) {
       return;
     }
@@ -756,8 +768,11 @@ class ThreadsController {
       const lastThread = unPinnedThreads.sort(orderDiscussionsbyLastComment)[
         unPinnedThreads.length - 1
       ];
-      const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
-      this.listingStore.setCutoffDate(options, cutoffDate);
+
+      if (lastThread) {
+        const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
+        this.listingStore.setCutoffDate(options, cutoffDate);
+      }
     }
 
     await Promise.all([
@@ -799,10 +814,12 @@ class ThreadsController {
     }
     this.numVotingThreads = numVotingThreads;
     this._initialized = true;
+    this._resetPagination = true;
   }
 
   public deinit() {
     this._initialized = false;
+    this._resetPagination = true;
     this._store.clear();
     this._listingStore.clear();
   }

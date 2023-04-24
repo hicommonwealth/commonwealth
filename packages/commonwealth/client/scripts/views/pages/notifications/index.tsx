@@ -12,11 +12,11 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { byDescendingCreationDate } from 'helpers';
 
 const NotificationsPage = () => {
+  const [allRead, setAllRead] = useState<boolean>(false);
+
   if (!app.isLoggedIn()) {
     return <PageError message="This page requires you to be logged in." />;
   }
-
-  const [allRead, setAllRead] = useState<boolean>(false);
 
   const discussionNotifications =
     app.user.notifications.discussionNotifications;

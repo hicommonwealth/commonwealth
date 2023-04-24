@@ -1,4 +1,3 @@
-import type { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
 import type {
   CosmosProposalState,
@@ -8,11 +7,8 @@ import type {
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import {
-  DepositParams,
-  Proposal,
   ProposalSDKType,
-  TallyResult,
-  VotingParams,
+  TallyResultSDKType,
 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any';
 import { ProposalStatus } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
@@ -25,8 +21,9 @@ import type CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
 import type CosmosChain from './chain';
 import type { CosmosApiType } from './chain';
-import { CosmosProposal } from './proposal';
+import { CosmosProposalV1 } from './proposal-v1';
 import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
+import { encodeMsgSubmitProposal } from './helpers';
 
 /** This file is a copy of controllers/chain/cosmos/governance.ts, modified for
  * gov module version v1. This is considered a patch to make sure v1-enabled chains
@@ -36,21 +33,21 @@ import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
  * - governance.ts uses cosmJS v1beta1 gov
  * - governance-v1.ts uses telescope-generated v1 gov  */
 
-const stateEnumToString = (status: ProposalStatus): CosmosProposalState => {
+const stateEnumToString = (status: string): CosmosProposalState => {
   switch (status) {
-    case ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED:
+    case 'PROPOSAL_STATUS_UNSPECIFIED':
       return 'Unspecified';
-    case ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD:
+    case 'PROPOSAL_STATUS_DEPOSIT_PERIOD':
       return 'DepositPeriod';
-    case ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD:
+    case 'PROPOSAL_STATUS_VOTING_PERIOD':
       return 'VotingPeriod';
-    case ProposalStatus.PROPOSAL_STATUS_PASSED:
+    case 'PROPOSAL_STATUS_PASSED':
       return 'Passed';
-    case ProposalStatus.PROPOSAL_STATUS_FAILED:
+    case 'PROPOSAL_STATUS_FAILED':
       return 'Failed';
-    case ProposalStatus.PROPOSAL_STATUS_REJECTED:
+    case 'PROPOSAL_STATUS_REJECTED':
       return 'Rejected';
-    case ProposalStatus.UNRECOGNIZED:
+    case 'UNRECOGNIZED':
       return 'Unrecognized';
     default:
       throw new Error(`Invalid proposal state: ${status}`);
@@ -61,29 +58,22 @@ const isCompleted = (status: string): boolean => {
   return status === 'Passed' || status === 'Rejected' || status === 'Failed';
 };
 
-const asciiLiteralToDecimal = async (n: Uint8Array) => {
-  if (!n) return null;
-  // 500000000000000000 = 0.5
-  // dividing by 1000000000000000 gives 3 decimal digits of precision
-  const cosm = await import('@cosmjs/encoding');
-  const nStr = cosm.fromAscii(n);
-  return +new BN(nStr).div(new BN('1000000000000000')) / 1000;
-};
-
-export const marshalTally = (tally: TallyResult): ICosmosProposalTally => {
+export const marshalTallyV1 = (
+  tally: TallyResultSDKType
+): ICosmosProposalTally => {
   if (!tally) return null;
   return {
-    yes: new BN(tally.yesCount),
-    abstain: new BN(tally.abstainCount),
-    no: new BN(tally.noCount),
-    noWithVeto: new BN(tally.noWithVetoCount),
+    yes: new BN(tally.yes_count),
+    abstain: new BN(tally.abstain_count),
+    no: new BN(tally.no_count),
+    noWithVeto: new BN(tally.no_with_veto_count),
   };
 };
 
 class CosmosGovernanceV1 extends ProposalModule<
   CosmosApiType,
   ICosmosProposal,
-  CosmosProposal
+  CosmosProposalV1
 > {
   private _votingPeriodS: number;
   private _yesThreshold: number;
@@ -119,12 +109,13 @@ class CosmosGovernanceV1 extends ProposalModule<
       const { voting_params } = await this._Chain.lcd.cosmos.gov.v1.params({
         paramsType: 'voting',
       });
-      this._votingPeriodS =
-        +VotingParams.fromSDK(voting_params)?.votingPeriod.seconds;
+      this._votingPeriodS = +voting_params.voting_period.replace('s', '');
       this._yesThreshold = +tally_params?.threshold;
       this._vetoThreshold = +tally_params?.veto_threshold;
-      this._maxDepositPeriodS =
-        +DepositParams.fromSDK(deposit_params)?.maxDepositPeriod.seconds;
+      this._maxDepositPeriodS = +deposit_params?.max_deposit_period.replace(
+        's',
+        ''
+      );
 
       // TODO: support off-denom deposits
       const depositCoins = deposit_params?.min_deposit.find(
@@ -153,18 +144,14 @@ class CosmosGovernanceV1 extends ProposalModule<
   }
 
   private async _initProposals(proposalId?: number): Promise<void> {
-    const propToIProposal = (
-      proposal: ProposalSDKType
-    ): ICosmosProposal | null => {
-      const p = Proposal.fromSDK(proposal);
-      const status = stateEnumToString(p.status);
+    const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
+      const status = stateEnumToString(p.status.toString());
       const identifier = p.id.toString();
-      let title = p.title;
-      let description = p.summary;
+      let title = '';
+      let description = '';
       let messages = [];
-      // Proposal.fromSDK(proposal) does not preserve `messages`, so use `proposal`
-      if (proposal.messages?.length > 0) {
-        messages = proposal.messages.map((m) => {
+      if (p.messages?.length > 0) {
+        messages = p.messages.map((m) => {
           const content = m['content'];
           // get title and description from 1st message if no top-level title/desc
           if (!title) title = content?.title;
@@ -182,10 +169,16 @@ class CosmosGovernanceV1 extends ProposalModule<
         title,
         description,
         messages,
-        submitTime: moment.unix(+p.submitTime.seconds / 1000),
-        depositEndTime: moment.unix(+p.depositEndTime.seconds / 1000),
-        votingEndTime: moment.unix(+p.votingEndTime.seconds / 1000),
-        votingStartTime: moment.unix(+p.votingStartTime.seconds / 1000),
+        submitTime: moment.unix(new Date(p.submit_time).valueOf() / 1000),
+        depositEndTime: moment.unix(
+          new Date(p.deposit_end_time).valueOf() / 1000
+        ),
+        votingEndTime: moment.unix(
+          new Date(p.voting_end_time).valueOf() / 1000
+        ),
+        votingStartTime: moment.unix(
+          new Date(p.voting_start_time).valueOf() / 1000
+        ),
         proposer: null,
         state: {
           identifier,
@@ -193,25 +186,27 @@ class CosmosGovernanceV1 extends ProposalModule<
           status,
           // TODO: handle non-default amount
           totalDeposit:
-            p.totalDeposit && p.totalDeposit[0]
-              ? new BN(p.totalDeposit[0].amount)
+            p.total_deposit && p.total_deposit[0]
+              ? new BN(p.total_deposit[0].amount)
               : new BN(0),
           depositors: [],
           voters: [],
-          tally: p.finalTallyResult && marshalTally(p.finalTallyResult),
+          tally: p.final_tally_result && marshalTallyV1(p.final_tally_result),
         },
       };
     };
 
-    let cosmosProposals: CosmosProposal[] = [];
+    let cosmosProposals: CosmosProposalV1[] = [];
     try {
       if (!proposalId) {
-        const { proposals, pagination } =
-          await this._Chain.lcd.cosmos.gov.v1.proposals({
-            proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
-            voter: '',
-            depositor: '',
-          });
+        const {
+          proposals,
+          pagination,
+        } = await this._Chain.lcd.cosmos.gov.v1.proposals({
+          proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
+          voter: '',
+          depositor: '',
+        });
 
         // fetch all proposals
         // TODO: only fetch next page of proposals on scroll
@@ -219,19 +214,21 @@ class CosmosGovernanceV1 extends ProposalModule<
         let prevKey = null; // avoid infinite loop
         while (nextKey?.length > 0 && nextKey !== prevKey) {
           console.log('nextKey', nextKey);
-          const { proposals: addlProposals, pagination: nextPage } =
-            await this._Chain.lcd.cosmos.gov.v1.proposals({
-              proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
-              voter: '',
-              depositor: '',
-              pagination: {
-                key: nextKey,
-                limit: null,
-                offset: null,
-                countTotal: true,
-                reverse: true,
-              },
-            });
+          const {
+            proposals: addlProposals,
+            pagination: nextPage,
+          } = await this._Chain.lcd.cosmos.gov.v1.proposals({
+            proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
+            voter: '',
+            depositor: '',
+            pagination: {
+              key: nextKey,
+              limit: null,
+              offset: null,
+              countTotal: true,
+              reverse: true,
+            },
+          });
 
           proposals.push(...addlProposals);
           prevKey = nextKey;
@@ -242,13 +239,15 @@ class CosmosGovernanceV1 extends ProposalModule<
           ?.map((p) => propToIProposal(p))
           .filter((p) => !!p)
           .sort((p1, p2) => +p2.identifier - +p1.identifier)
-          .map((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
+          .map(
+            (p) => new CosmosProposalV1(this._Chain, this._Accounts, this, p)
+          );
       } else {
         const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
           proposalId: numberToLong(proposalId),
         });
         cosmosProposals = [
-          new CosmosProposal(
+          new CosmosProposalV1(
             this._Chain,
             this._Accounts,
             this,
@@ -309,14 +308,11 @@ class CosmosGovernanceV1 extends ProposalModule<
     initialDeposit: CosmosToken,
     content: Any
   ): Promise<number> {
-    const msg: MsgSubmitProposalEncodeObject = {
-      typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
-      value: {
-        initialDeposit: [initialDeposit.toCoinObject()],
-        proposer: sender.address,
-        content,
-      },
-    };
+    const msg = encodeMsgSubmitProposal(
+      sender.address,
+      initialDeposit,
+      content
+    );
 
     // fetch completed proposal from returned events
     const events = await this._Chain.sendTx(sender, msg);
