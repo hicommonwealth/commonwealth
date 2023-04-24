@@ -98,7 +98,5 @@ export default async (
     })
   ).toJSON();
 
-  subscription.Chain = chain.toJSON();
-
   return res.json({ status: 'Success', result: subscription });
 };
