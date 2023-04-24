@@ -150,19 +150,19 @@ export const NewSnapshotProposalPageComponent = ({
       (member) => member.toLowerCase() === author.address.toLowerCase()
     );
 
-  const hasMinScore = userScore >= space.filters?.minScore;
+  const minScoreFromSpace =
+    space.validation?.params.minScore ?? space.filters?.minScore; // Fall back to filters
+
+  const hasMinScore = userScore >= minScoreFromSpace;
 
   const showScoreWarning =
-    space.filters?.minScore > 0 &&
-    !hasMinScore &&
-    !isMember &&
-    userScore !== null;
+    minScoreFromSpace > 0 && !hasMinScore && !isMember && userScore !== null;
 
   const isValid =
     !!space &&
     (!space.filters?.onlyMembers || (space.filters?.onlyMembers && isMember)) &&
-    (space.filters?.minScore === 0 ||
-      (space.filters?.minScore > 0 && userScore > space.filters?.minScore) ||
+    (minScoreFromSpace === 0 ||
+      (minScoreFromSpace > 0 && userScore > minScoreFromSpace) ||
       isMember);
 
   return (
@@ -237,29 +237,6 @@ export const NewSnapshotProposalPageComponent = ({
             });
           }}
         />
-        <div className="date-range">
-          <CWLabel label="Date Range" />
-          <CWRadioGroup
-            name="period"
-            options={[{ value: '4d', label: '4-day' }]}
-            toggledOption="4d"
-            onChange={(e: FormEvent<HTMLInputElement>) => {
-              const values: Partial<ThreadForm> = {
-                range: e.currentTarget.value,
-                start: new Date().getTime(),
-              };
-
-              if (form.range === '4d') {
-                form.end = moment().add(4, 'days').toDate().getTime();
-              }
-
-              setForm({
-                ...form,
-                ...values,
-              });
-            }}
-          />
-        </div>
         <ReactQuillEditor
           contentDelta={contentDelta}
           setContentDelta={setContentDelta}

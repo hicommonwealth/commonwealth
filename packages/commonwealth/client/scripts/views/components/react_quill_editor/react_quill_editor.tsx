@@ -23,7 +23,9 @@ import { Modal } from '../component_kit/cw_modal';
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
 import { nextTick } from 'process';
+
 import { MinimumProfile } from '../../../../../client/scripts/models';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
@@ -154,25 +156,42 @@ const ReactQuillEditor = ({
 
   const handleToggleMarkdown = () => {
     const editor = editorRef.current?.getEditor();
+
     if (!editor) {
       throw new Error('editor not set');
     }
     // if enabling markdown, confirm and remove formatting
     const newMarkdownEnabled = !isMarkdownEnabled;
+
     if (newMarkdownEnabled) {
-      let confirmed = true;
-      if (getTextFromDelta(editor.getContents()).length > 0) {
-        confirmed = window.confirm(
-          'All formatting and images will be lost. Continue?'
-        );
-      }
-      if (confirmed) {
-        editor.removeFormat(0, editor.getLength());
-        setIsMarkdownEnabled(newMarkdownEnabled);
-        setContentDelta({
-          ...editor.getContents(),
-          ___isMarkdown: newMarkdownEnabled,
+      const isContentAvailable =
+        getTextFromDelta(editor.getContents()).length > 0;
+
+      if (isContentAvailable) {
+        openConfirmation({
+          title: 'Warning',
+          description: <>All formatting and images will be lost. Continue?</>,
+          buttons: [
+            {
+              label: 'Yes',
+              buttonType: 'mini-red',
+              onClick: () => {
+                editor.removeFormat(0, editor.getLength());
+                setIsMarkdownEnabled(newMarkdownEnabled);
+                setContentDelta({
+                  ...editor.getContents(),
+                  ___isMarkdown: newMarkdownEnabled,
+                });
+              },
+            },
+            {
+              label: 'No',
+              buttonType: 'mini-white',
+            },
+          ],
         });
+      } else {
+        setIsMarkdownEnabled(newMarkdownEnabled);
       }
     } else {
       setIsMarkdownEnabled(newMarkdownEnabled);
