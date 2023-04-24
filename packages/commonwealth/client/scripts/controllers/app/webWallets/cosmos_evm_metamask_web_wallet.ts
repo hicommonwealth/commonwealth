@@ -33,7 +33,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   private _web3: Web3;
 
   public readonly name = WalletId.CosmosEvmMetamask;
-  public readonly label = 'Metamask (Cosmos)';
+  public readonly label = 'Metamask';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Injective;
   public readonly specificChains = ['injective', 'evmos'];
