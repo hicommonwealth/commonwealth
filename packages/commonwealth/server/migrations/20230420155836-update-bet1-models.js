@@ -93,6 +93,24 @@ module.exports = {
         { transaction: t }
       );
 
+      await queryInterface.removeColumn(
+        'CommunityContractTemplateMetadata',
+        'created_at',
+        { transaction: t }
+      );
+
+      await queryInterface.removeColumn(
+        'CommunityContractTemplateMetadata',
+        'updated_at',
+        { transaction: t }
+      );
+
+      await queryInterface.removeColumn('Template', 'created_at', {
+        transaction: t,
+      });
+      await queryInterface.removeColumn('Template', 'updated_at', {
+        transaction: t,
+      });
       await queryInterface.removeColumn('Template', 'created_by', {
         transaction: t,
       });
