@@ -20,7 +20,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   private _offlineSigner: OfflineDirectSigner;
 
   public readonly name = WalletId.KeplrEthereum;
-  public readonly label = 'Keplr (Ethereum)';
+  public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Evmos;
   public readonly specificChains = ['evmos'];
