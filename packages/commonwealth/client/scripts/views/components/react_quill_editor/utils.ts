@@ -161,6 +161,9 @@ const createDraftKey = (key: string) => `cw-draft-${key}`;
 
 // saveDraft saves the delta to local storage by key
 export const saveDraft = (key: string, contentDelta: DeltaStatic) => {
+  if (!key) {
+    return;
+  }
   const data: QuillDraft = {
     key,
     lastSavedAt: Date.now(),
@@ -171,6 +174,9 @@ export const saveDraft = (key: string, contentDelta: DeltaStatic) => {
 
 // restoreDraft returns the delta queried from local storage by key
 export const restoreDraft = (key: string): QuillDraft | null => {
+  if (!key) {
+    return null;
+  }
   const data = localStorage.getItem(createDraftKey(key));
   if (!data) {
     return null;
@@ -179,5 +185,8 @@ export const restoreDraft = (key: string): QuillDraft | null => {
 };
 
 export const clearDraft = (key: string) => {
+  if (!key) {
+    return;
+  }
   localStorage.removeItem(createDraftKey(key));
 };

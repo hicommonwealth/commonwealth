@@ -46,7 +46,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
     updatedCommentsCallback,
   } = props;
 
-  const draftKey = `new-thread-comment-${rootThread.id}`;
+  const draftKey = !parentCommentId
+    ? `new-thread-comment-${rootThread.id}`
+    : null;
 
   const author = app.user.activeAccount;
 
