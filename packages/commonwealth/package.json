@@ -67,7 +67,9 @@
     "gen-e2e": "npx playwright codegen",
     "test-e2e": "npx playwright test ./test/e2e/*",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
-    "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-staging2 --confirm commonwealth-staging2"
+    "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-staging2 --confirm commonwealth-staging2",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "engines": {
     "node": "18.x"
@@ -281,6 +283,13 @@
     "@openzeppelin/contracts": "^2.4.0",
     "@openzeppelin/contracts-governance": "npm:@openzeppelin/contracts@^4.3.2",
     "@playwright/test": "^1.31.2",
+    "@storybook/addon-essentials": "7.0.7",
+    "@storybook/addon-interactions": "7.0.7",
+    "@storybook/addon-links": "7.0.7",
+    "@storybook/blocks": "7.0.7",
+    "@storybook/react": "7.0.7",
+    "@storybook/react-webpack5": "7.0.7",
+    "@storybook/testing-library": "0.0.14-next.2",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "@types/node-fetch": "2.x",
@@ -301,9 +310,11 @@
     "playwright-test": "^8.2.0",
     "process": "^0.11.10",
     "source-map-support": "^0.5.13",
+    "storybook": "7.0.7",
     "sync-request": "^6.1.0",
     "ts-mocha": "^6.0.0",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths-webpack-plugin": "^4.0.1",
     "tslint": "^5.13.0",
     "webpack-dev-server": "^3.1.14"
   },
