@@ -30,6 +30,7 @@ export type LoginProps = {
   setAddress: (address: string) => void;
   setBodyType: (bodyType: LoginBodyType) => void;
   handleEmailLoginCallback: () => void;
+  handleSocialLoginCallback: (provider: string) => void; // Update this to use SocialProvider Enum?
   handleSetAvatar: (avatarUrl: string) => void;
   handleSetUsername: (username: string) => void;
   handleSetEmail: (e: any) => void;

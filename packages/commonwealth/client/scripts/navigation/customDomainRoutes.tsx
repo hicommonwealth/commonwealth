@@ -13,6 +13,7 @@ const MembersPage = lazy(() => import('views/pages/members'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
+const FinishSocialLoginPage = lazy(() => import('views/pages/finish_social_login'))
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettingsPage = lazy(
@@ -113,6 +114,10 @@ const customDomainRoutes = () => {
     <Route
       path="/finishaxielogin"
       element={withLayout(FinishAxieLoginPage, {})}
+    />,
+    <Route
+      path="/finishsociallogin"
+      element={withLayout(FinishSocialLoginPage, {})}
     />,
 
     // NOTIFICATIONS
@@ -351,6 +356,10 @@ const customDomainRoutes = () => {
     <Route
       path="/:scope/finishaxielogin"
       element={<Navigate to="/finishaxielogin" />}
+    />,
+    <Route
+      path="/finishsociallogin"
+      element={<Navigate to="/finishsociallogin" />}
     />,
 
     // NOTIFICATIONS

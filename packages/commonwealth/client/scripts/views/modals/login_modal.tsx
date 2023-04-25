@@ -10,6 +10,7 @@ import {
   completeClientLogin,
   loginWithMagicLink,
   updateActiveAddresses,
+  loginWithSocial,
 } from 'controllers/app/login';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
@@ -161,6 +162,27 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         notifyError("Couldn't send magic link");
         this.magicLoading = false;
         console.error(e);
+      }
+    };
+
+    // New callback for handling social login
+    const handleSocialLoginCallback = async (provider: string) => {
+      this.magicLoading = true;
+      try {
+        console.log('Starting handleSocialLoginCallback');
+        await loginWithSocial(provider);
+        console.log('Finished handleSocialLoginCallback');
+        this.magicLoading = false;
+        if (onSuccess) onSuccess();
+        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+          vnode.attrs.onModalClose();
+        } else {
+          vnode.attrs.onModalClose();
+        }
+      } catch (e) {
+        console.error(e);
+        notifyError(`Couldn't log in with ${provider}`);
+        this.magicLoading = false;
       }
     };
 
@@ -432,6 +454,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         handleEmailLoginCallback={handleEmailLoginCallback}
         saveProfileInfoCallback={saveProfileInfoCallback}
         performLinkingCallback={performLinkingCallback}
+        handleSocialLoginCallback={handleSocialLoginCallback} // Pass the new callback to LoginDesktop
         showResetWalletConnect={wcEnabled}
         onModalClose={vnode.attrs.onModalClose}
       />
@@ -478,6 +501,7 @@ export class LoginModal extends ClassComponent<LoginModalAttrs> {
         handleEmailLoginCallback={handleEmailLoginCallback}
         saveProfileInfoCallback={saveProfileInfoCallback}
         performLinkingCallback={performLinkingCallback}
+        handleSocialLoginCallback={handleSocialLoginCallback} // Pass the new callback to LoginMobile
         showResetWalletConnect={wcEnabled}
         onModalClose={vnode.attrs.onModalClose}
       />

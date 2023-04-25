@@ -46,6 +46,7 @@ export const LoginMobile = ({
   saveProfileInfoCallback,
   performLinkingCallback,
   setSelectedLinkingWallet,
+  handleSocialLoginCallback,
   magicLoading,
   showResetWalletConnect,
   onModalClose,
@@ -201,7 +202,23 @@ export const LoginMobile = ({
               <CWButton
                 label="Connect"
                 onClick={handleEmailLoginCallback}
+              />
+            </div>
+            <div className="buttons-row">
+              <CWButton
+                label="Github"
                 buttonType="primary-blue-dark"
+                onClick={() => handleSocialLoginCallback('github')}
+              />
+              <CWButton
+                label="Google"
+                buttonType="primary-blue-dark"
+                onClick={() => handleSocialLoginCallback('google')}
+              />
+              <CWButton
+                label="Apple"
+                buttonType="primary-blue-dark"
+                onClick={() => handleSocialLoginCallback('apple')}
               />
             </div>
           </div>

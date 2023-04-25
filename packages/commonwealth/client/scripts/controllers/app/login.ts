@@ -321,3 +321,51 @@ export async function loginWithMagicLink(email: string) {
     throw new Error(`Magic auth unsuccessful: ${response.status}`);
   }
 }
+
+export async function loginWithSocial(provider: string) {
+  const { Magic } = await import('magic-sdk');
+  const { OAuthExtension } = await import('@magic-ext/oauth');
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: [new OAuthExtension()],
+  });
+  await (magic as any).oauth.loginWithRedirect({
+    provider,
+    redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+  });
+}
+
+export async function handleSocialLoginCallback() {
+  const { Magic } = await import('magic-sdk');
+  const { OAuthExtension } = await import('@magic-ext/oauth');
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: [new OAuthExtension()],
+  });
+  const result = await magic.oauth.getRedirectResult();
+  console.log('Magic redirect result:', result);
+
+  const response = await $.post({
+    url: `${app.serverUrl()}/auth/magic`,
+    headers: {
+      Authorization: `Bearer ${result.magic.idToken}`,
+    },
+    xhrFields: {
+      withCredentials: true,
+    },
+    data: {
+      chain: app.activeChainId(),
+    },
+  });
+  console.log('Server response:', response);
+
+  if (response.status === 'Success') {
+    await initAppState(false);
+    if (app.chain) {
+      const c = app.user.selectedChain
+        ? app.user.selectedChain
+        : app.config.chains.getById(app.activeChainId());
+      await updateActiveAddresses(c);
+    }
+  } else {
+    throw new Error(`Social auth unsuccessful: ${response.status}`);
+  }
+}
