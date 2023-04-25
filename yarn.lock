@@ -7918,6 +7918,11 @@ copyfiles@^2.4.1:
     untildify "^4.0.0"
     yargs "^16.1.0"
 
+cordova-plugin-safearea@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/cordova-plugin-safearea/-/cordova-plugin-safearea-1.0.0.tgz#543d51d748acc6a86c2f402c353c58cb677cb417"
+  integrity sha512-ljpaDzMLOT6r7jGXk05ShAXqqRvSEcQ7lDa1pl/uXPxfTDbxSrL8WpD/gClQEDMJlJaICxwNDKTQnI2z/nV5rQ==
+
 core-js-compat@^3.25.1:
   version "3.27.2"
   resolved "https://registry.yarnpkg.com/core-js-compat/-/core-js-compat-3.27.2.tgz#607c50ad6db8fd8326af0b2883ebb987be3786da"
