@@ -4,8 +4,11 @@ import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
-import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
-import { CosmosProposalV1 } from 'controllers/chain/cosmos/proposal-v1';
+import {
+  CosmosProposal,
+  CosmosVote,
+} from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
@@ -34,7 +37,6 @@ import { ProposalExtensions } from './proposal_extensions';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import useForceRerender from 'hooks/useForceRerender';
 
 type CannotVoteProps = { label: string };
 
