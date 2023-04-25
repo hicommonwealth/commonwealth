@@ -889,8 +889,8 @@ function setupRouter(
   );
 
   // signed data
-  router.get('/canvas', getCanvasData.bind(this, models));
-  router.post('/canvas', postCanvasData.bind(this, models));
+  router.get('/oplog', getCanvasData.bind(this, models));
+  router.post('/oplog', postCanvasData.bind(this, models));
 
   // rules
   router.post(
