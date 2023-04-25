@@ -5,25 +5,18 @@ import { updateLastVisited } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { EventEmitter } from 'events';
 import $ from 'jquery';
 /* eslint-disable no-restricted-syntax */
-
 import { redraw } from 'mithrilInterop';
 import type { ChainEntity, MinimumProfile as Profile, Topic } from 'models';
-import {
-  Attachment,
-  NotificationSubscription,
-  Poll,
-  Thread,
-  ThreadStage,
-} from 'models';
+import { Attachment, NotificationSubscription, Poll, Thread, ThreadStage, } from 'models';
 import moment from 'moment';
 import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import { EventEmitter } from 'events';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -107,11 +100,11 @@ class ThreadsController {
     const result = this._store.getAll().filter((thread) => {
       return tertiary
         ? thread.kind === primary ||
-            thread.kind === secondary ||
-            thread.kind === tertiary
+        thread.kind === secondary ||
+        thread.kind === tertiary
         : secondary
-        ? thread.kind === primary || thread.kind === secondary
-        : thread.kind === primary;
+          ? thread.kind === primary || thread.kind === secondary
+          : thread.kind === primary;
     });
     return result;
   }
@@ -177,8 +170,8 @@ class ThreadsController {
             typeof history.author === 'string'
               ? JSON.parse(history.author)
               : typeof history.author === 'object'
-              ? history.author
-              : null;
+                ? history.author
+                : null;
           history.timestamp = moment(history.timestamp);
         } catch (e) {
           console.log(e);
@@ -203,8 +196,8 @@ class ThreadsController {
     const lastEditedProcessed = last_edited
       ? moment(last_edited)
       : versionHistoryProcessed && versionHistoryProcessed?.length > 1
-      ? versionHistoryProcessed[0].timestamp
-      : null;
+        ? versionHistoryProcessed[0].timestamp
+        : null;
 
     let topicFromStore = null;
     if (topic?.id) {
@@ -348,8 +341,8 @@ class ThreadsController {
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
           : err.message
-          ? err.message
-          : 'Failed to create thread'
+            ? err.message
+            : 'Failed to create thread'
       );
     }
   }
@@ -537,16 +530,22 @@ class ThreadsController {
         return thread;
       },
       error: (err) => {
-        notifyError(
-          `Could not update Snapshot Linked Proposal: ${err.responseJSON.error}`
-        );
-        console.error('Failed to update linked snapshot proposal');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to update linked proposals'
-        );
-      },
+        if (
+          err.responseJSON &&
+          err.responseJSON.error &&
+          !err.responseJSON.error.includes('Thread chain must support snapshot')
+        ) {
+          notifyError(
+            `Could not update Snapshot Linked Proposal: ${err.responseJSON.error}`
+          );
+          console.error('Failed to update linked snapshot proposal');
+          throw new Error(
+            err.responseJSON && err.responseJSON.error
+              ? err.responseJSON.error
+              : 'Failed to update linked proposals'
+          );
+        }
+      }
     });
   }
 
@@ -766,8 +765,8 @@ class ThreadsController {
     const unPinnedThreads = modeledThreads.filter((t) => !t.pinned);
     if (modeledThreads?.length) {
       const lastThread = unPinnedThreads.sort(orderDiscussionsbyLastComment)[
-        unPinnedThreads.length - 1
-      ];
+      unPinnedThreads.length - 1
+        ];
 
       if (lastThread) {
         const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;

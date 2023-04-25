@@ -76,10 +76,6 @@ export const UpdateProposalStatusModal = ({
         threadId: thread.id,
         entities: tempChainEntities,
       });
-      await app.threads.setLinkedSnapshotProposal({
-        threadId: thread.id,
-        snapshotProposal: tempSnapshotProposals[0]?.id,
-      });
     } catch (err) {
       console.log('Failed to update linked proposals');
       throw new Error(
@@ -87,6 +83,22 @@ export const UpdateProposalStatusModal = ({
           ? err.responseJSON.error
           : 'Failed to update linked proposals'
       );
+    }
+
+    try {
+      await app.threads.setLinkedSnapshotProposal({
+        threadId: thread.id,
+        snapshotProposal: tempSnapshotProposals[0]?.id,
+      });
+    } catch (err) {
+      if (
+        err.responseJSON &&
+        err.responseJSON.error &&
+        !err.responseJSON.error.includes('Thread chain must support snapshot')
+      ) {
+        console.log('Failed to update snapshot proposal');
+        throw new Error('Failed to update snapshot proposal');
+      }
     }
 
     onChangeHandler(tempStage, tempChainEntities, tempSnapshotProposals);
