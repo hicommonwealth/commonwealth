@@ -47,7 +47,7 @@ export const SublayoutHeader = ({
           <CWCommunityAvatar
             size="large"
             community={app.chain.meta}
-             onClick={() => { navigate('/discussions'); }}
+            onClick={() => { navigate('/discussions'); }}
           />
         )}
         {onMobile && app.activeChainId() && (
