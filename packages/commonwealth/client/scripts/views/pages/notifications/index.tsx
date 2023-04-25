@@ -57,7 +57,7 @@ const NotificationsPage = () => {
         <div className="NotificationsList">
           {mostRecentFirst.length > 0 ? (
             <Virtuoso
-              style={{ height: '400px' }}
+              style={{ height: '100%' }}
               data={mostRecentFirst}
               itemContent={(i, data) => (
                 <NotificationRow
