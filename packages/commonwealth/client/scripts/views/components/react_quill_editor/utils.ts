@@ -154,7 +154,7 @@ export const countLinesMarkdown = (text: string): number => {
 type QuillDraft = {
   key: string;
   lastSavedAt: number;
-  contentDelta: DeltaStatic;
+  contentDelta: SerializableDeltaStatic;
 };
 
 const createDraftKey = (key: string) => `cw-draft-${key}`;

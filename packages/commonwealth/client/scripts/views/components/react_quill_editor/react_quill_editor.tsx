@@ -27,6 +27,7 @@ import { nextTick } from 'process';
 import { MinimumProfile } from 'models';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { LoadingIndicator } from './loading_indicator';
+import { debounce } from 'lodash';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
@@ -382,8 +383,14 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
+  const debouncedSaveDraft = useCallback(debounce(saveDraft, 300), []);
+
+  // when content updated, save draft
+  useEffect(() => {
+    debouncedSaveDraft(draftKey, contentDelta);
+  }, [debouncedSaveDraft, draftKey, contentDelta]);
+
   // when initialized, restore draft
-  // then periodically save draft
   useEffect(() => {
     if (!draftKey) {
       return;
@@ -391,19 +398,8 @@ const ReactQuillEditor = ({
     const restoredDelta = restoreDraft(draftKey);
     if (restoredDelta) {
       setContentDelta(restoredDelta.contentDelta);
+      setIsMarkdownEnabled(!!restoredDelta.contentDelta?.___isMarkdown);
     }
-
-    const draftInterval = setInterval(() => {
-      const editor = editorRef.current.getEditor();
-      if (!editor) {
-        return;
-      }
-      saveDraft(draftKey, editor.getContents());
-    }, 250);
-
-    return () => {
-      clearInterval(draftInterval);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
