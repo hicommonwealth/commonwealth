@@ -24,7 +24,7 @@ import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
 import { nextTick } from 'process';
 
-import { MinimumProfile } from '../../../../../client/scripts/models';
+import { MinimumProfile } from 'models';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
