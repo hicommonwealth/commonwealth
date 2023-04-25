@@ -12,7 +12,7 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import 'modals/confirmation_modal.scss';
 
 interface ConfirmationModalProps {
-  title: string;
+  title?: string;
   description: string | JSX.Element;
   buttons: ButtonProps[];
   removeModal: () => void;
@@ -69,7 +69,7 @@ const ConfirmationModal = ({
 };
 
 interface OpenConfirmationProps {
-  title: string;
+  title?: string;
   description: string | JSX.Element;
   buttons: ButtonProps[];
 }

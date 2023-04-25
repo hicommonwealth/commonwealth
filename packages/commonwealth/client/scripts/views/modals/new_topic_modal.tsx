@@ -43,8 +43,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
     React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
   const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
-  const [submitIsDisabled, setSubmitIsDisabled] =
-    React.useState<boolean>(false);
 
   const editorText = getTextFromDelta(contentDelta);
 
@@ -161,7 +159,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
         )}
         <CWButton
           label="Create topic"
-          disabled={isSaving || !!errorMsg || submitIsDisabled}
+          disabled={isSaving || !!errorMsg}
           onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
             e.preventDefault();
 

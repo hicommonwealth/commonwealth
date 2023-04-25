@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from 'react';
 import { notifySuccess } from 'controllers/app/notifications';
 import { redraw } from 'mithrilInterop';
 import type { NotificationSubscription, Thread } from 'models';
@@ -42,7 +43,8 @@ export const handleToggleSubscription = async (
   thread: Thread,
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription,
-  isSubscribed: boolean
+  isSubscribed: boolean,
+  setIsSubscribed?: Dispatch<SetStateAction<boolean>>,
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
@@ -69,6 +71,7 @@ export const handleToggleSubscription = async (
     ]);
     notifySuccess('Subscribed!');
   }
+  if (setIsSubscribed) setIsSubscribed(!isSubscribed);
 
   redraw();
 };
@@ -90,7 +93,8 @@ export const getReactionSubscription = (thread: Thread) => {
 };
 
 export const getThreadSubScriptionMenuItem = (
-  thread: Thread
+  thread: Thread,
+  setIsSubscribed: Dispatch<SetStateAction<boolean>>,
 ): PopoverMenuItem => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
@@ -104,7 +108,8 @@ export const getThreadSubScriptionMenuItem = (
         thread,
         getCommentSubscription(thread),
         getReactionSubscription(thread),
-        isSubscribed
+        isSubscribed,
+        setIsSubscribed,
       );
       redraw();
     },

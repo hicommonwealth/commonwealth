@@ -1,6 +1,7 @@
 import React from 'react';
 
 import 'pages/view_proposal/proposal_header_links.scss';
+import 'pages/view_thread/thread_components.scss';
 
 import app from 'state';
 import {
@@ -39,18 +40,6 @@ export const ThreadAuthor = (props: ThreadComponentProps) => {
       {thread.collaborators?.length > 0 && (
         <>
           <CWText type="caption">and</CWText>
-          <Popover
-            content={
-              <div className="collaborators">
-                {thread.collaborators.map(({ address, chain }) => {
-                  return (
-                    <User user={new AddressInfo(null, address, chain, null)} />
-                  );
-                })}
-              </div>
-            }
-            {...popoverProps}
-          />
           <CWText
             type="caption"
             className="trigger-text"
@@ -58,6 +47,22 @@ export const ThreadAuthor = (props: ThreadComponentProps) => {
             onMouseLeave={popoverProps.handleInteraction}
           >
             {pluralize(thread.collaborators?.length, 'other')}
+            <Popover
+              content={
+                <div className="collaborators">
+                  {thread.collaborators.map(({ address, chain }) => {
+                    return (
+                      <User
+                        linkify
+                        key={address}
+                        user={new AddressInfo(null, address, chain, null)}
+                      />
+                    );
+                  })}
+                </div>
+              }
+              {...popoverProps}
+            />
           </CWText>
         </>
       )}

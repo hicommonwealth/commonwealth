@@ -1,9 +1,15 @@
-import { voteOptionFromJSON } from "./gov";
-import { AminoMsg } from "@cosmjs/amino";
-import { Long } from "../../../helpers";
-import { MsgSubmitProposal, MsgExecLegacyContent, MsgVote, MsgVoteWeighted, MsgDeposit } from "./tx";
+import { voteOptionFromJSON } from './gov';
+import { AminoMsg } from '@cosmjs/amino';
+import { Long } from '../../../helpers';
+import {
+  MsgSubmitProposal,
+  MsgExecLegacyContent,
+  MsgVote,
+  MsgVoteWeighted,
+  MsgDeposit,
+} from './tx';
 export interface AminoMsgSubmitProposal extends AminoMsg {
-  type: "cosmos-sdk/v1/MsgSubmitProposal";
+  type: 'cosmos-sdk/v1/MsgSubmitProposal';
   value: {
     messages: {
       type_url: string;
@@ -18,7 +24,7 @@ export interface AminoMsgSubmitProposal extends AminoMsg {
   };
 }
 export interface AminoMsgExecLegacyContent extends AminoMsg {
-  type: "cosmos-sdk/v1/MsgExecLegacyContent";
+  type: 'cosmos-sdk/v1/MsgExecLegacyContent';
   value: {
     content: {
       type_url: string;
@@ -28,7 +34,7 @@ export interface AminoMsgExecLegacyContent extends AminoMsg {
   };
 }
 export interface AminoMsgVote extends AminoMsg {
-  type: "cosmos-sdk/v1/MsgVote";
+  type: 'cosmos-sdk/v1/MsgVote';
   value: {
     proposal_id: string;
     voter: string;
@@ -37,7 +43,7 @@ export interface AminoMsgVote extends AminoMsg {
   };
 }
 export interface AminoMsgVoteWeighted extends AminoMsg {
-  type: "cosmos-sdk/v1/MsgVoteWeighted";
+  type: 'cosmos-sdk/v1/MsgVoteWeighted';
   value: {
     proposal_id: string;
     voter: string;
@@ -49,7 +55,7 @@ export interface AminoMsgVoteWeighted extends AminoMsg {
   };
 }
 export interface AminoMsgDeposit extends AminoMsg {
-  type: "cosmos-sdk/v1/MsgDeposit";
+  type: 'cosmos-sdk/v1/MsgDeposit';
   value: {
     proposal_id: string;
     depositor: string;
@@ -60,167 +66,167 @@ export interface AminoMsgDeposit extends AminoMsg {
   };
 }
 export const AminoConverter = {
-  "/cosmos.gov.v1.MsgSubmitProposal": {
-    aminoType: "cosmos-sdk/v1/MsgSubmitProposal",
+  '/cosmos.gov.v1.MsgSubmitProposal': {
+    aminoType: 'cosmos-sdk/v1/MsgSubmitProposal',
     toAmino: ({
       messages,
       initialDeposit,
       proposer,
-      metadata
-    }: MsgSubmitProposal): AminoMsgSubmitProposal["value"] => {
+      metadata,
+    }: MsgSubmitProposal): AminoMsgSubmitProposal['value'] => {
       return {
-        messages: messages.map(el0 => ({
+        messages: messages.map((el0) => ({
           type_url: el0.typeUrl,
-          value: el0.value
+          value: el0.value,
         })),
-        initial_deposit: initialDeposit.map(el0 => ({
+        initial_deposit: initialDeposit.map((el0) => ({
           denom: el0.denom,
-          amount: el0.amount
+          amount: el0.amount,
         })),
         proposer,
-        metadata
+        metadata,
       };
     },
     fromAmino: ({
       messages,
       initial_deposit,
       proposer,
-      metadata
-    }: AminoMsgSubmitProposal["value"]): MsgSubmitProposal => {
+      metadata,
+    }: AminoMsgSubmitProposal['value']): MsgSubmitProposal => {
       return {
-        messages: messages.map(el0 => ({
+        messages: messages.map((el0) => ({
           typeUrl: el0.type_url,
-          value: el0.value
+          value: el0.value,
         })),
-        initialDeposit: initial_deposit.map(el0 => ({
+        initialDeposit: initial_deposit.map((el0) => ({
           denom: el0.denom,
-          amount: el0.amount
+          amount: el0.amount,
         })),
         proposer,
-        metadata
+        metadata,
       };
-    }
+    },
   },
-  "/cosmos.gov.v1.MsgExecLegacyContent": {
-    aminoType: "cosmos-sdk/v1/MsgExecLegacyContent",
+  '/cosmos.gov.v1.MsgExecLegacyContent': {
+    aminoType: 'cosmos-sdk/v1/MsgExecLegacyContent',
     toAmino: ({
       content,
-      authority
-    }: MsgExecLegacyContent): AminoMsgExecLegacyContent["value"] => {
+      authority,
+    }: MsgExecLegacyContent): AminoMsgExecLegacyContent['value'] => {
       return {
         content: {
           type_url: content.typeUrl,
-          value: content.value
+          value: content.value,
         },
-        authority
+        authority,
       };
     },
     fromAmino: ({
       content,
-      authority
-    }: AminoMsgExecLegacyContent["value"]): MsgExecLegacyContent => {
+      authority,
+    }: AminoMsgExecLegacyContent['value']): MsgExecLegacyContent => {
       return {
         content: {
           typeUrl: content.type_url,
-          value: content.value
+          value: content.value,
         },
-        authority
+        authority,
       };
-    }
+    },
   },
-  "/cosmos.gov.v1.MsgVote": {
-    aminoType: "cosmos-sdk/v1/MsgVote",
+  '/cosmos.gov.v1.MsgVote': {
+    aminoType: 'cosmos-sdk/v1/MsgVote',
     toAmino: ({
       proposalId,
       voter,
       option,
-      metadata
-    }: MsgVote): AminoMsgVote["value"] => {
+      metadata,
+    }: MsgVote): AminoMsgVote['value'] => {
       return {
         proposal_id: proposalId.toString(),
         voter,
         option,
-        metadata
+        metadata,
       };
     },
     fromAmino: ({
       proposal_id,
       voter,
       option,
-      metadata
-    }: AminoMsgVote["value"]): MsgVote => {
+      metadata,
+    }: AminoMsgVote['value']): MsgVote => {
       return {
         proposalId: Long.fromString(proposal_id),
         voter,
         option: voteOptionFromJSON(option),
-        metadata
+        metadata,
       };
-    }
+    },
   },
-  "/cosmos.gov.v1.MsgVoteWeighted": {
-    aminoType: "cosmos-sdk/v1/MsgVoteWeighted",
+  '/cosmos.gov.v1.MsgVoteWeighted': {
+    aminoType: 'cosmos-sdk/v1/MsgVoteWeighted',
     toAmino: ({
       proposalId,
       voter,
       options,
-      metadata
-    }: MsgVoteWeighted): AminoMsgVoteWeighted["value"] => {
+      metadata,
+    }: MsgVoteWeighted): AminoMsgVoteWeighted['value'] => {
       return {
         proposal_id: proposalId.toString(),
         voter,
-        options: options.map(el0 => ({
+        options: options.map((el0) => ({
           option: el0.option,
-          weight: el0.weight
+          weight: el0.weight,
         })),
-        metadata
+        metadata,
       };
     },
     fromAmino: ({
       proposal_id,
       voter,
       options,
-      metadata
-    }: AminoMsgVoteWeighted["value"]): MsgVoteWeighted => {
+      metadata,
+    }: AminoMsgVoteWeighted['value']): MsgVoteWeighted => {
       return {
         proposalId: Long.fromString(proposal_id),
         voter,
-        options: options.map(el0 => ({
+        options: options.map((el0) => ({
           option: voteOptionFromJSON(el0.option),
-          weight: el0.weight
+          weight: el0.weight,
         })),
-        metadata
+        metadata,
       };
-    }
+    },
   },
-  "/cosmos.gov.v1.MsgDeposit": {
-    aminoType: "cosmos-sdk/v1/MsgDeposit",
+  '/cosmos.gov.v1.MsgDeposit': {
+    aminoType: 'cosmos-sdk/v1/MsgDeposit',
     toAmino: ({
       proposalId,
       depositor,
-      amount
-    }: MsgDeposit): AminoMsgDeposit["value"] => {
+      amount,
+    }: MsgDeposit): AminoMsgDeposit['value'] => {
       return {
         proposal_id: proposalId.toString(),
         depositor,
-        amount: amount.map(el0 => ({
+        amount: amount.map((el0) => ({
           denom: el0.denom,
-          amount: el0.amount
-        }))
+          amount: el0.amount,
+        })),
       };
     },
     fromAmino: ({
       proposal_id,
       depositor,
-      amount
-    }: AminoMsgDeposit["value"]): MsgDeposit => {
+      amount,
+    }: AminoMsgDeposit['value']): MsgDeposit => {
       return {
         proposalId: Long.fromString(proposal_id),
         depositor,
-        amount: amount.map(el0 => ({
+        amount: amount.map((el0) => ({
           denom: el0.denom,
-          amount: el0.amount
-        }))
+          amount: el0.amount,
+        })),
       };
-    }
-  }
+    },
+  },
 };

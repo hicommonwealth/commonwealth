@@ -18,9 +18,14 @@ export const paginate = (count: number, page: number) => {
 };
 
 // helper methods
-export const formatPagination = (query: IPagination) => {
+export type PaginationResult = {
+  limit?: number;
+  offset?: number;
+  order?: any;
+};
+export const formatPagination = (query: IPagination): PaginationResult => {
   const { limit, page } = query;
-  let pagination: any = {};
+  let pagination: PaginationResult = {};
   if (limit && page) pagination = paginate(limit, page);
   else if (limit) pagination = limitBy(limit);
 
@@ -48,4 +53,45 @@ export const flattenIncludedAddresses = (entities) => {
     e.dataValues['address'] = e.dataValues.Address.address;
     delete e.dataValues.Address;
   });
+};
+
+export type PaginationSqlOptions = {
+  limit?: number;
+  page?: number;
+  orderBy?: string;
+  orderDirection?: 'ASC' | 'DESC';
+};
+export type PaginationSqlResult = {
+  sql: string;
+  bind: {
+    limit?: number;
+    offset?: number;
+    orderDirection?: string;
+  };
+};
+export type PaginationSqlBind = PaginationSqlResult['bind'];
+
+export const buildPaginationSql = (
+  options: PaginationSqlOptions
+): PaginationSqlResult => {
+  const { limit, page, orderBy, orderDirection } = options;
+  let sql = '';
+  const bind: PaginationSqlBind = {};
+  if (typeof limit === 'number') {
+    sql += `ORDER BY ${orderBy} `;
+    if (['ASC', 'DESC'].includes(orderDirection)) {
+      sql += `${orderDirection} `;
+    } else {
+      sql += 'DESC ';
+    }
+  }
+  if (typeof limit === 'number') {
+    sql += 'LIMIT $limit ';
+    bind.limit = limit;
+    if (typeof page === 'number') {
+      sql += 'OFFSET $offset';
+      bind.offset = limit * (page - 1);
+    }
+  }
+  return { sql, bind };
 };

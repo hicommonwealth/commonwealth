@@ -15,6 +15,7 @@ import type {
 } from './types';
 import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
+import { featureFlags } from 'helpers/feature-flags';
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
@@ -35,24 +36,19 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 
   const newTree = currentTree;
 
-  localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
+    JSON.stringify(newTree);
 };
 
 const AdminSectionComponent = () => {
   const navigate = useCommonNavigate();
 
-  const [
-    isEditTopicThresholdsModalOpen,
-    setIsEditTopicThresholdsModalOpen,
-  ] = React.useState<boolean>(false);
-  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] = React.useState<
-    boolean
-  >(false);
-  const [isNewTopicModalOpen, setIsNewTopicModalOpen] = React.useState<boolean>(
-    false
-  );
+  const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
+    React.useState<boolean>(false);
+  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
+    React.useState<boolean>(false);
+  const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
+    React.useState<boolean>(false);
 
   const adminGroupData: SectionGroupAttrs[] = [
     {
@@ -97,28 +93,32 @@ const AdminSectionComponent = () => {
         );
       },
     },
-    {
-      title: 'Contracts',
-      containsChildren: false,
-      displayData: null,
-      hasDefaultToggle: false,
-      isActive: _DEPRECATED_getRoute().includes('/contracts'),
-      isVisible: true,
-      isUpdated: false,
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
+    ...(featureFlags.proposalTemplates
+      ? [
+          {
+            title: 'Contracts',
+            containsChildren: false,
+            displayData: null,
+            hasDefaultToggle: false,
+            isActive: _DEPRECATED_getRoute().includes('/contracts'),
+            isVisible: true,
+            isUpdated: false,
+            onClick: (e, toggle: boolean) => {
+              e.preventDefault();
 
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/contracts`,
-          app.activeChainId(),
-          () => {
-            setAdminToggleTree(`children.contracts.toggledState`, toggle);
-          }
-        );
-      },
-    },
+              handleRedirectClicks(
+                navigate,
+                e,
+                `/contracts`,
+                app.activeChainId(),
+                () => {
+                  setAdminToggleTree(`children.contracts.toggledState`, toggle);
+                }
+              );
+            },
+          },
+        ]
+      : []),
     {
       title: 'New topic',
       isActive: isNewTopicModalOpen,

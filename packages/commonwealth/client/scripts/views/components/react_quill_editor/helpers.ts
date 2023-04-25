@@ -3,12 +3,8 @@ import { render } from 'mithrilInterop';
 import { MarkdownFormattedText } from '../quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill_formatted_text';
 
-
 // TODO: Replace instances of this with QuillRenderer, which handles both richtext and markdown
-export const renderQuillTextBody = (
-  textBody: any,
-  params?: QuillTextParams
-) => {
+export const renderQuillTextBody = (textBody: any, params?: any) => {
   let decodedTextbody: string;
   try {
     decodedTextbody = decodeURIComponent(textBody);

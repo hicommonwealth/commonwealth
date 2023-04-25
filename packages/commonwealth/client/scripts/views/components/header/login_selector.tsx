@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import { initAppState } from 'state';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from 'utils';
 import $ from 'jquery';
 import { redraw } from 'mithrilInterop';
@@ -197,6 +197,14 @@ export const LoginSelectorMenuRight = ({
     localStorage.getItem('dark-mode-state') === 'on'
   );
 
+  const resetWalletConnectSession = async () => {
+    /**
+     * Imp to reset wc session on logout as subsequent login attempts fail
+     */
+    const walletConnectWallet = app.wallets.getByName(WalletId.WalletConnect);
+    await walletConnectWallet.reset();
+  };
+
   return (
     <>
       <div className="LoginSelectorMenu right">
@@ -231,6 +239,8 @@ export const LoginSelectorMenuRight = ({
             $.get(`${app.serverUrl()}/logout`)
               .then(async () => {
                 await initAppState();
+                await resetWalletConnectSession();
+
                 notifySuccess('Logged out');
                 onLogout();
                 setDarkMode(false);
@@ -287,6 +297,11 @@ export const LoginSelector = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =
     useState(false);
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
+
+  useEffect(() => {
+    setIsJoined(!!app.user.activeAccount);
+  }, [app.user.activeAccount]);
 
   const leftMenuProps = usePopover();
   const rightMenuProps = usePopover();
@@ -491,32 +506,30 @@ export const LoginSelector = () => {
   return (
     <>
       <div className="LoginSelector">
-        {app.chain &&
-          !app.chainPreloading &&
-          profileLoadComplete &&
-          !app.user.activeAccount && (
-            <div className="join-button-container">
-              <CWButton
-                buttonType="tertiary-black"
-                onClick={async () => {
-                  if (hasTermsOfService) {
-                    setIsTOSModalOpen(true);
-                  } else {
-                    await performJoinCommunityLinking();
-                  }
-                }}
-                label={
-                  sameBaseAddressesRemoveDuplicates.length === 0
-                    ? `No ${
-                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                        ''
-                      } address`
-                    : 'Join'
+        {app.chain && !app.chainPreloading && profileLoadComplete && !isJoined && (
+          <div className="join-button-container">
+            <CWButton
+              buttonType="tertiary-black"
+              onClick={async () => {
+                if (hasTermsOfService) {
+                  setIsTOSModalOpen(true);
+                } else {
+                  await performJoinCommunityLinking();
+                  setIsJoined(true);
                 }
-              />
-            </div>
-          )}
+              }}
+              label={
+                sameBaseAddressesRemoveDuplicates.length === 0
+                  ? `No ${
+                      CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                      CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                      ''
+                    } address`
+                  : 'Join'
+              }
+            />
+          </div>
+        )}
         {profileLoadComplete && (
           <ClickAwayListener
             onClickAway={() => {
@@ -586,6 +599,7 @@ export const LoginSelector = () => {
             onAccept={async () => {
               await performJoinCommunityLinking();
               setIsTOSModalOpen(false);
+              setIsJoined(true);
             }}
             onModalClose={() => setIsTOSModalOpen(false)}
           />

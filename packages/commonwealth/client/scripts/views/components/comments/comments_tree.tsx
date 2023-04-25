@@ -41,11 +41,9 @@ export const CommentsTree = (props: CommentsTreeAttrs) => {
         ? window.location.search.replace('?comment=', '')
         : null;
 
-      console.log({ commentId });
-
       if (commentId) jumpHighlightComment(Number(commentId));
     }
-  }, []);
+  }, [comments?.length, highlightedComment]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {

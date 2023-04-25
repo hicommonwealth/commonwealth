@@ -31,14 +31,23 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
     <div className="ProfileHeader">
       <div className="edit">
         {isCurrentUser && (
-          <CWButton label="Edit" buttonType="mini-white" iconLeft="write" onClick={() => navigate(`/profile/edit`)} />
+          <CWButton
+            label="Edit"
+            buttonType="mini-white"
+            iconLeft="write"
+            onClick={() => navigate(`/profile/edit`)}
+          />
         )}
       </div>
       <div className="profile-image">
         {profile.avatarUrl ? (
           <img src={profile.avatarUrl} />
         ) : (
-          <img src={`data:image/svg+xml;utf8,${encodeURIComponent(jdenticon.toSvg(profile.id, 90))}`} />
+          <img
+            src={`data:image/svg+xml;utf8,${encodeURIComponent(
+              jdenticon.toSvg(profile.id, 90)
+            )}`}
+          />
         )}
       </div>
       <div className="profile-name-and-bio">

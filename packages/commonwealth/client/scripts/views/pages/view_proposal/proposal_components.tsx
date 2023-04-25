@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+
+import app from 'state';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
@@ -16,6 +18,7 @@ import {
   ThreadLink,
   VotingInterfaceLink,
 } from './proposal_header_links';
+import useForceRerender from 'hooks/useForceRerender';
 
 type BaseCancelButtonProps = {
   onModalClose?: () => void;
@@ -69,6 +72,15 @@ type ProposalSubheaderProps = {
 
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
+  const forceRerender = useForceRerender();
+
+  useEffect(() => {
+    app.proposalEmitter.on('redraw', forceRerender);
+
+    return () => {
+      app.proposalEmitter.removeAllListeners();
+    };
+  }, [forceRerender]);
 
   return (
     <div className="ProposalSubheader">
