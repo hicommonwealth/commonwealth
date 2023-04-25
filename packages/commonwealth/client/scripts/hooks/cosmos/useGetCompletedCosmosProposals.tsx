@@ -1,42 +1,51 @@
-import { IApp } from 'state';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, Dispatch, SetStateAction } from 'react';
 import _ from 'lodash';
+import { IApp } from 'state';
 
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { getCompletedProposals } from 'controllers/chain/cosmos/gov/utils';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 
+type UseStateSetter<T> = Dispatch<SetStateAction<T>>;
+
 interface Response {
   completedCosmosProposals: CosmosProposal[];
-  isLoading: boolean;
 }
 
 interface Props {
   app: IApp;
+  setIsLoading: UseStateSetter<boolean>;
+  isLoading: boolean;
 }
 
-export const useGetCompletedCosmosProposals = ({ app }: Props): Response => {
-  const [isLoading, setLoading] = useState(false);
+export const useGetCompletedCosmosProposals = ({
+  app,
+  setIsLoading,
+  isLoading,
+}: Props): Response => {
   const [completedCosmosProposals, setCompletedCosmosProposals] = useState<
     CosmosProposal[]
   >([]);
 
+  const hasFetchedDataRef = useRef(false);
+
   useEffect(() => {
     const getProposals = async () => {
-      const cosmos = app.chain as Cosmos;
-      const storedProposals =
-        cosmos.governance.store.getAll() as CosmosProposal[];
-      const completedProposals = storedProposals.filter((p) => p.completed);
-      const deduped = _.uniqBy(completedProposals, 'identifier'); // not sure why store has duplicates
-
-      if (completedProposals?.length) {
-        setCompletedCosmosProposals(deduped);
-      } else {
-        setLoading(true);
-        const proposals = await getCompletedProposals(cosmos);
-        setCompletedCosmosProposals(proposals);
-        setLoading(false);
+      if (!hasFetchedDataRef.current) {
+        hasFetchedDataRef.current = true;
+        const cosmos = app.chain as Cosmos;
+        const storedProposals =
+          cosmos.governance.store.getAll() as CosmosProposal[];
+        const completedProposals = storedProposals.filter((p) => p.completed);
+        if (completedProposals?.length) {
+          setCompletedCosmosProposals(completedProposals);
+        } else {
+          setIsLoading(true);
+          const proposals = await getCompletedProposals(cosmos);
+          setCompletedCosmosProposals(proposals);
+          setIsLoading(false);
+        }
       }
     };
 
@@ -51,6 +60,5 @@ export const useGetCompletedCosmosProposals = ({ app }: Props): Response => {
 
   return {
     completedCosmosProposals,
-    isLoading,
   };
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -50,10 +50,18 @@ const ProposalsPage = () => {
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized
   );
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
+  const [
+    isCosmosCompletedProposalsLoading,
+    setIsCosmosCompletedProposalsLoading,
+  ] = useState(false);
+  const hasFetchedApiRef = useRef(false);
 
   useEffect(() => {
     const initApi = async () => {
-      await initChain();
+      if (!hasFetchedApiRef.current) {
+        hasFetchedApiRef.current = true;
+        await initChain();
+      }
     };
 
     if (!app.chain?.apiInitialized) initApi();
@@ -75,10 +83,11 @@ const ProposalsPage = () => {
     };
   }, [setLoading, setSubstrateLoading]);
 
-  const {
-    completedCosmosProposals,
+  const { completedCosmosProposals } = useGetCompletedCosmosProposals({
+    app,
+    setIsLoading: setIsCosmosCompletedProposalsLoading,
     isLoading: isCosmosCompletedProposalsLoading,
-  } = useGetCompletedCosmosProposals({ app });
+  });
 
   if (isLoading) {
     if (
