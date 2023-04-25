@@ -1,11 +1,5 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
-import { longify } from '@cosmjs/stargate/build/queries/utils';
-import {
-  QueryDepositsResponseSDKType,
-  QueryTallyResultResponseSDKType,
-  QueryVotesResponseSDKType,
-} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
 import { ProposalType } from 'common-common/src/types';
 import type {
   CosmosProposalState,
@@ -13,8 +7,13 @@ import type {
   CosmosVoteChoice,
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
+import type {
+  QueryDepositsResponse,
+  QueryTallyResultResponse,
+  QueryVotesResponse,
+} from 'cosmjs-types/cosmos/gov/v1beta1/query';
 
-import type { ITXModalData, ProposalEndTime } from 'models';
+import type { ITXModalData, IVote, ProposalEndTime } from 'models';
 import {
   DepositVote,
   Proposal,
@@ -23,31 +22,59 @@ import {
   VotingUnit,
 } from 'models';
 import moment from 'moment';
-import CosmosAccount from './account';
-import type CosmosAccounts from './accounts';
-import type CosmosChain from './chain';
-import type { CosmosApiType } from './chain';
-import { marshalTallyV1 } from './governance-v1';
-import type CosmosGovernanceV1 from './governance-v1';
-import { encodeMsgVote } from './helpers';
-import { CosmosVote } from './proposal';
+import CosmosAccount from '../../account';
+import type CosmosAccounts from '../../accounts';
+import type CosmosChain from '../../chain';
+import type { CosmosApiType } from '../../chain';
+import type CosmosGovernance from './governance-v1beta1';
+import { encodeMsgVote, marshalTally } from './utils-v1beta1';
 
-const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
-  switch (voteOption) {
-    case 'VOTE_OPTION_YES':
-      return 'Yes';
-    case 'VOTE_OPTION_NO':
-      return 'No';
-    case 'VOTE_OPTION_ABSTAIN':
-      return 'Abstain';
-    case 'VOTE_OPTION_NO_WITH_VETO':
-      return 'NoWithVeto';
-    default:
-      return null;
+export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
+  if (typeof voteOption === 'number') {
+    switch (voteOption) {
+      case 1:
+        return 'Yes';
+      case 2:
+        return 'Abstain';
+      case 3:
+        return 'No';
+      case 4:
+        return 'NoWithVeto';
+      default:
+        return null;
+    }
+  } else {
+    return voteOption as CosmosVoteChoice;
   }
 };
 
-export class CosmosProposalV1 extends Proposal<
+// TODO: add staking amount to this?
+export class CosmosVote implements IVote<CosmosToken> {
+  public readonly account: CosmosAccount;
+  public readonly choice: CosmosVoteChoice;
+
+  constructor(account: CosmosAccount, choice: CosmosVoteChoice) {
+    this.account = account;
+    this.choice = choice;
+  }
+
+  public get option(): number {
+    switch (this.choice) {
+      case 'Yes':
+        return 1;
+      case 'Abstain':
+        return 2;
+      case 'No':
+        return 3;
+      case 'NoWithVeto':
+        return 4;
+      default:
+        return 0;
+    }
+  }
+}
+
+export class CosmosProposal extends Proposal<
   CosmosApiType,
   CosmosToken,
   ICosmosProposal,
@@ -100,12 +127,12 @@ export class CosmosProposalV1 extends Proposal<
 
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
-  private _Governance: CosmosGovernanceV1;
+  private _Governance: CosmosGovernance;
 
   constructor(
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
-    Governance: CosmosGovernanceV1,
+    Governance: CosmosGovernance,
     data: ICosmosProposal
   ) {
     super(ProposalType.CosmosProposal, data);
@@ -120,25 +147,24 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public async init() {
-    const lcd = this._Chain.lcd;
-    const proposalId = longify(this.data.identifier);
+    const api = this._Chain.api;
     // only fetch voter data if active
     if (!this.data.state.completed) {
       try {
         const [depositResp, voteResp, tallyResp]: [
-          QueryDepositsResponseSDKType,
-          QueryVotesResponseSDKType,
-          QueryTallyResultResponseSDKType
+          QueryDepositsResponse,
+          QueryVotesResponse,
+          QueryTallyResultResponse
         ] = await Promise.all([
           this.status === 'DepositPeriod'
-            ? lcd.cosmos.gov.v1.deposits({ proposalId })
+            ? api.gov.deposits(this.data.identifier)
             : Promise.resolve(null),
           this.status === 'DepositPeriod'
             ? Promise.resolve(null)
-            : lcd.cosmos.gov.v1.votes({ proposalId }),
+            : api.gov.votes(this.data.identifier),
           this.status === 'DepositPeriod'
             ? Promise.resolve(null)
-            : lcd.cosmos.gov.v1.tallyResult({ proposalId }),
+            : api.gov.tally(this.data.identifier),
         ]);
         if (depositResp?.deposits) {
           for (const deposit of depositResp.deposits) {
@@ -152,7 +178,7 @@ export class CosmosProposalV1 extends Proposal<
         }
         if (voteResp) {
           for (const voter of voteResp.votes) {
-            const vote = voteToEnumV1(voter.options[0].option);
+            const vote = voteToEnum(voter.option);
             if (vote) {
               this.data.state.voters.push([voter.voter, vote]);
               this.addOrUpdateVote(
@@ -160,13 +186,13 @@ export class CosmosProposalV1 extends Proposal<
               );
             } else {
               console.error(
-                `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`
+                `voter: ${voter.voter} has invalid vote option: ${voter.option}`
               );
             }
           }
         }
         if (tallyResp?.tally) {
-          this.data.state.tally = marshalTallyV1(tallyResp?.tally);
+          this.data.state.tally = marshalTally(tallyResp?.tally);
         }
       } catch (err) {
         console.error(`Cosmos query failed: ${err.message}`);
