@@ -43,7 +43,7 @@ export const SublayoutHeader = ({
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {!app.sidebarToggled && app.activeChainId() && (
+        {(!isWindowSmallInclusive(window.innerWidth) || !app.sidebarToggled) && app.activeChainId() && (
           <CWCommunityAvatar
             size="large"
             community={app.chain.meta}
