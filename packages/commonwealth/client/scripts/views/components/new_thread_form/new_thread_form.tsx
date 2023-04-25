@@ -148,6 +148,7 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
+              draftKey={`new-thread-${app.activeChainId()}`}
             />
 
             <div className="buttons-row">

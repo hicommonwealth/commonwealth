@@ -11,7 +11,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import QuillMention from 'quill-mention';
 import moment from 'moment';
 
-import type { SerializableDeltaStatic } from './utils';
+import { SerializableDeltaStatic, restoreDraft, saveDraft } from './utils';
 import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
 
 import app from 'state';
@@ -26,18 +26,9 @@ import { nextTick } from 'process';
 
 import { MinimumProfile } from 'models';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { LoadingIndicator } from './loading_indicator';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
-
-const LoadingIndicator = () => {
-  return (
-    <div className="LoadingIndicator">
-      <div className="outer-circle">
-        <div className="inner-circle"></div>
-      </div>
-    </div>
-  );
-};
 
 const Delta = Quill.import('delta');
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
@@ -49,6 +40,7 @@ type ReactQuillEditorProps = {
   tabIndex?: number;
   contentDelta: SerializableDeltaStatic;
   setContentDelta: (d: SerializableDeltaStatic) => void;
+  draftKey?: string;
 };
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
@@ -58,6 +50,7 @@ const ReactQuillEditor = ({
   tabIndex,
   contentDelta,
   setContentDelta,
+  draftKey,
 }: ReactQuillEditorProps) => {
   const editorRef = useRef<ReactQuill>();
 
@@ -221,32 +214,6 @@ const ReactQuillEditor = ({
     ];
   }, []);
 
-  // when markdown state is changed, add markdown metadata to delta ops
-  // and refresh quill component
-  useEffect(() => {
-    const editor = editorRef.current?.getEditor();
-    if (editor) {
-      setContentDelta({
-        ...editor.getContents(),
-        ___isMarkdown: isMarkdownEnabled,
-      } as SerializableDeltaStatic);
-    }
-    refreshQuillComponent();
-  }, [isMarkdownEnabled, setContentDelta]);
-
-  // when initialized, update markdown state to match content type
-  useEffect(() => {
-    if (!editorRef.current) {
-      return;
-    }
-    setIsMarkdownEnabled(!!contentDelta?.___isMarkdown);
-    // sometimes a force refresh is needed to render the editor
-    setTimeout(() => {
-      refreshQuillComponent();
-    }, 100);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editorRef]);
-
   // if markdown is disabled, hide toolbar buttons
   const toolbar = useMemo(() => {
     if (isMarkdownEnabled) {
@@ -388,6 +355,57 @@ const ReactQuillEditor = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // when markdown state is changed, add markdown metadata to delta ops
+  // and refresh quill component
+  useEffect(() => {
+    const editor = editorRef.current?.getEditor();
+    if (editor) {
+      setContentDelta({
+        ...editor.getContents(),
+        ___isMarkdown: isMarkdownEnabled,
+      } as SerializableDeltaStatic);
+    }
+    refreshQuillComponent();
+  }, [isMarkdownEnabled, setContentDelta]);
+
+  // when initialized, update markdown state to match content type
+  useEffect(() => {
+    if (!editorRef.current) {
+      return;
+    }
+    setIsMarkdownEnabled(!!contentDelta?.___isMarkdown);
+    // sometimes a force refresh is needed to render the editor
+    setTimeout(() => {
+      refreshQuillComponent();
+    }, 100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editorRef]);
+
+  // when initialized, restore draft
+  // then periodically save draft
+  useEffect(() => {
+    if (!draftKey) {
+      return;
+    }
+    const restoredDelta = restoreDraft(draftKey);
+    if (restoredDelta) {
+      setContentDelta(restoredDelta.contentDelta);
+    }
+
+    const draftInterval = setInterval(() => {
+      const editor = editorRef.current.getEditor();
+      if (!editor) {
+        return;
+      }
+      saveDraft(draftKey, editor.getContents());
+    }, 250);
+
+    return () => {
+      clearInterval(draftInterval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editorRef]);
 
   return (
     <div className="QuillEditorWrapper">

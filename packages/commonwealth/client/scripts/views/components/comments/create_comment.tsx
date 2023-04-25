@@ -92,8 +92,9 @@ export const CreateComment = (props: CreateCommmentProps) => {
     rootThread instanceof Thread ? rootThread?.topic?.name : null;
 
   // token balance check if needed
-  const tokenPostingThreshold: BN =
-    TopicGateCheck.getTopicThreshold(activeTopicName);
+  const tokenPostingThreshold: BN = TopicGateCheck.getTopicThreshold(
+    activeTopicName
+  );
 
   const userBalance: BN = TopicGateCheck.getUserBalance();
   const userFailsThreshold =
@@ -131,6 +132,7 @@ export const CreateComment = (props: CreateCommmentProps) => {
         className="editor"
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
+        draftKey={`new-thread-comment-${rootThread.id}`}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
