@@ -7,8 +7,8 @@ import type { IApp } from 'state';
 import type CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
-import CosmosGovernance from './governance';
-import CosmosGovernanceV1 from './governance-v1';
+import CosmosGovernance from './gov/v1beta1/governance-v1beta1';
+import CosmosGovernanceV1 from './gov/v1/governance-v1';
 import type { CosmosToken } from './types';
 
 class Cosmos

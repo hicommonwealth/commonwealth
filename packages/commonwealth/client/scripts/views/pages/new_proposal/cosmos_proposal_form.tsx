@@ -5,6 +5,7 @@ import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import { encodeTextProposal } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -104,13 +105,13 @@ export const CosmosProposalForm = () => {
             : cosmos.governance.minDeposit;
 
           if (cosmosProposalType === 'textProposal') {
-            prop = cosmos.governance.encodeTextProposal(title, description);
+            prop = encodeTextProposal(title, description);
           } else if (cosmosProposalType === 'communitySpend') {
             prop = cosmos.governance.encodeCommunitySpend(
               title,
               description,
               recipient,
-              payoutAmount.toString(),
+              payoutAmount.toString()
             );
           } else {
             throw new Error('Unknown Cosmos proposal type.');
