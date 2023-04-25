@@ -11,7 +11,3 @@ export const Primary = {
     label: 'Sample',
   },
 };
-
-// const ButtonStories = () => {
-//     return
-// }
