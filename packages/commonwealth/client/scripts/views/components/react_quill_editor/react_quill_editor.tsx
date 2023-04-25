@@ -392,7 +392,7 @@ const ReactQuillEditor = ({
 
   // when initialized, restore draft
   useEffect(() => {
-    if (!draftKey) {
+    if (!editorRef.current || !draftKey) {
       return;
     }
     const restoredDelta = restoreDraft(draftKey);
