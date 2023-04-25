@@ -2,14 +2,22 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('Threads', 'links', {
-      type: Sequelize.JSONB,
-      allowNull: true,
-    });
+    const transaction = await queryInterface.sequelize.transaction();
+
+    await queryInterface.addColumn(
+      'Threads',
+      'links',
+      {
+        type: Sequelize.JSONB,
+        allowNull: true,
+      },
+      { transaction }
+    );
 
     // Get Threads
     const [threads, metadata] = await queryInterface.sequelize.query(
-      'SELECT id, snapshot_proposal FROM "Threads"'
+      'SELECT id, snapshot_proposal FROM "Threads"',
+      { transaction }
     );
     const updatePromises = [];
 
@@ -24,6 +32,7 @@ module.exports = {
         'SELECT * FROM "LinkedThreads" WHERE "linking_thread" = ?',
         {
           replacements: [thread.id],
+          transaction,
         }
       );
 
@@ -40,6 +49,7 @@ module.exports = {
         'SELECT * FROM "ChainEntityMeta" WHERE "thread_id" = ?',
         {
           replacements: [thread.id],
+          transaction,
         }
       );
 
@@ -57,6 +67,7 @@ module.exports = {
             `UPDATE "Threads" SET "links" = ? WHERE "id" = ?`,
             {
               replacements: [JSON.stringify(links), thread.id],
+              transaction,
             }
           )
         );
@@ -64,6 +75,7 @@ module.exports = {
     }
 
     await Promise.all(updatePromises);
+    await transaction.commit();
   },
 
   down: async (queryInterface, Sequelize) => {
