@@ -83,7 +83,7 @@ export const iconLookup = {
 
 export const customIconLookup = {
   'keplr-ethereum': CustomIcons.CWKeplr,
-  'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
+  'cosm-metamask': CustomIcons.CWMetaMask,
   keplr: CustomIcons.CWKeplr,
   magic: CustomIcons.CWMagic,
   metamask: CustomIcons.CWMetaMask,

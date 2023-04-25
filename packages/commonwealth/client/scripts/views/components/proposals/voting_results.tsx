@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
-import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
@@ -20,13 +20,23 @@ import {
   YesNoAbstainVetoVotingResult,
   YesNoRejectVotingResult,
 } from './voting_result_components';
+import useForceRerender from 'hooks/useForceRerender';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
+  const forceRerender = useForceRerender();
 
   const votes = proposal.getVotes();
+
+  useEffect(() => {
+    app.proposalEmitter.on('redraw', forceRerender);
+
+    return () => {
+      app.proposalEmitter.removeAllListeners();
+    };
+  }, [forceRerender]);
 
   // TODO: fix up this function for cosmos votes
   if (
@@ -113,12 +123,8 @@ export const VotingResults = (props: VotingResultsProps) => {
   } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
     // return different voting results on completed cosmos proposal, as voters are not available
     if (proposal.completed && (proposal as CosmosProposal).data?.state?.tally) {
-      const {
-        yes,
-        no,
-        abstain,
-        noWithVeto,
-      } = (proposal as CosmosProposal).data.state.tally;
+      const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data
+        .state.tally;
 
       // TODO: move this marshalling into controller
       const formatCurrency = (n: BN) => {

@@ -768,8 +768,11 @@ class ThreadsController {
       const lastThread = unPinnedThreads.sort(orderDiscussionsbyLastComment)[
         unPinnedThreads.length - 1
       ];
-      const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
-      this.listingStore.setCutoffDate(options, cutoffDate);
+
+      if (lastThread) {
+        const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
+        this.listingStore.setCutoffDate(options, cutoffDate);
+      }
     }
 
     await Promise.all([

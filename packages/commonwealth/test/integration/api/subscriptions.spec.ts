@@ -165,7 +165,7 @@ describe.skip('Subscriptions Tests', () => {
         address: loggedInAddr,
         jwt: jwtToken,
         text: 'cw4eva',
-        thread_id: `discussion_${res1.result.id}`,
+        thread_id: res1.result.id,
         session: loggedInSession.session,
         sign: loggedInSession.sign,
       });
@@ -203,7 +203,7 @@ describe.skip('Subscriptions Tests', () => {
         address: loggedInAddr,
         jwt: jwtToken,
         text: 'hi',
-        thread_id: `discussion_${res.result.id}`,
+        thread_id: res.result.id,
         session: loggedInSession.session,
         sign: loggedInSession.sign,
       });

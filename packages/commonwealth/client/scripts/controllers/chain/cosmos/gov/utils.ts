@@ -1,0 +1,39 @@
+import { CosmosProposal } from './v1beta1/proposal-v1beta1';
+import CosmosGovernance from './v1beta1/governance-v1beta1';
+import type Cosmos from '../adapter';
+import { getCompletedProposalsV1 } from './v1/utils-v1';
+import { CosmosProposalV1 } from './v1/proposal-v1';
+import CosmosGovernanceV1 from './v1/governance-v1';
+import { getCompletedProposalsV1Beta1 } from './v1beta1/utils-v1beta1';
+
+// -- Gov methods for all Cosmos SDK versions as of 0.46.11: --
+
+/* This can be used for v1 or v1beta1 */
+export const getCompletedProposals = async (
+  cosmosChain: Cosmos
+): Promise<CosmosProposal[]> => {
+  const { chain, accounts, governance, meta } = cosmosChain;
+  const isV1 = meta.cosmosGovernanceVersion === 'v1';
+  let cosmosProposals = [];
+
+  if (isV1) {
+    const v1Proposals = await getCompletedProposalsV1(chain.lcd);
+    cosmosProposals = v1Proposals.map(
+      (p) =>
+        new CosmosProposalV1(
+          chain,
+          accounts,
+          governance as CosmosGovernanceV1,
+          p
+        )
+    );
+  } else {
+    const v1Beta1Proposals = await getCompletedProposalsV1Beta1(chain.api);
+    cosmosProposals = v1Beta1Proposals.map(
+      (p) =>
+        new CosmosProposal(chain, accounts, governance as CosmosGovernance, p)
+    );
+  }
+  Promise.all(cosmosProposals.map((p) => p.init()));
+  return cosmosProposals;
+};

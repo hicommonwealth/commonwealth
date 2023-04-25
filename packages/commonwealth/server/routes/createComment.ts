@@ -332,7 +332,7 @@ const createComment = async (
   emitNotifications(
     models,
     NotificationCategories.NewComment,
-    thread_id,
+    `discussion_${thread_id}`,
     {
       created_at: new Date(),
       thread_id: thread_id,

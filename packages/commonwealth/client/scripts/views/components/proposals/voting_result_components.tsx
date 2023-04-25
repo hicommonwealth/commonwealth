@@ -4,7 +4,7 @@ import 'components/proposals/voting_result_components.scss';
 import type {
   CosmosProposal,
   CosmosVote,
-} from 'controllers/chain/cosmos/proposal';
+} from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
