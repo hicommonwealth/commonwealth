@@ -177,3 +177,7 @@ export const restoreDraft = (key: string): QuillDraft | null => {
   }
   return JSON.parse(data) as QuillDraft;
 };
+
+export const clearDraft = (key: string) => {
+  localStorage.removeItem(createDraftKey(key));
+};

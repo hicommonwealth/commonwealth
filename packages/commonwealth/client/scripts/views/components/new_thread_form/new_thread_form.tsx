@@ -21,6 +21,7 @@ import {
   updateTopicList,
 } from './helpers';
 import { ReactQuillEditor } from '../react_quill_editor';
+import { clearDraft, createDeltaFromText } from '../react_quill_editor/utils';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -45,6 +46,8 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
   } = useNewThreadForm(authorName, hasTopics);
+
+  const draftKey = `new-thread-${app.activeChainId()}`;
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
@@ -90,6 +93,9 @@ export const NewThreadForm = () => {
         deltaString,
         threadUrl
       );
+
+      setThreadContentDelta(createDeltaFromText(''));
+      clearDraft(draftKey);
 
       navigate(`/discussion/${result.id}`);
       updateTopicList(result.topic, app.chain);
@@ -148,7 +154,7 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
-              draftKey={`new-thread-${app.activeChainId()}`}
+              draftKey={draftKey}
             />
 
             <div className="buttons-row">
