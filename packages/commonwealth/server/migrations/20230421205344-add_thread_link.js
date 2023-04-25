@@ -3,79 +3,83 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const transaction = await queryInterface.sequelize.transaction();
-
-    await queryInterface.addColumn(
-      'Threads',
-      'links',
-      {
+    try {
+      await queryInterface.addColumn('Threads', 'links', {
         type: Sequelize.JSONB,
         allowNull: true,
-      },
-      { transaction }
-    );
+        transaction,
+      });
 
-    // Get Threads
-    const [threads, metadata] = await queryInterface.sequelize.query(
-      'SELECT id, snapshot_proposal FROM "Threads"',
-      { transaction }
-    );
-    const updatePromises = [];
-
-    for (const thread of threads) {
-      // Add snapshot links
-      const links = thread.snapshot_proposal
-        ? [{ source: 'snapshot', identifier: thread.snapshot_proposal }]
-        : [];
-
-      // Add linked threads
-      const linkedThreads = await queryInterface.sequelize.query(
-        'SELECT * FROM "LinkedThreads" WHERE "linking_thread" = ?',
-        {
-          replacements: [thread.id],
-          transaction,
-        }
+      const [threads, metadata] = await queryInterface.sequelize.query(
+        'SELECT id, snapshot_proposal FROM "Threads"'
       );
 
-      if (linkedThreads[0].length > 0) {
-        const threadLinks = linkedThreads[0].map((linkedThread) => ({
+      const linkedThreadsPromises = threads.map((thread) =>
+        queryInterface.sequelize.query(
+          'SELECT * FROM "LinkedThreads" WHERE "linking_thread" = ?',
+          {
+            replacements: [thread.id],
+            type: Sequelize.QueryTypes.SELECT,
+          }
+        )
+      );
+      const chainEntitiesPromises = threads.map((thread) =>
+        queryInterface.sequelize.query(
+          'SELECT * FROM "ChainEntityMeta" WHERE "thread_id" = ?',
+          {
+            replacements: [thread.id],
+            type: Sequelize.QueryTypes.SELECT,
+          }
+        )
+      );
+
+      const linkedThreads = await Promise.all(linkedThreadsPromises);
+      const chainEntities = await Promise.all(chainEntitiesPromises);
+
+      const updatePromises = threads.map(async (thread, index) => {
+        const links = [];
+        const linkedThreadsData = linkedThreads[index];
+        const chainEntitiesData = chainEntities[index];
+
+        // Add snapshot links
+        const snapshotLinks = thread.snapshot_proposal
+          ? [{ source: 'snapshot', identifier: thread.snapshot_proposal }]
+          : [];
+        links.push(...snapshotLinks);
+
+        // Add linked thread links
+        const threadLinks = linkedThreadsData.map((linkedThread) => ({
           source: 'thread',
           identifier: linkedThread.linked_thread.toString(),
         }));
         links.push(...threadLinks);
-      }
 
-      // Add chain entities
-      const chainEntities = await queryInterface.sequelize.query(
-        'SELECT * FROM "ChainEntityMeta" WHERE "thread_id" = ?',
-        {
-          replacements: [thread.id],
-          transaction,
-        }
-      );
-
-      if (chainEntities[0].length > 0) {
-        const ceLinks = chainEntities[0].map((ce) => ({
+        // Add chain entity links
+        const ceLinks = chainEntitiesData.map((ce) => ({
           source: 'proposal',
           identifier: ce.ce_id.toString(),
         }));
         links.push(...ceLinks);
-      }
 
-      if (links.length > 0) {
-        updatePromises.push(
-          queryInterface.sequelize.query(
+        // Update the "links" column
+        if (links.length > 0) {
+          await queryInterface.sequelize.query(
             `UPDATE "Threads" SET "links" = ? WHERE "id" = ?`,
             {
               replacements: [JSON.stringify(links), thread.id],
+              type: Sequelize.QueryTypes.UPDATE,
               transaction,
             }
-          )
-        );
-      }
-    }
+          );
+        }
+      });
 
-    await Promise.all(updatePromises);
-    await transaction.commit();
+      await Promise.all(updatePromises);
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   },
 
   down: async (queryInterface, Sequelize) => {
