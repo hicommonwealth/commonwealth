@@ -1,14 +1,21 @@
 @import 'shared';
 
+$ios-notch-safe-area: env(safe-area-inset-top);
+
 .SublayoutHeader {
   align-items: center;
   border-bottom: 1px solid $neutral-200;
   display: flex;
   gap: 8px;
-  height: $global-header-height;
+  height: calc(#{$global-header-height} + #{$ios-notch-safe-area});
   justify-content: space-between;
   min-height: $global-header-height;
   padding: 0 8px;
+
+  // Add this to adjust padding for the iOS notch
+  @supports (padding-top: env(safe-area-inset-top)) {
+    padding-top: $ios-notch-safe-area;
+  }
 
   .header-left {
     align-items: center;

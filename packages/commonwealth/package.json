@@ -90,6 +90,7 @@
     "@canvas-js/chain-ethereum": "^0.0.50-pre4",
     "@canvas-js/interfaces": "^0.0.50-pre4",
     "@capacitor/browser": "^4.0.1",
+    "@capacitor/push-notifications": "^4.1.2",
     "@cosmjs/amino": "^0.26.1",
     "@cosmjs/proto-signing": "^0.26.1",
     "@ethersproject/abi": "^5.7.0",

@@ -64,7 +64,7 @@ const LandingPage = () => {
   //   }
   // }
 
-  if (app.loginState !== LoginState.LoggedIn) {
+  if (app.loginState !== LoginState.LoggedIn && !app.isNative(window)) {
     return (
       <div className="LandingPage">
         <Header onLogin={forceRerender} />
