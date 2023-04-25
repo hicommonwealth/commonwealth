@@ -1,16 +1,24 @@
 import { AppError } from 'common-common/src/errors';
-import type { NextFunction, Request, Response } from 'express';
-import { Link, LinkSource } from '../../models/thread';
+import type { NextFunction } from 'express';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { Link, LinkSource, ThreadInstance } from '../../models/thread';
 import type { DB } from '../../models';
 import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
 
+type DeleteThreadLinkReq = {
+  thread_id: number;
+  links: Link[];
+};
+
+type DeleteThreadLinkRes = ThreadInstance;
+
 const deleteThreadLinks = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<DeleteThreadLinkReq>,
+  res: TypedResponse<DeleteThreadLinkRes>,
   next: NextFunction
 ) => {
-  const { thread_id, links }: { thread_id: number; links: Link[] } = req.body;
+  const { thread_id, links } = req.body;
   if (!links.every((obj) => Object.values(LinkSource).includes(obj.source)))
     return next(new AppError(Errors.InvalidSource));
   const thread = await models.Thread.findOne({
@@ -42,7 +50,7 @@ const deleteThreadLinks = async (
     where: { id: thread_id },
   });
 
-  return res.json({ status: 'Success', result: finalThread.toJSON() });
+  return success(res, finalThread.toJSON());
 };
 
 export default deleteThreadLinks;

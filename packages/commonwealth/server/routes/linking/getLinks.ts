@@ -1,21 +1,32 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Link, LinkSource } from '../../models/thread';
 import type { DB } from '../../models';
 import { Errors } from '../../util/linkingValidationHelper';
 import { Op } from 'sequelize';
 
+type GetLinksReq = {
+  thread_id?: number;
+  linkType: LinkSource;
+  link?: Link;
+};
+
+type GetLinksRes = {
+  links?: Link[];
+  threads?: {
+    id: number;
+    title: string;
+  }[];
+};
+
 const getLinks = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<GetLinksReq>,
+  res: TypedResponse<GetLinksRes>,
   next: NextFunction
 ) => {
-  const {
-    thread_id,
-    linkType,
-    link,
-  }: { thread_id?: number; linkType: LinkSource; link?: Link } = req.body;
+  const { thread_id, linkType, link } = req.body;
   let links;
   let threads;
   if (!link && !thread_id) {
@@ -50,10 +61,7 @@ const getLinks = async (
         : [];
   }
 
-  return res.json({
-    status: 'Success',
-    result: { links, threads },
-  });
+  return success(res, { links, threads });
 };
 
 export default getLinks;
