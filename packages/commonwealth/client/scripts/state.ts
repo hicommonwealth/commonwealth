@@ -220,7 +220,7 @@ const app: IApp = {
     document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
     //* TODO: @ Used to store the webpack SERVER_URL, should only be set for mobile deployments */
-    const mobileUrl = 'http://127.0.0.1:8080/api'; // Replace with your computer ip, staging, or production url
+    const mobileUrl = process.env.SERVER_URL;
 
     if (app.isNative(window)) {
       return mobileUrl;
@@ -248,6 +248,8 @@ export async function initAppState(
   customDomain = null
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    const requestUrl = `${app.serverUrl()}/status`;
+    console.log('Sending request to:', requestUrl);
     $.get(`${app.serverUrl()}/status`)
       .then(async (data) => {
         app.config.chains.clear();

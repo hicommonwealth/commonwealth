@@ -28,7 +28,7 @@ switch (process.env.NODE_ENV) {
     config = {
       ...baseConfig,
       server: {
-        url: 'http://127.0.0.1:8080',
+        url: process.env.SERVICE_URL,
         cleartext: true,
         allowNavigation: ['*'],
       },
@@ -38,7 +38,7 @@ switch (process.env.NODE_ENV) {
     config = {
       ...baseConfig,
       server: {
-        url: 'https://commonwealth-staging.herokuapp.com',
+        url: 'https://commonwealth-staging.herokuapp.com/api',
         cleartext: true,
         allowNavigation: ['*'],
       },
