@@ -32,7 +32,12 @@ export const UpdateProposalStatusModal = ({
   const [tempStage, setTempStage] = useState<ThreadStage>(thread.stage);
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<SnapshotProposal>
-  >([{ id: thread.snapshotProposal } as SnapshotProposal]);
+  >(
+    [
+      thread.snapshotProposal &&
+        ({ id: thread.snapshotProposal } as SnapshotProposal),
+    ].filter(Boolean)
+  );
   const [tempChainEntities, setTempChainEntities] = useState<
     Array<ChainEntity>
   >(thread.chainEntities || []);
@@ -76,10 +81,12 @@ export const UpdateProposalStatusModal = ({
         threadId: thread.id,
         entities: tempChainEntities,
       });
-      await app.threads.setLinkedSnapshotProposal({
-        threadId: thread.id,
-        snapshotProposal: tempSnapshotProposals[0]?.id,
-      });
+      if (tempSnapshotProposals.length > 0 && tempSnapshotProposals[0]?.id) {
+        await app.threads.setLinkedSnapshotProposal({
+          threadId: thread.id,
+          snapshotProposal: tempSnapshotProposals[0]?.id,
+        });
+      }
     } catch (err) {
       console.log('Failed to update linked proposals');
       throw new Error(
