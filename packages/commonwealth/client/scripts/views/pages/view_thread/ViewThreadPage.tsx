@@ -415,13 +415,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     return <PageNotFound />;
   }
 
-  if (
-    !app.newProfiles.allLoaded() &&
-    !prefetch[threadId]?.['profilesFinished']
-  ) {
-    return <PageLoading />;
-  }
-
   if (!thread) {
     return <PageLoading />;
   }
