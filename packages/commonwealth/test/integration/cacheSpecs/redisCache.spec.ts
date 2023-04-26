@@ -15,6 +15,24 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function addRandomKeys(redisCache: RedisCache, test_namespace: RedisNamespaces) {
+  const random = Math.random();
+    const key1 = `testKey${random}`;
+    const value1 = `testValue${random}`;
+    const key2 = `testKey${random + 1}`;
+    const value2 = `testValue${random + 1}`;
+    const key3 = `testKey${random + 2}`;
+    const value3 = `testValue${random + 2}`;
+    await redisCache.setKey(test_namespace, key1, value1);
+    await redisCache.setKey(test_namespace, key2, value2);
+    await redisCache.setKey(test_namespace, key3, value3);
+    return {
+      [`${RedisCache.getNamespaceKey(test_namespace, key1)}`]: value1,
+      [`${RedisCache.getNamespaceKey(test_namespace, key2)}`]: value2,
+      [`${RedisCache.getNamespaceKey(test_namespace, key3)}`]: value3,
+    }
+}
+
 export async function connectToRedis(redisCache: RedisCache) {
   const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
   if (!REDIS_URL) {
@@ -53,10 +71,15 @@ describe('RedisCache', () => {
   before(async () => {
     redisCache = new RedisCache();
     await connectToRedis(redisCache);
+    await redisCache.deleteNamespaceKeys(test_namespace);
   });
 
   after(async () => {
     await redisCache.closeClient();
+  });
+
+  afterEach(async () => {
+    await redisCache.deleteNamespaceKeys(test_namespace);
   });
 
   it('should set and get a key with namespace', async () => {
@@ -71,4 +94,19 @@ describe('RedisCache', () => {
   it('test key expiry', async () => {
     await testExpiry(redisCache, test_namespace);
   });
+
+  it('should get multiple keys with namespace', async () => {
+    const data = await addRandomKeys(redisCache, test_namespace);
+    const result = await redisCache.getNamespaceKeys(test_namespace);
+    expect(result).to.deep.equal(data);
+  });
+
+  it('should delete multiple keys with namespace', async () => {
+    await addRandomKeys(redisCache, test_namespace);
+    const records = await redisCache.deleteNamespaceKeys(test_namespace);
+    expect(records).to.equal(3);
+    const result = await redisCache.getNamespaceKeys(test_namespace);
+    expect(result).to.deep.equal({});
+  });
+
 });

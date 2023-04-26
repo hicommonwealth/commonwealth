@@ -1,7 +1,8 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, Request } from 'express';
 import { RedisNamespaces } from './types';
 import { RedisCache } from './redisCache';
 import { ServerError } from 'common-common/src/errors';
+import { defaultKeyGenerator } from './cacheKeyUtils';
 
 export class CacheDecorator {
   private redisCache: RedisCache;
@@ -10,9 +11,9 @@ export class CacheDecorator {
     this.redisCache = redisCache;
   }
 
-  public cache(duration: number, key = '', namespace: RedisNamespaces = RedisNamespaces.Route_Response): RequestHandler {
+  public cache(duration: number, keyGenerator: (req: Request) => string = defaultKeyGenerator, namespace: RedisNamespaces = RedisNamespaces.Route_Response): RequestHandler {
     return async function cacheMiddleware(req, res, next) {
-      const cacheKey = `${req.originalUrl}${key}`;
+      const cacheKey = keyGenerator(req);
       try {
         if (!this.redisCache) {
           next();
@@ -22,7 +23,7 @@ export class CacheDecorator {
         const cachedResponse = await this.redisCache.getKey(namespace, cacheKey);
         if (cachedResponse) {
           // Response found in cache, send it
-          console.log('Response found in cache, sending it');
+          console.log(`Response ${cacheKey} found in cache, sending it`);
           res.set('X-Cache', 'HIT');
           res.status(200).send(JSON.parse(cachedResponse));
           return;
@@ -32,7 +33,7 @@ export class CacheDecorator {
         const originalSend = res.send;
         res.send = (body) => {
           try {
-            console.log('Response not found in cache, sending it');
+            console.log(`Response ${cacheKey} not found in cache, sending it`);
             const response = originalSend.call(res,body);
             try {
               // const jsonBody = JSON.parse(body);

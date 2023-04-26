@@ -35,6 +35,11 @@ export class RedisCache {
     this.rollbar = rollbar_;
   }
 
+  // get namespace key for redis
+  static getNamespaceKey(namespace: RedisNamespaces, key: string) {
+    return `${namespace}_${key}`;
+  }
+
   /**
    * Initializes the Redis client. Must be run before any Redis command can be executed.
    */
@@ -129,7 +134,7 @@ export class RedisCache {
       );
       return false;
     }
-    const finalKey = namespace + '_' + key;
+    const finalKey = RedisCache.getNamespaceKey(namespace, key);
 
     try {
       if(duration>0) {
@@ -161,7 +166,7 @@ export class RedisCache {
       return;
     }
 
-    const finalKey = namespace + '_' + key;
+    const finalKey = RedisCache.getNamespaceKey(namespace, key);
     return await this.client.get(finalKey);
   }
 
@@ -202,7 +207,7 @@ export class RedisCache {
    */
   public async getNamespaceKeys(
     namespace: RedisNamespaces,
-    maxResults?: number
+    maxResults = 1000
   ): Promise<{ [key: string]: string } | boolean> {
     if (!this.initialized) {
       log.error(
@@ -211,16 +216,23 @@ export class RedisCache {
       return false;
     }
 
+    const keys = [];
     const data = {};
     try {
-      for await (const { field, value } of this.client.scanIterator({
+      for await (const key of this.client.scanIterator({
         MATCH: `${namespace}*`,
         COUNT: maxResults,
       })) {
-        data[field] = value;
+        keys.push(key);
       }
+
+      for (const key of keys) {
+        data[key] = await this.client.get(key);
+      }
+
       return data;
     } catch (e) {
+      console.log(e);
       return false;
     }
   }
@@ -250,24 +262,24 @@ export class RedisCache {
    * @returns boolean
    */
   public async deleteNamespaceKeys(
-    namespace: RedisNamespaces,
-    maxResults?: number
-  ): Promise<{ [key: string]: string } | boolean> {
+    namespace: RedisNamespaces
+  ): Promise<number | boolean> {
     try {
-      const data = this.getNamespaceKeys(namespace, maxResults);
+      let count = 0;
+      const data = await this.getNamespaceKeys(namespace);
       if (data) {
-        for (const key in data) {
+        for (const key of Object.keys(data)) {
           try {
             const resp = await this.client.del(key);
-            console.log(resp);
-            console.log(`Deleted ${key}`)
+            count += resp;
+            console.log(`deleted key ${key} ${resp} ${count}`)
           } catch (err) {
             console.log(`error deleting key ${key}`)
             console.log(err);
           }
         }
       }
-      return true;
+      return count;
     } catch (e) {
       console.log(e);
       return false;

@@ -205,10 +205,6 @@ async function main() {
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
-    app.use(function (err, req, res, next) {
-      console.error(err.stack);
-      res.status(500).send('Something broke!');
-    });
   };
 
   const templateFile = (() => {
