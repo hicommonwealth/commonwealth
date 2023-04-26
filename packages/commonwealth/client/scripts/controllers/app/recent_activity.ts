@@ -78,7 +78,7 @@ class RecentActivityController {
 
     const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/activeThreads`, params),
-      app.chainEntities.refresh(params.chain),
+      // app.chainEntities.refresh(params.chain),
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
