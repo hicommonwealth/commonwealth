@@ -21,7 +21,6 @@ export const TopicSelector = ({
   onChange,
 }: TopicSelectorProps) => {
   const options = topics
-    .filter((topic) => topic.featuredInSidebar)
     .sort((a, b) => a.order - b.order)
     .map(topicToOption);
 
