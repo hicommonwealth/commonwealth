@@ -8,7 +8,7 @@ import { Op } from 'sequelize';
 
 type GetLinksReq = {
   thread_id?: number;
-  linkType: LinkSource;
+  linkType: LinkSource[];
   link?: Link;
 };
 
@@ -41,7 +41,7 @@ const getLinks = async (
     if (!thread) return next(new AppError(Errors.NoThread));
     links = linkType
       ? thread.links.filter((items) => {
-          return items.source == linkType;
+          return linkType.includes(items.source);
         })
       : thread.links;
   }
