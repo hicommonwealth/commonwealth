@@ -18,7 +18,7 @@ import {
 
 export type SnapshotPollCardProps = Omit<
   PollCardProps & {
-    onSnapshotVoteCast: (option: string, callback: () => void) => void;
+    onSnapshotVoteCast: (option: string) => void;
   },
   'multiSelect' | 'onResultsClick'
 >;
@@ -56,29 +56,22 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
 
   const resultString = 'Results';
 
-  const castVote = async () => {
-    await onSnapshotVoteCast(selectedOptions[0], () => {
-      if (!votedFor) {
-        setInternalTotalVoteCount(internalTotalVoteCount + incrementalVoteCast);
-      }
-      setVoteDirectionString(buildVoteDirectionString(selectedOptions[0]));
-      setInternalHasVoted(true);
-      // Local vote information is updated here because it is not updated in the parent component in time
-      setInternalVoteInformation(
-        internalVoteInformation.map((option) => {
-          if (option.label === selectedOptions[0]) {
-            return {
-              ...option,
-              hasVoted: true,
-              voteCount: option.voteCount + incrementalVoteCast,
-            };
-          } else {
-            return option;
-          }
-        })
-      );
-    });
+  const castVote = () => {
+    setVoteDirectionString(buildVoteDirectionString(selectedOptions[0]));
+    onSnapshotVoteCast(selectedOptions[0]);
   };
+
+  useEffect(() => {
+    if (hasVoted) {
+      setInternalHasVoted(true);
+    }
+  }, [hasVoted]);
+
+  useEffect(() => {
+    if (votedFor) {
+      buildVoteDirectionString(votedFor);
+    }
+  }, [votedFor]);
 
   useEffect(() => {
     setInternalTotalVoteCount(totalVoteCount);
@@ -104,6 +97,7 @@ export const SnapshotPollCard = (props: SnapshotPollCardProps) => {
               voteInformation={internalVoteInformation}
               selectedOptions={selectedOptions}
               disableVoteOptions={disableVoteButton}
+              setSelectedOptions={setSelectedOptions}
             />
             <CastVoteSection
               disableVoteButton={
