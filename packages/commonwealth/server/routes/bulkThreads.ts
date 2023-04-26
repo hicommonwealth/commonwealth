@@ -1,10 +1,42 @@
 /* eslint-disable quotes */
 import { ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
 import { getLastEdited } from '../util/getLastEdited';
+
+const processLinks = async (thread, models) => {
+  let chain_entity_meta = [];
+  let linked_threads = [];
+  if (thread.links) {
+    const ces = thread.links.filter((item) => item.source === 'proposal');
+    if (ces.length > 0) {
+      chain_entity_meta = (
+        await models.ChainEntityMeta.findAll({
+          where: {
+            ce_id: {
+              [Op.in]: ces.map((ce) => parseInt(ce.identifier)),
+            },
+          },
+          attributes: ['ce_id', 'title'],
+        })
+      ).map((entity) => {
+        return { ce_id: entity.ce_id, title: ces.title };
+      });
+    }
+    linked_threads = thread.links
+      .filter((item) => item.source === 'thread')
+      .map((thread_link) => {
+        return {
+          linking_thread: thread.thread_id,
+          linked_thread: parseInt(thread_link.identifier),
+        };
+      });
+  }
+  return { chain_entity_meta, linked_threads };
+};
+
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
 const bulkThreads = async (
   models: DB,
@@ -39,10 +71,11 @@ const bulkThreads = async (
         threads.has_poll, threads.plaintext,
         threads.url, threads.pinned, threads.number_of_comments,
         threads.reaction_ids, threads.reaction_type, threads.addresses_reacted,
+        threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        collaborators, chain_entity_meta, linked_threads
+        collaborators
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
@@ -51,30 +84,16 @@ const bulkThreads = async (
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted,
           t.has_poll,
           t.plaintext,
-          t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
+          t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
               )
-            ) AS collaborators,
-          ARRAY_AGG(
-              JSON_BUILD_OBJECT('ce_id', entity_meta.ce_id, 'title', entity_meta.title)
-            ) AS chain_entity_meta,
-          ARRAY_AGG(DISTINCT
-            CONCAT(
-              '{ "id": "', linked_threads.id, '",
-                  "linked_thread": "', linked_threads.linked_thread, '",
-                  "linking_thread": "', linked_threads.linking_thread, '" }'
-            )
-          ) AS linked_threads 
+            ) AS collaborators
         FROM "Threads" t
-        LEFT JOIN "LinkedThreads" AS linked_threads
-        ON t.id = linked_threads.linking_thread
         LEFT JOIN "Collaborations" AS collaborations
         ON t.id = collaborations.thread_id
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
-        LEFT JOIN "ChainEntityMeta" AS entity_meta
-        ON t.id = entity_meta.thread_id
         LEFT JOIN (
             SELECT thread_id, COUNT(*) AS number_of_comments
             FROM "Comments"
@@ -117,15 +136,15 @@ const bulkThreads = async (
       return next(new ServerError('Could not fetch threads'));
     }
 
-    threads = preprocessedThreads.map((t) => {
+    threads = preprocessedThreads.map(async (t) => {
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
-      let chain_entity_meta = [];
-      if (t.chain_entity_meta[0].ce_id) chain_entity_meta = t.chain_entity_meta;
-      const linked_threads = JSON.parse(t.linked_threads[0]).id
-        ? t.linked_threads.map((c) => JSON.parse(c))
-        : [];
+      const { chain_entity_meta, linked_threads } = await processLinks(
+        t,
+        models
+      );
+
       const last_edited = getLastEdited(t);
 
       const data = {
@@ -189,21 +208,19 @@ const bulkThreads = async (
               model: models.Topic,
               as: 'topic',
             },
-            {
-              model: models.ChainEntityMeta,
-              as: 'chain_entity_meta',
-            },
-            {
-              model: models.LinkedThread,
-              as: 'linked_threads',
-            },
           ],
           attributes: { exclude: ['version_history'] },
           order: [['created_at', 'DESC']],
         })
-      ).map((t) => {
+      ).map(async (t) => {
         const row = t.toJSON();
         const last_edited = getLastEdited(row);
+        const { chain_entity_meta, linked_threads } = await processLinks(
+          t,
+          models
+        );
+        row['chain_entity_meta'] = chain_entity_meta;
+        row['linked_threads'] = linked_threads;
         row['last_edited'] = last_edited;
         return row;
       });
@@ -223,6 +240,8 @@ const bulkThreads = async (
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
   ).length;
+
+  threads = await Promise.all(threads);
 
   return res.json({
     status: 'Success',
