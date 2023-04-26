@@ -7,7 +7,7 @@ export const defaultKeyGenerator = (req: Request) => {
 export const defaultUserKeyGenerator = (req: Request) => {
     const user = req.user;
     if(user && user.id) {
-        return `${user.id}-${req.originalUrl}`;
+        return `${user.id}_${req.originalUrl}`;
     }
     return req.originalUrl;
 }

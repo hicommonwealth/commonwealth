@@ -19,6 +19,7 @@ export class CacheDecorator {
           next();
           return;
         }
+
         // Try to fetch the response from Redis cache
         const cachedResponse = await this.redisCache.getKey(namespace, cacheKey);
         if (cachedResponse) {
@@ -28,7 +29,7 @@ export class CacheDecorator {
           res.status(200).send(JSON.parse(cachedResponse));
           return;
         }
-        // Response not found in cache, generate it and cache it
+
         // Response not found in cache, generate it and cache it
         const originalSend = res.send;
         res.send = (body) => {
@@ -36,9 +37,7 @@ export class CacheDecorator {
             console.log(`Response ${cacheKey} not found in cache, sending it`);
             const response = originalSend.call(res,body);
             try {
-              // const jsonBody = JSON.parse(body);
-              // if(jsonBody && jsonBody.status=='Success') {
-              if(res.statusCode == 200) {
+              if(res.statusCode==200) {
                 this.redisCache.setKey(namespace, cacheKey, body, duration);
               }
             } catch (error) {
