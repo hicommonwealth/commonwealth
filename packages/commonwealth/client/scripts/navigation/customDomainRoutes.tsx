@@ -72,7 +72,10 @@ const customDomainRoutes = () => {
   return [
     <Route
       path="/"
-      element={withLayout(DiscussionsRedirectPage, { scoped: true })}
+      element={withLayout(DiscussionsRedirectPage, {
+        scoped: true,
+        deferChain: true,
+      })}
     />,
     <Route
       path="/createCommunity"

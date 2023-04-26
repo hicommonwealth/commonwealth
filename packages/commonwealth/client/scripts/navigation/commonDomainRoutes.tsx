@@ -277,6 +277,7 @@ const commonDomainsRoutes = () => [
     path="/:scope"
     element={withLayout(DiscussionsRedirectPage, {
       scoped: true,
+      deferChain: true,
     })}
   />,
   ...(featureFlags.communityHomepage
