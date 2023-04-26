@@ -9,6 +9,7 @@ import type { DeltaOperation, RangeStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import ReactQuill, { Quill } from 'react-quill';
 import QuillMention from 'quill-mention';
+import MagicUrl from 'quill-magic-url';
 import moment from 'moment';
 
 import type { SerializableDeltaStatic } from './utils';
@@ -42,6 +43,7 @@ const LoadingIndicator = () => {
 const Delta = Quill.import('delta');
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
 Quill.register('modules/mention', QuillMention);
+Quill.register('modules/magicUrl', MagicUrl);
 
 type ReactQuillEditorProps = {
   className?: string;
@@ -463,6 +465,7 @@ const ReactQuillEditor = ({
               matchers: clipboardMatchers,
             },
             mention,
+            magicUrl: !isMarkdownEnabled,
           }}
         />
       )}
