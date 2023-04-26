@@ -113,6 +113,7 @@ export const LinkedProposalsCard = ({
                           <LinkedProposal
                             thread={thread}
                             chainEntity={chainEntity}
+                            key={chainEntity.id}
                           />
                         );
                       })}
