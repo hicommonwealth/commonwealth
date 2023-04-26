@@ -100,6 +100,7 @@ class Thread implements IUniqueId {
     canvasAction,
     canvasSession,
     canvasHash,
+    links,
   }: {
     author: string;
     title: string;
@@ -132,6 +133,7 @@ class Thread implements IUniqueId {
     canvasAction?: string;
     canvasSession?: string;
     canvasHash?: string;
+    links?: Link[];
   }) {
     this.author = author;
     this.title = title;
@@ -182,6 +184,7 @@ class Thread implements IUniqueId {
     this.canvasAction = canvasAction;
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
+    this.links = links || [];
   }
 }
 

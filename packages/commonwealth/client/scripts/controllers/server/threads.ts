@@ -25,6 +25,7 @@ import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
 import { Link, LinkSource } from 'server/models/thread';
+import axios from 'axios';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -104,19 +105,6 @@ class ThreadsController {
     this._resetPagination = true;
   }
 
-  public getType(primary: string, secondary?: string, tertiary?: string) {
-    const result = this._store.getAll().filter((thread) => {
-      return tertiary
-        ? thread.kind === primary ||
-            thread.kind === secondary ||
-            thread.kind === tertiary
-        : secondary
-        ? thread.kind === primary || thread.kind === secondary
-        : thread.kind === primary;
-    });
-    return result;
-  }
-
   public getById(id: number) {
     return this._store.getByIdentifier(id);
   }
@@ -150,6 +138,7 @@ class ThreadsController {
       canvasAction,
       canvasSession,
       canvasHash,
+      links,
     } = thread;
 
     let { reactionIds, reactionType, addressesReacted } = thread;
@@ -267,6 +256,7 @@ class ThreadsController {
       canvasAction,
       canvasSession,
       canvasHash,
+      links,
     });
 
     ThreadsController.Instance.store.add(t);
@@ -522,21 +512,28 @@ class ThreadsController {
    * @param args
    * @returns updated Thread
    */
-  public async addLinks(args: {
+  public async addLinks({
+    threadId,
+    links,
+  }: {
     threadId: number;
     links: Link[];
   }): Promise<Thread> {
-    const response = await $.ajax({
-      url: `${app.serverUrl()}/linking/addThreadLink`,
-      type: 'POST',
-      data: {
-        thread_id: args.threadId,
-        links: args.links,
-        jwt: app.user.jwt,
-      },
-    });
-    // Resolve response to a thread object
-    return response;
+    try {
+      const response = await axios.post(
+        `${app.serverUrl()}/linking/addThreadLink`,
+        {
+          thread_id: threadId,
+          links,
+          jwt: app.user.jwt,
+        }
+      );
+
+      return response.data;
+    } catch (err) {
+      notifyError('Could not add link to the thread');
+      console.log(err);
+    }
   }
 
   /**
@@ -544,20 +541,30 @@ class ThreadsController {
    * @param args
    * @returns updated Thread
    */
-  public async deleteLinks(args: {
+  public async deleteLinks({
+    threadId,
+    links,
+  }: {
     threadId: number;
     links: Link[];
   }): Promise<Thread> {
-    const response = await $.ajax({
-      url: `${app.serverUrl()}/linking/deleteLinks`,
-      type: 'POST',
-      data: {
-        thread_id: args.threadId,
-        links: args.links,
-        jwt: app.user.jwt,
-      },
-    });
-    return response;
+    try {
+      const response = await axios.delete(
+        `${app.serverUrl()}/linking/deleteLinks`,
+        {
+          data: {
+            thread_id: threadId,
+            links,
+            jwt: app.user.jwt,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (err) {
+      notifyError('Could not delete link');
+      console.log(err);
+    }
   }
 
   /**
@@ -565,39 +572,44 @@ class ThreadsController {
    * @param args
    * @returns list of resolved links using adapters + link object
    */
-  public async getLinksForThread(args: {
+  public async getLinksForThread({
+    threadId,
+    linkType,
+  }: {
     threadId: number;
     linkType?: LinkSource;
   }): Promise<string[]> {
-    const response = await $.ajax({
-      url: `${app.serverUrl()}/linking/getLinks`,
-      type: 'POST',
-      data: {
-        thread_id: args.threadId,
-        source: args.linkType,
+    try {
+      const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
+        thread_id: threadId,
+        source: linkType,
         jwt: app.user.jwt,
-      },
-    });
-    // This may need to include an adapter that resolves response as an actual link
-    return response;
+      });
+
+      return response.data;
+    } catch (err) {
+      notifyError('Could not get links');
+      console.log(err);
+    }
   }
 
   /**
-   * gets all threads associated with a link(ie all threads linked to 1 proposal)
+   * Gets all threads associated with a link(ie all threads linked to 1 proposal)
    * @param args
    * @returns A list of resolved thread objects
    */
-  public async getThreadsForLink(args: { link: Link }): Promise<Thread[]> {
-    const response = await $.ajax({
-      url: `${app.serverUrl()}/linking/getLinks`,
-      type: 'POST',
-      data: {
-        link: args.link,
+  public async getThreadsForLink({ link }: { link: Link }): Promise<Thread[]> {
+    try {
+      const response = await axios.post(`${app.serverUrl()}/linking/getLinks`, {
+        link,
         jwt: app.user.jwt,
-      },
-    });
-    // Resolve Thread ids list in response to Thread
-    return response;
+      });
+
+      return response.data;
+    } catch (err) {
+      notifyError('Could not get threads');
+      console.log(err);
+    }
   }
 
   //PROPOSAL LINKING TODO: Remove this + reimplement in above fns
@@ -617,7 +629,11 @@ class ThreadsController {
       success: () => {
         const thread = this._store.getByIdentifier(args.threadId);
         if (!thread) return;
+        // TODO in new approach there will be thread.links instead of thread.snapshotProposal
+        // TODO move thread.snapshotProposal to addLinks
+
         thread.snapshotProposal = args.snapshotProposal;
+
         return thread;
       },
       error: (err) => {
