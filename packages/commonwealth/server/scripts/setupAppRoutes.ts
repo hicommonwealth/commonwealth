@@ -211,13 +211,12 @@ const setupAppRoutes = (
     const chain = await models.Chain.findOne({ where: { id: scope } });
 
     const proposalTypes = new Set([
-      ChainBase.CosmosSDK,
       ChainNetwork.Sputnik,
       ChainNetwork.Compound,
       ChainNetwork.Aave
     ]);
 
-    if (!proposalTypes.has(chain?.base)) {
+    if (!proposalTypes.has(chain?.network) && chain?.base !== ChainBase.CosmosSDK) {
       renderWithMetaTags(res, '', '', '', null);
       return;
     }
