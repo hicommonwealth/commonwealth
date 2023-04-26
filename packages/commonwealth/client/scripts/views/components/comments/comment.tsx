@@ -5,9 +5,9 @@ import type { Account, Comment as CommentType } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import { ContentType, ThreadActionType } from 'types';
+import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
-import deleteComment from '../../../../../server/routes/deleteComment';
+import { notifyError } from '../../../controllers/app/notifications';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
@@ -111,11 +111,11 @@ export const Comment = (props: CommentProps) => {
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              app.comments.delete(comment).then(() => {
-                updatedCommentsCallback();
-              });
-            } catch (err) {
-              console.log(err);
+              await app.comments.delete(comment);
+              updatedCommentsCallback();
+            } catch (e) {
+              console.log(e);
+              notifyError('Failed to delete comment.')
             }
           },
         },
