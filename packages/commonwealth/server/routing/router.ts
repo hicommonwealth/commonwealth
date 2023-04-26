@@ -180,6 +180,9 @@ import { createTemplate, getTemplates } from '../routes/templates';
 
 import { addSwagger } from './addSwagger';
 import * as controllers from '../controller';
+import addThreadLink from '../routes/linking/addThreadLinks';
+import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
+import getLinks from '../routes/linking/getLinks';
 
 function setupRouter(
   endpoint: string,
@@ -950,6 +953,25 @@ function setupRouter(
     '/generateImage',
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models)
+  );
+
+  //linking
+  router.post(
+    '/linking/addThreadLinks',
+    passport.authenticate('jwt', { session: false }),
+    addThreadLink.bind(this, models)
+  );
+
+  router.delete(
+    '/linking/deleteLinks',
+    passport.authenticate('jwt', { session: false }),
+    deleteThreadLinks.bind(this, models)
+  );
+
+  router.post(
+    '/linking/getLinks',
+    passport.authenticate('jwt', { session: false }),
+    getLinks.bind(this, models)
   );
 
   // login
