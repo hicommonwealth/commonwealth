@@ -216,10 +216,10 @@ function setupRouter(
     updateAddress.bind(this, models)
   );
   router.get('/domain', domain.bind(this, models));
-  router.get('/status', cacheDecorator.cache(60, defaultUserKeyGenerator), status.bind(this, models));
+  router.get('/status', cacheDecorator.cacheMiddleware(60, defaultUserKeyGenerator), status.bind(this, models));
   router.get(
     '/statusBroken',
-    cacheDecorator.cache(100),
+    cacheDecorator.cacheMiddleware(100),
     statusBroken.bind(this, models)
   );
   router.post(
@@ -804,13 +804,13 @@ function setupRouter(
   router.post(
     '/viewUserActivity',
     passport.authenticate('jwt', { session: false }),
-    cacheDecorator.cache(60, defaultUserKeyGenerator),
+    cacheDecorator.cacheMiddleware(60, defaultUserKeyGenerator),
     viewUserActivity.bind(this, models)
   );
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
   router.post(
     '/viewGlobalActivity'
-    ,cacheDecorator.cache(60*6)
+    ,cacheDecorator.cacheMiddleware(60*6)
     ,viewGlobalActivity.bind(this, models, globalActivityCache)
   );
   router.post(

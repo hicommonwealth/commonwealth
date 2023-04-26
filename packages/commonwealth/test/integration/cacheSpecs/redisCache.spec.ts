@@ -2,18 +2,8 @@ const chai = require('chai');
 const expect = chai.expect;
 import { RedisCache } from 'common-common/src/redisCache';
 import { RedisNamespaces } from 'common-common/src/types';
-
-function timeoutPromise(timeout: number) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error(`Timed out after ${timeout}ms`));
-    }, timeout);
-  });
-}
-
-export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { connectToRedis } from '../../util/redisUtils';
+import { sleep } from '../../util/delayUtils';
 
 async function addRandomKeys(redisCache: RedisCache, test_namespace: RedisNamespaces) {
   const random = Math.random();
@@ -31,21 +21,6 @@ async function addRandomKeys(redisCache: RedisCache, test_namespace: RedisNamesp
       [`${RedisCache.getNamespaceKey(test_namespace, key2)}`]: value2,
       [`${RedisCache.getNamespaceKey(test_namespace, key3)}`]: value3,
     }
-}
-
-export async function connectToRedis(redisCache: RedisCache) {
-  const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-  if (!REDIS_URL) {
-    throw new Error('REDIS_URL not set');
-  }
-  try {
-    await Promise.race([timeoutPromise(10000), redisCache.init(REDIS_URL)]);
-    if (!redisCache.isInitialized) {
-      throw new Error('Redis Cache not initialized');
-    }
-  } catch (error) {
-    throw error;
-  }
 }
 
 export async function testExpiry(

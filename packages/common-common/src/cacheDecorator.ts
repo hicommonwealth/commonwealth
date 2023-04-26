@@ -8,6 +8,7 @@ import { defaultKeyGenerator } from './cacheKeyUtils';
 export class CacheDecorator {
   private redisCache: RedisCache;
 
+  // Set redis cache instance
   public setCache(redisCache: RedisCache) {
     this.redisCache = redisCache;
   }
@@ -16,8 +17,10 @@ export class CacheDecorator {
   // duration: cache duration in seconds, 0 means no expiry
   // keyGenerator: function to generate cache key, default is the route path
   // namespace: namespace for the cache key, default is Route_Response
-  public cache(duration: number, keyGenerator: (req: Request) => string = defaultKeyGenerator, namespace: RedisNamespaces = RedisNamespaces.Route_Response): RequestHandler {
-    return async function cacheMiddleware(req, res, next) {
+  public cacheMiddleware(duration: number, keyGenerator: (req: Request) => string = defaultKeyGenerator, namespace: RedisNamespaces = RedisNamespaces.Route_Response): RequestHandler {
+    const initInterceptor = this.initInterceptor.bind(this);
+    const checkCacheAndSendResponseIfFound = this.checkCacheAndSendResponseIfFound.bind(this);
+    return async function cache(req, res, next) {
       // If cache is not set, skip caching
       if (!this.redisCache) {
         console.log(`cache undefined`)
@@ -35,14 +38,14 @@ export class CacheDecorator {
 
       try {
         // Try to fetch the response from Redis cache
-        const found = await this.checkCacheAndSendResponseIfFound(cacheKey, namespace, res);
+        const found = await checkCacheAndSendResponseIfFound(res, cacheKey, namespace);
         if (found) {
           return;
         }
 
         // Response not found in cache, generate it and cache it
         const originalSend = res.send;
-        res.send = this.initInterceptor(cacheKey, namespace, duration, originalSend, res);
+        res.send = initInterceptor(cacheKey, namespace, duration, originalSend, res);
         next();
       } catch (error) {
         console.log(`Error fetching cache ${cacheKey}`)
@@ -70,6 +73,16 @@ export class CacheDecorator {
       return true;
     }
     return false;
+  }
+
+  // Cache the response
+  public async cacheResponse(cacheKey: string, valueToCache: string, duration: number, namespace: RedisNamespaces = RedisNamespaces.Route_Response) {
+    return await this.redisCache.setKey(namespace, cacheKey, valueToCache, duration);
+  }
+
+  // Check if the response is already cached, if yes, return it
+  public async checkCache(cacheKey: string, namespace: RedisNamespaces = RedisNamespaces.Route_Response): Promise<string> {
+    return await this.redisCache.getKey(namespace, cacheKey);
   }
 
   // response interceptor to cache the response and send it
