@@ -137,7 +137,7 @@ export class RedisCache {
     const finalKey = RedisCache.getNamespaceKey(namespace, key);
 
     try {
-      if(duration>0) {
+      if (duration > 0) {
         await this.client.set(finalKey, value, {
           EX: duration
         });
