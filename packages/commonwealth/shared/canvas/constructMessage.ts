@@ -1,7 +1,4 @@
-import type {
-  Chain as CanvasChain,
-  SessionPayload,
-} from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 
 export const createCanvasSessionPayload = (
   canvasChain: CanvasChain, // Canvas chain network, e.g. "ethereum"

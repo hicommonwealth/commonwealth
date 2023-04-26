@@ -20,7 +20,6 @@ import { getEIP712SignableSession } from '../../shared/adapters/chain/ethereum/k
 import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
 import { addressSwapper } from '../../shared/utils';
 import {
-  chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
   createCanvasSessionPayload,
 } from '../../shared/canvas';
@@ -56,7 +55,6 @@ const verifySessionSignature = async (
   }
 
   // Reconstruct the expected canvas message.
-  const canvasChain = chainBaseToCanvasChain(chain.base);
   const canvasChainId = chainBaseToCanvasChainId(chain.base, chain_id);
   const canvasSessionPayload = createCanvasSessionPayload(
     canvasChain,

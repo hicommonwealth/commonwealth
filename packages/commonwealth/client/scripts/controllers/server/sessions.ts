@@ -4,7 +4,6 @@ import { addressSwapper } from 'commonwealth/shared/utils';
 
 import {
   createCanvasSessionPayload,
-  chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
 } from 'canvas';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
@@ -34,7 +33,6 @@ export async function signSessionWithAccount<T extends { address: string }>(
     wallet.chain === ChainBase.CosmosSDK
       ? app.chain?.meta.bech32Prefix || 'cosmos'
       : app.chain?.meta.node?.ethChainId || 1;
-  const canvasChain = chainBaseToCanvasChain(wallet.chain);
   const canvasChainId = chainBaseToCanvasChainId(wallet.chain, idOrPrefix);
   const sessionPublicAddress = await app.sessions.getOrCreateAddress(
     wallet.chain,
