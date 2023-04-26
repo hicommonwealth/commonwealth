@@ -64,28 +64,32 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     };
   }, [threads]);
 
+  useEffect(() => {
+    setTotalThreads(app.threads.numTotalThreads);
+  }, [app.threads.numTotalThreads]);
+
   // setup initial threads
   useEffect(() => {
     app.threads.resetPagination();
     app.threads
       .loadNextPage({ topicName, stageName, includePinnedThreads: true })
-      .then(({ threads: t, totalResults }) => {
+      .then((t) => {
         // Fetch first 20 + unpinned threads
         setThreads(t);
-        !totalThreads && setTotalThreads(totalResults);
+        // !totalThreads && setTotalThreads(totalResults);
         setInitializing(false);
       });
   }, [stageName, topicName]);
 
   const loadMore = useCallback(async () => {
-    const response = await app.threads.loadNextPage({ topicName, stageName });
+    const newThreads = await app.threads.loadNextPage({ topicName, stageName });
     // If no new threads (we reached the end)
-    if (!response) {
+    if (!newThreads) {
       return;
     }
 
-    !totalThreads && setTotalThreads(response.totalResults);
-    return setThreads((oldThreads) => [...oldThreads, ...response.threads]);
+    // !totalThreads && setTotalThreads(response.totalResults);
+    return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
   }, [stageName, topicName, totalThreads]);
 
   if (initializing) {

@@ -5,6 +5,161 @@ import { QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
 import { getLastEdited } from '../util/getLastEdited';
+
+export const bulkThreadsQueryWithCutoffDate = (
+  countResults: boolean,
+  includePinnedThreads?: boolean,
+  topicOptions?: string,
+  limit?: number
+) => `
+  SELECT 
+  ${
+    countResults
+      ? 'COUNT(*)'
+      : `
+      addr.id AS addr_id, 
+      addr.address AS addr_address, 
+      last_commented_on, 
+      addr.chain AS addr_chain, 
+      threads.thread_id, 
+      thread_title, 
+      thread_chain, 
+      thread_created, 
+      threads.kind, 
+      threads.read_only, 
+      threads.body, 
+      threads.stage, 
+      threads.snapshot_proposal, 
+      threads.has_poll, 
+      threads.plaintext, 
+      threads.url, 
+      threads.pinned, 
+      threads.number_of_comments, 
+      threads.reaction_ids, 
+      threads.reaction_type, 
+      threads.addresses_reacted, 
+      topics.id AS topic_id, 
+      topics.name AS topic_name, 
+      topics.description AS topic_description, 
+      topics.chain_id AS topic_chain, 
+      topics.telegram AS topic_telegram, 
+      collaborators, 
+      chain_entity_meta, 
+      linked_threads 
+    `
+  }
+  FROM 
+    "Addresses" AS addr 
+    RIGHT JOIN (
+      SELECT 
+        t.id AS thread_id, 
+        t.title AS thread_title, 
+        t.address_id, 
+        t.last_commented_on, 
+        t.created_at AS thread_created, 
+        t.chain AS thread_chain, 
+        t.read_only, 
+        t.body, 
+        comments.number_of_comments, 
+        reactions.reaction_ids, 
+        reactions.reaction_type, 
+        reactions.addresses_reacted, 
+        t.has_poll, 
+        t.plaintext, 
+        t.stage, 
+        t.snapshot_proposal, 
+        t.url, 
+        t.pinned, 
+        t.topic_id, 
+        t.kind, 
+        ARRAY_AGG(
+          DISTINCT CONCAT(
+            '{ "address": "', editors.address, 
+            '", "chain": "', editors.chain, 
+            '" }'
+          )
+        ) AS collaborators, 
+        ARRAY_AGG(
+          JSON_BUILD_OBJECT(
+            'ce_id', entity_meta.ce_id, 'title', 
+            entity_meta.title
+          )
+        ) AS chain_entity_meta, 
+        ARRAY_AGG(
+          DISTINCT CONCAT(
+            '{ "id": "', linked_threads.id, '",
+                    "linked_thread": "', 
+            linked_threads.linked_thread, '",
+                    "linking_thread": "', 
+            linked_threads.linking_thread, 
+            '" }'
+          )
+        ) AS linked_threads 
+      FROM 
+        "Threads" t 
+        LEFT JOIN "LinkedThreads" AS linked_threads ON t.id = linked_threads.linking_thread 
+        LEFT JOIN "Collaborations" AS collaborations ON t.id = collaborations.thread_id 
+        LEFT JOIN "Addresses" editors ON collaborations.address_id = editors.id 
+        LEFT JOIN "ChainEntityMeta" AS entity_meta ON t.id = entity_meta.thread_id 
+        LEFT JOIN (
+          SELECT 
+            thread_id, 
+            COUNT(*) AS number_of_comments 
+          FROM 
+            "Comments" 
+          WHERE 
+            deleted_at IS NULL 
+          GROUP BY 
+            thread_id
+        ) comments ON t.id = comments.thread_id 
+        LEFT JOIN (
+          SELECT 
+            thread_id, 
+            STRING_AGG(ad.address :: text, ',') AS addresses_reacted, 
+            STRING_AGG(r.reaction :: text, ',') AS reaction_type, 
+            STRING_AGG(r.id :: text, ',') AS reaction_ids 
+          FROM 
+            "Reactions" as r 
+            LEFT JOIN "Addresses" ad ON r.address_id = ad.id 
+          GROUP BY 
+            thread_id
+        ) reactions ON t.id = reactions.thread_id 
+      WHERE 
+        t.deleted_at IS NULL 
+        AND t.chain = $chain ${topicOptions || ''} 
+        AND (
+          ${includePinnedThreads ? 't.pinned = true OR' : ''} (
+            COALESCE(
+              t.last_commented_on, t.created_at
+            ) < $created_at 
+            AND t.pinned = false
+          )
+        ) 
+      GROUP BY 
+        (
+          t.id, 
+          COALESCE(
+            t.last_commented_on, t.created_at
+          ), 
+          comments.number_of_comments, 
+          reactions.reaction_ids, 
+          reactions.reaction_type, 
+          reactions.addresses_reacted
+        ) 
+      ORDER BY 
+        t.pinned DESC, 
+        COALESCE(
+          t.last_commented_on, t.created_at
+        ) DESC 
+      ${limit ? `LIMIT ${limit}` : ''}
+    ) threads ON threads.address_id = addr.id 
+    LEFT JOIN "Topics" topics ON threads.topic_id = topics.id ${
+      !countResults && includePinnedThreads
+        ? 'ORDER BY threads.pinned DESC'
+        : ''
+    }
+`;
+
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
 const bulkThreads = async (
   models: DB,
@@ -30,169 +185,21 @@ const bulkThreads = async (
   bind['created_at'] = cutoff_date;
 
   let threads;
-  let numTotalThreads = 0;
   if (cutoff_date) {
-    const baseQuery = (countResults: boolean, limit?: number) => `
-      SELECT 
-      ${
-        countResults
-          ? 'COUNT(*)'
-          : `
-          addr.id AS addr_id, 
-          addr.address AS addr_address, 
-          last_commented_on, 
-          addr.chain AS addr_chain, 
-          threads.thread_id, 
-          thread_title, 
-          thread_chain, 
-          thread_created, 
-          threads.kind, 
-          threads.read_only, 
-          threads.body, 
-          threads.stage, 
-          threads.snapshot_proposal, 
-          threads.has_poll, 
-          threads.plaintext, 
-          threads.url, 
-          threads.pinned, 
-          threads.number_of_comments, 
-          threads.reaction_ids, 
-          threads.reaction_type, 
-          threads.addresses_reacted, 
-          topics.id AS topic_id, 
-          topics.name AS topic_name, 
-          topics.description AS topic_description, 
-          topics.chain_id AS topic_chain, 
-          topics.telegram AS topic_telegram, 
-          collaborators, 
-          chain_entity_meta, 
-          linked_threads 
-        `
-      }
-      FROM 
-        "Addresses" AS addr 
-        RIGHT JOIN (
-          SELECT 
-            t.id AS thread_id, 
-            t.title AS thread_title, 
-            t.address_id, 
-            t.last_commented_on, 
-            t.created_at AS thread_created, 
-            t.chain AS thread_chain, 
-            t.read_only, 
-            t.body, 
-            comments.number_of_comments, 
-            reactions.reaction_ids, 
-            reactions.reaction_type, 
-            reactions.addresses_reacted, 
-            t.has_poll, 
-            t.plaintext, 
-            t.stage, 
-            t.snapshot_proposal, 
-            t.url, 
-            t.pinned, 
-            t.topic_id, 
-            t.kind, 
-            ARRAY_AGG(
-              DISTINCT CONCAT(
-                '{ "address": "', editors.address, 
-                '", "chain": "', editors.chain, 
-                '" }'
-              )
-            ) AS collaborators, 
-            ARRAY_AGG(
-              JSON_BUILD_OBJECT(
-                'ce_id', entity_meta.ce_id, 'title', 
-                entity_meta.title
-              )
-            ) AS chain_entity_meta, 
-            ARRAY_AGG(
-              DISTINCT CONCAT(
-                '{ "id": "', linked_threads.id, '",
-                        "linked_thread": "', 
-                linked_threads.linked_thread, '",
-                        "linking_thread": "', 
-                linked_threads.linking_thread, 
-                '" }'
-              )
-            ) AS linked_threads 
-          FROM 
-            "Threads" t 
-            LEFT JOIN "LinkedThreads" AS linked_threads ON t.id = linked_threads.linking_thread 
-            LEFT JOIN "Collaborations" AS collaborations ON t.id = collaborations.thread_id 
-            LEFT JOIN "Addresses" editors ON collaborations.address_id = editors.id 
-            LEFT JOIN "ChainEntityMeta" AS entity_meta ON t.id = entity_meta.thread_id 
-            LEFT JOIN (
-              SELECT 
-                thread_id, 
-                COUNT(*) AS number_of_comments 
-              FROM 
-                "Comments" 
-              WHERE 
-                deleted_at IS NULL 
-              GROUP BY 
-                thread_id
-            ) comments ON t.id = comments.thread_id 
-            LEFT JOIN (
-              SELECT 
-                thread_id, 
-                STRING_AGG(ad.address :: text, ',') AS addresses_reacted, 
-                STRING_AGG(r.reaction :: text, ',') AS reaction_type, 
-                STRING_AGG(r.id :: text, ',') AS reaction_ids 
-              FROM 
-                "Reactions" as r 
-                LEFT JOIN "Addresses" ad ON r.address_id = ad.id 
-              GROUP BY 
-                thread_id
-            ) reactions ON t.id = reactions.thread_id 
-          WHERE 
-            t.deleted_at IS NULL 
-            AND t.chain = $chain ${topicOptions} 
-            AND (
-              ${includePinnedThreads ? 't.pinned = true OR' : ''} (
-                COALESCE(
-                  t.last_commented_on, t.created_at
-                ) < $created_at 
-                AND t.pinned = false
-              )
-            ) 
-          GROUP BY 
-            (
-              t.id, 
-              COALESCE(
-                t.last_commented_on, t.created_at
-              ), 
-              comments.number_of_comments, 
-              reactions.reaction_ids, 
-              reactions.reaction_type, 
-              reactions.addresses_reacted
-            ) 
-          ORDER BY 
-            t.pinned DESC, 
-            COALESCE(
-              t.last_commented_on, t.created_at
-            ) DESC 
-          ${limit ? `LIMIT ${limit}` : ''}
-        ) threads ON threads.address_id = addr.id 
-        LEFT JOIN "Topics" topics ON threads.topic_id = topics.id ${
-          !countResults && includePinnedThreads
-            ? 'ORDER BY threads.pinned DESC'
-            : ''
-        }
-    `;
-
     let preprocessedThreads;
     try {
-      preprocessedThreads = await models.sequelize.query(baseQuery(false, 20), {
-        bind,
-        type: QueryTypes.SELECT,
-      });
-
-      const counts = await models.sequelize.query(baseQuery(true), {
-        bind,
-        type: QueryTypes.SELECT,
-      });
-      numTotalThreads = parseInt((counts[0] as { count: string }).count);
+      preprocessedThreads = await models.sequelize.query(
+        bulkThreadsQueryWithCutoffDate(
+          false,
+          includePinnedThreads,
+          topicOptions,
+          20
+        ),
+        {
+          bind,
+          type: QueryTypes.SELECT,
+        }
+      );
     } catch (e) {
       console.log(e);
       return next(new ServerError('Could not fetch threads'));
@@ -288,7 +295,6 @@ const bulkThreads = async (
         row['last_edited'] = last_edited;
         return row;
       });
-    numTotalThreads = threads.length;
   }
 
   const countsQuery = `
@@ -310,7 +316,6 @@ const bulkThreads = async (
   return res.json({
     status: 'Success',
     result: {
-      numTotalThreads,
       numVotingThreads,
       threads,
     },

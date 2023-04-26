@@ -19,6 +19,7 @@ import type { ThreadInstance } from '../models/thread';
 import type { TopicInstance } from '../models/topic';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
+import { bulkThreadsQueryWithCutoffDate } from './bulkThreads';
 
 export const Errors = {};
 
@@ -35,6 +36,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     admins,
     mostActiveUsers,
     threadsInVoting,
+    totalThreads,
     chatChannels,
     rules,
     communityBanner,
@@ -47,6 +49,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         RoleInstanceWithPermission[],
         unknown,
         ThreadInstance[],
+        unknown,
         ChatChannelInstance[],
         RuleInstance[],
         CommunityBannerInstance,
@@ -120,6 +123,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         type: QueryTypes.SELECT,
       }
     ),
+    await models.sequelize.query(bulkThreadsQueryWithCutoffDate(true, true), {
+      bind: { chain: chain.id, created_at: new Date().toISOString() },
+      type: QueryTypes.SELECT,
+    }),
     models.ChatChannel.findAll({
       where: {
         chain_id: chain.id,
@@ -195,11 +202,16 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     (t) => t.stage === 'voting'
   ).length;
 
+  const numTotalThreads = parseInt(
+    (totalThreads[0] as { count: string }).count
+  );
+
   return res.json({
     status: 'Success',
     result: {
       topics: topics.map((t) => t.toJSON()),
       numVotingThreads,
+      numTotalThreads,
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
       chatChannels: JSON.stringify(chatChannels),

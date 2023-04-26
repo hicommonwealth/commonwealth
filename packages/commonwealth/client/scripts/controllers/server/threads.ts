@@ -97,6 +97,7 @@ class ThreadsController {
   }
 
   public numVotingThreads: number;
+  public numTotalThreads: number;
   private _resetPagination: boolean;
 
   public resetPagination() {
@@ -745,7 +746,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
-    const { threads, numTotalThreads } = response.result;
+    const { threads } = response.result;
     // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
     const modeledThreads: Thread[] = threads.map((t) => {
       return this.modelFromServer(t);
@@ -790,10 +791,15 @@ class ThreadsController {
       this.listingStore.depleteListing(options);
     }
 
-    return { threads: modeledThreads, totalResults: numTotalThreads };
+    return modeledThreads;
   }
 
-  public initialize(initialThreads = [], numVotingThreads, reset) {
+  public initialize(
+    initialThreads = [],
+    numVotingThreads,
+    numTotalThreads,
+    reset
+  ) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -810,6 +816,7 @@ class ThreadsController {
       }
     }
     this.numVotingThreads = numVotingThreads;
+    this.numTotalThreads = numTotalThreads;
     this._initialized = true;
     this._resetPagination = true;
   }
