@@ -16,7 +16,7 @@ import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
 import { PermissionManager } from '../../shared/permissions';
 
-import { createCanvasSessionPayload, CANVAS_APPNAME } from 'canvas';
+import { createCanvasSessionPayload } from 'canvas';
 
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
@@ -249,7 +249,6 @@ export const createThread = async (args: ThreadArgs) => {
 
   const actionPayload: ActionPayload = {
     app: session.payload.app,
-    appName: CANVAS_APPNAME,
     block: session.payload.block,
     call: "thread",
     callArgs: {
@@ -314,7 +313,6 @@ export const createComment = async (args: CommentArgs) => {
 
   const actionPayload: ActionPayload = {
     app: session.payload.app,
-    appName: CANVAS_APPNAME,
     block: session.payload.block,
     call: "comment",
     callArgs: {
@@ -402,7 +400,6 @@ export const createReaction = async (args: CreateReactionArgs) => {
 
   const actionPayload: ActionPayload = {
     app: session.payload.app,
-    appName: CANVAS_APPNAME,
     block: session.payload.block,
     call: "reactComment",
     callArgs: { comment_id, value: reaction },

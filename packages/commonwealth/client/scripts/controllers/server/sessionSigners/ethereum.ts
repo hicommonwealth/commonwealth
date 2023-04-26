@@ -132,7 +132,6 @@ export class EthereumSessionController implements ISessionController {
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,
-      appName: 'Commonwealth',
       from: sessionPayload.from,
       timestamp: +Date.now(),
       chain: 'ethereum',
