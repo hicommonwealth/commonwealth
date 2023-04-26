@@ -1,3 +1,5 @@
+@import '../../shared';
+
 .QuillEditorWrapper {
   .ql-editor {
     min-height: 180px;
@@ -79,6 +81,90 @@
       }
       100% {
         transform: rotate(360deg);
+      }
+    }
+  }
+}
+
+.ql-mention-list-container {
+  background: $white;
+  border-top: 1px solid $neutral-200;
+  border-left: 1px solid $neutral-200;
+  border-right: 1px solid $neutral-200;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  z-index: 2;
+
+  max-height: 200px;
+  overflow-y: scroll;
+
+  .ql-mention-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+
+    li {
+      padding: 8px;
+      border-bottom: 1px solid $neutral-200;
+      margin: 0;
+      display: flex;
+      align-items: center;
+
+      > div {
+        font-size: 17px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      &:first-child {
+        border-radius: 4px 4px 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 0 4px 4px;
+      }
+    }
+
+    > .selected {
+      background: $neutral-100;
+      cursor: pointer;
+    }
+
+    .ql-mention-text-wrap {
+      width: 100%;
+
+      .ql-mention-name {
+        font-size: 16px;
+        margin-right: 16px;
+      }
+
+      .ql-mention-addr {
+        float: right;
+        color: $neutral-500;
+        font-size: 14px;
+      }
+
+      .ql-mention-la {
+        display: block;
+        color: $neutral-500;
+        font-size: 14px;
+        white-space: nowrap;
+        margin-bottom: 2px;
+      }
+    }
+
+    .ql-mention-avatar {
+      height: 20px;
+      width: 20px;
+      min-height: 20px;
+      min-width: 20px;
+      margin-right: 12px;
+      border-radius: 9999px;
+
+      &.missing {
+        background-color: $neutral-300;
       }
     }
   }
