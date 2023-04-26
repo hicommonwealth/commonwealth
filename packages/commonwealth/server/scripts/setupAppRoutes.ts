@@ -1,6 +1,6 @@
 import cheerio from 'cheerio';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
@@ -136,40 +136,39 @@ const setupAppRoutes = (
   const renderThread = async (
     scope: string,
     threadId: string,
-    res,
-    chain?: ChainInstance
+    res
   ) => {
-    chain = chain || (await models.Chain.findOne({ where: { id: scope } }));
-
     // Retrieve discussions
     const thread = await models.Thread.findOne({
       where: { id: threadId },
       include: [
         {
           model: models.Chain,
+          attributes: ['icon_url']
         },
         {
           model: models.Address,
           as: 'Address',
+          attributes: ['profile_id'],
+          include: [
+            {
+              model: models.Profile,
+              attributes: ['profile_name']
+            }
+          ]
         },
       ],
     });
 
     const title = thread ? decodeTitle(thread.title) : '';
     const description = thread ? thread.plaintext : '';
-    const image = chain
-      ? `https://commonwealth.im${chain.icon_url}`
+    const image = thread?.Chain?.icon_url
+      ? `https://commonwealth.im${thread.Chain.icon_url}`
       : DEFAULT_COMMONWEALTH_LOGO;
 
-    let author;
-    try {
-      const profile = await models.Profile.findOne({
-        where: { id: thread.Address.id },
-      });
-      author = profile.profile_name;
-    } catch (e) {
-      author = '';
-    }
+    const author = thread?.Address?.Profile?.profile_name ?
+      thread.Address.Profile.profile_name :
+      '';
 
     renderWithMetaTags(res, title, description, author, image);
   };
@@ -200,7 +199,7 @@ const setupAppRoutes = (
   app.get('/:scope/discussion/:identifier', async (req, res) => {
     const scope = req.params.scope;
     const threadId = req.params.identifier.split('-')[0];
-    if (isNaN(threadId)){
+    if (isNaN(threadId)) {
       return; // don't render because thread ID needs to be a number
     }
     await renderThread(scope, threadId, res);
