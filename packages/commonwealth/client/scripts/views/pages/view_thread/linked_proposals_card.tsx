@@ -62,6 +62,8 @@ export const LinkedProposalsCard = ({
   const [space, setSpace] = useState<SnapshotSpace>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  console.log('thread2', thread)
+
   useEffect(() => {
     if (thread.snapshotProposal?.length > 0) {
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
