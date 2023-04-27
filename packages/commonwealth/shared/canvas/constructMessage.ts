@@ -1,6 +1,6 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase } from '../../../common-common/src/types';
-import { chainBaseToCanvasChain } from './chainMappings';
+import { chainBaseToCaip2 } from './chainMappings';
 
 export const createCanvasSessionPayload = (
   chainBase: ChainBase, // Canvas chain network, e.g. "ethereum"
@@ -16,12 +16,12 @@ export const createCanvasSessionPayload = (
   // The blockhash is optional, but must be explicitly so
   if (block === undefined) throw new Error('Invalid Canvas signing message');
 
-  const canvasChain = chainBaseToCanvasChain(chainBase);
+  const caip2Prefix = chainBaseToCaip2(chainBase)
 
   const payload: SessionPayload = {
     app: placeholderMultihash,
     block: block === null ? null : block,
-    chain: `${canvasChain}:${canvasChainId}`,
+    chain: `${caip2Prefix}:${canvasChainId}`,
     from,
     sessionAddress,
     sessionDuration: 86400 * 1000,
