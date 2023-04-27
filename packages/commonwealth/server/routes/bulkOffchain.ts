@@ -19,7 +19,6 @@ import type { ThreadInstance } from '../models/thread';
 import type { TopicInstance } from '../models/topic';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-import { bulkThreadsQueryWithCutoffDate } from './bulkThreads';
 
 export const Errors = {};
 
@@ -123,10 +122,39 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         type: QueryTypes.SELECT,
       }
     ),
-    await models.sequelize.query(bulkThreadsQueryWithCutoffDate(true, true), {
-      bind: { chain: chain.id, created_at: new Date().toISOString() },
-      type: QueryTypes.SELECT,
-    }),
+    await models.sequelize.query(
+      `
+      SELECT 
+        COUNT(*) 
+      FROM 
+        "Addresses" AS addr 
+        RIGHT JOIN (
+          SELECT 
+            t.id AS thread_id, 
+            t.address_id, 
+            t.topic_id 
+          FROM 
+            "Threads" t 
+          WHERE 
+            t.deleted_at IS NULL 
+            AND t.chain = $chain 
+            AND (
+              t.pinned = true 
+              OR (
+                COALESCE(
+                  t.last_commented_on, t.created_at
+                ) < $created_at 
+                AND t.pinned = false
+              )
+            )
+        ) threads ON threads.address_id = addr.id 
+        LEFT JOIN "Topics" topics ON threads.topic_id = topics.id
+      `,
+      {
+        bind: { chain: chain.id, created_at: new Date().toISOString() },
+        type: QueryTypes.SELECT,
+      }
+    ),
     models.ChatChannel.findAll({
       where: {
         chain_id: chain.id,
