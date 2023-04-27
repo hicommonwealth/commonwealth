@@ -1,4 +1,3 @@
-import createHash from 'create-hash';
 import type { Action, Session } from '@canvas-js/interfaces';
 import { import_ } from "@brillout/import"
 
