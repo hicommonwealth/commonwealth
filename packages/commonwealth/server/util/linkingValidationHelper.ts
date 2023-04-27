@@ -12,6 +12,7 @@ export const Errors = {
   LinksExist: 'All provided links already exist',
   InvalidSource: 'Provided Source is invalid',
   LinkDeleted: 'Link already deleted or Doesnt exist',
+  UpdateMismatch: 'Must pass equal existing and new links',
 };
 
 export const isAuthorOrAdmin = async (
