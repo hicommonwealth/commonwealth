@@ -45,8 +45,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
-    const [, response] = await Promise.all([
-      this.app.chainEntities.refresh(this.meta.id),
+    const [response] = await Promise.all([
+      // this.app.chainEntities.refresh(this.meta.id),
       $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
         community: null,

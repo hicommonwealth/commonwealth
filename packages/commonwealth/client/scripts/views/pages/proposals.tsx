@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -6,10 +6,10 @@ import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { CosmosProposalV1 } from 'controllers/chain/cosmos/proposal-v1';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import type { ProposalModule } from 'models';
-
+import { initChain } from 'helpers/chain';
 import 'pages/proposals.scss';
 
 import app from 'state';
@@ -26,6 +26,8 @@ import {
   CompoundProposalStats,
   SubstrateProposalStats,
 } from '../components/proposals/proposals_explainers';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -44,18 +46,48 @@ function getModules(): ProposalModule<any, any, any>[] {
 }
 
 const ProposalsPage = () => {
-  const [isLoading, setLoading] = useState(!app.chain || !app.chain.loaded);
+  const [isLoading, setLoading] = useState(
+    !app.chain || !app.chain.loaded || !app.chain.apiInitialized
+  );
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
+  const [
+    isCosmosCompletedProposalsLoading,
+    setIsCosmosCompletedProposalsLoading,
+  ] = useState(false);
+  const hasFetchedApiRef = useRef(false);
+
+  useEffect(() => {
+    const initApi = async () => {
+      if (!hasFetchedApiRef.current) {
+        hasFetchedApiRef.current = true;
+        await initChain();
+      }
+    };
+
+    if (!app.chain?.apiInitialized) initApi();
+  }, [app.chain, initChain]);
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
     app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
 
     return () => {
-      app.chainAdapterReady.off('ready', () => setLoading(false));
-      app.chainModuleReady.off('ready', () => setSubstrateLoading(false));
+      app.chainAdapterReady.off('ready', () => {
+        setLoading(false);
+        app.chainAdapterReady.removeAllListeners();
+      });
+      app.chainModuleReady.off('ready', () => {
+        setSubstrateLoading(false);
+        app.chainModuleReady.removeAllListeners();
+      });
     };
   }, [setLoading, setSubstrateLoading]);
+
+  const { completedCosmosProposals } = useGetCompletedCosmosProposals({
+    app,
+    setIsLoading: setIsCosmosCompletedProposalsLoading,
+    isLoading: isCosmosCompletedProposalsLoading,
+  });
 
   if (isLoading) {
     if (
@@ -81,6 +113,7 @@ const ProposalsPage = () => {
   const onCompound = app.chain && app.chain.network === ChainNetwork.Compound;
   const onAave = app.chain && app.chain.network === ChainNetwork.Aave;
   const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
+  const onCosmos = app.chain && app.chain.base === ChainBase.CosmosSDK;
 
   const modLoading = loadSubstrateModules('Proposals', getModules);
 
@@ -94,8 +127,7 @@ const ProposalsPage = () => {
       .filter((p) => !p.completed);
 
   const activeCosmosProposals =
-    app.chain &&
-    app.chain.base === ChainBase.CosmosSDK &&
+    onCosmos &&
     (app.chain as Cosmos).governance.store
       .getAll()
       .map((p) => p as CosmosProposal | CosmosProposalV1)
@@ -130,7 +162,7 @@ const ProposalsPage = () => {
     !activeAaveProposals?.length &&
     !activeSputnikProposals?.length
       ? [
-          <div key={'no-active'} className="no-proposals">
+          <div key="no-active" className="no-proposals">
             No active proposals
           </div>,
         ]
@@ -173,14 +205,8 @@ const ProposalsPage = () => {
       .getAll()
       .filter((p) => p.completed);
 
-  const inactiveCosmosProposals =
-    app.chain &&
-    app.chain.base === ChainBase.CosmosSDK &&
-    (app.chain as Cosmos).governance.store
-      .getAll()
-      .map((p) => p as CosmosProposal | CosmosProposalV1)
-      .filter((p) => p.completed)
-      .sort((a, b) => +b.identifier - +a.identifier);
+  // lazy-loaded in useGetCompletedProposals
+  const inactiveCosmosProposals = onCosmos && completedCosmosProposals;
 
   const inactiveCompoundProposals =
     onCompound &&
@@ -203,48 +229,51 @@ const ProposalsPage = () => {
       .filter((p) => p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
 
-  const inactiveProposalContent =
-    !inactiveDemocracyProposals?.length &&
+  const inactiveProposalContent = isCosmosCompletedProposalsLoading ? (
+    <CWSpinner />
+  ) : !inactiveDemocracyProposals?.length &&
     !inactiveCosmosProposals?.length &&
     !inactiveCompoundProposals?.length &&
     !inactiveAaveProposals?.length &&
-    !inactiveSputnikProposals?.length
-      ? [
-          <div key={'no-inactive'} className="no-proposals">
-            No past proposals
-          </div>,
-        ]
-      : (inactiveDemocracyProposals || [])
-          .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
-          .concat(
-            (inactiveCosmosProposals || []).map((proposal, i) => (
-              <ProposalCard key={i} proposal={proposal} />
-            ))
-          )
-          .concat(
-            (inactiveCompoundProposals || []).map((proposal, i) => (
-              <ProposalCard key={i} proposal={proposal} />
-            ))
-          )
-          .concat(
-            (inactiveAaveProposals || []).map((proposal, i) => (
-              <ProposalCard
-                key={i}
+    !inactiveSputnikProposals?.length ? (
+    [
+      <div key="no-inactive" className="no-proposals">
+        No past proposals
+      </div>,
+    ]
+  ) : (
+    (inactiveDemocracyProposals || [])
+      .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
+      .concat(
+        inactiveCosmosProposals?.length ? inactiveCosmosProposals.map((proposal, i) => (
+          <ProposalCard key={i} proposal={proposal} />
+        )) : []
+      )
+      .concat(
+        (inactiveCompoundProposals || []).map((proposal, i) => (
+          <ProposalCard key={i} proposal={proposal} />
+        ))
+      )
+      .concat(
+        (inactiveAaveProposals || []).map((proposal, i) => (
+          <ProposalCard
+            key={i}
+            proposal={proposal}
+            injectedContent={
+              <AaveProposalCardDetail
                 proposal={proposal}
-                injectedContent={
-                  <AaveProposalCardDetail
-                    proposal={proposal}
-                    statusText={getStatusText(proposal)}
-                  />
-                }
+                statusText={getStatusText(proposal)}
               />
-            ))
-          )
-          .concat(
-            (inactiveSputnikProposals || []).map((proposal, i) => (
-              <ProposalCard key={i} proposal={proposal} />
-            ))
-          );
+            }
+          />
+        ))
+      )
+      .concat(
+        (inactiveSputnikProposals || []).map((proposal, i) => (
+          <ProposalCard key={i} proposal={proposal} />
+        ))
+      )
+  );
 
   return (
     <Sublayout>

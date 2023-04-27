@@ -72,7 +72,10 @@ const customDomainRoutes = () => {
   return [
     <Route
       path="/"
-      element={withLayout(DiscussionsRedirectPage, { scoped: true })}
+      element={withLayout(DiscussionsRedirectPage, {
+        scoped: true,
+        deferChain: true,
+      })}
     />,
     <Route
       path="/createCommunity"
@@ -197,6 +200,7 @@ const customDomainRoutes = () => {
       path="/discussion/:identifier"
       element={withLayout(ViewThreadPage, {
         scoped: true,
+        deferChain: true,
       })}
     />,
     <Route
@@ -270,7 +274,10 @@ const customDomainRoutes = () => {
     // TREASURY END
 
     // ADMIN
-    <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />,
+    <Route path="/manage" element={withLayout(ManageCommunityPage, {
+      scoped: true,
+      deferChain: true,
+    })} />,
     <Route
       path="/analytics"
       element={withLayout(AnalyticsPage, {

@@ -254,6 +254,7 @@ const commonDomainsRoutes = () => [
     path="/:scope/discussion/:identifier"
     element={withLayout(ViewThreadPage, {
       scoped: true,
+      deferChain: true,
     })}
   />,
   <Route
@@ -277,6 +278,7 @@ const commonDomainsRoutes = () => [
     path="/:scope"
     element={withLayout(DiscussionsRedirectPage, {
       scoped: true,
+      deferChain: true,
     })}
   />,
   ...(featureFlags.communityHomepage
@@ -352,6 +354,7 @@ const commonDomainsRoutes = () => [
     path="/:scope/manage"
     element={withLayout(ManageCommunityPage, {
       scoped: true,
+      deferChain: true,
     })}
   />,
   <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />,

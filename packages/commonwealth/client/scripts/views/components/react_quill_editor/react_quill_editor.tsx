@@ -5,11 +5,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import type { DeltaOperation } from 'quill';
+import type { DeltaOperation, RangeStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import ReactQuill, { Quill } from 'react-quill';
+import QuillMention from 'quill-mention';
+import MagicUrl from 'quill-magic-url';
+import moment from 'moment';
 
-import type { SerializableDeltaStatic } from './utils';
+import { SerializableDeltaStatic, restoreDraft, saveDraft } from './utils';
 import { base64ToFile, getTextFromDelta, uploadFileToS3 } from './utils';
 
 import app from 'state';
@@ -21,22 +24,18 @@ import { Modal } from '../component_kit/cw_modal';
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
 import { nextTick } from 'process';
+
+import { MinimumProfile } from 'models';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { LoadingIndicator } from './loading_indicator';
+import { debounce } from 'lodash';
 
 const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
-const LoadingIndicator = () => {
-  return (
-    <div className="LoadingIndicator">
-      <div className="outer-circle">
-        <div className="inner-circle"></div>
-      </div>
-    </div>
-  );
-};
-
 const Delta = Quill.import('delta');
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
+Quill.register('modules/mention', QuillMention);
+Quill.register('modules/magicUrl', MagicUrl);
 
 type ReactQuillEditorProps = {
   className?: string;
@@ -44,6 +43,7 @@ type ReactQuillEditorProps = {
   tabIndex?: number;
   contentDelta: SerializableDeltaStatic;
   setContentDelta: (d: SerializableDeltaStatic) => void;
+  draftKey?: string;
 };
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
@@ -53,6 +53,7 @@ const ReactQuillEditor = ({
   tabIndex,
   contentDelta,
   setContentDelta,
+  draftKey,
 }: ReactQuillEditorProps) => {
   const editorRef = useRef<ReactQuill>();
 
@@ -60,6 +61,10 @@ const ReactQuillEditor = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isMarkdownEnabled, setIsMarkdownEnabled] = useState<boolean>(false);
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
+
+  // ref is used to prevent rerenders when selection
+  // is changed, since rerenders bug out the editor
+  const lastSelectionRef = useRef<RangeStatic | null>(null);
 
   // refreshQuillComponent unmounts and remounts the
   // React Quill component, as this is the only way
@@ -212,6 +217,148 @@ const ReactQuillEditor = ({
     ];
   }, []);
 
+  // if markdown is disabled, hide toolbar buttons
+  const toolbar = useMemo(() => {
+    if (isMarkdownEnabled) {
+      return [];
+    }
+    return ([[{ header: 1 }, { header: 2 }]] as any).concat([
+      ['bold', 'italic', 'strike'],
+      ['link', 'code-block', 'blockquote'],
+      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+    ]);
+  }, [isMarkdownEnabled]);
+
+  const selectMention = useCallback(
+    (item: QuillMention) => {
+      const editor = editorRef.current?.getEditor();
+      if (!editor) {
+        return;
+      }
+      if (item.link === '#' && item.name === '') return;
+      const text = editor.getText();
+      const lastSelection = lastSelectionRef.current;
+      if (!lastSelection) {
+        return;
+      }
+      const cursorIdx = lastSelection.index;
+      const mentionLength =
+        text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
+      const beforeText = text.slice(0, cursorIdx - mentionLength);
+      const afterText = text.slice(cursorIdx).replace(/\n$/, '');
+      const delta = new Delta()
+        .retain(beforeText.length)
+        .delete(mentionLength)
+        .insert(`@${item.name}`, { link: item.link });
+      if (!afterText.startsWith(' ')) delta.insert(' ');
+      editor.updateContents(delta);
+      editor.setSelection(
+        editor.getLength() -
+          afterText.length -
+          (afterText.startsWith(' ') ? 0 : 1),
+        0
+      );
+    },
+    [lastSelectionRef]
+  );
+
+  const mention = useMemo(() => {
+    return {
+      allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.]*$/,
+      mentionDenotationChars: ['@'],
+      dataAttributes: ['name', 'link', 'component'],
+      renderItem: (item) => item.component,
+      onSelect: selectMention,
+      source: async (
+        searchTerm: string,
+        renderList: (
+          formattedMatches: QuillMention,
+          searchTerm: string
+        ) => null,
+        mentionChar: string
+      ) => {
+        if (mentionChar !== '@') return;
+
+        let formattedMatches = [];
+        if (searchTerm.length === 0) {
+          const node = document.createElement('div');
+          const tip = document.createElement('span');
+          tip.innerText = 'Type to tag a member';
+          node.appendChild(tip);
+          formattedMatches = [
+            {
+              link: '#',
+              name: '',
+              component: node.outerHTML,
+            },
+          ];
+        } else if (searchTerm.length > 0) {
+          const members = await app.search.searchMentionableAddresses(
+            searchTerm,
+            {
+              pageSize: 10,
+              chainScope: app.activeChainId(),
+            }
+          );
+          formattedMatches = members.map((addr) => {
+            const profile = app.newProfiles.getProfile(
+              addr.chain,
+              addr.address
+            );
+            const node = document.createElement('div');
+
+            let avatar;
+            if (profile.avatarUrl) {
+              avatar = document.createElement('img');
+              (avatar as HTMLImageElement).src = profile.avatarUrl;
+              avatar.className = 'ql-mention-avatar';
+              node.appendChild(avatar);
+            } else {
+              avatar = document.createElement('div');
+              avatar.className = 'ql-mention-avatar';
+              avatar.innerHTML = MinimumProfile.getSVGAvatar(addr.address, 20);
+            }
+
+            const nameSpan = document.createElement('span');
+            nameSpan.innerText = addr.name;
+            nameSpan.className = 'ql-mention-name';
+
+            const addrSpan = document.createElement('span');
+            addrSpan.innerText =
+              addr.chain === 'near'
+                ? addr.address
+                : `${addr.address.slice(0, 6)}...`;
+            addrSpan.className = 'ql-mention-addr';
+
+            const lastActiveSpan = document.createElement('span');
+            lastActiveSpan.innerText = profile.lastActive
+              ? `Last active ${moment(profile.lastActive).fromNow()}`
+              : null;
+            lastActiveSpan.className = 'ql-mention-la';
+
+            const textWrap = document.createElement('div');
+            textWrap.className = 'ql-mention-text-wrap';
+
+            node.appendChild(avatar);
+            textWrap.appendChild(nameSpan);
+            textWrap.appendChild(addrSpan);
+            textWrap.appendChild(lastActiveSpan);
+            node.appendChild(textWrap);
+
+            return {
+              link: `/profile/id/${addr.profile_id}`,
+              name: addr.name,
+              component: node.outerHTML,
+            };
+          });
+        }
+        renderList(formattedMatches, searchTerm);
+      },
+      isolateChar: true,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // when markdown state is changed, add markdown metadata to delta ops
   // and refresh quill component
   useEffect(() => {
@@ -238,17 +385,25 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
-  // if markdown is disabled, hide toolbar buttons
-  const toolbar = useMemo(() => {
-    if (isMarkdownEnabled) {
-      return [];
+  const debouncedSaveDraft = useCallback(debounce(saveDraft, 300), []);
+
+  // when content updated, save draft
+  useEffect(() => {
+    debouncedSaveDraft(draftKey, contentDelta);
+  }, [debouncedSaveDraft, draftKey, contentDelta]);
+
+  // when initialized, restore draft
+  useEffect(() => {
+    if (!editorRef.current || !draftKey) {
+      return;
     }
-    return ([[{ header: 1 }, { header: 2 }]] as any).concat([
-      ['bold', 'italic', 'strike'],
-      ['link', 'code-block', 'blockquote'],
-      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-    ]);
-  }, [isMarkdownEnabled]);
+    const restoredDelta = restoreDraft(draftKey);
+    if (restoredDelta) {
+      setContentDelta(restoredDelta.contentDelta);
+      setIsMarkdownEnabled(!!restoredDelta.contentDelta?.___isMarkdown);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editorRef]);
 
   return (
     <div className="QuillEditorWrapper">
@@ -309,6 +464,12 @@ const ReactQuillEditor = ({
           theme="snow"
           value={contentDelta}
           onChange={handleChange}
+          onChangeSelection={(selection: RangeStatic) => {
+            if (!selection) {
+              return;
+            }
+            lastSelectionRef.current = selection;
+          }}
           modules={{
             toolbar,
             imageDropAndPaste: {
@@ -317,6 +478,8 @@ const ReactQuillEditor = ({
             clipboard: {
               matchers: clipboardMatchers,
             },
+            mention,
+            magicUrl: !isMarkdownEnabled,
           }}
         />
       )}
