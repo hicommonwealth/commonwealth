@@ -120,10 +120,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   }, [stageName, topicName]);
 
   if (initializing) {
-    return <PageLoading />;
+    return <PageLoading hideSearch={false} />;
   }
+
   return (
-    <Sublayout hideFooter={true}>
+    <Sublayout hideFooter={true} hideSearch={false}>
       <div className="DiscussionsPage">
         <Virtuoso
           style={{ height: '100%', width: '100%' }}
