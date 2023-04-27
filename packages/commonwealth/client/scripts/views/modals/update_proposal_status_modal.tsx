@@ -15,16 +15,6 @@ import { SnapshotProposalSelector } from '../components/snapshot_proposal_select
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { Link, LinkSource } from 'models/Thread';
 
-type UpdateProposalStatusModalProps = {
-  onChangeHandler: (
-    stage: ThreadStage,
-    chainEntities?: ChainEntity[],
-    links?: Link[]
-  ) => void;
-  onModalClose: () => void;
-  thread: Thread;
-};
-
 const getAddedAndDeleted = (
   tempSnapshotProposals: Pick<SnapshotProposal, 'id'>[],
   initialSnapshotProposals: Pick<SnapshotProposal, 'id'>[]
@@ -54,10 +44,53 @@ const getAddedAndDeleted = (
   return { toAdd, toDelete };
 };
 
+const getAddedAndDeletedProposals = (
+  tempProposals: Pick<ChainEntity, 'typeId'>[],
+  initialProposals: Pick<ChainEntity, 'typeId'>[]
+) => {
+  const toAdd = tempProposals.reduce((acc, curr) => {
+    const wasSelected = initialProposals.find(
+      ({ typeId }) => String(curr.typeId) === String(typeId)
+    );
+
+    if (wasSelected) {
+      return acc;
+    }
+
+    return [...acc, curr];
+  }, []);
+
+  const toDelete = initialProposals.reduce((acc, curr) => {
+    const isSelected = tempProposals.find(
+      ({ typeId }) => String(curr.typeId) === String(typeId)
+    );
+
+    if (isSelected) {
+      return acc;
+    }
+
+    return [...acc, curr];
+  }, []);
+
+  return { toAdd, toDelete };
+};
+
 const getInitialSnapshots = (thread: Thread) => {
   return thread.links
     .filter((l) => l.source === LinkSource.Snapshot)
     .map((l) => ({ id: l.identifier }));
+};
+
+const getInitialProposals = (thread: Thread) => {
+  return thread.links
+    .filter((l) => l.source === LinkSource.Proposal)
+    .map((l) => ({ typeId: l.identifier }));
+};
+
+type UpdateProposalStatusModalProps = {
+  onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
+  onModalClose: () => void;
+  thread: Thread;
 };
 
 export const UpdateProposalStatusModal = ({
@@ -69,10 +102,9 @@ export const UpdateProposalStatusModal = ({
   const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
     Array<Pick<SnapshotProposal, 'id'>>
   >(getInitialSnapshots(thread));
-
-  const [tempChainEntities, setTempChainEntities] = useState<
-    Array<ChainEntity>
-  >(thread.chainEntities || []);
+  const [tempProposals, setTempProposals] = useState<
+    Array<Pick<ChainEntity, 'typeId'>>
+  >(getInitialProposals(thread));
 
   if (!app.chain?.meta) {
     return;
@@ -107,7 +139,7 @@ export const UpdateProposalStatusModal = ({
       );
     }
 
-    let links: Link[] = [];
+    let links: Link[] = thread.links;
 
     try {
       const { toAdd, toDelete } = getAddedAndDeleted(
@@ -144,21 +176,40 @@ export const UpdateProposalStatusModal = ({
     }
 
     try {
-      // set linked chain entities
-      await app.threads.setLinkedChainEntities({
-        threadId: thread.id,
-        entities: tempChainEntities,
-      });
-    } catch (err) {
-      console.log('Failed to update linked proposals');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to update linked proposals'
+      const { toAdd, toDelete } = getAddedAndDeletedProposals(
+        tempProposals,
+        getInitialProposals(thread)
       );
+
+      if (toAdd.length > 0) {
+        const updatedThread = await app.threads.addLinks({
+          threadId: thread.id,
+          links: toAdd.map(({ typeId }) => ({
+            source: LinkSource.Proposal,
+            identifier: typeId,
+          })),
+        });
+
+        links = updatedThread.links;
+      }
+
+      if (toDelete.length > 0) {
+        const updatedThread = await app.threads.deleteLinks({
+          threadId: thread.id,
+          links: toDelete.map(({ typeId }) => ({
+            source: LinkSource.Proposal,
+            identifier: typeId,
+          })),
+        });
+
+        links = updatedThread.links;
+      }
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to update linked proposals');
     }
 
-    onChangeHandler(tempStage, tempChainEntities, links);
+    onChangeHandler(tempStage, links);
     onModalClose();
   };
 
@@ -178,14 +229,16 @@ export const UpdateProposalStatusModal = ({
     setVotingStage();
   };
 
-  const handleSelectChainEntity = (ce: ChainEntity) => {
-    const isSelected = tempChainEntities.find(({ id }) => ce.id === id);
+  const handleSelectChainEntity = (ce: { typeId: string }) => {
+    const isSelected = tempProposals.find(
+      ({ typeId }) => ce.typeId === String(typeId)
+    );
 
     const updatedChainEntities = isSelected
-      ? tempChainEntities.filter(({ id }) => ce.id !== id)
-      : [...tempChainEntities, ce];
+      ? tempProposals.filter(({ typeId }) => ce.typeId !== String(typeId))
+      : [...tempProposals, ce];
 
-    setTempChainEntities(updatedChainEntities);
+    setTempProposals(updatedChainEntities);
     setVotingStage();
   };
 
@@ -220,7 +273,7 @@ export const UpdateProposalStatusModal = ({
         {app.chainEntities && (
           <ChainEntitiesSelector
             onSelect={handleSelectChainEntity}
-            chainEntitiesToSet={tempChainEntities}
+            proposalsToSet={tempProposals}
           />
         )}
         <div className="buttons-row">

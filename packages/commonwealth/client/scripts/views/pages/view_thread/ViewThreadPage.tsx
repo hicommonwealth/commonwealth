@@ -5,9 +5,10 @@ import { modelFromServer as modelReactionCountFromServer } from 'controllers/ser
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
 
-import type { ChainEntity, Comment, Poll, Topic } from 'models';
+import type { Comment, Poll, Topic } from 'models';
 import { Thread, ThreadStage as ThreadStageType } from 'models';
 import type { IThreadCollaborator } from 'models/Thread';
+import { Link, LinkSource } from 'models/Thread';
 import { useCommonNavigate } from 'navigation/helpers';
 
 import 'pages/view_thread/index.scss';
@@ -45,7 +46,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { Link, LinkSource } from 'models/Thread';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -463,7 +463,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showLinkedProposalOptions =
     thread.links.filter((l) => l.source === LinkSource.Snapshot)?.length > 0 ||
-    thread.chainEntities?.length > 0 ||
+    thread.links.filter((l) => l.source === LinkSource.Thread)?.length > 0 ||
     isAuthor ||
     isAdminOrMod;
 
@@ -497,13 +497,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const handleLinkedProposalChange = (
     stage: ThreadStageType,
-    chainEntities: ChainEntity[] = [],
     links: Link[] = []
   ) => {
     const newThread = {
       ...thread,
       stage,
-      chainEntities,
       links,
     } as Thread;
 

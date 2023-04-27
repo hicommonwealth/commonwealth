@@ -19,36 +19,38 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { Modal } from '../../components/component_kit/cw_modal';
 import { Link, LinkSource } from 'models/Thread';
+import { IChainEntityKind } from 'chain-events/src';
 
 type LinkedProposalProps = {
-  chainEntity: ChainEntity;
   thread: Thread;
+  ceType: ChainEntity['type'];
+  ceTypeId: ChainEntity['typeId'];
+  ceCompleted?: ChainEntity['completed'];
 };
 
-const LinkedProposal = (props: LinkedProposalProps) => {
-  const { thread, chainEntity } = props;
-
-  const slug = chainEntityTypeToProposalSlug(chainEntity.type);
+const LinkedProposal = ({
+  thread,
+  ceType,
+  ceTypeId,
+  ceCompleted,
+}: LinkedProposalProps) => {
+  const slug = chainEntityTypeToProposalSlug(ceType);
 
   const threadLink = `${
     app.isCustomDomain() ? '' : `/${thread.chain}`
-  }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
+  }${getProposalUrlPath(slug, ceTypeId, true)}`;
 
   return (
     <a href={threadLink}>
-      {`${chainEntityTypeToProposalName(chainEntity.type)} #${
-        chainEntity.typeId
-      } ${chainEntity.completed ? ' (Completed)' : ''}`}
+      {`${chainEntityTypeToProposalName(ceType)} #${ceTypeId} ${
+        ceCompleted ? ' (Completed)' : ''
+      }`}
     </a>
   );
 };
 
 type LinkedProposalsCardProps = {
-  onChangeHandler: (
-    stage: ThreadStage,
-    chainEntities: Array<ChainEntity>,
-    links?: Link[]
-  ) => void;
+  onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
   showAddProposalButton: boolean;
   thread: Thread;
 };
@@ -65,6 +67,11 @@ export const LinkedProposalsCard = ({
 
   const initialSnapshotLinks = useMemo(
     () => thread.links.filter((l) => l.source === LinkSource.Snapshot),
+    [thread.links]
+  );
+
+  const initialProposalLinks = useMemo(
+    () => thread.links.filter((l) => l.source === LinkSource.Proposal),
     [thread.links]
   );
 
@@ -110,15 +117,17 @@ export const LinkedProposalsCard = ({
             </div>
           ) : (
             <div className="LinkedProposalsCard">
-              {thread.chainEntities.length > 0 || showSnapshot ? (
+              {initialProposalLinks.length > 0 || showSnapshot ? (
                 <div className="links-container">
-                  {thread.chainEntities.length > 0 && (
+                  {initialProposalLinks.length > 0 && (
                     <div className="linked-proposals">
-                      {thread.chainEntities.map((chainEntity) => {
+                      {initialProposalLinks.map((l) => {
                         return (
                           <LinkedProposal
+                            key={l.identifier}
                             thread={thread}
-                            chainEntity={chainEntity}
+                            ceType={'proposal' as IChainEntityKind}
+                            ceTypeId={l.identifier}
                           />
                         );
                       })}

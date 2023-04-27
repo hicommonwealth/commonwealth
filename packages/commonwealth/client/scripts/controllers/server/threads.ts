@@ -632,8 +632,6 @@ class ThreadsController {
       success: () => {
         const thread = this._store.getByIdentifier(args.threadId);
         if (!thread) return;
-        // TODO in new approach there will be thread.links instead of thread.snapshotProposal
-        // TODO move thread.snapshotProposal to addLinks
 
         thread.snapshotProposal = args.snapshotProposal;
 
