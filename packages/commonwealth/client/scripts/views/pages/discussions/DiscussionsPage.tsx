@@ -65,7 +65,37 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   // setup initial threads
   useEffect(() => {
+    // always reset pagination on page change
     app.threads.resetPagination();
+
+    // check if store already has atleast 20 threads for this community -> topic/stage,
+    // if so dont fetch more for now (scrolling will fetch more)
+    const chain = app.activeChainId();
+    const foundThreadsForChain = app.threads.store
+      .getAll()
+      .filter((x) => x.chain === chain);
+    if (foundThreadsForChain.length >= 20) {
+      // if topic was selected then find threads for this topic
+      const topicId = app.topics.getByName(topicName, chain)?.id;
+      if (topicId) {
+        const threadsForTopic = foundThreadsForChain.filter(
+          (x) => x.topic.id === topicId
+        );
+        if (threadsForTopic.length >= 20) {
+          setThreads(threadsForTopic);
+          setInitializing(false);
+          return;
+        }
+      }
+      // else show all threads
+      else {
+        setThreads(foundThreadsForChain);
+        setInitializing(false);
+        return;
+      }
+    }
+
+    // if the store has <= 20 threads then fetch more
     app.threads
       .loadNextPage({ topicName, stageName, includePinnedThreads: true })
       .then((t) => {
