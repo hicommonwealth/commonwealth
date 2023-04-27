@@ -463,12 +463,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showLinkedProposalOptions =
     thread.links.filter((l) => l.source === LinkSource.Snapshot)?.length > 0 ||
-    thread.links.filter((l) => l.source === LinkSource.Thread)?.length > 0 ||
+    thread.links.filter((l) => l.source === LinkSource.Proposal)?.length > 0 ||
     isAuthor ||
     isAdminOrMod;
 
   const showLinkedThreadOptions =
-    thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
+    thread.links.filter((l) => l.source === LinkSource.Thread)?.length > 0 ||
+    isAuthor ||
+    isAdminOrMod;
 
   const canComment =
     app.user.activeAccount ||
