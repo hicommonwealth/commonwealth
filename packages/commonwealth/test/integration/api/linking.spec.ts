@@ -30,7 +30,7 @@ describe('Linking Tests', () => {
   let userAddressId;
   let thread1: ThreadInstance;
   let thread2: ThreadInstance;
-  const link1 = { source: LinkSource.Snapshot, identifier: '0x1234567' };
+  const link1 = { source: LinkSource.Snapshot, identifier: '0x1234567', title: 'my snapshot' };
   const link2 = { source: LinkSource.Thread, identifier: '2' };
   const link3 = { source: LinkSource.Proposal, identifier: '123' };
   const link4 = { source: LinkSource.Thread, identifier: '3' };
@@ -98,6 +98,7 @@ describe('Linking Tests', () => {
       expect(result.result).to.not.be.null;
       expect(result.result.links[0].source).to.equal(link1.source.toString());
       expect(result.result.links[0].identifier).to.equal(link1.identifier);
+      expect(result.result.links[0].title).to.equal('my snapshot')
     });
     it('should add multiple links to existing links', async () => {
       const result = await modelUtils.createLink({
