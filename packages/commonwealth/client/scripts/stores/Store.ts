@@ -2,7 +2,15 @@ abstract class Store<T> {
   protected _store: T[] = [];
 
   public add(item: T): Store<T> {
-    this._store.push(item);
+    const index = this._store.indexOf(item);
+
+    // Only add unique elements to store
+    if (index === -1) {
+      this._store.push(item);
+    } else {
+      this._store[index] = item;
+    }
+
     return this;
   }
 
