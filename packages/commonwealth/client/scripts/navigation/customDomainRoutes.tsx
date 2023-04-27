@@ -269,10 +269,13 @@ const customDomainRoutes = () => {
     // TREASURY END
 
     // ADMIN
-    <Route path="/manage" element={withLayout(ManageCommunityPage, {
-      scoped: true,
-      deferChain: true,
-    })} />,
+    <Route
+      path="/manage"
+      element={withLayout(ManageCommunityPage, {
+        scoped: true,
+        deferChain: true,
+      })}
+    />,
     <Route
       path="/analytics"
       element={withLayout(AnalyticsPage, {
@@ -403,7 +406,9 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/discussion/:identifier"
-      element={<Navigate to="/discussion/:identifier" />}
+      element={
+        <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
+      }
     />,
     <Route
       path="/:scope/new/discussion"
