@@ -21,10 +21,7 @@ import { fromDuration } from '../../../../../../common-common/src/cosmos-ts/src/
 export class CosmosSDKSessionController implements ISessionController {
   signers: Record<
     string,
-    Record<
-      string,
-      { signer: Secp256k1Wallet; bech32Address: string; privkey: string }
-    >
+    Record<string, { signer: Secp256k1Wallet; bech32Address: string; privkey: string }>
   > = {};
   private auths: Record<
     number,
