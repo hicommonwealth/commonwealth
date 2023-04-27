@@ -481,7 +481,11 @@ const customDomainRoutes = () => {
     />,
     <Route
       path="/:scope/new/snapshot/:snapshotId"
-      element={<Navigate to={(parameters) => `/new/snapshot/${parameters.snapshotId}`} />}
+      element={
+        <Navigate
+          to={(parameters) => `/new/snapshot/${parameters.snapshotId}`}
+        />
+      }
     />,
     // ADMIN END
 
@@ -493,7 +497,9 @@ const customDomainRoutes = () => {
     <Route path="/:scope/account" element={<Navigate to="/account" />} />,
     <Route
       path="/:scope/profile/id/:profileId"
-      element={<Navigate to={(parameters) => `/profile/id/${parameters.profileId}`} /}
+      element={
+        <Navigate to={(parameters) => `/profile/id/${parameters.profileId}`} />
+      }
     />,
     <Route
       path="/:scope/profile/edit"
