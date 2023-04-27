@@ -128,8 +128,7 @@ export class NEARSessionController implements ISessionController {
       app: sessionPayload.app,
       from: sessionPayload.from,
       timestamp: +Date.now(),
-      chain: 'near',
-      chainId,
+      chain: `near:${chainId}`,
       block: sessionPayload.block, // will be null
       call,
       callArgs,
