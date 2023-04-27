@@ -486,7 +486,7 @@ function setupRouter(
   );
   router.get(
     '/getThreads',
-    databaseValidationService.validateChain,
+    // databaseValidationService.validateChain,
     getThreadsOld.bind(this, models)
   );
   router.get('/getThreadCommunity', getThreadCommunity.bind(this, models));

@@ -24,6 +24,7 @@ import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 import { EventEmitter } from 'events';
+import axios from 'axios';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -798,11 +799,15 @@ class ThreadsController {
 
   public async getThreadCommunityId(threadId: string) {
     try {
-      const response = await $.get(`${app.serverUrl()}/getThreadCommunity`, {
-        id: threadId,
+      const response = await axios.get(`${app.serverUrl()}/getThreads`, {
+        params: {
+          ids: [threadId],
+        },
       });
 
-      return response.result;
+      const thread = response['data']['result'][0];
+      console.log({ thread });
+      return thread;
     } catch (e) {
       return null;
     }

@@ -1,13 +1,10 @@
 import React, { useEffect } from 'react';
-import { NavigateOptions } from 'react-router-dom';
 
 import app from 'state';
 import { PageLoading } from './loading';
-import { DefaultPage } from 'common-common/src/types';
 import { useCommonNavigate } from 'navigation/helpers';
-import { featureFlags } from 'helpers/feature-flags';
 
-export default function ThreadRedirect({ identifier }) {
+export default function ThreadRedirect({ identifier }: { identifier: string }) {
   const navigate = useCommonNavigate();
 
   useEffect(() => {

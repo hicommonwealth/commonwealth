@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
 
-const getThreads = async (models: DB, req: Request, res: Response) => {
+const getThreadCommunity = async (models: DB, req: Request, res: Response) => {
   let thread;
   try {
     thread = await models.Thread.findOne({
@@ -19,4 +19,4 @@ const getThreads = async (models: DB, req: Request, res: Response) => {
   return res.json({ status: 'Success', result: { chain: thread.chain } });
 };
 
-export default getThreads;
+export default getThreadCommunity;
