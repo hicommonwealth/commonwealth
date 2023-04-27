@@ -13,9 +13,12 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
   public update(newProposal: ProposalT) {
     const oldProposal = this.getByIdentifier(newProposal.identifier);
     if (oldProposal) {
-      this.remove(oldProposal);
+      super.update(oldProposal, (x) => x.identifier === oldProposal.identifier);
+      this._storeId[oldProposal.identifier] = { ...newProposal };
+    } else {
+      super.add(newProposal);
+      this.add(newProposal);
     }
-    this.add(newProposal);
     return this;
   }
 

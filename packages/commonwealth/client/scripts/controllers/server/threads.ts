@@ -662,8 +662,6 @@ class ThreadsController {
     }
     return response.result.map((rawThread) => {
       const thread = this.modelFromServer(rawThread);
-      const existing = this._store.getByIdentifier(thread.id);
-      if (existing) this._store.remove(existing);
       this._store.update(thread);
       // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
       this.fetchReactionsCount([thread]);
