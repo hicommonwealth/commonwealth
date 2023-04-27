@@ -324,6 +324,8 @@ class ThreadsController {
       if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
+      this.store.add(result);
+      this.numTotalThreads += 1;
       this._listingStore.add(result);
       const activeEntity = app.chain;
       updateLastVisited(activeEntity.meta, true);
@@ -430,6 +432,7 @@ class ThreadsController {
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
+          this.numTotalThreads -= 1;
           redraw();
           resolve(result);
         })
@@ -667,7 +670,10 @@ class ThreadsController {
       const thread = this.modelFromServer(rawThread);
       const existing = this._store.getByIdentifier(thread.id);
       if (existing) this._store.remove(existing);
-      this._store.update(thread);
+      else {
+        this._store.update(thread);
+        this.numTotalThreads += 1;
+      }
       // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
       this.fetchReactionsCount([thread]);
       return thread;
@@ -829,6 +835,7 @@ class ThreadsController {
     this._resetPagination = true;
     this._store.clear();
     this._listingStore.clear();
+    this.numTotalThreads = 0;
   }
 }
 
