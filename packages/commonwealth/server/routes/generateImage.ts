@@ -60,6 +60,10 @@ const generateImage = async (
   try {
     const upload = await s3.upload(params).promise();
     imageUrl = upload.Location;
+    imageUrl = imageUrl.replace(
+      'commonwealth-uploads.s3.us-east-2.amazonaws.com',
+      'commonwealth.im/assets'
+    );
   } catch (e) {
     console.log(e);
     throw new AppError('Problem uploading image!');
